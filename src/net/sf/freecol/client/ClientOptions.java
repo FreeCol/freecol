@@ -62,13 +62,22 @@ import javax.xml.stream.XMLStreamReader;
  * <br>
  * <br>
  *
- * New options should be added to {@link #addDefaultOptions()} and each option
- * should be given an unique identifier (defined as a constant in this class,
- * then as fully-qualified strings in FreeColMessages.properties). Identifiers
- * like "guiShowSonsOfLiberty" actually REQUIRE string keys of:
- * clientOptions.messages.guiShowSonsOfLiberty.name
- * clientOptions.messages.guiShowSonsOfLiberty.shortDescription So be sure to
- * include both.
+ * Most available client options and their default values are defined
+ * in the file <code>base/client-options.xml</code> in the FreeCol
+ * data directory. They are overridden by the player's personal
+ * settings in the file <code>options.xml</code> in the user
+ * directory. Options that can not be defined in this way because they
+ * are generated dynamically (such as a list of available mods) must
+ * be added to {@link #addDefaultOptions()}.
+ *
+ * Each option should be given an unique identifier (defined as a
+ * constant in this class). In general, the options are called
+ * something like "model.option.UNIQUENAME". Since the options must
+ * also be represented by the GUI, they following two keys must be
+ * added to the file <code>FreeColMessages.properties</code>:
+ *
+ * <ul><li>model.option.UNIQUENAME.name</li>
+ * <li>model.option.UNIQUENAME.shortDescription</li></ul>
  */
 public class ClientOptions extends OptionGroup {
 
@@ -152,7 +161,8 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String DISPLAY_TILE_TEXT = "model.option.displayTileText";
 
-    public static final int DISPLAY_TILE_TEXT_EMPTY = 0, DISPLAY_TILE_TEXT_NAMES = 1, DISPLAY_TILE_TEXT_OWNERS = 2, DISPLAY_TILE_TEXT_REGIONS = 3;
+    public static final int DISPLAY_TILE_TEXT_EMPTY = 0, DISPLAY_TILE_TEXT_NAMES = 1,
+        DISPLAY_TILE_TEXT_OWNERS = 2, DISPLAY_TILE_TEXT_REGIONS = 3;
 
     /**
      * Animation speed for friendly units.
@@ -354,7 +364,7 @@ public class ClientOptions extends OptionGroup {
                 && s2.getEstablished().getNumber() > 0) {
                 return s1.getEstablished().getNumber() - s2.getEstablished().getNumber();
             } else {
-                // TODO: remove compatibility code
+                // TODO: remove 0.9.x compatibility code
                 // ID should indicate age
                 return s1.getIntegerID().compareTo(s2.getIntegerID());
             }
