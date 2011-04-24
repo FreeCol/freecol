@@ -845,7 +845,7 @@ public final class Canvas extends JDesktopPane {
             = FreeColDialog.createInputDialog(Messages.message(text),
                                               Messages.message(defaultValue),
                                               Messages.message(okText),
-                                              Messages.message(cancelText));
+                                              cancelText == null ? null : Messages.message(cancelText));
         String response = null;
         for (;;) {
             response = showFreeColDialog(inputDialog, tile);
