@@ -58,7 +58,7 @@ public class MapConverter {
                     FreeColServer server = new FreeColServer(savegame, FreeCol.DEFAULT_PORT,
                                                              "mapTransformer", specification);
                     System.out.println("Started server.");
-                    server.saveGame(out, server.getOwner(), thumbnail);
+                    server.saveGame(out, server.getOwner(), null, thumbnail);
                     System.out.println("Saved updated savegame.");
                     server.shutdown();
                     System.out.println("Shut down server.");

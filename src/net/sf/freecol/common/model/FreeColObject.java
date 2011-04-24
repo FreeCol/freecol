@@ -23,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -135,7 +136,7 @@ public abstract class FreeColObject {
      * Debugging tool, dump object XML to System.err.
      */
     public void dumpObject() {
-        save(null);
+        save(System.err);
     }
 
     /**
@@ -143,11 +144,19 @@ public abstract class FreeColObject {
      *
      * @param file the save file
      */
-    public void save(File file) {
+    public void save(File file) throws FileNotFoundException {
+        save(new FileOutputStream(file));
+    }
+
+    /**
+     * Writes the object to the given output stream
+     *
+     * @param out the OutputStream
+     */
+    public void save(OutputStream out) {
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         XMLStreamWriter xsw = null;
         try {
-            OutputStream out = (file == null) ? System.err : new FileOutputStream(file);
             xsw = xof.createXMLStreamWriter(out, "UTF-8");
             xsw.writeStartDocument("UTF-8", "1.0");
             this.toXML(xsw, null, true, true);

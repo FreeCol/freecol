@@ -241,7 +241,7 @@ public final class MapEditorController {
                     BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
                                                                   BufferedImage.TYPE_INT_ARGB);
                     scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
-                    freeColClient.getFreeColServer().saveGame(file, "mapEditor", scaledImage);
+                    freeColClient.getFreeColServer().saveGame(file, "mapEditor", null, scaledImage);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();

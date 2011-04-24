@@ -595,8 +595,8 @@ public final class FreeColServer {
      * @throws IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveGame(File file, String username) throws IOException {
-        saveGame(file, username, null);
+    public void saveGame(File file, String username, OptionGroup options) throws IOException {
+        saveGame(file, username, options, null);
     }
 
     /**
@@ -608,7 +608,7 @@ public final class FreeColServer {
      * @exception IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveGame(File file, String username, BufferedImage image)
+    public void saveGame(File file, String username, OptionGroup options, BufferedImage image)
         throws IOException {
         final Game game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -616,11 +616,19 @@ public final class FreeColServer {
         try {
             XMLStreamWriter xsw;
             fos = new JarOutputStream(new FileOutputStream(file));
+
             if (image != null) {
                 fos.putNextEntry(new JarEntry("thumbnail.png"));
                 ImageIO.write(image, "png", fos);
                 fos.closeEntry();
             }
+
+            if (options != null) {
+                fos.putNextEntry(new JarEntry("client-options.xml"));
+                options.save(fos);
+                fos.closeEntry();
+            }
+
             Properties properties = new Properties();
             properties.put("map.width", Integer.toString(game.getMap().getWidth()));
             properties.put("map.height", Integer.toString(game.getMap().getHeight()));
@@ -628,6 +636,7 @@ public final class FreeColServer {
             properties.store(fos, null);
             fos.closeEntry();
 
+            // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
 

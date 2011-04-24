@@ -260,7 +260,8 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getFreeColServer()
                 .setActiveUnit(freeColClient.getGUI().getActiveUnit());
             freeColClient.getFreeColServer()
-                .saveGame(file, freeColClient.getMyPlayer().getName());
+                .saveGame(file, freeColClient.getMyPlayer().getName(),
+                          freeColClient.getClientOptions());
             canvas.closeStatusPanel();
             result = true;
         } catch (IOException e) {

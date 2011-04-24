@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
 import net.miginfocom.swing.MigLayout;
@@ -212,7 +214,14 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
                                                        filters, getDefaultFileName());
             if (saveFile != null) {
                 ui.updateOption();
-                group.save(saveFile);
+                try {
+                    group.save(saveFile);
+                } catch(FileNotFoundException e) {
+                    logger.warning(e.toString());
+                    StringTemplate t = StringTemplate.template("failedToSave")
+                        .addName("%name%", saveFile.getPath());
+                    getCanvas().showInformationMessage(t);
+                }
             }
         } else if (LOAD.equals(command)) {
             File loadFile = getCanvas().showLoadDialog(FreeCol.getOptionsDirectory(), filters);

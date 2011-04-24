@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -59,7 +60,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MiniMap.class.getName());
-    
+
     public static final int MAX_TILE_SIZE = 24;
     public static final int MIN_TILE_SIZE = 4;
     public static final int SCALE_STEP = 4;
@@ -94,7 +95,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * The constructor that will initialize this component.
-     * 
+     *
      * @param freeColClient The main controller object for the client
      */
     public MiniMap(FreeColClient freeColClient) {
@@ -145,7 +146,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomOutButton.setLocation(264, 174);
 
         add(miniMapZoomInButton);
-        add(miniMapZoomOutButton);        
+        add(miniMapZoomOutButton);
     }
 
     /**
@@ -153,6 +154,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public void zoomIn() {
         tileSize = Math.min(tileSize + SCALE_STEP, MAX_TILE_SIZE);
+        setZoomOption(tileSize);
         ((MiniMapZoomInAction) miniMapZoomInButton.getAction()).update();
         repaint();
     }
@@ -163,6 +165,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public void zoomOut() {
         tileSize = Math.max(tileSize - SCALE_STEP, MIN_TILE_SIZE);
+        setZoomOption(tileSize);
         ((MiniMapZoomOutAction) miniMapZoomOutButton.getAction()).update();
         repaint();
     }
@@ -175,10 +178,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public void setTileSize(int size) {
         tileSize = Math.max(Math.min(size, MAX_TILE_SIZE), MIN_TILE_SIZE);
+        setZoomOption(tileSize);
         ((MiniMapZoomOutAction) miniMapZoomOutButton.getAction()).update();
         repaint();
-    }        
-    
+    }
+
     /**
      * Return true if tile size can be decreased.
      *
@@ -189,7 +193,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 && freeColClient.getGame().getMap() != null
                 && tileSize < MAX_TILE_SIZE);
     }
-    
+
     /**
      * Return true if tile size can be increased.
      *
@@ -202,9 +206,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
 
+    private void setZoomOption(int tileSize) {
+        int zoom = tileSize / 4 - 1;
+        ((IntegerOption) freeColClient.getClientOptions().getOption(ClientOptions.DEFAULT_MINIMAP_ZOOM))
+        .setValue(zoom);
+    }
+
+
     /**
      * Paints this component.
-     * @param graphics The <code>Graphics</code> context in which 
+     * @param graphics The <code>Graphics</code> context in which
      *                 to draw this component.
      */
     public void paintComponent(Graphics graphics) {
@@ -214,10 +225,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
         Image back = ResourceManager.getImage("MiniMap.back");
         Image skin = ResourceManager.getImage("MiniMap.skin");
-        
+
     	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     	this.setBackgroundColor(newBackground);
-        
+
         if (skin == null) {
             paintMap(graphics, getWidth(), getHeight());
         } else {
@@ -236,7 +247,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * Paints a representation of the mapboard onto this component.
-     * @param graphics The <code>Graphics</code> context in which 
+     * @param graphics The <code>Graphics</code> context in which
      *                 to draw this component.
      * @param width The width of the map.
      * @param height The height of the map.
@@ -251,7 +262,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                            RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_RENDERING,
                            RenderingHints.VALUE_RENDER_QUALITY);
- 	  	
+
         /* Fill the rectangle with background color */
         g.setColor(ResourceManager.getColor("miniMapBackground.color"));
         g.fillRect(0, 0, width, height);
@@ -434,7 +445,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         focus(e);
     }
 
-    
+
     public void mouseReleased(MouseEvent e) {
 
     }

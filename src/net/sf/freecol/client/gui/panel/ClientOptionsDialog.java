@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
 import javax.swing.JMenuBar;
@@ -30,6 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -67,18 +69,26 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getGroup().save(new File(FreeCol.getOptionsDirectory(), getDefaultFileName()));
-            getClient().getActionManager().update();
-            JMenuBar menuBar = getClient().getFrame().getJMenuBar();
-            if (menuBar != null) {
-                ((FreeColMenuBar) menuBar).reset();
-            }
+            File file = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
+            try {
+                getGroup().save(file);
+                getClient().getActionManager().update();
+                JMenuBar menuBar = getClient().getFrame().getJMenuBar();
+                if (menuBar != null) {
+                    ((FreeColMenuBar) menuBar).reset();
+                }
 
-            // Immediately redraw the minimap if that was updated.
-            MapControlsAction mca = (MapControlsAction) getClient()
-                .getActionManager().getFreeColAction(MapControlsAction.id);
-            if (mca.getMapControls() != null) {
-                mca.getMapControls().update();
+                // Immediately redraw the minimap if that was updated.
+                MapControlsAction mca = (MapControlsAction) getClient()
+                    .getActionManager().getFreeColAction(MapControlsAction.id);
+                if (mca.getMapControls() != null) {
+                    mca.getMapControls().update();
+                }
+            } catch(FileNotFoundException e) {
+                logger.warning(e.toString());
+                StringTemplate t = StringTemplate.template("failedToSave")
+                    .addName("%name%", file.getPath());
+                getCanvas().showInformationMessage(t);
             }
         }
     }

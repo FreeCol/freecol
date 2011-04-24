@@ -30,6 +30,7 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -548,7 +549,7 @@ public final class FreeColClient {
      *
      * @see ClientOptions
      */
-    public void saveClientOptions() {
+    public void saveClientOptions() throws FileNotFoundException {
         saveClientOptions(FreeCol.getClientOptionsFile());
     }
 
@@ -566,7 +567,7 @@ public final class FreeColClient {
      * @param saveFile The file where the client options should be written.
      * @see ClientOptions
      */
-    public void saveClientOptions(File saveFile) {
+    public void saveClientOptions(File saveFile) throws FileNotFoundException {
         getClientOptions().save(saveFile);
     }
 
