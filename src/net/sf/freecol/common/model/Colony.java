@@ -647,6 +647,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void removeGoods(GoodsType type, int amount) {
         Goods removed = goodsContainer.removeGoods(type, amount);
+        invalidateCache();
         modifySpecialGoods(type, -removed.getAmount());
     }
 
@@ -671,7 +672,16 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Describe <code>addGoods</code> method here.
+     * Add goods to this colony;
+     *
+     * @param goods an <code>AbstractGoods</code> value
+     */
+    public void addGoods(AbstractGoods goods) {
+        addGoods(goods.getType(), goods.getAmount());
+    }
+
+    /**
+     * Add goods to this colony.
      *
      * @param type a <code>GoodsType</code> value
      * @param amount an <code>int</code> value
@@ -703,12 +713,6 @@ public class Colony extends Settlement implements Nameable {
         }
 
     }
-
-    public void addGoods(AbstractGoods goods) {
-        addGoods(goods.getType(), goods.getAmount());
-    }
-
-
 
 
     /**
@@ -2133,6 +2137,7 @@ public class Colony extends Settlement implements Nameable {
     }
 
     public void invalidateCache() {
+        logger.finest("invalidating production cache");
         netProduction = null;
         productionAndConsumption = null;
     }
@@ -2140,7 +2145,7 @@ public class Colony extends Settlement implements Nameable {
 
     public TypeCountMap<GoodsType> getNetProduction() {
         if (netProduction == null) {
-            netProduction = new TypeCountMap<GoodsType>();
+            TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
             for (Entry<Object, ProductionInfo> entry : getProductionAndConsumption().entrySet()) {
                 ProductionInfo productionInfo = entry.getValue();
                 for (AbstractGoods goods : productionInfo.getProduction()) {
@@ -2153,6 +2158,7 @@ public class Colony extends Settlement implements Nameable {
                     netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
                 }
             }
+            this.netProduction = netProduction;
         }
         return netProduction;
     }
@@ -2170,7 +2176,7 @@ public class Colony extends Settlement implements Nameable {
     @SuppressWarnings("unchecked")
     public java.util.Map<Object, ProductionInfo> getProductionAndConsumption() {
         if (productionAndConsumption == null) {
-            productionAndConsumption = new HashMap<Object, ProductionInfo>();
+            java.util.Map<Object, ProductionInfo> productionAndConsumption = new HashMap<Object, ProductionInfo>();
             ProductionMap production = new ProductionMap();
             int count = 0;
             for (ColonyTile colonyTile : getColonyTiles()) {
@@ -2217,6 +2223,7 @@ public class Colony extends Settlement implements Nameable {
                 production.remove(info.getConsumption());
                 productionAndConsumption.put(consumer, info);
             }
+            this.productionAndConsumption = productionAndConsumption;
         }
         return productionAndConsumption;
     }
