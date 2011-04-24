@@ -171,7 +171,7 @@ public class Messages {
     public static String message(String messageId) {
         // Check that all the values are correct.
         if (messageId == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Message ID must not be null!");
         }
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
