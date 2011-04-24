@@ -283,7 +283,6 @@ public final class GUI {
 
     public static enum BorderType { COUNTRY, REGION };
 
-    private int displayTileText = 0;
     private GeneralPath gridPath = null;
     private GeneralPath fog = new GeneralPath();
 
@@ -338,7 +337,6 @@ public final class GUI {
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         viewMode = new ViewMode(this);
         logger.info("Starting in Move Units View Mode");
-        displayTileText = freeColClient.getClientOptions().getDisplayTileText();
         blinkingMarqueeEnabled = true;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
@@ -2436,7 +2434,7 @@ public final class GUI {
      */
     private void displayOptionalValues(Graphics2D g, Tile tile) {
         String text = null;
-        switch (displayTileText) {
+        switch (freeColClient.getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT)) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
             if (tile.getNameKey() != null) {
                 text = Messages.message(tile.getNameKey());
@@ -2574,16 +2572,6 @@ public final class GUI {
     public PathNode getGotoPath() {
         return gotoPath;
     }
-
-    /**
-     * Set the type of text drawn in the tiles.
-     *
-     * @param tileTextType a <code>DisplayText</code> value
-     */
-    public void setDisplayTileText(DisplayText tileTextType) {
-        this.displayTileText = tileTextType.ordinal();
-    }
-
 
     /**
     * Breaks a line between two words. The breaking point

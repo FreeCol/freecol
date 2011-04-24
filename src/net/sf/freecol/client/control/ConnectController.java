@@ -23,6 +23,7 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -369,7 +370,7 @@ public final class ConnectController {
         try {
             // Get suggestions for "singleplayer" and "public game" settings from the file:
             final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
-            xs = FreeColServer.createXMLStreamReader(fis);
+            xs = new XMLStream(fis.getSavegameInputStream());
             final XMLStreamReader in = xs.getXMLStreamReader();
             in.nextTag();
             final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
@@ -381,6 +382,12 @@ public final class ConnectController {
                 defaultPublicServer = false;
             }
             xs.close();
+            try {
+                freeColClient.getClientOptions().load(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS), true);
+            } catch(IOException e) {
+                // old savegame format, we don't care
+                logger.info("No saved client options available.");
+            }
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
@@ -415,7 +422,9 @@ public final class ConnectController {
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
         } finally {
-            xs.close();
+            if (xs != null) {
+                xs.close();
+            }
         }
 
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {

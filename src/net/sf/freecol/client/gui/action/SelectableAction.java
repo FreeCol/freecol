@@ -45,11 +45,11 @@ public abstract class SelectableAction extends MapboardAction {
     }
 
     /**
-     * Updates the "enabled"-status 
+     * Updates the "enabled"-status
      */
     public void update() {
         super.update();
-        
+
         final Game game = getFreeColClient().getGame();
         final Player player = getFreeColClient().getMyPlayer();
         if (game != null && player != null && !player.getNewModelMessages().isEmpty()) {
@@ -64,7 +64,7 @@ public abstract class SelectableAction extends MapboardAction {
     public boolean isSelected() {
         return selected;
     }
-    
+
     public void setSelected(boolean b) {
         this.selected = b;
     }

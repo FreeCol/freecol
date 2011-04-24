@@ -26,6 +26,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.common.option.IntegerOption;
 
 /**
  * Display text over tiles.
@@ -45,13 +47,13 @@ public class DisplayTileTextAction extends SelectableAction {
         KeyEvent.VK_O,
         KeyEvent.VK_R
     };
-        
+
 
     private DisplayText display;
 
     /**
      * Creates this action
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      * @param type a <code>DisplayText</code> value
      */
@@ -65,7 +67,7 @@ public class DisplayTileTextAction extends SelectableAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
@@ -74,12 +76,13 @@ public class DisplayTileTextAction extends SelectableAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
-            freeColClient.getGUI().setDisplayTileText(display);
+            ((IntegerOption) freeColClient.getClientOptions().getOption(ClientOptions.DISPLAY_TILE_TEXT))
+            .setValue(display.ordinal());
             freeColClient.getCanvas().refresh();
         }
     }

@@ -32,6 +32,9 @@ public class FreeColSavegameFile extends FreeColDataFile {
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
 
     public static final String SAVEGAME_FILE = "savegame.xml";
+    public static final String SAVEGAME_PROPERTIES = "savegame.properties";
+    public static final String CLIENT_OPTIONS = "client-options.xml";
+    public static final String THUMBNAIL_FILE = "thumbnail.png";
 
     public FreeColSavegameFile(File file) throws IOException {
         super(file);

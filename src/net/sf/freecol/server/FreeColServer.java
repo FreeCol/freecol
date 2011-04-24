@@ -618,13 +618,13 @@ public final class FreeColServer {
             fos = new JarOutputStream(new FileOutputStream(file));
 
             if (image != null) {
-                fos.putNextEntry(new JarEntry("thumbnail.png"));
+                fos.putNextEntry(new JarEntry(FreeColSavegameFile.THUMBNAIL_FILE));
                 ImageIO.write(image, "png", fos);
                 fos.closeEntry();
             }
 
             if (options != null) {
-                fos.putNextEntry(new JarEntry("client-options.xml"));
+                fos.putNextEntry(new JarEntry(FreeColSavegameFile.CLIENT_OPTIONS));
                 options.save(fos);
                 fos.closeEntry();
             }
@@ -632,7 +632,7 @@ public final class FreeColServer {
             Properties properties = new Properties();
             properties.put("map.width", Integer.toString(game.getMap().getWidth()));
             properties.put("map.height", Integer.toString(game.getMap().getHeight()));
-            fos.putNextEntry(new JarEntry("savegame.properties"));
+            fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_PROPERTIES));
             properties.store(fos, null);
             fos.closeEntry();
 

@@ -50,7 +50,7 @@ public class MapConverter {
                     FreeColSavegameFile savegame = new FreeColSavegameFile(in);
                     BufferedImage thumbnail = null;
                     try {
-                        thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
+                        thumbnail = ImageIO.read(savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
                         System.out.println("Loaded thumbnail.");
                     } catch (FileNotFoundException e) {
                         System.out.println("No thumbnail present.");

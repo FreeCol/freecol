@@ -22,6 +22,7 @@ package net.sf.freecol.client;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -547,24 +548,35 @@ public class ClientOptions extends OptionGroup {
      *            options from.
      * @param update a <code>boolean</code> value
      */
-    private void load(File loadFile, boolean update) {
+    public void load(File loadFile, boolean update) {
         if (loadFile == null || !loadFile.exists()) {
             logger.warning("Could not find the client options file.");
             return;
         }
-
-        InputStream in = null;
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        XMLStreamReader xsr = null;
+        logger.finest((update ? "Updating" : "Loading") + " client options from " + loadFile.getPath());
         try {
-            in = new BufferedInputStream(new FileInputStream(loadFile));
-            xsr = xif.createXMLStreamReader(in, "UTF-8");
+            load(new BufferedInputStream(new FileInputStream(loadFile)), update);
+        } catch(FileNotFoundException e) {
+            logger.warning("Could not find the client options file.");
+        }
+    }
+
+    /**
+     * Reads the options from the given file.
+     *
+     * @param loadFile The <code>File</code> to read the
+     *            options from.
+     * @param update a <code>boolean</code> value
+     */
+    public void load(InputStream in, boolean update) {
+        try {
+            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in, "UTF-8");
             xsr.nextTag();
             if (update) {
-                logger.finest("Updating " + getId() + " from " + loadFile.getPath());
+                logger.finest("Updating " + getId());
                 updateFromXML(xsr);
             } else {
-                logger.finest("Loading " + getId() + " from " + loadFile.getPath());
+                logger.finest("Loading " + getId());
                 readFromXML(xsr);
             }
         } catch (Exception e) {
