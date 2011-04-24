@@ -21,7 +21,7 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.util.logging.Logger;
 
 /**
@@ -45,7 +45,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * @throws IOException if thrown while opening the
      *      input stream.
      */
-    public InputStream getSavegameInputStream() throws IOException {
+    public BufferedInputStream getSavegameInputStream() throws IOException {
         return getInputStream(SAVEGAME_FILE);
     }
 
