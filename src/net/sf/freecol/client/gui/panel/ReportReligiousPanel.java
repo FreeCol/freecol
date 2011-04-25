@@ -67,7 +67,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
             Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
             Building building = colony.getBuildingForProducing(crosses);
             reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
-            reportPanel.add(new BuildingPanel(building, productionMap.get(building), getCanvas()));
+            reportPanel.add(new BuildingPanel(building, getCanvas()));
             production += colony.getProductionOf(crosses);
         }
 

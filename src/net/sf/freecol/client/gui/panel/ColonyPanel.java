@@ -929,7 +929,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(building, colony.getProductionAndConsumption().get(building), getCanvas());
+                super(building, getCanvas());
             }
 
             public void autoscroll(Point p) {

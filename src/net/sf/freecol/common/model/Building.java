@@ -621,6 +621,10 @@ public class Building extends FreeColGameObject
         }
     }
 
+    public ProductionInfo getProductionInfo() {
+        return colony.getProductionAndConsumption().get(this);
+    }
+
     public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
         if (getGoodsOutputType() != null) {

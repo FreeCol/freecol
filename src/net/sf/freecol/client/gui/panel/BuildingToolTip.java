@@ -51,10 +51,9 @@ public class BuildingToolTip extends JToolTip {
      * Creates this BuildingToolTip.
      *
      * @param building The building to display information from.
-     * @param info a <code>ProductionInfo</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingToolTip(Building building, ProductionInfo info, Canvas parent) {
+    public BuildingToolTip(Building building, Canvas parent) {
 
         int workplaces = building.getMaxUnits();
 
@@ -73,6 +72,7 @@ public class BuildingToolTip extends JToolTip {
         buildingName.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 16f));
         add(buildingName, "span");
 
+        ProductionInfo info = building.getProductionInfo();
         if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {

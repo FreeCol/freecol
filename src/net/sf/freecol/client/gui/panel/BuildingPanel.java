@@ -54,8 +54,6 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private final Building building;
 
-    private ProductionInfo info;
-
     private ProductionLabel productionOutput = null;
 
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
@@ -66,11 +64,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingPanel(Building building, ProductionInfo info, Canvas parent) {
+    public BuildingPanel(Building building, Canvas parent) {
 
         this.building = building;
         this.parent = parent;
-        this.info = info;
 
         addPropertyChangeListeners();
 
@@ -84,10 +81,8 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         removeAll();
         unitLabels.clear();
 
-        if (info == null) {
-            info = building.getColony().getProductionAndConsumption()
-                .get(building);
-        }
+        ProductionInfo info = building.getProductionInfo();
+
         if (info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
@@ -150,7 +145,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
     public JToolTip createToolTip() {
-        return new BuildingToolTip(building, info, parent);
+        return new BuildingToolTip(building, parent);
     }
 
     public void addPropertyChangeListeners() {
