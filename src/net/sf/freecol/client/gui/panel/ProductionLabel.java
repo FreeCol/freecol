@@ -105,6 +105,9 @@ public final class ProductionLabel extends JComponent {
      */
     private String toolTipPrefix = null;
 
+    private Image stringImage = null;
+
+
     /**
      * Creates a new <code>ProductionLabel</code> instance.
      *
@@ -383,7 +386,7 @@ public final class ProductionLabel extends JComponent {
      */
     public Dimension getPreferredSize() {
 
-        if (goodsIcon == null || production == 0) {
+        if (goodsIcon == null) {
             return new Dimension(0, 0);
         } else {
             return new Dimension(getPreferredWidth(), goodsIcon.getImage().getHeight(null));
@@ -399,11 +402,11 @@ public final class ProductionLabel extends JComponent {
      */
     public int getPreferredWidth() {
 
-        if (goodsIcon == null || production == 0) {
+        if (goodsIcon == null) {
             return 0;
         }
 
-        int drawImageCount = Math.min(Math.abs(production), maxIcons);
+        int drawImageCount = Math.max(1, Math.min(Math.abs(production), maxIcons));
 
         int iconWidth = goodsIcon.getIconWidth();
         int pixelsPerIcon = iconWidth / 2;
@@ -420,7 +423,12 @@ public final class ProductionLabel extends JComponent {
             pixelsPerIcon = maxSpacing;
         }
 
-        return pixelsPerIcon * (drawImageCount - 1) + iconWidth;
+        if (getStringImage() == null) {
+            return 0;
+        } else {
+            return Math.max(getStringImage().getWidth(null),
+                            pixelsPerIcon * (drawImageCount - 1) + iconWidth);
+        }
 
     }
 
@@ -435,27 +443,7 @@ public final class ProductionLabel extends JComponent {
             return;
         }
 
-        Image stringImage = null;
-        int stringWidth = 0;
-        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
-            || (maximumProduction > production && production > 0)) {
-            String number = "";
-            if (stockNumber >= 0 ) {
-                number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
-                drawPlus = true;
-            }
-            if (production >=0 && drawPlus ) {
-                number = number + "+" + Integer.toString(production);
-            } else {
-                number = number + Integer.toString(production);
-            }
-            if (maximumProduction > production && production > 0) {
-                number = number + "/" + String.valueOf(maximumProduction);
-            }
-            Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-            stringImage = parent.getGUI().createStringImage(g, number, getForeground(), font);
-            stringWidth = stringImage.getWidth(null);
-        }
+        int stringWidth = getStringImage() == null ? 0 : getStringImage().getWidth(null);
 
         int drawImageCount = Math.min(Math.abs(production), maxIcons);
         if (drawImageCount==0) {
@@ -501,5 +489,32 @@ public final class ProductionLabel extends JComponent {
                         goodsIcon.getIconHeight()/2 - stringImage.getHeight(null)/2, null);
         }
     }
+
+
+    private Image getStringImage() {
+        if (stringImage == null) {
+            if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
+                || (maximumProduction > production && production > 0)) {
+                String number = "";
+                if (stockNumber >= 0 ) {
+                    number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
+                    drawPlus = true;
+                }
+                if (production >=0 && drawPlus ) {
+                    number = number + "+" + Integer.toString(production);
+                } else {
+                    number = number + Integer.toString(production);
+                }
+                if (maximumProduction > production && production > 0) {
+                    number = number + "/" + String.valueOf(maximumProduction);
+                }
+                Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+                stringImage = parent.getGUI().createStringImage(getCanvas().getGraphics(),
+                                                                number, getForeground(), font);
+            }
+        }
+        return stringImage;
+    }
+
 
 }
