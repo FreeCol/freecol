@@ -412,6 +412,8 @@ public final class ColonyPanel extends FreeColPanel
     }
 
     public void updateProductionPanel() {
+        // TODO: find out why the cache needs to be explicitly invalidated
+        colony.invalidateCache();
         netProductionPanel.removeAll();
 
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
