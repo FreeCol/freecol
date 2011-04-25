@@ -90,11 +90,11 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
                     JButton mapButton = new JButton(mapName);
                     try {
                         FreeColSavegameFile savegame = new FreeColSavegameFile(file);
-                        Image thumbnail = ImageIO.read(savegame.getInputStream("thumbnail.png"));
+                        Image thumbnail = ImageIO.read(savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
                         mapButton.setIcon(new ImageIcon(thumbnail));
                         try {
                             Properties properties = new Properties();
-                            properties.load(savegame.getInputStream("savegame.properties"));
+                            properties.load(savegame.getInputStream(FreeColSavegameFile.SAVEGAME_PROPERTIES));
                             mapButton.setToolTipText(properties.getProperty("map.width")
                                                      + "\u00D7"
                                                      + properties.getProperty("map.height"));
