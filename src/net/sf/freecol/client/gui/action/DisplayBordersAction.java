@@ -25,7 +25,6 @@ import javax.swing.JCheckBoxMenuItem;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.option.BooleanOption;
 
 /**
  * An action to toggle the display of national borders.
@@ -37,22 +36,21 @@ public class DisplayBordersAction extends SelectableAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     DisplayBordersAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
-        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS));
+        super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
     }
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        ((BooleanOption) freeColClient.getClientOptions().getOption(ClientOptions.DISPLAY_BORDERS)).setValue(b);
+        updateOption(b);
         freeColClient.getCanvas().refresh();
     }
 }

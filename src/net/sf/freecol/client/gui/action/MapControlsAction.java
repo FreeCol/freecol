@@ -29,7 +29,7 @@ import net.sf.freecol.client.gui.panel.MapControls;
 
 /**
  * An action for displaying the map controls.
- * 
+ *
  * @see MapControls
  */
 public class MapControlsAction extends SelectableAction {
@@ -41,12 +41,11 @@ public class MapControlsAction extends SelectableAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     MapControlsAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
-        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        super(freeColClient, id, ClientOptions.DISPLAY_MAP_CONTROLS);
     }
 
     /**
@@ -60,7 +59,7 @@ public class MapControlsAction extends SelectableAction {
 
     /**
      * Returns The MapControls object.
-     * 
+     *
      * @return The MapControls object.
      */
     public MapControls getMapControls() {
@@ -69,11 +68,12 @@ public class MapControlsAction extends SelectableAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
+        updateOption(selected);
         showMapControls(enabled && selected);
     }
 

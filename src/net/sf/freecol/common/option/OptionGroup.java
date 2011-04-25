@@ -35,8 +35,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
-* Used for grouping objects of {@link Option}s.
-*/
+ * Used for grouping objects of {@link Option}s.
+ */
 public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
@@ -64,10 +64,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-    * Adds the given <code>Option</code>.
-    * @param option The <code>Option</code> that should be
-    *               added to this <code>OptionGroup</code>.
-    */
+     * Adds the given <code>Option</code>.
+     * @param option The <code>Option</code> that should be
+     *               added to this <code>OptionGroup</code>.
+     */
     public void add(Option option) {
         String id = option.getId();
         if (optionMap.containsKey(id)) {
@@ -106,14 +106,14 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-    * Gets the integer value of an option.
-    *
-    * @param id The id of the option.
-    * @return The value.
-    * @exception IllegalArgumentException If there is no integer
-    *            value associated with the specified option.
-    * @exception NullPointerException if the given <code>Option</code> does not exist.
-    */
+     * Gets the integer value of an option.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no integer
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
     public int getInteger(String id) {
         try {
             return ((IntegerOption) getOption(id)).getValue();
@@ -124,17 +124,54 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
 
     /**
-    * Gets the boolean value of an option.
-    *
-    * @param id The id of the option.
-    * @return The value.
-    * @exception IllegalArgumentException If there is no boolean
-    *            value associated with the specified option.
-    * @exception NullPointerException if the given <code>Option</code> does not exist.
-    */
+     * Sets the integer value of an option.
+     *
+     * @param id The id of the option.
+     * @param value the new value of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no integer
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public void setInteger(String id, int value) {
+        try {
+            ((IntegerOption) getOption(id)).setValue(value);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No integer value associated with the specified option.");
+        }
+    }
+
+
+    /**
+     * Gets the boolean value of an option.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no boolean
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
     public boolean getBoolean(String id) {
         try {
             return ((BooleanOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+        }
+    }
+
+    /**
+     * Sets the boolean value of an option.
+     *
+     * @param id The id of the option.
+     * @param value the new value of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no boolean
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public void setBoolean(String id, boolean value) {
+        try {
+            ((BooleanOption) getOption(id)).setValue(value);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("No boolean value associated with the specified option.");
         }
@@ -150,9 +187,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
 
     /**
-    * Returns an <code>Iterator</code> for the <code>Option</code>s.
-    * @return The <code>Iterator</code>.
-    */
+     * Returns an <code>Iterator</code> for the <code>Option</code>s.
+     * @return The <code>Iterator</code>.
+     */
     public Iterator<Option> iterator() {
         return options.iterator();
     }
@@ -237,9 +274,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "optionGroup".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "optionGroup".
+     */
     public static String getXMLElementTagName() {
         return "optionGroup";
     }

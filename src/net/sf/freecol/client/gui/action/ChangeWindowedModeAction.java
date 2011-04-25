@@ -34,15 +34,15 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
     /**
      * Creates a new <code>ChangeWindowedModeAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ChangeWindowedModeAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+        super(freeColClient, id, "NO_ID");
     }
-    
+
     /**
-     * Updates the "enabled"-status 
+     * Updates the "enabled"-status
      */
     @Override
     public void update() {
@@ -50,10 +50,18 @@ public class ChangeWindowedModeAction extends SelectableAction {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean shouldBeSelected() {
+        return !getFreeColClient().isWindowed();
+    }
+
+    /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().changeWindowedMode(!getFreeColClient().isWindowed());
     }

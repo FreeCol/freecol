@@ -27,7 +27,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.common.option.IntegerOption;
 
 /**
  * Display text over tiles.
@@ -58,9 +57,8 @@ public class DisplayTileTextAction extends SelectableAction {
      * @param type a <code>DisplayText</code> value
      */
     DisplayTileTextAction(FreeColClient freeColClient, DisplayText type) {
-        super(freeColClient, id + type);
+        super(freeColClient, id + type, ClientOptions.DISPLAY_TILE_TEXT);
         display = type;
-        setSelected(freeColClient.getClientOptions().getDisplayTileText() == type.ordinal());
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
                                               KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
     }
@@ -75,14 +73,25 @@ public class DisplayTileTextAction extends SelectableAction {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean shouldBeSelected() {
+        if (freeColClient.getClientOptions() == null || display == null) {
+            return false;
+        } else {
+            return freeColClient.getClientOptions().getDisplayTileText() == display.ordinal();
+        }
+    }
+
+    /**
      * Applies this action.
      *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
-            ((IntegerOption) freeColClient.getClientOptions().getOption(ClientOptions.DISPLAY_TILE_TEXT))
-            .setValue(display.ordinal());
+            freeColClient.getClientOptions().setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
             freeColClient.getCanvas().refresh();
         }
     }

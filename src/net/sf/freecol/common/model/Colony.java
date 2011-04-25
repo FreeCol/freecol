@@ -2228,6 +2228,14 @@ public class Colony extends Settlement implements Nameable {
         return productionAndConsumption;
     }
 
+
+    /**
+     * Returns a list of all {@link Consumer}s in the colony sorted by
+     * priority. Consumers include all object that consume goods,
+     * e.g. Units, Buildings and BuildQueues.
+     *
+     * @return a list of consumers
+     */
     public List<Consumer> getConsumers() {
         List<Consumer> result = new ArrayList<Consumer>();
         result.addAll(getUnitList());

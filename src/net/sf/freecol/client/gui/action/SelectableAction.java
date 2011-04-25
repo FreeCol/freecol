@@ -33,20 +33,28 @@ public abstract class SelectableAction extends MapboardAction {
 
     public static final String id = "selectableAction";
 
+    private String optionId;
+
     protected boolean selected = false;
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client
      * @param id a <code>String</code> value
+     * @param optionId the id of a boolean client option
      */
-    protected SelectableAction(FreeColClient freeColClient, String id) {
+    protected SelectableAction(FreeColClient freeColClient, String id, String optionId) {
         super(freeColClient, id);
+        this.optionId = optionId;
+        setSelected(shouldBeSelected());
     }
 
     /**
-     * Updates the "enabled"-status
+     * Updates the "enabled" status with the value returned by {@link
+     * #shouldBeEnabled} and the "selected" status with the value
+     * returned by {@link #shouldBeSelected}.
      */
+    @Override
     public void update() {
         super.update();
 
@@ -55,17 +63,42 @@ public abstract class SelectableAction extends MapboardAction {
         if (game != null && player != null && !player.getNewModelMessages().isEmpty()) {
             enabled = false;
         }
+        setSelected(shouldBeSelected());
     }
 
     /**
-     * Checks if the map controls is selcted.
+     * Returns whether the action is selected.
+     *
      * @return <code>true</code> if the map controls is selected.
      */
     public boolean isSelected() {
         return selected;
     }
 
+    /**
+     * Sets whether the action is selected.
+     *
+     * @param b a <code>boolean</code> value
+     */
     public void setSelected(boolean b) {
         this.selected = b;
     }
+
+    /**
+     * Returns true if this action should be selected.
+     *
+     * @return a <code>boolean</code> value
+     */
+    protected boolean shouldBeSelected() {
+        if (freeColClient.getClientOptions() == null) {
+            return false;
+        } else {
+            return freeColClient.getClientOptions().getBoolean(optionId);
+        }
+    }
+
+    protected void updateOption(boolean value) {
+        freeColClient.getClientOptions().setBoolean(optionId, value);
+    }
+
 }

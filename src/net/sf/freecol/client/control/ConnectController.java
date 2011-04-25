@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
@@ -384,6 +385,7 @@ public final class ConnectController {
             xs.close();
             try {
                 freeColClient.getClientOptions().load(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS), true);
+                freeColClient.getActionManager().update();
             } catch(IOException e) {
                 // old savegame format, we don't care
                 logger.info("No saved client options available.");
