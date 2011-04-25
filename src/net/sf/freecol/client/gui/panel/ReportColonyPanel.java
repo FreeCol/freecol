@@ -46,6 +46,11 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class ReportColonyPanel extends ReportPanel {
 
+    private static final int COLONISTS_PER_ROW = 16;
+    private static final int UNITS_PER_ROW = 12;
+    private static final int GOODS_PER_ROW = 12;
+    private static final int BUILDINGS_PER_ROW = 8;
+
     private List<Colony> colonies;
 
     /**
@@ -62,35 +67,36 @@ public final class ReportColonyPanel extends ReportPanel {
         // Display Panel
         Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
-        reportPanel.setLayout(new MigLayout("fill, wrap 16"));
+        reportPanel.setLayout(new MigLayout("fill"));
 
         for (Colony colony : colonies) {
 
             // Name
             JButton button = getLinkButton(colony.getName(), null, colony.getId());
             button.addActionListener(this);
-            reportPanel.add(button, "newline 20, span, split 2");
+            reportPanel.add(button, "newline 20, split 2");
             reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
             // Units
             List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                reportPanel.add(unitLabel, "sg units");
+            for (int index = 0; index < unitList.size(); index++) {
+                UnitLabel unitLabel = new UnitLabel(unitList.get(index), getCanvas(), true, true);
+                if (index % COLONISTS_PER_ROW == 0) {
+                    reportPanel.add(unitLabel, "newline, split " + COLONISTS_PER_ROW);
+                } else {
+                    reportPanel.add(unitLabel);
+                }
             }
-            if (unitList.size() % 16 != 0) {
-                reportPanel.add(new JLabel(), "wrap");
-            }
-
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                reportPanel.add(unitLabel, "span 2");
-            }
-            if (unitList.size() % 8 != 0) {
-                reportPanel.add(new JLabel(), "wrap");
+            for (int index = 0; index < unitList.size(); index++) {
+                UnitLabel unitLabel = new UnitLabel(unitList.get(index), getCanvas(), true, true);
+                if (index % UNITS_PER_ROW == 0) {
+                    reportPanel.add(unitLabel, "newline, split " + UNITS_PER_ROW);
+                } else {
+                    reportPanel.add(unitLabel);
+                }
             }
 
             // Production
@@ -107,25 +113,33 @@ public final class ReportColonyPanel extends ReportPanel {
                         productionLabel.setMaximumProduction(building.getMaximumProduction());
                     }
                     if (goodsType == horses) {
+                        // horse images don't stack well
                         productionLabel.setMaxGoodsIcons(1);
                     }
-                    productionLabel.setStockNumber(stockValue);   // Show stored items in ReportColonyPanel
-                    reportPanel.add(productionLabel, "span 2, top");
+                    // Show stored items in ReportColonyPanel
+                    productionLabel.setStockNumber(stockValue);
+                    if (count % GOODS_PER_ROW == 0) {
+                        reportPanel.add(productionLabel, "newline, split " + GOODS_PER_ROW);
+                    } else {
+                        reportPanel.add(productionLabel);
+                    }
                     count++;
                 }
-            }
-            if (count % 8 != 0) {
-                reportPanel.add(new JLabel(), "wrap");
             }
 
             List<Building> buildingList = colony.getBuildings();
             Collections.sort(buildingList);
-            for (Building building : buildingList) {
+            for (int index = 0; index < buildingList.size(); index++) {
+                Building building = buildingList.get(index);
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
                                                                       + ".image", 0.66)));
                 buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
-                reportPanel.add(buildingLabel, "span 2");
+                if (index % BUILDINGS_PER_ROW == 0) {
+                    reportPanel.add(buildingLabel, "newline, split " + BUILDINGS_PER_ROW);
+                } else {
+                    reportPanel.add(buildingLabel);
+                }
             }
 
             // Buildings
@@ -137,7 +151,7 @@ public final class ReportColonyPanel extends ReportPanel {
                 buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
                                                                .add("%buildable%", currentType.getNameKey())));
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
-                reportPanel.add(buildableLabel, "span 2");
+                reportPanel.add(buildableLabel);
             }
         }
 
