@@ -2154,7 +2154,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Ask for autoload emigrants
-        if (freeColClient.getCanvas().getClient().getClientOptions()
+        if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
             int spaceLeft = unit.getSpaceLeft();
             for (Unit u : new ArrayList<Unit>(unit.getLocation().getUnitList())) {

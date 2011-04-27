@@ -570,24 +570,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Removes the mouse listeners for moving the frame of the given component.
-     *
-     * @param c The component the listeners should be removed from.
-     */
-    public void deactivateMovable(JComponent c) {
-        for (MouseListener ml : c.getMouseListeners()) {
-            if (ml instanceof FrameMotionListener) {
-                c.removeMouseListener(ml);
-            }
-        }
-        for (MouseMotionListener ml : c.getMouseMotionListeners()) {
-            if (ml instanceof FrameMotionListener) {
-                c.removeMouseMotionListener(ml);
-            }
-        }
-    }
-
-    /**
      * Tells the map controls that a chat message was received.
      *
      * @param sender The player who sent the chat message to the server.
@@ -651,29 +633,9 @@ public final class Canvas extends JDesktopPane {
         return freeColClient;
     }
 
-    /**
-     * Returns the <code>ClientOptionsDialog</code>.
-     *
-     * @return The <code>ClientOptionsDialog</code>
-     * @see net.sf.freecol.client.ClientOptions
-     */
-    public ClientOptionsDialog getClientOptionsDialog() {
-        return clientOptionsDialog;
-    }
-
     public GUI getColonyTileGUI() {
         return colonyTileGUI;
     }
-
-    /**
-     * Gets the <code>EuropePanel</code>.
-     *
-     * @return The <code>EuropePanel</code>.
-     */
-    public EuropePanel getEuropePanel() {
-        return europePanel;
-    }
-
 
     /**
      * Returns this <code>Canvas</code>'s <code>GUI</code>.
@@ -754,15 +716,6 @@ public final class Canvas extends JDesktopPane {
         return loadingSavegameDialog;
     }
 
-    /**
-     * Gets the <code>MainPanel</code>.
-     *
-     * @return The <code>MainPanel</code>.
-     * @see MainPanel
-     */
-    public MainPanel getMainPanel() {
-        return mainPanel;
-    }
 
     /**
      * Returns the MapControls of this Canvas.
@@ -1855,7 +1808,6 @@ public final class Canvas extends JDesktopPane {
      * @param panel a <code>FreeColPanel</code> value
      */
     public void showPanel(FreeColPanel panel) {
-        //closeMenus();
         showSubPanel(panel);
     }
 
