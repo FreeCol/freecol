@@ -65,7 +65,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
 
         JButton openButton = new JButton( Messages.message("openAction.name") );
         JButton mapEditorButton = new JButton( Messages.message("mainPanel.editor") );
-        JButton optionsButton = new JButton( Messages.message("mainPanel.options") );
+        JButton optionsButton = new JButton( Messages.message("clientOptions.name") );
         JButton quitButton = new JButton( Messages.message("quitAction.name") );
 
         setCancelComponent(quitButton);
