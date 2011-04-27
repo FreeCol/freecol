@@ -1536,24 +1536,6 @@ public final class Canvas extends JDesktopPane {
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button. Use <i>null</i>
      *            to disable the cancel-option.
-     * @return The text the user have entered or <i>null</i> if the user chose
-     *         to cancel the action.
-     * @see FreeColDialog
-     */
-    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
-                                  String okText, String cancelText) {
-        return showInputDialog(tile, text, defaultValue, okText, cancelText, true);
-    }
-
-    /**
-     * Displays a dialog with a text field and a ok/cancel option.
-     *
-     * @param tile An optional tile to make visible (not under the dialog).
-     * @param text The text that explains the action to the user.
-     * @param defaultValue The default value appearing in the text field.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button. Use <i>null</i>
-     *            to disable the cancel-option.
      * @param rejectEmptyString a <code>boolean</code> value
      * @return The text the user have entered or <i>null</i> if the user chose
      *         to cancel the action.
