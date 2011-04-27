@@ -568,6 +568,19 @@ public final class Canvas extends JDesktopPane {
 
         return false;
     }
+    
+    /**
+     * Detailed view of a foreign colony when in debug mode.
+     *
+     * @param tile The <code>Settlement</code> with the colony.
+     */
+    public void debugForeignColony(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            FreeColGameObject fcgo = freeColClient.getFreeColServer().getGame()
+                .getFreeColGameObject(settlement.getId());
+            showColonyPanel((Colony) fcgo);
+        }
+    }
 
     public void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
@@ -2371,6 +2384,20 @@ public final class Canvas extends JDesktopPane {
     private void takeFocus() {
         if (!isShowingSubPanel()) {
             requestFocus();
+        }
+    }
+
+    public void showSettlement(Settlement s) {
+        if (s instanceof Colony) {
+            if (s.getOwner().equals(freeColClient.getMyPlayer())) {
+                showColonyPanel((Colony) s);
+            } else if (FreeCol.isInDebugMode()) {
+                debugForeignColony(s);
+            }
+        } else if (s instanceof IndianSettlement) {
+            showIndianSettlementPanel((IndianSettlement) s);
+        } else {
+            throw new IllegalStateException("Bogus settlement");
         }
     }
 }

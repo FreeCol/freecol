@@ -67,7 +67,6 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -950,18 +949,6 @@ public final class GUI {
         return (Image) ResourceManager.getImage(key);//, lib.getScalingFactor());
     }
 
-    /**
-     * Detailed view of a foreign colony when in debug mode.
-     *
-     * @param tile The <code>Tile</code> with the colony.
-     */
-    public void debugForeignColony(Tile tile) {
-        if (tile.getSettlement() instanceof Colony) {
-            FreeColGameObject fcgo = freeColClient.getFreeColServer().getGame()
-                .getFreeColGameObject(tile.getSettlement().getId());
-            freeColClient.getCanvas().showColonyPanel((Colony) fcgo);
-        }
-    }
 
     /**
      * Displays this GUI onto the given Graphics2D.
@@ -1069,61 +1056,6 @@ public final class GUI {
     }
 
     /**
-     * Draws all roads on the given Tile.
-     *
-     * @param g The <code>Graphics</code> to draw the road upon.
-     * @param tile a <code>Tile</code> value
-     */
-    public void drawRoad(Graphics2D g, Tile tile) {
-
-        Color oldColor = g.getColor();
-        g.setColor(ResourceManager.getColor("road.color"));
-        g.setStroke(roadStroke);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        GeneralPath path = new GeneralPath();
-        List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
-        for (Direction direction : Direction.values()) {
-            Tile borderingTile = tile.getAdjacentTile(direction);
-            if (borderingTile != null && borderingTile.hasRoad()) {
-                points.add(corners.get(direction));
-            }
-        }
-
-        switch(points.size()) {
-        case 0:
-            path.moveTo(0.35f * tileWidth, 0.35f * tileHeight);
-            path.lineTo(0.65f * tileWidth, 0.65f * tileHeight);
-            path.moveTo(0.35f * tileWidth, 0.65f * tileHeight);
-            path.lineTo(0.65f * tileWidth, 0.35f * tileHeight);
-            break;
-        case 1:
-            path.moveTo(halfWidth, halfHeight);
-            path.lineTo(points.get(0).getX(), points.get(0).getY());
-            break;
-        case 2:
-            path.moveTo(points.get(0).getX(), points.get(0).getY());
-            path.quadTo(halfWidth, halfHeight, points.get(1).getX(), points.get(1).getY());
-            break;
-        case 3:
-        case 4:
-            Point2D p0 = points.get(points.size() - 1);
-            path.moveTo(p0.getX(), p0.getY());
-            for (Point2D p : points) {
-                path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
-            }
-            break;
-        default:
-            for (Point2D p : points) {
-                path.moveTo(halfWidth, halfHeight);
-                path.lineTo(p.getX(), p.getY());
-            }
-        }
-        g.draw(path);
-        g.setColor(oldColor);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-    }
-
-    /**
      * Run some code with the given unit made invisible.
      * You can nest several of these method calls in order
      * to hide multiple units. There are no problems
@@ -1144,7 +1076,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Force the next screen repaint to reposition the tiles on the window.
      */
@@ -1162,6 +1093,7 @@ public final class GUI {
     public Unit getActiveUnit() {
         return activeUnit;
     }
+
 
     /**
      * Describe <code>getCursor</code> method here.
@@ -1213,27 +1145,6 @@ public final class GUI {
     }
 
     /**
-     * Gets the message at position 'index'. The message at position 0 is the oldest
-     * message and is most likely to be removed during the next call of removeOldMessages().
-     * The higher the index of a message, the more recently it was added.
-     *
-     * @param index The index of the message to return.
-     * @return The message at position 'index'.
-     */
-    public GUIMessage getMessage(int index) {
-        return messages.get(index);
-    }
-
-    /**
-     * Gets the amount of message that are currently being displayed on this GUI.
-     * @return The amount of message that are currently being displayed on this GUI.
-     */
-    public int getMessageCount() {
-        return messages.size();
-    }
-
-
-    /**
      * Returns an occupation indicator, i.e. a small image with a
      * single letter or symbol that indicates the Unit's state.
      *
@@ -1280,7 +1191,6 @@ public final class GUI {
         return img;
     }
 
-
     /**
     * Gets the selected tile.
     *
@@ -1290,7 +1200,6 @@ public final class GUI {
     public Tile getSelectedTile() {
         return selectedTile;
     }
-
 
     /**
      * Calculate the bounds of the rectangle containing a Tile on the screen,
@@ -1313,6 +1222,7 @@ public final class GUI {
         }
         return result;
     }
+
 
     /**
      * Describe <code>getTileHeight</code> method here.
@@ -1360,50 +1270,6 @@ public final class GUI {
     }
 
     /**
-    * Gets the unit that should be displayed on the given tile.
-    *
-    * @param unitTile The <code>Tile</code>.
-    * @return The <code>Unit</code> or <i>null</i> if no unit applies.
-    */
-    public Unit getUnitInFront(Tile unitTile) {
-        if (unitTile == null || unitTile.getUnitCount() <= 0) {
-            return null;
-        }
-
-        if (activeUnit != null && activeUnit.getTile() == unitTile) {
-            return activeUnit;
-        } else {
-            if (unitTile.getSettlement() == null) {
-                Unit bestDefendingUnit = null;
-                if (activeUnit != null) {
-                    bestDefendingUnit = unitTile.getDefendingUnit(activeUnit);
-                    if (bestDefendingUnit != null) {
-                        return bestDefendingUnit;
-                    }
-                }
-
-                Unit movableUnit = unitTile.getMovableUnit();
-                if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
-                    return movableUnit;
-                } else {
-                    Unit bestPick = null;
-                    Iterator<Unit> unitIterator = unitTile.getUnitIterator();
-                    while (unitIterator.hasNext()) {
-                        Unit u = unitIterator.next();
-                        if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
-                            bestPick = u;
-                        }
-                    }
-
-                    return bestPick;
-                }
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
      * Gets the position where a unitLabel located at tile should be drawn.
      * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
      * @param tileP The position of the Tile on the screen.
@@ -1420,6 +1286,7 @@ public final class GUI {
             return null;
         }
     }
+
 
     /**
      *  Get the <code>View Mode</code> object
@@ -1438,7 +1305,6 @@ public final class GUI {
         return size.width;
     }
 
-
     /**
      * Checks if there is currently a goto operation on the mapboard.
      * @return <code>true</code> if a goto operation is in progress.
@@ -1446,7 +1312,6 @@ public final class GUI {
     public boolean isGotoStarted() {
         return gotoStarted;
     }
-
 
     /**
      * Returns 'true' if the Tile is near the bottom.
@@ -1456,7 +1321,6 @@ public final class GUI {
     public boolean isMapNearBottom(int y) {
         return (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows));
     }
-
 
     /**
      * Returns 'true' if the Tile is near the left.
@@ -1525,30 +1389,6 @@ public final class GUI {
 
 
     /**
-     * Removes all the message that are older than MESSAGE_AGE.
-     * @return 'true' if at least one message has been removed, 'false' otherwise.
-     * This can be useful to see if it is necessary to refresh the screen.
-     */
-    public synchronized boolean removeOldMessages() {
-        long currentTime = new Date().getTime();
-        boolean result = false;
-
-        int i = 0;
-        while (i < getMessageCount()) {
-            long messageCreationTime = getMessage(i).getCreationTime().getTime();
-            if ((currentTime - messageCreationTime) >= MESSAGE_AGE) {
-                result = true;
-                messages.remove(i);
-            } else {
-                i++;
-            }
-        }
-
-        return result;
-    }
-
-
-    /**
      * Describe <code>restartBlinking</code> method here.
      *
      */
@@ -1576,6 +1416,7 @@ public final class GUI {
         forceReposition();
         freeColClient.getCanvas().refresh();
     }
+
 
     /**
     * Sets the active unit. Invokes {@link #setSelectedTile(Tile)} if the
@@ -1640,6 +1481,7 @@ public final class GUI {
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
+
     /**
     * Sets the focus of the map and repaints the screen immediately.
     *
@@ -1654,6 +1496,7 @@ public final class GUI {
         freeColClient.getCanvas().paintImmediately(0, 0, getWidth(), getHeight());
     }
 
+
     /**
     * Sets the path to be drawn on the map.
     * @param gotoPath The path that should be drawn on the map
@@ -1664,6 +1507,7 @@ public final class GUI {
 
         freeColClient.getCanvas().refresh();
     }
+
 
     /**
      * Sets the focus of the map but offset to the left or right so that
@@ -1738,19 +1582,8 @@ public final class GUI {
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             if (activeUnitIsAt(selectedTile)) {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
-                    Canvas canvas = freeColClient.getCanvas();
                     Settlement s = selectedTile.getSettlement();
-                    if (s instanceof Colony) {
-                        if (s.getOwner().equals(freeColClient.getMyPlayer())) {
-                            canvas.showColonyPanel((Colony) s);
-                        } else if (FreeCol.isInDebugMode()) {
-                            debugForeignColony(selectedTile);
-                        }
-                    } else if (s instanceof IndianSettlement) {
-                        canvas.showIndianSettlementPanel((IndianSettlement) s);
-                    } else {
-                        throw new IllegalStateException("Bogus settlement");
-                    }
+                    freeColClient.getCanvas().showSettlement(s);
                     return;
                 }
 
@@ -1794,7 +1627,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Selects a tile, without clearing the orders of the first unit
      * contained.
@@ -1808,7 +1640,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Describe <code>setSize</code> method here.
      *
@@ -1818,7 +1649,6 @@ public final class GUI {
         this.size = size;
         updateMapDisplayVariables();
     }
-
 
     /**
      * Describe <code>showColonyPanel</code> method here.
@@ -1844,7 +1674,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Starts the unit-selection-cursor blinking animation.
      */
@@ -1868,7 +1697,6 @@ public final class GUI {
         cursor.startBlinking();
     }
 
-
     /**
     * Starts a goto operation on the mapboard.
     */
@@ -1886,6 +1714,7 @@ public final class GUI {
     public void stopBlinking() {
         blinkingMarqueeEnabled = false;
     }
+
 
     /**
      * Stops any ongoing goto operation on the mapboard.
@@ -1913,12 +1742,12 @@ public final class GUI {
     }
 
 
-
     private boolean activeUnitIsAt(Tile selectedTile) {
         return activeUnit == null ||
             (activeUnit.getTile() != null &&
              !activeUnit.getTile().equals(selectedTile));
     }
+
 
     /**
      * Centers the given Image on the tile.
@@ -1990,6 +1819,7 @@ public final class GUI {
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
+
     /**
      * Create a "chip" with the given text and colors.
      *
@@ -2019,6 +1849,8 @@ public final class GUI {
         g2.dispose();
         return bi.getSubimage(0, 0, width, height);
     }
+
+
 
     /**
      * Creates an Image that shows the given text centred on a
@@ -2087,6 +1919,7 @@ public final class GUI {
         return bi;
     }
 
+
     /**
      * Draws a cross indicating a religious mission is present in the native village.
      *
@@ -2142,7 +1975,6 @@ public final class GUI {
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
-
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -2216,7 +2048,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Fog of war will be drawn.
@@ -2234,7 +2065,6 @@ public final class GUI {
             g.setComposite(oldComposite);
         }
     }
-
 
     /**
      * Describe <code>displayGotoPath</code> method here.
@@ -2648,7 +2478,6 @@ public final class GUI {
 
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Show tile names, coordinates
@@ -2717,6 +2546,7 @@ public final class GUI {
             centerString(g, valueString);
         }
     }
+
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -2791,6 +2621,7 @@ public final class GUI {
         
     }
 
+
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Addtions and improvements to
@@ -2846,6 +2677,7 @@ public final class GUI {
         }
     }
 
+
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
@@ -2874,8 +2706,6 @@ public final class GUI {
             displayOptionalValues(g, tile);
         }
     }
-
-
 
     /**
      * Displays the given Unit onto the given Graphics2D object at the
@@ -2961,6 +2791,7 @@ public final class GUI {
         }
     }
 
+
     /**
      * Describe <code>drawCursor</code> method here.
      *
@@ -3005,6 +2836,61 @@ public final class GUI {
     }
 
     /**
+     * Draws all roads on the given Tile.
+     *
+     * @param g The <code>Graphics</code> to draw the road upon.
+     * @param tile a <code>Tile</code> value
+     */
+    private void drawRoad(Graphics2D g, Tile tile) {
+
+        Color oldColor = g.getColor();
+        g.setColor(ResourceManager.getColor("road.color"));
+        g.setStroke(roadStroke);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        GeneralPath path = new GeneralPath();
+        List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
+        for (Direction direction : Direction.values()) {
+            Tile borderingTile = tile.getAdjacentTile(direction);
+            if (borderingTile != null && borderingTile.hasRoad()) {
+                points.add(corners.get(direction));
+            }
+        }
+
+        switch(points.size()) {
+        case 0:
+            path.moveTo(0.35f * tileWidth, 0.35f * tileHeight);
+            path.lineTo(0.65f * tileWidth, 0.65f * tileHeight);
+            path.moveTo(0.35f * tileWidth, 0.65f * tileHeight);
+            path.lineTo(0.65f * tileWidth, 0.35f * tileHeight);
+            break;
+        case 1:
+            path.moveTo(halfWidth, halfHeight);
+            path.lineTo(points.get(0).getX(), points.get(0).getY());
+            break;
+        case 2:
+            path.moveTo(points.get(0).getX(), points.get(0).getY());
+            path.quadTo(halfWidth, halfHeight, points.get(1).getX(), points.get(1).getY());
+            break;
+        case 3:
+        case 4:
+            Point2D p0 = points.get(points.size() - 1);
+            path.moveTo(p0.getX(), p0.getY());
+            for (Point2D p : points) {
+                path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
+            }
+            break;
+        default:
+            for (Point2D p : points) {
+                path.moveTo(halfWidth, halfHeight);
+                path.lineTo(p.getX(), p.getY());
+            }
+        }
+        g.draw(path);
+        g.setColor(oldColor);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
+    /**
      * Describe <code>enterUnitOutForAnimation</code> method here.
      *
      * @param unit an <code>Unit</code> value
@@ -3028,6 +2914,8 @@ public final class GUI {
         unitsOutForAnimation.put(unit, i);
         return unitsOutForAnimationLabels.get(unit);
     }
+
+
 
     /**
      * Describe <code>getForegroundColor</code> method here.
@@ -3083,6 +2971,25 @@ public final class GUI {
         return leftColumns;
     }
 
+    /**
+     * Gets the message at position 'index'. The message at position 0 is the oldest
+     * message and is most likely to be removed during the next call of removeOldMessages().
+     * The higher the index of a message, the more recently it was added.
+     *
+     * @param index The index of the message to return.
+     * @return The message at position 'index'.
+     */
+    private GUIMessage getMessage(int index) {
+        return messages.get(index);
+    }
+
+    /**
+     * Gets the amount of message that are currently being displayed on this GUI.
+     * @return The amount of message that are currently being displayed on this GUI.
+     */
+    private int getMessageCount() {
+        return messages.size();
+    }
 
     /**
      * Returns the amount of columns that are to the right of the Tile
@@ -3093,7 +3000,6 @@ public final class GUI {
     private int getRightColumns() {
         return getRightColumns(focus.getY());
     }
-
 
     /**
      * Returns the amount of columns that are to the right of the Tile
@@ -3156,6 +3062,51 @@ public final class GUI {
 
 
     /**
+    * Gets the unit that should be displayed on the given tile.
+    *
+    * @param unitTile The <code>Tile</code>.
+    * @return The <code>Unit</code> or <i>null</i> if no unit applies.
+    */
+    private Unit getUnitInFront(Tile unitTile) {
+        if (unitTile == null || unitTile.getUnitCount() <= 0) {
+            return null;
+        }
+
+        if (activeUnit != null && activeUnit.getTile() == unitTile) {
+            return activeUnit;
+        } else {
+            if (unitTile.getSettlement() == null) {
+                Unit bestDefendingUnit = null;
+                if (activeUnit != null) {
+                    bestDefendingUnit = unitTile.getDefendingUnit(activeUnit);
+                    if (bestDefendingUnit != null) {
+                        return bestDefendingUnit;
+                    }
+                }
+
+                Unit movableUnit = unitTile.getMovableUnit();
+                if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
+                    return movableUnit;
+                } else {
+                    Unit bestPick = null;
+                    Iterator<Unit> unitIterator = unitTile.getUnitIterator();
+                    while (unitIterator.hasNext()) {
+                        Unit u = unitIterator.next();
+                        if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
+                            bestPick = u;
+                        }
+                    }
+
+                    return bestPick;
+                }
+            } else {
+                return null;
+            }
+        }
+    }
+
+
+    /**
      * Draw the unit's image and occupation indicator in one JLabel object.
      * @param unit The unit to be drawn
      * @return A JLabel object with the unit's image.
@@ -3187,6 +3138,7 @@ public final class GUI {
     private boolean isOutForAnimation(final Unit unit) {
         return unitsOutForAnimation.containsKey(unit);
     }
+
 
     private boolean isTileVisible(Tile tile) {
         return tile.getY() >= topRow && tile.getY() <= bottomRow
@@ -3299,8 +3251,6 @@ public final class GUI {
             positionMap(focus);
     }
 
-
-
     /**
      * Position the map so that the supplied location is
      * displayed at the center.
@@ -3395,6 +3345,8 @@ public final class GUI {
         }
     }
 
+
+
     private void redrawMapControls() {
         int x = 0, y = 0;
         MapControls mapControls = freeColClient.getCanvas().getMapControls();
@@ -3422,6 +3374,29 @@ public final class GUI {
             i--;
             unitsOutForAnimation.put(unit, i);
         }
+    }
+
+    /**
+     * Removes all the message that are older than MESSAGE_AGE.
+     * @return 'true' if at least one message has been removed, 'false' otherwise.
+     * This can be useful to see if it is necessary to refresh the screen.
+     */
+    private synchronized boolean removeOldMessages() {
+        long currentTime = new Date().getTime();
+        boolean result = false;
+
+        int i = 0;
+        while (i < getMessageCount()) {
+            long messageCreationTime = getMessage(i).getCreationTime().getTime();
+            if ((currentTime - messageCreationTime) >= MESSAGE_AGE) {
+                result = true;
+                messages.remove(i);
+            } else {
+                i++;
+            }
+        }
+
+        return result;
     }
 
 
