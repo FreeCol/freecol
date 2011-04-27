@@ -173,9 +173,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * Updates the map generator options displayed on this panel.
      */
     public void updateMapGeneratorOptions() {
-        getClient().getPreGameController().getMapGeneratorOptions()
+        getClient().getGame().getMapGeneratorOptions()
             .getOption("model.option.mapWidth");
-        getClient().getPreGameController().getMapGeneratorOptions()
+        getClient().getGame().getMapGeneratorOptions()
             .getOption("model.option.mapHeight");
     }
 
@@ -280,7 +280,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getClient().isAdmin(), true));
                 break;
             case MAP_GENERATOR_OPTIONS:
-                OptionGroup mgo = getClient().getPreGameController().getMapGeneratorOptions();
+                OptionGroup mgo = getClient().getGame().getMapGeneratorOptions();
                 FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
                 boolean loadCustomOptions = (importFile.getValue() == null);
                 getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getCanvas(), mgo, getClient().isAdmin(),

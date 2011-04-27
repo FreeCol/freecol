@@ -68,16 +68,6 @@ public final class PreGameController {
     }
 
     /**
-     * Gets the <code>MapGeneratorOptions</code> used when creating
-     * a map.
-     *
-     * @return The <code>MapGeneratorOptions</code>.
-     */
-    public OptionGroup getMapGeneratorOptions() {
-        return freeColClient.getGame().getMapGeneratorOptions();
-    }
-
-    /**
     * Sets this client to be (or not be) ready to start the game.
     * @param ready Indicates wether or not this client is ready
     *              to start the game.
@@ -183,7 +173,7 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
      public void sendMapGeneratorOptions() {
-         OptionGroup mapGeneratorOptions = getMapGeneratorOptions();
+         OptionGroup mapGeneratorOptions = freeColClient.getGame().getMapGeneratorOptions();
          Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
          updateMapGeneratorOptionsElement
              .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
