@@ -569,6 +569,11 @@ public final class Canvas extends JDesktopPane {
         return false;
     }
 
+    public void displayChat(String senderNme, String message, boolean privateChat) {
+        startGamePanel.displayChat(senderNme, message, privateChat);
+        
+    }
+
     /**
      * Tells the map controls that a chat message was received.
      *
@@ -707,6 +712,7 @@ public final class Canvas extends JDesktopPane {
         return freeColClient.getImageLibrary();
     }
 
+
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
      *
@@ -715,7 +721,6 @@ public final class Canvas extends JDesktopPane {
     public LoadingSavegameDialog getLoadingSavegameDialog() {
         return loadingSavegameDialog;
     }
-
 
     /**
      * Returns the MapControls of this Canvas.
@@ -766,15 +771,6 @@ public final class Canvas extends JDesktopPane {
         return freeColClient.getGame().getSpecification();
     }
 
-    /**
-     * Gets the <code>StartGamePanel</code> that lies in this container.
-     *
-     * @return The <code>StartGamePanel</code>.
-     * @see StartGamePanel
-     */
-    public StartGamePanel getStartGamePanel() {
-        return startGamePanel;
-    }
 
     /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
@@ -858,6 +854,11 @@ public final class Canvas extends JDesktopPane {
     public void refresh() {
         gui.forceReposition();
         repaint(0, 0, getWidth(), getHeight());
+    }
+
+    public void refreshPlayersTable() {
+        startGamePanel.refreshPlayersTable();
+        
     }
 
     /**
@@ -1080,6 +1081,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(dialog, winner.getTile());
     }
 
+
     /**
      * Displays the <code>ChatPanel</code>.
      *
@@ -1114,7 +1116,6 @@ public final class Canvas extends JDesktopPane {
         ChoiceItem<T> response = showFreeColDialog(choiceDialog, tile);
         return (response == null) ? null : response.getObject();
     }
-
 
     public <T> T showChoiceDialog(Tile tile, StringTemplate template, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
@@ -1477,6 +1478,9 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
+
+    // A variety of special purpose panels/dialogs follow
+
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1505,9 +1509,6 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(freeColClient.getGame().getMessageDisplay(message),
                                message);
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2139,6 +2140,7 @@ public final class Canvas extends JDesktopPane {
                                  unit.getTile());
     }
 
+
     /**
      * Displays a dialog that asks the user what he wants to do with his
      * missionary in the indian settlement.
@@ -2179,6 +2181,10 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? MissionaryAction.CANCEL : result;
     }
 
+    public void updateGameOptions() {
+        startGamePanel.updateGameOptions();
+    }
+
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -2186,6 +2192,10 @@ public final class Canvas extends JDesktopPane {
         getClient().getFrame().getJMenuBar().repaint();
     }
 
+    public void updateMapGeneratorOptions() {
+        startGamePanel.updateMapGeneratorOptions();
+        
+    }
 
     /**
      * Updates the sizes of the components on this Canvas.
@@ -2208,6 +2218,7 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
     }
+
 
     /**
      * Adds a component centered on this Canvas inside a frame. Removes the
@@ -2337,7 +2348,6 @@ public final class Canvas extends JDesktopPane {
         }
         return (JInternalFrame) temp;
     }
-
 
     /**
      * Given a tile to be made visible, determine a position to popup

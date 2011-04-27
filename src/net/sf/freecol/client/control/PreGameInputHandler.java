@@ -153,7 +153,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         } else {
            game.getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
         }
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -172,7 +172,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Player player = new Player(game, playerElement);
 
         getFreeColClient().getGame().removePlayer(player);
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -190,7 +190,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         OptionGroup gameOptions = game.getSpecification().getOptionGroup("gameOptions");
         gameOptions.readFromXMLElement(mgoElement);
 
-        getFreeColClient().getCanvas().getStartGamePanel().updateGameOptions();
+        getFreeColClient().getCanvas().updateGameOptions();
 
         return null;
     }
@@ -205,7 +205,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Element mgoElement = (Element) element.getElementsByTagName(MapGeneratorOptions.getXMLElementTagName()).item(0);
         getFreeColClient().getGame().getMapGeneratorOptions().readFromXMLElement(mgoElement);
 
-        getFreeColClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+        getFreeColClient().getCanvas().updateMapGeneratorOptions();
 
         return null;
     }
@@ -220,7 +220,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     private Element chat(Element element)  {
         ChatMessage chatMessage = new ChatMessage(getGame(), element);
         Canvas canvas = getFreeColClient().getCanvas();
-        canvas.getStartGamePanel().displayChat(chatMessage.getPlayer().getName(),
+        canvas.displayChat(chatMessage.getPlayer().getName(),
                                                chatMessage.getMessage(),
                                                chatMessage.isPrivate());
         return null;
@@ -240,7 +240,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         boolean ready = Boolean.valueOf(element.getAttribute("value")).booleanValue();
 
         player.setReady(ready);
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -259,7 +259,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Nation nation = getGame().getSpecification().getNation(element.getAttribute("value"));
 
         player.setNation(nation);
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -278,7 +278,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         NationType nationType = getGame().getSpecification().getNationType(element.getAttribute("value"));
 
         player.setNationType(nationType);
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -294,7 +294,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
         NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
         getFreeColClient().getGame().getNationOptions().setNationState(nation, state);
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
@@ -363,7 +363,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
 
         game.removePlayer(player);
 
-        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().refreshPlayersTable();
 
         return null;
     }
