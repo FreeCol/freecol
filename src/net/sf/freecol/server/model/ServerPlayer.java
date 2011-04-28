@@ -1005,7 +1005,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (isEuropean()) {
             csBombardEnemyShips(random, cs);
 
-            csYearlyGoodsRemoval(random, cs);
+            csYearlyGoodsAdjust(random, cs);
 
             FoundingFather father = checkFoundingFather();
             if (father != null) {
@@ -1193,40 +1193,42 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Remove a standard yearly amount of storable goods, and
-     * a random extra amount of a random type.
+     * Add or remove a standard yearly amount of storable goods, and a
+     * random extra amount of a random type.
      *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csYearlyGoodsRemoval(Random random, ChangeSet cs) {
+    public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
         List<GoodsType> goodsTypes = getGame().getSpecification()
             .getGoodsTypeList();
         Market market = getMarket();
 
-        // Pick a random type of storable goods to remove an extra amount of.
-        GoodsType removeType;
-        for (;;) {
-            removeType = Utils.getRandomMember(logger, "Choose goods type",
-                                               goodsTypes, random);
-            if (removeType.isStorable()) break;
-        }
+        // Pick a random type of storable goods to add/remove an extra
+        // amount of.
+        GoodsType extraType;
+        while (!(extraType = Utils.getRandomMember(logger, "Choose goods type",
+                                                   goodsTypes, random))
+               .isStorable());
+
         // Remove standard amount, and the extra amount.
         for (GoodsType type : goodsTypes) {
             if (type.isStorable() && market.hasBeenTraded(type)) {
+                boolean add = market.getAmountInMarket(type)
+                    < type.getInitialAmount();
                 int amount = getGame().getTurn().getNumber() / 10;
-                if (type == removeType && amount > 0) {
-                    amount += Utils.randomInt(logger, "Remove from market",
-                                              random, 2 * amount + 1);
-                }
-                if (amount > 0) {
-                    market.addGoodsToMarket(type, -amount);
-                    logger.finest(getName() + " removal of " + amount
-                                  + " " + type
-                                  + ", total: " + market.getAmountInMarket(type));
-                }
+                if (type == extraType) amount = 2 * amount + 1;
+                if (amount <= 0) continue;
+                amount = Utils.randomInt(logger, "Market adjust " + type,
+                                         random, amount);
+                if (!add) amount = -amount;
+                market.addGoodsToMarket(type, amount);
+                logger.finest(getName() + " adjust of " + amount
+                              + " " + type
+                              + ", total: " + market.getAmountInMarket(type)
+                              + ", initial: " + type.getInitialAmount());
+                csFlushMarket(type, cs);
             }
-            csFlushMarket(type, cs);
         }
     }
 

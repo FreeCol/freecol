@@ -113,8 +113,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Have to advance time as yearly goods removal is initially low.
         game.setTurn(new Turn(200));
         for (int i = 0; i < 100; i++) {
-            igc.yearlyGoodsRemoval((ServerPlayer) french);
-            igc.yearlyGoodsRemoval((ServerPlayer) english);
+            igc.yearlyGoodsAdjust((ServerPlayer) french);
+            igc.yearlyGoodsAdjust((ServerPlayer) english);
         }
 
         // Price should have recovered

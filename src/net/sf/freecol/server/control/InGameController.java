@@ -195,16 +195,16 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Public version of the yearly goods removal (public so it can be
+     * Public version of the yearly goods adjust (public so it can be
      * use in the Market test code).  Sends the market and change
      * messages to the player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose market
      *            is to be updated.
      */
-    public void yearlyGoodsRemoval(ServerPlayer serverPlayer) {
+    public void yearlyGoodsAdjust(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csYearlyGoodsRemoval(random, cs);
+        serverPlayer.csYearlyGoodsAdjust(random, cs);
         sendElement(serverPlayer, cs);
     }
 

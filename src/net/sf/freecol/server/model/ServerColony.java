@@ -273,7 +273,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Export goods if custom house is built.
         // Do not flush price changes yet, as any price change may change
-        // yet again in csYearlyGoodsRemoval.
+        // yet again in csYearlyGoodsAdjust.
         if (hasAbility("model.ability.export")) {
             boolean gold = false;
             for (Goods goods : container.getCompactGoods()) {
