@@ -1580,7 +1580,7 @@ public final class GUI {
             selectedTile = gameData.getMap().getTile(selectedPosition);
         
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
-            if (activeUnitIsAt(selectedTile)) {
+            if (noActiveUnitIsAt(selectedTile)) {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
                     Settlement s = selectedTile.getSettlement();
                     freeColClient.getCanvas().showSettlement(s);
@@ -1742,13 +1742,6 @@ public final class GUI {
     }
 
 
-    private boolean activeUnitIsAt(Tile selectedTile) {
-        return activeUnit == null ||
-            (activeUnit.getTile() != null &&
-             !activeUnit.getTile().equals(selectedTile));
-    }
-
-
     /**
      * Centers the given Image on the tile.
      *
@@ -1776,6 +1769,7 @@ public final class GUI {
                      (tileWidth - g.getFontMetrics().stringWidth(text))/2,
                      (tileHeight - g.getFontMetrics().getAscent())/2);
     }
+
 
     /**
      * Draws the pentagram indicating a native capital.
@@ -1819,7 +1813,6 @@ public final class GUI {
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
-
     /**
      * Create a "chip" with the given text and colors.
      *
@@ -1851,7 +1844,6 @@ public final class GUI {
     }
 
 
-
     /**
      * Creates an Image that shows the given text centred on a
      * translucent rounded rectangle with the given color.
@@ -1867,6 +1859,8 @@ public final class GUI {
         specs[0] = new TextSpecification(text, font);
         return createLabel(g, specs, backgroundColor);
     }
+
+
 
     /**
      * Creates an Image that shows the given text centred on a
@@ -1918,7 +1912,6 @@ public final class GUI {
         }
         return bi;
     }
-
 
     /**
      * Draws a cross indicating a religious mission is present in the native village.
@@ -1975,6 +1968,7 @@ public final class GUI {
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
+
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -2547,7 +2541,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Settlements and Lost City
@@ -2707,6 +2700,7 @@ public final class GUI {
         }
     }
 
+
     /**
      * Displays the given Unit onto the given Graphics2D object at the
      * location specified by the coordinates.
@@ -2791,7 +2785,6 @@ public final class GUI {
         }
     }
 
-
     /**
      * Describe <code>drawCursor</code> method here.
      *
@@ -2800,6 +2793,7 @@ public final class GUI {
     private void drawCursor(Graphics2D g) {
         g.drawImage(cursorImage, 0, 0, null);
     }
+
 
     /**
      * Draws the given TileItem on the given Tile.
@@ -2915,8 +2909,6 @@ public final class GUI {
         return unitsOutForAnimationLabels.get(unit);
     }
 
-
-
     /**
      * Describe <code>getForegroundColor</code> method here.
      *
@@ -2937,6 +2929,8 @@ public final class GUI {
             return Color.BLACK;
         }
     }
+
+
 
     /**
      * Returns the amount of columns that are to the left of the Tile
@@ -3023,7 +3017,6 @@ public final class GUI {
 
         return rightColumns;
     }
-
 
     /**
      * Describe <code>getStringBorderColor</code> method here.
@@ -3143,6 +3136,13 @@ public final class GUI {
     private boolean isTileVisible(Tile tile) {
         return tile.getY() >= topRow && tile.getY() <= bottomRow
             && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
+    }
+
+
+    private boolean noActiveUnitIsAt(Tile selectedTile) {
+        return activeUnit == null ||
+            (activeUnit.getTile() != null &&
+             !activeUnit.getTile().equals(selectedTile));
     }
 
     /**
