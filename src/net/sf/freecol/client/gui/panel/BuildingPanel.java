@@ -83,7 +83,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
         ProductionInfo info = building.getProductionInfo();
 
-        if (info.getProduction().isEmpty()) {
+        if (info == null || info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
             AbstractGoods output = info.getProduction().get(0);
