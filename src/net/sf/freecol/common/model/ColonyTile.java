@@ -328,12 +328,14 @@ public class ColonyTile extends FreeColGameObject
      */
     public void add(final Locatable locatable) {
         if (isColonyCenterTile()) {
-            throw new IllegalStateException("Can not add to colony center");
+            throw new IllegalStateException("Can not add to colony center: "
+                                            + toString());
         } else if (unit != null) {
-            throw new IllegalStateException("Can not add to occupied tile");
-        } else if (getWorkTile().getOwningSettlement() != null
-                   && getWorkTile().getOwningSettlement() != getColony()) {
-            throw new IllegalStateException("Can not add to tile owned by another colony");
+            throw new IllegalStateException("Can not add to occupied tile: "
+                                            + toString());
+        } else if (getWorkTile().getOwningSettlement() != getColony()) {
+            throw new IllegalStateException("Can not add to tile owned by another colony: "
+                                            + toString());
         } else if (!canAdd(locatable)) {
             throw new IllegalStateException("Can not add " + locatable
                                             + " to " + toString());

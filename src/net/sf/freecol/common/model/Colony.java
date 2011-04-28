@@ -1416,7 +1416,7 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         } else if (expertProduction.isFarmed()) {
-            ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
+            ColonyTile colonyTile = getVacantColonyTileFor(unit, false, expertProduction);
             if (colonyTile != null) {
                 return new Occupation(colonyTile, expertProduction);
             }
