@@ -81,7 +81,6 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         Specification spec = getSpecification();
 
         Tile workTile = getWorkTile();
-        TileType workType = workTile.getType();
         Unit unit = getUnit();
         if (isColonyCenterTile()) {
             /*

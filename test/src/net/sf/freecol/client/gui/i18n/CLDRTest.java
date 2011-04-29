@@ -21,9 +21,6 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.freecol.client.gui.i18n.Number.Category;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -32,7 +29,6 @@ public class CLDRTest extends FreeColTestCase {
 
     public void testRuleParsing() {
 
-	List<String> tokens = new ArrayList<String>();
 	Rule rule = new Rule("n mod 10 in 2..4 and n mod 100 not in 12..14");
 	assertTrue(rule.matches(2));
 	assertTrue(rule.matches(102));
