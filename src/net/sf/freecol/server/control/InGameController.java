@@ -2861,12 +2861,11 @@ public final class InGameController extends Controller {
         }
 
         // Remove any unit equipment
-        boolean containerDirty = false;
         if (!unit.getEquipment().isEmpty()) {
             ((ServerUnit)unit).csRemoveEquipment(colony,
                 new HashSet<EquipmentType>(unit.getEquipment().keySet()),
                 0, random, cs);
-            containerDirty = true;
+          
         }
 
         // Check for upgrade.

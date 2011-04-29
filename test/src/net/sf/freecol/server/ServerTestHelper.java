@@ -146,7 +146,6 @@ public final class ServerTestHelper {
 
     public static void newTurn() {
         ServerGame game = (ServerGame) server.getGame();
-        InGameController igc = server.getInGameController();
         game.csNewTurn(random, new ChangeSet());
     }
 
