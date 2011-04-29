@@ -797,6 +797,8 @@ public class ChangeSet {
             return (ServerPlayer) first == serverPlayer
                 || (ServerPlayer) second == serverPlayer
                 || stance == Stance.WAR
+                || first.getStance(second) == Stance.WAR
+                || second.getStance(first) == Stance.WAR
                 || serverPlayer.hasAbility("model.ability.betterForeignAffairsReport");
         }
 
