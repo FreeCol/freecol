@@ -1684,7 +1684,6 @@ public class Unit extends FreeColGameObject
     public Location getRepairLocation() {
         Location closestLocation = null;
         int shortestDistance = INFINITY;
-        Map map = getGame().getMap();
         Player player = getOwner();
         Tile tile = getTile();
         for (Colony colony : player.getColonies()) {
@@ -2594,7 +2593,6 @@ public class Unit extends FreeColGameObject
         // TODO: move to the server.
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
-        int turns;
 
         switch (state) {
         case IMPROVING:

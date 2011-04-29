@@ -57,7 +57,6 @@ public class PrivateerMission extends Mission {
 	private PrivateerMissionState state = PrivateerMissionState.HUNTING;
 	private Location nearestPort = null;
 	private Tile target = null;
-	private boolean invalidateMission = false;
 
 
     /**
@@ -194,13 +193,11 @@ public class PrivateerMission extends Mission {
             findNearestPort();
             if(nearestPort == null){
             	logger.finest("Failed to find port for goods");
-                invalidateMission = true;
                 return;
             }
             path = getValidPathForNearestPort();
             if(path == null){
             	logger.finest("Failed to deliver goods to " + nearestPort + ", no path");
-            	invalidateMission = true;
                 return;
             }
         }

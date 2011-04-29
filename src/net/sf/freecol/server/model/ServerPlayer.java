@@ -2273,7 +2273,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         Location repair = ship.getRepairLocation();
         StringTemplate repairLocationName = repair.getLocationNameFor(shipPlayer);
-        Location oldLocation = ship.getLocation();
         StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -2420,7 +2419,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate attackerNation = attackerPlayer.getNationName();
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationName();
-        Tile tile = colony.getTile();
         int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony destruction.

@@ -56,8 +56,6 @@ public class ScoutingMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
-    private boolean valid = true;
-
     private EquipmentType scoutEquipment;
 
     private Tile transportDestination = null;
@@ -136,7 +134,6 @@ public class ScoutingMission extends Mission {
                         }
                     }
                 }
-                valid = false;
                 return;
             }
 
@@ -239,7 +236,6 @@ public class ScoutingMission extends Mission {
                 debugAction = "Transport to: " + transportDestination.getPosition();
             } else {
                 transportDestination = null;
-                valid = false;
             }
         } else {
             Iterator<Position> it = getGame().getMap().getFloodFillIterator(getUnit().getTile().getPosition());
@@ -252,7 +248,6 @@ public class ScoutingMission extends Mission {
                 }
             }
             transportDestination = null;
-            valid = false;
         }
     }
 

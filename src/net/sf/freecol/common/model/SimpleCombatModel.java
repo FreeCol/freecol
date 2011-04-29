@@ -105,7 +105,6 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
-            Unit defenderUnit = (Unit) defender;
             if (attackerSettlement.hasAbility("model.ability.bombardShips")) {
                 for (Unit unit : attackerSettlement.getTile().getUnitList()) {
                     if (unit.hasAbility("model.ability.bombard")) {
@@ -302,7 +301,6 @@ public class SimpleCombatModel extends CombatModel {
             Unit attackerUnit = (Unit) attacker;
             UnitType type = attackerUnit.getType();
             Settlement settlement = (Settlement) defender;
-            Player defenderPlayer = settlement.getOwner();
             if (settlement.getFeatureContainer() == null) {
                 // Client can not see inside the settlement
                 result.add(UNKNOWN_DEFENCE_MODIFIER);

@@ -64,9 +64,6 @@ public class ServerColony extends Colony implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerColony.class.getName());
 
-    // Temporary variable:
-    private int lastVisited;
-
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -132,7 +129,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
-        lastVisited = -1;
     }
 
 
@@ -414,7 +410,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    (UnitType) buildQueue.getCurrentlyBuilding(),
                                    UnitState.ACTIVE);
-        if (unit == null) return null;
         if (unit.hasAbility("model.ability.bornInColony")) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
