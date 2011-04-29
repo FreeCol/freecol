@@ -577,48 +577,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         return null;
     }
 
-    /**
-     * Are all the requirements to complete a buildable satisfied?
-     *
-     * @param buildable The <code>Buildable</code> to check.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private boolean csHasAllRequirements(BuildableType buildable,
-                                         ChangeSet cs) {
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        GoodsContainer container = getGoodsContainer();
-        // Check availability of goods required for construction
-        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
-        for (AbstractGoods required : buildable.getGoodsRequired()) {
-            GoodsType type = required.getType();
-            int available = container.getGoodsCount(type);
-            if (available < required.getAmount()) {
-                if (type.isStorable()) {
-                    int need = required.getAmount() - available;
-                    messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                                  "model.colony.buildableNeedsGoods",
-                                                  this, type)
-                                 .addName("%colony%", getName())
-                                 .add("%buildable%", buildable.getNameKey())
-                                 .addName("%amount%", String.valueOf(need))
-                                 .add("%goodsType%", type.getNameKey()));
-                } else {
-                    // Not complete due to missing unstorable goods
-                    // (probably hammers) so there is no point griping.
-                    return false;
-                }
-            }
-        }
-        if (!messages.isEmpty()) {
-            // Not complete due to missing storable goods.
-            // Gripe away.
-            for (ModelMessage message : messages) {
-                cs.addMessage(See.only(owner), message);
-            }
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Evict the users from a tile used by this colony, due to military

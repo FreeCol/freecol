@@ -380,15 +380,6 @@ public final class InGameController extends Controller {
         sendToList(getOtherPlayers(), cs);
     }
 
-    /**
-     * Send an element to all players.
-     * Deprecated, please avoid if possible.
-     *
-     * @param element The <code>Element</code> to send.
-     */
-    private void sendToAll(Element element) {
-        sendToList(getOtherPlayers(), element);
-    }
 
     /**
      * Send an update to all players except one.

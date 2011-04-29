@@ -116,10 +116,6 @@ public class IndianBringGiftMission extends Mission {
         readFromXML(in);
     }
 
-    private boolean OK(String ok) {
-        System.err.println(ok);
-        return true;
-    }
     /**
      * Performs the mission.
      *

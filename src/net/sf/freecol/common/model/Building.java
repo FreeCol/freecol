@@ -562,22 +562,6 @@ public class Building extends FreeColGameObject
         }
     }
 
-    private int getGoodsInputAuto(int available) {
-        if (getGoodsInputType() == null) {
-            return 0;
-        } else {
-            int outputGoods = colony.getGoodsCount(getGoodsOutputType());
-            if (outputGoods < getGoodsOutputType().getBreedingNumber()) {
-                // not enough animals to breed
-                return 0;
-            } else if (outputGoods >= colony.getWarehouseCapacity()) {
-                // warehouse is already full
-                return 0;
-            } else {
-                return available;
-            }
-        }
-    }
 
     /**
      * Returns the actual production of this building given the number
