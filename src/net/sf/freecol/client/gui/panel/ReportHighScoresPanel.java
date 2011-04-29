@@ -50,7 +50,6 @@ public final class ReportHighScoresPanel extends ReportPanel {
         reportPanel.removeAll();
 
         List<HighScore> highScores = getController().getHighScores();
-        int number = highScores.size();
 
         reportPanel.setLayout(new MigLayout("wrap 3, gapx 30", "[][][align right]", ""));
 

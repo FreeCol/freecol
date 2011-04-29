@@ -83,8 +83,7 @@ public class AttackMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
-
+        
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);

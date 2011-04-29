@@ -42,7 +42,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 import org.w3c.dom.Element;
@@ -1260,7 +1259,6 @@ public class Player extends FreeColGameObject implements Nameable {
         Specification spec = getSpecification();
         UnitType unitType = au.getUnitType(spec);
         if (unitType.hasPrice()) {
-            Role role = au.getRole();
             int price = getEurope().getUnitPrice(unitType);
             for (EquipmentType equip : au.getEquipment(spec)) {
                 for (AbstractGoods goods : equip.getGoodsRequired()) {

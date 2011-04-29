@@ -661,7 +661,6 @@ public final class InGameController implements NetworkConstants {
      */
     private Location operateTradeRoute(Unit unit, List<ModelMessage> messages) {
         Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
 
         // Complain and return if the stop is no longer valid.
         Stop stop = unit.getStop();
@@ -4132,7 +4131,6 @@ public final class InGameController implements NetworkConstants {
 
         Player player = freeColClient.getMyPlayer();
         List<AbstractGoods> requiredGoods = type.getGoodsRequired();
-        HashMap<GoodsType, Integer> savedGoods = null;
         Colony colony = null;
         if (unit.isInEurope()) {
             for (AbstractGoods goods : requiredGoods) {

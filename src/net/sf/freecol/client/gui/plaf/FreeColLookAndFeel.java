@@ -36,7 +36,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
-import net.sf.freecol.FreeCol;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -47,10 +47,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
-
-    private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
-
-    private File dataDirectory;
 
 
     /**
@@ -94,10 +90,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 }
             });
 
-        if (dataDirectory.isDirectory()) {
-            this.dataDirectory = dataDirectory;
-        } else {
-            throw new FreeColException("Data directory is not a directory.");
+        if (!dataDirectory.isDirectory()) {
+           throw new FreeColException("Data directory is not a directory.");
         }
     }
 

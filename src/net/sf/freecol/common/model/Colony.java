@@ -1360,7 +1360,6 @@ public class Colony extends Settlement implements Nameable {
      */
     private Occupation getOccupationFor(Unit unit) {
         TypeCountMap<GoodsType> netProduction = getNetProduction();
-        GoodsType workType = null;
         for (AbstractGoods consumption : unit.getType().getConsumedGoods()) {
             // TODO: this should consider a list of all consumed
             // goods, weighted by priority. This, in turn, would

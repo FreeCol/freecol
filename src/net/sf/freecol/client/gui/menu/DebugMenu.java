@@ -77,8 +77,6 @@ public class DebugMenu extends JMenu {
 
     private final GUI gui;
 
-    private JMenuItem skipTurnsMenuItem;
-
 
     public DebugMenu(FreeColClient fcc) {
         super(Messages.message("menuBar.debug"));

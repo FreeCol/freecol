@@ -56,7 +56,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
     private JButton allButton;
     private JButton noneButton;
 
-    private Unit winner;
     private JList goodsList;
     private int maxCargo;
 
@@ -69,8 +68,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
      */
     public CaptureGoodsDialog(Canvas parent, Unit winner, List<Goods> loot) {
         super(parent);
-
-        this.winner = winner;
+        
         maxCargo = winner.getSpaceLeft();
 
         setLayout(new MigLayout("wrap 1", "[center]", "[]20[]20[]"));
