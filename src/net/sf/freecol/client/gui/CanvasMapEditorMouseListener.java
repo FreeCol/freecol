@@ -381,7 +381,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             scrollThread.setDirection(direction);
         } else {
             // start scrolling in a direction
-            scrollThread = new ScrollThread(getMap(), gui);
+            scrollThread = new ScrollThread(gui);
             scrollThread.setDirection(direction);
             scrollThread.start();
         }
@@ -392,8 +392,6 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      * Scrolls the view of the Map by moving its focus.
      */
     private class ScrollThread extends Thread {
-
-        private final Map map;
 
         private final GUI gui;
 
@@ -408,9 +406,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
          * @param m The Map that needs to be scrolled.
          * @param g The GUI that holds information such as screen resolution.
          */
-        public ScrollThread(Map m, GUI g) {
+        public ScrollThread(GUI g) {
             super(FreeCol.CLIENT_THREAD+"Mouse scroller");
-            map = m;
             gui = g;
             cont = true;
         }

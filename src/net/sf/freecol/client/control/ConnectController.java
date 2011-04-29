@@ -361,7 +361,6 @@ public final class ConnectController {
             }
         }
 
-        final boolean publicServer;
         final boolean singleplayer;
         final String name;
         final int port;
@@ -393,7 +392,6 @@ public final class ConnectController {
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
                 if (canvas.showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
                     LoadingSavegameDialog lsd = canvas.getLoadingSavegameDialog();
-                    publicServer = lsd.isPublic();
                     singleplayer = lsd.isSingleplayer();
                     name = lsd.getName();
                     port = lsd.getPort();
@@ -401,7 +399,6 @@ public final class ConnectController {
                     return;
                 }
             } else {
-                publicServer = defaultPublicServer;
                 singleplayer = defaultSingleplayer;
                 name = null;
                 port = FreeCol.getDefaultPort();

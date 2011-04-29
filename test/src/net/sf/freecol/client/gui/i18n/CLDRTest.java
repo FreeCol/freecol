@@ -77,41 +77,41 @@ public class CLDRTest extends FreeColTestCase {
             fail("Failed to close input stream.");
         }
 
-        assertNotNull(numberRules.getNumberForLanguage("az"));
-        assertTrue(numberRules.getNumberForLanguage("az") instanceof OtherNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("az"));
+        assertTrue(NumberRules.getNumberForLanguage("az") instanceof OtherNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("ko"));
-        assertTrue(numberRules.getNumberForLanguage("ko") instanceof OtherNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("ko"));
+        assertTrue(NumberRules.getNumberForLanguage("ko") instanceof OtherNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("th"));
-        assertTrue(numberRules.getNumberForLanguage("th") instanceof OtherNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("th"));
+        assertTrue(NumberRules.getNumberForLanguage("th") instanceof OtherNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("en"));
-        assertTrue(numberRules.getNumberForLanguage("en") instanceof PluralNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("en"));
+        assertTrue(NumberRules.getNumberForLanguage("en") instanceof PluralNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("it"));
-        assertTrue(numberRules.getNumberForLanguage("it") instanceof PluralNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("it"));
+        assertTrue(NumberRules.getNumberForLanguage("it") instanceof PluralNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("pt"));
-        assertTrue(numberRules.getNumberForLanguage("pt") instanceof PluralNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("pt"));
+        assertTrue(NumberRules.getNumberForLanguage("pt") instanceof PluralNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("ak"));
-        assertTrue(numberRules.getNumberForLanguage("ak") instanceof ZeroOneNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("ak"));
+        assertTrue(NumberRules.getNumberForLanguage("ak") instanceof ZeroOneNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("hi"));
-        assertTrue(numberRules.getNumberForLanguage("hi") instanceof ZeroOneNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("hi"));
+        assertTrue(NumberRules.getNumberForLanguage("hi") instanceof ZeroOneNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("wa"));
-        assertTrue(numberRules.getNumberForLanguage("wa") instanceof ZeroOneNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("wa"));
+        assertTrue(NumberRules.getNumberForLanguage("wa") instanceof ZeroOneNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("ga"));
-        assertTrue(numberRules.getNumberForLanguage("ga") instanceof DualNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("ga"));
+        assertTrue(NumberRules.getNumberForLanguage("ga") instanceof DualNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("smi"));
-        assertTrue(numberRules.getNumberForLanguage("smi") instanceof DualNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("smi"));
+        assertTrue(NumberRules.getNumberForLanguage("smi") instanceof DualNumberRule);
 
-        assertNotNull(numberRules.getNumberForLanguage("sms"));
-        assertTrue(numberRules.getNumberForLanguage("sms") instanceof DualNumberRule);
+        assertNotNull(NumberRules.getNumberForLanguage("sms"));
+        assertTrue(NumberRules.getNumberForLanguage("sms") instanceof DualNumberRule);
 
 
     }

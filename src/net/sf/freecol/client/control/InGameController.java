@@ -930,7 +930,6 @@ public final class InGameController implements NetworkConstants {
                 // whole cargo or not.
                 Canvas canvas = freeColClient.getCanvas();
                 String locName = colony.getName();
-                String overflowMessage = null;
                 String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
@@ -3739,7 +3738,6 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         // Sanity checks.
-        Colony colony = null;
         if (goods == null) {
             throw new IllegalArgumentException("Null goods.");
         } else if (goods.getAmount() <= 0) {
@@ -3748,7 +3746,7 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalArgumentException("Null carrier.");
         } else if (carrier.isInEurope()) {
             ;
-        } else if ((colony = carrier.getColony()) == null) {
+        } else if (carrier.getColony() == null) {
             throw new IllegalArgumentException("Carrier not at colony or Europe.");
         }
 

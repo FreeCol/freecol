@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
@@ -440,7 +439,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (tile.getFirstUnit() == null
             || tile.getFirstUnit().getOwner() == getOwner()) return tile;
 
-        Map map = getGame().getMap();
         for (int r = 1; true; r++) {
             List<Tile> tiles = tile.getSurroundingTiles(r, r);
             Collections.shuffle(tiles, random);

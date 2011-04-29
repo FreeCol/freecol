@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -51,7 +50,6 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
 
     private static final String EDIT = "EDIT";
 
-    private JPanel optionPanel;
 
     private JButton edit = new JButton(Messages.message("edit"));
 

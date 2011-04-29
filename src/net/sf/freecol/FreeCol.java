@@ -87,8 +87,7 @@ public final class FreeCol {
 
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
 
-    private static boolean  windowed = false,
-                            sound = true,
+    private static boolean  sound = true,
                             javaCheck = true,
                             memoryCheck = true,
                             consoleLogging = false,
@@ -141,7 +140,6 @@ public final class FreeCol {
     private static final Options options = new Options();
 
     private static String splashFilename = DEFAULT_SPLASH_FILE;
-    private static boolean displaySplash = false;
     private static Dimension windowSize;
 
     private static long freeColSeed = 0L;
@@ -643,7 +641,6 @@ public final class FreeCol {
                 Messages.setMessageBundle(newLocale);
             }
             if (line.hasOption("splash")) {
-                displaySplash = true;
                 final String str = line.getOptionValue("splash");
                 if (str != null) {
                     splashFilename = str;
@@ -693,7 +690,6 @@ public final class FreeCol {
                 javaCheck = false;
             }
             if (line.hasOption("windowed")) {
-                windowed = true;
                 String dimensions = line.getOptionValue("windowed");
                 if (dimensions == null) {
                     windowSize = new Dimension(-1, -1);
@@ -757,7 +753,6 @@ public final class FreeCol {
             if (line.hasOption("check-savegame")) {
                 setSavegame(line.getOptionValue("load-savegame"));
                 checkIntegrity = true;
-                displaySplash = false;
                 standAloneServer = true;
                 serverPort = DEFAULT_PORT;
             }

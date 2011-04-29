@@ -977,7 +977,6 @@ public final class ColonyPanel extends FreeColPanel
              * @return The component argument.
              */
             public Component add(Component comp, boolean editState) {
-                Container oldParent = comp.getParent();
 
                 if (editState) {
                     if (comp instanceof UnitLabel) {
