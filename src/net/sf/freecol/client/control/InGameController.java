@@ -869,7 +869,6 @@ public final class InGameController implements NetworkConstants {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
-        int amount = goods.getAmount();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         UnitWas unitWas = new UnitWas(carrier);
@@ -1024,7 +1023,6 @@ public final class InGameController implements NetworkConstants {
                 : sellGoods(goods);
         }
         GoodsType type = goods.getType();
-        int amount = goods.getAmount();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
@@ -1327,7 +1325,6 @@ public final class InGameController implements NetworkConstants {
      */
     public void buildColony() {
         if (!requireOurTurn()) return;
-        Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
 
@@ -4764,7 +4761,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         GetNationSummaryMessage message = new GetNationSummaryMessage(player);
         Element reply = askExpecting(client, message.toXMLElement(),
-                                     message.getXMLElementTagName());
+                                     GetNationSummaryMessage.getXMLElementTagName());
         if (reply == null) return null;
 
         Game game = freeColClient.getGame();
@@ -4885,7 +4882,6 @@ public final class InGameController implements NetworkConstants {
      * @param routes The trade routes to set.
      */
     public void setTradeRoutes(List<TradeRoute> routes) {
-        Player player = freeColClient.getMyPlayer();
 
         askSetTradeRoutes(routes);
     }

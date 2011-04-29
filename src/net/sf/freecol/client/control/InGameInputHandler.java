@@ -781,7 +781,6 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         Specification spec = game.getSpecification();
         Player player = freeColClient.getMyPlayer();
-        Monarch monarch = player.getMonarch();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         final MonarchAction action = message.getAction();
         boolean accept;

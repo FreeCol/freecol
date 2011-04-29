@@ -395,7 +395,6 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     InGameController igc = server.getInGameController();
                     boolean more = true;
-                    int n = 0;
                     while (more) {
                         int val = igc.stepRandom();
                         more = canvas.showConfirmDialog(null,
