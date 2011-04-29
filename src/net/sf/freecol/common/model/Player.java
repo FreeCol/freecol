@@ -1377,6 +1377,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         } // Else, native ownership
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
+            if (type == getSpecification().getPrimaryFoodType()) {
+                // Only consider specific food types, not the aggregation.
+                continue;
+            }
             price += tile.potential(type, null);
         }
         price *= getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
