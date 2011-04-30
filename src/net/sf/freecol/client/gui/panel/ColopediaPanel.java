@@ -500,15 +500,17 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     }
 
     private JButton getGoodsButton(final GoodsType goodsType) {
-        return getButton(goodsType, null, getLibrary().getGoodsImageIcon(goodsType));
-    }
-
-    private JButton getGoodsButton(final GoodsType goodsType, String text) {
-        return getButton(goodsType, text, getLibrary().getGoodsImageIcon(goodsType));
+        return getGoodsButton(goodsType, null);
     }
 
     private JButton getGoodsButton(final GoodsType goodsType, int amount) {
-        return getButton(goodsType, Integer.toString(amount), getLibrary().getGoodsImageIcon(goodsType));
+        return getGoodsButton(goodsType, Integer.toString(amount));
+    }
+
+    private JButton getGoodsButton(final GoodsType goodsType, String text) {
+        JButton result = getButton(goodsType, text, getLibrary().getGoodsImageIcon(goodsType));
+        result.setToolTipText(Messages.getName(goodsType));
+        return result;
     }
 
     private JButton getUnitButton(AbstractUnit unit) {
