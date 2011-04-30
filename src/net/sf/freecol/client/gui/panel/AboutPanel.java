@@ -20,18 +20,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -41,102 +37,70 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
+import net.miginfocom.swing.MigLayout;
+
 /**
- * This is the About panel 
+ * This is the About panel
  */
 public final class AboutPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
+    public static final String SITE_URL = "http://www.freecol.org";
+    public static final String PROJECT_URL = "http://sourceforge.net/projects/freecol/";
+
     /**
     * The constructor that will add the items to this panel.
-    * 
+    *
     * @param parent The parent of this panel.
     */
     public AboutPanel(Canvas parent) {
-        super(parent);
-        
-        setLayout(new BorderLayout());
+        super(parent, new MigLayout("wrap 2"));
 
         // Header with image
-        JPanel header = new JPanel();
-        this.add(header, BorderLayout.NORTH);
         Image tempImage = ResourceManager.getImage("TitleImage");
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
             logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2), new BevelBorder(BevelBorder.LOWERED)));
-            header.add(logoLabel,JPanel.CENTER_ALIGNMENT);
+            add(logoLabel, "span, center");
         }
-        
-        // Info panel
-        JPanel infoPanel = new JPanel(new GridLayout(3, 1));
-        this.add(infoPanel,BorderLayout.CENTER);
-        infoPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
-        // version and links
-        JPanel table = new JPanel(new GridLayout(3, 2));
-        infoPanel.add(table);
-        table.add(new JLabel(Messages.message("aboutPanel.version")));
-        table.add(new JLabel(FreeCol.getRevision()));
-        table.add(new JLabel(Messages.message("aboutPanel.officialSite")));
-        String siteURL = "http://www.freecol.org";
-        JLabel site = new JLabel("<html><font color='Blue'>"+siteURL+"</font></html>");
-        site.setFocusable(true);
-        site.addMouseListener(new URLMouseListener(siteURL));
-        table.add(site);
-        table.add(new JLabel(Messages.message("aboutPanel.sfProject")));
-        String projectURL = "http://sourceforge.net/projects/freecol/";
-        JLabel project = new JLabel("<html><font color='Blue'>"+projectURL+"</font></html>");
-        project.setFocusable(true);
-        project.addMouseListener(new URLMouseListener(projectURL));
-        table.add(project);
-        // license disclaimer
-        String disclaimer = Messages.message("aboutPanel.legalDisclaimer");
-        JTextArea textarea = new JTextArea();
-        textarea.setOpaque(false);
-        textarea.setText(disclaimer);
-        textarea.setLineWrap(true);
-        textarea.setWrapStyleWord(true);
-        textarea.setEditable(false);
-        textarea.setFocusable(false);
-        infoPanel.add(textarea);
-        // copyright
-        infoPanel.add(new JLabel(Messages.message("aboutPanel.copyright"),JLabel.CENTER),BorderLayout.CENTER);
-        
-        this.add(okButton, BorderLayout.SOUTH);
 
-        setSize(getPreferredSize());
+        // version and links
+        add(localizedLabel("aboutPanel.version"), "newline 20");
+        add(new JLabel(FreeCol.getRevision()));
+
+        add(localizedLabel("aboutPanel.officialSite"));
+        JButton site = getLinkButton(SITE_URL, null, SITE_URL);
+        site.addActionListener(this);
+        add(site);
+
+        add(localizedLabel("aboutPanel.sfProject"));
+        JButton project = getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        project.addActionListener(this);
+        add(project);
+
+        // license disclaimer
+        add(getDefaultTextArea(Messages.message("aboutPanel.legalDisclaimer")),
+            "newline 20, span, growx");
+
+        // copyright
+        add(localizedLabel("aboutPanel.copyright"), "span, center");
+
+        add(okButton, "newline 20, span, tag ok");
+
     }
 
+
     /**
-     * This inner class is meant to handle mouse click events from hypertext-style links
-     * Swing has no explicit support for links, but they can be simulated with
-     * JLabel, HTML fragments and a mouse listener such as this one.
-     * This class could also be moved from AboutPanel if needed somewhere else. 
+     * {@inheritDoc}
      */
-    public class URLMouseListener implements MouseListener {
-        private String url;
-        public URLMouseListener(String url) {
-        	this.url = url;
-        }
-        public void mouseEntered(MouseEvent e) {
-        }
-        public void mouseExited(MouseEvent e) {
-        }
-        public void mousePressed(MouseEvent e) {
-        }
-        public void mouseReleased(MouseEvent e) {
-        }
-        public void mouseClicked(MouseEvent e) {
-            if (e.getButton()==MouseEvent.BUTTON1) {
-                // left click
-                openBrowserURL();
-            }
-        }
-        public void openBrowserURL() {
+    public void actionPerformed(ActionEvent event) {
+        String url = event.getActionCommand();
+        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {
             String os = System.getProperty("os.name");
             String[] cmd = null;
-            if (os==null) {
+            if (os == null) {
                 // error, the operating system could not be determined
                 return;
             } else if (os.toLowerCase().contains("mac")) {
@@ -159,6 +123,8 @@ public final class AboutPanel extends FreeColPanel {
             } catch(IOException x) {
                 // couldn't start browser
             }
+        } else {
+            super.actionPerformed(event);
         }
     }
 }
