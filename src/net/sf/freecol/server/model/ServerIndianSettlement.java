@@ -170,7 +170,6 @@ public class ServerIndianSettlement extends IndianSettlement
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
         // TODO: remove this
         GoodsType grainType = spec.getGoodsType("model.goods.grain");
-        GoodsType reqGoodsType = horsesType.getRawMaterial();
         int foodProdAvail = getProductionOf(grainType) - getFoodConsumption();
         if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
             && foodProdAvail > 0) {

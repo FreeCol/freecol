@@ -799,7 +799,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
     public void csMove(Tile newTile, Random random, ChangeSet cs) {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
         Game game = getGame();
-        Specification spec = game.getSpecification();
         Turn turn = game.getTurn();
 
         // Plan to update tiles that could not be seen before but will

@@ -2877,7 +2877,6 @@ public final class InGameController extends Controller {
         // We could avoid updating the whole tile if we knew that this
         // was definitely a move between locations and no student/teacher
         // interaction occurred.
-        Location oldLoc = unit.getLocation();
         unit.setState(UnitState.IN_COLONY);
         unit.setLocation(workLocation);
         cs.add(See.perhaps(), colony.getTile());

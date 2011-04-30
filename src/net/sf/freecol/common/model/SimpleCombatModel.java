@@ -161,7 +161,6 @@ public class SimpleCombatModel extends CombatModel {
             || combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
             UnitType type = attackerUnit.getType();
-            Specification spec = attackerUnit.getSpecification();
             result.add(new Modifier(Modifier.OFFENCE,
                                     Specification.BASE_OFFENCE_SOURCE,
                                     type.getOffence(),

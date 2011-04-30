@@ -778,12 +778,10 @@ public final class InGameInputHandler extends InputHandler {
     private Element monarchAction(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = getGame();
-        Specification spec = game.getSpecification();
         Player player = freeColClient.getMyPlayer();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         final MonarchAction action = message.getAction();
         boolean accept;
-        String amount;
         String additions;
 
         switch (action) {
@@ -791,7 +789,6 @@ public final class InGameInputHandler extends InputHandler {
             break;
 
         case RAISE_TAX:
-            amount = Integer.toString(message.getAmount());
             GoodsType goodsType = message.getGoodsType(game);
             String goods = Messages.message(goodsType.getLabel(true));
             accept = new ShowMonarchPanelSwingTask(action, StringTemplate.template("")

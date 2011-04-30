@@ -96,8 +96,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
         StyledDocument doc = textPane.getStyledDocument();
 
         // check which colonies can train which units
-        int unitTypeIndex = 0;
-        List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
         for (Colony colony : colonies) {
             TypeCountMap<UnitType> newUnitCount = new TypeCountMap<UnitType>();
             Set<UnitType> newCanTrain = new HashSet<UnitType>();

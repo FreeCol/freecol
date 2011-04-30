@@ -44,7 +44,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ProductionLabel extends JComponent {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ProductionLabel.class.getName());
 
     private final Canvas parent;

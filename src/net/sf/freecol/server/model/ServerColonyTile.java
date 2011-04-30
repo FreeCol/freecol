@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -78,7 +77,6 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         logger.finest("ServerColonyTile.csNewTurn, for " + toString());
         Colony colony = getColony();
         ServerPlayer owner = (ServerPlayer) colony.getOwner();
-        Specification spec = getSpecification();
 
         Tile workTile = getWorkTile();
         Unit unit = getUnit();

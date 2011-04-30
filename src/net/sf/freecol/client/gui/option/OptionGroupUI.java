@@ -166,7 +166,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             ui = c;
         } else if (option instanceof ListOption<?>) {
             @SuppressWarnings("unchecked")
-            ListOptionUI c = new ListOptionUI((ListOption) option, editable);
+            ListOptionUI c = new ListOptionUI((ListOption) option, editable); 
             ui = c;
         } else if (option instanceof RangeOption) {
             RangeOptionUI c = new RangeOptionUI((RangeOption) option, editable);
