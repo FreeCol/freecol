@@ -57,6 +57,7 @@ public class PrivateerMission extends Mission {
 	private PrivateerMissionState state = PrivateerMissionState.HUNTING;
 	private Location nearestPort = null;
 	private Tile target = null;
+	private boolean valid = true;
 
 
     /**
@@ -191,13 +192,16 @@ public class PrivateerMission extends Mission {
         PathNode path = getValidPathForNearestPort();
         if(path == null){
             findNearestPort();
-            if(nearestPort == null){
-            	logger.finest("Failed to find port for goods");
+            if (nearestPort == null) {
+                logger.finest("Failed to find port for goods");
+                valid = false;
                 return;
             }
             path = getValidPathForNearestPort();
-            if(path == null){
-            	logger.finest("Failed to deliver goods to " + nearestPort + ", no path");
+            if (path == null) {
+                logger.finest("Failed to deliver goods to "
+                              + nearestPort + ", no path");
+                valid = false;
                 return;
             }
         }
@@ -342,7 +346,7 @@ public class PrivateerMission extends Mission {
      * @return True if the mission is still valid.
      */
     public boolean isValid() {
-        return super.isValid() && !isValid(getAIUnit());
+        return super.isValid() && valid && isValid(getAIUnit());
     }
 
     /**
