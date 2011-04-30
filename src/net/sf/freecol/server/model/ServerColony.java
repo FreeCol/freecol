@@ -167,7 +167,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                         int experience = goods.getAmount() / workLocation.getUnitCount();
                         for (Unit unit : workLocation.getUnitList()) {
                             if (goods.getType() == unit.getExperienceType()
-                                && unit.getType().canBeUpgraded(expert, ChangeType.EDUCATION)) {
+                                && unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)) {
                                 unit.setExperience(unit.getExperience() + experience);
                                 cs.addPartial(See.only(owner), unit, "experience");
                             }

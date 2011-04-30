@@ -130,7 +130,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setLocation(location);
 
         workLeft = -1;
-        workType = getSpecification().getPrimaryFoodType();
+        workType = null;
 
         this.movesLeft = getInitialMovesLeft();
         hitpoints = unitType.getHitPoints();

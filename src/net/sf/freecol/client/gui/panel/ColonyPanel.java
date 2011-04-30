@@ -1554,84 +1554,18 @@ public final class ColonyPanel extends FreeColPanel
              * @return The component argument.
              */
             public Component add(Component comp, boolean editState) {
-                Canvas canvas = getCanvas();
                 Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
-                        Unit unit = ((UnitLabel) comp).getUnit();
-                        Tile tile = colonyTile.getWorkTile();
-                        Colony colony = getColony();
-                        Player player = unit.getOwner();
-
-                        // May need to acquire the tile before working it.
-                        if (tile.getOwningSettlement() != colony
-                            && player.canAcquireForSettlement(tile)) {
-                            if (getController().claimLand(tile, colony, 0)
-                                && tile.getOwningSettlement() == colony) {
-                                logger.info("Colony " + colony.getName()
-                                    + " claims tile " + tile.toString()
-                                    + " with unit " + unit.getId());
-                            } else {
-                                logger.warning("Colony " + colony.getName()
-                                    + " did not claim " + tile.toString()
-                                    + " with unit " + unit.getId());
-                                return null;
-                            }
-                        }
-
-                        if (colonyTile.canAdd(unit)) {
+                        if (tryWorkTile(((UnitLabel) comp).getUnit())) {
                             oldParent.remove(comp);
-
-                            GoodsType workType = unit.getWorkType();
-                            getController().work(unit, colonyTile);
-                            // check whether worktype is suitable
-                            if (workType != null
-                                && workType != unit.getWorkType()) {
-                                getController().changeWorkType(unit, workType);
-                            }
                             ((UnitLabel) comp).setSmall(false);
-
-                            if (getClient().getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
-                                ColonyTile bestTile = getColony().getVacantColonyTileFor(unit, false, workType);
-                                if (bestTile != null && colonyTile != bestTile
-                                    && (colonyTile.getProductionOf(unit, workType)
-                                        < bestTile.getProductionOf(unit, workType))) {
-                                    StringTemplate template = StringTemplate.template("colonyPanel.notBestTile")
-                                        .addStringTemplate("%unit%", Messages.getLabel(unit))
-                                        .add("%goods%", workType.getNameKey())
-                                        .addStringTemplate("%tile%", bestTile.getLabel());
-                                    canvas.showInformationMessage(template);
-                                }
-                            }
                         } else {
-                            // could not add the unit on the tile
-                            Tile workTile = colonyTile.getWorkTile();
-                            Settlement s = workTile.getOwningSettlement();
-
-                            if (s != null && s != getColony()) {
-                                if (s.getOwner() == player) {
-                                    // Its one of ours
-                                    canvas.errorMessage("tileTakenSelf");
-                                } else if (s.getOwner().isEuropean()) {
-                                    // occupied by a foreign european colony
-                                    canvas.errorMessage("tileTakenEuro");
-                                } else if (s instanceof IndianSettlement) {
-                                    // occupied by an indian settlement
-                                    canvas.errorMessage("tileTakenInd");
-                                }
-                            } else {
-                                if (colonyTile.getUnitCount() > 0) {
-                                    ; // Tile is already occupied
-                                } else if (!workTile.isLand()) { // no docks
-                                    canvas.errorMessage("tileNeedsDocks");
-                                } else if (workTile.hasLostCityRumour()) {
-                                    canvas.errorMessage("tileHasRumour");
-                                }
-                            }
                             return null;
                         }
                     } else {
-                        logger.warning("An invalid component got dropped on this ASingleTilePanel.");
+                        logger.warning("An invalid component was dropped"
+                                       + " on this ASingleTilePanel.");
                         return null;
                     }
                 }
@@ -1645,6 +1579,100 @@ public final class ColonyPanel extends FreeColPanel
                  refresh();
                 */
                 return comp;
+            }
+
+            /**
+             * Try to work this tile with a specified unit.
+             *
+             * @param unit The <code>Unit</code> to work the tile.
+             * @return True if the unit succeeds.
+             */
+            private boolean tryWorkTile(Unit unit) {
+                Tile tile = colonyTile.getWorkTile();
+                Colony colony = getColony();
+                Player player = unit.getOwner();
+
+                // May need to acquire the tile before working it.
+                if (tile.getOwningSettlement() != colony
+                    && player.canAcquireForSettlement(tile)) {
+                    if (getController().claimLand(tile, colony, 0)
+                        && tile.getOwningSettlement() == colony) {
+                        logger.info("Colony " + colony.getName()
+                                    + " claims tile " + tile.toString()
+                                    + " with unit " + unit.getId());
+                    } else {
+                        logger.warning("Colony " + colony.getName()
+                                       + " did not claim " + tile.toString()
+                                       + " with unit " + unit.getId());
+                        return false;
+                    }
+                }
+
+                Canvas canvas = getCanvas();
+                if (!colonyTile.canAdd(unit)) {
+                    Settlement s = tile.getOwningSettlement();
+                    if (s != null && s != getColony()) {
+                        if (s.getOwner() == player) {
+                            // Its one of ours
+                            canvas.errorMessage("tileTakenSelf");
+                        } else if (s.getOwner().isEuropean()) {
+                            // occupied by a foreign european colony
+                            canvas.errorMessage("tileTakenEuro");
+                        } else if (s instanceof IndianSettlement) {
+                            // occupied by an indian settlement
+                            canvas.errorMessage("tileTakenInd");
+                        }
+                    } else {
+                        if (colonyTile.getUnitCount() > 0) {
+                            ; // Tile is already occupied
+                        } else if (!tile.isLand()) {
+                            canvas.errorMessage("tileNeedsDocks");
+                        } else if (tile.hasLostCityRumour()) {
+                            canvas.errorMessage("tileHasRumour");
+                        }
+                    }
+                    return false;
+                }
+
+                // Choose the work to be done.
+                // FTM, do not change the work type unless explicitly
+                // told to as this destroys experience (TODO: allow
+                // multiple experience accumulation?).
+                GoodsType workType = unit.getWorkType();
+                if (workType == null) {
+                    // Try to use expertise, then tile-specific
+                    workType = unit.getType().getExpertProduction();
+                    if (workType == null) {
+                        workType = colonyTile.getWorkType(unit);
+                    }
+                }
+                // Set the unit to work.  Note this might upgrade the
+                // unit, and possibly even change its work type as the
+                // server has the right to maintain consistency.
+                getController().work(unit, colonyTile);
+                // Now recheck, and see if we want to change to the
+                // expected work type.
+                if (workType != null
+                    && workType != unit.getWorkType()) {
+                    getController().changeWorkType(unit, workType);
+                }
+
+                if (getClient().getClientOptions()
+                    .getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
+                    ColonyTile best = colony.getVacantColonyTileFor(unit, false,
+                                                                    workType);
+                    if (best != null && colonyTile != best
+                        && (colonyTile.getProductionOf(unit, workType)
+                            < best.getProductionOf(unit, workType))) {
+                        StringTemplate template
+                            = StringTemplate.template("colonyPanel.notBestTile")
+                            .addStringTemplate("%unit%", Messages.getLabel(unit))
+                            .add("%goods%", workType.getNameKey())
+                            .addStringTemplate("%tile%", best.getLabel());
+                        canvas.showInformationMessage(template);
+                    }
+                }
+                return true;
             }
 
             public void addPropertyChangeListeners() {

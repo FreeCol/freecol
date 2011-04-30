@@ -964,12 +964,9 @@ public class Unit extends FreeColGameObject
     /**
      * Gets the type of goods this unit is producing in its current occupation.
      *
-     * @return The type of goods this unit would produce.
+     * @return The type of goods this unit is producing.
      */
     public GoodsType getWorkType() {
-        if (getLocation() instanceof Building) {
-            return ((Building) getLocation()).getGoodsOutputType();
-        }
         return workType;
     }
 

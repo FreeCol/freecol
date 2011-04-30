@@ -2869,9 +2869,8 @@ public final class InGameController extends Controller {
         }
 
         // Check for upgrade.
-        UnitType type
-            = unit.getType().getTargetType(ChangeType.ENTER_COLONY,
-                                               unit.getOwner());
+        UnitType type = unit.getType().getTargetType(ChangeType.ENTER_COLONY,
+                                                     unit.getOwner());
         if (type != null) unit.setType(type);
 
         // Change the location.
@@ -2882,7 +2881,6 @@ public final class InGameController extends Controller {
         unit.setState(UnitState.IN_COLONY);
         unit.setLocation(workLocation);
         cs.add(See.perhaps(), colony.getTile());
-
         // Others can see colony change size
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
