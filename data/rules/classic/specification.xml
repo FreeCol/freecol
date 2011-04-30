@@ -51,6 +51,7 @@
               source="model.source.colonyGoodsParty"
               value="50" type="percentage"
               increment="-2" incrementType="additive" />
+    <modifier id="model.goods.food" value="0" type="additive"/>
   </modifiers>
 
   <events>
