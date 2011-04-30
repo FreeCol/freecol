@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -120,8 +119,6 @@ public class WishRealizationMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
-        Unit unit = getUnit();
-
         if (!isValid()) {
             return;
         }

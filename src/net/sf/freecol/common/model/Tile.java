@@ -1946,7 +1946,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (settlement != null && playerExploredTiles != null) {
             for (Entry<Player, PlayerExploredTile> e
                      : playerExploredTiles.entrySet()) {
-                Player player = e.getKey();
                 PlayerExploredTile pet = e.getValue();
                 if (pet != null && (pet.getOwner() == null
                                     || pet.getOwningSettlement() == null)) {

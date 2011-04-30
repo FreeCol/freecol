@@ -2177,7 +2177,6 @@ public class Colony extends Settlement implements Nameable {
         if (productionAndConsumption == null) {
             java.util.Map<Object, ProductionInfo> productionAndConsumption = new HashMap<Object, ProductionInfo>();
             ProductionMap production = new ProductionMap();
-            int count = 0;
             for (ColonyTile colonyTile : getColonyTiles()) {
                 List<AbstractGoods> p = colonyTile.getProduction();
                 if (!p.isEmpty()) {

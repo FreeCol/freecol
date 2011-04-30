@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.ai.AIMessage;
@@ -141,7 +140,6 @@ public class CreateMissionAtSettlementGoal extends Goal {
                             if (((IndianSettlement)target).getMissionary()==null ||
                                 ((IndianSettlement)target).getMissionary().getOwner()!=player.getPlayer()) {
                                 PathNode pathNode = u.getUnit().findPath(target.getTile());
-                                Direction d = pathNode.getDirection();
                                 u.getUnit().setMovesLeft(0);
                                                         
                                 AIMessage.askEstablishMission(u,

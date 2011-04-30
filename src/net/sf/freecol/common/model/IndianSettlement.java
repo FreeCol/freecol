@@ -357,7 +357,6 @@ public class IndianSettlement extends Settlement {
      */
     public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
         boolean change = makeContactSettlement(player);
-        Level oldLevel = getAlarm(player).getLevel();
         change |= changeAlarm(player, addToAlarm);
 
         // Propagate alarm upwards.  Capital has a greater impact.

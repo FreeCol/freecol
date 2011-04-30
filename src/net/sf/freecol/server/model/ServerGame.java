@@ -253,7 +253,6 @@ public class ServerGame extends Game implements ServerModelObject {
     private void csSpanishSuccession(ChangeSet cs, Event spanishSuccession) {
         Player weakestAIPlayer = null;
         Player strongestAIPlayer = null;
-        int rebelPlayers = 0;
         for (Player player : getLiveEuropeanPlayers()) {
             if (player.isREF() || !player.isAI()) continue;
             if (weakestAIPlayer == null

@@ -243,7 +243,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param amount The new amount.
      */
     public void setAmount(GoodsType goodsType, int newAmount) {
-        int oldAmount = getGoodsCount(goodsType);
         if (newAmount == 0) {
             storedGoods.remove(goodsType);
         } else {
