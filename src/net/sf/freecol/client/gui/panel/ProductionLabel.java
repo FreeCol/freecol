@@ -423,11 +423,11 @@ public final class ProductionLabel extends JComponent {
             pixelsPerIcon = maxSpacing;
         }
 
+        int width = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
         if (getStringImage() == null) {
-            return 0;
+            return width;
         } else {
-            return Math.max(getStringImage().getWidth(null),
-                            pixelsPerIcon * (drawImageCount - 1) + iconWidth);
+            return Math.max(getStringImage().getWidth(null), width);
         }
 
     }
@@ -440,6 +440,7 @@ public final class ProductionLabel extends JComponent {
     public void paintComponent(Graphics g) {
 
         if (goodsIcon == null || (production == 0 && stockNumber<0) ) {
+            logger.fine("Empty production label: fix this!");
             return;
         }
 
