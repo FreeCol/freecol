@@ -89,6 +89,7 @@ public class ActionManager extends OptionGroup {
         add(new GotoTileAction(freeColClient));
         add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
+        add(new MapEditorAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient, true));
         add(new MiniMapZoomOutAction(freeColClient));
