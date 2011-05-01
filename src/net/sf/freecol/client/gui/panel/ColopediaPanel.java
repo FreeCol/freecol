@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Feature;
@@ -780,7 +781,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildGoodsDetail(GoodsType type) {
 
-        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gap 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
@@ -803,42 +804,131 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 }
             }
 
-            detailPanel.add(localizedLabel("colopedia.goods.improvedBy"), "top");
+            detailPanel.add(localizedLabel("colopedia.goods.improvedBy"), "newline 20, top");
             if (improvements.size() == 0) {
-                detailPanel.add(new JLabel(none));
-            } else if (improvements.size() == 1) {
-                detailPanel.add(new JLabel(Messages.message(improvements.get(0).getNameKey()) + " (" +
-                                           getModifierAsString(modifiers.get(0)) + ")"));
+                detailPanel.add(new JLabel(none), "span");
             } else {
-                detailPanel.add(new JLabel(Messages.message(improvements.get(0).getNameKey()) + " (" +
-                                           getModifierAsString(modifiers.get(0)) + ")"),
-                                "flowy, split " + improvements.size());
-                for (int index = 1; index < improvements.size(); index++) {
-                    detailPanel.add(new JLabel(Messages.message(improvements.get(index).getNameKey()) + " (" +
-                                               getModifierAsString(modifiers.get(index)) + ")"));
+                for (int index = 0; index < improvements.size(); index++) {
+                    String constraints = (index == 0) ? "span" : "skip, span";
+                    detailPanel.add(localizedLabel(StringTemplate.template("colopedia.goods.improvement")
+                                                   .addName("%name%", improvements.get(index))
+                                                   .addName("%amount%", getModifierAsString(modifiers.get(index)))),
+                                    constraints);
                 }
             }
         } else {
-            detailPanel.add(localizedLabel("colopedia.goods.madeFrom"));
+            detailPanel.add(localizedLabel("colopedia.goods.madeFrom"), "newline 20");
             if (type.isRefined()) {
-                detailPanel.add(getGoodsButton(type.getRawMaterial()));
+                detailPanel.add(getGoodsButton(type.getRawMaterial()), "span");
             } else {
-                detailPanel.add(new JLabel(none));
+                detailPanel.add(localizedLabel("nothing"), "span");
             }
         }
 
-        detailPanel.add(localizedLabel("colopedia.goods.makes"));
+        detailPanel.add(localizedLabel("colopedia.goods.makes"), "newline 20");
         if (type.isRawMaterial()) {
-            detailPanel.add(getGoodsButton(type.getProducedMaterial()), "wrap 40");
-        } else {
-            detailPanel.add(new JLabel(none), "wrap 40");
+            detailPanel.add(getGoodsButton(type.getProducedMaterial()), "span");
+        } else if (type.getStoredAs() != type) {
+            detailPanel.add(getGoodsButton(type.getStoredAs()), "span");
+        } else if (!type.isBuildingMaterial()) {
+            detailPanel.add(localizedLabel("nothing"), "span");
         }
 
-        detailPanel.add(localizedLabel("colopedia.goods.description"));
-        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
+        if (type.isBuildingMaterial()) {
+            List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
+            boolean allTypes = filterBuildables(getSpecification().getBuildingTypeList(), buildingTypes, type);
+            if (buildingTypes.size() > 0) {
+                detailPanel.add(localizedLabel("colopedia.goods.buildings"), "newline 20");
+                if (allTypes) {
+                    JButton button = getLinkButton(Messages.message("colopedia.goods.allBuildings"),
+                                                   null, PanelType.BUILDINGS.toString());
+                    button.addActionListener(this);
+                    detailPanel.add(button, "span");
+                } else {
+                    int count = 0;
+                    for (BuildingType building : buildingTypes) {
+                        JButton label = getButton(building);
+                        if (count > 0 && count % 3 == 0) {
+                            detailPanel.add(label, "skip");
+                        } else {
+                            detailPanel.add(label);
+                        }
+                        count++;
+                    }
+                }
+            }
+            List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
+            allTypes = filterBuildables(getSpecification().getEquipmentTypeList(), equipmentTypes, type);
+            if (equipmentTypes.size() > 0) {
+                detailPanel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
+                if (allTypes) {
+                    detailPanel.add(localizedLabel("colopedia.goods.allEquipment"));
+                    /*
+                      JButton button = getLinkButton(Messages.message("colopedia.goods.allEquipment"),
+                      null, PanelType.EQUIPMENT.toString());
+                      button.addActionListener(this);
+                      detailPanel.add(button, "newline, skip, span");
+                    */
+                } else {
+                    int count = 0;
+                    for (EquipmentType equipment : equipmentTypes) {
+                        //JButton label = getButton(equipment);
+                        JLabel label = localizedLabel(equipment.getNameKey());
+                        if (count > 0 && count % 3 == 0) {
+                            detailPanel.add(label, "skip");
+                        } else {
+                            detailPanel.add(label);
+                        }
+                        count++;
+                    }
+                }
+            }
+            List<UnitType> unitTypes = new ArrayList<UnitType>();
+            allTypes = filterBuildables(getSpecification().getUnitTypeList(), unitTypes, type);
+            if (unitTypes.size() > 0) {
+                detailPanel.add(localizedLabel("colopedia.goods.units"), "newline 20");
+                if (allTypes) {
+                    JButton button = getLinkButton(Messages.message("colopedia.goods.allUnits"),
+                                                   null, PanelType.UNITS.toString());
+                    button.addActionListener(this);
+                    detailPanel.add(button, "span");
+                } else {
+                    int count = 0;
+                    for (UnitType unit : unitTypes) {
+                        JButton label = getButton(unit);
+                        if (count > 0 && count % 3 == 0) {
+                            detailPanel.add(label, "skip");
+                        } else {
+                            detailPanel.add(label);
+                        }
+                        count++;
+                    }
+                }
+            }
+        }
+
+        detailPanel.add(localizedLabel("colopedia.goods.description"), "newline 20");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span, growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
+    }
+
+
+    private <T extends BuildableType> boolean filterBuildables(List<T> input, List<T> output, GoodsType type) {
+        boolean result = true;
+        loop: for (T buildableType : input) {
+            if (!buildableType.getGoodsRequired().isEmpty()) {
+                for (AbstractGoods goods : buildableType.getGoodsRequired()) {
+                    if (type == goods.getType()) {
+                        output.add(buildableType);
+                        continue loop;
+                    }
+                }
+                result = false;
+            }
+        }
+        return result;
     }
 
     /**
@@ -1327,8 +1417,17 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         } else {
             DefaultMutableTreeNode node = nodeMap.get(command);
             tree.collapsePath(tree.getSelectionPath().getParentPath());
-            tree.scrollPathToVisible(new TreePath(node.getPath()));
-            initialize(getSpecification().getType(command));
+            TreePath newPath = new TreePath(node.getPath());
+            tree.scrollPathToVisible(newPath);
+            tree.expandPath(newPath);
+            try {
+                initialize(getSpecification().getType(command));
+            } catch(IllegalArgumentException e) {
+                // this must be a PanelType
+                detailPanel.removeAll();
+                detailPanel.revalidate();
+                detailPanel.repaint();
+            }
         }
     }
 
