@@ -78,7 +78,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                         canvas.debugForeignColony(tile.getSettlement());
                     }
                 } else {
-                    gui.showColonyPanel(position);
+                    canvas.showColonyPanel(position);
                 }
             } else {
                 canvas.requestFocus();

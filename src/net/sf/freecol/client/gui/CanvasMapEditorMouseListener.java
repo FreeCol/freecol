@@ -103,7 +103,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         try {
             if (e.getClickCount() > 1) {
                 Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                gui.showColonyPanel(p);
+                canvas.showColonyPanel(p);
             } else {
                 canvas.requestFocus();
             }

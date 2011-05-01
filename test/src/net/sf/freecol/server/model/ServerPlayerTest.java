@@ -36,7 +36,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -440,7 +439,6 @@ public class ServerPlayerTest extends FreeColTestCase {
     public int sellUntilPriceDrop(Game game, ServerPlayer player,
                                   GoodsType type) {
         Random random = new Random();
-        ChangeSet cs = new ChangeSet();
 
         int result = 0;
 
@@ -466,7 +464,6 @@ public class ServerPlayerTest extends FreeColTestCase {
                                  GoodsType type) {
         Game g = ServerTestHelper.startServerGame(getTestMap());
         Random random = new Random();
-        ChangeSet cs = new ChangeSet();
 
         int result = 0;
 

@@ -117,6 +117,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -1205,6 +1206,31 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, getPopupPosition(colony.getTile()));
         return panel;
     }
+    
+    /**
+     * Describe <code>showColonyPanel</code> method here.
+     *
+     * @param selectedTile a <code>Position</code> value
+     */
+    public void showColonyPanel(Position selectedTile) {
+        Game gameData = freeColClient.getGame();
+
+        if (selectedTile != null && !freeColClient.getGame().getMap().isValid(selectedTile)) {
+            return;
+        }
+
+        if (gui.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
+            Tile t = gameData.getMap().getTile(selectedTile);
+            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
+                if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
+                    gui.setFocus(t);
+                    gui.stopBlinking();
+                    showColonyPanel(t.getColony());
+                }
+            }
+        }
+    }
+    
 
     /**
      * Display a dialog to confirm a declaration of independence.

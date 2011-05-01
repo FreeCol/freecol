@@ -1244,9 +1244,7 @@ public final class GUI {
      *      not drawn on the mapboard.
      */
     public Point getTilePosition(Tile t) {
-        if (bottomRow < 0) {
-            positionMap();
-        }
+        repositionMapIfNeeded();
         if (isTileVisible(t)) {
             int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
             int y = ((t.getY() - topRow) * halfHeight) + topRowY;
@@ -1382,7 +1380,7 @@ public final class GUI {
      * otherwise.
      */
     public boolean onScreen(Tile tileToCheck) {
-        if (bottomRow < 0) positionMap();
+        repositionMapIfNeeded();
         return tileToCheck.getY() - 2 > topRow && tileToCheck.getY() + 4 < bottomRow
             && tileToCheck.getX() - 1 > leftColumn && tileToCheck.getX() + 2 < rightColumn;
     }
@@ -1650,29 +1648,7 @@ public final class GUI {
         updateMapDisplayVariables();
     }
 
-    /**
-     * Describe <code>showColonyPanel</code> method here.
-     *
-     * @param selectedTile a <code>Position</code> value
-     */
-    public void showColonyPanel(Position selectedTile) {
-        Game gameData = freeColClient.getGame();
-
-        if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
-            return;
-        }
-
-        if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
-            Tile t = gameData.getMap().getTile(selectedTile);
-            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
-                if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-                    setFocus(t);
-                    stopBlinking();
-                    freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
-                }
-            }
-        }
-    }
+ 
 
     /**
      * Starts the unit-selection-cursor blinking animation.
@@ -2138,9 +2114,7 @@ public final class GUI {
         Position the map if it is not positioned yet.
         */
 
-        if (bottomRow < 0) {
-            positionMap();
-        }
+        repositionMapIfNeeded();
 
         /*
         PART 1a
@@ -2614,7 +2588,6 @@ public final class GUI {
         
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Addtions and improvements to
@@ -2785,6 +2758,7 @@ public final class GUI {
         }
     }
 
+
     /**
      * Describe <code>drawCursor</code> method here.
      *
@@ -2793,7 +2767,6 @@ public final class GUI {
     private void drawCursor(Graphics2D g) {
         g.drawImage(cursorImage, 0, 0, null);
     }
-
 
     /**
      * Draws the given TileItem on the given Tile.
@@ -2828,6 +2801,7 @@ public final class GUI {
             }
         }
     }
+
 
     /**
      * Draws all roads on the given Tile.
@@ -2930,8 +2904,6 @@ public final class GUI {
         }
     }
 
-
-
     /**
      * Returns the amount of columns that are to the left of the Tile
      * that is displayed in the center of the Map.
@@ -2941,6 +2913,8 @@ public final class GUI {
     private int getLeftColumns() {
         return getLeftColumns(focus.getY());
     }
+
+
 
     /**
      * Returns the amount of columns that are to the left of the Tile
@@ -3038,7 +3012,6 @@ public final class GUI {
             return Color.BLACK;
         }
     }
-
 
     /**
      * Gets the coordinates to draw a unit in a given tile.
@@ -3144,6 +3117,7 @@ public final class GUI {
             (activeUnit.getTile() != null &&
              !activeUnit.getTile().equals(selectedTile));
     }
+
 
     /**
      * Draws the borders of a territory on the given Tile. The
@@ -3345,8 +3319,6 @@ public final class GUI {
         }
     }
 
-
-
     private void redrawMapControls() {
         int x = 0, y = 0;
         MapControls mapControls = freeColClient.getCanvas().getMapControls();
@@ -3356,6 +3328,8 @@ public final class GUI {
         }
         freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
     }
+
+
 
     /**
      * Describe <code>releaseUnitOutForAnimation</code> method here.
@@ -3397,6 +3371,12 @@ public final class GUI {
         }
 
         return result;
+    }
+
+    private void repositionMapIfNeeded() {
+        if (bottomRow < 0) {
+            positionMap();
+        }
     }
 
 
