@@ -149,9 +149,6 @@ public class IndianDemandMessage extends Message {
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        if (colony == null) {
-            return Message.clientError("Bad colony: " + colonyId);
-        }
         int gold = 0;
         if (goods != null) {
             if (goods.getLocation() != colony) {
