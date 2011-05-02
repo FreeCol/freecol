@@ -150,8 +150,27 @@ public final class TilePopup extends JPopupMenu {
                     });
                 add(gotoMenuItem);
                 hasAnItem = true;
-                addSeparator();
             }
+
+            // Add move to Europe entry if the unit can do so
+            if (unitTile == tile && activeUnit.isNaval()
+                && activeUnit.canMoveToEurope()) {
+                JMenuItem europeMenuItem
+                    = new JMenuItem(Messages.message(StringTemplate.template("gotoEurope")));
+                europeMenuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            if (freeColClient.getGame().getCurrentPlayer()
+                                != freeColClient.getMyPlayer()) {
+                                return;
+                            }
+                            freeColClient.getInGameController()
+                                .moveToEurope(activeUnit);
+                        }
+                    });
+                add(europeMenuItem);
+                hasAnItem = true;
+            }
+            if (hasAnItem) addSeparator();
         }
 
         Settlement settlement = tile.getSettlement();
