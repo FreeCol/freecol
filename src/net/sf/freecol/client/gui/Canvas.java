@@ -106,7 +106,6 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -117,7 +116,6 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -298,7 +296,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
 
-    private final GUI gui;
+    private final GUI gui; 
 
     private final ServerListPanel serverListPanel;
 
@@ -1210,17 +1208,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Describe <code>showColonyPanel</code> method here.
      *
-     * @param selectedTile a <code>Position</code> value
+     * @param selectedTile a <code>Tile</code> value
      */
-    public void showColonyPanel(Position selectedTile) {
-        Game gameData = freeColClient.getGame();
-
-        if (selectedTile != null && !freeColClient.getGame().getMap().isValid(selectedTile)) {
-            return;
-        }
-
+    public void showColonyPanel(Tile t) {
         if (gui.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
-            Tile t = gameData.getMap().getTile(selectedTile);
             if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
                 if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
                     gui.setFocus(t);
@@ -2146,24 +2137,20 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a tile popup.
      *
-     * @param pos The coordinates of the Tile where the popup occurred.
+     * @param tile The Tile where the popup occurred.
      * @param x The x-coordinate on the screen where the popup needs to be
      *            placed.
      * @param y The y-coordinate on the screen where the popup needs to be
      *            placed.
      * @see TilePopup
      */
-    public void showTilePopup(Map.Position pos, int x, int y) {
-        if (pos != null) {
-            Tile t = freeColClient.getGame().getMap().getTile(pos.getX(), pos.getY());
-
-            if (t != null) {
-                TilePopup tp = new TilePopup(t, freeColClient, this, getGUI());
-                if (tp.hasItem()) {
-                    showPopup(tp, x, y);
-                } else if (t.isExplored()) {
-                    showPanel(new TilePanel(this, t));
-                }
+    public void showTilePopup(Tile tile, int x, int y) {
+        if (tile != null) {
+            TilePopup tp = new TilePopup(tile, freeColClient, this, getGUI());
+            if (tp.hasItem()) {
+                showPopup(tp, x, y);
+            } else if (tile.isExplored()) {
+                showPanel(new TilePanel(this, tile));
             }
         }
     }

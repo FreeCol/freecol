@@ -1380,7 +1380,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             freeColClient.playSound("sound.event.buildingComplete");
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile);
+            gui.setSelectedTile(tile, false);
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
@@ -1559,7 +1559,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             GUI gui = freeColClient.getGUI();
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile);
+            gui.setSelectedTile(tile, false);
         }
     }
 
@@ -5085,7 +5085,7 @@ public final class InGameController implements NetworkConstants {
             doEndTurn();
         } else if (tile != null) {
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile);
+            gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             doEndTurn();
         } else {

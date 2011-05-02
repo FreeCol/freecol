@@ -399,10 +399,10 @@ public final class GUI {
      *
      * @param x The x-coordinate in pixels.
      * @param y The y-coordinate in pixels.
-     * @return The map coordinates of the Tile that is located at
+     * @return The Tile that is located at
      * the given position on the screen.
      */
-    public Map.Position convertToMapCoordinates(int x, int y) {
+    public Tile convertToMapTile(int x, int y) {
         Game gameData = freeColClient.getGame();
         if ((gameData == null) || (gameData.getMap() == null)) {
             return null;
@@ -880,7 +880,13 @@ public final class GUI {
                 }
             }
         }
-        return new Map.Position(focus.getX() - diffLeft, focus.getY() - diffUp);
+        Position position = new Map.Position(focus.getX() - diffLeft, focus.getY() - diffUp);
+        
+        if (!freeColClient.getGame().getMap().isValid(position))
+            return null;
+        
+        return freeColClient.getGame().getMap().getTile(position);
+        
     }
 
     /**
@@ -1195,7 +1201,7 @@ public final class GUI {
     * Gets the selected tile.
     *
     * @return The <code>Tile</code> selected.
-    * @see #setSelectedTile(Tile)
+    * @see #setSelectedTile(Tile, boolean)
     */
     public Tile getSelectedTile() {
         return selectedTile;
@@ -1361,7 +1367,7 @@ public final class GUI {
         if(selectedTile != null){
             Tile newTile = selectedTile.getNeighbourOrNull(direction);
             if(newTile != null)
-                setSelectedTile(newTile);
+                setSelectedTile(newTile, false);
         }
         else{
             logger.warning("selectedTile is null");
@@ -1417,12 +1423,12 @@ public final class GUI {
 
 
     /**
-    * Sets the active unit. Invokes {@link #setSelectedTile(Tile)} if the
+    * Sets the active unit. Invokes {@link #setSelectedTile(Tile, boolean)} if the
     * selected tile is another tile than where the <code>activeUnit</code>
     * is located.
     *
     * @param activeUnit The new active unit.
-    * @see #setSelectedTile(Tile)
+    * @see #setSelectedTile(Tile, boolean)
     */
     public void setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
@@ -1455,7 +1461,7 @@ public final class GUI {
             viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         if (activeUnit != null) {
-            setSelectedTile(activeUnit.getTile());
+            setSelectedTile(activeUnit.getTile(), false);
         } else {
             freeColClient.getActionManager().update();
             freeColClient.updateMenuBar();
@@ -1563,19 +1569,10 @@ public final class GUI {
     * @see #setActiveUnit
     * @see #setFocus(Map.Position)
     */
-    public void setSelectedTile(Position selectedPosition, boolean clearGoToOrders) {
-        Game gameData = freeColClient.getGame();
-
-        if (selectedPosition != null && !gameData.getMap().isValid(selectedPosition)) {
-            return;
-        }
-
+    public void setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         Tile oldTile = this.selectedTile;
 
-        if (selectedPosition == null)
-            selectedTile = null;
-        else
-            selectedTile = gameData.getMap().getTile(selectedPosition);
+        selectedTile = newTileToSelect;
         
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             if (noActiveUnitIsAt(selectedTile)) {
@@ -1625,18 +1622,6 @@ public final class GUI {
         }
     }
 
-    /**
-     * Selects a tile, without clearing the orders of the first unit
-     * contained.
-     *
-     * @param tile The <code>Tile</code> to select.
-     * @see #setSelectedTile(Map.Position, boolean)
-     */
-    public void setSelectedTile(Tile tile) {
-        if (tile != null) {
-            setSelectedTile(tile.getPosition(), false);
-        }
-    }
 
     /**
      * Describe <code>setSize</code> method here.

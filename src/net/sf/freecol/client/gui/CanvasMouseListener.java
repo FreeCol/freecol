@@ -30,7 +30,6 @@ import javax.swing.Timer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -71,14 +70,13 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
-                Map.Position position = gui.convertToMapCoordinates(e.getX(), e.getY());
+                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
                 if (FreeCol.isInDebugMode()) {
-                    Tile tile = canvas.getClient().getGame().getMap().getTile(position);
                     if (tile.getSettlement() != null) {
                         canvas.debugForeignColony(tile.getSettlement());
                     }
                 } else {
-                    canvas.showColonyPanel(position);
+                    canvas.showColonyPanel(tile);
                 }
             } else {
                 canvas.requestFocus();
@@ -122,14 +120,9 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                     gui.stopGoto();
                 }
 
-                canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
+                canvas.showTilePopup(gui.convertToMapTile(e.getX(), e.getY()), e.getX(), e.getY());
             } else if (e.getButton() == MouseEvent.BUTTON2) {
-                Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                if (p == null || !canvas.getClient().getGame().getMap().isValid(p)) {
-                    return;
-                }
-
-                Tile tile = canvas.getClient().getGame().getMap().getTile(p);
+                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     Unit unit = gui.getActiveUnit();
                     if (unit != null && unit.getTile() != tile) {
@@ -203,6 +196,6 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     public void actionPerformed(ActionEvent timerEvent){
         doubleClickTimer.stop();
-        gui.setSelectedTile(gui.convertToMapCoordinates(centerX, centerY), true);
+        gui.setSelectedTile(gui.convertToMapTile(centerX, centerY), true);
     }
 }

@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -102,8 +101,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         try {
             if (e.getClickCount() > 1) {
-                Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                canvas.showColonyPanel(p);
+                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+                canvas.showColonyPanel(tile);
             } else {
                 canvas.requestFocus();
             }
@@ -145,8 +144,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-                Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                Tile tile = getMap().getTile(p);
+                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
@@ -166,7 +164,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         canvas.showFreeColDialog(new EditSettlementDialog(canvas, settlement));
                     }
                 } else {
-                    gui.setSelectedTile(p, true);
+                    gui.setSelectedTile(null, true);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 startPoint = e.getPoint();
@@ -201,34 +199,34 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         drawBox(component, startPoint, oldPoint);
         if (gui.getFocus() != null) {	
-            Position start = gui.convertToMapCoordinates(startPoint.x, startPoint.y);
-            Position end = start;
+            Tile start = gui.convertToMapTile(startPoint.x, startPoint.y);
+            Tile end = start;
             //Optimization, only check if the points are different
             if(startPoint.x != oldPoint.x || startPoint.y != oldPoint.y){
-            	end = gui.convertToMapCoordinates(oldPoint.x, oldPoint.y);
+            	end = gui.convertToMapTile(oldPoint.x, oldPoint.y);
             }
             
             // no option selected, just center map
             if(!isTransformActive){
-            	gui.setFocus(getMap().getTile(end));
+            	gui.setFocus(end);
             	return;
             }
             
             // find the area to transform
             int min_x, max_x, min_y, max_y;
-            if (start.x < end.x) {
-                min_x = start.x;
-                max_x = end.x;
+            if (start.getX() < end.getX()) {
+                min_x = start.getX();
+                max_x = end.getX();
             } else {
-                min_x = end.x;
-                max_x = start.x;
+                min_x = end.getX();
+                max_x = start.getX();
             }
-            if (start.y < end.y) {
-                min_y = start.y;
-                max_y = end.y;
+            if (start.getY() < end.getY()) {
+                min_y = start.getY();
+                max_y = end.getY();
             } else {
-                min_y = end.y;
-                max_y = start.y;
+                min_y = end.getY();
+                max_y = start.getY();
             }
             
             // apply transformation to all tiles in the area

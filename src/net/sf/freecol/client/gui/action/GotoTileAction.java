@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 
@@ -61,7 +60,7 @@ public class GotoTileAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        GUI gui = getFreeColClient().getCanvas().getGUI();
+        GUI gui = getFreeColClient().getGUI();
 
         //Action should be disabled if there is no active unit, but make sure
         if (gui.getActiveUnit() == null) {
@@ -77,18 +76,15 @@ public class GotoTileAction extends UnitAction {
             //CanvaseMouseMotionListener
             Point pt = getFreeColClient().getCanvas().getMousePosition();
             if (pt != null) {
-                Map map = getFreeColClient().getGame().getMap();
-                Map.Position p = gui.convertToMapCoordinates(pt.x, pt.y);
+                Tile tile = gui.convertToMapTile(pt.x, pt.y);
 
-                if (p != null && map.isValid(p)) {
-                    Tile tile = map.getTile(p);
-                    if (tile != null) {
-                        if (gui.getActiveUnit().getTile() != tile) {
-                            PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                            gui.setGotoPath(dragPath);
-                        }
+                if (tile != null) {
+                    if (gui.getActiveUnit().getTile() != tile) {
+                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                        gui.setGotoPath(dragPath);
                     }
                 }
+                
             }
         } else {
             gui.stopGoto();

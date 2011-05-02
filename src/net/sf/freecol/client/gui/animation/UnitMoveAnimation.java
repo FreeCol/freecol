@@ -94,7 +94,7 @@ final class UnitMoveAnimation {
                     : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
                 final int signalY = (srcPoint.getY() == dstPoint.getY()) ? 0
                     : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
-
+ 
                 // Painting the whole screen once to get rid of
                 // disposed dialog-boxes.
                 canvas.paintImmediately(canvas.getBounds());

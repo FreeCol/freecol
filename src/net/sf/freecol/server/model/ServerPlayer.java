@@ -900,7 +900,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                            modifyTension(otherPlayer, modifier));
                 }
                 cs.addStance(See.perhaps(), this, stance, otherPlayer,
-                             stance == Stance.WAR || old == stance.WAR);
+                             stance == Stance.WAR || old == Stance.WAR);
                 logger.info("Stance change " + getName()
                             + " " + old.toString()
                             + " -> " + stance.toString()
@@ -920,7 +920,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 if (!change) {
                     cs.addStance(See.perhaps(), otherPlayer, stance, this,
-                                 stance == Stance.WAR || old == stance.WAR);
+                                 stance == Stance.WAR || old == Stance.WAR);
                 }
                 logger.info("Stance change " + otherPlayer.getName()
                             + " " + old.toString()

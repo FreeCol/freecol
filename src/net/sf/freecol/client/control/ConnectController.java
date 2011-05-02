@@ -286,11 +286,13 @@ public final class ConnectController {
                         if (activeUnitId != null) {
                             freeColClient.setActiveUnit(activeUnitId);
                         } else {
-                            freeColClient.getGUI().setSelectedTile(entryTile);
+                            freeColClient.getGUI().setSelectedTile(entryTile, false);
                         }
                     } else {
-                        freeColClient.getGUI().setSelectedTile(entryTile);
+                        freeColClient.getGUI().setSelectedTile(entryTile, false);
                     }
+                    freeColClient.getGUI().setSelectedTile(thisPlayer
+                        .getEntryLocation().getTile(), false);
                 }
             } else if (in.getLocalName().equals("error")) {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));

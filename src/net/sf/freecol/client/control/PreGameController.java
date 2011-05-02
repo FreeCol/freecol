@@ -227,7 +227,7 @@ public final class PreGameController {
         }
 
         InGameController igc = freeColClient.getInGameController();
-        gui.setSelectedTile((Tile) myPlayer.getEntryLocation());
+        gui.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
         if (freeColClient.getGame().getCurrentPlayer() == myPlayer) {
             igc.nextActiveUnit();
         }

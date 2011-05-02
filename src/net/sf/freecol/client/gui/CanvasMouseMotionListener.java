@@ -94,13 +94,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                 gui.stopGoto();
             }
             
-            Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+            Tile tile = gui.convertToMapTile(e.getX(), e.getY());
 
-            if (p == null || !map.isValid(p)) {
-                return;
-            }
-        
-            Tile tile = map.getTile(p);
             if (tile != null) {
                 if (lastTile != tile) {
                     lastTile = tile;
@@ -122,7 +117,6 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
-        Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
 
         if (e.getComponent().isEnabled() &&
 			 canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
@@ -132,11 +126,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread = null;
         }
 
-        if (p == null || !map.isValid(p)) {
-            return;
-        }
-
-        Tile tile = map.getTile(p);
+        Tile tile = gui.convertToMapTile(e.getX(), e.getY());
         if (tile != null && 
             (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
             // only perform the goto for the left mouse button
@@ -148,10 +138,6 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                         lastTile = tile;
                         if (gui.getActiveUnit().getTile() != tile) {
                             PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                            // ONLY FOR DEBUGGING: PathNode dragPath =
-                            // map.findPath(gui.getActiveUnit(),
-                            // gui.getActiveUnit().getTile(), tile, (Unit)
-                            // gui.getActiveUnit().getLocation());
                             gui.setGotoPath(dragPath);
                         } else {
                             gui.setGotoPath(null);
