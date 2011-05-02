@@ -209,6 +209,10 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                 out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
+                if (isCurrentPlayer && freeColServer.getActiveUnit() != null) {
+                    out.writeAttribute("activeUnit",
+                                       freeColServer.getActiveUnit().getId());
+                }
                 freeColServer.getGame().toXML(out, player);
                 freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
                 out.writeEndElement();

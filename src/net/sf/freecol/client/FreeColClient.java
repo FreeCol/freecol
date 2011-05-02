@@ -920,14 +920,15 @@ public final class FreeColClient {
     /**
      * Set the game-wide next active unit if one can be found.
      *
+     * @param unitId A unit id for the unit to make active.
      */
-    public void setActiveUnit() {
-        if (getFreeColServer() != null) {
-            Unit active = getFreeColServer().getActiveUnit();
-            if (active != null && getGame() != null) {
-                // Convert to client side
-                active = (Unit) getGame().getFreeColGameObject(active.getId());
+    public void setActiveUnit(String unitId) {
+        if (unitId != null && getGame() != null) {
+            Unit active = (Unit) getGame().getFreeColGameObject(unitId);
+            if (active != null) {
+                active.getOwner().resetIterators();
                 active.getOwner().setNextActiveUnit(active);
+                getGUI().setActiveUnit(active);
             }
         }
     }

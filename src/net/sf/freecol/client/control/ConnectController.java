@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -256,6 +257,7 @@ public final class ConnectController {
                 boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
                 boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                 boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
+                String activeUnitId = in.getAttributeValue(null, "activeUnit");
 
                 in.nextTag();
                 Game game = new Game(in, username);
@@ -269,21 +271,26 @@ public final class ConnectController {
                 freeColClient.setMyPlayer(thisPlayer);
 
                 freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
-                freeColClient.setActiveUnit();
 
                 c.endTransmission(in);
 
                 // If (true) --> reconnect
                 if (startGame) {
+                    Tile entryTile = thisPlayer.getEntryLocation().getTile();
                     freeColClient.setSingleplayer(singleplayer);
                     freeColClient.getPreGameController().startGame();
 
                     if (isCurrentPlayer) {
                         freeColClient.getInGameController()
                             .setCurrentPlayer(thisPlayer);
+                        if (activeUnitId != null) {
+                            freeColClient.setActiveUnit(activeUnitId);
+                        } else {
+                            freeColClient.getGUI().setSelectedTile(entryTile);
+                        }
+                    } else {
+                        freeColClient.getGUI().setSelectedTile(entryTile);
                     }
-                    freeColClient.getGUI().setSelectedTile(thisPlayer
-                        .getEntryLocation().getTile());
                 }
             } else if (in.getLocalName().equals("error")) {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
