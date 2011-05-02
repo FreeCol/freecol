@@ -758,6 +758,7 @@ public class ChangeSet {
         private Player first;
         private Stance stance;
         private Player second;
+        private boolean war;
 
         /**
          * Build a new StanceChange.
@@ -766,12 +767,15 @@ public class ChangeSet {
          * @param first The <code>Player</code> changing stance.
          * @param stance The <code>Stance</code> to change to.
          * @param second The <code>Player</code> wrt with to change.
+         * @param war The war status.
          */
-        StanceChange(See see, Player first, Stance stance, Player second) {
+        StanceChange(See see, Player first, Stance stance, Player second,
+                     boolean war) {
             super(see);
             this.first = first;
             this.stance = stance;
             this.second = second;
+            this.war = war;
         }
 
         /**
@@ -796,9 +800,8 @@ public class ChangeSet {
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return (ServerPlayer) first == serverPlayer
                 || (ServerPlayer) second == serverPlayer
-                || stance == Stance.WAR
-                || first.getStance(second) == Stance.WAR
-                || second.getStance(first) == Stance.WAR
+                || (war && serverPlayer.hasContacted(first)
+                    && serverPlayer.hasContacted(second))
                 || serverPlayer.hasAbility("model.ability.betterForeignAffairsReport");
         }
 
@@ -1166,11 +1169,12 @@ public class ChangeSet {
      * @param first The <code>Player</code> changing stance.
      * @param stance The <code>Stance</code> to change to.
      * @param second The <code>Player</code> wrt with to change.
+     * @param war Was this change to/from a war stance.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addStance(See see, Player first, Stance stance,
-                               Player second) {
-        changes.add(new StanceChange(see, first, stance, second));
+                               Player second, boolean war) {
+        changes.add(new StanceChange(see, first, stance, second, war));
         return this;
     }
 

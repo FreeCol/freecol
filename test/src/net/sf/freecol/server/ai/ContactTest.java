@@ -242,8 +242,8 @@ public class ContactTest extends FreeColTestCase {
         tile3.setExploredBy(apache, false);
         tile3.setExploredBy(iroquois, true);
 
-        assertFalse(iroquois.hasContacted(apache));
-        assertFalse(apache.hasContacted(iroquois));
+        assertTrue(iroquois.hasContacted(apache));
+        assertTrue(apache.hasContacted(iroquois));
 
         Unit brave1 = new ServerUnit(game, tile1, apache, braveType,
                                      UnitState.FORTIFIED);
@@ -256,9 +256,6 @@ public class ContactTest extends FreeColTestCase {
         assertTrue(apache.hasContacted(iroquois));
         assertEquals(Stance.PEACE, iroquois.getStance(apache));
         assertEquals(Stance.PEACE, apache.getStance(iroquois));
-
-        // TODO: do we need this?
-        // assertNotNull(iroquois.getTension(apache));
     }
 
     public void testNativeMeetsColony() throws Exception {
@@ -310,8 +307,8 @@ public class ContactTest extends FreeColTestCase {
         tile3.setExploredBy(apache, false);
         tile3.setExploredBy(iroquois, true);
 
-        assertFalse(iroquois.hasContacted(apache));
-        assertFalse(apache.hasContacted(iroquois));
+        assertTrue(iroquois.hasContacted(apache));
+        assertTrue(apache.hasContacted(iroquois));
 
         // build settlement
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -324,10 +321,6 @@ public class ContactTest extends FreeColTestCase {
         assertTrue(apache.hasContacted(iroquois));
         assertEquals(Stance.PEACE, iroquois.getStance(apache));
         assertEquals(Stance.PEACE, apache.getStance(iroquois));
-
-        // TODO: do we need this?
-        // assertNotNull(iroquois.getTension(apache));
-        // assertNotNull(settlement.getAlarm(iroquois));
     }
 
     public void testShipMeetsShip() throws Exception {

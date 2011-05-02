@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -126,10 +127,19 @@ public final class PreGameController extends Controller {
         // loadGame in createMap
         gameOptions.readFromXMLElement(oldGameOptions);
 
-        // Initial randomizations for all players.
+        // Initial stances and randomizations for all players.
         Random random = getFreeColServer().getServerRandom();
         for (Player player : game.getPlayers()) {
             ((ServerPlayer) player).startGame(random);
+            if (player.isIndian()) {
+                // Indian players know about each other, but European colonial
+                // players do not.
+                for (Player other : game.getPlayers()) {
+                    if (other != player && other.isIndian()) {
+                        player.setStance(other, Stance.PEACE);
+                    }
+                }
+            }
         }
 
         // Inform the clients.
