@@ -55,6 +55,8 @@ public class SimpleCombatModel extends CombatModel {
         = "model.modifier.fortified";
     public static final String ARTILLERY_AGAINST_RAID
         = "model.modifier.artilleryAgainstRaid";
+    public static final String AMPHIBIOUS_ATTACK
+        = "model.modifier.amphibiousAttack";
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
         = new Modifier("bogus", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
@@ -236,6 +238,11 @@ public class SimpleCombatModel extends CombatModel {
             result.addAll(spec.getModifiers(BIG_MOVEMENT_PENALTY));
         } else if (movesLeft == 2) {
             result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
+        }
+
+        // Amphibious attack?
+        if (combatIsAmphibious(attacker, defender)) {
+            result.addAll(spec.getModifiers(AMPHIBIOUS_ATTACK));
         }
 
         if (combatIsMeasurement(attacker, defender)) {
@@ -641,7 +648,8 @@ public class SimpleCombatModel extends CombatModel {
 
             // Capture suitable units if the winner is capable.
             } else if (loser.hasAbility("model.ability.canBeCaptured")
-                       && winner.hasAbility("model.ability.captureUnits")) {
+                       && winner.hasAbility("model.ability.captureUnits")
+                       && !combatIsAmphibious(winner, loser)) {
                 crs.add(CombatResult.CAPTURE_UNIT);
 
             // Final catch all is just to slaughter.

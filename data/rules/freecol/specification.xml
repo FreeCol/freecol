@@ -76,6 +76,16 @@
 
   <options>
     <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.map">
+        <!-- Enables/disables fog of war -->
+        <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
+        <!-- Whether to award exploration points or not -->
+        <booleanOption id="model.option.explorationPoints" defaultValue="true"/>
+        <!-- The number of turns it takes to sail between Europe and the New World -->
+        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <!-- Whether amphibious moves are allowed. -->
+        <booleanOption id="model.option.amphibiousMoves" defaultValue="true"/>
+      </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->
         <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>

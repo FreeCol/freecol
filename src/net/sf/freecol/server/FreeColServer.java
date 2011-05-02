@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -879,6 +880,15 @@ public final class FreeColServer {
             if (!specification.hasOption("model.option.guiShowGoodsMovement")) {
                 // Introduced: SAVEGAME_VERSION == 11
                 addBooleanOption("model.option.guiShowGoodsMovement", false);
+            }
+            if (!specification.hasOption("model.option.amphibiousMoves")) {
+                // Introduced: SAVEGAME_VERSION == 11
+                addBooleanOption("model.option.amphibiousMoves", false);
+                game.getSpecification()
+                    .addModifier(new Modifier("model.modifier.amphibiousAttack",
+                                              Specification.AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
+                                              -75.0f,
+                                              Modifier.Type.PERCENTAGE));
             }
 
             // Now units are all present, set active unit.

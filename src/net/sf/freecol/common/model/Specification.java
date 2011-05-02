@@ -66,6 +66,8 @@ public final class Specification {
         new FreeColGameObjectType("model.source.fortified");
     public static final FreeColGameObjectType INDIAN_RAID_BONUS_SOURCE =
         new FreeColGameObjectType("model.source.artilleryAgainstRaid");
+    public static final FreeColGameObjectType AMPHIBIOUS_ATTACK_PENALTY_SOURCE =
+        new FreeColGameObjectType("model.source.amphibiousAttack");
     public static final FreeColGameObjectType BASE_OFFENCE_SOURCE =
         new FreeColGameObjectType("model.source.baseOffence");
     public static final FreeColGameObjectType BASE_DEFENCE_SOURCE =
@@ -168,6 +170,7 @@ public final class Specification {
                 ATTACK_BONUS_SOURCE,
                 FORTIFICATION_BONUS_SOURCE,
                 INDIAN_RAID_BONUS_SOURCE,
+                AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
                 BASE_OFFENCE_SOURCE,
                 BASE_DEFENCE_SOURCE,
                 CARGO_PENALTY_SOURCE,

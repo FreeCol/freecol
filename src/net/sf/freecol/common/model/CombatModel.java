@@ -135,6 +135,24 @@ abstract public class CombatModel {
     }
 
     /**
+     * Could this attack be an amphibious operation?
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if the attack is amphibious.
+     */
+    public boolean combatIsAmphibious(FreeColGameObject attacker,
+                                      FreeColGameObject defender) {
+        return attacker instanceof Unit
+            && ((Unit) attacker).getTile() != null
+            && !((Unit) attacker).getTile().isLand()
+            && defender instanceof Locatable
+            && ((Locatable) defender).getTile() != null
+            && ((Locatable) defender).getTile().isLand();
+    }
+
+
+    /**
      * Calculates the chance of the outcomes of a combat.
      *
      * @param attacker The attacker.

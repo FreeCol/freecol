@@ -1820,15 +1820,19 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_BEACHED:
             if (interactive) {
                 freeColClient.playSound("sound.event.illegalMove");
-                canvas.showInformationMessage(unit, StringTemplate.template("move.noAccessBeached")
-                                              .addStringTemplate("%nation%", getNationAt(unit.getTile(), direction)));
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessBeached")
+                        .addStringTemplate("%nation%", nation));
             }
             return false;
         case MOVE_NO_ACCESS_CONTACT:
             if (interactive) {
                 freeColClient.playSound("sound.event.illegalMove");
-                canvas.showInformationMessage(unit, StringTemplate.template("move.noAccessContact")
-                                              .addStringTemplate("%nation%", getNationAt(unit.getTile(), direction)));
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessContact")
+                        .addStringTemplate("%nation%", nation));
             }
             return false;
         case MOVE_NO_ACCESS_LAND:
@@ -1841,11 +1845,11 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_SETTLEMENT:
             if (interactive) {
                 freeColClient.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSettlement")
                        .addStringTemplate("%unit%", Messages.getLabel(unit))
-                       .addStringTemplate("%nation%",
-                           getNationAt(unit.getTile(), direction)));
+                       .addStringTemplate("%nation%", nation));
             }
             return false;
         case MOVE_NO_ACCESS_SKILL:
@@ -1859,15 +1863,19 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_TRADE:
             if (interactive) {
                 freeColClient.playSound("sound.event.illegalMove");
-                canvas.showInformationMessage(unit, StringTemplate.template("move.noAccessTrade")
-                                              .addStringTemplate("%nation%", getNationAt(unit.getTile(), direction)));
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessTrade")
+                        .addStringTemplate("%nation%", nation));
             }
             return false;
         case MOVE_NO_ACCESS_WAR:
             if (interactive) {
                 freeColClient.playSound("sound.event.illegalMove");
-                canvas.showInformationMessage(unit, StringTemplate.template("move.noAccessWar")
-                                              .addStringTemplate("%nation%", getNationAt(unit.getTile(), direction)));
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessWar")
+                        .addStringTemplate("%nation%", nation));
             }
             return false;
         case MOVE_NO_ACCESS_WATER:
@@ -1875,6 +1883,14 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.playSound("sound.event.illegalMove");
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWater")
+                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+            }
+            return false;
+        case MOVE_NO_ATTACK_MARINE:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAttackWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
             return false;
@@ -2026,8 +2042,6 @@ public final class InGameController implements NetworkConstants {
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             canvas.paintImmediately(canvas.getBounds());
             try {
-                // UNIT_LAST_MOVE_DELAY is an instance variable
-                // located at the top of this class.
                 Thread.sleep(UNIT_LAST_MOVE_DELAY);
             } catch (InterruptedException e) {} // Ignore
         }

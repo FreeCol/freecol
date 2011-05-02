@@ -1396,9 +1396,11 @@ public class Unit extends FreeColGameObject
             Unit defender = target.getFirstUnit();
             if (defender != null && !ignoreEnemyUnits
                 && defender.getOwner() != getOwner()) {
-                return (isOffensiveUnit()) ? MoveType.ATTACK
+                return (isOffensiveUnit())
+                    ? MoveType.ATTACK
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.canMoveToEurope() && getOwner().canMoveToEurope()) {
+            } else if (target.canMoveToEurope()
+                       && getOwner().canMoveToEurope()) {
                 return MoveType.MOVE_HIGH_SEAS;
             } else {
                 return MoveType.MOVE;
@@ -1435,7 +1437,7 @@ public class Unit extends FreeColGameObject
                     } else if (!isOffensiveUnit()) {
                         return MoveType.MOVE_NO_ATTACK_CIVILIAN;
                     } else {
-                        return (allowMoveFrom(from))
+                        return (from.isLand())
                             ? MoveType.ATTACK
                             : MoveType.MOVE_NO_ATTACK_MARINE;
                     }
@@ -1465,7 +1467,9 @@ public class Unit extends FreeColGameObject
                 }
                 return MoveType.MOVE_ILLEGAL; // should not happen
             } else if (isOffensiveUnit()) {
-                return MoveType.ATTACK;
+                return (allowMoveFrom(from))
+                    ? MoveType.ATTACK
+                    : MoveType.MOVE_NO_ATTACK_MARINE;
             } else {
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
@@ -1497,9 +1501,9 @@ public class Unit extends FreeColGameObject
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_TRADE;
         } else if (settlement instanceof IndianSettlement) {
-            return (!allowContact(settlement))
-                ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+            return (allowContact(settlement))
+                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
+                : MoveType.MOVE_NO_ACCESS_CONTACT;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }
@@ -1560,6 +1564,7 @@ public class Unit extends FreeColGameObject
      */
     private MoveType getScoutMoveType(Tile from, Settlement settlement) {
         if (settlement instanceof Colony) {
+            // No allowMoveFrom check for Colonies
             return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
         } else if (settlement instanceof IndianSettlement) {
             return (!allowMoveFrom(from))
@@ -1578,7 +1583,8 @@ public class Unit extends FreeColGameObject
      * @return True if the move is allowed.
      */
     private boolean allowMoveFrom(Tile from) {
-        return from.isLand();
+        return from.isLand() || getSpecification()
+            .getBooleanOption("model.option.amphibiousMoves").getValue();
     }
 
     /**

@@ -214,8 +214,14 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, galleon, game.getCurrentPlayer(),
                                        colonistType, UnitState.ACTIVE);
         cost = base.getCost(colonist, unitTile, settlementTile, 4,4);
-        assertTrue("Move invalid, direct from carrier to settlement",
-                   cost == CostDecider.ILLEGAL_MOVE);
+        if (spec().getBooleanOption("model.option.amphibiousMoves")
+            .getValue()) {
+            assertFalse("Move valid, direct from carrier to settlement",
+                        cost == CostDecider.ILLEGAL_MOVE);
+        } else {
+            assertTrue("Move invalid, direct from carrier to settlement",
+                       cost == CostDecider.ILLEGAL_MOVE);
+        }
         assertNotNull("Path should be valid from carrier to settlement",
                       map.findPath(colonist, unitTile, settlementTile,
                                    galleon, base));

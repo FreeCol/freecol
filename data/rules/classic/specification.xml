@@ -45,6 +45,9 @@
     <modifier id="model.modifier.artilleryAgainstRaid"
               source="model.source.artilleryAgainstRaid"
               value="100" type="percentage" />
+    <modifier id="model.modifier.amphibiousAttack"
+              source="model.source.amphibiousAttack"
+              value="-75" type="percentage" />
     <!-- Modifiers with an increment are really templates to be instantiated
          with the specific start/end years they apply to. -->
     <modifier id="model.modifier.colonyGoodsParty"
@@ -1892,6 +1895,8 @@
         <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
         <!-- The number of turns it takes to sail between Europe and the New World -->
         <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <!-- Whether amphibious moves are allowed. -->
+        <booleanOption id="model.option.amphibiousMoves" defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

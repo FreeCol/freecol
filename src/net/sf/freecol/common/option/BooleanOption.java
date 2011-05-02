@@ -39,7 +39,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     private boolean value;
 
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new <code>BooleanOption</code>.
      *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
