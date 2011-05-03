@@ -1048,40 +1048,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the panel for negotiating a purchase from a settlement.
-     *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param settlement The <code>Settlement</code> to buy from.
-     * @param goods The <code>Goods</code> to buy.
-     * @param gold The current negotiated price.
-     * @param canBuy True if buy is a valid option.
-     * @return The chosen action, buy, haggle, or cancel.
-     */
-    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-                                   Goods goods, int gold, boolean canBuy) {
-        List<ChoiceItem<BuyAction>> choices
-            = new ArrayList<ChoiceItem<BuyAction>>();
-        choices.add(new ChoiceItem<BuyAction>(
-                Messages.message("buy.takeOffer"),
-                BuyAction.BUY, canBuy));
-        choices.add(new ChoiceItem<BuyAction>(
-                Messages.message("buy.moreGold"),
-                BuyAction.HAGGLE));
-        StringTemplate goodsTemplate = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", goods.getType().getNameKey())
-            .addAmount("%amount%", goods.getAmount());
-        BuyAction result =
-            showChoiceDialog(unit.getTile(),
-                             Messages.message(StringTemplate.template("buy.text")
-                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                                              .addStringTemplate("%goods%", goodsTemplate)
-                                              .addAmount("%gold%", gold)),
-                             Messages.message("buyProposition.cancel"),
-                             choices);
-        return (result == null) ? BuyAction.CANCEL : result;
-    }
-
-    /**
      * Displays the <code>LootCargoDialog</code>.
      *
      * @param winner The <code>Unit</code> that is looting.
@@ -2008,6 +1974,41 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays the panel for negotiating a purchase from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is buying.
+     * @param settlement The <code>Settlement</code> to buy from.
+     * @param goods The <code>Goods</code> to buy.
+     * @param gold The current negotiated price.
+     * @param canBuy True if buy is a valid option.
+     * @return The chosen action, buy, haggle, or cancel.
+     */
+    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
+                                   Goods goods, int gold, boolean canBuy) {
+        StringTemplate goodsTemplate
+            = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", goods.getType().getNameKey())
+            .addAmount("%amount%", goods.getAmount());
+        StringTemplate nation = settlement.getOwner().getNationName();
+        List<ChoiceItem<BuyAction>> choices
+            = new ArrayList<ChoiceItem<BuyAction>>();
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.takeOffer"),
+                BuyAction.BUY, canBuy));
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.moreGold"),
+                BuyAction.HAGGLE));
+        BuyAction result = showChoiceDialog(unit.getTile(),
+                Messages.message(StringTemplate.template("buy.text")
+                                 .addStringTemplate("%nation%", nation)
+                                 .addStringTemplate("%goods%", goodsTemplate)
+                                 .addAmount("%gold%", gold)),
+                Messages.message("buyProposition.cancel"),
+                choices);
+        return (result == null) ? BuyAction.CANCEL : result;
+    }
+
+    /**
      * Displays the panel for negotiating a sale to a settlement.
      *
      * @param unit The <code>Unit</code> that is selling.
@@ -2018,6 +2019,11 @@ public final class Canvas extends JDesktopPane {
      */
     public SellAction showSellDialog(Unit unit, Settlement settlement,
                                      Goods goods, int gold) {
+        StringTemplate goodsTemplate
+            = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", goods.getType().getNameKey())
+            .addAmount("%amount%", goods.getAmount());
+        StringTemplate nation = settlement.getOwner().getNationName();
         List<ChoiceItem<SellAction>> choices
             = new ArrayList<ChoiceItem<SellAction>>();
         choices.add(new ChoiceItem<SellAction>(
@@ -2026,17 +2032,17 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<SellAction>(
                 Messages.message("sell.moreGold"),
                 SellAction.HAGGLE));
-        choices.add(new ChoiceItem<SellAction>(Messages.message(StringTemplate.template("sell.gift")
-                                                                .addName("%goods%", goods)),
-                                               SellAction.GIFT));
-        SellAction result =
-            showChoiceDialog(unit.getTile(),
-                             Messages.message(StringTemplate.template("sell.text")
-                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
-                                              .addName("%goods%", goods)
-                                              .addAmount("%gold%", gold)),
-                             Messages.message("sellProposition.cancel"),
-                             choices);
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message(StringTemplate.template("sell.gift")
+                                 .addStringTemplate("%goods%", goodsTemplate)),
+                SellAction.GIFT));
+        SellAction result = showChoiceDialog(unit.getTile(),
+                Messages.message(StringTemplate.template("sell.text")
+                                 .addStringTemplate("%nation%", nation)
+                                 .addStringTemplate("%goods%", goodsTemplate)
+                                 .addAmount("%gold%", gold)),
+                Messages.message("sellProposition.cancel"),
+                choices);
         return (result == null) ? SellAction.CANCEL : result;
     }
 
