@@ -1116,6 +1116,11 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             checkCashInTreasureTrain(unit);
+            if (unit.getMovesLeft() > 0 && unit.getTile() != null
+                && freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.ALWAYS_CENTER)) {
+                freeColClient.getGUI().setSelectedTile(unit.getTile(), false);
+            }
         } else {
             if (freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT)) {
