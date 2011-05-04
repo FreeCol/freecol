@@ -56,6 +56,9 @@ public class IndianSettlement extends Settlement {
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
 
+    public static final int GOODS_BASE_PRICE = 20;
+    public static final int GOODS_CAPACITY = 200;
+
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
 
@@ -684,8 +687,6 @@ public class IndianSettlement extends Settlement {
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *
-     * <br><br>
-     *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
@@ -698,23 +699,17 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the settlement type trade bonus.
-     */
-    private int getPriceAddition() {
-        return getType().getTradeBonus();
-    }
-
-
-    /**
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *
-     * It is only meaningful to call this method from the
-     * server, since the settlement's {@link GoodsContainer}
-     * is hidden from the clients.  Note that this takes no account
-     * of whether the native player actually has the gold.
+     * It is only meaningful to call this method from the server,
+     * since the settlement's {@link GoodsContainer} is hidden from
+     * the clients.  The AI uses it though so it stays here for now.
+     * Note that it takes no account of whether the native player
+     * actually has the gold.
      *
      * TODO: this is rancid with magic numbers.
+     * TODO: the hardwired goods/equipment types are a wart.
      *
      * @param type The type of <code>Goods</code> to price.
      * @param amount The amount of <code>Goods</code> to price.
@@ -723,101 +718,116 @@ public class IndianSettlement extends Settlement {
     public int getPrice(GoodsType type, int amount) {
         if (amount > 100) throw new IllegalArgumentException("Amount > 100");
 
-        Specification spec = getSpecification();
-        final GoodsType armsType = spec.getGoodsType("model.goods.muskets");
-        final GoodsType horsesType = spec.getGoodsType("model.goods.horses");
         int returnPrice = 0;
-
-        if (type == armsType) {
-            final EquipmentType armsEqType
-                = spec.getEquipmentType("model.equipment.indian.muskets");
-            final int musketsToArmIndian
-                = armsEqType.getAmountRequiredOf(armsType);
-            int musketsCurrAvail = getGoodsCount(armsType);
+        Specification spec = getSpecification();
+        if (type == spec.getGoodsType("model.goods.muskets")) {
             int need = 0;
-            int supply = musketsCurrAvail;
-            for (int i = 0; i < ownedUnits.size(); i++) {
-                need += musketsToArmIndian;
-                if (ownedUnits.get(i).isArmed()) {
-                    supply += musketsToArmIndian;
-                }
-            }
-
-            int sets = ((musketsCurrAvail + amount) / musketsToArmIndian)
-                - (musketsCurrAvail / musketsToArmIndian);
-            int startPrice = (19 + getPriceAddition()) - (supply / musketsToArmIndian);
-            for (int i = 0; i < sets; i++) {
-                if ((startPrice - i) < 8 && (need > supply || musketsCurrAvail < musketsToArmIndian)) {
-                    startPrice = 8 + i;
-                }
-                returnPrice += musketsToArmIndian * (startPrice - i);
-            }
-        } else if (type == horsesType) {
-            final EquipmentType horsesEqType
-                = spec.getEquipmentType("model.equipment.indian.horses");
-            final int horsesToMountIndian
-                = horsesEqType.getAmountRequiredOf(horsesType);
-            int horsesCurrAvail = getGoodsCount(horsesType);
+            for (Unit u : ownedUnits) if (!u.isArmed()) need++;
+            int toArm = spec.getEquipmentType("model.equipment.indian.muskets")
+                .getAmountRequiredOf(type);
+            returnPrice = getMilitaryGoodsPrice(type, amount, toArm, need);
+        } else if (type == spec.getGoodsType("model.goods.horses")) {
             int need = 0;
-            int supply = horsesCurrAvail;
-            for (int i = 0; i < ownedUnits.size(); i++) {
-                need += horsesToMountIndian;
-                if (ownedUnits.get(i).isMounted()) {
-                    supply += horsesToMountIndian;
-                }
-            }
-
-            int sets = (horsesCurrAvail + amount) / horsesToMountIndian
-                - (horsesCurrAvail / horsesToMountIndian);
-            int startPrice = (24 + getPriceAddition()) - (supply / horsesToMountIndian);
-
-            for (int i = 0; i < sets; i++) {
-                if ((startPrice - (i * 4)) < 4 && (need > supply ||	horsesCurrAvail < horsesToMountIndian * 2)) {
-                    startPrice = 4 + (i * 4);
-                }
-                returnPrice += horsesToMountIndian * (startPrice - (i * 4));
-            }
+            for (Unit u : ownedUnits) if (!u.isMounted()) need++;
+            int toArm = spec.getEquipmentType("model.equipment.indian.horses")
+                .getAmountRequiredOf(type);
+            returnPrice = getMilitaryGoodsPrice(type, amount, toArm, need);
         } else if (type.isFarmed()) {
             returnPrice = 0;
         } else {
-            int current = getGoodsCount(type);
-
-            // Increase amount if raw materials are produced.
-            GoodsType rawType = type.getRawMaterial();
-            if (rawType != null) {
-                int rawProduction = getMaximumProduction(rawType);
-                if (current < 100) {
-                    if (rawProduction < 5) {
-                        current += rawProduction * 10;
-                    } else if (rawProduction < 10) {
-                        current += 50 + Math.max((rawProduction - 5) * 5, 0);
-                    } else if (rawProduction < 20) {
-                        current += 75 + Math.max((rawProduction - 10) * 2, 0);
-                    } else {
-                        current += 100;
-                    }
-                }
-            }
-
-            // Small artificial increase of the trade goods stored.
-            if (type.isTradeGoods()) current += 20;
-
-            // Only interested in the amount of goods that keeps the
-            // total under 200.
-            int valued = Math.max(0, Math.min(amount, 200 - current));
-
-            // Unit price then is maximum price (20) + bonus for
-            // settlement type, less the total amount of goods the
-            // natives will have post-sale (current + valued) / 20.
-            int unitPrice = 20 + getPriceAddition() - (current + valued) / 20;
-            returnPrice = valued * unitPrice;
+            returnPrice = getNormalGoodsPrice(type, amount);
         }
 
-        // Bonus for top 3 types of goods.
-        return (type == wantedGoods[0]) ? (returnPrice * 12) / 10
-            : (type == wantedGoods[1])  ? (returnPrice * 11) / 10
-            : (type == wantedGoods[2])  ? (returnPrice * 105) / 100
-            : returnPrice;
+        // Apply wanted bonus
+        final int wantedBase = 100; // Granularity for wanted bonus
+        final int wantedBonus // Premium paid for wanted goods types
+            = (type == wantedGoods[0]) ? 120
+            : (type == wantedGoods[1]) ? 110
+            : (type == wantedGoods[2]) ? 105
+            : 100;
+        // Do not simplify with *=, we want the integer truncation.
+        returnPrice = wantedBonus * returnPrice / wantedBase;
+
+        logger.finest("Full price(" + amount + " " + type + ")"
+                      + " -> " + returnPrice);
+        return returnPrice;
+    }
+
+    /**
+     * Price some goods according to the amount present in the settlement.
+     *
+     * @param type The type of goods for sale.
+     * @param amount The amount of goods for sale.
+     * @return A price for the goods.
+     */
+    private int getNormalGoodsPrice(GoodsType type, int amount) {
+        final int tradeGoodsAdd = 20; // Fake additional trade goods present
+        int current = getGoodsCount(type);
+
+        // Increase effective stock if its raw material is produced here.
+        GoodsType rawType = type.getRawMaterial();
+        int add = 0;
+        if (rawType != null) {
+            int rawProduction = getMaximumProduction(rawType);
+            add = (rawProduction < 5)  ? 10 * rawProduction
+                : (rawProduction < 10) ?  5 * rawProduction + 25
+                : (rawProduction < 20) ?  2 * rawProduction + 55
+                : 100;
+            // Decrease bonus in proportion to current stock, up to capacity.
+            add = (GOODS_CAPACITY - Math.min(GOODS_CAPACITY, current)) * add
+                / GOODS_CAPACITY;
+        }
+        current += add;
+
+        // Small artificial increase of the trade goods stored.
+        if (type.isTradeGoods()) current += tradeGoodsAdd;
+
+        // Only interested in the amount of goods that keeps the
+        // total under the threshold.
+        int valued = Math.max(0, Math.min(amount, GOODS_CAPACITY - current));
+
+        // Unit price then is maximum price plus the bonus for the
+        // settlement type, reduced by the proportion of goods present.
+        int unitPrice = (GOODS_BASE_PRICE + getType().getTradeBonus())
+            * (GOODS_CAPACITY - current) / GOODS_CAPACITY;
+
+        // Only pay for the portion that is valued.
+        int returnPrice = (unitPrice < 0) ? 0 : valued * unitPrice;
+        logger.finest("Normal price(" + amount + " " + type + ")"
+                      + " valued=" + valued
+                      + " current=" + getGoodsCount(type)
+                      + " + " + (current - getGoodsCount(type))
+                      + " unitPrice=" + unitPrice
+                      + " -> " + returnPrice);
+        return returnPrice;
+    }
+
+    /**
+     * Price some goods that have military value to the settlement.
+     *
+     * @param type The type of goods for sale.
+     * @param amount The amount of goods for sale.
+     * @param toArm The amount of goods required to make one set of the
+     *     corresponding equipment.
+     * @param need The number of sets of equipment the settlement could use.
+     * @return A price for the goods.
+     */
+    private int getMilitaryGoodsPrice(GoodsType type, int amount, int toArm,
+                                      int need) {
+        int current = getGoodsCount(type);
+        int valued = Math.max(0, need * toArm - current);
+        int fullPrice = GOODS_BASE_PRICE + getType().getTradeBonus();
+
+        // If the settlement can use more than half of the goods on offer,
+        // then pay top dollar for the lot.  Otherwise only pay the premium
+        // price for the part they need and refer the remaining amount to
+        // the normal goods pricing.
+        int returnPrice = (valued > amount / 2) ? fullPrice * amount
+            : valued * fullPrice + getNormalGoodsPrice(type, amount - valued);
+        logger.finest("Military price(" + amount + " " + type + ")"
+                      + " valued=" + valued
+                      + " -> " + returnPrice);
+        return returnPrice;
     }
 
     /**

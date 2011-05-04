@@ -33,14 +33,25 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ServerIndianSettlementTest extends FreeColTestCase {
 
-    private static final TileType desertType
-        = spec().getTileType("model.tile.desert");
+    private static final GoodsType clothType
+        = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType coatsType
+        = spec().getGoodsType("model.goods.coats");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType rumType
+        = spec().getGoodsType("model.goods.rum");
+    private static final GoodsType toolsType
+        = spec().getGoodsType("model.goods.tools");
+
+    private static final TileType desertType
+        = spec().getTileType("model.tile.desert");
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
 
     private static final UnitType brave
         = spec().getUnitType("model.unit.brave");
@@ -138,5 +149,94 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         int expectedHorsesBreeded = 0;
         int horsesBreeded = camp1.getGoodsCount(horsesType) - initialHorses;
         assertEquals("No horses should be bred",expectedHorsesBreeded,horsesBreeded);
+    }
+
+    public void testPricing() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+
+        final int braveCount = 4;
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.initialBravesInCamp(braveCount).build();
+        final int topPrice = IndianSettlement.GOODS_BASE_PRICE
+            + camp.getType().getTradeBonus();
+
+        // Clear wanted goods so as not to confuse comparisons
+        camp.setWantedGoods(0, null);
+        camp.setWantedGoods(1, null);
+        camp.setWantedGoods(2, null);
+
+        assertEquals(braveCount, camp.getUnitCount());
+
+        // Should initially value military goods highly
+        assertEquals("High price for horses", topPrice,
+                     camp.getPrice(horsesType, 1));
+
+        // But once there are enough for all the braves, the price should fall
+        camp.addGoods(horsesType, 50);
+        assertEquals("Still high price for horses", topPrice,
+                     camp.getPrice(horsesType, 1));
+        camp.addGoods(horsesType, 50);
+        assertTrue("Commercial price for horses",
+                   camp.getPrice(horsesType, 1) <= topPrice / 2);
+
+        // Farmed goods should be ignored
+        assertEquals("Ignore farmed goods", 0,
+                     camp.getPrice(grainType, 100));
+
+        // Rum is more interesting...
+        assertEquals(0, camp.getGoodsCount(rumType));
+        assertEquals("Buy rum", topPrice,
+                     camp.getPrice(rumType, 1));
+
+        // ...but the price falls with amount present
+        camp.addGoods(rumType, 100);
+        assertTrue("Add rum",
+                   camp.getPrice(rumType, 1) <= topPrice / 2);
+        assertTrue("Add more rum",
+                   camp.getPrice(rumType, 99) <= 99 * topPrice / 2);
+        camp.addGoods(rumType, 100);
+        assertEquals("Do not buy more rum", 0,
+                     camp.getPrice(rumType, 1));
+
+        // On plains cotton can be grown, so cloth should be cheaper than
+        // coats.
+        assertTrue("Cloth ("
+                   + camp.getPrice(clothType, 50) + ") cheaper than coats ("
+                   + camp.getPrice(coatsType, 50) + ")",
+                   camp.getPrice(clothType, 50) < camp.getPrice(coatsType, 50));
+        camp.addGoods(clothType, 100);
+        camp.addGoods(coatsType, 100);
+        assertTrue("Cloth still ("
+                   + camp.getPrice(clothType, 50) + ") cheaper than coats ("
+                   + camp.getPrice(coatsType, 50) + ")",
+                   camp.getPrice(clothType, 50) < camp.getPrice(coatsType, 50));
+        camp.addGoods(clothType, 100);
+        camp.addGoods(coatsType, 100);
+        assertEquals("Cloth now ignored", 0,
+                     camp.getPrice(clothType, 1));
+        assertEquals("Coats now ignored", 0,
+                     camp.getPrice(coatsType, 1));
+
+        // Check that wanted goods at least increases the price
+        camp.setWantedGoods(2, horsesType);
+        camp.setWantedGoods(1, horsesType);
+        camp.setWantedGoods(0, horsesType);
+        int p3 = camp.getPrice(toolsType, 100);
+        camp.setWantedGoods(2, toolsType);
+        camp.setWantedGoods(1, horsesType);
+        camp.setWantedGoods(0, horsesType);
+        int p2 = camp.getPrice(toolsType, 100);
+        assertTrue("Wanted 2: (" + p2 + " > " + p3 + ")",  p2 > p3);
+        camp.setWantedGoods(2, horsesType);
+        camp.setWantedGoods(1, toolsType);
+        camp.setWantedGoods(0, horsesType);
+        int p1 = camp.getPrice(toolsType, 100);
+        assertTrue("Wanted 1: (" + p1 + " > " + p2 + ")",  p1 > p2);
+        camp.setWantedGoods(2, horsesType);
+        camp.setWantedGoods(1, horsesType);
+        camp.setWantedGoods(0, toolsType);
+        int p0 = camp.getPrice(toolsType, 100);
+        assertTrue("Wanted 0: (" + p0 + " > " + p1 + ")",  p0 > p1);
     }
 }
