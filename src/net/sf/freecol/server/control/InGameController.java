@@ -224,7 +224,7 @@ public final class InGameController extends Controller {
 
     /**
      * Public change stance and inform all routine.  Mostly used in the
-     * test suite now.
+     * test suite, but the AIs also call it.
      *
      * @param player The originating <code>Player</code>.
      * @param stance The new <code>Stance</code>.
