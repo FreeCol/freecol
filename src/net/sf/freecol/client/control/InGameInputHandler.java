@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.control;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +134,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = chooseFoundingFather(element);
             } else if (type.equals("indianDemand")) {
                 reply = indianDemand(element);
+            } else if (type.equals("spyResult")) {
+                reply = spyResult(element);
             } else if (type.equals("reconnect")) {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
@@ -768,6 +772,56 @@ public final class InGameInputHandler extends InputHandler {
         element.setAttribute("accepted", String.valueOf(accepted));
         return element;
     }
+
+    /**
+     * Handles a "spyResult" message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    private Element spyResult(Element element) {
+        // The element contains two children, being the full and
+        // normal versions of the settlement-being-spied-upon's tile.
+        // It has to be the tile, as otherwise we do not see the units
+        // defending the settlement.  So, we have to unpack, update
+        // with the first, display, then update with the second.  This
+        // is hacky as the client could retain the settlement
+        // information, but the potential abuses are limited.
+        NodeList nodeList = element.getChildNodes();
+        if (nodeList.getLength() != 2) {
+            logger.warning("spyResult length = " + nodeList.getLength());
+            return null;
+        }
+        Game game = getGame();
+        final Element fullTile = (Element) nodeList.item(0);
+        final Element normalTile = (Element) nodeList.item(1);
+        String tileId = element.getAttribute("tile");
+        FreeColGameObject fcgo;
+        if (tileId == null
+            || (fcgo = game.getFreeColGameObjectSafely(tileId)) == null
+            || !(fcgo instanceof Tile)) {
+            logger.warning("spyResult bad tile = " + tileId);
+            return null;
+        }
+        final Tile tile = (Tile) fcgo;
+        tile.readFromXMLElement(fullTile);
+        Colony colony = tile.getColony();
+        if (colony == null) {
+            tile.readFromXMLElement(normalTile);
+        } else {
+            Canvas canvas = getFreeColClient().getCanvas();
+            canvas.showColonyPanel(colony)
+                .addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                            if ("closing".equals(e.getPropertyName())) {
+                                tile.readFromXMLElement(normalTile);
+                            }
+                        }
+                    });
+        }
+        return null;
+    }
+
 
     /**
      * Handles a "monarchAction"-request.
@@ -1549,7 +1603,6 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-
         private String _messageId;
 
         private String _message;
@@ -1579,12 +1632,12 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * This class displays a dialog that lets the player pick a Founding Father.
+     * This class displays a dialog that lets the player pick a
+     * Founding Father.
      */
     class ShowSelectFoundingFatherSwingTask extends SwingTask {
 
         private List<FoundingFather> choices;
-
 
         /**
          * Constructor.

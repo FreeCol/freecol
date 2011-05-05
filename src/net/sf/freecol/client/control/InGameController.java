@@ -3065,11 +3065,9 @@ public final class InGameController implements NetworkConstants {
      * @param direction The <code>Direction</code> of a colony to spy on.
      */
     private void moveSpy(Unit unit, Direction direction) {
-        Colony colony = askSpy(unit, direction);
-        if (colony != null) {
-            freeColClient.getCanvas().showColonyPanel(colony);
+        if (askSpy(unit, direction)) {
+            nextActiveUnit();
         }
-        nextActiveUnit();
     }
 
     /**
@@ -3077,31 +3075,18 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is spying.
      * @param direction The <code>Direction</code> of a colony to spy on.
-     * @return A private version of the colony to display.
+     * @return True if the client/server interaction succeeded.
      */
-    private Colony askSpy(Unit unit, Direction direction) {
+    private boolean askSpy(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
-        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
-        if (colony == null || colony.getOwner() == unit.getOwner()) return null;
-        SpySettlementMessage message = new SpySettlementMessage(unit,
-                                                                direction);
+        SpySettlementMessage message
+            = new SpySettlementMessage(unit, direction);
         Element reply = askExpecting(client, message.toXMLElement(), null);
-        if (reply == null) return null;
+        if (reply == null) return false;
 
-        // Sleight of hand here.  The reply is a normal update message
-        // with the *full* colony under a new ID appended as the last
-        // node.  Pull that off, process the rest normally, and return
-        // the independently read colony node.  This is hacky as the
-        // client retains the colony information, it may not be
-        // correctly updated with the proper limited range of
-        // information normally available to the player until some
-        // arbitrarily later event triggers an update.
-        Element colonyElement = (Element) reply.getLastChild();
-        reply.removeChild(colonyElement);
         Connection conn = client.getConnection();
         freeColClient.getInGameInputHandler().handle(conn, reply);
-        colony.readFromXMLElement(colonyElement);
-        return colony;
+        return true;
     }
 
     /**

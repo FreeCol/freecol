@@ -906,6 +906,7 @@ public final class Canvas extends JDesktopPane {
         if (comp == null) {
             return;
         } else if (comp instanceof FreeColPanel) {
+            ((FreeColPanel) comp).firePropertyChange("closing", false, true);
             ((FreeColPanel) comp).setSavedSize(comp.getSize());
         }
 
@@ -1170,7 +1171,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, getPopupPosition(colony.getTile()));
         return panel;
     }
-    
+
     /**
      * Describe <code>showColonyPanel</code> method here.
      *
