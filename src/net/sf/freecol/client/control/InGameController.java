@@ -5070,16 +5070,14 @@ public final class InGameController implements NetworkConstants {
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
         // just select nothing and wait.
+        gui.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
         if (moveMode >= MODE_END_TURN) {
             doEndTurn();
         } else if (tile != null) {
-            gui.setActiveUnit(null);
             gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             doEndTurn();
-        } else {
-            gui.setActiveUnit(null);
         }
     }
 
