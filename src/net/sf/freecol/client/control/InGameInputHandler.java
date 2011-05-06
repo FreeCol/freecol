@@ -566,7 +566,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chooseFoundingFather(Element element) {
-        final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
+        final List<FoundingFather> ffs = new ArrayList<FoundingFather>();
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id != null && !id.equals("")) {
@@ -575,18 +575,12 @@ public final class InGameInputHandler extends InputHandler {
                 if (father == null) {
                     logger.warning("Bogus " + type + " father: " + id);
                 } else {
-                    possibleFoundingFathers.add(father);
+                    ffs.add(father);
                 }
             }
         }
 
-        FoundingFather foundingFather = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
-        if (foundingFather != null) {
-            getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
-            Element e = Message.createNewRootElement("chooseFoundingFather");
-            e.setAttribute("foundingFather", foundingFather.getId());
-            getFreeColClient().getClient().send(e);
-        }
+        new FoundingFatherSwingTask(ffs).invokeLater();
         return null;
     }
 
@@ -1295,6 +1289,37 @@ public final class InGameInputHandler extends InputHandler {
         }
     }
 
+    /**
+     * This class displays a dialog that lets the player pick a
+     * Founding Father.
+     */
+    class FoundingFatherSwingTask extends NoResultCanvasSwingTask {
+
+        private List<FoundingFather> choices;
+
+        /**
+         * Constructor.
+         *
+         * @param choices The possible founding fathers.
+         */
+        public FoundingFatherSwingTask(List<FoundingFather> choices) {
+            this.choices = choices;
+        }
+
+        protected void doWork(Canvas canvas) {
+            ChooseFoundingFatherDialog dialog
+                = new ChooseFoundingFatherDialog(canvas, choices);
+            FoundingFather ff = canvas.showFreeColDialog(dialog);
+            if (ff != null) {
+                FreeColClient freeColClient = getFreeColClient();
+                freeColClient.getMyPlayer().setCurrentFather(ff);
+                Element e = Message.createNewRootElement("chooseFoundingFather");
+                e.setAttribute("foundingFather", ff.getId());
+                freeColClient.getClient().send(e);
+            }
+        }
+    }
+
     class RefreshTilesSwingTask extends NoResultCanvasSwingTask {
 
         public RefreshTilesSwingTask(Tile oldTile, Tile newTile) {
@@ -1635,47 +1660,6 @@ public final class InGameInputHandler extends InputHandler {
             try {
                 Object result = invokeAndWait();
                 return ((Integer) result).intValue();
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e.getCause());
-                }
-            }
-        }
-    }
-
-    /**
-     * This class displays a dialog that lets the player pick a
-     * Founding Father.
-     */
-    class ShowSelectFoundingFatherSwingTask extends SwingTask {
-
-        private List<FoundingFather> choices;
-
-        /**
-         * Constructor.
-         *
-         * @param choices The possible founding fathers.
-         */
-        public ShowSelectFoundingFatherSwingTask(List<FoundingFather> choices) {
-            this.choices = choices;
-        }
-
-        protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
-            return canvas.showFreeColDialog(new ChooseFoundingFatherDialog(canvas, choices));
-        }
-
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return selection.
-         */
-        public FoundingFather select() {
-            try {
-                Object result = invokeAndWait();
-                return (FoundingFather) result;
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
