@@ -83,6 +83,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -487,7 +488,9 @@ public final class ColonyPanel extends FreeColPanel
     private void debugSetGoods(Canvas canvas, Colony colony) {
         List<ChoiceItem<GoodsType>> gtl
             = new ArrayList<ChoiceItem<GoodsType>>();
-        for (GoodsType t : getSpecification().getGoodsTypeList()) {
+        Specification spec = getSpecification();
+        for (GoodsType t : spec.getGoodsTypeList()) {
+            if (t == spec.getPrimaryFoodType()) continue;
             gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
                                               t));
         }
@@ -506,12 +509,10 @@ public final class ColonyPanel extends FreeColPanel
             return;
         }
         GoodsContainer cgc = colony.getGoodsContainer();
+        cgc.setAmount(goodsType, a);
         GoodsContainer sgc = (GoodsContainer) getClient().getFreeColServer()
             .getGame().getFreeColGameObject(cgc.getId());
         sgc.setAmount(goodsType, a);
-        cgc = new GoodsContainer(getGame(), colony,
-                sgc.toXMLElement(Message.createNewDocument()));
-        colony.setGoodsContainer(cgc);
         updateConstructionPanel();
         updateProductionPanel();
         updateWarehousePanel();
