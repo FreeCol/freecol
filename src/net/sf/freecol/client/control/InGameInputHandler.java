@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -809,15 +807,7 @@ public final class InGameInputHandler extends InputHandler {
         if (colony == null) {
             tile.readFromXMLElement(normalTile);
         } else {
-            Canvas canvas = getFreeColClient().getCanvas();
-            canvas.showColonyPanel(colony)
-                .addPropertyChangeListener(new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent e) {
-                            if ("closing".equals(e.getPropertyName())) {
-                                tile.readFromXMLElement(normalTile);
-                            }
-                        }
-                    });
+            new SpyColonySwingTask(colony, normalTile).invokeLater();
         }
         return null;
     }
@@ -1428,6 +1418,30 @@ public final class InGameInputHandler extends InputHandler {
             }
             Animations.unitAttack(canvas, unit, defender, success);
             canvas.refresh();
+        }
+    }
+
+    /**
+     * This task shows an enhanced colony panel, then restores the
+     * normal information when it closes.
+     */
+    class SpyColonySwingTask extends NoResultCanvasSwingTask {
+        private Colony colony;
+        private Element normalTile;
+
+        public SpyColonySwingTask(Colony colony, Element normalTile) {
+            this.colony = colony;
+            this.normalTile = normalTile;
+        }
+
+        protected void doWork(Canvas canvas) {
+            final Tile tile = colony.getTile();
+            canvas.showColonyPanel(colony)
+                .addClosingCallback(new Runnable() {
+                        public void run() {
+                            tile.readFromXMLElement(normalTile);
+                        }
+                    });
         }
     }
 

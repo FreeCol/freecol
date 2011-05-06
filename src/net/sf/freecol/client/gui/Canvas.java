@@ -906,7 +906,7 @@ public final class Canvas extends JDesktopPane {
         if (comp == null) {
             return;
         } else if (comp instanceof FreeColPanel) {
-            ((FreeColPanel) comp).firePropertyChange("closing", false, true);
+            ((FreeColPanel) comp).notifyClose();
             ((FreeColPanel) comp).setSavedSize(comp.getSize());
         }
 

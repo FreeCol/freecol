@@ -33,6 +33,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -481,6 +483,30 @@ public class FreeColPanel extends JPanel implements ActionListener {
         if (command.equals(okCommand)) {
             getCanvas().remove(this);
         }
+    }
+
+    /**
+     * Notify that this panel is closing, (that is, is being removed
+     * from the canvas (see Canvas.remove())).
+     */
+    public void notifyClose() {
+        firePropertyChange("closing", false, true);
+    }
+
+    /**
+     * Add a routine to be called when this panel closes.
+     * Triggered by notifyClose() above.
+     *
+     * @param runnable Some code to run on close.
+     */
+    public void addClosingCallback(final Runnable runnable) {
+        addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    if ("closing".equals(e.getPropertyName())) {
+                        runnable.run();
+                    }
+                }
+            });
     }
 
     /**

@@ -711,7 +711,6 @@ public class ChangeSet {
      * Encapsulate an owned object change.
      */
     private static class OwnedChange extends Change {
-
         private FreeColObject fco;
 
         /**
@@ -747,6 +746,49 @@ public class ChangeSet {
             Element child = fco.toXMLElement(serverPlayer, doc, false, false);
             child.setAttribute("owner", serverPlayer.getId());
             element.appendChild(child);
+            return element;
+        }
+    }
+
+    private static class SpyChange extends Change {
+        private Tile tile;
+
+        /**
+         * Build a new SpyChange.
+         *
+         * @param see The visibility of this change.
+         * @param settlement The <code>Settlement</code> to spy on.
+         */
+        SpyChange(See see, Settlement settlement) {
+            super(see);
+            tile = settlement.getTile();
+        }
+
+        /**
+         * The sort priority.
+         *
+         * @return priority.
+         */
+        public int sortPriority() {
+            return ChangePriority.CHANGE_NORMAL.getPriority();
+        }
+
+        /**
+         * Specialize a SpyChange into an element with the supplied name.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to update.
+         * @param doc The owner <code>Document</code>.
+         * @return An element.
+         */
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            Element element = doc.createElement("spyResult");
+            element.setAttribute("tile", tile.getId());
+            // Have to tack on two copies of the settlement tile.
+            // One full version, one ordinary version to restore.
+            element.appendChild(tile.toXMLElement(serverPlayer, doc,
+                                                  true, false));
+            element.appendChild(tile.toXMLElement(serverPlayer, doc,
+                                                  false, false));
             return element;
         }
     }
@@ -858,9 +900,9 @@ public class ChangeSet {
      * from its name.
      */
     private static class TrivialChange extends Change {
-        int priority;
-        String name;
-        String[] attributes;
+        private int priority;
+        private String name;
+        private String[] attributes;
 
         /**
          * Build a new TrivialChange.
@@ -1159,6 +1201,18 @@ public class ChangeSet {
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
         changes.add(new OwnedChange(See.only(serverPlayer), sale));
         serverPlayer.saveSale(sale);
+        return this;
+    }
+
+    /**
+     * Helper function to add a spying change to a ChangeSet.
+     *
+     * @param vis The visibility of this change.
+     * @param settlement The <code>Settlement</code> to spy on.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addSpy(See see, Settlement settlement) {
+        changes.add(new SpyChange(see, settlement));
         return this;
     }
 

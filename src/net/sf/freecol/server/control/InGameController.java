@@ -111,7 +111,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.TransactionSession;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -2823,23 +2822,8 @@ public final class InGameController extends Controller {
     public Element spySettlement(ServerPlayer serverPlayer, Unit unit,
                                  Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        Tile tile = settlement.getTile();
 
-        // Explicitly send a special spyResult message.
-        cs.addTrivial(See.only(serverPlayer), "spyResult",
-                      ChangeSet.ChangePriority.CHANGE_NORMAL,
-                      "tile", tile.getId());
-        // Have to tack on two copies of the settlement tile.
-        // One full version, one ordinary version to restore.
-        // TODO: eliminate the explicit Element hackery
-        Element reply = cs.build(serverPlayer);
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(tile.toXMLElement(serverPlayer, doc, true, false));
-        reply.appendChild(tile.toXMLElement(serverPlayer, doc, false, false));
-        sendElement(serverPlayer, reply);
-
-        // Return a simple update that just ends the scouts move.
-        cs = new ChangeSet();
+        cs.addSpy(See.only(serverPlayer), settlement);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         return cs.build(serverPlayer);
