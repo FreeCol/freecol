@@ -2147,7 +2147,9 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         if ((newTile == null
              || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope()))
-            && canvas.showConfirmDialog(oldTile, StringTemplate.key("highseas.text"),
+            && canvas.showConfirmDialog(oldTile, StringTemplate.template("highseas.text")
+                                        .addAmount("%number%", getSpecification()
+                                                   .getInteger("model.option.turnsToSail")),
                                         "highseas.yes", "highseas.no")) {
             moveToEurope(unit);
             nextActiveUnit();
