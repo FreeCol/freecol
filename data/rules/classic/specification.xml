@@ -485,7 +485,7 @@
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
-    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20">
+    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>

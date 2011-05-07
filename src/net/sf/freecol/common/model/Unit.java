@@ -90,7 +90,11 @@ public class Unit extends FreeColGameObject
         SKIPPED
     }
 
-    /** The roles a Unit can have. */
+    /**
+     * The roles a Unit can have. TODO: make this configurable by
+     * adding roles to the specification instead of using an enum. New
+     * roles, such as mounted pioneers, have already been suggested.
+     */
     public static enum Role {
         DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
 

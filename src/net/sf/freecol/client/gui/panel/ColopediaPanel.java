@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -861,26 +862,23 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             allTypes = filterBuildables(getSpecification().getEquipmentTypeList(), equipmentTypes, type);
             if (equipmentTypes.size() > 0) {
                 detailPanel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
-                if (allTypes) {
-                    detailPanel.add(localizedLabel("colopedia.goods.allEquipment"));
-                    /*
-                      JButton button = getLinkButton(Messages.message("colopedia.goods.allEquipment"),
-                      null, PanelType.EQUIPMENT.toString());
-                      button.addActionListener(this);
-                      detailPanel.add(button, "newline, skip, span");
-                    */
-                } else {
-                    int count = 0;
-                    for (EquipmentType equipment : equipmentTypes) {
-                        //JButton label = getButton(equipment);
-                        JLabel label = localizedLabel(equipment.getNameKey());
-                        if (count > 0 && count % 3 == 0) {
-                            detailPanel.add(label, "skip");
-                        } else {
-                            detailPanel.add(label);
-                        }
-                        count++;
+                Set<Role> roles = EnumSet.noneOf(Role.class);
+                for (EquipmentType equipment : equipmentTypes) {
+                    roles.add(equipment.getRole());
+                }
+                // TODO: fix special case by upgrading role to FreeColGameObjectType
+                if (roles.contains(Role.SOLDIER) || roles.contains(Role.SCOUT)) {
+                    roles.add(Role.DRAGOON);
+                }
+                int count = 0;
+                for (Role role : roles) {
+                    JLabel label = localizedLabel("model.unit.role." + role.getId());
+                    if (count > 0 && count % 3 == 0) {
+                        detailPanel.add(label, "skip");
+                    } else {
+                        detailPanel.add(label);
                     }
+                    count++;
                 }
             }
             List<UnitType> unitTypes = new ArrayList<UnitType>();
