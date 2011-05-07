@@ -678,6 +678,22 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             detailPanel.add(new JLabel(Integer.toString(type.getSpace())), "right");
         }
 
+        Player player = getMyPlayer();
+        // player can be null when using the map editor
+        Europe europe = (player == null) ? null : player.getEurope();
+
+        String price = null;
+        if (europe != null && europe.getUnitPrice(type) > 0) {
+            price = Integer.toString(europe.getUnitPrice(type));
+        } else if (type.getPrice() > 0) {
+            price = Integer.toString(type.getPrice());
+        }
+        if (price != null) {
+            detailPanel.add(localizedLabel("colopedia.unit.price"));
+            detailPanel.add(new JLabel(price), "right");
+        }
+
+
         if (type.hasSkill()) {
             detailPanel.add(localizedLabel("colopedia.unit.skill"));
             detailPanel.add(new JLabel(Integer.toString(type.getSkill())), "right");
@@ -691,32 +707,41 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             }
 
             if (!schools.isEmpty()) {
-                detailPanel.add(localizedLabel("colopedia.unit.school"));
-                if (schools.size() > 1) {
-                    detailPanel.add(getButton(schools.get(0)),
-                                    "span, split " + schools.size());
-                    for (int index = 1; index < schools.size(); index++) {
-                        detailPanel.add(getButton(schools.get(index)));
+                detailPanel.add(localizedLabel("colopedia.unit.school"), "newline");
+                int count = 0;
+                for (BuildingType school : schools) {
+                    JButton label = getButton(school);
+                    if (count > 0 && count % 3 == 0) {
+                        detailPanel.add(label, "skip");
+                    } else {
+                        detailPanel.add(label);
                     }
-                } else {
-                    detailPanel.add(getButton(schools.get(0)));
+                    count++;
                 }
             }
-        }
 
-        Player player = getMyPlayer();
-        // player can be null when using the map editor
-        Europe europe = (player == null) ? null : player.getEurope();
+            List<IndianNationType> nations = new ArrayList<IndianNationType>();
+            for (IndianNationType nation : getSpecification().getIndianNationTypes()) {
+                for (RandomChoice<UnitType> choice : nation.getSkills()) {
+                    if (choice.getObject() == type) {
+                        nations.add(nation);
+                    }
+                }
+            }
+            if (!nations.isEmpty()) {
+                detailPanel.add(localizedLabel("colopedia.unit.natives"), "newline");
+                int count = 0;
+                for (IndianNationType nation : nations) {
+                    JButton label = getButton(nation);
+                    if (count > 0 && count % 3 == 0) {
+                        detailPanel.add(label, "skip");
+                    } else {
+                        detailPanel.add(label);
+                    }
+                    count++;
+                }
+            }
 
-        String price = null;
-        if (europe != null && europe.getUnitPrice(type) > 0) {
-            price = Integer.toString(europe.getUnitPrice(type));
-        } else if (type.getPrice() > 0) {
-            price = Integer.toString(type.getPrice());
-        }
-        if (price != null) {
-            detailPanel.add(localizedLabel("colopedia.unit.price"));
-            detailPanel.add(new JLabel(price));
         }
 
         // Requires - prerequisites to build
@@ -937,7 +962,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildBuildingDetail(BuildingType buildingType) {
 
-        detailPanel.setLayout(new MigLayout("wrap 7, fillx, gapx 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
         JLabel name = localizedLabel(buildingType.getNameKey());
         name.setFont(smallHeaderFont);
