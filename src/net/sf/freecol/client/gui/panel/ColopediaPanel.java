@@ -611,7 +611,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildResourceDetail(ResourceType type) {
 
-        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
+        detailPanel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
@@ -645,7 +645,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(goodsPanel);
 
         detailPanel.add(localizedLabel("colopedia.resource.description"), "newline 20");
-        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -658,29 +658,29 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildUnitDetail(UnitType type) {
 
-        detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20"));
+        detailPanel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
         JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
         detailPanel.add(localizedLabel("colopedia.unit.offensivePower"));
-        detailPanel.add(new JLabel(Integer.toString(type.getOffence())));
+        detailPanel.add(new JLabel(Integer.toString(type.getOffence())), "right");
 
         detailPanel.add(localizedLabel("colopedia.unit.defensivePower"));
-        detailPanel.add(new JLabel(Integer.toString(type.getDefence())));
+        detailPanel.add(new JLabel(Integer.toString(type.getDefence())), "right");
 
         detailPanel.add(localizedLabel("colopedia.unit.movement"));
-        detailPanel.add(new JLabel(String.valueOf(type.getMovement()/3)));
+        detailPanel.add(new JLabel(String.valueOf(type.getMovement()/3)), "right");
 
         if (type.canCarryGoods() || type.canCarryUnits()) {
             detailPanel.add(localizedLabel("colopedia.unit.capacity"));
-            detailPanel.add(new JLabel(Integer.toString(type.getSpace())));
+            detailPanel.add(new JLabel(Integer.toString(type.getSpace())), "right");
         }
 
         if (type.hasSkill()) {
             detailPanel.add(localizedLabel("colopedia.unit.skill"));
-            detailPanel.add(new JLabel(Integer.toString(type.getSkill())));
+            detailPanel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
             for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
@@ -721,14 +721,21 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         // Requires - prerequisites to build
         if (!type.getAbilitiesRequired().isEmpty()) {
-            detailPanel.add(localizedLabel("colopedia.unit.requirements"), "top");
-            try {
-                JTextPane textPane = getDefaultTextPane();
-                StyledDocument doc = textPane.getStyledDocument();
-                appendRequiredAbilities(doc, type);
-                detailPanel.add(textPane);
-            } catch(BadLocationException e) {
-                logger.warning(e.toString());
+            detailPanel.add(localizedLabel("colopedia.unit.requirements"), "newline, top");
+            String key = type.getAbilitiesRequired().keySet().iterator().next();
+            // TODO: Fix inheritance of abilities in IndianNationType!
+            if (type.getAbilitiesRequired().size() == 1
+                && "model.ability.native".equals(key)) {
+                detailPanel.add(localizedLabel(key + ".name"), "span");
+            } else {
+                try {
+                    JTextPane textPane = getDefaultTextPane();
+                    StyledDocument doc = textPane.getStyledDocument();
+                    appendRequiredAbilities(doc, type);
+                    detailPanel.add(textPane, "span");
+                } catch(BadLocationException e) {
+                    logger.warning(e.toString());
+                }
             }
         }
 
@@ -748,7 +755,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 String bonus = getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus));
             }
-            detailPanel.add(productionPanel, "growx");
+            detailPanel.add(productionPanel, "span");
         }
 
         if (!type.getGoodsRequired().isEmpty()) {
@@ -769,7 +776,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.add(localizedLabel("colopedia.unit.description"),
                         "newline 20");
-        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span");
 
         detailPanel.revalidate();
         detailPanel.repaint();
