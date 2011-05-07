@@ -122,8 +122,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @param template a <code>Modifier</code> value
      */
     public Modifier(Modifier template) {
-        setId(template.getId());
-        setSource(template.getSource());
+        super.copy(template);
         setType(template.getType());
         setValue(template.getValue());
         if (template.hasIncrement()) {

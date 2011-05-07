@@ -73,6 +73,17 @@ public final class Ability extends Feature {
     /**
      * Creates a new <code>Ability</code> instance.
      *
+     * @param template an <code>Ability</code> value
+     */
+    public Ability(Ability template) {
+        super.copy(template);
+        this.value = template.value;
+    }
+
+
+    /**
+     * Creates a new <code>Ability</code> instance.
+     *
      * @param element an <code>Element</code> value
      */
     public Ability(Element element) {

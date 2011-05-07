@@ -205,7 +205,9 @@ public abstract class Feature extends FreeColObject {
                 (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode() {
         int hash = 7;
         hash += 31 * hash + (getId() == null ? 0 : getId().hashCode());
@@ -222,6 +224,9 @@ public abstract class Feature extends FreeColObject {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -272,6 +277,15 @@ public abstract class Feature extends FreeColObject {
         } else {
             return false;
         }
+    }
+
+
+    protected void copy(Feature other) {
+        setId(other.getId());
+        this.source = other.source;
+        this.firstTurn = other.firstTurn;
+        this.lastTurn = other.lastTurn;
+        setScopes(other.getScopes());
     }
 
 

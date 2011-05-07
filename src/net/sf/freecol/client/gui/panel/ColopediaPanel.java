@@ -723,19 +723,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (!type.getAbilitiesRequired().isEmpty()) {
             detailPanel.add(localizedLabel("colopedia.unit.requirements"), "newline, top");
             String key = type.getAbilitiesRequired().keySet().iterator().next();
-            // TODO: Fix inheritance of abilities in IndianNationType!
-            if (type.getAbilitiesRequired().size() == 1
-                && "model.ability.native".equals(key)) {
-                detailPanel.add(localizedLabel(key + ".name"), "span");
-            } else {
-                try {
-                    JTextPane textPane = getDefaultTextPane();
-                    StyledDocument doc = textPane.getStyledDocument();
-                    appendRequiredAbilities(doc, type);
-                    detailPanel.add(textPane, "span");
-                } catch(BadLocationException e) {
-                    logger.warning(e.toString());
-                }
+            try {
+                JTextPane textPane = getDefaultTextPane();
+                StyledDocument doc = textPane.getStyledDocument();
+                appendRequiredAbilities(doc, type);
+                detailPanel.add(textPane, "span, width 70%");
+            } catch(BadLocationException e) {
+                logger.warning(e.toString());
             }
         }
 
