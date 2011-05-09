@@ -55,7 +55,6 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
-import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
@@ -396,20 +395,6 @@ public class AIMessage {
         return sendMessage(aiUnit.getConnection(),
                            new GetTransactionMessage(aiUnit.getUnit(),
                                                      settlement));
-    }
-
-
-    /**
-     * Gives independence to a player.
-     *
-     * @param connection The <code>Connection</code> to the server.
-     * @param player The <code>Player</code> gaining independence.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askGiveIndependence(Connection connection,
-                                              Player player) {
-        return sendMessage(connection,
-                           new GiveIndependenceMessage(player));
     }
 
 

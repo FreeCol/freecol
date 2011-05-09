@@ -70,22 +70,6 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
     /**
-     * Checks if this player has a single Man-of-War.
-     * @return <code>true</code> if this player owns
-     *      a single Man-of-War.
-     */
-    public boolean hasManOfWar() {
-        Iterator<Unit> it = getPlayer().getUnitIterator();
-        while (it.hasNext()) {
-            Unit unit = it.next();
-            if ("model.unit.manOWar".equals(unit.getType().getId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Ask the server to train a unit in Europe on behalf of the AIPlayer
      */
     public AIUnit trainAIUnitInEurope(UnitType unitType) {

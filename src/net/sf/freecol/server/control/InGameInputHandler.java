@@ -51,7 +51,6 @@ import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
-import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -336,14 +335,6 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new GetTransactionMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(GiveIndependenceMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new GiveIndependenceMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(GoodsForSaleMessage.getXMLElementTagName(),

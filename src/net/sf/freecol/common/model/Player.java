@@ -25,7 +25,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -1024,21 +1023,30 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a list of the players this REF player is currently fighting.
-     * @return The list. Empty if this is not an REF player. 
+     * Checks if this player has work to do if it is a REF-player.
+     *
+     * @return True if any of our units are located in the new
+     *     world or a nation is in rebellion against us.
      */
-    public List<Player> getDominionsAtWar() {
-        List<Player> dominions = new LinkedList<Player>();        
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player p = it.next();
-            if (p.getREFPlayer() == this
-                    && p.getPlayerType() == PlayerType.REBEL
-                    && p.getMonarch() == null) {
-                dominions.add(p);
-            }
+    public boolean isWorkForREF() {
+        for (Unit u : getUnits()) { // Work to do if unit in the new world
+            if (u.getTile() != null) return true;
         }
-        return dominions;
+        return !getRebels().isEmpty();
+    }
+
+    /**
+     * Gets a list of the players in rebellion against this (REF) player.
+     *
+     * @return A list of nations in rebellion against us.
+     */
+    public List<Player> getRebels() {
+        List<Player> rebels = new ArrayList<Player>();
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            if (p.getREFPlayer() == this
+                && p.getPlayerType() == PlayerType.REBEL) rebels.add(p);
+        }
+        return rebels;
     }
 
     /**

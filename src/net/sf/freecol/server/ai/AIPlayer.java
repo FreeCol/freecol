@@ -260,41 +260,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * For REF-players: Checks if we have lost the war of independence.
-     *
-     * TODO: "REF defeat" is a gameplay decision, not a decision an AI
-     * should make for itself. Move this to another class (Player?).
-     */
-    protected boolean checkForREFDefeat() {
-        logger.finest("Entering method checkForREFDefeat");
-        if (!getPlayer().isREF()) {
-        	throw new IllegalStateException("Checking for REF player defeat when player not REF.");
-        }
-
-        List<Player> dominions = getPlayer().getDominionsAtWar();
-
-        // Return if independence should not be granted:
-
-        if (dominions.isEmpty()) {
-            return false;
-        }
-
-        if (!getPlayer().getSettlements().isEmpty()) {
-            return false;
-        }
-
-        if (getPlayer().hasManOfWar() && getPlayer().getNumberOfKingLandUnits() > 6) {
-            return false;
-        }
-
-        for (Player p : dominions) {
-            AIMessage.askGiveIndependence(getConnection(), p);
-        }
-        return true;
-    }
-
-
-    /**
      * Standard stance change determination.  If a change occurs,
      * contact the server and propagate.
      *

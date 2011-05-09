@@ -73,10 +73,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     + ", year " + getGame().getTurn());
         sessionRegister.clear();
         clearAIUnits();
-        checkForREFDefeat();
-        if (!isWorkForREF()) {
-            return;
-        }
+        if (!getPlayer().isWorkForREF()) return;
         determineStances();
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
@@ -278,91 +275,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     }
 
     /**
-     * Gets a list of the players this REF player is currently fighting.
-     * @return The list. Empty if this is not an REF getPlayer().
-     */
-    private List<Player> getDominionsAtWar() {
-        List<Player> dominions = new LinkedList<Player>();
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player p = it.next();
-            if (p.getREFPlayer() == getPlayer()
-                && p.getPlayerType() == PlayerType.REBEL
-                && p.getMonarch() == null) {
-                dominions.add(p);
-            }
-        }
-        return dominions;
-    }
-
-
-    /**
-     * Gets the number of King's units.
-     * @return The number of units with ability "model.ability.refUnit" this player owns.
-     */
-    private int getNumberOfKingUnits() {
-        int n = 0;
-        for (Unit unit : getPlayer().getUnits()) {
-            if (unit.hasAbility("model.ability.refUnit")) {
-                n++;
-            }
-        }
-        return n;
-    }
-
-    /**
-     * For REF-players: Checks if we have lost the war of independence.
-     */
-    private void checkForREFDefeat() {
-        logger.finest("Entering method checkForREFDefeat");
-
-        List<Player> dominions = getDominionsAtWar();
-
-        // Return if independence should not be granted:
-
-        if (dominions.isEmpty()) {
-            return;
-        }
-
-        if (!getPlayer().getSettlements().isEmpty()) {
-            return;
-        }
-
-        if (hasManOfWar() && getNumberOfKingUnits() > 6) {
-            return;
-        }
-
-        for (Player p : dominions) {
-            AIMessage.askGiveIndependence(getConnection(), p);
-        }
-    }
-
-    /**
-     * Checks if this player has work to do (provided it is an REF-player).
-     *
-     * @return <code>true</code> if any of our units are located in the new
-     *         world or if a puppet-nation has declared independence.
-     */
-    private boolean isWorkForREF() {
-        logger.finest("Entering method isWorkForREF");
-        Iterator<Unit> it = getPlayer().getUnitIterator();
-        while (it.hasNext()) {
-            if (it.next().getTile() != null) {
-                return true;
-            }
-        }
-        Iterator<Player> it2 = getGame().getPlayerIterator();
-        while (it2.hasNext()) {
-            Player p = it2.next();
-            if (p.getREFPlayer() == getPlayer() &&
-                p.getPlayerType() == PlayerType.REBEL) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Decides whether to accept an Indian demand, or not.
      *
      * @param unit The unit making demands.
@@ -376,6 +288,4 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // TODO: make a better choice
         return false;
     }
-
-
 }

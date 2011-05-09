@@ -183,8 +183,7 @@ public class StandardAIPlayer extends AIPlayer {
         this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         clearAIUnits();
-        if (getPlayer().isREF()
-            && (checkForREFDefeat() || !isWorkForREF())) return;
+        if (getPlayer().isREF() && !getPlayer().isWorkForREF()) return;
         cheat();
         determineStances();
         rearrangeWorkersInColonies();
@@ -751,31 +750,6 @@ public class StandardAIPlayer extends AIPlayer {
                 au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
             }
         }
-    }
-
-    /**
-     * Checks if this player has work to do (provided it is an REF-player).
-     *
-     * @return <code>true</code> if any of our units are located in the new
-     *         world or if a puppet-nation has declared independence.
-     */
-    private boolean isWorkForREF() {
-        logger.finest("Entering method isWorkForREF");
-        Iterator<Unit> it = getPlayer().getUnitIterator();
-        while (it.hasNext()) {
-            if (it.next().getTile() != null) {
-                return true;
-            }
-        }
-        Iterator<Player> it2 = getGame().getPlayerIterator();
-        while (it2.hasNext()) {
-            Player p = it2.next();
-            if (p.getREFPlayer() == getPlayer() &&
-                p.getPlayerType() == PlayerType.REBEL) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -556,6 +556,13 @@ public final class InGameController extends Controller {
                 sendToAll(cs);
                 logger.info(player.getNation() + " is dead.");
                 continue;
+            } else if (player.isREF() && player.checkForREFDefeat()) {
+                for (Player p : player.getRebels()) {
+                    csGiveIndependence(player, (ServerPlayer) p, cs);
+                }
+                sendToAll(cs);
+                logger.info(player.getNation() + " is defeated.");
+                continue;
             }
 
             // Do "new turn"-like actions that need to wait until right
@@ -596,6 +603,68 @@ public final class InGameController extends Controller {
                 sendElement(serverPlayer, cs);
             }
         }
+    }
+
+    /**
+     * Give independence.  Note that the REF player is granting, but
+     * most of the changes happen to the newly independent player.
+     * hence the special handling.
+     *
+     * @param serverPlayer The REF <code>ServerPlayer</code> that is granting.
+     * @param independent The newly independent <code>ServerPlayer</code>.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    private void csGiveIndependence(ServerPlayer serverPlayer,
+                                    ServerPlayer independent, ChangeSet cs) {
+        serverPlayer.csChangeStance(Stance.PEACE, independent, true, cs);
+        independent.setPlayerType(PlayerType.INDEPENDENT);
+        Turn turn = getGame().getTurn();
+        independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
+        independent.setTax(0);
+        independent.recalculateBellsBonus();
+        independent.reinitialiseMarket();
+        independent.addHistory(new HistoryEvent(turn,
+                HistoryEvent.EventType.INDEPENDENCE));
+        cs.addMessage(See.only(independent),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "model.player.independence",
+                             independent)
+                .addStringTemplate("%ref%", serverPlayer.getNationName()));
+
+        // Who surrenders?
+        List<Unit> surrenderUnits = new ArrayList<Unit>();
+        for (Unit u : serverPlayer.getUnits()) {
+            if (!u.isNaval()) surrenderUnits.add(u);
+        }
+        if (surrenderUnits.size() > 0) {
+            StringTemplate surrender = StringTemplate.label(", ");
+            for (Unit u : surrenderUnits) {
+                UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
+                                                     independent);
+                if (downgrade != null) u.setType(downgrade);
+                u.setOwner(independent);
+                surrender.addStringTemplate(u.getLabel());
+                // Make sure the former owner is notified!
+                cs.add(See.perhaps().always(serverPlayer), u);
+            }
+            cs.addMessage(See.only(independent),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "model.player.independence.unitsAcquired",
+                                 independent)
+                    .addStringTemplate("%units%", surrender));
+        }
+
+        // Update player type.  Again, a pity to have to do a whole
+        // player update, but a partial update works for other players.
+        cs.addPartial(See.all().except(independent), independent,
+                      "playerType");
+        cs.addMessage(See.all().except(independent),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "model.player.independence.announce",
+                             independent)
+                .addStringTemplate("%nation%", independent.getNationName())
+                .addStringTemplate("%ref%", serverPlayer.getNationName()));
+        cs.add(See.only(independent), independent);
     }
 
     /**
@@ -1046,78 +1115,6 @@ public final class InGameController extends Controller {
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
-
-    /**
-     * Give independence.  Note that the REF player is granting, but
-     * most of the changes happen to the newly independent player.
-     * hence the special handling.
-     *
-     * @param serverPlayer The REF <code>ServerPlayer</code> that is granting.
-     * @param independent The newly independent <code>ServerPlayer</code>.
-     * @return An <code>Element</code> encapsulating this action.
-     */
-    public Element giveIndependence(ServerPlayer serverPlayer,
-                                    ServerPlayer independent) {
-        ChangeSet cs = new ChangeSet();
-
-        // The rebels have won.
-        if (!serverPlayer.csChangeStance(Stance.PEACE, independent,
-                                         true, cs)) {
-            return Message.clientError("Unable to make peace!?!");
-        }
-        independent.setPlayerType(PlayerType.INDEPENDENT);
-        Turn turn = getGame().getTurn();
-        independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
-        independent.setTax(0);
-        independent.recalculateBellsBonus();
-        independent.reinitialiseMarket();
-        independent.addHistory(new HistoryEvent(turn,
-                HistoryEvent.EventType.INDEPENDENCE));
-        cs.addMessage(See.only(independent),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.player.independence",
-                             independent)
-                .addStringTemplate("%ref%", serverPlayer.getNationName()));
-
-        // Who surrenders?
-        List<Unit> surrenderUnits = new ArrayList<Unit>();
-        for (Unit u : serverPlayer.getUnits()) {
-            if (!u.isNaval()) surrenderUnits.add(u);
-        }
-        if (surrenderUnits.size() > 0) {
-            StringTemplate surrender = StringTemplate.label(", ");
-            for (Unit u : surrenderUnits) {
-                UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
-                                                     independent);
-                if (downgrade != null) u.setType(downgrade);
-                u.setOwner(independent);
-                surrender.addStringTemplate(u.getLabel());
-                // Make sure the former owner is notified!
-                cs.add(See.perhaps().always(serverPlayer), u);
-            }
-            cs.addMessage(See.only(independent),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "model.player.independence.unitsAcquired",
-                                 independent)
-                    .addStringTemplate("%units%", surrender));
-        }
-
-        // Update player type.  Again, a pity to have to do a whole
-        // player update, but a partial update works for other players.
-        cs.addPartial(See.all().except(independent), independent,
-                      "playerType");
-        cs.addMessage(See.all().except(independent),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.player.independence.announce",
-                             independent)
-                .addStringTemplate("%nation%", independent.getNationName())
-                .addStringTemplate("%ref%", serverPlayer.getNationName()));
-        cs.add(See.only(independent), independent);
-
-        sendToOthers(serverPlayer, cs);
-        return cs.build(serverPlayer);
-    }
-
 
     /**
      * Rename an object.

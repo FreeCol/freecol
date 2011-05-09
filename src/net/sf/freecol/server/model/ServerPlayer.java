@@ -283,21 +283,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
             return true;
 
-        case ROYAL: // Still alive if there are rebels to quell
-            for (Player enemy : getGame().getLiveEuropeanPlayers()) {
-                if (enemy.getREFPlayer() == (Player) this
-                    && enemy.getPlayerType() == PlayerType.REBEL) {
-                    return false;
-                }
-            }
-
-            // Still alive if there are units not in Europe
-            for (Unit u : getUnits()) {
-                if (!u.isInEurope()) return false;
-            }
-
-            // Otherwise, the REF has been defeated and gone home.
-            return true;
+        case ROYAL:
+            return !isWorkForREF();
 
         case UNDEAD:
             return getUnits().isEmpty();
@@ -474,6 +461,37 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (checkGold(goldNeeded)) return false;
         // Does not have enough money for recruiting or training
         logger.info(getName() + " does not have enough money for recruiting or training");
+        return true;
+    }
+
+    /**
+     * Check if a REF player has lost the war of independence.
+     *
+     * @return True if this REF player has been defeated.
+     */
+    public boolean checkForREFDefeat() {
+        if (!isREF()) {
+            throw new IllegalStateException("Checking for REF player defeat when player not REF.");
+        }
+
+        // Not defeated if there are still rebels to fight.
+        if (!getRebels().isEmpty()) return false;
+
+        // Not defeated if there are settlements.
+        if (!getSettlements().isEmpty()) return false;
+
+        // Not defeated if there is a non-zero navy and enough land units.
+        final int landREFUnitsRequired = 7; // TODO: magic number
+        boolean naval = false;
+        int land = 0;
+        for (Unit u : getUnits()) {
+            if (u.isNaval()) naval = true; else {
+                if (u.hasAbility("model.ability.refUnit")) land++;
+            }
+        }
+        if (naval && land >= landREFUnitsRequired) return false;
+
+        // REF is defeated
         return true;
     }
 
