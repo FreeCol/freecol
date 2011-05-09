@@ -1299,6 +1299,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 cs.add(See.only(this), is);
                             }
                         }
+                        csChangeStance(Stance.PEACE, p, true, cs);
                     }
                 }
 
