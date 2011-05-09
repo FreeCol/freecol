@@ -1898,7 +1898,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else { // At least one player is non-European
             if (isEuropean()) {
-                csChangeStance(Stance.WAR, defenderPlayer, false, cs);
+                csChangeStance(Stance.WAR, defenderPlayer, true, cs);
             } else if (isIndian()) {
                 if (result == CombatResult.WIN) {
                     attackerTension -= Tension.TENSION_ADD_MINOR;
@@ -1907,7 +1907,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (defenderPlayer.isEuropean()) {
-                defenderPlayer.csChangeStance(Stance.WAR, this, false, cs);
+                defenderPlayer.csChangeStance(Stance.WAR, this, true, cs);
             } else if (defenderPlayer.isIndian()) {
                 if (result == CombatResult.WIN) {
                     defenderTension += Tension.TENSION_ADD_MINOR;
