@@ -612,7 +612,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @return A list of FoundingFathers.
      */
-    private Set<FoundingFather> getRandomFoundingFathers(Random random) {
+    private List<FoundingFather> getRandomFoundingFathers(Random random) {
         // Build weighted random choice for each father type
         Specification spec = getGame().getSpecification();
         int age = getGame().getTurn().getAge();
@@ -633,7 +633,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Select one from each father type
-        Set<FoundingFather> randomFathers = new HashSet<FoundingFather>();
+        List<FoundingFather> randomFathers = new ArrayList<FoundingFather>();
         String logMessage = "Random fathers";
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
@@ -1034,7 +1034,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 clearOfferedFathers();
             }
             if (canRecruitFoundingFather()) {
-                Set<FoundingFather> ffs = getOfferedFathers();
+                List<FoundingFather> ffs = getOfferedFathers();
                 if (ffs.isEmpty()) {
                     ffs = getRandomFoundingFathers(random);
                     setOfferedFathers(ffs);

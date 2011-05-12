@@ -298,8 +298,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
     /** The offered founding fathers. */
-    final protected Set<FoundingFather> offeredFathers
-        = new HashSet<FoundingFather>();
+    final protected List<FoundingFather> offeredFathers
+        = new ArrayList<FoundingFather>();
 
     /** The current tax rate for this player. */
     protected int tax = 0;
@@ -1668,7 +1668,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The current set of offered fathers.
      */
-    public Set<FoundingFather> getOfferedFathers() {
+    public List<FoundingFather> getOfferedFathers() {
         return offeredFathers;
     }
 
@@ -1684,7 +1684,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param fathers A list of <code>FoundingFather</code>s to offer.
      */
-    public void setOfferedFathers(Set<FoundingFather> fathers) {
+    public void setOfferedFathers(List<FoundingFather> fathers) {
         clearOfferedFathers();
         offeredFathers.addAll(fathers);
     }

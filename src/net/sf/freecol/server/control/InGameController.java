@@ -942,7 +942,7 @@ public final class InGameController extends Controller {
             return Message.clientError("Not an offered father: " + id);
         } else {
             serverPlayer.setCurrentFather(father);
-            serverPlayer.setOfferedFathers(new HashSet<FoundingFather>());
+            serverPlayer.setOfferedFathers(new ArrayList<FoundingFather>());
             logger.info("Selected founding father: " + father.getId());
         }
         return null;
