@@ -962,7 +962,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerPlayer.csNewTurn, for " + toString());
+        logger.finest("ServerPlayer.csNewTurn, for " + getName());
 
         // Settlements
         List<Settlement> settlements
