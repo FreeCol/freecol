@@ -26,7 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 
 /**
- * 
+ *
  */
 public class ReportForeignAction extends FreeColAction {
 
@@ -35,7 +35,7 @@ public class ReportForeignAction extends FreeColAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ReportForeignAction(FreeColClient freeColClient) {
@@ -44,7 +44,7 @@ public class ReportForeignAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

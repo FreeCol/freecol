@@ -34,7 +34,7 @@ public class EuropeAction extends MapboardAction {
 
     /**
      * Creates a new <code>EuropeAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     EuropeAction(FreeColClient freeColClient) {
@@ -43,7 +43,7 @@ public class EuropeAction extends MapboardAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the player has access to Europe.
      */
     protected boolean shouldBeEnabled() {
@@ -54,7 +54,7 @@ public class EuropeAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

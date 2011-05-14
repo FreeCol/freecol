@@ -30,9 +30,9 @@ import net.sf.freecol.common.model.Unit.UnitState;
 * An action to set sentry state to the active unit.
 */
 public class SentryAction extends UnitAction {
-    
+
     public static final String id = "sentryAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
@@ -41,14 +41,14 @@ public class SentryAction extends UnitAction {
         super(freeColClient, id);
         addImageIcons("sentry");
     }
-    
+
     /**
      * Applies this action.
      * @param actionEvent The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent actionEvent) {
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
                                                              UnitState.SENTRY);
     }
-    
+
 }

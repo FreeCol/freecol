@@ -35,7 +35,7 @@ public class FortifyAction extends UnitAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     FortifyAction(FreeColClient freeColClient) {
@@ -45,7 +45,7 @@ public class FortifyAction extends UnitAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if there is an active unit.
      */
     protected boolean shouldBeEnabled() {
@@ -55,7 +55,7 @@ public class FortifyAction extends UnitAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

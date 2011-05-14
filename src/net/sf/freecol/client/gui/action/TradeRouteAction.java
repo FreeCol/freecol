@@ -40,11 +40,11 @@ public class TradeRouteAction extends MapboardAction {
     TradeRouteAction(FreeColClient freeColClient) {
         super(freeColClient, id);
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = getFreeColClient().getCanvas();
         canvas.showFreeColDialog(new TradeRouteDialog(canvas, null));

@@ -32,7 +32,7 @@ public class ReportHighScoresAction extends FreeColAction {
 
     public static final String id = "reportHighScoresAction";
 
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
@@ -40,7 +40,7 @@ public class ReportHighScoresAction extends FreeColAction {
     public ReportHighScoresAction(FreeColClient freeColClient) {
         super(freeColClient, id);
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

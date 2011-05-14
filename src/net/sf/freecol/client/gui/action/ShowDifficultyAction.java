@@ -34,7 +34,7 @@ public class ShowDifficultyAction extends FreeColAction {
 
     /**
      * Creates a new <code>ShowDifficultyAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ShowDifficultyAction(FreeColClient freeColClient) {
@@ -43,7 +43,7 @@ public class ShowDifficultyAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

@@ -34,7 +34,7 @@ public class OpenAction extends FreeColAction {
 
     /**
      * Creates a new <code>OpenAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     OpenAction(FreeColClient freeColClient) {
@@ -43,7 +43,7 @@ public class OpenAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

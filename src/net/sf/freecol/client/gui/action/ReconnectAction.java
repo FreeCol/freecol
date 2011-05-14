@@ -33,7 +33,7 @@ public class ReconnectAction extends FreeColAction {
 
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ReconnectAction(FreeColClient freeColClient) {
@@ -42,7 +42,7 @@ public class ReconnectAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

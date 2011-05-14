@@ -32,7 +32,7 @@ import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
 public class ReportHistoryAction extends FreeColAction {
 
     public static final String id = "reportHistoryAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

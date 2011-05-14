@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 public class ReportMilitaryAction extends FreeColAction {
 
     public static final String id = "reportMilitaryAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

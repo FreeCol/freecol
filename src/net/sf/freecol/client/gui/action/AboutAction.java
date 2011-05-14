@@ -35,7 +35,7 @@ public class AboutAction extends FreeColAction {
 
     /**
      * Creates a new <code>AboutAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     AboutAction(FreeColClient freeColClient) {
@@ -45,7 +45,7 @@ public class AboutAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

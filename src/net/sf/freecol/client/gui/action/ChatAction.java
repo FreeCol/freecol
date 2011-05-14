@@ -25,7 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 
 /**
  * An action for initiating chatting.
- * 
+ *
  * @see net.sf.freecol.client.gui.panel.MapControls
  */
 public class ChatAction extends FreeColAction {
@@ -35,7 +35,7 @@ public class ChatAction extends FreeColAction {
 
     /**
      * Creates a new <code>ChatAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ChatAction(FreeColClient freeColClient) {
@@ -44,7 +44,7 @@ public class ChatAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the mapboard is selected.
      */
     protected boolean shouldBeEnabled() {
@@ -57,7 +57,7 @@ public class ChatAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

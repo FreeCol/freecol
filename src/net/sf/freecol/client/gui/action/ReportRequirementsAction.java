@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 public class ReportRequirementsAction extends FreeColAction {
 
     public static final String id = "reportRequirementsAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

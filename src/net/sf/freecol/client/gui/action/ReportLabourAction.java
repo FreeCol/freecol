@@ -36,7 +36,7 @@ import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 public class ReportLabourAction extends FreeColAction {
 
     public static final String id = "reportLabourAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

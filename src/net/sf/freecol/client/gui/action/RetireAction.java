@@ -33,7 +33,7 @@ public class RetireAction extends FreeColAction {
 
     /**
      * Creates a new <code>RetireAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     RetireAction(FreeColClient freeColClient) {
@@ -42,18 +42,18 @@ public class RetireAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && freeColClient.getMyPlayer() != null
             && freeColClient.getMyPlayer().getPlayerType() != PlayerType.INDEPENDENT;
-    }    
-    
+    }
+
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

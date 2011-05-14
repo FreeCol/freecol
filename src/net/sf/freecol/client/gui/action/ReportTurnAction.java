@@ -33,7 +33,7 @@ import net.sf.freecol.client.FreeColClient;
 public class ReportTurnAction extends FreeColAction {
 
     public static final String id = "reportTurnAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

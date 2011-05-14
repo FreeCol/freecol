@@ -35,7 +35,7 @@ public class ZoomInAction extends FreeColAction {
 
     /**
      * Creates a new <code>ZoomInAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ZoomInAction(FreeColClient freeColClient) {
@@ -44,20 +44,20 @@ public class ZoomInAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the mapboard is selected
      *      and can be zoomed onto.
      */
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) {
             return false;
-        } 
-        
+        }
+
         Canvas canvas = getFreeColClient().getCanvas();
-        
+
         if (canvas == null || !canvas.isMapboardActionsEnabled())
         	return false;
-        
+
         float oldScaling = getFreeColClient().getGUI().getMapScale();
 
         return oldScaling < 1.0;
@@ -65,7 +65,7 @@ public class ZoomInAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

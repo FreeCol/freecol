@@ -34,7 +34,7 @@ public class SkipUnitAction extends UnitAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     SkipUnitAction(FreeColClient freeColClient) {
@@ -44,7 +44,7 @@ public class SkipUnitAction extends UnitAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

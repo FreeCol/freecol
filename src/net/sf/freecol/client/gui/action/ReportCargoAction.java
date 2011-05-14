@@ -32,7 +32,7 @@ import net.sf.freecol.client.gui.panel.ReportCargoPanel;
 public class ReportCargoAction extends FreeColAction {
 
     public static final String id = "reportCargoAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
@@ -40,7 +40,7 @@ public class ReportCargoAction extends FreeColAction {
     ReportCargoAction(FreeColClient freeColClient) {
         super(freeColClient, id);
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

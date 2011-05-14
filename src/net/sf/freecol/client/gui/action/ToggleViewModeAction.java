@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.ViewMode;
 /**
  * An action for changing view mode between move units mode and view terrain
  * mode
- * 
+ *
  * @see ViewMode
  */
 public class ToggleViewModeAction extends MapboardAction {
@@ -38,7 +38,7 @@ public class ToggleViewModeAction extends MapboardAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ToggleViewModeAction(FreeColClient freeColClient) {
@@ -47,7 +47,7 @@ public class ToggleViewModeAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

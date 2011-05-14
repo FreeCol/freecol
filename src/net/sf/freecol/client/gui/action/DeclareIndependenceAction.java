@@ -35,7 +35,7 @@ public class DeclareIndependenceAction extends MapboardAction {
 
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     DeclareIndependenceAction(FreeColClient freeColClient) {
@@ -44,7 +44,7 @@ public class DeclareIndependenceAction extends MapboardAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the player can declare independence.
      */
     protected boolean shouldBeEnabled() {
@@ -54,7 +54,7 @@ public class DeclareIndependenceAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

@@ -33,7 +33,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
 
     /**
      * Creates a new <code>ExecuteGotoOrdersAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ExecuteGotoOrdersAction(FreeColClient freeColClient) {
@@ -42,7 +42,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

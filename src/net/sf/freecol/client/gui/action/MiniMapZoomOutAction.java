@@ -43,7 +43,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
         super(freeColClient, id);
         addImageIcons("zoom_out");
     }
-    
+
     /**
      * Creates a new <code>MiniMapZoomOutAction</code>.
      * @param freeColClient The main controller object for the client.
@@ -53,10 +53,10 @@ public class MiniMapZoomOutAction extends MapboardAction {
         super(freeColClient, id + ".secondary");
         addImageIcons("zoom_out");
     }
-    
+
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the minimap can be zoomed out.
      */
     protected boolean shouldBeEnabled() {
@@ -65,12 +65,12 @@ public class MiniMapZoomOutAction extends MapboardAction {
         return super.shouldBeEnabled()
             && mca.getMapControls() != null
             && mca.getMapControls().canZoomOut();
-    }      
-    
+    }
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent e) {
         MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
             .getFreeColAction(MapControlsAction.id);

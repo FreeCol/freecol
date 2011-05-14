@@ -34,7 +34,7 @@ public class SaveAction extends FreeColAction {
 
     /**
      * Creates a new <code>SaveAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     SaveAction(FreeColClient freeColClient) {
@@ -43,14 +43,14 @@ public class SaveAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
         if (freeColClient.isMapEditor()) {
             return true;
         }
-        
+
         //In game
         if (!freeColClient.canSaveCurrentGame()) {
             return false;
@@ -60,7 +60,7 @@ public class SaveAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

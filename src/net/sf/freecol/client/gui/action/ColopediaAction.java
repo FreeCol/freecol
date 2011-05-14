@@ -50,7 +50,7 @@ public class ColopediaAction extends FreeColAction {
     };
 
     private PanelType panelType;
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
@@ -60,7 +60,7 @@ public class ColopediaAction extends FreeColAction {
         this.panelType = panelType;
         setMnemonic(mnemonics[panelType.ordinal()]);
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

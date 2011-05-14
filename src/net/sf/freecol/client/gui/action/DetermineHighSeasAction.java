@@ -47,7 +47,7 @@ public class DetermineHighSeasAction extends FreeColAction {
 
     /**
      * Creates a new <code>DetermineHighSeasAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     DetermineHighSeasAction(FreeColClient freeColClient) {
@@ -56,7 +56,7 @@ public class DetermineHighSeasAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active map.
      */
     @Override
@@ -64,12 +64,12 @@ public class DetermineHighSeasAction extends FreeColAction {
         return super.shouldBeEnabled()
             && freeColClient.isMapEditor()
             && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null; 
+            && freeColClient.getGame().getMap() != null;
     }
-    
+
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
@@ -81,7 +81,7 @@ public class DetermineHighSeasAction extends FreeColAction {
             TerrainGenerator.determineHighSeas(map, p.distToLandFromHighSeas, p.maxDistanceToEdge);
         }
     }
-    
+
     /**
      * Displays a dialog for setting parameters.
      * @return The parameters
@@ -90,20 +90,20 @@ public class DetermineHighSeasAction extends FreeColAction {
         /*
          * TODO: Extend this dialog. It should be possible
          *       to specify the sizes using percentages.
-         *       
+         *
          *       Add a panel containing information about
          *       the scaling (old size, new size etc).
          */
         final int COLUMNS = 5;
         final int DEFAULT_distToLandFromHighSeas = 4;
         final int DEFAULT_maxDistanceToEdge = 12;
-        
+
         final Canvas canvas = getFreeColClient().getCanvas();
         final String okText = Messages.message("ok");
         final String cancelText = Messages.message("cancel");
         final String dText = Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas");
         final String mText = Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge");
-        
+
         final JTextField inputD = new JTextField(Integer.toString(DEFAULT_distToLandFromHighSeas), COLUMNS);
         final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
@@ -134,7 +134,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         };
         JButton okButton = new JButton(okText);
         buttons.add(okButton);
-        
+
         JButton cancelButton = new JButton(cancelText);
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -143,16 +143,16 @@ public class DetermineHighSeasAction extends FreeColAction {
         });
         buttons.add(cancelButton);
         inputDialog.setCancelComponent(cancelButton);
-        
+
         okButton.addActionListener(al);
         inputD.addActionListener(al);
         inputM.addActionListener(al);
-        
+
         JLabel widthLabel = new JLabel(dText);
         widthLabel.setLabelFor(inputD);
         JLabel heightLabel = new JLabel(mText);
         heightLabel.setLabelFor(inputM);
-        
+
         JPanel widthPanel = new JPanel(new FlowLayout());
         widthPanel.setOpaque(false);
         widthPanel.add(widthLabel);
@@ -160,8 +160,8 @@ public class DetermineHighSeasAction extends FreeColAction {
         JPanel heightPanel = new JPanel(new FlowLayout());
         heightPanel.setOpaque(false);
         heightPanel.add(heightLabel);
-        heightPanel.add(inputM);       
-        
+        heightPanel.add(inputM);
+
         inputDialog.add(widthPanel);
         inputDialog.add(heightPanel);
         inputDialog.add(buttons);
@@ -170,15 +170,15 @@ public class DetermineHighSeasAction extends FreeColAction {
 
         return canvas.showFreeColDialog(inputDialog);
     }
-    
+
     private class Parameters {
         int distToLandFromHighSeas;
         int maxDistanceToEdge;
-        
+
         Parameters(int distToLandFromHighSeas, int maxDistanceToEdge) {
             this.distToLandFromHighSeas = distToLandFromHighSeas;
             this.maxDistanceToEdge = maxDistanceToEdge;
         }
     }
-    
+
 }

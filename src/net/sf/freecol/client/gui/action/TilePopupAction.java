@@ -33,7 +33,7 @@ public class TilePopupAction extends MapboardAction {
 
     /**
      * Creates a new <code>TilePopupAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     TilePopupAction(FreeColClient freeColClient) {
@@ -42,7 +42,7 @@ public class TilePopupAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

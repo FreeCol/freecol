@@ -28,7 +28,7 @@ import net.sf.freecol.client.FreeColClient;
 
 /**
  * An action for ending the turn.
- * 
+ *
  * @see net.sf.freecol.client.gui.panel.MapControls
  */
 public class EndTurnAction extends MapboardAction {
@@ -38,7 +38,7 @@ public class EndTurnAction extends MapboardAction {
 
     /**
      * Creates a new <code>EndTurnAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     EndTurnAction(FreeColClient freeColClient) {
@@ -48,7 +48,7 @@ public class EndTurnAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

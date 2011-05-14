@@ -32,7 +32,7 @@ public class CenterAction extends UnitAction {
 
     /**
      * Creates a new <code>CenterAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     CenterAction(FreeColClient freeColClient) {
@@ -41,7 +41,7 @@ public class CenterAction extends UnitAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

@@ -34,7 +34,7 @@ public class BuildColonyAction extends UnitAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     BuildColonyAction(FreeColClient freeColClient) {
@@ -44,7 +44,7 @@ public class BuildColonyAction extends UnitAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active unit or the active
      *         unit cannot build a colony, and <code>true</code> otherwise.
      */
@@ -62,7 +62,7 @@ public class BuildColonyAction extends UnitAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

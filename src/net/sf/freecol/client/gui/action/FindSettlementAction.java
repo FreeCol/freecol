@@ -36,7 +36,7 @@ public class FindSettlementAction extends MapboardAction {
 
     /**
      * Creates a new <code>FindSettlementAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     FindSettlementAction(FreeColClient freeColClient) {
@@ -45,7 +45,7 @@ public class FindSettlementAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.panel.ReportTradePanel;
 public class ReportTradeAction extends FreeColAction {
 
     public static final String id = "reportTradeAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.

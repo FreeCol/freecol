@@ -36,7 +36,7 @@ public class DebugAction extends FreeColAction {
 
     /**
      * Creates a new <code>DebugAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     DebugAction(FreeColClient freeColClient) {
@@ -55,7 +55,7 @@ public class DebugAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

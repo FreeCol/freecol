@@ -31,7 +31,7 @@ import net.sf.freecol.client.gui.panel.ReportExplorationPanel;
 public class ReportExplorationAction extends FreeColAction {
 
     public static final String id = "reportExplorationAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
@@ -39,7 +39,7 @@ public class ReportExplorationAction extends FreeColAction {
     ReportExplorationAction(FreeColClient freeColClient) {
         super(freeColClient, id);
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.

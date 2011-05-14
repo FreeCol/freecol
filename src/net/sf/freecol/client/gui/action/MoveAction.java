@@ -36,7 +36,7 @@ public class MoveAction extends MapboardAction {
 
     /**
      * Creates a new <code>MoveAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      * @param direction a <code>Direction</code> value
      */
@@ -47,7 +47,7 @@ public class MoveAction extends MapboardAction {
 
     /**
      * Creates a new <code>MoveAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      * @param direction a <code>Direction</code> value
      * @param secondary a <code>boolean</code> value
@@ -59,7 +59,7 @@ public class MoveAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

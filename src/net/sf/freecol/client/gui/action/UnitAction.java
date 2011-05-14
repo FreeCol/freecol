@@ -38,7 +38,7 @@ public abstract class UnitAction extends MapboardAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active unit.
      */
     protected boolean shouldBeEnabled() {

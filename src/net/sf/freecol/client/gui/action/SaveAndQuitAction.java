@@ -34,7 +34,7 @@ public class SaveAndQuitAction extends FreeColAction {
 
     /**
      * Creates a new <code>SaveAndQuitAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     SaveAndQuitAction(FreeColClient freeColClient) {
@@ -43,7 +43,7 @@ public class SaveAndQuitAction extends FreeColAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

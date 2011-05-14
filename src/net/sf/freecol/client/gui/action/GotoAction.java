@@ -37,7 +37,7 @@ public class GotoAction extends UnitAction {
 
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     GotoAction(FreeColClient freeColClient) {
@@ -46,7 +46,7 @@ public class GotoAction extends UnitAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>true</code> if the mapboard is selected.
      */
     protected boolean shouldBeEnabled() {
@@ -56,7 +56,7 @@ public class GotoAction extends UnitAction {
 
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {

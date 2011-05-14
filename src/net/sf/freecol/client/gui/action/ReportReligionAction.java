@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 public class ReportReligionAction extends FreeColAction {
 
     public static final String id = "reportReligionAction";
-    
+
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
