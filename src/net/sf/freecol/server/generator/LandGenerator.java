@@ -31,24 +31,24 @@ import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * Class for creating a land map.
- * 
+ *
  * <br><br>
- * 
+ *
  * A land map is a two-dimensional array with the boolean
  * values:
- * 
+ *
  * <ul>
  *     <li><code>true</code>: land</li>
  *     <li><code>false</code>: ocean</li>
  * </ul>
  */
 public class LandGenerator {
-    
+
     private final OptionGroup mapGeneratorOptions;
     private final Random random;
-     
+
     private boolean[][] map;
-     
+
     private int width;
     private int height;
     private int landMass;
@@ -61,7 +61,7 @@ public class LandGenerator {
 
     /**
      * Creates a new <code>LandGenerator</code>.
-     * 
+     *
      * @param mapGeneratorOptions The options to be
      *         used when creating a land map.
      * @param random The <code>Random</code> number source to use.
@@ -75,9 +75,9 @@ public class LandGenerator {
 
     /**
      * Imports the land map from the given <code>Game</code>.
-     * 
+     *
      * @param game The <code>Game</code> to get the land map from.
-     * @return An array where <i>true</i> means land 
+     * @return An array where <i>true</i> means land
      * and <i>false</i> means ocean.
      */
     public static boolean[][] importLandMap(Game game) {
@@ -94,8 +94,8 @@ public class LandGenerator {
 
     /**
      * Creates a new land map.
-     * 
-     * @return An array where <i>true</i> means land 
+     *
+     * @return An array where <i>true</i> means land
      * and <i>false</i> means ocean.
      */
     public boolean[][] createLandMap() {
@@ -107,7 +107,7 @@ public class LandGenerator {
         minimumNumberOfTiles = width * height * landMass / 100;
         genType = mapGeneratorOptions.getInteger("model.option.landGeneratorType");
 
-        //set other internal values        
+        //set other internal values
         map = new boolean[width][height];
         numberOfLandTiles = 0;
 
@@ -152,7 +152,7 @@ public class LandGenerator {
     }
 
 
-    private void createClassicLandMap() {    
+    private void createClassicLandMap() {
         int x;
         int y;
 
@@ -205,7 +205,7 @@ public class LandGenerator {
         size++;
 
         //add all valid neighbour positions to list
-        p = new Position(x, y);  
+        p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
             Position n = p.getAdjacent(direction);
             if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
@@ -219,12 +219,12 @@ public class LandGenerator {
         while (size < maxsize && l.size()>0) {
             int i=random.nextInt(l.size());
             p = l.remove(i);
-            
+
             if (!newland[p.getX()][p.getY()]) {
                 newland[p.getX()][p.getY()] = true;
                 size++;
-                
-                //add all valid neighbour positions to list    
+
+                //add all valid neighbour positions to list
                 for (Direction direction : Direction.longSides) {
                     Position n = p.getAdjacent(direction);
                     if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
@@ -233,7 +233,7 @@ public class LandGenerator {
                 }
             }
         }
-        
+
         //add generated island to map
         for (x=0; x<width; x++) {
             for (y=0; y<height; y++) {
@@ -250,7 +250,7 @@ public class LandGenerator {
     }
 
     /**
-     * Adds land to the first two and last two rows. 
+     * Adds land to the first two and last two rows.
      */
     private void addPolarRegions() {
         for (int x = 0; x < width; x++) {
@@ -310,7 +310,7 @@ public class LandGenerator {
      * Sets a given map position to land.
      * Calls #gl(int,int) for all valid adjacent map positions, which may
      * recursively call setLand for these.
-     */                   
+     */
     private void setLand(int x, int y) {
         if (map[x][y]) {
             return;
@@ -333,11 +333,11 @@ public class LandGenerator {
 
     /**
      * Determines, based on position, number of adjacent land tiles and some
-     * random factor, whether a given map position should be set to land.      
+     * random factor, whether a given map position should be set to land.
      * This is called for all valid map positions adjacent to a position
      * that has been set to land by #setLand(int,int), and may recursively call
      * setLand for the current position.
-     */                   
+     */
     private void growLand(int i, int j) {
         if (map[i][j]) {
             return;
@@ -368,7 +368,7 @@ public class LandGenerator {
             setLand(i,j);
         }
     }
-    
-    
-    
+
+
+
 }
