@@ -128,7 +128,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
                 int amountNeeded = requiredGoods.getAmount();
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
-                int amountProduced = colony.getNetProductionOf(requiredGoods.getType());
+                int amountProduced = colony.getAdjustedNetProductionOf(requiredGoods.getType());
                 add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");

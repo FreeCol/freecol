@@ -1017,7 +1017,6 @@ public class ColonyPlan {
         };
         Collections.sort(producers, comp);
 
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
         // shift units gathering raw materials to production of manufactured goods
         Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
         while(iter.hasNext()){
@@ -1036,8 +1035,10 @@ public class ColonyPlan {
             }
 
             // get  the production values if the unit is shifted
-            int rawProd = netProduction.getCount(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
-            int mfnProd = netProduction.getCount(producedGoods) + factory.getAdditionalProductionNextTurn(u);
+            int rawProd = colony.getNetProductionOf(rawMat)
+                - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
+            int mfnProd = colony.getNetProductionOf(producedGoods)
+                + factory.getAdditionalProductionNextTurn(u);
             if(stockRawMat < 50 && rawProd < mfnProd){
                 return;
             }

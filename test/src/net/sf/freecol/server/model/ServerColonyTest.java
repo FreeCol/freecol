@@ -330,11 +330,9 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(0, colony.getGoodsCount(bellsType));
         ServerTestHelper.newTurn();
 
-        TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
-
         int bells = 3;
         assertEquals(population, colony.getUnitCount());
-        assertEquals(bells, netProduction.getCount(bellsType));
+        assertEquals(bells, colony.getNetProductionOf(bellsType));
         assertEquals(bells, colony.getGoodsCount(bellsType));
 
         colony.addGoods(bellsType, 7);
@@ -348,7 +346,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(bells, colony.getLiberty());
 
         int crosses = colony.getProductionOf(crossType) - colony.getConsumptionOf(crossType);
-        assertEquals(crosses, netProduction.getCount(crossType));
+        assertEquals(crosses, colony.getNetProductionOf(crossType));
         assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
 

@@ -153,36 +153,31 @@ public class ServerColony extends Colony implements ServerModelObject {
         GoodsContainer container = getGoodsContainer();
         container.saveState();
 
-        java.util.Map<Object, ProductionInfo> info
-            = getProductionAndConsumption();
-        TypeCountMap<GoodsType> netProduction = new TypeCountMap<GoodsType>();
-        for (Entry<Object, ProductionInfo> entry : info.entrySet()) {
-            ProductionInfo productionInfo = entry.getValue();
-            if (entry.getKey() instanceof WorkLocation) {
-                WorkLocation workLocation = (WorkLocation) entry.getKey();
-                ((ServerModelObject) workLocation).csNewTurn(random, cs);
-                if (workLocation.getUnitCount() > 0) {
-                    for (AbstractGoods goods : productionInfo.getProduction()) {
-                        UnitType expert = spec.getExpertForProducing(goods.getType());
-                        int experience = goods.getAmount() / workLocation.getUnitCount();
-                        for (Unit unit : workLocation.getUnitList()) {
-                            if (goods.getType() == unit.getExperienceType()
-                                && unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)) {
-                                unit.setExperience(unit.getExperience() + experience);
-                                cs.addPartial(See.only(owner), unit, "experience");
-                            }
+        for (WorkLocation workLocation : getWorkLocations()) {
+            ProductionInfo productionInfo = getProductionInfo(workLocation);
+            ((ServerModelObject) workLocation).csNewTurn(random, cs);
+            if (workLocation.getUnitCount() > 0) {
+                for (AbstractGoods goods : productionInfo.getProduction()) {
+                    UnitType expert = spec.getExpertForProducing(goods.getType());
+                    int experience = goods.getAmount() / workLocation.getUnitCount();
+                    for (Unit unit : workLocation.getUnitList()) {
+                        if (goods.getType() == unit.getExperienceType()
+                            && unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)) {
+                            unit.setExperience(unit.getExperience() + experience);
+                            cs.addPartial(See.only(owner), unit, "experience");
                         }
                     }
                 }
-                if (entry.getKey() instanceof Building) {
-                    // TODO: generalize to other WorkLocations?
-                    csCheckMissingInput((Building) entry.getKey(),
-                                        productionInfo, cs);
-                }
-            } else if (entry.getKey() instanceof BuildQueue
-                && !productionInfo.getConsumption().isEmpty()) {
+            }
+            if (workLocation instanceof Building) {
+                // TODO: generalize to other WorkLocations?
+                csCheckMissingInput((Building) workLocation, productionInfo, cs);
+            }
+        }
+
+        for (BuildQueue queue : new BuildQueue[] { buildQueue, populationQueue }) {
+            if (!getProductionInfo(queue).getConsumption().isEmpty()) {
                 // this means we are actually building something
-                BuildQueue queue = (BuildQueue) entry.getKey();
                 BuildableType buildable = queue.getCurrentlyBuilding();
                 if (buildable instanceof UnitType) {
                     Unit newUnit = csBuildUnit(queue, random, cs);
@@ -199,71 +194,56 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // to see if there is a problem with the next item if any.
                 buildable = csGetBuildable(cs);
             }
-
-            for (AbstractGoods goods : productionInfo.getProduction()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getStorage()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-            }
-            for (AbstractGoods goods : productionInfo.getConsumption()) {
-                netProduction.incrementCount(goods.getType().getStoredAs(), -goods.getAmount());
-            }
         }
 
         // Apply the changes accumulated in the netProduction map.
         // Check for famine when total primary food goes negative.
-        boolean famine = false;
-        for (Entry<GoodsType, Integer> entry
-                 : netProduction.getValues().entrySet()) {
-            GoodsType goodsType = entry.getKey();
-            int net = entry.getValue();
+        int turnsToStarvation = INFINITY;
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+            int net = getNetProductionOf(goodsType);
             int stored = getGoodsCount(goodsType);
             if (net + stored < 0) {
-                if (goodsType == spec.getPrimaryFoodType()) famine = true;
                 removeGoods(goodsType, stored);
             } else {
                 addGoods(goodsType, net);
             }
-        }
-
-        // Handle the food situation
-        if (famine) {
-            if (getUnitCount() > 1) {
-                Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                    getUnitList(), random);
-                updates.add((FreeColGameObject) victim.getLocation());
-                cs.addDispose(owner, this, victim);
-                cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                               "model.colony.colonistStarved",
-                                               this)
-                              .addName("%colony%", getName()));
-            } else { // Its dead, Jim.
-                cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                               "model.colony.colonyStarved",
-                                               this)
-                              .addName("%colony%", getName()));
-                cs.addDispose(owner, getTile(), this);
-                return;
-            }
-        } else {
-            int storedFood = getGoodsCount(spec.getPrimaryFoodType());
-            int netFood = netProduction.getCount(spec.getPrimaryFoodType());
-            int turns;
-            if (!newUnitBorn && netFood < 0
-                && (turns = storedFood / -netFood) <= 3) {
-                cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.WARNING,
-                                               "model.colony.famineFeared",
-                                               this)
-                              .addName("%colony%", getName())
-                              .addName("%number%", String.valueOf(turns)));
-                logger.finest("Famine feared in " + getName()
-                              + " food=" + storedFood
-                              + " production=" + netFood
-                              + " turns=" + turns);
+            if (goodsType == spec.getPrimaryFoodType()) {
+                // Handle the food situation
+                if (net + stored < 0) {
+                    if (getUnitCount() > 1) {
+                        Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                                                            getUnitList(), random);
+                        updates.add((FreeColGameObject) victim.getLocation());
+                        cs.addDispose(owner, this, victim);
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                                       "model.colony.colonistStarved",
+                                                       this)
+                                      .addName("%colony%", getName()));
+                    } else { // Its dead, Jim.
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                                       "model.colony.colonyStarved",
+                                                       this)
+                                      .addName("%colony%", getName()));
+                        cs.addDispose(owner, getTile(), this);
+                        return;
+                    }
+                } else if (net < 0) {
+                    int turns = stored / -net;
+                    if (turns <= 3 && !newUnitBorn) {
+                        cs.addMessage(See.only(owner),
+                                      new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                       "model.colony.famineFeared",
+                                                       this)
+                                      .addName("%colony%", getName())
+                                      .addAmount("%number%", turns));
+                        logger.finest("Famine feared in " + getName()
+                                      + " food=" + stored
+                                      + " production=" + net
+                                      + " turns=" + turns);
+                    }
+                }
             }
         }
 
@@ -284,9 +264,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
                                              "customs.sale", this)
-                            .addName("%colony%", getName())
-                            .addName("%amount%", Integer.toString(amount))
-                            .add("%goods%", type.getNameKey()));
+                                      .addName("%colony%", getName())
+                                      .addAmount("%amount%", amount)
+                                      .add("%goods%", type.getNameKey()));
                     }
                 }
             }
@@ -349,7 +329,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                   && hasAbility("model.ability.export")
                   && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
                 && amount <= limit) {
-                int loss = amount + netProduction.getCount(type) - limit;
+                int loss = amount + getNetProductionOf(type) - limit;
                 if (loss > 0) {
                     cs.addMessage(See.only(owner),
                                   new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,

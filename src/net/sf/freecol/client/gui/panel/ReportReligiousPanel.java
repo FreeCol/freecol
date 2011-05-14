@@ -64,11 +64,10 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
         int production = 0;
         for (Colony colony : colonies) {
-            Map<Object, ProductionInfo> productionMap = colony.getProductionAndConsumption();
             Building building = colony.getBuildingForProducing(crosses);
             reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
             reportPanel.add(new BuildingPanel(building, getCanvas()));
-            production += colony.getProductionOf(crosses);
+            production += colony.getNetProductionOf(crosses);
         }
 
         progressBar.update(0, player.getImmigrationRequired(), player.getImmigration(), production);

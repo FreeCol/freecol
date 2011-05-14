@@ -161,6 +161,14 @@ public class LostCityRumour extends TileItem {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean isTileTypeAllowed(TileType tileType) {
+        return !tileType.isWater();
+    }
+
+
+    /**
      * Chooses a type of Lost City Rumour. The type of rumour depends on the
      * exploring unit, as well as player settings.
      *

@@ -191,9 +191,23 @@ public class Resource extends TileItem {
      * Disposes this resource.
      */
     @Override
-        public void dispose() {
+    public void dispose() {
         super.dispose();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isTileTypeAllowed(TileType tileType) {
+        return tileType.canHaveResourceType(getType());
+    }
+
+    /* TODO: what was this for? Named resources, such as Lost Crazy Russian Gold Mine?
+    public void setName(String newName) {
+        // do nothing
+    }
+    */
+
 
     // ------------------------------------------------------------ API methods
 
@@ -259,9 +273,6 @@ public class Resource extends TileItem {
      */
     public static String getXMLElementTagName() {
         return "resource";
-    }
-
-    public void setName(String newName) {
     }
 
 }

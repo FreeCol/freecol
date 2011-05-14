@@ -70,11 +70,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
     private Map<Colony, Set<UnitType>> canTrain =
         new HashMap<Colony, Set<UnitType>>();
 
-    /**
-     * Records surplus production indexed by colony and goods type.
-     */
-    private Map<Colony, TypeCountMap<GoodsType>> surplus =
-        new HashMap<Colony, TypeCountMap<GoodsType>>();
 
 
 
@@ -107,7 +102,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
             unitCount.put(colony, newUnitCount);
             canTrain.put(colony, newCanTrain);
-            surplus.put(colony, colony.getNetProduction());
         }
 
         for (Colony colony : colonies) {
@@ -175,7 +169,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 }
             }
 
-            Map<Object, ProductionInfo> info = colony.getProductionAndConsumption();
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
                 Unit unit = colonyTile.getUnit();
                 if (unit != null) {
@@ -203,7 +196,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 }
                 if (goodsType != null) {
                     // not enough input
-                    if (!info.get(building).hasMaximumProduction()
+                    if (!building.getProductionInfo().hasMaximumProduction()
                         && !productionWarning.contains(goodsType)) {
                         addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
                         productionWarning.add(goodsType);
@@ -351,7 +344,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             ArrayList<Colony> withSurplus = new ArrayList<Colony>();
             ArrayList<Integer> theSurplus = new ArrayList<Integer>();
             for (Colony col : colonies) {
-                int amount = surplus.get(col).getCount(input);
+                int amount = colony.getAdjustedNetProductionOf(input);
                 if (amount > 0) {
                     withSurplus.add(col);
                     theSurplus.add(amount);

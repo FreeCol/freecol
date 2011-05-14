@@ -80,7 +80,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), bellsType);
             int total = 0;
             for (Colony colony : player.getColonies()) {
-                total += colony.getNetProduction().getCount(bellsType);
+                total += colony.getNetProductionOf(bellsType);
             }
             int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();

@@ -33,12 +33,12 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     public static final int RUMOUR_ZINDEX = 500;
 
     protected Tile tile;
-    
+
     /**
     * Creates a new <code>TileItem</code>.
     *
     * @param game The <code>Game</code> in which this object belong.
-    * @param tile The location of the <code>Settlement</code>.    
+    * @param tile The location of the <code>Settlement</code>.
     */
     public TileItem(Game game, Tile tile) {
         super(game);
@@ -72,7 +72,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     }
 
     /**
-     * Initiates a new <code>TileItem</code> 
+     * Initiates a new <code>TileItem</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -137,4 +137,15 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     public void dispose() {
         super.dispose();
     }
+
+
+    /**
+     * Returns true if the TileItem is compatible with the given
+     * <object>TileType</object>.
+     *
+     * @param tileType a <code>TileType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public abstract boolean isTileTypeAllowed(TileType tileType);
+
 }

@@ -150,8 +150,9 @@ public final class ReportTradePanel extends ReportPanel {
 
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
-            TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
-            deltaUnits.add(netProduction);
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+                deltaUnits.incrementCount(goodsType, colony.getNetProductionOf(goodsType));
+            }
             for (Goods goods : colony.getGoodsContainer().getCompactGoods()) {
                 totalUnits.incrementCount(goods.getType(), goods.getAmount());
             }
@@ -168,7 +169,7 @@ public final class ReportTradePanel extends ReportPanel {
                 }
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
-                int production = netProduction.getCount(goodsType);
+                int production = colony.getNetProductionOf(goodsType);
 
                 JLabel productionLabel = createNumberLabel(production, true);
 

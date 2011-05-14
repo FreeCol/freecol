@@ -1942,6 +1942,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owner = settlementOwner;
         }
 
+        if (getColony() != null && getColony().isTileInUse(this)) {
+            getColony().invalidateCache();
+        }
+
         // 0.9.x compatibility code
         if (settlement != null && playerExploredTiles != null) {
             for (Entry<Player, PlayerExploredTile> e

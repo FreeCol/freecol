@@ -191,6 +191,11 @@ public class TileImprovement extends TileItem implements Named {
         return turnsToComplete;
     }
 
+    /**
+     * Update the turns required to complete the improvement.
+     *
+     * @param turns an <code>int</code> value
+     */
     public void setTurnsToComplete(int turns) {
         turnsToComplete = turns;
     }
@@ -371,8 +376,10 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Method for returning the 'most effective' TileImprovementType allowed for a given <code>Tile</code>.
-     * Useful for AI in deciding the Improvements to prioritize.
+     * Method for returning the 'most effective' TileImprovementType
+     * allowed for a given <code>Tile</code>.  Useful for AI in
+     * deciding the Improvements to prioritize.
+     *
      * @param tile The <code>Tile</code> that will be improved
      * @param goodsType The <code>GoodsType</code> to be prioritized.
      * @return The best TileImprovementType available to be done.
@@ -413,6 +420,14 @@ public class TileImprovement extends TileItem implements Named {
         }
         return type.isWorkerAllowed(unit);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isTileTypeAllowed(TileType tileType) {
+        return type.isTileTypeAllowed(tileType);
+    }
+
 
     /**
      * Disposes this improvement.

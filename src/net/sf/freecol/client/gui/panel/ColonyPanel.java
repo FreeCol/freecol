@@ -417,7 +417,7 @@ public final class ColonyPanel extends FreeColPanel
         netProductionPanel.removeAll();
 
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            int amount = colony.getNetProductionOf(goodsType);
+            int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(goodsType, amount, getCanvas()));
             }
@@ -1473,7 +1473,7 @@ public final class ColonyPanel extends FreeColPanel
 
                 setLayout(new MigLayout("wrap 1, center"));
 
-                for (AbstractGoods goods : colony.getProductionAndConsumption().get(colonyTile).getProduction()) {
+                for (AbstractGoods goods : colony.getProductionInfo(colonyTile).getProduction()) {
                     add(new ProductionLabel(goods, getCanvas()), "center");
                 }
             }

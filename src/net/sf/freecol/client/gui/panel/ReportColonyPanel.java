@@ -102,9 +102,8 @@ public final class ReportColonyPanel extends ReportPanel {
             // Production
             GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
             int count = 0;
-            TypeCountMap<GoodsType> netProduction = colony.getNetProduction();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                int newValue = netProduction.getCount(goodsType);
+                int newValue = colony.getNetProductionOf(goodsType);
                 int stockValue = colony.getGoodsCount(goodsType);
                 if (newValue != 0 || stockValue > 0) {
                     Building building = colony.getBuildingForProducing(goodsType);

@@ -194,14 +194,14 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(5 + 5, colony.getFoodProduction());
-        assertEquals(false, plain58.hasImprovement(plow));
+        assertFalse(plain58.hasImprovement(plow));
         assertEquals(0, colony.getProductionBonus());
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
 
         // One turn to check production
         ServerTestHelper.newTurn();
 
-        assertEquals(false, plain58.hasImprovement(plow));
+        assertFalse(plain58.hasImprovement(plow));
         assertEquals(8, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(0, colony.getProductionBonus());
@@ -219,17 +219,19 @@ public class ServerUnitTest extends FreeColTestCase {
             n++;
         }
 
-        assertEquals(true, plain58.hasImprovement(plow));
+        assertTrue(plain58.hasImprovement(plow));
         // Production for next turn is updated
         assertEquals(5 + 6, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
         // But in only 10 - 2 == 8 are added from last turn
         assertEquals(8 + n * 8, colony.getGoodsCount(foodType));
 
+        // In game, this should happen via a Tile update
+        colony.invalidateCache();
         // Advance last turn
         ServerTestHelper.newTurn();
 
-        assertEquals(true, plain58.hasImprovement(plow));
+        assertTrue(plain58.hasImprovement(plow));
         assertEquals(5 + 6, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(8 + n * 8 + 9, colony.getGoodsCount(foodType));
