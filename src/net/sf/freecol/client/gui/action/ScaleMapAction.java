@@ -47,7 +47,7 @@ public class ScaleMapAction extends FreeColAction {
 
     /**
      * Creates a new <code>ScaleMapAction</code>.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     ScaleMapAction(FreeColClient freeColClient) {
@@ -56,7 +56,7 @@ public class ScaleMapAction extends FreeColAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active map.
      */
     @Override
@@ -64,12 +64,12 @@ public class ScaleMapAction extends FreeColAction {
         return super.shouldBeEnabled()
             && freeColClient.isMapEditor()
             && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null; 
+            && freeColClient.getGame().getMap() != null;
     }
-    
+
     /**
      * Applies this action.
-     * 
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
@@ -78,7 +78,7 @@ public class ScaleMapAction extends FreeColAction {
             scaleMapTo(ms.width, ms.height);
         }
     }
-    
+
     /**
      * Displays a dialog for choosing the new map size.
      * @return The size of the new map.
@@ -87,7 +87,7 @@ public class ScaleMapAction extends FreeColAction {
         /*
          * TODO: Extend this dialog. It should be possible
          *       to specify the sizes using percentages.
-         *       
+         *
          *       Add a panel containing information about
          *       the scaling (old size, new size etc).
          */
@@ -95,13 +95,13 @@ public class ScaleMapAction extends FreeColAction {
 
         final Game game = freeColClient.getGame();
         final Map oldMap = game.getMap();
-        
+
         final Canvas canvas = getFreeColClient().getCanvas();
         final String okText = Messages.message("ok");
         final String cancelText = Messages.message("cancel");
         final String widthText = Messages.message("width");
         final String heightText = Messages.message("height");
-        
+
         final JTextField inputWidth = new JTextField(Integer.toString(oldMap.getWidth()), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(oldMap.getHeight()), COLUMNS);
 
@@ -132,7 +132,7 @@ public class ScaleMapAction extends FreeColAction {
         };
         JButton okButton = new JButton(okText);
         buttons.add(okButton);
-        
+
         JButton cancelButton = new JButton(cancelText);
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -141,16 +141,16 @@ public class ScaleMapAction extends FreeColAction {
         });
         buttons.add(cancelButton);
         inputDialog.setCancelComponent(cancelButton);
-        
+
         okButton.addActionListener(al);
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);
-        
+
         JLabel widthLabel = new JLabel(widthText);
         widthLabel.setLabelFor(inputWidth);
         JLabel heightLabel = new JLabel(heightText);
         heightLabel.setLabelFor(inputHeight);
-        
+
         JPanel widthPanel = new JPanel(new FlowLayout());
         widthPanel.setOpaque(false);
         widthPanel.add(widthLabel);
@@ -158,8 +158,8 @@ public class ScaleMapAction extends FreeColAction {
         JPanel heightPanel = new JPanel(new FlowLayout());
         heightPanel.setOpaque(false);
         heightPanel.add(heightLabel);
-        heightPanel.add(inputHeight);       
-        
+        heightPanel.add(inputHeight);
+
         inputDialog.add(widthPanel);
         inputDialog.add(heightPanel);
         inputDialog.add(buttons);
@@ -168,21 +168,21 @@ public class ScaleMapAction extends FreeColAction {
 
         return canvas.showFreeColDialog(inputDialog);
     }
-    
+
     private class MapSize {
         int width;
         int height;
-        
+
         MapSize(int width, int height) {
             this.width = width;
             this.height = height;
         }
     }
-    
+
     /**
      * Scales the current map into the specified size. The current
      * map is given by freeColClient.getGame().getMap().
-     * 
+     *
      * @param width The width of the resulting map.
      * @param height The height of the resulting map.
      */
@@ -190,19 +190,19 @@ public class ScaleMapAction extends FreeColAction {
         /*
          * This implementation uses a simple linear scaling, and
          * the isometric shape is not taken into account.
-         * 
+         *
          * TODO: Find a better method for choosing a group of
          *       adjacent tiles. This group can then be merged into
          *       a common tile by using the average value (for
          *       example: are there a majority of ocean tiles?).
          */
-        
+
         final Game game = freeColClient.getGame();
         final Map oldMap = game.getMap();
 
         final int oldWidth = oldMap.getWidth();
         final int oldHeight = oldMap.getHeight();
-        
+
         Tile[][] tiles = new Tile[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -226,13 +226,13 @@ public class ScaleMapAction extends FreeColAction {
 
         Map map = new Map(game, tiles);
         game.setMap(map);
-        
+
         /* Commented because it doesn't appear to do anything valuable
         // Update river directions
         for (Tile t : map.getAllTiles()) {
             t.getTileItemContainer().updateRiver();
         }*/
-        
+
         freeColClient.getGUI().setSelectedTile(map.getTile(0, 0), false);
         freeColClient.getCanvas().refresh();
     }
