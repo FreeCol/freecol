@@ -20,7 +20,10 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -176,7 +179,9 @@ public class LostCityRumour extends TileItem {
      * @param difficulty The difficulty level.
      * @param random A random number source.
      * @return The type of rumour.
-     * TODO: Move all the magic numbers in here to the specification.
+     *
+     * TODO: Make RumourType a FreeColGameObjectType and move all the
+     * magic numbers in here to the specification.
      */
     public RumourType chooseType(Unit unit, int difficulty, Random random) {
         Tile tile = getTile();
@@ -234,88 +239,46 @@ public class LostCityRumour extends TileItem {
             }
         }
 
-        // Now, the individual events; each section should add up to 100
+        Map<RumourType, Integer> events =
+            new EnumMap<RumourType, Integer>(RumourType.class);
+
         // The NEUTRAL
-        int eventNothing = 100;
+        events.put(RumourType.NOTHING, 100 * percentNeutral);
 
         // The BAD
-        int eventVanish;
-        int eventBurialGround;
         // If the tile not is European-owned, allow burial grounds rumour.
         if (tile.getOwner() != null && tile.getOwner().isIndian()) {
-            eventVanish = 75;
-            eventBurialGround = 25;
+            events.put(RumourType.EXPEDITION_VANISHES, 75 * percentBad);
+            events.put(RumourType.BURIAL_GROUND, 25 * percentBad);
         } else {
-            eventVanish = 100;
-            eventBurialGround = 0;
+            events.put(RumourType.EXPEDITION_VANISHES, 100 * percentBad);
+            events.put(RumourType.BURIAL_GROUND, 0);
         }
 
         // The GOOD
-        int eventLearn;
-        int eventTrinkets;
-        int eventColonist;
         if (allowLearn) { // if the unit can learn
-            eventLearn    = 30;
-            eventTrinkets = 30;
-            eventColonist = 20;
+            events.put(RumourType.LEARN, 30 * percentGood);
+            events.put(RumourType.TRIBAL_CHIEF, 30 * percentGood);
+            events.put(RumourType.COLONIST, 20 * percentGood);
         } else {
-            eventLearn    =  0;
-            eventTrinkets = 50;
-            eventColonist = 30;
+            events.put(RumourType.LEARN, 0);
+            events.put(RumourType.TRIBAL_CHIEF, 50 * percentGood);
+            events.put(RumourType.COLONIST, 30 * percentGood);
         }
 
         // The SPECIAL
         // Right now, these are considered "good" events that happen randomly.
-        int eventMounds   = 8;
-        int eventRuins    = 6;
-        int eventCibola   = 4;
-        int eventFountain = 3;
-
-        // Finally, apply the Good/Bad/Neutral modifiers from
-        // above, so that we end up with a ton of values, some of
-        // them zero, the sum of which should be 10000.
-        eventNothing      *= percentNeutral;
-        eventVanish       *= percentBad;
-        eventBurialGround *= percentBad;
-        eventLearn        *= percentGood;
-        eventTrinkets     *= percentGood;
-        eventColonist     *= percentGood;
-        eventMounds       *= percentGood;
-        eventRuins        *= percentGood;
-        eventCibola       *= percentGood;
-        eventFountain     *= percentGood;
+        events.put(RumourType.MOUNDS, 8 * percentGood);
+        events.put(RumourType.RUINS, 6 * percentGood);
+        events.put(RumourType.CIBOLA, 4 * percentGood);
+        events.put(RumourType.FOUNTAIN_OF_YOUTH, 3 * percentGood);
 
         // Add all possible events to a RandomChoice List
         List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
-        if (eventNothing > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, eventNothing));
-        }
-        if (eventVanish > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, eventVanish));
-        }
-        if (eventBurialGround > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, eventBurialGround));
-        }
-        if (eventLearn > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, eventLearn));
-        }
-        if (eventTrinkets > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, eventTrinkets));
-        }
-        if (eventColonist > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
-        }
-        if (eventMounds > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.MOUNDS, eventRuins));
-        }
-        if (eventRuins > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.RUINS, eventRuins));
-        }
-        if (eventCibola > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.CIBOLA, eventCibola));
-        }
-        if (eventFountain > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
+        for (Entry<RumourType, Integer> entry : events.entrySet()) {
+            if (entry.getValue() > 0) {
+                choices.add(new RandomChoice<RumourType>(entry.getKey(), entry.getValue()));
+            }
         }
         return RandomChoice.getWeightedRandom(logger,
             "Choose rumour", random, choices);
