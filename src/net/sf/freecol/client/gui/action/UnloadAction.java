@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Unit;
 

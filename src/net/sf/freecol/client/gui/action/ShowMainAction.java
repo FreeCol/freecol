@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.MainPanel;
 
 /**
  * Returns to the <code>MainPanel</code>.

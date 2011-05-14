@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.ViewMode;
 
 /**
  * An action for changing view mode between move units mode and view terrain
