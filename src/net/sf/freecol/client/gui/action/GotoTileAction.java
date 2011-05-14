@@ -22,11 +22,11 @@ package net.sf.freecol.client.gui.action;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 /**
  * An action to make a unit go to a specific tile.
@@ -61,36 +61,29 @@ public class GotoTileAction extends UnitAction {
      */
     public void actionPerformed(ActionEvent e) {
         GUI gui = getFreeColClient().getGUI();
+        Unit unit = gui.getActiveUnit();
 
-        //Action should be disabled if there is no active unit, but make sure
-        if (gui.getActiveUnit() == null) {
-            return;
-        }
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit != null) {
+            // Enter "goto mode" if not already activated; otherwise cancel it
+            if (gui.isGotoStarted()) {
+                gui.stopGoto();
+            } else {
+                gui.startGoto();
 
-        //Enter "goto mode" if not already activated; otherwise cancel it
-        if (!gui.isGotoStarted()) {
-            gui.startGoto();
-
-            //Draw the path to the current mouse position, if the
-            //mouse is over the screen; see also
-            //CanvaseMouseMotionListener
-            Point pt = getFreeColClient().getCanvas().getMousePosition();
-            if (pt != null) {
-                Tile tile = gui.convertToMapTile(pt.x, pt.y);
-
-                if (tile != null) {
-                    if (gui.getActiveUnit().getTile() != tile) {
-                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                // Draw the path to the current mouse position, if the
+                // mouse is over the screen; see also
+                // CanvaseMouseMotionListener
+                Point pt = getFreeColClient().getCanvas().getMousePosition();
+                if (pt != null) {
+                    Tile tile = gui.convertToMapTile(pt.x, pt.y);
+                    if (tile != null && unit.getTile() != tile) {
+                        PathNode dragPath = unit.findPath(tile);
                         gui.setGotoPath(dragPath);
                     }
                 }
-
             }
-        } else {
-            gui.stopGoto();
         }
-
-
     }
 
 }
