@@ -55,8 +55,8 @@ public class ChangeAction extends UnitAction {
         super(freeColClient, id);
         update();
     }
-    
-    
+
+
     /**
      * Updates the "enabled"-status with the value
      * returned by {@link #shouldBeEnabled} and
@@ -64,12 +64,11 @@ public class ChangeAction extends UnitAction {
      */
     public void update() {
         super.update();
-        
+
         GUI gui = getFreeColClient().getGUI();
         if (gui != null) {
-        if (getFreeColClient().getGUI().getActiveUnit() != null) {
-            Unit unit = getFreeColClient().getGUI().getActiveUnit();
-            if (unit.getTile() != null) {
+            Unit unit = gui.getActiveUnit();
+            if (unit != null && unit.getTile() != null) {
                 if (unit.getColony() != null) {
                     putValue(NAME, Messages.message("changeAction.enterColony.name"));
                 } else if (unit.isOnCarrier()) {
@@ -79,19 +78,18 @@ public class ChangeAction extends UnitAction {
                 }
             }
         }
-        }
     }
-    
+
     /**
      * Checks if this action should be enabled.
-     * 
+     *
      * @return <code>false</code> if there is no active unit.
      */
-    protected boolean shouldBeEnabled() {    
+    protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getFreeColClient().getGUI().getActiveUnit().getTile() != null;
     }
-    
+
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
