@@ -29,7 +29,6 @@ import javax.swing.JCheckBox;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.Option;
 
 
 /**

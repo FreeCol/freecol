@@ -35,7 +35,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.RangeOption;
 
 /**

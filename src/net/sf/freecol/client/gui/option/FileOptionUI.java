@@ -39,7 +39,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.FileOption;
-import net.sf.freecol.common.option.Option;
 
 /**
  * This class provides visualization for an {@link FileOption}. In order to

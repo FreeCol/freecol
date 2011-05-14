@@ -31,7 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.Option;
 
 
 /**

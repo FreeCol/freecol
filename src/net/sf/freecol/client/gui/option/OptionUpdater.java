@@ -20,7 +20,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-import net.sf.freecol.common.option.Option;
 
 
 /**

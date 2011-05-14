@@ -48,7 +48,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
-import net.sf.freecol.common.option.Option;
 
 /**
  * This class provides visualization for a {@link ListOption}. In order to
