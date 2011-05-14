@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  */
 public class LostCityRumour extends TileItem {
 
-    private static Logger logger = Logger.getLogger(LostCityRumour.class.getName());
+    private static final Logger logger = Logger.getLogger(LostCityRumour.class.getName());
 
     /**
      * The type of the rumour. A RumourType, or null if the type has

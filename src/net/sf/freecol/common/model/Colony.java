@@ -37,10 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.RandomRange;
 
 import org.w3c.dom.Element;
 
@@ -882,14 +879,13 @@ public class Colony extends Settlement implements Nameable {
              * otherwise first applicant wins.
              */
             if (potentialStudent.getTeacher() == null
-                && potentialStudent.canBeStudent(teacher)) {
-                if (student == null
+                && potentialStudent.canBeStudent(teacher)
+                && (student == null
                     || potentialStudent.getSkillLevel() < skillLevel
                     || (potentialStudent.getSkillLevel() == skillLevel
-                        && potentialStudent.getWorkType() == expertProduction)){
-                    student = potentialStudent;
-                    skillLevel = student.getSkillLevel();
-                }
+                        && potentialStudent.getWorkType() == expertProduction))) {
+                student = potentialStudent;
+                skillLevel = student.getSkillLevel();
             }
         }
         return student;

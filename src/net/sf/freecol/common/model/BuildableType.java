@@ -55,7 +55,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     /**
      * Stores the abilities required by this Type.
      */
-    private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
+    private final Map<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
 
 
     public BuildableType(String id, Specification specification) {

@@ -38,7 +38,8 @@ import org.w3c.dom.Element;
 public class Building extends FreeColGameObject
     implements WorkLocation, Ownable, Named, Comparable<Building>, Consumer {
 
-    private static Logger logger = Logger.getLogger(Building.class.getName());
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Building.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
@@ -871,7 +872,7 @@ public class Building extends FreeColGameObject
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (units.size() > 0) {
+        while (!units.isEmpty()) {
             objects.addAll(units.remove(0).disposeList());
         }
         objects.addAll(super.disposeList());
