@@ -34,10 +34,10 @@ import net.sf.freecol.common.model.Tile;
 public class GotoTileAction extends UnitAction {
 
     public static final String id = "gotoTileAction";
-    
+
     /**
      * Creates this action.
-     * 
+     *
      * @param freeColClient The main controller object for the client.
      */
     GotoTileAction(FreeColClient freeColClient) {
@@ -46,8 +46,8 @@ public class GotoTileAction extends UnitAction {
 
     /**
      * Checks if this action should be enabled.
-     * 
-     * @return <code>false</code> if there is no active unit, and 
+     *
+     * @return <code>false</code> if there is no active unit, and
      *      <code>true</code> otherwise.
      */
     protected boolean shouldBeEnabled() {
@@ -58,7 +58,7 @@ public class GotoTileAction extends UnitAction {
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent e) {
         GUI gui = getFreeColClient().getGUI();
 
@@ -66,8 +66,8 @@ public class GotoTileAction extends UnitAction {
         if (gui.getActiveUnit() == null) {
             return;
         }
-        
-        //Enter "goto mode" if not already activated; otherwise cancel it 
+
+        //Enter "goto mode" if not already activated; otherwise cancel it
         if (!gui.isGotoStarted()) {
             gui.startGoto();
 
@@ -84,7 +84,7 @@ public class GotoTileAction extends UnitAction {
                         gui.setGotoPath(dragPath);
                     }
                 }
-                
+
             }
         } else {
             gui.stopGoto();
@@ -92,5 +92,5 @@ public class GotoTileAction extends UnitAction {
 
 
     }
-    
+
 }
