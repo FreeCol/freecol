@@ -155,16 +155,6 @@ public class ActionManager extends OptionGroup {
     }
 
     /**
-     * Adds the given <code>FreeColAction</code>.
-     *
-     * @param freeColAction The <code>FreeColAction</code> that should be
-     *            added to this <code>ActionManager</code>.
-     */
-    public void add(FreeColAction freeColAction) {
-        super.add(freeColAction);
-    }
-
-    /**
      * Gets the <code>FreeColAction</code> specified by the given
      * <code>id</code>.
      *
