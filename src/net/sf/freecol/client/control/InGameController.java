@@ -3183,9 +3183,9 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) return null;
 
         java.util.Map<String,Boolean> session = new HashMap<String,Boolean>();
-        session.put("canBuy",  new Boolean(reply.getAttribute("canBuy")));
-        session.put("canSell", new Boolean(reply.getAttribute("canSell")));
-        session.put("canGift", new Boolean(reply.getAttribute("canGift")));
+        session.put("canBuy",  Boolean.parseBoolean(reply.getAttribute("canBuy")));
+        session.put("canSell", Boolean.parseBoolean(reply.getAttribute("canSell")));
+        session.put("canGift", Boolean.parseBoolean(reply.getAttribute("canGift")));
         return session;
     }
 
@@ -4853,7 +4853,7 @@ public final class InGameController implements NetworkConstants {
      */
     public TradeRoute getNewTradeRoute(Player player) {
         int n = player.getTradeRoutes().size();
-        if (askGetNewTradeRoute(player)
+        if (askGetNewTradeRoute()
             && player.getTradeRoutes().size() == n + 1) {
             return player.getTradeRoutes().get(n);
         }
@@ -4863,10 +4863,9 @@ public final class InGameController implements NetworkConstants {
     /**
      * Server query-response for creating a new trade route.
      *
-     * @param player The <code>Player</code> to own the trade route.
      * @return True if the server interaction succeeded.
      */
-    private boolean askGetNewTradeRoute(Player player) {
+    private boolean askGetNewTradeRoute() {
         Client client = freeColClient.getClient();
         Element element = Message.createNewRootElement("getNewTradeRoute");
         Element reply = askExpecting(client, element, null);
