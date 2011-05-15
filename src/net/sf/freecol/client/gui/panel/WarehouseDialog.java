@@ -20,13 +20,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -46,28 +43,22 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Asks the user if he's sure he wants to quit.
  */
-public final class WarehouseDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
-
-    private static final int OK = 0, CANCEL = 1;
-
-    private final JButton ok = new JButton(Messages.message("ok"));
-
-    private final JButton cancel = new JButton(Messages.message("cancel"));
 
     private final JPanel warehouseDialog;
 
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public WarehouseDialog(Canvas parent, Colony colony) {
         super(parent);
 
-        warehouseDialog = new JPanel(new GridLayout(0, 4, margin, margin));
+        warehouseDialog = new JPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);
 
         JScrollPane scrollPane = new JScrollPane(warehouseDialog,
@@ -77,21 +68,14 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
 
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
-        enterPressesWhenFocused(cancel);
-        setCancelComponent(cancel);
+        setCancelComponent(cancelButton);
 
         setLayout(new MigLayout("fill, wrap 1", "", ""));
 
         add(getDefaultHeader(Messages.message("warehouseDialog.name")), "align center");
         add(scrollPane, "grow");
-        add(ok, "newline 20, split 2, tag ok");
-        add(cancel, "tag cancel");
+        add(okButton, "newline 20, split 2, tag ok");
+        add(cancelButton, "tag cancel");
 
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
@@ -102,37 +86,26 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
         setSize(getPreferredSize());
     }
 
-    public void requestFocus() {
-        ok.requestFocus();
-    }
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(new Boolean(true));
-                for (Component c : warehouseDialog.getComponents()) {
-                    if (c instanceof WarehouseGoodsPanel) {
-                        ((WarehouseGoodsPanel) c).saveSettings();
-                    }
+        if (OK.equals(command)) {
+            setResponse(Boolean.TRUE);
+            for (Component c : warehouseDialog.getComponents()) {
+                if (c instanceof WarehouseGoodsPanel) {
+                    ((WarehouseGoodsPanel) c).saveSettings();
                 }
-                break;
-            case CANCEL:
-                getCanvas().remove(this);
-                setResponse(new Boolean(false));
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        } else if (CANCEL.equals(command)) {
+            getCanvas().remove(this);
+            setResponse(Boolean.FALSE);
+        } else {
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 
@@ -158,7 +131,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             this.goodsType = goodsType;
 
             setLayout(new MigLayout("wrap 2", "", ""));
-            setOpaque(true);
+            setOpaque(false);
             String goodsName = Messages.message(goodsType.getNameKey());
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsName),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
@@ -166,7 +139,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             ExportData exportData = colony.getExportData(goodsType);
 
             // goods label
-            Goods goods = new Goods(colony.getGame(), colony, goodsType, 
+            Goods goods = new Goods(colony.getGame(), colony, goodsType,
                                     colony.getGoodsContainer().getGoodsCount(goodsType));
             GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
@@ -211,7 +184,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
                 || (lowLevelValue != exportData.getLowLevel())
                 || (highLevelValue != exportData.getHighLevel())
                 || (exportLevelValue != exportData.getExportLevel());
-            
+
             exportData.setExported(export.isSelected());
             exportData.setLowLevel(lowLevelValue);
             exportData.setHighLevel(highLevelValue);
