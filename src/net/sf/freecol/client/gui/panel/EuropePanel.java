@@ -186,6 +186,7 @@ public final class EuropePanel extends FreeColPanel {
                 .message("docks")));
         inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("inPort")));
+        marketPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         log.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("sales")));
@@ -205,19 +206,19 @@ public final class EuropePanel extends FreeColPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3, insets 30",
-                                "push[fill, :380:480][fill, :380:480][fill, 150:200:]push",
-                                "push[fill, 124:][fill, 124:][fill, 124:][fill, 100:][fill, ::160][::40]push"));
+        setLayout(new MigLayout("wrap 3, insets 20, fill",
+                                "[380:][380:][150:200:]"));
 
-        // at the moment, there is no room for the header
-        // add(header, "span, center");
-        add(toAmericaScroll);
-        add(docksScroll, "spany 4");
-        add(logScroll, "spany 4");
-        add(toEuropeScroll);
-        add(inPortScroll);
-        add(cargoScroll);
-        add(marketScroll, "span");
+        if (parent.getHeight() > 750) {
+            add(header, "span, center");
+        }
+        add(toAmericaScroll, "sg, height 124:, grow");
+        add(toEuropeScroll, "sg, height 124:, grow");
+        add(logScroll, "spany 3, grow");
+        add(inPortScroll, "sg, height 124:, grow");
+        add(docksScroll, "spany 2, grow");
+        add(cargoScroll, "height 100:, grow");
+        add(marketScroll, "span, grow");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
