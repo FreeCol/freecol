@@ -36,8 +36,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
@@ -1861,7 +1859,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         region = getFreeColGameObject(in, "region", Region.class, null);
         moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
             ? null
-            : new Boolean(getAttribute(in, "moveToEurope", false));
+            : getAttribute(in, "moveToEurope", false);
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {
