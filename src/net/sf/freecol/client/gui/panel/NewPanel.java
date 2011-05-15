@@ -50,7 +50,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 
 /**
- * A panel filled with 'new game' items.
+ * This dialog allows the user to start a single player or multiplayer
+ * game, to join a running game and to fetch a list of games from the
+ * meta-server.
  */
 public final class NewPanel extends FreeColPanel implements ActionListener {
 
@@ -246,6 +248,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(joinComponents, false);
             enableComponents(serverComponents, false);
             enableComponents(gameComponents, true);
+            specificationBox.setEnabled(specification == null);
             break;
         case JOIN:
             enableComponents(joinComponents, true);
@@ -256,6 +259,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(joinComponents, false);
             enableComponents(serverComponents, true);
             enableComponents(gameComponents, true);
+            specificationBox.setEnabled(specification == null);
             break;
         case META_SERVER:
             enableComponents(joinComponents, false);
@@ -263,7 +267,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(gameComponents, false);
             break;
         }
-        specificationBox.setEnabled(specification == null);
     }
 
     /**
