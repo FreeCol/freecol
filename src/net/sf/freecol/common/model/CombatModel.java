@@ -23,10 +23,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Unit;
-
 
 abstract public class CombatModel {
 
