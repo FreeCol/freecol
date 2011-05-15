@@ -47,23 +47,23 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     /**
      * Creates a standard <code>Goods</code>-instance given the place where
      * the goods is.
-     * 
-     * This constructor only asserts that the game and 
+     *
+     * This constructor only asserts that the game and
      * that the location (if given) can store goods. The goods will not
      * be added to the location (use Location.add for this).
-     * 
+     *
      * @param game The <code>Game</code> in which this object belongs
      * @param location The location of the goods (may be null)
      * @param type The type of the goods.
      * @param amount The amount of the goods.
-     * 
+     *
      * @throws IllegalArgumentException if the location cannot store any goods.
      */
     public Goods(Game game, Location location, GoodsType type, int amount) {
         if (game == null) {
             throw new IllegalArgumentException("Parameter 'game' must not be 'null'.");
         }
-        
+
         if (type == null) {
             throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
@@ -90,7 +90,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         readFromXML(in);
 
     }
-    
+
     /**
      * Creates a new <code>Goods</code> instance.
      *
@@ -121,7 +121,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * @param p The <code>Player</code> that should take ownership
      *      of this {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by
-     *      this method. 
+     *      this method.
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
@@ -220,7 +220,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     */
     public void adjustAmount() {
         int maxAmount = location.getGoodsContainer().getGoodsCount(getType());
-        
+
         if (getAmount() > maxAmount)
             setAmount(maxAmount);
     }
@@ -257,7 +257,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
@@ -277,14 +277,14 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
         out.writeEndElement();
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setType(game.getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
         setAmount(Integer.parseInt(in.getAttributeValue(null, "amount")));
 
@@ -292,7 +292,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         if (locationStr != null) {
             location = (Location) getGame().getFreeColGameObject(locationStr);
         }
-        
+
         in.nextTag();
     }
 

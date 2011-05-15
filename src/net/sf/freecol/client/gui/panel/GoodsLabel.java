@@ -19,10 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Image;
-import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -39,20 +36,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This label holds Goods data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class GoodsLabel extends JLabel {
-    
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(GoodsLabel.class.getName());
-    
-    private final Goods goods;
-    
-    private final Canvas parent;
-    
-    private boolean partialChosen;
-    
-    private boolean toEquip;
-    
-    
+public final class GoodsLabel extends AbstractGoodsLabel {
+
     /**
      * Initializes this JLabel with the given goods data.
      *
@@ -60,15 +45,9 @@ public final class GoodsLabel extends JLabel {
      * @param parent The parent that knows more than we do.
      */
     public GoodsLabel(Goods goods, Canvas parent) {
-        super(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
-        this.goods = goods;
-        setToolTipText(Messages.message(goods.getNameKey()));
-        this.parent = parent;
-        partialChosen = false;
-        toEquip = false;
-        initializeDisplay();
+        this(goods, parent, false);
     }
-    
+
     /**
      * Initializes this JLabel with the given goods data.
      *
@@ -77,17 +56,18 @@ public final class GoodsLabel extends JLabel {
      * @param isSmall A smaller picture will be used if <code>true</code>.
      */
     public GoodsLabel(Goods goods, Canvas parent, boolean isSmall) {
-        this(goods, parent);
-        setSmall(true);
+        super(goods, parent, isSmall);
+        initializeDisplay();
     }
-    
+
     /**
      * Initializes the display that shows the goods.
      */
     private void initializeDisplay() {
         Player player = null;
+        Goods goods = getGoods();
         Location location = goods.getLocation();
-        
+
         if (location instanceof Ownable) {
             player = ((Ownable) location).getOwner();
         }
@@ -102,7 +82,7 @@ public final class GoodsLabel extends JLabel {
             setToolTipText(Messages.message(goods.getLabel(false)));
             setIcon(getDisabledIcon());
         }
-        
+
         if (!goods.getType().limitIgnored()
             && location instanceof Colony
             && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
@@ -118,65 +98,18 @@ public final class GoodsLabel extends JLabel {
         } else {
             setForeground(ResourceManager.getColor("goodsLabel.positiveAmount.color"));
         }
-        
+
         super.setText(String.valueOf(goods.getAmount()));
     }
-    
-    public boolean isPartialChosen() {
-        return partialChosen;
-    }
-    
-    public void setPartialChosen(boolean partialChosen) {
-        this.partialChosen = partialChosen;
-    }
-    
-    public boolean isToEquip() {
-        return toEquip;
-    }
-    
-    public void toEquip(boolean toEquip) {
-        this.toEquip = toEquip;
-    }
-    
-    
-    /**
-     * Returns the parent Canvas object.
-     *
-     * @return This UnitLabel's Canvas.
-     */
-    public Canvas getCanvas() {
-        return parent;
-    }
-    
+
     /**
      * Returns this GoodsLabel's goods data.
      *
      * @return This GoodsLabel's goods data.
      */
+    @Override
     public Goods getGoods() {
-        return goods;
+        return (Goods) super.getGoods();
     }
-    
-    /**
-     * Sets whether or not this goods should be selected.
-     *
-     * @param b Whether or not this goods should be selected.
-     */
-    public void setSelected(boolean b) {
-    }
-    
-    /**
-     * Sets that this <code>GoodsLabel</code> should be small.
-     *
-     * @param isSmall A smaller picture will be used if <code>true</code>.
-     */
-    public void setSmall(boolean isSmall) {
-        if (isSmall) {
-            ImageIcon imageIcon = parent.getImageLibrary().getGoodsImageIcon(goods.getType());
-            setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2,
-                    imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
-        } else {
-            setIcon(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
-        }
-    }
+
 }

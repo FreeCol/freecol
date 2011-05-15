@@ -42,11 +42,9 @@ import net.sf.freecol.common.resources.ResourceManager;
  * The ProductionLabel represents Goods that are produced in a
  * WorkLocation or Settlement. It is similar to the GoodsLabel.
  */
-public final class ProductionLabel extends JComponent {
+public final class ProductionLabel extends AbstractGoodsLabel {
 
     private static Logger logger = Logger.getLogger(ProductionLabel.class.getName());
-
-    private final Canvas parent;
 
     /**
      * The maximum number of goodsIcons to display.
@@ -69,19 +67,9 @@ public final class ProductionLabel extends JComponent {
     private int compressedWidth = -1;
 
     /**
-     * The type of goods being produced.
-     */
-    private GoodsType goodsType;
-
-    /**
      * The goodsIcon for this type of production.
      */
     private ImageIcon goodsIcon;
-
-    /**
-     * The amount of goods being produced.
-     */
-    private int production;
 
     /**
      * The amount of goods that could be produced.
@@ -114,7 +102,29 @@ public final class ProductionLabel extends JComponent {
      * @param parent a <code>Canvas</code> value
      */
     public ProductionLabel(AbstractGoods goods, Canvas parent) {
-        this(goods.getType(), goods.getAmount(), -1, parent);
+        this(goods, -1, parent);
+    }
+
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
+     * @param goods a <code>AbstractGoods</code> value
+     * @param maximum an <code>AbstractGoods</code> value
+     * @param parent a <code>Canvas</code> value
+     */
+    public ProductionLabel(AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
+        this(goods, maximum.getAmount(), parent);
+    }
+
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     * @param parent a <code>Canvas</code> value
+     */
+    public ProductionLabel(GoodsType goodsType, int amount, Canvas parent) {
+        this(new AbstractGoods(goodsType, amount), -1, parent);
     }
 
     /**
@@ -124,48 +134,21 @@ public final class ProductionLabel extends JComponent {
      * @param maximum a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
-        this(goods.getType(), goods.getAmount(), maximum.getAmount(), parent);
-    }
-
-    /**
-     * Creates a new <code>ProductionLabel</code> instance.
-     *
-     * @param goodsType an <code>int</code> value
-     * @param amount an <code>int</code> value
-     * @param parent a <code>Canvas</code> value
-     */
-    public ProductionLabel(GoodsType goodsType, int amount, Canvas parent) {
-        this(goodsType, amount, -1, parent);
-    }
-
-    /**
-     * Creates a new <code>ProductionLabel</code> instance.
-     *
-     * @param goodsType an <code>int</code> value
-     * @param amount an <code>int</code> value
-     * @param maximumProduction an <code>int</code> value
-     * @param parent a <code>Canvas</code> value
-     */
-    public ProductionLabel(GoodsType goodsType, int amount, int maximumProduction, Canvas parent) {
-        super();
-        this.parent = parent;
-        this.production = amount;
-        this.goodsType = goodsType;
+    public ProductionLabel(AbstractGoods goods, int maximum, Canvas parent) {
+        super(goods, parent, false);
         this.maximumProduction = maximumProduction;
         ClientOptions options = parent.getClient().getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 
-
         setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
-        if (amount < 0) {
+        if (goods.getAmount() < 0) {
             setForeground(Color.RED);
         } else {
             setForeground(Color.WHITE);
         }
-        if (goodsType != null) {
-            setGoodsIcon(parent.getImageLibrary().getGoodsImageIcon(goodsType));
+        if (goods.getType() != null) {
+            setGoodsIcon(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
             updateToolTipText();
         }
     }
@@ -187,15 +170,6 @@ public final class ProductionLabel extends JComponent {
     public void setToolTipPrefix(final String newToolTipPrefix) {
         this.toolTipPrefix = newToolTipPrefix;
         updateToolTipText();
-    }
-
-    /**
-     * Returns the parent Canvas object.
-     *
-     * @return This ProductionLabel's Canvas.
-     */
-    public Canvas getCanvas() {
-        return parent;
     }
 
     /**
@@ -236,31 +210,22 @@ public final class ProductionLabel extends JComponent {
     }
 
     /**
-     * Get the <code>Production</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getProduction() {
-        return production;
-    }
-
-    /**
      * Set the <code>Production</code> value.
      *
      * @param newProduction The new Production value.
      */
     public void setProduction(final int newProduction) {
-        this.production = newProduction;
+        getGoods().setAmount(newProduction);
         updateToolTipText();
     }
 
     private void updateToolTipText() {
-        if (goodsType == null || production == 0) {
+        if (getType() == null || getAmount() == 0) {
             setToolTipText(null);
         } else {
             String text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                           .add("%goods%", goodsType.getNameKey())
-                                           .addAmount("%amount%", production));
+                                           .add("%goods%", getGoods().getNameKey())
+                                           .addAmount("%amount%", getAmount()));
             if (toolTipPrefix != null) {
                 text = toolTipPrefix + " " + text;
             }
@@ -393,7 +358,6 @@ public final class ProductionLabel extends JComponent {
     }
 
 
-    // TODO: get rid of the ugly code duplication
     /**
      * Returns only the width component of the preferred size.
      *
@@ -405,7 +369,7 @@ public final class ProductionLabel extends JComponent {
             return 0;
         }
 
-        int drawImageCount = Math.max(1, Math.min(Math.abs(production), maxIcons));
+        int drawImageCount = Math.max(1, Math.min(Math.abs(getAmount()), maxIcons));
 
         int iconWidth = goodsIcon.getIconWidth();
         int pixelsPerIcon = iconWidth / 2;
@@ -438,14 +402,14 @@ public final class ProductionLabel extends JComponent {
      */
     public void paintComponent(Graphics g) {
 
-        if (goodsIcon == null || (production == 0 && stockNumber<0) ) {
+        if (goodsIcon == null || (getAmount() == 0 && stockNumber<0) ) {
             logger.fine("Empty production label: fix this!");
             return;
         }
 
         int stringWidth = getStringImage() == null ? 0 : getStringImage().getWidth(null);
 
-        int drawImageCount = Math.min(Math.abs(production), maxIcons);
+        int drawImageCount = Math.min(Math.abs(getAmount()), maxIcons);
         if (drawImageCount==0) {
             drawImageCount=1;
         }
@@ -493,24 +457,24 @@ public final class ProductionLabel extends JComponent {
 
     private Image getStringImage() {
         if (stringImage == null) {
-            if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
-                || (maximumProduction > production && production > 0)) {
+            if (getAmount() >= displayNumber || getAmount() < 0 || maxIcons < getAmount() || stockNumber > 0
+                || (maximumProduction > getAmount() && getAmount() > 0)) {
                 String number = "";
                 if (stockNumber >= 0 ) {
                     number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
                     drawPlus = true;
                 }
-                if (production >=0 && drawPlus ) {
-                    number = number + "+" + Integer.toString(production);
+                if (getAmount() >=0 && drawPlus ) {
+                    number = number + "+" + Integer.toString(getAmount());
                 } else {
-                    number = number + Integer.toString(production);
+                    number = number + Integer.toString(getAmount());
                 }
-                if (maximumProduction > production && production > 0) {
+                if (maximumProduction > getAmount() && getAmount() > 0) {
                     number = number + "/" + String.valueOf(maximumProduction);
                 }
                 Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-                stringImage = parent.getGUI().createStringImage(getCanvas().getGraphics(),
-                                                                number, getForeground(), font);
+                stringImage = getCanvas().getGUI().createStringImage(getCanvas().getGraphics(),
+                                                                     number, getForeground(), font);
             }
         }
         return stringImage;
