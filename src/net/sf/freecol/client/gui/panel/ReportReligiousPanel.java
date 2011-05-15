@@ -19,11 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionListener;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -34,14 +32,13 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.ProductionInfo;
 
 import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Religious Report.
  */
-public final class ReportReligiousPanel extends ReportPanel implements ActionListener {
+public final class ReportReligiousPanel extends ReportPanel {
 
 
     /**

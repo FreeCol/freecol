@@ -67,8 +67,9 @@ public final class ReportTurnPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
+     * @param messages A variable number of ModelMessages
      */
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("reportTurnAction.name"));
@@ -85,7 +86,6 @@ public final class ReportTurnPanel extends ReportPanel {
 
         Object source = this;
         ModelMessage.MessageType type = null;
-        int headlines = 0;
         Game game = getClient().getGame();
 
         // count number of headlines
@@ -94,13 +94,10 @@ public final class ReportTurnPanel extends ReportPanel {
                 FreeColGameObject messageSource = game.getMessageSource(message);
                 if (messageSource != source) {
                     source = messageSource;
-                    headlines++;
                 }
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE) {
-                if (message.getMessageType() != type) {
-                    type = message.getMessageType();
-                    headlines++;
-                }
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
+                       && message.getMessageType() != type) {
+                type = message.getMessageType();
             }
         }
 
@@ -119,13 +116,12 @@ public final class ReportTurnPanel extends ReportPanel {
                     source = messageSource;
                     reportPanel.add(getHeadline(source), "newline 20, skip");
                 }
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE) {
-                if (message.getMessageType() != type) {
-                    type = message.getMessageType();
-                    JLabel headline = localizedLabel(message.getMessageTypeName());
-                    headline.setFont(smallHeaderFont);
-                    reportPanel.add(headline, "newline 20, skip, span");
-                }
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
+                       && message.getMessageType() != type) {
+                type = message.getMessageType();
+                JLabel headline = localizedLabel(message.getMessageTypeName());
+                headline.setFont(smallHeaderFont);
+                reportPanel.add(headline, "newline 20, skip, span");
             }
 
             JComponent component = new JLabel();

@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,7 +37,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.TypeCountMap;
 
 import net.miginfocom.swing.MigLayout;

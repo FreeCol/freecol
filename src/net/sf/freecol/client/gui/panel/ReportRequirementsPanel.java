@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -185,22 +184,20 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 GoodsType goodsType = building.getGoodsOutputType();
                 UnitType expert = building.getExpertUnitType();
 
-                if (goodsType != null && expert != null) {
-                    // check if this building has no expert producing goods
-                    if (building.getFirstUnit() != null &&
-                        !missingExpertWarning.contains(expert) &&
-                        unitCount.get(colony).getCount(expert) == 0) {
-                        addExpertWarning(doc, colony, goodsType, expert);
-                        missingExpertWarning.add(expert);
-                    }
+                // check if this building has no expert producing goods
+                if (goodsType != null && expert != null
+                    && building.getFirstUnit() != null
+                    && !missingExpertWarning.contains(expert)
+                    && unitCount.get(colony).getCount(expert) == 0) {
+                    addExpertWarning(doc, colony, goodsType, expert);
+                    missingExpertWarning.add(expert);
                 }
-                if (goodsType != null) {
-                    // not enough input
-                    if (!building.getProductionInfo().hasMaximumProduction()
-                        && !productionWarning.contains(goodsType)) {
-                        addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
-                        productionWarning.add(goodsType);
-                    }
+                // not enough input
+                if (goodsType != null
+                    && !building.getProductionInfo().hasMaximumProduction()
+                    && !productionWarning.contains(goodsType)) {
+                    addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
+                    productionWarning.add(goodsType);
                 }
             }
 
