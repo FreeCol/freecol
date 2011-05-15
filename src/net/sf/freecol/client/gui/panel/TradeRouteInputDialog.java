@@ -325,7 +325,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-            	if (verifyNewTradeRoute()) {            	
+            	if (verifyNewTradeRoute()) {
                     getCanvas().remove(this);
                     originalRoute.setName(tradeRouteName.getText());
                     ArrayList<Stop> stops = new ArrayList<Stop>();
@@ -335,12 +335,12 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     originalRoute.setStops(stops);
                     // TODO: update trade routes only if they have been modified
                     getController().updateTradeRoute(originalRoute);
-                    setResponse(new Boolean(true));
+                    setResponse(Boolean.TRUE);
                 }
                 break;
             case CANCEL:
                 getCanvas().remove(this);
-                setResponse(new Boolean(false));
+                setResponse(Boolean.FALSE);
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");
