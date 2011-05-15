@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
 import org.w3c.dom.Element;
 

@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;

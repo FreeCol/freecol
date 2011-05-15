@@ -21,12 +21,12 @@
  *
  * This class is specialized to control the "Colonial" player type,
  * using it for any other type will fail.
- * 
+ *
  * It is currently not used in any standard game setting,
- * but can be activated by starting a game using the "--experimentalAI" arg. 
- * 
+ * but can be activated by starting a game using the "--experimentalAI" arg.
+ *
  ******************************************************************************/
-   
+
 package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
@@ -68,7 +68,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -96,13 +95,13 @@ import net.sf.freecol.server.model.ServerPlayer;
 import org.w3c.dom.Element;
 
 /**
- * 
+ *
  * Objects of this class contains AI-information for a single {@link Player} and
  * is used for controlling this player.
- * 
+ *
  * <br />
  * <br />
- * 
+ *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
@@ -119,12 +118,12 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Goal to manage missionary units of this player.
-     */         
+     */
     private ManageMissionariesGoal mGoal = new ManageMissionariesGoal((AIPlayer)this, null, 1.0f);
 
     /**
      * Creates a new <code>AIPlayer</code>.
-     * 
+     *
      * @param aiMain The main AI-class.
      * @param player The player that should be associated with this
      *            <code>AIPlayer</code>.
@@ -137,7 +136,7 @@ public class ColonialAIPlayer extends AIPlayer {
     /**
      * Creates a new <code>AIPlayer</code> and reads the information from the
      * given <code>Element</code>.
-     * 
+     *
      * @param aiMain The main AI-class.
      * @param element The XML-element containing information.
      */
@@ -149,7 +148,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Creates a new <code>AIPlayer</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -179,11 +178,11 @@ public class ColonialAIPlayer extends AIPlayer {
             !getPlayer().isEuropean()) {
             throw new IllegalStateException("Player type not supported by this AI!");
         }
-        
+
         // TODO: find some intelligent solution to set a proper strategy!
         this.strategy = AIStrategy.TRADE;
 
-        //reset unit iterator to all units without current goal         
+        //reset unit iterator to all units without current goal
         clearAIUnits();
 
         //add goals for missionaries (this will remove them from the iterator)
@@ -193,9 +192,9 @@ public class ColonialAIPlayer extends AIPlayer {
         boolean furtherPlanning = true;
         while (furtherPlanning) {
             mGoal.doPlanning();
-            furtherPlanning = mGoal.needsPlanning();            
+            furtherPlanning = mGoal.needsPlanning();
         }
-        
+
         //manage the remaining units as before
         cheat();
         determineStances();
@@ -215,14 +214,14 @@ public class ColonialAIPlayer extends AIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureCorrectMissions();
-        
+
         clearAIUnits();
     }
 
     /**
      * Returns an <code>Iterator</code> over all the
      * <code>TileImprovement</code>s needed by all of this player's colonies.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see TileImprovement
      */
@@ -238,7 +237,7 @@ public class ColonialAIPlayer extends AIPlayer {
         }
         return tileImprovements.iterator();
     }
-    
+
     /**
      * Remove a <code>TileImprovementPlan</code> from the list
      */
@@ -258,10 +257,10 @@ public class ColonialAIPlayer extends AIPlayer {
      * players into building more colonies. The method will be removed after the
      * proper code for deciding whether a colony should be built or not has been
      * implemented.
-     * 
+     *
      * @return <code>true</code> if the AI should build more colonies.
      */
-    public boolean hasFewColonies() {        
+    public boolean hasFewColonies() {
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
@@ -271,7 +270,7 @@ public class ColonialAIPlayer extends AIPlayer {
             numberOfColonies++;
             numberOfWorkers += colony.getUnitCount();
         }
-        
+
         boolean result = numberOfColonies <= 2
             || (numberOfColonies >= 3
                 && numberOfWorkers / numberOfColonies > numberOfColonies - 2);
@@ -283,7 +282,7 @@ public class ColonialAIPlayer extends AIPlayer {
      * Returns an <code>Iterator</code> for all the wishes. The items are
      * sorted by the {@link Wish#getValue value}, with the item having the
      * highest value appearing first in the <code>Iterator</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see Wish
      */
@@ -304,7 +303,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Selects the most useful founding father offered.
-     * 
+     *
      * @param foundingFathers The founding fathers on offer.
      * @return The founding father selected.
      */
@@ -326,7 +325,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Decides whether to accept the monarch's tax raise or not.
-     * 
+     *
      * @param tax The new tax rate to be considered.
      * @return <code>true</code> if the tax raise should be accepted.
      */
@@ -335,12 +334,12 @@ public class ColonialAIPlayer extends AIPlayer {
         if (toBeDestroyed == null) {
             return false;
         }
-        
+
         GoodsType goodsType = toBeDestroyed.getType();
         if (goodsType.isFoodType() || goodsType.isBreedable()) {
             // we should be able to produce food and horses ourselves
             return false;
-        } else if (goodsType.isMilitaryGoods() || 
+        } else if (goodsType.isMilitaryGoods() ||
                    goodsType.isTradeGoods() ||
                    goodsType.isBuildingMaterial()) {
             if (getGame().getTurn().getAge() == 3) {
@@ -372,7 +371,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Decides whether to accept an Indian demand, or not.
-     * 
+     *
      * @param unit The unit making demands.
      * @param colony The colony where demands are being made.
      * @param goods The goods demanded.
@@ -391,7 +390,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Decides whether to accept a mercenary offer, or not.
-     * 
+     *
      * @return <code>true</code> if this <code>AIPlayer</code> accepts the
      *         offer and <code>false</code> otherwise.
      */
@@ -476,10 +475,10 @@ public class ColonialAIPlayer extends AIPlayer {
         return accept;
     }
 
-    
+
     /**
      * Called after another <code>Player</code> sends a <code>trade</code> message
-     * 
+     *
      * @param goods The goods which we are going to offer
      */
     public void registerSellGoods(Goods goods) {
@@ -489,8 +488,8 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Called when another <code>Player</code> proposes a trade.
-     * 
-     * 
+     *
+     *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
      *            which the given <code>Unit</code> is trying to trade.
@@ -507,7 +506,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Called when another <code>Player</code> proposes a sale.
-     * 
+     *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
      *            which the given <code>Unit</code> if trying to sell goods.
@@ -543,7 +542,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Writes this object to an XML stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -557,7 +556,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Reads information for this object from an XML stream.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
@@ -570,7 +569,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return the tag name.
      */
     public static String getXMLElementTagName() {
@@ -590,13 +589,13 @@ public class ColonialAIPlayer extends AIPlayer {
         for (GoodsType goodsType : getGame().getSpecification().getGoodsTypeList()) {
             getPlayer().getMarket().setArrears(goodsType, 0);
         }
-        
+
         //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = getGame().getSpecification().getUnitTypeList();
-            
+
             if (getAIRandom().nextInt(10) == 1) {
                 int price = 0;
                 UnitType unitToTrain = null;
@@ -621,7 +620,7 @@ public class ColonialAIPlayer extends AIPlayer {
                     GoodsType horses = spec.getGoodsType("model.goods.horses");
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
-                    
+
                     AIMessage.askClearSpeciality(getAIUnit(unit));
                     AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.horses"), 1);
                     AIMessage.askEquipUnit(getAIUnit(unit), spec.getEquipmentType("model.equipment.muskets"), 1);
@@ -636,7 +635,7 @@ public class ColonialAIPlayer extends AIPlayer {
                         total += europe.getUnitPrice(unitType);
                     }
                 }
-                
+
                 UnitType unitToPurchase = null;
                 int random = getAIRandom().nextInt(total);
                 total = 0;
@@ -672,7 +671,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Determines the stances towards each player.
-     * 
+     *
      * That is: should we declare war?
      */
     private void determineStances() {
@@ -769,7 +768,7 @@ public class ColonialAIPlayer extends AIPlayer {
      */
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
-        
+
         // Create a datastructure for the worker wishes:
         java.util.Map<UnitType, ArrayList<Wish>> workerWishes = new HashMap<UnitType, ArrayList<Wish>>();
 
@@ -790,24 +789,24 @@ public class ColonialAIPlayer extends AIPlayer {
             }
         }
 
-        
+
         final boolean fewColonies = hasFewColonies();
         boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
-            
+
             if (aiUnit.hasMission()) {
                 continue;
             }
-            
+
             Unit unit = aiUnit.getUnit();
-            
+
             if (unit.isUninitialized()) {
                 logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
                 continue;
             }
-            
+
             // Setup as a pioneer if unit is:
             //      - already with tools, or
             //      - an expert pioneer, or
@@ -820,17 +819,17 @@ public class ColonialAIPlayer extends AIPlayer {
                 isPioneerReq = false;
                 continue;
             }
-            
+
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
                        ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
             } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                       && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
+                       && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") ||
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.isColonist()) {                
+            } else if (unit.isColonist()) {
                 /*
                  * Motivated by (speed) performance: This map stores the
                  * distance between the unit and the destination of a Wish:
@@ -885,7 +884,7 @@ public class ColonialAIPlayer extends AIPlayer {
                 if (colonyTile != null) {
                     bestTurns = unit.getTurnsToReach(colonyTile);
                 }
-                
+
                 // Check if we can find a better site to work than a new colony:
                 if (!fewColonies || colonyTile == null || bestTurns > 10) {
                     for (int i = 0; i < workerWishes.size(); i++) {
@@ -924,21 +923,21 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
                 // Choose to build a new colony:
                 if (colonyTile != null) {
-                	Mission mission = new BuildColonyMission(getAIMain(), 
-                							aiUnit, 
-                							colonyTile, 
+                	Mission mission = new BuildColonyMission(getAIMain(),
+                							aiUnit,
+                							colonyTile,
                 							getPlayer().getColonyValue(colonyTile));
                     aiUnit.setMission(mission);
-                    
-                    boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier(); 
+
+                    boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
                     if (isUnitOnCarrier) {
                         AIUnit carrier = (AIUnit) getAIMain().getAIObject(
                                 (FreeColGameObject) aiUnit.getUnit().getLocation());
-                        
+
                         //make verification of carrier mission
                         Mission carrierMission = carrier.getMission();
-                        
-                        boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission; 
+
+                        boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission;
                         if(!isCarrierMissionToTransport){
                         	throw new IllegalStateException("Carrier carrying unit not on a transport mission");
                         }
@@ -974,9 +973,9 @@ public class ColonialAIPlayer extends AIPlayer {
     }
 
     /**
-     * 
+     *
      * Makes every unit perform their mission.
-     * 
+     *
      */
     private void doMissions() {
         logger.finest("Entering method doMissions");
@@ -998,11 +997,11 @@ public class ColonialAIPlayer extends AIPlayer {
 
     int getDefendColonyMissionValue(Unit u, Colony colony, int turns) {
         logger.finest("Entering method getDefendColonyMissionValue");
-        
+
         // Sanitation
         if(colony == null)
         	return Integer.MIN_VALUE;
-        
+
         // Temporary helper method for: giveMilitaryMission
         int value = 10025 - turns;
         int numberOfDefendingUnits = 0;
@@ -1013,7 +1012,7 @@ public class ColonialAIPlayer extends AIPlayer {
             if (m != null && m instanceof DefendSettlementMission) {
                 if (((DefendSettlementMission) m).getSettlement() == colony) {
                 	//TODO: this decrease seems too little
-                	value -= 6; 
+                	value -= 6;
                     numberOfDefendingUnits++;
                 }
             }
@@ -1035,16 +1034,16 @@ public class ColonialAIPlayer extends AIPlayer {
 
     int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
         logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
-        
+
         Unit defender = newTile.getDefendingUnit(unit);
-        
+
         if(!isTargetValidForSeekAndDestroy(unit, defender)){
         	return Integer.MIN_VALUE;
         }
-        
+
         int value = 10020;
         CombatModel combatModel = unit.getGame().getCombatModel();
-        
+
         if (getBestTreasureTrain(newTile) != null) {
         	value += Math.min(getBestTreasureTrain(newTile).getTreasureAmount() / 10, 50);
         }
@@ -1052,11 +1051,11 @@ public class ColonialAIPlayer extends AIPlayer {
         		newTile.getSettlement() == null) {
         	value += 200 - combatModel.getDefencePower(unit, defender) * 2 - turns * 50;
         }
-            
+
         value += combatModel.getOffencePower(defender, unit) -
               combatModel.getDefencePower(defender, unit);
         value -= turns * 10;
- 
+
         if (!defender.isNaval()) {
         	if (defender.hasAbility("model.ability.expertSoldier")
                     && !defender.isArmed()) {
@@ -1076,23 +1075,23 @@ public class ColonialAIPlayer extends AIPlayer {
                     }
                 }
             }
-        }   
+        }
         return Math.max(0, value);
     }
-    
+
     /**
      * TODO: Package for access by a test only - necessary?
-     */     
+     */
     boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
         if (attacker.getOwner()!=getPlayer()) {
             logger.warning("isTargetValidForSeekAndDestroy() called for other players unit!");
             return false;
         }
-    
+
         if (defender == null) { // Sanitation
             return false;
         }
-    	
+
         // A naval unit cannot attack a land unit and vice-versa
         if (attacker.isNaval() != defender.isNaval()) {
             return false;
@@ -1114,26 +1113,26 @@ public class ColonialAIPlayer extends AIPlayer {
         // If european, do not attack if not at war
         return attackerPlayer.atWarWith(defenderPlayer);
     }
-        
+
     /**
      * Gives a military <code>Mission</code> to the given unit. <br>
      * <br>
      * <b>This method should only be used on units owned by european players.</b>
      *
      * TODO: Package for access by a test only - necessary?
-     * 
+     *
      * @param aiUnit The unit.
      */
     void giveMilitaryMission(AIUnit aiUnit) {
         logger.finest("Entering method giveMilitaryMission");
         /*
-         * 
+         *
          * Temporary method for giving a military mission.
-         * 
+         *
          * This method will be removed when "MilitaryStrategy" and
-         * 
+         *
          * the "Tactic"-classes has been implemented.
-         * 
+         *
          */
         final Unit unit = aiUnit.getUnit();
         Unit carrier = (unit.isOnCarrier()) ? (Unit) unit.getLocation() : null;
@@ -1153,11 +1152,11 @@ public class ColonialAIPlayer extends AIPlayer {
             }
         }
         /*
-         * 
+         *
          * Checks if we are currently located on a Tile with a Settlement
-         * 
+         *
          * which requires defenders:
-         * 
+         *
          */
         if (unit.getColony() != null) {
             bestTarget = unit.getColony();
@@ -1329,7 +1328,7 @@ public class ColonialAIPlayer extends AIPlayer {
         if(transportables.isEmpty()){
             return;
         }
-        
+
         // Update the priority
         for (Transportable t : transportables){
             t.increaseTransportPriority();
@@ -1345,13 +1344,13 @@ public class ColonialAIPlayer extends AIPlayer {
                 vacantTransports.add(au.getMission());
             }
         }
-        
+
         // save further processing
         // we must only do this verification after the priority update
         if(vacantTransports.isEmpty()){
             return;
         }
-        
+
         // order the list by priority
         Collections.sort(transportables, new Comparator<Transportable>() {
             public int compare(Transportable o1, Transportable o2) {
@@ -1436,7 +1435,7 @@ public class ColonialAIPlayer extends AIPlayer {
     /**
      * Returns the treasure train carrying the largest treasure
      * located on the given <code>Tile</code>.
-     * 
+     *
      * @param tile a <code>Tile</code> value
      * @return The best treasure train or <code>null</code> if no treasure
      *         train is located on this <code>Tile</code>.
@@ -1445,7 +1444,7 @@ public class ColonialAIPlayer extends AIPlayer {
         Unit bestTreasureTrain = null;
         for (Unit unit : tile.getUnitList()) {
             if (unit.canCarryTreasure() &&
-                (bestTreasureTrain == null || 
+                (bestTreasureTrain == null ||
                  bestTreasureTrain.getTreasureAmount() < unit.getTreasureAmount())) {
                 bestTreasureTrain = unit;
             }
@@ -1459,12 +1458,12 @@ public class ColonialAIPlayer extends AIPlayer {
         while (it.hasNext()) {
             AIUnit au = it.next();
             Unit u = au.getUnit();
-            
+
             if (u.getRole()==Role.MISSIONARY) {
                 logger.info("Found missionary unit:"+u.getId());
                 mGoal.addUnit(au);
                 //NOTE: Removes units being assigned a goal from the units list
-                it.remove(); 
+                it.remove();
             }
         }
     }
@@ -1472,10 +1471,10 @@ public class ColonialAIPlayer extends AIPlayer {
     /**
      * Returns an iterator over all <code>AIUnit</code>s owned by this
      * player, which currently do _not_ have a goal.
-     * 
+     *
      * This is a temporary override to allow the old AI code to keep working
      * with some units, while exempting those already managed by new code.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     protected Iterator<AIUnit> getAIUnitIterator() {
@@ -1501,11 +1500,11 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /**
      * Helper method to let implementing subclasses clear aiUnits.
-     * Override, see above!     
-     */         
+     * Override, see above!
+     */
     protected void clearAIUnits() {
         logger.info("Override: clearAIUnits()!");
-        myAIUnits.clear();    
+        myAIUnits.clear();
     }
 
 }
