@@ -131,7 +131,7 @@ public final class EuropePanel extends FreeColPanel {
         inPortPanel = new InPortPanel();
         cargoPanel = new EuropeCargoPanel(parent);
         cargoPanel.setParentPanel(this);
-        docksPanel = new DocksPanel(this);
+        docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
 
         log = new TransactionLog();
@@ -700,13 +700,6 @@ public final class EuropePanel extends FreeColPanel {
      */
     public final class DocksPanel extends JPanel
         implements PropertyChangeListener {
-
-        /**
-         * Creates this DocksPanel.
-         *
-         * @param europePanel The panel that holds this DocksPanel.
-         */
-        public DocksPanel(EuropePanel europePanel) {}
 
         /**
          * Initializes this DocksPanel.
