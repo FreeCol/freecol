@@ -131,13 +131,6 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      */
     public abstract int getZIndex();
 
-    /**
-     * Disposes this TileItem.
-     */
-    public void dispose() {
-        super.dispose();
-    }
-
 
     /**
      * Returns true if the TileItem is compatible with the given

@@ -429,14 +429,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
 
-    /**
-     * Disposes this improvement.
-     */
-    @Override
-    public void dispose() {
-        super.dispose();
-    }
-
     // ------------------------------------------------------------ API methods
 
     /**
