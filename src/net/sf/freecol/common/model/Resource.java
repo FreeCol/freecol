@@ -188,14 +188,6 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Disposes this resource.
-     */
-    @Override
-    public void dispose() {
-        super.dispose();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public boolean isTileTypeAllowed(TileType tileType) {
