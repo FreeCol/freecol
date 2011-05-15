@@ -936,21 +936,31 @@ public final class FreeColClient {
 
 
     /**
-    * Notifies this GUI that the game has started or ended.
-    * @param inGame Indicates whether or not the game has started.
-    */
+     * Notifies this GUI that the game has started or ended.
+     * @param inGame Indicates whether or not the game has started.
+     */
     public void setInGame(boolean inGame) {
         this.inGame = inGame;
     }
 
-
     /**
-    * Checks if the game has started.
-    * @return <i>true</i> if the game has started.
-    * @see #setInGame
-    */
+     * Checks if the game has started.
+     * @return <i>true</i> if the game has started.
+     * @see #setInGame
+     */
     public boolean isInGame() {
         return inGame;
     }
 
+    /**
+     * Start the game skipping turns.
+     *
+     * @param turns The number of turns to skip.
+     */
+    public void skipTurns(int turns) {
+        if (freeColServer == null) return;
+        freeColServer.getInGameController().setSkippedTurns(turns);
+        getCanvas().closeMenus();
+        inGameController.endTurn();
+    }
 }

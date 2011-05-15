@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.control;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -1279,6 +1282,16 @@ public final class InGameInputHandler extends InputHandler {
 
             // If our turn is beginning, select a unit.
             if (newTurn) {
+                if (FreeCol.isDebugRunComplete()
+                    && FreeCol.getDebugRunSaveName() != null) {
+                    try {
+                        fcc.getFreeColServer().saveGame(
+                            new File(".", FreeCol.getDebugRunSaveName()),
+                            fcc.getMyPlayer().getName(),
+                            fcc.getClientOptions());
+                    } catch (IOException e) {}
+                    fcc.quit();
+                }
                 List<Settlement> settlements = newPlayer.getSettlements();
                 Tile defTile = (settlements.size() > 0)
                     ? settlements.get(0).getTile()

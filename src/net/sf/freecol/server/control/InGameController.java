@@ -544,7 +544,15 @@ public final class InGameController extends Controller {
             ChangeSet cs = new ChangeSet();
             if (game.isNextPlayerInNewTurn()) {
                 game.csNewTurn(random, cs);
-                if (debugOnlyAITurns > 0) debugOnlyAITurns--;
+                if (debugOnlyAITurns > 0) {
+                    if (--debugOnlyAITurns <= 0) {
+                        // If this was a debug run, complete it.  This will
+                        // possibly signal the client to save and quit.
+                        if (FreeCol.getDebugRunTurns() > 0) {
+                            FreeCol.completeDebugRun();
+                        }
+                    }
+                }
             }
 
             if ((player = (ServerPlayer) game.getNextPlayer()) == null) {

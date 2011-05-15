@@ -24,6 +24,7 @@ package net.sf.freecol.client.control;
 import java.awt.Color;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMouseListener;
@@ -236,7 +237,9 @@ public final class PreGameController {
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,
                  freeColClient.getGame().getMap()));
 
-        if (freeColClient.getGame().getTurn().getNumber() == 1) {
+        if (FreeCol.isInDebugMode() && FreeCol.getDebugRunTurns() > 0) {
+            freeColClient.skipTurns(FreeCol.getDebugRunTurns());
+        } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
             myPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                                       "tutorial.startGame",
                                                       myPlayer));

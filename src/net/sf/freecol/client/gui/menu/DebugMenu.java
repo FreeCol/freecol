@@ -261,11 +261,13 @@ public class DebugMenu extends JMenu {
                                                              StringTemplate.name("How many turns should be skipped:"),
                                                              Integer.toString(10), "ok", "cancel", true);
                     if (response == null) return;
+                    int skip;
                     try {
-                        int skip = Integer.parseInt(response);
-                        igc.setSkippedTurns(skip);
-                    } catch (NumberFormatException nfe) {}
-                    freeColClient.getInGameController().endTurn();
+                        skip = Integer.parseInt(response);
+                    } catch (NumberFormatException nfe) {
+                        skip = -1;
+                    }
+                    if (skip > 0) freeColClient.skipTurns(skip);
                 }
             });
         this.addChangeListener(new ChangeListener() {

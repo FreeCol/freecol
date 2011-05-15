@@ -104,6 +104,8 @@ public final class FreeCol {
     private static final int DEBUG_LIMITED = 1;
     private static final int DEBUG_FULL = 2;
     private static int debugLevel = DEBUG_OFF;
+    private static int debugRunTurns = -1;
+    private static String debugRunSave = null;
 
     private static boolean usesExperimentalAI = false;
 
@@ -585,6 +587,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.debuglevel"))
                           .hasOptionalArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("debug-run")
+                          .withDescription(Messages.message("cli.debug-run"))
+                          .withArgName(Messages.message("cli.arg.debugRun"))
+                          .hasOptionalArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("private")
                           .withDescription(Messages.message("cli.private"))
                           .create());
@@ -730,8 +737,20 @@ public final class FreeCol {
                     debugLevel = DEBUG_FULL;
                 }
                 // user set log level has precedence
-                if (!line.hasOption("log-level")){
+                if (!line.hasOption("log-level")) {
                     logLevel = Level.FINEST;
+                }
+                if (line.hasOption("debug-run")) {
+                    String opt = line.getOptionValue("debug-run");
+                    int comma = opt.indexOf(",");
+                    String turns = opt.substring(0, (comma < 0) ? opt.length()
+                                                 : comma);
+                    try {
+                        debugRunTurns = Integer.parseInt(turns);
+                    } catch (NumberFormatException e) {
+                        debugRunTurns = -1;
+                    }
+                    if (comma > 0) debugRunSave = opt.substring(comma + 1);
                 }
             }
             if (line.hasOption("server")) {
@@ -837,6 +856,40 @@ public final class FreeCol {
      */
     public static void setInDebugMode(boolean debug) {
         debugLevel = (debug) ? DEBUG_FULL : DEBUG_OFF;
+    }
+
+    /**
+     * Gets the turns to run in debug mode.
+     *
+     * @return The turns to run in debug mode.
+     */
+    public static int getDebugRunTurns() {
+        return debugRunTurns;
+    }
+
+    /**
+     * Complete debug run.
+     */
+    public static void completeDebugRun() {
+        debugRunTurns = 0;
+    }
+
+    /**
+     * Is a debug run complete?
+     *
+     * @return True if a debug run is complete.
+     */
+    public static boolean isDebugRunComplete() {
+        return debugRunTurns == 0;
+    }
+
+    /**
+     * Gets the name of a file to save to at the end of a debug run.
+     *
+     * @return The name of a file to save to at the end of a debug run.
+     */
+    public static String getDebugRunSaveName() {
+        return debugRunSave;
     }
 
     /**
