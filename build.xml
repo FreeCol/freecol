@@ -745,7 +745,7 @@
       <pmd shortFilenames="true">
         <ruleset>basic</ruleset>
         <ruleset>imports</ruleset>
-        <ruleset>optimizations</ruleset>
+        <!-- <ruleset>optimizations</ruleset> -->
         <ruleset>unusedcode</ruleset>
         <formatter type="html" toFile="pmd_report.html" linkPrefix="http://pmd.sourceforge.net/xref/"/>
         <fileset dir="src">

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -40,15 +39,10 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
-    private static final int OK = 0;
-    
-    private JLabel header;
-
-    private JLabel imageLabel;
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      * @param type The type of this panel.
      */
@@ -56,75 +50,53 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
         super(parent);
 
-        setLayout(new MigLayout("", "", ""));
+        setLayout(new MigLayout("wrap 1", "[center]", "[]20"));
 
-        header = new JLabel();
-        header.setFont(mediumHeaderFont);
-
-        imageLabel = new JLabel();
-
+        // TODO: simplify this -- event should contain the necessary
+        // information; add it to enum or upgrade to class
+        String text = null;
+        String image = null;
         switch(type) {
         case FIRST_LANDING:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
-            header.setText(Messages.message(StringTemplate.template("event.firstLanding")
-                                            .addName("%name%", Messages.getNewLandName(getMyPlayer()))));
+            image = "EventImage.firstLanding";
+            text = Messages.message(StringTemplate.template("event.firstLanding")
+                                    .addName("%name%", Messages.getNewLandName(getMyPlayer())));
             break;
         case MEETING_EUROPEANS:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingEuropeans")));
-            header.setText(Messages.message("event.meetingEuropeans"));
+            image = "EventImage.meetingEuropeans";
+            text = Messages.message("event.meetingEuropeans");
             break;
         case MEETING_NATIVES:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));
-            header.setText(Messages.message("event.meetingNatives"));
+            image = "EventImage.meetingNatives";
+            text = Messages.message("event.meetingNatives");
             break;
         case MEETING_AZTEC:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingAztec")));
-            header.setText(Messages.message("event.meetingAztec"));
+            image = "EventImage.meetingAztec";
+            text = Messages.message("event.meetingAztec");
             break;
         case MEETING_INCA:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingInca")));
-            header.setText(Messages.message("event.meetingInca"));
+            image = "EventImage.meetingInca";
+            text = Messages.message("event.meetingInca");
             break;
         case DISCOVER_PACIFIC:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.discoverPacific")));
-            header.setText(Messages.message("model.region.pacific.discover"));
+            image = "EventImage.discoverPacific";
+            text = Messages.message("model.region.pacific.discover");
             break;
         default:
             setResponse(Boolean.FALSE);
         }
 
-        add(header, "align center, wrap 20");
+        JLabel header = new JLabel(text);
+        header.setFont(mediumHeaderFont);
+
+        JLabel imageLabel = new JLabel(new ImageIcon(ResourceManager.getImage(image)));
+
+        add(header);
         add(imageLabel);
-        add(okButton, "newline 20, tag ok");
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
+        add(okButton, "tag ok");
 
         setSize(getPreferredSize());
-        enterPressesWhenFocused(okButton);
-    }
-    
-    public void requestFocus() {
-        okButton.requestFocus();
+
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(new Boolean(true));
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
 }

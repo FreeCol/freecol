@@ -420,12 +420,22 @@ public class DebugMenu extends JMenu {
         panelMenu.add(monarchPanel);
 
         final JMenuItem victoryPanel = new JMenuItem("Display Victory panel");
-        monarchPanel.addActionListener(new ActionListener() {
+        victoryPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     canvas.showPanel(new VictoryPanel(canvas));
                 }
             });
         panelMenu.add(victoryPanel);
+
+        for (final Canvas.EventType eventType : Canvas.EventType.values()) {
+            final JMenuItem mItem = new JMenuItem("Display " + eventType + " panel");
+            mItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        canvas.showEventPanel(eventType);
+                    }
+                });
+            panelMenu.add(mItem);
+        }
         this.add(panelMenu);
 
         final JMenuItem europeStatus = new JMenuItem("Display Europe Status");
