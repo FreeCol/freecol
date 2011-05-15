@@ -1141,17 +1141,17 @@ public final class InGameInputHandler extends InputHandler {
          */
         public final void run() {
             try {
-                if (taskLogger.isLoggable(Level.FINEST)) {
-                    taskLogger.log(Level.FINEST, "Running Swing task " + getClass().getName() + "...");
-                }
+                taskLogger.log(Level.FINEST, "Running Swing task "
+                               + getClass().getName() + "...");
 
                 setResult(doWork());
 
-                if (taskLogger.isLoggable(Level.FINEST)) {
-                    taskLogger.log(Level.FINEST, "Swing task " + getClass().getName() + " returned " + _result);
-                }
+                taskLogger.log(Level.FINEST, "Swing task "
+                               + getClass().getName()
+                               + " returned " + _result);
             } catch (RuntimeException e) {
-                taskLogger.log(Level.WARNING, "Swing task " + getClass().getName() + " failed!", e);
+                taskLogger.log(Level.WARNING, "Swing task "
+                               + getClass().getName() + " failed!", e);
                 // Let the exception bubble up if the calling thread is waiting
                 if (isSynchronous()) {
                     throw e;

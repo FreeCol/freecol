@@ -702,7 +702,8 @@ public class TransportMission extends Mission {
                 unavailLoc.add(destLoc);
                 continue;
             }
-            logger.finest("Transporting " + transportable + " to " + destLoc);
+            logger.finest("Transporting " + transportable.getId()
+                          + " to " + destLoc);
             boolean moveToEurope = destLoc instanceof Europe;
             return new Destination(moveToEurope,path);
         }
