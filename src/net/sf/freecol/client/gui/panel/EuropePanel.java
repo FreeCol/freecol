@@ -705,6 +705,7 @@ public final class EuropePanel extends FreeColPanel {
          * Initializes this DocksPanel.
          */
         public void initialize() {
+            setLayout(new MigLayout("wrap 6"));
             addPropertyChangeListeners();
             update();
         }
