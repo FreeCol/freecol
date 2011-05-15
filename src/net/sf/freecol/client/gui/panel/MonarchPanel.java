@@ -136,9 +136,9 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            setResponse(new Boolean(true));
+            setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {
-            setResponse(new Boolean(false));
+            setResponse(Boolean.FALSE);
         } else {
             logger.warning("Invalid action command: " + command);
         }
