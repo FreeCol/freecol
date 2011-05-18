@@ -656,15 +656,10 @@ public final class FreeColServer {
             }
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
-            Iterator<FreeColGameObject> fcgoIterator
-                = game.getFreeColGameObjectIterator();
-            while (fcgoIterator.hasNext()) {
-                FreeColGameObject fcgo = fcgoIterator.next();
-                if (fcgo instanceof ServerModelObject) {
-                    xsw.writeStartElement(((ServerModelObject) fcgo).getServerXMLElementTagName());
-                    xsw.writeAttribute("ID", fcgo.getId());
-                    xsw.writeEndElement();
-                }
+            for (ServerModelObject smo : game.getServerModelObjects()) {
+                xsw.writeStartElement(smo.getServerXMLElementTagName());
+                xsw.writeAttribute("ID", ((FreeColGameObject) smo).getId());
+                xsw.writeEndElement();
             }
             xsw.writeEndElement();
             // Add the game:
