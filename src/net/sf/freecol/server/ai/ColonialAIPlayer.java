@@ -663,7 +663,7 @@ public class ColonialAIPlayer extends AIPlayer {
             AIUnit au = it.next();
             if (!au.hasMission()
                     && (au.getUnit().getLocation() instanceof ColonyTile || au.getUnit().getLocation() instanceof Building)) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getColony());
+                AIColony ac = getAIColony(au.getUnit().getColony());
                 au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
             }
         }
@@ -931,8 +931,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
                     boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
                     if (isUnitOnCarrier) {
-                        AIUnit carrier = (AIUnit) getAIMain().getAIObject(
-                                (FreeColGameObject) aiUnit.getUnit().getLocation());
+                        AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit().getLocation());
 
                         //make verification of carrier mission
                         Mission carrierMission = carrier.getMission();
@@ -1375,7 +1374,7 @@ public class ColonialAIPlayer extends AIPlayer {
             Location transportableLoc = t.getTransportLocatable().getLocation();
             boolean isTransportableAlreadyOnCarrier = transportableLoc instanceof Unit;
             if (isTransportableAlreadyOnCarrier) {
-                AIUnit carrierAI = (AIUnit) getAIMain().getAIObject((Unit) transportableLoc);
+                AIUnit carrierAI = getAIUnit((Unit) transportableLoc);
                 Mission m = carrierAI.getMission();
                 if (m instanceof TransportMission) {
                     ((TransportMission) m).addToTransportList(t);
@@ -1484,7 +1483,7 @@ public class ColonialAIPlayer extends AIPlayer {
             Iterator<Unit> unitsIterator = getPlayer().getUnitIterator();
             while (unitsIterator.hasNext()) {
                 Unit theUnit = unitsIterator.next();
-                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
+                AIUnit a = getAIUnit(theUnit);
                 if (a != null) {
                     if (a.getGoal() == null) au.add(a);
                 } else {

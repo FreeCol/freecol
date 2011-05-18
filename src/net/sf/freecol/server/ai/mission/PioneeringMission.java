@@ -142,7 +142,7 @@ public class PioneeringMission extends Mission {
     }
 
     private void updateTileImprovementPlan() {
-        final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
+        final AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
         final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
 
         Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
@@ -399,7 +399,7 @@ public class PioneeringMission extends Mission {
     private void equipUnitWithTools(Connection connection) {
         Unit unit = getUnit();
         logger.finest("About to equip " + unit + " in " + colonyWithTools.getName());
-        AIColony ac = (AIColony) getAIMain().getAIObject(colonyWithTools);
+        AIColony ac = getAIMain().getAIColony(colonyWithTools);
         EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
         int amount = toolsType.getMaximumCount();
         for (AbstractGoods materials : toolsType.getGoodsRequired()) {
@@ -500,7 +500,7 @@ public class PioneeringMission extends Mission {
             return false;
         }
 
-        AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getId());
+        AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(aiUnit.getUnit().getOwner());
         Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
 
 
@@ -553,7 +553,7 @@ public class PioneeringMission extends Mission {
                 continue;
             }
 
-            AIColony ac = (AIColony) aiu.getAIMain().getAIObject(colony);
+            AIColony ac = aiu.getAIMain().getAIColony(colony);
             // Sanitation
             if(ac == null){
                 continue;
@@ -595,11 +595,9 @@ public class PioneeringMission extends Mission {
         List<AIUnit> list = new ArrayList<AIUnit>();
 
         AIMain aiMain = aiPlayer.getAIMain();
-        for(Unit u : aiPlayer.getPlayer().getUnits()){
-            AIUnit aiu =  (AIUnit) aiMain.getAIObject(u);
-            if(aiu == null){
-                continue;
-            }
+        for (Unit u : aiPlayer.getPlayer().getUnits()) {
+            AIUnit aiu = aiMain.getAIUnit(u);
+            if (aiu == null) continue;
             if(aiu.getMission() instanceof PioneeringMission){
                 list.add(aiu);
             }

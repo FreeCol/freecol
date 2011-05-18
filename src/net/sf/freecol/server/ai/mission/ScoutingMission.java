@@ -125,7 +125,7 @@ public class ScoutingMission extends Mission {
 
         if (getUnit().getRole() != Unit.Role.SCOUT) {
             if (getUnit().getColony() != null) {
-                AIColony colony = (AIColony) getAIMain().getAIObject(getUnit().getColony());
+                AIColony colony = getAIMain().getAIColony(getUnit().getColony());
                 for (EquipmentType equipment : getAIMain().getGame().getSpecification().getEquipmentTypeList()) {
                     if (equipment.getRole() == Unit.Role.SCOUT && getUnit().canBeEquippedWith(equipment)
                             && colony.canBuildEquipment(equipment)) {

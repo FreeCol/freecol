@@ -184,7 +184,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      *            XML tree) that holds all the information.
      */
     private Element setCurrentPlayer(final DummyConnection connection, final Element setCurrentPlayerElement) {
-        logger.finest("Entering setCurrentPlayer");
         final Game game = freeColServer.getGame();
         final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
@@ -202,7 +201,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             };
             t.start();
         }
-        logger.finest("About to exit from setCurrentPlayerElement.");
         return null;
     }
 
@@ -336,17 +334,12 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     }
 
     /**
-     * 
      * Gets the <code>AIPlayer</code> using this
-     * 
      * <code>AIInGameInputHandler</code>.
      * 
-     * 
-     * 
      * @return The <code>AIPlayer</code>.
-     * 
      */
-    public AIPlayer getAIPlayer() {
-        return (AIPlayer) aiMain.getAIObject(serverPlayer);
+    private AIPlayer getAIPlayer() {
+        return aiMain.getAIPlayer(serverPlayer);
     }
 }

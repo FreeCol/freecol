@@ -486,7 +486,7 @@ public class DebugMenu extends JMenu {
                                         sb.append(" (Repairing)");
                                     } else {
                                         sb.append("    ");
-                                        AIUnit aiu = (AIUnit) aiMain.getAIObject(u);
+                                        AIUnit aiu = aiMain.getAIUnit(u);
                                         if (aiu.getMission() == null) {
                                             sb.append(" (None)");
                                         } else{
@@ -513,7 +513,7 @@ public class DebugMenu extends JMenu {
         useAI.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     net.sf.freecol.server.ai.AIMain aiMain = server.getAIMain();
-                    net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) aiMain.getAIObject(player.getId());
+                    net.sf.freecol.server.ai.AIPlayer ap = aiMain.getAIPlayer(player);
                     ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                     ap.startWorking();
                     freeColClient.getConnectController().reconnect();

@@ -248,8 +248,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
                     boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
                     if (isUnitOnCarrier) {
-                        AIUnit carrier = (AIUnit) getAIMain().getAIObject(
-                                                                          (FreeColGameObject) aiUnit.getUnit().getLocation());
+                        AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit().getLocation());
 
                         //make verification of carrier mission
                         Mission carrierMission = carrier.getMission();

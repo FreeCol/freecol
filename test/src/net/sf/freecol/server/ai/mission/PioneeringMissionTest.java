@@ -67,7 +67,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
                                        UnitState.ACTIVE, toolsEqType);
 
         // Setup mission
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(colonist);
+        AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
         Tile improvementTarget = map.getTile(10, 10);
         TileImprovementType roadImprovement = spec().getTileImprovementType("model.improvement.road");

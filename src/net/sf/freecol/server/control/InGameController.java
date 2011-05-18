@@ -568,6 +568,7 @@ public final class InGameController extends Controller {
                 for (Player p : player.getRebels()) {
                     csGiveIndependence(player, (ServerPlayer) p, cs);
                 }
+                player.csWithdraw(cs);
                 sendToAll(cs);
                 logger.info(player.getNation() + " is defeated.");
                 continue;
@@ -1118,7 +1119,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%newNation%", serverPlayer.getNationName())
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
-        serverPlayer.csChangeStance(Stance.WAR, refPlayer, false, cs);
+        serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
 
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
@@ -1234,8 +1235,8 @@ public final class InGameController extends Controller {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
             sellGoods = indianSettlement.getSellGoods();
             if (!sellGoods.isEmpty()) {
-                AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain()
-                    .getAIObject(indianSettlement.getOwner());
+                AIPlayer aiPlayer = getFreeColServer()
+                    .getAIPlayer(indianSettlement.getOwner());
                 for (Goods goods : sellGoods) {
                     aiPlayer.registerSellGoods(goods);
                 }
@@ -1271,8 +1272,7 @@ public final class InGameController extends Controller {
         }
 
         // AI considers the proposition, return with a gold value
-        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
-            .getAIObject(settlement.getOwner());
+        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int gold = ai.buyProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
@@ -1305,8 +1305,7 @@ public final class InGameController extends Controller {
         }
 
         // AI considers the proposition, return with a gold value
-        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain()
-            .getAIObject(settlement.getOwner());
+        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int gold = ai.sellProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
@@ -2143,7 +2142,7 @@ public final class InGameController extends Controller {
 
         // Check that this is the agreement that was made
         settlement.makeContactSettlement(serverPlayer);
-        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.buyProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
@@ -2201,7 +2200,7 @@ public final class InGameController extends Controller {
 
         settlement.makeContactSettlement(serverPlayer);
         // Check that the gold is the agreed amount
-        AIPlayer ai = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.sellProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");

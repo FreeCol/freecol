@@ -81,14 +81,14 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create attacking player and units
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIObject(dutch.getId());
+        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Tile tile2 = map.getTile(2, 1);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         Unit friendlyColonist = new ServerUnit(game, tile2, dutch, colonistType, UnitState.ACTIVE);
         
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(soldier);
+        AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
@@ -121,7 +121,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer incaPlayer = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIObject(incaPlayer.getId());
+        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(incaPlayer);
         ServerPlayer dutchPlayer = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile dutchUnitTile = map.getTile(9, 9);
@@ -132,14 +132,14 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Player.makeContact(incaPlayer, dutchPlayer);
 
-        assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+        assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
 
         incaPlayer.setTension(dutchPlayer, new Tension(Tension.Level.HATEFUL.getLimit()));
-        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
 
         incaPlayer.setStance(dutchPlayer, Stance.WAR);
         dutchPlayer.setStance(incaPlayer, Stance.WAR);
-        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
     }
 	
     public void testGiveMilitaryMission() {
@@ -149,12 +149,12 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create attacking player and units
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIObject(dutch.getId());
+        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(soldier);
+        AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
         
         // Create defending player
@@ -197,12 +197,12 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIObject(dutch.getId());
+        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(soldier);
+        AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
                 
         aiDutch.giveMilitaryMission(aiUnit);
@@ -248,7 +248,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer inca = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIObject(inca.getId());
+        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(inca);
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile settlementTile = map.getTile(9, 9);
@@ -272,7 +272,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         while(campUnitIter.hasNext()){
             Unit brave = campUnitIter.next();
             assertNotNull("Got null while getting the camps units", brave);
-            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+            AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);
 
             aiInca.giveMilitaryMission(aiUnit);
@@ -295,7 +295,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         // Verify if a unit was assigned a UnitSeekAndDestroyMission
         boolean isSeekAndDestroyMission = false;
         for(Unit brave : inca.getUnits()){
-            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+            AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get aiUnit for players brave",aiUnit);
             assertNotNull("Unit missing mission",aiUnit.getMission());
 
@@ -321,7 +321,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer inca = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIObject(inca.getId());
+        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(inca);
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile settlementTile = map.getTile(9, 9);
@@ -342,7 +342,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertEquals("Galleon should be full",0,galleon.getSpaceLeft());
 
         for(Unit brave : camp.getUnitList()){
-            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+            AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
 
             aiInca.giveMilitaryMission(aiUnit);
@@ -364,7 +364,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         boolean notUnitWanderHostileMission = false;
         for(Unit brave : inca.getUnits()){
-            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+            AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
 
             boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;

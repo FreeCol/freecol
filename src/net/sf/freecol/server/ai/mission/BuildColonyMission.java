@@ -229,8 +229,7 @@ public class BuildColonyMission extends Mission {
                 if (AIMessage.askBuildColony(getAIUnit(), Player.ASSIGN_SETTLEMENT_NAME)
                     && target.getSettlement() != null) {
                     colonyBuilt = true;
-                    AIColony aiColony = (AIColony) getAIMain()
-                        .getAIObject(target.getSettlement());
+                    AIColony aiColony = getAIMain().getAIColony(target.getColony());
                     getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
                 } else {
                     logger.warning("Could not build an AI colony on tile "

@@ -2713,8 +2713,8 @@ public final class GUI {
             && freeColClient.getFreeColServer() != null
             && (unit.getOwner().isAI()
                 || unit.hasAbility("model.ability.piracy"))) {
-            net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit)
-                freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
+            net.sf.freecol.server.ai.AIUnit au = freeColClient
+                .getFreeColServer().getAIMain().getAIUnit(unit);
             if (au != null) {
                 g.setColor(Color.WHITE);
                 String text = (unit.getOwner().isAI()) ? "" : "(";

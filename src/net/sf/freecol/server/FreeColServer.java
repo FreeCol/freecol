@@ -88,6 +88,7 @@ import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.InGameInputHandler;
@@ -382,7 +383,7 @@ public final class FreeColServer {
             }
             if (navalUnits.size() > 0) {
                 UnitType navalType = navalUnits.get(Utils.randomInt(logger, "Choose undead navy", random, navalUnits.size()));
-                Unit theFlyingDutchman = new ServerUnit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
+                Unit theFlyingDutchman = new ServerUnit(game, ((Tile) p.getEntryLocation()).getVacantTile(random), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
                     UnitType landType = landUnits.get(random.nextInt(landUnits.size()));
                     new ServerUnit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
@@ -1354,6 +1355,16 @@ public final class FreeColServer {
         addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
         getServer().sendToAll(addNewPlayer, theConnection);
         return aiPlayer;
+    }
+
+    /**
+     * Gets the AI player corresponding to a given player.
+     *
+     * @param player The <code>Player</code> to look up.
+     * @return The corresponding AI player, or null if not found.
+     */
+    public AIPlayer getAIPlayer(Player player) {
+        return getAIMain().getAIPlayer(player);
     }
 
     /**

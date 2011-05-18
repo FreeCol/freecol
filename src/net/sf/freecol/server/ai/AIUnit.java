@@ -364,7 +364,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @return The owning AIPlayer.
      */
     public AIPlayer getAIOwner() {
-        return (AIPlayer) getAIMain().getAIObject(unit.getOwner());
+        return getAIMain().getAIPlayer(unit.getOwner());
     }
 
     public Connection getConnection() {

@@ -134,7 +134,7 @@ public class WishRealizationMission extends Mission {
 
                     if (AIMessage.askWork(getAIUnit(), colony.getVacantWorkLocationFor(getUnit()))) {
                         //getUnit().setLocation(colony);
-                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), (AIColony) getAIMain().getAIObject(colony)));
+                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), getAIMain().getAIColony(colony)));
                     } else {
                         logger.warning("AIunit " + getAIUnit().getId()
                                        + " could not work in " + colony.getId());

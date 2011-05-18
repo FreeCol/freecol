@@ -102,7 +102,7 @@ public class Player extends FreeColGameObject implements Nameable {
         //   ----------------------------------   a = attack
         //   UNCONTACTED  |  -  x  c  x  i    |   c = contact
         //   ALLIANCE     |  x  -  d  x  adit |   d = act of diplomacy
-        //   PEACE        |  x  d  -  x  adit |   i = incitement
+        //   PEACE        |  x  d  -  x  adit |   i = incitement/rebellion
         //   CEASE_FIRE   |  x  d  t  -  adit |   t = change of tension
         //   WAR          |  x  d  ds dt -    |   s = surrender
         //   ----------------------------------   x = invalid

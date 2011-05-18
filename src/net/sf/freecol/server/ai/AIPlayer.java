@@ -100,67 +100,15 @@ public abstract class AIPlayer extends AIObject {
         player = p;
     }
 
-
-    protected AIUnit getAIUnit(Unit unit) {
-        return (AIUnit) getAIMain().getAIObject(unit);
-    }
-
     /**
-     * Helper method to let implementing subclasses clear aiUnits.
-     */
-    protected void clearAIUnits() {
-        aiUnits.clear();
-    }
-
-    /**
-     * Creates a list of AIUnits for the player.
+     * Returns the ID for this <code>AIPlayer</code>. This is the same as the
+     * ID for the {@link Player} this <code>AIPlayer</code> controls.
      *
-     * @return A list of AIUnits.
+     * @return The ID.
      */
-    protected List<AIUnit> createAIUnits() {
-        ArrayList<AIUnit> au = new ArrayList<AIUnit>();
-        for (Unit u : getPlayer().getUnits()) {
-            AIUnit a = getAIUnit(u);
-            if (a != null) {
-                au.add(a);
-            } else {
-                logger.warning("Could not find the AIUnit for: "
-                               + u + " (" + u.getId() + ")");
-            }
-        }
-        return au;
-    }
-
-    /**
-     * Returns an iterator over all the <code>AIUnit</code>s owned by this
-     * player.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    protected Iterator<AIUnit> getAIUnitIterator() {
-        if (aiUnits.size() == 0) {
-            aiUnits = createAIUnits();
-        }
-        return aiUnits.iterator();
-    }
-
-    /**
-     * Returns an iterator over all the <code>AIColony</code>s owned by this
-     * player.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    protected Iterator<AIColony> getAIColonyIterator() {
-        ArrayList<AIColony> ac = new ArrayList<AIColony>();
-        for (Colony colony : getPlayer().getColonies()) {
-            AIColony a = (AIColony) getAIMain().getAIObject(colony.getId());
-            if (a != null) {
-                ac.add(a);
-            } else {
-                logger.warning("Could not find the AIColony for: " + colony);
-            }
-        }
-        return ac.iterator();
+    @Override
+    public String getId() {
+        return player.getId();
     }
 
     /**
@@ -178,7 +126,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     *
      * Sets the <code>Connection</code> to be used while communicating with
      * the server.
      *
@@ -191,15 +138,88 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Returns the ID for this <code>AIPlayer</code>. This is the same as the
-     * ID for the {@link Player} this <code>AIPlayer</code> controls.
-     *
-     * @return The ID.
+     * Clears the cache of AI units.
      */
-    @Override
-    public String getId() {
-        return player.getId();
+    protected void clearAIUnits() {
+        aiUnits.clear();
     }
+
+    /**
+     * Build the cache of AI units.
+     */
+    private void createAIUnits() {
+        clearAIUnits();
+        for (Unit u : getPlayer().getUnits()) {
+            AIUnit a = getAIUnit(u);
+            if (a != null) {
+                aiUnits.add(a);
+            } else {
+                logger.warning("Could not find the AIUnit for: "
+                               + u + " (" + u.getId() + ")");
+            }
+        }
+    }
+
+    /**
+     * Gets a list of AIUnits for the player.
+     *
+     * @return A list of AIUnits.
+     */
+    protected List<AIUnit> getAIUnits() {
+        if (aiUnits.size() == 0) createAIUnits();
+        return new ArrayList<AIUnit>(aiUnits);
+    }
+
+    /**
+     * Returns an iterator over all the <code>AIUnit</code>s owned by this
+     * player.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    protected Iterator<AIUnit> getAIUnitIterator() {
+        if (aiUnits.size() == 0) createAIUnits();
+        return aiUnits.iterator();
+    }
+
+    /**
+     * Returns an iterator over all the <code>AIColony</code>s owned by this
+     * player.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    protected Iterator<AIColony> getAIColonyIterator() {
+        ArrayList<AIColony> ac = new ArrayList<AIColony>();
+        for (Colony colony : getPlayer().getColonies()) {
+            AIColony a = getAIColony(colony);
+            if (a != null) {
+                ac.add(a);
+            } else {
+                logger.warning("Could not find the AIColony for: " + colony);
+            }
+        }
+        return ac.iterator();
+    }
+
+    /**
+     * Gets the AI colony corresponding to a given colony, if any.
+     *
+     * @param colony The <code>Colony</code> to look up.
+     * @return The corresponding AI colony or null if not found.
+     */
+    protected AIColony getAIColony(Colony colony) {
+        return getAIMain().getAIColony(colony);
+    }
+
+    /**
+     * Gets the AI unit corresponding to a given unit, if any.
+     *
+     * @param unit The <code>Unit</code> to look up.
+     * @return The corresponding AI unit or null if not found.
+     */
+    protected AIUnit getAIUnit(Unit unit) {
+        return getAIMain().getAIUnit(unit);
+    }
+
 
     /**
      * Helper function for server communication - Ask the server
@@ -288,14 +308,9 @@ public abstract class AIPlayer extends AIObject {
 
 
     /**
-     *
      * Tells this <code>AIPlayer</code> to make decisions. The
      * <code>AIPlayer</code> is done doing work this turn when this method
      * returns.
-     *
-     * NOTE: For the moment, any implementation of this _must_ make sure
-     * to call checkForREFDefeat() at the start of a turn,
-     * if the player this AI works for isREF(). See TODO at that method.
      */
     public abstract void startWorking();
 

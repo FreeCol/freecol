@@ -189,7 +189,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                     Unit newDefender = is.getFirstUnit();
                     newDefender.setState(UnitState.ACTIVE);
                     newDefender.setLocation(is.getTile());
-                    AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
+                    AIUnit newDefenderAI = getAIUnit(newDefender);
                     if (bestTarget != null) {
                         newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
                                                                                bestTarget));
@@ -217,7 +217,7 @@ public class IndianAIPlayer extends NewAIPlayer {
             int alreadyAssignedUnits = 0;
             Iterator<Unit> ownedUnits = indianSettlement.getOwnedUnitsIterator();
             while (ownedUnits.hasNext()) {
-                if (((AIUnit) getAIMain().getAIObject(ownedUnits.next())).getMission() instanceof IndianBringGiftMission) {
+                if (getAIUnit(ownedUnits.next()).getMission() instanceof IndianBringGiftMission) {
                     alreadyAssignedUnits++;
                 }
             }
@@ -237,7 +237,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                 Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
-                    chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
+                    chosenOne = getAIUnit(it2.next());
                     if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
                         chosenOne = null;
                     } else if (chosenOne.getMission() == null
@@ -272,7 +272,7 @@ public class IndianAIPlayer extends NewAIPlayer {
             int alreadyAssignedUnits = 0;
             Iterator<Unit> ownedUnits = indianSettlement.getOwnedUnitsIterator();
             while (ownedUnits.hasNext()) {
-                if (((AIUnit) getAIMain().getAIObject(ownedUnits.next())).getMission() instanceof IndianDemandMission) {
+                if (getAIUnit(ownedUnits.next()).getMission() instanceof IndianDemandMission) {
                     alreadyAssignedUnits++;
                 }
             }
@@ -307,7 +307,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                 Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
-                    chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
+                    chosenOne = getAIUnit(it2.next());
                     if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
                         chosenOne = null;
                     } else if (chosenOne.getMission() == null

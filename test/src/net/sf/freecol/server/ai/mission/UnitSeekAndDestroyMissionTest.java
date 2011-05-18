@@ -61,7 +61,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Tile tile1 = map.getTile(2, 2);
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
                                        UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(attacker);
+        AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
@@ -83,7 +83,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         assertTrue("Attacking unit should have been captured", attacker.getOwner() == player2);
         
         // re-check unit mission
-        aiUnit = (AIUnit) aiMain.getAIObject(attacker);
+        aiUnit = aiMain.getAIUnit(attacker);
         assertFalse("Captured unit should lose previous mission", aiUnit.getMission() == null);
         
     }
@@ -98,7 +98,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         Tile tile1 = map.getTile(2, 2);
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
                                        UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(attacker);
+        AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit

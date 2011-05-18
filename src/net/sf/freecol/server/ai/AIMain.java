@@ -213,40 +213,71 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
 
 
     /**
-    * Gets the <code>AIObject</code> for the given
-    * <code>FreeColGameObject</code>.
-    *
-    * @param fcgo The <code>FreeColGameObject</code> to find
-    *        the <code>AIObject</code> for.
-    * @see #getAIObject(String)
-    * @return The <code>AIObject</code>.
-    */
+     * Gets the <code>AIObject</code> for the given
+     * <code>FreeColGameObject</code>.
+     *
+     * @param fcgo The <code>FreeColGameObject</code> to find
+     *        the <code>AIObject</code> for.
+     * @see #getAIObject(String)
+     * @return The <code>AIObject</code>.
+     */
     public AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getId());
     }
 
-
     /**
-    * Gets the <code>AIObject</code> identified by the given ID.
-    *
-    * @param id The ID of the <code>AIObject</code>.
-    * @see #getAIObject(FreeColGameObject)
-    * @return The <code>AIObject</code>.
-    */
+     * Gets the <code>AIObject</code> identified by the given ID.
+     *
+     * @param id The ID of the <code>AIObject</code>.
+     * @see #getAIObject(FreeColGameObject)
+     * @return The <code>AIObject</code>.
+     */
     public AIObject getAIObject(String id) {        
         return aiObjects.get(id);
     }
 
+    /**
+     * Gets the AI colony corresponding to a given colony.
+     *
+     * @param colony The <code>Colony</code> to look up.
+     * @return The corresponding AI colony, or null if not found.
+     */
+    public AIColony getAIColony(Colony colony) {
+        AIObject aio = getAIObject(colony.getId());
+        return (aio instanceof AIColony) ? (AIColony) aio : null;
+    }
 
     /**
-    * Adds a reference to the given <code>AIObject</code>.
-    *
-    * @param id The ID of the <code>AIObject</code>.
-    * @param aiObject The <code>AIObject</code> to store a reference
-    *        for.
-    * @exception IllegalStateException if an <code>AIObject</code> with
-    *       the same <code>id</code> has already been created.
-    */
+     * Gets the AI player corresponding to a given player.
+     *
+     * @param player The <code>Player</code> to look up.
+     * @return The corresponding AI player, or null if not found.
+     */
+    public AIPlayer getAIPlayer(Player player) {
+        AIObject aio = getAIObject(player.getId());
+        return (aio instanceof AIPlayer) ? (AIPlayer) aio : null;
+    }
+
+    /**
+     * Gets the AI unit corresponding to a given unit.
+     *
+     * @param unit The <code>Unit</code> to look up.
+     * @return The corresponding AI unit, or null if not found.
+     */
+    public AIUnit getAIUnit(Unit unit) {
+        AIObject aio = getAIObject(unit.getId());
+        return (aio instanceof AIUnit) ? (AIUnit) aio : null;
+    }
+
+    /**
+     * Adds a reference to the given <code>AIObject</code>.
+     *
+     * @param id The ID of the <code>AIObject</code>.
+     * @param aiObject The <code>AIObject</code> to store a reference
+     *        for.
+     * @exception IllegalStateException if an <code>AIObject</code> with
+     *       the same <code>id</code> has already been created.
+     */
     public void addAIObject(String id, AIObject aiObject) {
         if (aiObjects.containsKey(id)) {
             throw new IllegalStateException("AIObject already created: " + id);
@@ -259,23 +290,23 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
 
 
     /**
-    * Removes a reference to the given <code>AIObject</code>.
-    *
-    * @param id The ID of the <code>AIObject</code>.
-    */
+     * Removes a reference to the given <code>AIObject</code>.
+     *
+     * @param id The ID of the <code>AIObject</code>.
+     */
     public void removeAIObject(String id) {
         aiObjects.remove(id);
     }
 
 
     /**
-    * Gets the <code>FreeColGameObject</code> with the given ID.
-    * This is just a convenience method for:
-    * {@link Game#getFreeColGameObject}
-    *
-    * @param id The ID of the <code>FreeColGameObject</code> to find.
-    * @return The <code>FreeColGameObject</code>.
-    */
+     * Gets the <code>FreeColGameObject</code> with the given ID.
+     * This is just a convenience method for:
+     * {@link Game#getFreeColGameObject}
+     *
+     * @param id The ID of the <code>FreeColGameObject</code> to find.
+     * @return The <code>FreeColGameObject</code>.
+     */
     public FreeColGameObject getFreeColGameObject(String id) {
         return freeColServer.getGame().getFreeColGameObject(id);
     }

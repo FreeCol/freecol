@@ -387,7 +387,7 @@ public class ColonyPlan {
 
         // add artillery if necessary
         // TODO: at some point, we will have to add ships
-        if (((AIColony) aiMain.getAIObject(colony)).isBadlyDefended()) {
+        if (aiMain.getAIColony(colony).isBadlyDefended()) {
             for (UnitType unitType : buildableDefenders) {
                 if (colony.canBuild(unitType)) {
                     int priority = (profile.getType() == ProfileType.LARGE

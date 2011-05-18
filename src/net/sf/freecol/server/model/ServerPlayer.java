@@ -284,7 +284,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return true;
 
         case ROYAL:
-            return !isWorkForREF();
+            return getRebels().isEmpty();
 
         case UNDEAD:
             return getUnits().isEmpty();
@@ -465,7 +465,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Check if a REF player has lost the war of independence.
+     * Check if a REF player has been defeated and should surrender.
      *
      * @return True if this REF player has been defeated.
      */
@@ -474,22 +474,39 @@ public class ServerPlayer extends Player implements ServerModelObject {
             throw new IllegalStateException("Checking for REF player defeat when player not REF.");
         }
 
-        // Not defeated if there are still rebels to fight.
-        if (!getRebels().isEmpty()) return false;
+        // No one to fight?  Either the rebels are dead, or the REF
+        // was already defeated and the rebels are independent.
+        // Either way, it does not need to surrender.
+        if (getRebels().isEmpty()) return false;
 
         // Not defeated if there are settlements.
         if (!getSettlements().isEmpty()) return false;
 
         // Not defeated if there is a non-zero navy and enough land units.
         final int landREFUnitsRequired = 7; // TODO: magic number
+        final CombatModel cm = getGame().getCombatModel();
         boolean naval = false;
         int land = 0;
+        int power = 0;
         for (Unit u : getUnits()) {
             if (u.isNaval()) naval = true; else {
-                if (u.hasAbility("model.ability.refUnit")) land++;
+                if (u.hasAbility("model.ability.refUnit")) {
+                    land++;
+                    power += cm.getOffencePower(u, null);
+                }
             }
         }
         if (naval && land >= landREFUnitsRequired) return false;
+
+        // Still not defeated as long as military strength is greater
+        // than the rebels.
+        int rebelPower = 0;
+        for (Player rebel : getRebels()) {
+            for (Unit r : rebel.getUnits()) {
+                if (!r.isNaval()) rebelPower += cm.getOffencePower(r, null);
+            }
+        }
+        if (power > rebelPower) return false;
 
         // REF is defeated
         return true;

@@ -289,7 +289,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case TO_AMERICA:
             logger.info(toString() + " arrives in America");
-            csMove(getVacantEntryLocation(random), random, cs);
+            csMove(getFullEntryLocation().getVacantTile(random), random, cs);
             break;
         case FORTIFYING:
             setState(UnitState.FORTIFIED);
@@ -423,32 +423,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              loc.getLocationNameFor(owner)));
         }
         cs.addPartial(See.only(owner), this, "hitpoints");
-    }
-
-    /**
-     * Finds a suitable tile to put this unit on return from Europe.
-     * If this unit has not not been outside Europe before, it will
-     * return the default value from the owner.
-     *
-     * @param random A pseudo-random number source.
-     * @return A suitable entry location for this unit.
-     * @see #getEntryLocation
-     */
-    private Tile getVacantEntryLocation(Random random) {
-        Tile tile = getFullEntryLocation();
-        if (tile.getFirstUnit() == null
-            || tile.getFirstUnit().getOwner() == getOwner()) return tile;
-
-        for (int r = 1; true; r++) {
-            List<Tile> tiles = tile.getSurroundingTiles(r, r);
-            Collections.shuffle(tiles, random);
-            for (Tile t : tiles) {
-                if (t.getFirstUnit() == null
-                    || t.getFirstUnit().getOwner() == getOwner()) {
-                    return t;
-                }
-            }
-        }
     }
 
     /**

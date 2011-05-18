@@ -117,7 +117,7 @@ public class AIColonyTest extends FreeColTestCase {
             = colony.getBuildingForProducing(hammersType);
         final Building blacksmithHouse
             = colony.getBuildingForProducing(toolsType);
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
         aiColony.propertyChange(null); // force rearranging workers
@@ -166,7 +166,7 @@ public class AIColonyTest extends FreeColTestCase {
         final Building blacksmithHouse
             = colony.getBuildingForProducing(toolsType);
 
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
         aiColony.propertyChange(null); // force rearranging workers
 
@@ -216,7 +216,7 @@ public class AIColonyTest extends FreeColTestCase {
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
         Unit lumberjack = colony.getUnitList().get(0);
 
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        AIColony aiColony = aiMain.getAIColony(colony);
 
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers(player.getConnection());
@@ -239,7 +239,7 @@ public class AIColonyTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony = getStandardColony(1);
-        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        AIColony aiColony = aiMain.getAIColony(colony);
         game.setCurrentPlayer(colony.getOwner());
         final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();

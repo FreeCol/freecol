@@ -315,9 +315,8 @@ public class PrivateerMission extends Mission {
             }
         }
 
-        List<Unit> unitLst = new ArrayList<Unit>(unit.getUnitList());
-        for(Unit u : unitLst){
-            unitLeavesShip((AIUnit) getAIMain().getAIObject(u));
+        for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
+            unitLeavesShip(getAIMain().getAIUnit(u));
         }
     }
 
@@ -330,7 +329,7 @@ public class PrivateerMission extends Mission {
      */
     public static boolean isValid(AIUnit aiUnit) {
         Unit unit = aiUnit.getUnit();
-        AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
+        AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(unit.getOwner());
         return unit != null
             && unit.isNaval() && unit.hasAbility("model.ability.piracy")
             && !unit.isUnderRepair()

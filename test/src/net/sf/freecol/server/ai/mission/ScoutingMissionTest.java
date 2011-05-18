@@ -69,7 +69,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Setup mission
         // this will call AIPlayer.giveNormalMissions() and set the scout mission
 
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(scout);
+        AIUnit aiUnit = aiMain.getAIUnit(scout);
         assertNotNull(aiUnit);
         assertTrue("Scouting mission should be assignable to scout",ScoutingMission.isValid(aiUnit));
         aiUnit.setMission(new ScoutingMission(aiMain,aiUnit));

@@ -62,7 +62,7 @@ public class TensionTest extends FreeColTestCase {
 
         ServerPlayer european = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer indian = (ServerPlayer) game.getPlayer("model.nation.tupi");
-        StandardAIPlayer indianAI = (StandardAIPlayer)aiMain.getAIObject(indian.getId());
+        StandardAIPlayer indianAI = (StandardAIPlayer)aiMain.getAIPlayer(indian);
 
         // initially, the players are unknown to each other
         Tension tension = indian.getTension(european);
@@ -137,7 +137,7 @@ public class TensionTest extends FreeColTestCase {
         Iterator<Unit> iter = settlement.getOwnedUnitsIterator();
         while (iter.hasNext()) {
             Unit brave = iter.next();
-            AIUnit aiBrave = (AIUnit) aiMain.getAIObject(brave);
+            AIUnit aiBrave = aiMain.getAIUnit(brave);
             if (aiBrave.getMission() instanceof UnitSeekAndDestroyMission) {
                 fail();
             }

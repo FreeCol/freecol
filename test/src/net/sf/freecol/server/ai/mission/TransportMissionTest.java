@@ -75,14 +75,14 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull(aiMain);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(dutch.getId());
+        AIPlayer aiPlayer = aiMain.getAIPlayer(dutch);
 
         // Create a ship at sea carrying a colonist
         Tile tile1 = map.getTile(12, 9);
         
         Unit galleon = new ServerUnit(game, tile1, dutch, galleonType,
                                       UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
         assertTrue(galleon.hasAbility("model.ability.navalUnit"));
         assertEquals("Galleon should be repaired in Europe",
@@ -131,7 +131,7 @@ public class TransportMissionTest extends FreeColTestCase {
         
         Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType,
                                       UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
         
         // assign transport mission to the ship
@@ -165,7 +165,7 @@ public class TransportMissionTest extends FreeColTestCase {
         
         Unit galleon = new ServerUnit(game, colonyTile, dutch, galleonType,
                                       UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
         
         // assign transport mission to the ship
@@ -201,7 +201,7 @@ public class TransportMissionTest extends FreeColTestCase {
         
         Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType,
                                       UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
         
         // assign transport mission to the ship
@@ -237,7 +237,7 @@ public class TransportMissionTest extends FreeColTestCase {
         Tile galleonTile = map.getTile(9, 10);
         Unit galleon = new ServerUnit(game, galleonTile, dutch, galleonType,
                                       UnitState.ACTIVE);
-        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
         
         // assign transport mission to the ship

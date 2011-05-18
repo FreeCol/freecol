@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1693,6 +1694,26 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         return null;
     }
+
+    /**
+     * Finds an empty tile to put a unit near to this one.
+     * Useful on return from Europe.
+     *
+     * @param random A pseudo-random number source.
+     * @return A vacant tile near this one.
+     */
+    public Tile getVacantTile(Random random) {
+        if (getFirstUnit() == null) return this;
+
+        for (int r = 1; true; r++) {
+            List<Tile> tiles = getSurroundingTiles(r, r);
+            Collections.shuffle(tiles, random);
+            for (Tile t : tiles) {
+                if (t.getFirstUnit() == null) return t;
+            }
+        }
+    }
+
 
     /**
      * Write a minimal version of the tile.  Useful if the player

@@ -166,7 +166,7 @@ public class TransportMission extends Mission {
         Iterator<Unit> ui = carrier.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(u);
+            AIUnit aiUnit = getAIMain().getAIUnit(u);
             if(aiUnit == null){
                 logger.warning("Could not find ai unit");
                 continue;
@@ -769,7 +769,7 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     private void buyCargo(Connection connection) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
+        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
 
         if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
@@ -811,8 +811,7 @@ public class TransportMission extends Mission {
             if (t.getTransportDestination() != null && t.getTransportDestination().getTile() != null
                     && t.getTransportDestination().getTile().getColony() != null
                     && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(
-                        t.getTransportDestination().getTile().getColony().getId());
+                AIColony ac = getAIMain().getAIColony(t.getTransportDestination().getTile().getColony());
                 aiColonies.add(ac);
             }
         }
@@ -821,8 +820,7 @@ public class TransportMission extends Mission {
          * Add the colony containing the wish with the highest value to the
          * "aiColonies"-list:
          */
-        Iterator<Wish> highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId()))
-                .getWishIterator();
+        Iterator<Wish> highValueWishIterator = (getAIMain().getAIPlayer(getUnit().getOwner())).getWishIterator();
         while (highValueWishIterator.hasNext()) {
             Wish w = highValueWishIterator.next();
             if (w.getTransportable() != null) {
@@ -831,14 +829,14 @@ public class TransportMission extends Mission {
             if (w instanceof WorkerWish && w.getDestination() instanceof Colony) {
                 WorkerWish ww = (WorkerWish) w;
                 Colony c = (Colony) ww.getDestination();
-                AIColony ac = (AIColony) getAIMain().getAIObject(c);
+                AIColony ac = getAIMain().getAIColony(c);
                 if (!aiColonies.contains(ac)) {
                     aiColonies.add(ac);
                 }
             } else if (w instanceof GoodsWish && w.getDestination() instanceof Colony) {
                 GoodsWish gw = (GoodsWish) w;
                 Colony c = (Colony) gw.getDestination();
-                AIColony ac = (AIColony) getAIMain().getAIObject(c);
+                AIColony ac = getAIMain().getAIColony(c);
                 if (!aiColonies.contains(ac)) {
                     aiColonies.add(ac);
                 }
@@ -911,7 +909,7 @@ public class TransportMission extends Mission {
      * @return The goods.
      */
     public AIGoods buyGoodsInEurope(Connection connection, GoodsType type, int amount, Location destination) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
+        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
 
@@ -952,7 +950,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
+        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
@@ -965,7 +963,7 @@ public class TransportMission extends Mission {
         while (ui.hasNext()) {
             Unit u = ui.next();
             if (unitType == null || unitType == u.getType()) {
-                return (AIUnit) getAIMain().getAIObject(u.getId());
+                return getAIMain().getAIUnit(u);
             }
         }
 
@@ -1001,7 +999,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getCheapestUnitInEurope(Connection connection) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
+        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
@@ -1016,8 +1014,8 @@ public class TransportMission extends Mission {
         Iterator<Unit> ui = europe.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (!u.isCarrier() && ((AIUnit) getAIMain().getAIObject(u)).getTransport() == null) {
-                return (AIUnit) getAIMain().getAIObject(u.getId());
+            if (!u.isCarrier() && getAIMain().getAIUnit(u).getTransport() == null) {
+                return getAIMain().getAIUnit(u);
             }
         }
 
@@ -1375,15 +1373,15 @@ public class TransportMission extends Mission {
 
         // Verify if empty unit is a privateer and able to be assigned a PrivateerMisison
         if(unit.hasAbility("model.ability.piracy")){
-            AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
-        	// Do not consider this unit mission
-        	int transportMissions = getPlayerNavalTransportMissionCount(aiPlayer,unit);
-        	if(transportMissions > 0){
-        		// there are other naval units doing Transport missions
-        		// this one can do some pirating
-        		logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " does no longer have TransportMission");
-        		return false;
-        	}
+            AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(unit.getOwner());
+            // Do not consider this unit mission
+            int transportMissions = getPlayerNavalTransportMissionCount(aiPlayer,unit);
+            if(transportMissions > 0){
+                // there are other naval units doing Transport missions
+                // this one can do some pirating
+                logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " does no longer have TransportMission");
+                return false;
+            }
         }
 
         return true;
@@ -1459,7 +1457,7 @@ public class TransportMission extends Mission {
             if(!unit.isNaval()){
                 continue;
             }
-            AIUnit aiUnit = (AIUnit) aiPlayer.getAIMain().getAIObject(unit);
+            AIUnit aiUnit = aiPlayer.getAIMain().getAIUnit(unit);
             if(aiUnit.getMission() instanceof TransportMission){
                 units++;
             }

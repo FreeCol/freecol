@@ -129,11 +129,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     protected AIUnit getAIUnit(Unit unit) {
-        return (AIUnit) getAIMain().getAIObject(unit);
+        return getAIMain().getAIUnit(unit);
     }
 
     protected AIPlayer getAIOwner() {
-        return (AIPlayer) getAIMain().getAIObject(colony.getOwner());
+        return getAIMain().getAIPlayer(colony.getOwner());
     }
 
     protected Connection getConnection() {

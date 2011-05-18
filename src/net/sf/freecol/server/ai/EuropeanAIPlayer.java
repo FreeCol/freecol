@@ -114,7 +114,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
             AIUnit au = it.next();
             if (!au.hasMission()
                 && (au.getUnit().getLocation() instanceof ColonyTile || au.getUnit().getLocation() instanceof Building)) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getColony());
+                AIColony ac = getAIMain().getAIColony(au.getUnit().getColony());
                 au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
             }
         }
@@ -723,8 +723,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
             Transportable t = ti.next();
             t.increaseTransportPriority();
             if (t.getTransportLocatable().getLocation() instanceof Unit) {
-                Mission m = ((AIUnit) getAIMain().getAIObject(
-                                                              (FreeColGameObject) t.getTransportLocatable().getLocation())).getMission();
+                Mission m = getAIMain().getAIUnit((Unit) t.getTransportLocatable().getLocation()).getMission();
                 if (m instanceof TransportMission) {
                     ((TransportMission) m).addToTransportList(t);
                 }
@@ -833,7 +832,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
     public Iterator<AIColony> getAIColonyIterator() {
         ArrayList<AIColony> ac = new ArrayList<AIColony>();
         for (Colony colony : getPlayer().getColonies()) {
-            AIColony a = (AIColony) getAIMain().getAIObject(colony.getId());
+            AIColony a = getAIColony(colony);
             if (a != null) {
                 ac.add(a);
             } else {

@@ -24,12 +24,14 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -122,9 +124,117 @@ public abstract class NewAIPlayer extends AIObject {
         readFromXML(in);
     }
 
-    protected AIUnit getAIUnit(Unit unit) {
-        return (AIUnit) getAIMain().getAIObject(unit);
+    /**
+     * Returns the <code>Player</code> this <code>AIPlayer</code> is
+     * controlling.
+     *
+     * @return The <code>Player</code>.
+     */
+    public Player getPlayer() {
+        return player;
     }
+
+    /**
+     * Returns the ID for this <code>AIPlayer</code>. This is the same as the
+     * ID for the {@link Player} this <code>AIPlayer</code> controls.
+     *
+     * @return The ID.
+     */
+    @Override
+    public String getId() {
+        return player.getId();
+    }
+
+    /**
+     * Gets the connection to the server.
+     *
+     * @return The connection that can be used when communication with the
+     *         server.
+     */
+    public Connection getConnection() {
+        if (debuggingConnection != null) {
+            return debuggingConnection;
+        } else {
+            return ((DummyConnection) player.getConnection()).getOtherConnection();
+        }
+    }
+
+    /**
+     * Sets the <code>Connection</code> to be used while communicating with
+     * the server.
+     *
+     * This method is only used for debugging.
+     *
+     * @param debuggingConnection The connection to be used for debugging.
+     */
+    public void setDebuggingConnection(Connection debuggingConnection) {
+        this.debuggingConnection = debuggingConnection;
+    }
+
+    /**
+     * Clears the cache of AI units.
+     */
+    protected void clearAIUnits() {
+        aiUnits.clear();
+    }
+
+    /**
+     * Build the cache of AI units.
+     */
+    private void createAIUnits() {
+        clearAIUnits();
+        for (Unit u : player.getUnits()) {
+            AIUnit a = getAIUnit(u);
+            if (a != null) {
+                aiUnits.add(a);
+            } else {
+                logger.warning("Could not find the AIUnit for: "
+                               + u + " (" + u.getId() + ")");
+            }
+        }
+    }
+
+    /**
+     * Gets a list of all the AIUnits owned by this player.
+     *
+     * @return A list of all the AIUnits owned by this player.
+     */
+    protected List<AIUnit> getAIUnits() {
+        if (aiUnits.size() == 0) createAIUnits();
+        return new ArrayList<AIUnit>(aiUnits);
+    }
+
+    /**
+     * Returns an iterator over all the <code>AIUnit</code>s owned by this
+     * player.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    protected Iterator<AIUnit> getAIUnitIterator() {
+        if (aiUnits.size() == 0) createAIUnits();
+        return aiUnits.iterator();
+    }
+
+    /**
+     * Gets the AI unit corresponding to a given unit, if any.
+     *
+     * @param unit The <code>Unit</code> to look up.
+     * @return The corresponding AI unit or null if not found.
+     */
+    protected AIUnit getAIUnit(Unit unit) {
+        return getAIMain().getAIUnit(unit);
+    }
+
+    /**
+     * Gets the AI colony corresponding to a given colony, if any.
+     *
+     * @param colony The <code>Colony</code> to look up.
+     * @return The corresponding AI colony or null if not found.
+     */
+    protected AIColony getAIColony(Colony colony) {
+        return getAIMain().getAIColony(colony);
+    }
+
 
     /**
      *
@@ -337,80 +447,6 @@ public abstract class NewAIPlayer extends AIObject {
     }
 
     /**
-     * Returns an iterator over all the <code>AIUnit</code>s owned by this
-     * player.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<AIUnit> getAIUnitIterator() {
-        if (aiUnits.size() == 0) {
-            ArrayList<AIUnit> au = new ArrayList<AIUnit>();
-            Iterator<Unit> unitsIterator = player.getUnitIterator();
-            while (unitsIterator.hasNext()) {
-                Unit theUnit = unitsIterator.next();
-                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
-                if (a != null) {
-                    au.add(a);
-                } else {
-                    logger.warning("Could not find the AIUnit for: "
-                                   + theUnit + " (" + theUnit.getId() + ") - "
-                                   + (getGame().getFreeColGameObject(theUnit.getId()) != null));
-                }
-            }
-            aiUnits = au;
-        }
-        return aiUnits.iterator();
-    }
-
-    /**
-     * Returns the <code>Player</code> this <code>AIPlayer</code> is
-     * controlling.
-     *
-     * @return The <code>Player</code>.
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Gets the connection to the server.
-     *
-     * @return The connection that can be used when communication with the
-     *         server.
-     */
-    public Connection getConnection() {
-        if (debuggingConnection != null) {
-            return debuggingConnection;
-        } else {
-            return ((DummyConnection) player.getConnection()).getOtherConnection();
-        }
-    }
-
-    /**
-     *
-     * Sets the <code>Connection</code> to be used while communicating with
-     * the server.
-     *
-     * This method is only used for debugging.
-     *
-     * @param debuggingConnection The connection to be used for debugging.
-     */
-    public void setDebuggingConnection(Connection debuggingConnection) {
-        this.debuggingConnection = debuggingConnection;
-    }
-
-    /**
-     * Returns the ID for this <code>AIPlayer</code>. This is the same as the
-     * ID for the {@link Player} this <code>AIPlayer</code> controls.
-     *
-     * @return The ID.
-     */
-    @Override
-    public String getId() {
-        return player.getId();
-    }
-
-    /**
      * Writes this object to an XML stream.
      *
      * @param out The target stream.
@@ -506,9 +542,5 @@ public abstract class NewAIPlayer extends AIObject {
                 }
             }
         }
-    }
-
-    protected void clearAIUnits() {
-        aiUnits.clear();
     }
 }

@@ -255,7 +255,8 @@ public final class TilePopup extends JPopupMenu {
                 takeOwnership.add(toMenuItem);
                 notEmpty = true;
                 if (currentUnit.isCarrier()) {
-                    final AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(currentUnit);
+                    final AIUnit au = freeColClient.getFreeColServer()
+                        .getAIMain().getAIUnit(currentUnit);
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
                         JMenuItem menuItem = new JMenuItem(currentUnit.toString());
                         menuItem.addActionListener(new ActionListener() {
@@ -292,7 +293,8 @@ public final class TilePopup extends JPopupMenu {
                         // Server:
                         final Game serverGame = freeColClient.getFreeColServer().getGame();
                         final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
-                        final AIColony ac = (AIColony) freeColClient.getFreeColServer().getAIMain().getAIObject(serverTile.getSettlement());
+                        final AIColony ac = freeColClient.getFreeColServer()
+                            .getAIMain().getAIColony(serverTile.getColony());
                         StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());
                         info.append("\n\nTILE IMPROVEMENTS:\n");
                         Iterator<TileImprovementPlan> tipIt = ac.getTileImprovementPlanIterator();

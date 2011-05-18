@@ -123,7 +123,7 @@ public abstract class Wish extends ValuedAIObject {
      */
     public void dispose() {
         if (destination instanceof Colony) {
-            AIColony ac = (AIColony) getAIMain().getAIObject((FreeColGameObject) destination);
+            AIColony ac = (AIColony) getAIMain().getAIColony((Colony) destination);
             ac.removeWish(this);
         } else {
             logger.warning("Unknown destination: " + destination);

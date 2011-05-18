@@ -82,7 +82,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
                                            UnitState.ACTIVE,
                                            musketsEqType, horsesEqType);
 
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
         
         player.reOrganizeSoldiersOfColony(colony);
@@ -114,7 +114,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
                                            UnitState.ACTIVE,
                                            musketsEqType, horsesEqType);
         StandardAIPlayer player
-            = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
+            = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
         
         assertTrue("Free colonist should have horses",freeColonist.getEquipmentCount(horsesEqType) == 1);
@@ -146,7 +146,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
                                             expertSoldierType,
                                             UnitState.ACTIVE,
                                             new EquipmentType[0]);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
 
         assertTrue("Expert soldier should not have any equipment",expertSoldier.getEquipment().isEmpty());
@@ -162,7 +162,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony1.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
         game.setCurrentPlayer(colony1.getOwner());
         Tile col1Tile = colony1.getTile();
         Tile otherTile = col1Tile.getAdjacentTile(Direction.N);
@@ -238,7 +238,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony1.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
         game.setCurrentPlayer(colony1.getOwner());
         Tile col1Tile = colony1.getTile();
 
@@ -268,7 +268,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(camp.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount();
@@ -327,7 +327,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(camp.getOwner());
+        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount() - 1;
