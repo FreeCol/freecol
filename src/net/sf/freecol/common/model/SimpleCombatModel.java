@@ -253,25 +253,28 @@ public class SimpleCombatModel extends CombatModel {
                           .getModifierSet("model.modifier.bombardBonus"));
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
-            if (defenderUnit.getSettlement() != null) {
-                result.addAll(attackerUnit
-                              .getModifierSet("model.modifier.bombardBonus"));
-            } else {
-                // Ambush bonus in the open = defender's defence
-                // bonus, if defender is REF, or attacker is indian.
-                if (isAmbush(attacker, defender)) {
-                    for (Modifier mod : defenderUnit.getTile().getType()
-                             .getModifierSet(Modifier.DEFENCE)) {
-                        Modifier modifier = new Modifier(mod);
-                        modifier.setId(Modifier.OFFENCE);
-                        modifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
-                        result.add(modifier);
+            Tile tile = defenderUnit.getTile();
+            if (tile != null) {
+                if (tile.getSettlement() != null) {
+                    result.addAll(attackerUnit
+                                  .getModifierSet("model.modifier.bombardBonus"));
+                } else {
+                    // Ambush bonus in the open = defender's defence
+                    // bonus, if defender is REF, or attacker is indian.
+                    if (isAmbush(attacker, defender)) {
+                        for (Modifier mod : tile.getType()
+                                 .getModifierSet(Modifier.DEFENCE)) {
+                            Modifier modifier = new Modifier(mod);
+                            modifier.setId(Modifier.OFFENCE);
+                            modifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
+                            result.add(modifier);
+                        }
                     }
-                }
-                // Artillery in the open penalty
-                if (attackerUnit.hasAbility("model.ability.bombard")
-                    && attackerUnit.getSettlement() == null) {
-                    result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                    // Artillery in the open penalty
+                    if (attackerUnit.hasAbility("model.ability.bombard")
+                        && attackerUnit.getSettlement() == null) {
+                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
+                    }
                 }
             }
         } else {
