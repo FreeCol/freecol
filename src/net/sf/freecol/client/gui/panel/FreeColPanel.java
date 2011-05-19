@@ -26,6 +26,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -50,11 +51,13 @@ import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
@@ -77,7 +80,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * Superclass for all panels in FreeCol.
  */
-public class FreeColPanel extends JPanel implements ActionListener {
+public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
@@ -193,12 +196,12 @@ public class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Set the <code>SavedSize</code> value.
+     * Returns the saved position of this panel, null by default.
      *
-     * @param newSavedSize The new SavedSize value.
+     * @return a <code>Point</code> value
      */
-    public void setSavedSize(final Dimension newSavedSize) {
-        // override this if you want a panel to remember its size
+    public Point getSavedPosition() {
+        return null;
     }
 
     /**
@@ -209,6 +212,22 @@ public class FreeColPanel extends JPanel implements ActionListener {
     public final Canvas getCanvas() {
         return canvas;
     }
+
+    /**
+     * Return the location of the enclosing
+     * <code>JInternalFrame</code>, if any.
+     *
+     * @return a <code>Point</code> value
+     */
+    public Point getFrameLocation() {
+        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
+        if (frame == null) {
+            return null;
+        } else {
+            return frame.getLocation();
+        }
+    }
+
 
     /**
      * Returns the ImageLibrary.

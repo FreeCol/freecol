@@ -20,7 +20,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -107,6 +109,16 @@ public final class EuropePanel extends FreeColPanel {
 
     private JLabel header = getDefaultHeader("");
 
+    /**
+     * The saved size of this panel.
+     */
+    private static Dimension savedSize = new Dimension(850, 600);
+
+    /**
+     * The saved position of this panel.
+     */
+    private static Point savedPosition = null;
+
 
     /**
      * The constructor for a EuropePanel.
@@ -119,12 +131,18 @@ public final class EuropePanel extends FreeColPanel {
         setFocusCycleRoot(true);
 
         // Use ESCAPE for closing the ColonyPanel:
-        exitButton = new EuropeButton(Messages.message("close"), KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
-        EuropeButton trainButton = new EuropeButton(Messages.message("train"), KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
-        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"), KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
-        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"), KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
-        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"), KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
-        EuropeButton sailButton = new EuropeButton(Messages.message("sail"), KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
+        exitButton = new EuropeButton(Messages.message("close"),
+                                      KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
+        EuropeButton trainButton = new EuropeButton(Messages.message("train"),
+                                                    KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
+        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"),
+                                                       KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
+        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"),
+                                                      KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
+        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"),
+                                                     KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
+        EuropeButton sailButton = new EuropeButton(Messages.message("sail"),
+                                                   KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
 
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
@@ -233,7 +251,17 @@ public final class EuropePanel extends FreeColPanel {
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
 
-        setSize(parent.getWidth(), parent.getHeight());
+        setPreferredSize(savedSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        EuropePanel.savedSize = getSize();
+        EuropePanel.savedPosition = getFrameLocation();
     }
 
     /**

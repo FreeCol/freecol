@@ -164,6 +164,11 @@ public final class ColonyPanel extends FreeColPanel
      */
     private static Dimension savedSize = null;
 
+    /**
+     * The saved position of this panel.
+     */
+    private static Point savedPosition = null;
+
 
     /**
      * The constructor for the panel.
@@ -335,12 +340,13 @@ public final class ColonyPanel extends FreeColPanel
     }
 
     /**
-     * Set the <code>SavedSize</code> value.
-     *
-     * @param newSavedSize The new SavedSize value.
+     * {@inheritDoc}
      */
-    public final void setSavedSize(final Dimension newSavedSize) {
-        ColonyPanel.savedSize = newSavedSize;
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        ColonyPanel.savedSize = getSize();
+        ColonyPanel.savedPosition = getFrameLocation();
     }
 
     /**

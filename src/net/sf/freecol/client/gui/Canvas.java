@@ -907,7 +907,6 @@ public final class Canvas extends JDesktopPane {
             return;
         } else if (comp instanceof FreeColPanel) {
             ((FreeColPanel) comp).notifyClose();
-            ((FreeColPanel) comp).setSavedSize(comp.getSize());
         }
 
         final Rectangle updateBounds = comp.getBounds();
@@ -2322,23 +2321,31 @@ public final class Canvas extends JDesktopPane {
             height = Math.min(height, getHeight());
         }
         f.setSize(width, height);
-        switch (popupPosition) {
-        case CENTERED:
-            f.setLocation((getWidth() - f.getWidth()) / 2,
-                         (getHeight() - f.getHeight()) / 2);
-            break;
-        case CENTERED_LEFT:
-            f.setLocation((getWidth() - f.getWidth()) / 4,
-                          (getHeight() - f.getHeight()) / 2);
-            break;
-        case CENTERED_RIGHT:
-            f.setLocation(((getWidth() - f.getWidth()) * 3) / 4,
-                          (getHeight() - f.getHeight()) / 2);
-            break;
-        case ORIGIN:
-        default:
-            f.setLocation(0, 0);
-            break;
+        Point p = (comp instanceof FreeColPanel)
+            ? ((FreeColPanel) comp).getSavedPosition()
+            : null;
+
+        if (p == null) {
+            switch (popupPosition) {
+            case CENTERED:
+                f.setLocation((getWidth() - f.getWidth()) / 2,
+                              (getHeight() - f.getHeight()) / 2);
+                break;
+            case CENTERED_LEFT:
+                f.setLocation((getWidth() - f.getWidth()) / 4,
+                              (getHeight() - f.getHeight()) / 2);
+                break;
+            case CENTERED_RIGHT:
+                f.setLocation(((getWidth() - f.getWidth()) * 3) / 4,
+                              (getHeight() - f.getHeight()) / 2);
+                break;
+            case ORIGIN:
+            default:
+                f.setLocation(0, 0);
+                break;
+            }
+        } else {
+            f.setLocation(p);
         }
         add(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());

@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
@@ -65,6 +66,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * The saved size of this panel.
      */
     private static Dimension savedSize = new Dimension(850, 600);
+
+    /**
+     * The saved position of this panel.
+     */
+    private static Point savedPosition = null;
+
 
     public static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
@@ -130,12 +137,13 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Set the <code>SavedSize</code> value.
-     *
-     * @param newSavedSize The new SavedSize value.
+     * {@inheritDoc}
      */
-    public final void setSavedSize(final Dimension newSavedSize) {
-        ReportPanel.savedSize = newSavedSize;
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        ReportPanel.savedSize = getSize();
+        ReportPanel.savedPosition = getFrameLocation();
     }
 
     /**
