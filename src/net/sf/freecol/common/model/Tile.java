@@ -1699,7 +1699,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Finds an empty tile to put a unit near to this one.
      * Useful on return from Europe.
      *
-     * @param random A pseudo-random number source.
+     * @param random An optional pseudo-random number source.
      * @return A vacant tile near this one.
      */
     public Tile getVacantTile(Random random) {
@@ -1707,9 +1707,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         for (int r = 1; true; r++) {
             List<Tile> tiles = getSurroundingTiles(r, r);
-            Collections.shuffle(tiles, random);
+            if (random != null) Collections.shuffle(tiles, random);
             for (Tile t : tiles) {
-                if (t.getFirstUnit() == null) return t;
+                if (t.getFirstUnit() == null
+                    || t.getSettlement() == null) return t;
             }
         }
     }
