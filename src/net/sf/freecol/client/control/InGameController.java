@@ -2596,6 +2596,12 @@ public final class InGameController implements NetworkConstants {
         // Pick units the user wants to disembark.
         Canvas canvas = freeColClient.getCanvas();
         while (disembarkable.size() > 0) {
+            if (disembarkable.size() == 1) {
+                if (canvas.showConfirmDialog("disembark.text", "yes", "no")) {
+                    move(disembarkable.get(0), direction);
+                }
+                break;
+            }
             List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
             for (Unit dUnit : disembarkable) {
                 choices.add(new ChoiceItem<Unit>(Messages.message(Messages.getLabel(dUnit)), dUnit));
