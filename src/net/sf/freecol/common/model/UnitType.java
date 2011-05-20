@@ -555,10 +555,6 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      */
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
         for (UnitTypeChange change : typeChanges) {
-System.err.println("newType = " + newType
-                               + " change = " + change.getNewUnitType()
-                               + " prob = " + change.getProbability(changeType)
-                   + " result = " + (newType == change.getNewUnitType()));
             if ((newType == null || newType == change.getNewUnitType())
                 && change.getProbability(changeType) > 0) {
                 return true;
