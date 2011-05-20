@@ -1178,12 +1178,11 @@ public final class Canvas extends JDesktopPane {
      */
     public void showColonyPanel(Tile t) {
         if (gui.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
-            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
-                if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-                    gui.setFocus(t);
-                    gui.stopBlinking();
-                    showColonyPanel(t.getColony());
-                }
+            if (t != null && t.getColony() != null
+                && t.getColony().getOwner().equals(freeColClient.getMyPlayer())) {
+                gui.setFocus(t);
+                gui.stopBlinking();
+                showColonyPanel(t.getColony());
             }
         }
     }

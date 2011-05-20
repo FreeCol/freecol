@@ -159,9 +159,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                             logger.warning("Unknown river style: " + style);
                         }
                     }
-                    if (tile.getSettlement() instanceof IndianSettlement) {
-                        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
-                        canvas.showFreeColDialog(new EditSettlementDialog(canvas, settlement));
+                    if (tile.getIndianSettlement() != null) {
+                        canvas.showFreeColDialog(new EditSettlementDialog(canvas, tile.getIndianSettlement()));
                     }
                 } else {
                     gui.setSelectedTile(null, true);

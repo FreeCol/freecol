@@ -101,21 +101,21 @@ public class AskSkillMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        MoveType type = unit.getMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
             return Message.clientError("Unable to enter "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
 
         // Update the skill
         return server.getInGameController()
-            .askLearnSkill(serverPlayer, unit, (IndianSettlement) settlement);
+            .askLearnSkill(serverPlayer, unit, is);
     }
 
     /**

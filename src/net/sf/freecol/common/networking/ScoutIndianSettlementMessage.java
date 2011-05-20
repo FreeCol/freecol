@@ -101,22 +101,21 @@ public class ScoutIndianSettlementMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        MoveType type = unit.getMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return Message.clientError("Unable to enter "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
 
         // Valid request, do the scouting.
         return server.getInGameController()
-            .scoutIndianSettlement(serverPlayer, unit,
-                                   (IndianSettlement) settlement);
+            .scoutIndianSettlement(serverPlayer, unit, is);
     }
 
     /**

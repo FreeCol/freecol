@@ -101,25 +101,24 @@ public class LearnSkillMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
         // Do not use getMoveType (checking moves left) as the preceding
         // AskLearnSkill transaction will have already zeroed the moves.
         // TODO: use a transaction, so that declining restores the moves?
-        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        MoveType type = unit.getSimpleMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
             return Message.clientError("Unable to enter "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
 
         // Learn the skill if possible.
         return server.getInGameController()
-            .learnFromIndianSettlement(serverPlayer, unit,
-                                       (IndianSettlement) settlement);
+            .learnFromIndianSettlement(serverPlayer, unit, is);
     }
 
     /**

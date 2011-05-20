@@ -119,12 +119,11 @@ public class InciteMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
         Player enemy;
         if (enemyId == null || enemyId.length() == 0) {
             return Message.clientError("Empty enemyId.");
@@ -139,10 +138,10 @@ public class InciteMessage extends Message {
         if (!enemy.isEuropean()) {
             return Message.clientError("Inciting against non-European!");
         }
-        MoveType type = unit.getMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return Message.clientError("Unable to enter "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
         int gold;
@@ -154,7 +153,7 @@ public class InciteMessage extends Message {
 
         // Valid, proceed to incite.
         return server.getInGameController()
-            .incite(serverPlayer, unit, indianSettlement, enemy, gold);
+            .incite(serverPlayer, unit, is, enemy, gold);
     }
 
     /**

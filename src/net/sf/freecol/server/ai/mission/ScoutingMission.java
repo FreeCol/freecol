@@ -267,9 +267,8 @@ public class ScoutingMission extends Mission {
                 }
             }
             return false;
-        } else if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
-            IndianSettlement settlement = (IndianSettlement) t.getSettlement();
-            return !settlement.hasSpokenToChief(u.getOwner());
+        } else if (t.getIndianSettlement() != null) {
+            return !t.getIndianSettlement().hasSpokenToChief(u.getOwner());
         } else {
             return false;
         }

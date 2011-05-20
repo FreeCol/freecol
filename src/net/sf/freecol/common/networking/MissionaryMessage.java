@@ -108,40 +108,39 @@ public class MissionaryMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        Unit missionary = indianSettlement.getMissionary();
+        Unit missionary = is.getMissionary();
         if (denounce) {
             if (missionary == null) {
                 return Message.clientError("Denouncing an empty mission at: "
-                                           + indianSettlement.getId());
+                                           + is.getId());
             } else if (missionary.getOwner() == player) {
                 return Message.clientError("Denouncing our own missionary at: "
-                                           + indianSettlement.getId());
+                                           + is.getId());
             }
         } else {
             if (missionary != null) {
                 return Message.clientError("Establishing extra mission at: "
-                                           + indianSettlement.getId());
+                                           + is.getId());
             }
         }
-        MoveType type = unit.getMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return Message.clientError("Unable to enter "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
 
         // Valid, proceed to denounce/establish.
         return (denounce)
             ? server.getInGameController()
-                .denounceMission(serverPlayer, unit, indianSettlement)
+                .denounceMission(serverPlayer, unit, is)
             : server.getInGameController()
-                .establishMission(serverPlayer, unit, indianSettlement);
+                .establishMission(serverPlayer, unit, is);
     }
 
     /**

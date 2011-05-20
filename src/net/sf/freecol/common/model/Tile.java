@@ -768,17 +768,29 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * the settlement is a colony.
      *
      * @return The <code>Colony</code> that is located on this
-     *         <code>Tile</code> or <i>null</i> if no <code>Colony</code>
-     *         apply.
+     *         <code>Tile</code> or <i>null</i> if none found.
      * @see #getSettlement
      */
     public Colony getColony() {
+        return (settlement != null && settlement instanceof Colony)
+            ? (Colony) settlement
+            : null;
+    }
 
-        if (settlement != null && settlement instanceof Colony) {
-            return ((Colony) settlement);
-        }
-
-        return null;
+    /**
+     * Gets the <code>IndianSettlement</code> located on this
+     * <code>Tile</code>. Only a convenience method for {@link
+     * #getSettlement} that makes sure that the settlement is a native
+     * settlement.
+     *
+     * @return The <code>IndianSettlement</code> that is located on this
+     *         <code>Tile</code> or <i>null</i> if none found.
+     * @see #getSettlement
+     */
+    public IndianSettlement getIndianSettlement() {
+        return (settlement != null && settlement instanceof IndianSettlement)
+            ? (IndianSettlement) settlement
+            : null;
     }
 
     /**

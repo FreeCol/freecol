@@ -163,8 +163,8 @@ public class ManageMissionariesGoal extends Goal {
 /* INTERNAL *******************************************************************/
 
 
-    private IndianSettlement findSettlement(Tile t) {
-        if (t==null) {
+    private IndianSettlement findSettlement(Tile tile) {
+        if (tile == null) {
             //TODO: We're in europe - let's deal with it.
             return null;
         } else {
@@ -172,13 +172,13 @@ public class ManageMissionariesGoal extends Goal {
             //Otherwise, missionaries starting from the same position will find
             //the same settlement.
 
-            for (Tile settlementTile: t.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
-                Settlement s = settlementTile.getSettlement();
-                if (s instanceof IndianSettlement &&
-                    (((IndianSettlement)s).getMissionary()==null ||
-                    ((IndianSettlement)s).getMissionary().getOwner()!=player.getPlayer())) {
-                        //TODO: Check if this settlement is reachable
-                        return (IndianSettlement)s;
+            for (Tile t : tile.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
+                IndianSettlement is = t.getIndianSettlement();
+                if (is != null
+                    && (is.getMissionary() == null
+                        || is.getMissionary().getOwner() != player.getPlayer())) {
+                    //TODO: Check if this settlement is reachable
+                    return is;
                 }
             }
         }

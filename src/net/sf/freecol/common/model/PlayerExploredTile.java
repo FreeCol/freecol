@@ -112,14 +112,14 @@ public class PlayerExploredTile extends FreeColGameObject {
             }
         }
 
-        Settlement settlement = tile.getSettlement();
-        if (settlement instanceof Colony) {
-            Colony colony = (Colony) settlement;
+        Colony colony = tile.getColony();
+        if (colony != null) {
             colonyUnitCount = colony.getUnitCount();
             colonyStockadeKey = colony.getTrueStockadeKey();
             missionary = null;
-        } else if (settlement instanceof IndianSettlement) {
-            IndianSettlement is = (IndianSettlement) settlement;
+        }
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is != null) {
             colonyUnitCount = 0;
             colonyStockadeKey = null;
             missionary = is.getMissionary();
@@ -127,8 +127,6 @@ public class PlayerExploredTile extends FreeColGameObject {
                 skill = is.getLearnableSkill();
                 wantedGoods = is.getWantedGoods();
             }
-        } else if (settlement != null) {
-            throw new IllegalStateException("Bogus settlement");
         }
     }
 

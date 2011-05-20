@@ -106,8 +106,8 @@ public class DemandTributeMessage extends Message {
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null || !(settlement instanceof IndianSettlement)) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
@@ -115,13 +115,13 @@ public class DemandTributeMessage extends Message {
         if (type != MoveType.ATTACK
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return Message.clientError("Unable to demand tribute at: "
-                                       + settlement.getName()
+                                       + is.getName()
                                        + ": " + type.whyIllegal());
         }
 
         // Do the demand
         return server.getInGameController()
-            .demandTribute(serverPlayer, unit, (IndianSettlement) settlement);
+            .demandTribute(serverPlayer, unit, is);
     }
 
     /**

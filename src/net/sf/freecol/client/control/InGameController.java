@@ -2054,12 +2054,12 @@ public final class InGameController implements NetworkConstants {
         if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
             nextActiveUnit(tile);
         } else {
-            if (tile.getSettlement() instanceof Colony
+            if (tile.getColony() != null
                 && unit.isCarrier()
                 && unit.getTradeRoute() == null
                 && (unit.getDestination() == null
                     || unit.getDestination().getTile() == tile.getTile())) {
-                canvas.showColonyPanel((Colony) tile.getSettlement());
+                canvas.showColonyPanel(tile.getColony());
             }
             if (unit.getMovesLeft() == 0) {
                 nextActiveUnit();
@@ -2303,12 +2303,9 @@ public final class InGameController implements NetworkConstants {
         // Extra option with native settlement
         Tile tile = unit.getTile();
         Tile target = tile.getNeighbourOrNull(direction);
-        Settlement settlement = target.getSettlement();
-        if (settlement != null
-            && settlement instanceof IndianSettlement
-            && unit.isArmed()) {
-            IndianSettlement natives = (IndianSettlement) settlement;
-            switch (canvas.showArmedUnitIndianSettlementDialog(natives)) {
+        IndianSettlement is = target.getIndianSettlement();
+        if (is != null && unit.isArmed()) {
+            switch (canvas.showArmedUnitIndianSettlementDialog(is)) {
             case CANCEL:
                 return;
             case INDIAN_SETTLEMENT_ATTACK:
@@ -2725,7 +2722,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
-        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+        IndianSettlement settlement = tile.getIndianSettlement();
         clearGotoOrders(unit);
 
         // Offer the choices.
