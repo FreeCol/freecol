@@ -336,7 +336,6 @@ public class IndianAIPlayer extends NewAIPlayer {
     /**
      * Called when another <code>Player</code> proposes a sale.
      *
-     *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
      *            which the given <code>Unit</code> if trying to sell goods.
@@ -356,7 +355,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                 return price;
             }
         } else {
-            price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
+            price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(unit.getOwner()).getValue();
             if (price <= 0) {
                 return 0;
             }

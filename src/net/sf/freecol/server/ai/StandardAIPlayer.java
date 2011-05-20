@@ -561,7 +561,7 @@ public class StandardAIPlayer extends AIPlayer {
                     return price;
                 }
             } else {
-                price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
+                price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(unit.getOwner()).getValue();
                 if (price <= 0) return 0;
                 sessionRegister.put(goldKey, new Integer(price));
             }

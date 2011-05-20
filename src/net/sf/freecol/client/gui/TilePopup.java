@@ -46,11 +46,13 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -68,8 +70,9 @@ import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
- * Allows the user to obtain more info about a certain tile
- * or to activate a specific unit on the tile.
+ * Allows the user to obtain more info about a certain tile or to
+ * activate a specific unit on the tile, or perform various debug mode
+ * actions.
  */
 public final class TilePopup extends JPopupMenu {
 
@@ -103,6 +106,7 @@ public final class TilePopup extends JPopupMenu {
         this.freeColClient = freeColClient;
         this.gui = gui;
 
+        final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
             Tile unitTile = activeUnit.getTile();
@@ -130,7 +134,7 @@ public final class TilePopup extends JPopupMenu {
             if (gotoMenuItem != null) {
                 gotoMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+                            if (freeColClient.getGame().getCurrentPlayer() != player) {
                             	return;
                             }
                             Tile currTile = activeUnit.getTile();
@@ -160,7 +164,7 @@ public final class TilePopup extends JPopupMenu {
                 europeMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             if (freeColClient.getGame().getCurrentPlayer()
-                                != freeColClient.getMyPlayer()) {
+                                != player) {
                                 return;
                             }
                             freeColClient.getInGameController()
@@ -175,7 +179,7 @@ public final class TilePopup extends JPopupMenu {
 
         Settlement settlement = tile.getSettlement();
         if (settlement != null) {
-            if (settlement.getOwner() == freeColClient.getMyPlayer()) {
+            if (settlement.getOwner() == player) {
                 addColony(((Colony) settlement));
             } else if (settlement instanceof IndianSettlement) {
                 addIndianSettlement((IndianSettlement) settlement);
@@ -231,19 +235,21 @@ public final class TilePopup extends JPopupMenu {
         // START DEBUG
         if (FreeCol.isInDebugMode()
             && freeColClient.getFreeColServer() != null) {
+            final Game serverGame = freeColClient.getFreeColServer().getGame();
+            final Player serverPlayer = (Player)
+                serverGame.getFreeColGameObject(player.getId());
+            boolean notEmpty = false;
             addSeparator();
             JMenu takeOwnership = new JMenu("Take ownership");
             takeOwnership.setOpaque(false);
+
             JMenu transportLists = new JMenu("Transport lists");
             transportLists.setOpaque(false);
-            boolean notEmpty = false;
             for (final Unit currentUnit : tile.getUnitList()) {
                 JMenuItem toMenuItem = new JMenuItem(currentUnit.toString());
                 toMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             // Server:
-                            final Game serverGame = freeColClient.getFreeColServer().getGame();
-                            final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
                             final Unit serverUnit = (Unit) serverGame.getFreeColGameObject(currentUnit.getId());
                             serverUnit.setOwner(serverPlayer);
                             for (Unit serverChildUnit : currentUnit.getUnitList()) {
@@ -279,20 +285,21 @@ public final class TilePopup extends JPopupMenu {
                 toMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         // Server:
-                        final Game serverGame = freeColClient.getFreeColServer().getGame();
-                        final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
-                        final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
+                        final Tile serverTile = (Tile)
+                            serverGame.getFreeColGameObject(tile.getId());
                         serverTile.getSettlement().changeOwner(serverPlayer);
                         freeColClient.getConnectController().reconnect();
                     }
                 });
                 takeOwnership.add(toMenuItem);
+                notEmpty = true;
+
                 JMenuItem displayColonyPlan = new JMenuItem("Display Colony Plan");
                 displayColonyPlan.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         // Server:
-                        final Game serverGame = freeColClient.getFreeColServer().getGame();
-                        final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
+                        final Tile serverTile = (Tile)
+                            serverGame.getFreeColGameObject(tile.getId());
                         final AIColony ac = freeColClient.getFreeColServer()
                             .getAIMain().getAIColony(serverTile.getColony());
                         StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());
@@ -318,30 +325,45 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
                 add(displayColonyPlan);
-                notEmpty = true;
+            }
+            if (tile.getIndianSettlement() != null) {
+                JMenuItem displayGoods = new JMenuItem("Examine Settlement");
+                final IndianSettlement is = tile.getIndianSettlement();
+                displayGoods.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            final IndianSettlement sis = (IndianSettlement)
+                                serverGame.getFreeColGameObject(is.getId());
+                            canvas.showInformationMessage(
+                                debugSummarizeSettlement(serverGame, sis));
+                        }
+                    });
+                add(displayGoods);
             }
             if (notEmpty) {
                 add(takeOwnership);
                 hasAnItem = true;
             }
+
             if (tile.hasLostCityRumour()) {
                 JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
                 rumourItem.setOpaque(false);
                 rumourItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            debugSetRumourType(tile);
+                            debugSetRumourType(serverGame, tile);
                         }
                     });
                 add(rumourItem);
             }
+
             JMenuItem addu = new JMenuItem("Add unit");
             addu.setOpaque(false);
             addu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        debugAddNewUnitToTile(tile);
+                        debugAddNewUnitToTile(serverGame, tile);
                     }
                 });
             add(addu);
+
             JMenuItem dumpItem = new JMenuItem("Dump tile");
             dumpItem.setOpaque(false);
             dumpItem.addActionListener(new ActionListener() {
@@ -349,9 +371,8 @@ public final class TilePopup extends JPopupMenu {
                         System.err.println("\nClient side:\n");
                         tile.dumpObject();
                         System.err.println("\nServer side:\n");
-                        Game sGame = freeColClient.getFreeColServer().getGame();
-                        Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
-                        sTile.dumpObject();
+                        serverGame.getFreeColGameObject(tile.getId())
+                            .dumpObject();
                     }
                 });
             add(dumpItem);
@@ -478,7 +499,9 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * Adds an indian settlement entry to this popup.
-     * @param settlement The Indian settlement that will be represented on the popup.
+     *
+     * @param settlement The Indian settlement that will be
+     *     represented on the popup.
      */
     private void addIndianSettlement(final IndianSettlement settlement) {
         String name = settlement.getNameFor(freeColClient.getMyPlayer());
@@ -494,6 +517,7 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * Adds a tile entry to this popup.
+     *
      * @param tile The tile that will be represented on the popup.
      */
     private void addTile(final Tile tile) {
@@ -513,9 +537,11 @@ public final class TilePopup extends JPopupMenu {
     }
 
     /**
-     * Returns true if this popup has at least one menuitem so that we know that we can
-     * show it to the user. Returns false if there are no menuitems.
-     * @return true if this popup has at least one menuitem, false otherwise.
+     * Returns true if this popup has at least one menuitem so that we
+     * know that we can show it to the user. Returns false if there
+     * are no menuitems.
+     *
+     * @return True if this popup has at least one menuitem, false otherwise.
      */
     public boolean hasItem() {
         return hasAnItem || FreeCol.isInDebugMode();
@@ -524,19 +550,23 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Debug action to set the lost city rumour type on a tile.
      *
+     * @param serverGame The server <code>Game</code> containing the tile.
      * @param tile The <code>Tile</code> to operate on.
      */
-    private void debugSetRumourType(Tile tile) {
-        List<ChoiceItem<RumourType>> rumours = new ArrayList<ChoiceItem<RumourType>>();
+    private void debugSetRumourType(final Game serverGame, Tile tile) {
+        List<ChoiceItem<RumourType>> rumours
+            = new ArrayList<ChoiceItem<RumourType>>();
         for (RumourType rumour : RumourType.values()) {
             if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
         }
+
         RumourType rumourChoice = freeColClient.getCanvas()
-            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel", rumours);
+            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
+                              rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
-        final Tile serverTile = (Tile) freeColClient.getFreeColServer()
-            .getGame().getFreeColGameObject(tile.getId());
+        final Tile serverTile = (Tile) serverGame
+            .getFreeColGameObject(tile.getId());
         serverTile.getTileItemContainer().getLostCityRumour()
             .setType(rumourChoice);
     }
@@ -544,29 +574,94 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Debug action to add a new unit to a tile.
      *
+     * @param serverGame The server <code>Game</code> containing the tile.
      * @param tile The <code>Tile</code> to add to.
      */
-    private void debugAddNewUnitToTile(Tile tile) {
+    private void debugAddNewUnitToTile(final Game serverGame, Tile tile) {
         List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
         for (UnitType t : tile.getSpecification().getUnitTypeList()) {
-            uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString() + ".name"), t));
+            uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString()
+                                                              + ".name"), t));
         }
         UnitType unitChoice = freeColClient.getCanvas()
             .showChoiceDialog(null, "Select Unit Type", "Cancel", uts);
-        if (unitChoice != null) {
-            Game game = freeColClient.getGame();
-            Game sGame = freeColClient.getFreeColServer().getGame();
-            Player player = freeColClient.getMyPlayer();
-            Player sPlayer = (Player) sGame.getFreeColGameObject(player.getId());
-            Tile sTile = (Tile) sGame.getFreeColGameObject(tile.getId());
-            ServerUnit sUnit = new ServerUnit(sGame, sTile, sPlayer,
-                                              unitChoice, UnitState.ACTIVE,
-                                              unitChoice.getDefaultEquipment());
-            Unit unit = new Unit(game, sUnit.toXMLElement(Message.createNewDocument()));
-            tile.add(unit);
-            player.invalidateCanSeeTiles();
-            canvas.refresh();
-        }
+        if (unitChoice == null) return;
+
+        Player player = freeColClient.getMyPlayer();
+        Player serverPlayer = (Player) serverGame
+            .getFreeColGameObject(player.getId());
+        Tile serverTile = (Tile) serverGame
+            .getFreeColGameObject(tile.getId());
+        ServerUnit serverUnit
+            = new ServerUnit(serverGame, serverTile, serverPlayer,
+                             unitChoice, UnitState.ACTIVE,
+                             unitChoice.getDefaultEquipment());
+        Unit unit = new Unit(freeColClient.getGame(),
+                serverUnit.toXMLElement(Message.createNewDocument()));
+        tile.add(unit);
+        player.invalidateCanSeeTiles();
+        canvas.refresh();
     }
 
+    /**
+     * Debug action to summarize information about a native settlement
+     * that is normally hidden.
+     *
+     * @param serverGame The server <code>Game</code> containing the
+     *     settlement.
+     * @param sis The server version of the <code>IndianSettlement</code>
+     *     to summarize.
+     * @return A string summarizing the settlement.
+     */
+    private String debugSummarizeSettlement(final Game serverGame,
+                                            final IndianSettlement sis) {
+        StringBuilder sb = new StringBuilder(sis.getName() + "\n");
+
+        sb.append("\nAlarm\n");
+        for (Player p : serverGame.getLiveEuropeanPlayers()) {
+            Tension tension = sis.getAlarm(p);
+            sb.append(Messages.message(p.getNationName())
+                      + " " + ((tension == null) ? "(none)"
+                               : Integer.toString(tension.getValue()))
+                      + " " + Messages.message(sis.getShortAlarmLevelMessageId(p))
+                      + " " + ((sis.hasSpokenToChief(p)) ? "(spoke to chief)"
+                               : "")
+                      + "\n");
+        }
+
+        sb.append("\nGoods\n");
+        for (Goods goods : sis.getCompactGoods()) {
+            sb.append(Messages.message(goods.getLabel(true)) + "\n");
+        }
+
+        sb.append("\nPrices (buy 1/100 / sell 1/100)\n");
+        GoodsType[] wanted = sis.getWantedGoods();
+        for (GoodsType type : serverGame.getSpecification().getGoodsTypeList()) {
+            if (!type.isStorable()) continue;
+            int i;
+            for (i = wanted.length - 1; i >= 0; i--) {
+                if (type == wanted[i]) break;
+            }
+            sb.append(Messages.message(type.getNameKey())
+                      + ": " + sis.getPriceToBuy(type, 1)
+                      + "/" + sis.getPriceToBuy(type, 100)
+                      + " / " + sis.getPriceToSell(type, 1)
+                      + "/" + sis.getPriceToSell(type, 100)
+                      + ((i < 0) ? "" : " wanted[" + Integer.toString(i) + "]")
+                      + "\n");
+        }
+
+        sb.append("\nOwned Units\n");
+        for (Unit u : sis.getOwnedUnits()) {
+            sb.append(u + "\n");
+            sb.append("  at " + u.getTile() + "\n");
+        }
+
+        sb.append("\nTiles\n");
+        for (Tile t : sis.getOwnedTiles()) {
+            sb.append(t + "\n");
+        }
+
+        return sb.toString();
+    }
 }

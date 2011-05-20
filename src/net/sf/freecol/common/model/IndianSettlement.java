@@ -113,22 +113,25 @@ public class IndianSettlement extends Settlement {
     private java.util.Map<Player, Tension> alarm = new HashMap<Player, Tension>();
 
     // sort goods types descending by price
-    private final Comparator<GoodsType> wantedGoodsComparator = new Comparator<GoodsType>() {
-        public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-            return getPrice(goodsType2, 100) - getPrice(goodsType1, 100);
-        }
-    };
+    private final Comparator<GoodsType> wantedGoodsComparator
+        = new Comparator<GoodsType>() {
+            public int compare(GoodsType goodsType1, GoodsType goodsType2) {
+                return getPriceToBuy(goodsType2, 100)
+                - getPriceToBuy(goodsType1, 100);
+            }
+        };
 
     // sort goods descending by amount and price when amounts are equal
-    private final Comparator<Goods> exportGoodsComparator = new Comparator<Goods>() {
-        public int compare(Goods goods1, Goods goods2) {
-            if (goods2.getAmount() == goods1.getAmount()) {
-                return getPrice(goods2) - getPrice(goods1);
-            } else {
-                return goods2.getAmount() - goods1.getAmount();
+    private final Comparator<Goods> exportGoodsComparator
+        = new Comparator<Goods>() {
+            public int compare(Goods goods1, Goods goods2) {
+                if (goods2.getAmount() == goods1.getAmount()) {
+                    return getPriceToBuy(goods2) - getPriceToBuy(goods1);
+                } else {
+                    return goods2.getAmount() - goods1.getAmount();
+                }
             }
-        }
-    };
+        };
 
 
     /**
@@ -468,6 +471,15 @@ public class IndianSettlement extends Settlement {
 
 
     /**
+     * Gets a list of the units native to this settlement.
+     *
+     * @return The list of units native to this settlement.
+     */
+    public List<Unit> getOwnedUnits() {
+        return new ArrayList<Unit>(ownedUnits);
+    }
+
+    /**
      * Gets an iterator over all the units this
      * <code>IndianSettlement</code> is owning.
      *
@@ -632,6 +644,24 @@ public class IndianSettlement extends Settlement {
 
 
     /**
+     * Returns this settlement.
+     *
+     * @return This settlement.
+     */
+    public Settlement getSettlement() {
+        return this;
+    }
+
+    /**
+     * An Indian settlement is not a colony.
+     *
+     * @return Null.
+     */
+    public Colony getColony() {
+        return null;
+    }
+
+    /**
      * Returns the amount of Units at this Location.
      *
      * @return The amount of Units at this Location.
@@ -665,9 +695,13 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
-     * @param attacker The unit that would be attacking this <code>IndianSettlement</code>.
-     * @return The <code>Unit</code> that has been chosen to defend this <code>IndianSettlement</code>.
+     * Gets the <code>Unit</code> that is currently defending this
+     * <code>IndianSettlement</code>.
+     *
+     * @param attacker The unit that would be attacking this
+     *     <code>IndianSettlement</code>.
+     * @return The <code>Unit</code> that has been chosen to defend
+     *     this <code>IndianSettlement</code>.
      */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
@@ -684,6 +718,13 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the range of gold plunderable when this settlement is captured.
+     */
+    public RandomRange getPlunderRange(Unit attacker) {
+        return getType().getPlunderRange(attacker);
+    }
+
+    /**
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *
@@ -694,8 +735,8 @@ public class IndianSettlement extends Settlement {
      * @param goods The <code>Goods</code> to price.
      * @return The price.
      */
-    public int getPrice(Goods goods) {
-        return getPrice(goods.getType(), goods.getAmount());
+    public int getPriceToBuy(Goods goods) {
+        return getPriceToBuy(goods.getType(), goods.getAmount());
     }
 
     /**
@@ -715,27 +756,16 @@ public class IndianSettlement extends Settlement {
      * @param amount The amount of <code>Goods</code> to price.
      * @return The price.
      */
-    public int getPrice(GoodsType type, int amount) {
+    public int getPriceToBuy(GoodsType type, int amount) {
         if (amount > 100) throw new IllegalArgumentException("Amount > 100");
 
-        int returnPrice = 0;
-        Specification spec = getSpecification();
-        if (type == spec.getGoodsType("model.goods.muskets")) {
-            int need = 0;
-            for (Unit u : ownedUnits) if (!u.isArmed()) need++;
-            int toArm = spec.getEquipmentType("model.equipment.indian.muskets")
-                .getAmountRequiredOf(type);
-            returnPrice = getMilitaryGoodsPrice(type, amount, toArm, need);
-        } else if (type == spec.getGoodsType("model.goods.horses")) {
-            int need = 0;
-            for (Unit u : ownedUnits) if (!u.isMounted()) need++;
-            int toArm = spec.getEquipmentType("model.equipment.indian.horses")
-                .getAmountRequiredOf(type);
-            returnPrice = getMilitaryGoodsPrice(type, amount, toArm, need);
-        } else if (type.isFarmed()) {
-            returnPrice = 0;
-        } else {
-            returnPrice = getNormalGoodsPrice(type, amount);
+        int price = 0;
+        if (type.isMilitaryGoods()) {
+            // Might return zero if a surplus is present
+            price = getMilitaryGoodsPriceToBuy(type, amount);
+        }
+        if (price == 0) {
+            price = getNormalGoodsPriceToBuy(type, amount);
         }
 
         // Apply wanted bonus
@@ -746,11 +776,11 @@ public class IndianSettlement extends Settlement {
             : (type == wantedGoods[2]) ? 110
             : 100;
         // Do not simplify with *=, we want the integer truncation.
-        returnPrice = wantedBonus * returnPrice / wantedBase;
+        price = wantedBonus * price / wantedBase;
 
         logger.finest("Full price(" + amount + " " + type + ")"
-                      + " -> " + returnPrice);
-        return returnPrice;
+                      + " -> " + price);
+        return price;
     }
 
     /**
@@ -760,7 +790,7 @@ public class IndianSettlement extends Settlement {
      * @param amount The amount of goods for sale.
      * @return A price for the goods.
      */
-    private int getNormalGoodsPrice(GoodsType type, int amount) {
+    private int getNormalGoodsPriceToBuy(GoodsType type, int amount) {
         final int tradeGoodsAdd = 20; // Fake additional trade goods present
         int current = getGoodsCount(type);
 
@@ -791,15 +821,45 @@ public class IndianSettlement extends Settlement {
         int unitPrice = (GOODS_BASE_PRICE + getType().getTradeBonus())
             * (GOODS_CAPACITY - current) / GOODS_CAPACITY;
 
+        // But farmed goods are always less interesting.
+        if (type.isFarmed()) unitPrice /= 2;
+
+        // and small settlements are not interested in building.
+        if (type.isRawBuildingMaterial()) unitPrice /= 2;
+
         // Only pay for the portion that is valued.
-        int returnPrice = (unitPrice < 0) ? 0 : valued * unitPrice;
+        int price = (unitPrice < 0) ? 0 : valued * unitPrice;
         logger.finest("Normal price(" + amount + " " + type + ")"
                       + " valued=" + valued
                       + " current=" + getGoodsCount(type)
                       + " + " + (current - getGoodsCount(type))
                       + " unitPrice=" + unitPrice
-                      + " -> " + returnPrice);
-        return returnPrice;
+                      + " -> " + price);
+        return price;
+    }
+
+    /**
+     * Calculates how much of the given military goods type this settlement
+     * needs to fully arm.  Takes no account of current stock.
+     *
+     * @param type The military <code>GoodsType</code>.
+     * @return The amount of goods required for a complete arming.
+     */
+    private int getRequiredMilitaryGoodsAmount(GoodsType type) {
+        final Specification spec = getSpecification();
+        int need = 0;
+        int toArm = 0;
+
+        if (type == spec.getGoodsType("model.goods.muskets")) {
+            for (Unit u : ownedUnits) if (!u.isArmed()) need++;
+            toArm = spec.getEquipmentType("model.equipment.indian.muskets")
+                .getAmountRequiredOf(type);
+        } else if (type == spec.getGoodsType("model.goods.horses")) {
+            for (Unit u : ownedUnits) if (!u.isMounted()) need++;
+            toArm = spec.getEquipmentType("model.equipment.indian.horses")
+                .getAmountRequiredOf(type);
+        }
+        return need * toArm;
     }
 
     /**
@@ -807,27 +867,124 @@ public class IndianSettlement extends Settlement {
      *
      * @param type The type of goods for sale.
      * @param amount The amount of goods for sale.
-     * @param toArm The amount of goods required to make one set of the
-     *     corresponding equipment.
+     * @param required The amount of goods required to arm fully.
      * @param need The number of sets of equipment the settlement could use.
      * @return A price for the goods.
      */
-    private int getMilitaryGoodsPrice(GoodsType type, int amount, int toArm,
-                                      int need) {
-        int current = getGoodsCount(type);
-        int valued = Math.max(0, need * toArm - current);
-        int fullPrice = GOODS_BASE_PRICE + getType().getTradeBonus();
+    private int getMilitaryGoodsPriceToBuy(GoodsType type, int amount) {
+        final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
+        int required = getRequiredMilitaryGoodsAmount(type);
+        if (required == 0) return 0; // Do not pay military price
 
         // If the settlement can use more than half of the goods on offer,
         // then pay top dollar for the lot.  Otherwise only pay the premium
         // price for the part they need and refer the remaining amount to
         // the normal goods pricing.
-        int returnPrice = (valued > amount / 2) ? fullPrice * amount
-            : valued * fullPrice + getNormalGoodsPrice(type, amount - valued);
+        int valued = Math.max(0, required - getGoodsCount(type));
+        int price = (valued > amount / 2) ? full * amount
+            : valued * full + getNormalGoodsPriceToBuy(type, amount - valued);
         logger.finest("Military price(" + amount + " " + type + ")"
                       + " valued=" + valued
-                      + " -> " + returnPrice);
-        return returnPrice;
+                      + " -> " + price);
+        return price;
+    }
+
+    /**
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to sell the given <code>Goods</code> for.
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param goods The <code>Goods</code> to price.
+     * @return The price.
+     */
+    public int getPriceToSell(Goods goods) {
+        return getPriceToSell(goods.getType(), goods.getAmount());
+    }
+
+    /**
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to sell the given <code>Goods</code> for.
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param type The type of <code>Goods</code> to price.
+     * @param amount The amount of <code>Goods</code> to price.
+     * @return The price.
+     */
+    public int getPriceToSell(GoodsType type, int amount) {
+        if (amount > 100) {
+            throw new IllegalArgumentException("Too many goods");
+        }
+        final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
+
+        // Base price is purchase price plus delta.
+        // Treat useful military goods at double value, and trade goods
+        // at maximum.
+        int price = amount + Math.max(0, getPriceToBuy(type, amount));
+        if (type.isMilitaryGoods()
+            && getRequiredMilitaryGoodsAmount(type) > 0) {
+            price = Math.max(price, amount * full * 2);
+        } else if (type.isTradeGoods()) {
+            price = Math.max(price, 150 * amount * full / 100);
+        }
+        return price;
+    }
+
+    /**
+     * Gets the goods this settlement can sell.
+     *
+     * @param limit The maximum number of goods required.
+     * @return A list of goods to sell.
+     */
+    public List<Goods> getSellGoods(int limit) {
+        List<Goods> settlementGoods = getCompactGoods();
+        for (Goods goods : settlementGoods) {
+            if (goods.getAmount() > 100) {
+                goods.setAmount(100);
+            }
+        }
+        Collections.sort(settlementGoods, exportGoodsComparator);
+
+        List<Goods> result = new ArrayList<Goods>();
+        int count = 0;
+        for (Goods goods : settlementGoods) {
+            if (goods.getType().isNewWorldGoodsType()
+                && goods.getAmount() > 0) {
+                result.add(goods);
+                count++;
+                if (count >= limit) break;
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Allows spread of horses and arms between settlements
+     * @param settlement
+     */
+    public void tradeGoodsWithSetlement(IndianSettlement settlement) {
+        GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
+
+        List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
+        goodsToTrade.add(armsType);
+        goodsToTrade.add(horsesType);
+
+        for(GoodsType goods : goodsToTrade){
+            int goodsInStock = getGoodsCount(goods);
+            if(goodsInStock <= 50){
+                continue;
+            }
+            int goodsTraded = goodsInStock / 2;
+            settlement.addGoods(goods, goodsTraded);
+            removeGoods(goods, goodsTraded);
+        }
     }
 
     /**
@@ -1182,127 +1339,10 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-
-    /**
-     * Returns this settlement.
-     *
-     * @return This settlement.
-     */
-    public Settlement getSettlement() {
-        return this;
-    }
-
-    /**
-     * An Indian settlement is not a colony.
-     *
-     * @return Null.
-     */
-    public Colony getColony() {
-        return null;
-    }
-
-    /**
-     * Returns an array with goods to sell
-     */
-    public List<Goods> getSellGoods() {
-        List<Goods> settlementGoods = getCompactGoods();
-        for(Goods goods : settlementGoods) {
-            if (goods.getAmount() > 100) {
-                goods.setAmount(100);
-            }
-        }
-        Collections.sort(settlementGoods, exportGoodsComparator);
-
-        List<Goods> result = new ArrayList<Goods>();
-        int count = 0;
-        for (Goods goods : settlementGoods) {
-            if (goods.getType().isNewWorldGoodsType() && goods.getAmount() > 0) {
-                result.add(goods);
-                count++;
-                if (count > 2) {
-                    return result;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Gets the range of gold plunderable when this settlement is captured.
-     */
-    public RandomRange getPlunderRange(Unit attacker) {
-        return getType().getPlunderRange(attacker);
-    }
-
-    /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to pay for the given <code>Goods</code>.
-     *
-     * <br><br>
-     *
-     * It is only meaningful to call this method from the
-     * server, since the settlement's {@link GoodsContainer}
-     * is hidden from the clients.
-     *
-     * @param goods The <code>Goods</code> to price.
-     * @return The price.
-     */
-    public int getPriceToSell(Goods goods) {
-        return getPriceToSell(goods.getType(), goods.getAmount());
-    }
-
-    /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to pay for the given <code>Goods</code>.
-     *
-     * <br><br>
-     *
-     * It is only meaningful to call this method from the
-     * server, since the settlement's {@link GoodsContainer}
-     * is hidden from the clients.
-     *
-     * @param type The type of <code>Goods</code> to price.
-     * @param amount The amount of <code>Goods</code> to price.
-     * @return The price.
-     */
-    public int getPriceToSell(GoodsType type, int amount) {
-        if (amount > 100) {
-            throw new IllegalArgumentException();
-        }
-
-        int price = 10 - getProductionOf(type);
-        if (price < 1) price = 1;
-        return amount * price;
-    }
-
     public String toString() {
         StringBuilder s = new StringBuilder(getName());
         s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")");
         return s.toString();
-    }
-
-    /**
-     * Allows spread of horses and arms between settlements
-     * @param settlement
-     */
-    public void tradeGoodsWithSetlement(IndianSettlement settlement) {
-        GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-
-        List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
-        goodsToTrade.add(armsType);
-        goodsToTrade.add(horsesType);
-
-        for(GoodsType goods : goodsToTrade){
-            int goodsInStock = getGoodsCount(goods);
-            if(goodsInStock <= 50){
-                continue;
-            }
-            int goodsTraded = goodsInStock / 2;
-            settlement.addGoods(goods, goodsTraded);
-            removeGoods(goods, goodsTraded);
-        }
     }
 
     /**

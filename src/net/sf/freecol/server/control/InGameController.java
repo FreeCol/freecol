@@ -1233,7 +1233,7 @@ public final class InGameController extends Controller {
 
         if (settlement instanceof IndianSettlement) {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            sellGoods = indianSettlement.getSellGoods();
+            sellGoods = indianSettlement.getSellGoods(3);
             if (!sellGoods.isEmpty()) {
                 AIPlayer aiPlayer = getFreeColServer()
                     .getAIPlayer(indianSettlement.getOwner());
@@ -2262,7 +2262,7 @@ public final class InGameController extends Controller {
             indianSettlement.makeContactSettlement(serverPlayer);
             cs.add(See.only(serverPlayer),
                    indianSettlement.modifyAlarm(serverPlayer,
-                   -indianSettlement.getPrice(goods) / 50));
+                   -indianSettlement.getPriceToBuy(goods) / 50));
             indianSettlement.updateWantedGoods();
             tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), settlement);

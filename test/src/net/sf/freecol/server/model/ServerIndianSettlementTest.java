@@ -170,73 +170,76 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         // Should initially value military goods highly
         assertEquals("High price for horses", topPrice,
-                     camp.getPrice(horsesType, 1));
+                     camp.getPriceToBuy(horsesType, 1));
 
         // But once there are enough for all the braves, the price should fall
         camp.addGoods(horsesType, 50);
         assertEquals("Still high price for horses", topPrice,
-                     camp.getPrice(horsesType, 1));
+                     camp.getPriceToBuy(horsesType, 1));
         camp.addGoods(horsesType, 50);
         assertTrue("Commercial price for horses",
-                   camp.getPrice(horsesType, 1) <= topPrice / 2);
+                   camp.getPriceToBuy(horsesType, 1) <= topPrice / 2);
 
-        // Farmed goods should be ignored
-        assertEquals("Ignore farmed goods", 0,
-                     camp.getPrice(grainType, 100));
+        // Farmed goods should be much cheaper
+        assertTrue("Grain is farmed", grainType.isFarmed());
+        assertTrue("Devalue farmed goods",
+                   camp.getPriceToBuy(grainType, 100) <= 100 * topPrice / 2);
 
         // Rum is more interesting...
         assertEquals(0, camp.getGoodsCount(rumType));
         assertEquals("Buy rum", topPrice,
-                     camp.getPrice(rumType, 1));
+                     camp.getPriceToBuy(rumType, 1));
 
         // ...but the price falls with amount present
         camp.addGoods(rumType, 100);
         assertTrue("Add rum",
-                   camp.getPrice(rumType, 1) <= topPrice / 2);
+                   camp.getPriceToBuy(rumType, 1) <= topPrice / 2);
         assertTrue("Add more rum",
-                   camp.getPrice(rumType, 99) <= 99 * topPrice / 2);
+                   camp.getPriceToBuy(rumType, 99) <= 99 * topPrice / 2);
         camp.addGoods(rumType, 100);
         assertEquals("Do not buy more rum", 0,
-                     camp.getPrice(rumType, 1));
+                     camp.getPriceToBuy(rumType, 1));
 
         // On plains cotton can be grown, so cloth should be cheaper than
         // coats.
         assertTrue("Cloth ("
-                   + camp.getPrice(clothType, 50) + ") cheaper than coats ("
-                   + camp.getPrice(coatsType, 50) + ")",
-                   camp.getPrice(clothType, 50) < camp.getPrice(coatsType, 50));
+                   + camp.getPriceToBuy(clothType, 50)
+                   + ") cheaper than coats ("
+                   + camp.getPriceToBuy(coatsType, 50) + ")",
+            camp.getPriceToBuy(clothType, 50) < camp.getPriceToBuy(coatsType, 50));
         camp.addGoods(clothType, 100);
         camp.addGoods(coatsType, 100);
         assertTrue("Cloth still ("
-                   + camp.getPrice(clothType, 50) + ") cheaper than coats ("
-                   + camp.getPrice(coatsType, 50) + ")",
-                   camp.getPrice(clothType, 50) < camp.getPrice(coatsType, 50));
+                   + camp.getPriceToBuy(clothType, 50)
+                   + ") cheaper than coats ("
+                   + camp.getPriceToBuy(coatsType, 50) + ")",
+            camp.getPriceToBuy(clothType, 50) < camp.getPriceToBuy(coatsType, 50));
         camp.addGoods(clothType, 100);
         camp.addGoods(coatsType, 100);
         assertEquals("Cloth now ignored", 0,
-                     camp.getPrice(clothType, 1));
+                     camp.getPriceToBuy(clothType, 1));
         assertEquals("Coats now ignored", 0,
-                     camp.getPrice(coatsType, 1));
+                     camp.getPriceToBuy(coatsType, 1));
 
         // Check that wanted goods at least increases the price
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, horsesType);
-        int p3 = camp.getPrice(toolsType, 100);
+        int p3 = camp.getPriceToBuy(toolsType, 100);
         camp.setWantedGoods(2, toolsType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, horsesType);
-        int p2 = camp.getPrice(toolsType, 100);
+        int p2 = camp.getPriceToBuy(toolsType, 100);
         assertTrue("Wanted 2: (" + p2 + " > " + p3 + ")",  p2 > p3);
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, toolsType);
         camp.setWantedGoods(0, horsesType);
-        int p1 = camp.getPrice(toolsType, 100);
+        int p1 = camp.getPriceToBuy(toolsType, 100);
         assertTrue("Wanted 1: (" + p1 + " > " + p2 + ")",  p1 > p2);
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, toolsType);
-        int p0 = camp.getPrice(toolsType, 100);
+        int p0 = camp.getPriceToBuy(toolsType, 100);
         assertTrue("Wanted 0: (" + p0 + " > " + p1 + ")",  p0 > p1);
     }
 }
