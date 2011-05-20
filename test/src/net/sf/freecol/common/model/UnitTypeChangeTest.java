@@ -98,4 +98,18 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         assertEquals(farmer, gardenerUnit.getType());
 
     }
+
+    public void testEquality() {
+
+        for (UnitType unitType : spec().getUnitTypeList()) {
+            for (UnitTypeChange change : unitType.getTypeChanges()) {
+                UnitType newUnitType = change.getNewUnitType();
+                assertTrue(newUnitType == spec().getUnitType(newUnitType.getId()));
+            }
+
+        }
+
+
+    }
+
 }
