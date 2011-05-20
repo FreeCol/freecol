@@ -56,7 +56,7 @@ public class IndianSettlement extends Settlement {
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
 
-    public static final int GOODS_BASE_PRICE = 20;
+    public static final int GOODS_BASE_PRICE = 12;
     public static final int GOODS_CAPACITY = 200;
 
     /** The amount of goods a brave can produce a single turn. */
@@ -741,9 +741,9 @@ public class IndianSettlement extends Settlement {
         // Apply wanted bonus
         final int wantedBase = 100; // Granularity for wanted bonus
         final int wantedBonus // Premium paid for wanted goods types
-            = (type == wantedGoods[0]) ? 120
-            : (type == wantedGoods[1]) ? 110
-            : (type == wantedGoods[2]) ? 105
+            = (type == wantedGoods[0]) ? 150
+            : (type == wantedGoods[1]) ? 125
+            : (type == wantedGoods[2]) ? 110
             : 100;
         // Do not simplify with *=, we want the integer truncation.
         returnPrice = wantedBonus * returnPrice / wantedBase;
