@@ -257,6 +257,16 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Set preferred size to saved size, or to the given
+     * <code>Dimension</code> if no saved size was found.
+     *
+     * @param d a <code>Dimension</code> value
+     */
+    protected void restoreSavedSize(Dimension d) {
+        restoreSavedSize(d.width, d.height);
+    }
+
+    /**
      * Set preferred size to saved size, or to [w, h] if no saved
      * size was found.
      *
