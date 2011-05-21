@@ -86,7 +86,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
 
         Collections.sort(knownSettlements, settlementComparator);
 
-        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
+        MigLayout layout = new MigLayout("wrap 1", "[align center]", "[]30[]30[]");
         setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
@@ -102,7 +102,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
 
         Action selectAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    selectSettlement();      
+                    selectSettlement();
                 }
             };
 
@@ -126,11 +126,11 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
             };
         settlementList.addMouseListener(mouseListener);
 
-        add(listScroller, "growx, growy");
+        add(listScroller, "width max(300, 100%), height max(300, 100%)");
 
         add(okButton, "tag ok");
 
-        setSize(getPreferredSize());
+        restoreSavedSize(360, 480);
     }
 
     private void selectSettlement() {
@@ -146,6 +146,19 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        saveSize();
+        savePosition();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         settlementList.requestFocus();
@@ -154,7 +167,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param e a <code>ListSelectionEvent</code> value
      */
     public void valueChanged(ListSelectionEvent e) {
@@ -178,5 +191,5 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
         }
     }
 
-} 
+}
 
