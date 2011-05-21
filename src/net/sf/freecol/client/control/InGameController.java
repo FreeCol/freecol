@@ -4936,6 +4936,25 @@ public final class InGameController implements NetworkConstants {
     public void endTurn() {
         if (!requireOurTurn()) return;
 
+        int active = 0;
+        int skipped = 0;
+        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+            if (unit.couldMove()) {
+                if (unit.getState() == UnitState.ACTIVE) {
+                    active++;
+                } else if (unit.getState() == UnitState.SKIPPED) {
+                    skipped++;
+                }
+            }
+        }
+        if (active + skipped > 0) {
+            StringTemplate t = StringTemplate.template("endTurnDialog.areYouSure")
+                .addAmount("%active%", active)
+                .addAmount("%skipped%", skipped);
+            if (!freeColClient.getCanvas().showConfirmDialog(null, t, "yes", "no")) {
+                return;
+            }
+        }
         // Make sure all goto orders are complete before ending turn.
         moveMode = MODE_END_TURN;
         if (!doExecuteGotoOrders()) return;

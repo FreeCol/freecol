@@ -1682,6 +1682,18 @@ public class Unit extends FreeColGameObject
             setMovesLeft(0);
     }
 
+    /**
+     * Returns true if this Unit could still be moved. This is used to
+     * prevent an accidental end of turn order.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean couldMove() {
+        return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
+            && location instanceof Tile
+            && getMovesLeft() > 0;
+    }
+
 
     /**
      * Finds the closest <code>Location</code> to this tile where
