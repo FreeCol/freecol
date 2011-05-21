@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -119,16 +118,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private Map<String, DefaultMutableTreeNode> nodeMap =
         new HashMap<String, DefaultMutableTreeNode>();
 
-    /**
-     * The saved size of this panel.
-     */
-    private static Dimension savedSize = new Dimension(850, 600);
-
-    /**
-     * The saved position of this panel.
-     */
-    private static Point savedPosition = null;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -179,29 +168,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         add(okButton, "newline 20, span, tag ok");
 
-        setPreferredSize(savedSize);
+        restoreSavedSize();
         tree = buildTree();
         initialize(panelType, objectType);
     }
-
-    /**
-     * Returns the saved size of this panel.
-     *
-     * @return a <code>Dimension</code> value
-     */
-    public final Dimension getSavedSize() {
-        return savedSize;
-    }
-
-    /**
-     * Returns the saved position of this panel.
-     *
-     * @return a <code>Point</code> value
-     */
-    public Point getSavedPosition() {
-        return savedPosition;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -209,8 +179,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     @Override
     public void notifyClose() {
         super.notifyClose();
-        ColopediaPanel.savedSize = getSize();
-        ColopediaPanel.savedPosition = getFrameLocation();
+        saveSize();
+        savePosition();
     }
 
 

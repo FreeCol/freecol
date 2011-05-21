@@ -184,8 +184,15 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         return group;
     }
 
+    /**
+     * Returns the default name of the file to save the
+     * <code>OptionGroup</code>.
+     */
     public abstract String getDefaultFileName();
 
+    /**
+     * Returns the ID of the <code>OptionGroup</code>.
+     */
     public abstract String getOptionGroupId();
 
     /**

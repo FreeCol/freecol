@@ -49,15 +49,20 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      */
     public ClientOptionsDialog(Canvas parent) {
         super(parent, true);
-        //loadCustomOptions();
         getButtons().clear();
         initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDefaultFileName() {
         return "options.xml";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getOptionGroupId() {
         return OPTION_GROUP_ID;
     }

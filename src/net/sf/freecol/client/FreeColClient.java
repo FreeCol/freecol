@@ -65,6 +65,7 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -266,6 +267,14 @@ public final class FreeColClient {
         // load options
         clientOptions = new ClientOptions();
         logger.info("Loaded default client options.");
+        try {
+            FreeColSavegameFile savegame = new FreeColSavegameFile(savegameFile);
+            clientOptions.load(savegame.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS), false);
+            logger.info("Loaded client options from savegame file.");
+        } catch(Exception e) {
+            logger.warning("Failed to read client options from savegame file.");
+        }
+
         actionManager = new ActionManager(this);
         File preferences = FreeCol.getClientOptionsFile();
         if (preferences != null && preferences.exists()) {

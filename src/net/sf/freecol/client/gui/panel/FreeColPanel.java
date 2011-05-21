@@ -65,6 +65,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -75,6 +76,8 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -195,13 +198,105 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         setCancelComponent(okButton);
     }
 
+
+    private int getInteger(String key) {
+        return getClient().getClientOptions().getInteger(getClass().getName() + key);
+    }
+
+    /**
+     * Returns the saved size of this panel, null by default.
+     *
+     * @return a <code>Dimension</code> value
+     */
+    public final Dimension getSavedSize() {
+        try {
+            return new Dimension(getInteger(".w"), getInteger(".h"));
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
+
+    private void saveInteger(String key, int value) {
+        Option o = getClient().getClientOptions().getOption(getClass().getName() + key);
+        if (o == null) {
+            IntegerOption io = new IntegerOption(getClass().getName() + key);
+            io.setValue(value);
+            getClient().getClientOptions().add(io);
+        } else if (o instanceof IntegerOption) {
+            ((IntegerOption) o).setValue(value);
+        }
+    }
+
+    /**
+     * Save the current size of the panel.
+     *
+     */
+    protected void saveSize() {
+        saveSize(getSize());
+    }
+
+    /**
+     * Save the given Dimension as size of the panel.
+     *
+     * @param size a <code>Dimension</code> value
+     */
+    protected void saveSize(Dimension size) {
+        saveInteger(".w", size.width);
+        saveInteger(".h", size.height);
+    }
+
+
+    /**
+     * Set preferred size to saved size, or to [850, 600] if no saved
+     * size was found.
+     *
+     */
+    protected void restoreSavedSize() {
+        restoreSavedSize(850, 600);
+    }
+
+    /**
+     * Set preferred size to saved size, or to [w, h] if no saved
+     * size was found.
+     *
+     * @param w an <code>int</code> value
+     * @param h an <code>int</code> value
+     */
+    protected void restoreSavedSize(int w, int h) {
+        Dimension size = getSavedSize();
+        if (size == null) {
+            size = new Dimension(w, h);
+            saveSize(size);
+        }
+        setPreferredSize(size);
+    }
+
+
     /**
      * Returns the saved position of this panel, null by default.
      *
      * @return a <code>Point</code> value
      */
     public Point getSavedPosition() {
-        return null;
+        try {
+            return new Point(getInteger(".x"), getInteger(".y"));
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Save the current location of the <code>JInternalFrame</code>
+     * enclosing this panel.
+     *
+     */
+    protected void savePosition() {
+        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
+        if (frame != null) {
+            saveInteger(".x", frame.getLocation().x);
+            saveInteger(".y", frame.getLocation().y);
+        }
     }
 
     /**
@@ -212,22 +307,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public final Canvas getCanvas() {
         return canvas;
     }
-
-    /**
-     * Return the location of the enclosing
-     * <code>JInternalFrame</code>, if any.
-     *
-     * @return a <code>Point</code> value
-     */
-    public Point getFrameLocation() {
-        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
-        if (frame == null) {
-            return null;
-        } else {
-            return frame.getLocation();
-        }
-    }
-
 
     /**
      * Returns the ImageLibrary.

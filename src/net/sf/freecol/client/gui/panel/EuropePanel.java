@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -108,16 +106,6 @@ public final class EuropePanel extends FreeColPanel {
     private JButton exitButton;
 
     private JLabel header = getDefaultHeader("");
-
-    /**
-     * The saved size of this panel.
-     */
-    private static Dimension savedSize = new Dimension(850, 600);
-
-    /**
-     * The saved position of this panel.
-     */
-    private static Point savedPosition = null;
 
 
     /**
@@ -251,7 +239,7 @@ public final class EuropePanel extends FreeColPanel {
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
 
-        setPreferredSize(savedSize);
+        restoreSavedSize(1000, parent.getHeight() > 750 ? 700 : 600);
     }
 
     /**
@@ -260,8 +248,8 @@ public final class EuropePanel extends FreeColPanel {
     @Override
     public void notifyClose() {
         super.notifyClose();
-        EuropePanel.savedSize = getSize();
-        EuropePanel.savedPosition = getFrameLocation();
+        saveSize();
+        savePosition();
     }
 
     /**
@@ -370,6 +358,7 @@ public final class EuropePanel extends FreeColPanel {
         marketPanel.initialize();
         docksPanel.initialize();
         log.initialize();
+
     }
 
     /**

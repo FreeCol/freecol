@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
@@ -61,16 +59,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     protected JLabel header;
 
     protected JScrollPane scrollPane;
-
-    /**
-     * The saved size of this panel.
-     */
-    private static Dimension savedSize = new Dimension(850, 600);
-
-    /**
-     * The saved position of this panel.
-     */
-    private static Point savedPosition = null;
 
 
     public static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
@@ -115,7 +103,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         add(scrollPane, "cell 0 1, height 100%, width 100%");
         add(okButton, "cell 0 2, tag ok");
 
-        setPreferredSize(savedSize);
+        restoreSavedSize();
     }
 
     protected void setMainComponent(Component main) {
@@ -128,22 +116,13 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Get the <code>SavedSize</code> value.
-     *
-     * @return a <code>Dimension</code> value
-     */
-    public final Dimension getSavedSize() {
-        return savedSize;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void notifyClose() {
         super.notifyClose();
-        ReportPanel.savedSize = getSize();
-        ReportPanel.savedPosition = getFrameLocation();
+        saveSize();
+        savePosition();
     }
 
     /**

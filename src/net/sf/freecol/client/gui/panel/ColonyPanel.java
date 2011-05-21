@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -67,7 +66,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -158,16 +156,6 @@ public final class ColonyPanel extends FreeColPanel
 
     private JButton setGoodsButton = (FreeCol.isInDebugMode())
         ? new JButton("Set Goods") : null;
-
-    /**
-     * The saved size of this panel.
-     */
-    private static Dimension savedSize = null;
-
-    /**
-     * The saved position of this panel.
-     */
-    private static Point savedPosition = null;
 
 
     /**
@@ -320,9 +308,7 @@ public final class ColonyPanel extends FreeColPanel
         add(exitButton);
 
         initialize(colony);
-        if (savedSize != null) {
-            setPreferredSize(savedSize);
-        }
+        restoreSavedSize();
     }
 
     @Override
@@ -331,22 +317,13 @@ public final class ColonyPanel extends FreeColPanel
     }
 
     /**
-     * Get the <code>SavedSize</code> value.
-     *
-     * @return a <code>Dimension</code> value
-     */
-    public final Dimension getSavedSize() {
-        return savedSize;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void notifyClose() {
         super.notifyClose();
-        ColonyPanel.savedSize = getSize();
-        ColonyPanel.savedPosition = getFrameLocation();
+        saveSize();
+        savePosition();
     }
 
     /**
