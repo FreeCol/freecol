@@ -205,7 +205,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
         });
 
-        setLayout(new MigLayout("wrap 4", "[fill]", ""));
+        setLayout(new MigLayout("wrap 4", "[]20[fill]rel"));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
@@ -213,11 +213,11 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         add(nameLabel);
         add(tradeRouteName, "span");
         add(destinationLabel);
-        add(destinationSelector);
-        add(addStopButton);
-        add(removeStopButton, "skip 2");
+        add(destinationSelector, "span");
+        add(addStopButton, "skip 2");
+        add(removeStopButton);
         add(goodsPanel, "span");
-        add(cargoPanel, "span, height 80:");
+        add(cargoPanel, "span, height 80:, growy");
         add(ok, "newline 20, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
@@ -260,7 +260,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         // set name of trade route
         tradeRouteName.setText(tradeRoute.getName());
 
-        setSize(getPreferredSize());
+        restoreSavedSize(getPreferredSize());
 
     }
 
@@ -276,8 +276,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
     }
 
-    public void requestFocus() {
-        ok.requestFocus();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        saveSize();
+        savePosition();
     }
 
     /**
@@ -381,7 +387,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     public class GoodsPanel extends JPanel {
 
         public GoodsPanel() {
-            super(new GridLayout(0, 5, margin, margin));
+            super(new GridLayout(0, 4, margin, margin));
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     CargoLabel label = new CargoLabel(goodsType);

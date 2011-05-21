@@ -263,7 +263,14 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param d a <code>Dimension</code> value
      */
     protected void restoreSavedSize(Dimension d) {
-        restoreSavedSize(d.width, d.height);
+        Dimension size = getSavedSize();
+        if (size == null) {
+            size = d;
+            saveSize(size);
+        }
+        if (!getPreferredSize().equals(size)) {
+            setPreferredSize(size);
+        }
     }
 
     /**
@@ -274,12 +281,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param h an <code>int</code> value
      */
     protected void restoreSavedSize(int w, int h) {
-        Dimension size = getSavedSize();
-        if (size == null) {
-            size = new Dimension(w, h);
-            saveSize(size);
-        }
-        setPreferredSize(size);
+        restoreSavedSize(new Dimension(w, h));
     }
 
 

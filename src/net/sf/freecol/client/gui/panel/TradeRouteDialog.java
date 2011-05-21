@@ -53,7 +53,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
-    
+
     private static enum Action { OK, CANCEL, DEASSIGN, DELETE }
 
     private final JButton ok = new JButton(Messages.message("ok"));
@@ -111,7 +111,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         // button for editing TradeRoute
         editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    parent.showFreeColDialog(new TradeRouteInputDialog(parent, 
+                    parent.showFreeColDialog(new TradeRouteInputDialog(parent,
                         (TradeRoute) tradeRoutes.getSelectedValue()));
                 }
             });
@@ -161,30 +161,45 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         }
         updateButtons();
 
-        setLayout(new MigLayout("wrap 2", "", ""));
+        setLayout(new MigLayout("wrap 2", "[fill][fill]"));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.name")),
             "span, align center");
-  
-        add(tradeRouteView, "height 360:400");
-        add(newRouteButton, "split 3, flowy, growx");
+
+        add(tradeRouteView, "height 360:400, width 250:");
+        add(newRouteButton, "split 4, flowy, growx");
         add(editRouteButton, "growx");
         add(removeRouteButton, "growx");
-
-        add(ok, "newline 20, span, split 3, tag ok");
-        add(cancel, "tag cancel");
         add(deassignRouteButton);
 
-        setSize(getPreferredSize());
+        add(ok, "newline 20, span, split 2, tag ok");
+        add(cancel, "tag cancel");
+
+        restoreSavedSize(getPreferredSize());
 
     }
-    
+
      private static final Comparator<TradeRoute> tradeRouteComparator = new Comparator<TradeRoute>() {
          public int compare(TradeRoute r1, TradeRoute r2) {
              return r1.getName().compareTo(r2.getName());
          }
      };
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notifyClose() {
+        super.notifyClose();
+        saveSize();
+        savePosition();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void requestFocus() {
         ok.requestFocus();
     }
@@ -201,7 +216,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         }
     }
 
-    
+
     /**
      * This function analyses an event and calls the right methods to take
      * care of the user's requests.
@@ -242,7 +257,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             case CANCEL: default:
                 break;
             }
-        }        
+        }
         getCanvas().remove(this);
         setResponse(null);
     }
