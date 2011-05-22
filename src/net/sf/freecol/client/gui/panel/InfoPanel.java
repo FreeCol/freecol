@@ -38,6 +38,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
@@ -424,8 +425,6 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class EndTurnPanel extends JPanel {
 
-        private JButton endTurnButton = new JButton(Messages.message("infoPanel.endTurnPanel.endTurnButton"));
-
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
@@ -444,26 +443,10 @@ public final class InfoPanel extends FreeColPanel {
                 add(new JLabel(labelString));
             }
 
-            add(endTurnButton);
+            add(new JButton(getClient().getActionManager().getFreeColAction(EndTurnAction.id)));
             setOpaque(false);
             setSize(getPreferredSize());
 
-            /*
-             * TODO: The action listener does not work, because this button
-             * looses it's focus. The reason why the focus gets lost should be
-             * found, in order to use the actionlistener.
-             */
-            /*
-             * endTurnButton.addActionListener(new ActionListener() { public
-             * void actionPerformed(ActionEvent e) {
-             * getClient().getInGameController().endTurn(); } });
-             */
-
-            endTurnButton.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    getController().endTurn();
-                }
-            });
         }
     }
 }
