@@ -32,7 +32,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * image on FreeColMenuBar, such as that at the top of the window.
  */
 public class FreeColMenuBarUI extends BasicMenuBarUI {
-    
+
     private static FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
 
 

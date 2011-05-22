@@ -31,10 +31,10 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * Draw the "background.FreeColPanel" resource as a tiled background image.
  */
 public class FreeColPanelUI extends BasicPanelUI {
-    
+
     private static FreeColPanelUI sharedInstance = new FreeColPanelUI();
 
-    
+
     private FreeColPanelUI() {}
 
     public static ComponentUI createUI(JComponent c) {

@@ -34,15 +34,15 @@ public class FreeColMenuItemUI extends BasicMenuItemUI {
         return new FreeColMenuItemUI();
     }
 
-    
+
     public void installUI(JComponent c) {
         super.installUI(c);
 
         c.setOpaque(false);
     }
-    
+
     @Override
-    public void paint(Graphics g, JComponent c) { 
+    public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
         super.paint(g, c);
     }

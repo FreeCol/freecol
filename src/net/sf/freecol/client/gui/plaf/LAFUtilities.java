@@ -29,18 +29,18 @@ import javax.swing.JComponent;
  * Utility methods for Look-and-Feel classes.
  */
 public final class LAFUtilities {
-    
+
     private static final int AA_TEXT_SIZE = 16;
-    
+
     /**
      * Modifies the given graphics object with any relevant
      * {@link JComponent#getClientProperty(Object) client property}
      * from the given component.
-     * 
+     *
      * Currently only <code>RenderingHints.KEY_TEXT_ANTIALIASING</code>
      * is supported. Antialiasing is enabled explicitly if the text size
      * is larger or equal to 16.
-     * 
+     *
      * @param g The graphics object to be updated.
      * @param c The component to get the properties from.
      */

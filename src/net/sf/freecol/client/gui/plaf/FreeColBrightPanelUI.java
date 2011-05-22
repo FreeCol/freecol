@@ -35,9 +35,9 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * subpanels in the ColonyPanel.
  */
 public class FreeColBrightPanelUI extends BasicPanelUI {
-    
+
     private static FreeColBrightPanelUI sharedInstance = new FreeColBrightPanelUI();
-    
+
     public static ComponentUI createUI(JComponent c) {
         return sharedInstance;
     }

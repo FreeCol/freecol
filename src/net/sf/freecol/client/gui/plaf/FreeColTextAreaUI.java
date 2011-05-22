@@ -40,17 +40,17 @@ public class FreeColTextAreaUI extends BasicTextAreaUI {
     public FreeColTextAreaUI(JComponent c) {
         this.c = c;
     }
-    
+
     public static ComponentUI createUI(JComponent c) {
         return new FreeColTextAreaUI(c);
     }
 
     @Override
-    public void paintSafely(Graphics g) { 
+    public void paintSafely(Graphics g) {
         LAFUtilities.setProperties(g, c);
         super.paintSafely(g);
     }
-    
+
     public void paintBackground(java.awt.Graphics g) {
         JComponent c = getComponent();
         if (c.isOpaque()) {

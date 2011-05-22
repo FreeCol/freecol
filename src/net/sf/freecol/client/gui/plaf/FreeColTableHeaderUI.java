@@ -37,7 +37,7 @@ public class FreeColTableHeaderUI extends BasicTableHeaderUI {
         return new FreeColTableHeaderUI();
     }
 
-    
+
     public void installUI(JComponent c) {
         super.installUI(c);
 
@@ -49,7 +49,7 @@ public class FreeColTableHeaderUI extends BasicTableHeaderUI {
     }
 
     @Override
-    public void paint(Graphics g, JComponent c) { 
+    public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
         super.paint(g, c);
     }

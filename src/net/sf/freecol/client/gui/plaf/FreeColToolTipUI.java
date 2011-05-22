@@ -41,9 +41,9 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * image on tool tip popups.
  */
 public class FreeColToolTipUI extends BasicToolTipUI {
-    
+
     private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
-    
+
 
     public static ComponentUI createUI(JComponent c) {
         return sharedInstance;
@@ -53,7 +53,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }
-         
+
         LAFUtilities.setProperties(g, c);
 
         // Copied from "BasicToolTipUI":

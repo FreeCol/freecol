@@ -52,29 +52,29 @@ public class FreeColButtonUI extends MetalButtonUI {
 
     public void installUI(JComponent c) {
         super.installUI(c);
-        
+
         c.setOpaque(false);
     }
-    
+
     public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
-        
+
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColButton", g, c, null);
         }
         super.paint(g, c);
-        
+
         AbstractButton a = (AbstractButton) c;
         if (a.isRolloverEnabled()) {
             Point p = MouseInfo.getPointerInfo().getLocation();
             SwingUtilities.convertPointFromScreen(p, c);
             boolean rollover = c.contains(p);
-            if (rollover) { 
+            if (rollover) {
                 paintButtonPressed(g, (AbstractButton) c);
             }
         }
     }
-    
+
     protected void paintButtonPressed(Graphics g, AbstractButton c) {
         if (c.isContentAreaFilled()) {
             Graphics2D g2d = (Graphics2D) g;

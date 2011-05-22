@@ -40,13 +40,13 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
     public FreeColTextFieldUI(JComponent c) {
         this.c = c;
     }
-    
+
     public static ComponentUI createUI(JComponent c) {
         return new FreeColTextFieldUI(c);
     }
-    
+
     @Override
-    public void paintSafely(Graphics g) { 
+    public void paintSafely(Graphics g) {
         LAFUtilities.setProperties(g, c);
         super.paintSafely(g);
     }

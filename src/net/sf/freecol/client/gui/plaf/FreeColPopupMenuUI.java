@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * Obviously these contain text so a light colour is recommended.
  */
 public class FreeColPopupMenuUI extends BasicPopupMenuUI {
-    
+
     private static FreeColPopupMenuUI sharedInstance = new FreeColPopupMenuUI();
 
 
