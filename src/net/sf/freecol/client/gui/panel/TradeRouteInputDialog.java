@@ -19,12 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
@@ -55,10 +50,12 @@ import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
@@ -77,15 +74,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 
-    private static final int OK = 0, CANCEL = 1;
-
     public static final DataFlavor STOP_FLAVOR = new DataFlavor(Stop.class, "Stop");
 
     private TradeRoute originalRoute;
-
-    private final JButton ok = new JButton(Messages.message("ok"));
-
-    private final JButton cancel = new JButton(Messages.message("cancel"));
 
     private final JButton addStopButton = new JButton(Messages.message("traderouteDialog.addStop"));
 
@@ -125,15 +116,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         super(parent);
 
         originalRoute = newRoute;
-
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
-        enterPressesWhenFocused(cancel);
-        setCancelComponent(cancel);
 
         goodsPanel = new GoodsPanel();
         goodsPanel.setTransferHandler(cargoHandler);
@@ -205,7 +187,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
         });
 
-        setLayout(new MigLayout("wrap 4", "[]20[fill]rel"));
+        setLayout(new MigLayout("wrap 4, fill", "[]20[fill]rel"));
 
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             "span, align center");
@@ -218,8 +200,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         add(removeStopButton);
         add(goodsPanel, "span");
         add(cargoPanel, "span, height 80:, growy");
-        add(ok, "newline 20, span, split 2, tag ok");
-        add(cancel, "tag cancel");
+        add(okButton, "newline 20, span, split 2, tag ok");
+        add(cancelButton, "tag cancel");
 
         TradeRoute tradeRoute = newRoute.clone();
 
@@ -318,31 +300,24 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-            	if (verifyNewTradeRoute()) {
-                    getCanvas().remove(this);
-                    originalRoute.setName(tradeRouteName.getText());
-                    ArrayList<Stop> stops = new ArrayList<Stop>();
-                    for (int index = 0; index < listModel.getSize(); index++) {
-                        stops.add((Stop) listModel.get(index));
-                    }
-                    originalRoute.setStops(stops);
-                    // TODO: update trade routes only if they have been modified
-                    getController().updateTradeRoute(originalRoute);
-                    setResponse(Boolean.TRUE);
-                }
-                break;
-            case CANCEL:
+        if (OK.equals(command)) {
+            if (verifyNewTradeRoute()) {
                 getCanvas().remove(this);
-                setResponse(Boolean.FALSE);
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
+                originalRoute.setName(tradeRouteName.getText());
+                ArrayList<Stop> stops = new ArrayList<Stop>();
+                for (int index = 0; index < listModel.getSize(); index++) {
+                    stops.add((Stop) listModel.get(index));
+                }
+                originalRoute.setStops(stops);
+                // TODO: update trade routes only if they have been modified
+                getController().updateTradeRoute(originalRoute);
+                setResponse(Boolean.TRUE);
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        } else if (CANCEL.equals(command)) {
+            getCanvas().remove(this);
+            setResponse(Boolean.FALSE);
+        } else {
+            super.actionPerformed(event);
         }
     }
 
@@ -599,9 +574,16 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private class StopRenderer implements ListCellRenderer {
 
-        private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
-        private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
+        private final JPanel SELECTED_COMPONENT = new JPanel();
+        private final JPanel NORMAL_COMPONENT = new JPanel();
 
+        public StopRenderer() {
+            NORMAL_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
+            NORMAL_COMPONENT.setOpaque(false);
+            SELECTED_COMPONENT.setLayout(new MigLayout("", "[80, center][]"));
+            SELECTED_COMPONENT.setOpaque(false);
+            SELECTED_COMPONENT.setUI((PanelUI) FreeColSelectedPanelUI.createUI(SELECTED_COMPONENT));
+        }
 
         /**
          * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
@@ -642,31 +624,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
             return panel;
         }
-
-        private class NormalComponent extends JPanel {
-
-            public NormalComponent() {
-                super(new MigLayout("", "[80][]"));
-                setOpaque(false);
-            }
-        }
-
-        private class SelectedComponent extends NormalComponent {
-
-            public void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                Composite oldComposite = g2d.getComposite();
-                Color oldColor = g2d.getColor();
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                g2d.setComposite(oldComposite);
-                g2d.setColor(oldColor);
-
-                super.paintComponent(g);
-            }
-        }
-
 
     }
 

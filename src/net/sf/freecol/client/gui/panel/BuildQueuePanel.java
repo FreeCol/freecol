@@ -19,13 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -63,10 +58,12 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import javax.swing.plaf.PanelUI;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -908,25 +905,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
-    /**
-     * See FreeColComboBoxRenderer.
-     */
-    class SelectedPanel extends JPanel {
-
-        public void paintComponent(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g;
-            Composite oldComposite = g2d.getComposite();
-            Color oldColor = g2d.getColor();
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(0, 0, getWidth(), getHeight());
-            g2d.setComposite(oldComposite);
-            g2d.setColor(oldColor);
-
-            super.paintComponent(g);
-        }
-    }
-
     class SimpleBuildQueueCellRenderer extends FreeColComboBoxRenderer {
 
         public void setLabelValues(JLabel c, Object value) {
@@ -938,7 +916,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     class DefaultBuildQueueCellRenderer implements ListCellRenderer {
 
         JPanel itemPanel = new JPanel();
-        JPanel selectedPanel = new SelectedPanel();
+        JPanel selectedPanel = new JPanel();
         JLabel imageLabel = new JLabel(new ImageIcon());
         JLabel nameLabel = new JLabel();
 
@@ -952,6 +930,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             itemPanel.setLayout(new MigLayout());
             selectedPanel.setOpaque(false);
             selectedPanel.setLayout(new MigLayout());
+            selectedPanel.setUI((PanelUI) FreeColSelectedPanelUI.createUI(selectedPanel));
         }
 
         public Component getListCellRendererComponent(JList list,
