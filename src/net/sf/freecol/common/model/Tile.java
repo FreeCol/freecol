@@ -1708,21 +1708,27 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Finds an empty tile to put a unit near to this one.
+     * Finds a safe tile to put a unit on, near to this one.
      * Useful on return from Europe.
      *
+     * @param player The owner of the unit to place (may be null).
      * @param random An optional pseudo-random number source.
      * @return A vacant tile near this one.
      */
-    public Tile getVacantTile(Random random) {
-        if (getFirstUnit() == null) return this;
+    public Tile getSafeTile(Player player, Random random) {
+        if ((getFirstUnit() == null || getFirstUnit().getOwner() == player)
+            && (getSettlement() == null || getSettlement().getOwner() == player)) {
+            return this;
+        }
 
         for (int r = 1; true; r++) {
             List<Tile> tiles = getSurroundingTiles(r, r);
             if (random != null) Collections.shuffle(tiles, random);
             for (Tile t : tiles) {
-                if (t.getFirstUnit() == null
-                    || t.getSettlement() == null) return t;
+                if ((t.getFirstUnit() == null || t.getFirstUnit().getOwner() == player)
+                    && (t.getSettlement() == null || t.getSettlement().getOwner() == player)) {
+                    return t;
+                }
             }
         }
     }

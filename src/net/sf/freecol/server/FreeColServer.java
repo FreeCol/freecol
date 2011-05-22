@@ -383,7 +383,7 @@ public final class FreeColServer {
             }
             if (navalUnits.size() > 0) {
                 UnitType navalType = navalUnits.get(Utils.randomInt(logger, "Choose undead navy", random, navalUnits.size()));
-                Unit theFlyingDutchman = new ServerUnit(game, ((Tile) p.getEntryLocation()).getVacantTile(random), p, navalType, UnitState.ACTIVE);
+                Unit theFlyingDutchman = new ServerUnit(game, ((Tile) p.getEntryLocation()).getSafeTile(p, random), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
                     UnitType landType = landUnits.get(random.nextInt(landUnits.size()));
                     new ServerUnit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);

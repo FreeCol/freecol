@@ -1296,7 +1296,7 @@ public final class InGameInputHandler extends InputHandler {
                 Tile defTile = ((settlements.size() > 0)
                                 ? settlements.get(0).getTile()
                                 : newPlayer.getEntryLocation().getTile())
-                    .getVacantTile(null);
+                    .getSafeTile(null, null);
                 newPlayer.resetIterators();
                 fcc.getInGameController().nextActiveUnit(defTile);
             }

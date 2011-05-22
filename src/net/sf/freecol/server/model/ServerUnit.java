@@ -289,7 +289,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case TO_AMERICA:
             logger.info(toString() + " arrives in America");
-            csMove(getFullEntryLocation().getVacantTile(random), random, cs);
+            csMove(getFullEntryLocation().getSafeTile(getOwner(), random),
+                   random, cs);
             break;
         case FORTIFYING:
             setState(UnitState.FORTIFIED);
