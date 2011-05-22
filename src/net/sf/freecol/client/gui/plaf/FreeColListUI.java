@@ -53,6 +53,6 @@ public class FreeColListUI extends BasicListUI {
     }
 
     protected ListCellRenderer createRenderer() {
-        return new FreeColComboBoxRenderer.UIResource();
-    }    
+        return new FreeColComboBoxRenderer();
+    }
 }

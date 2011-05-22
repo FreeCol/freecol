@@ -41,16 +41,7 @@ public class FreeColComboBoxUI extends MetalComboBoxUI {
         c.setOpaque(false);
     }
 
-
-    /*protected  JButton createArrowButton() {
-        JButton button = super.createArrowButton();
-
-        // TODO: Make button prettier?
-
-        return button;
-    }*/
-    
     protected ListCellRenderer createRenderer() {
-        return new FreeColComboBoxRenderer.UIResource();
+        return new FreeColComboBoxRenderer();
     }
 }

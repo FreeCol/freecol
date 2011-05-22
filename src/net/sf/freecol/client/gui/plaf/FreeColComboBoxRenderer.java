@@ -26,6 +26,7 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
+import javax.swing.plaf.UIResource;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,15 +35,15 @@ import javax.swing.ListCellRenderer;
 /**
  * A <code>ListCellRenderer</code> to be used by <code>FreeColListUI</code>.
  */
-public class FreeColComboBoxRenderer implements ListCellRenderer {
-    
+public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
+
     private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
     private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
 
 
     /**
      * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
-     * 
+     *
      * @param list The <code>JList</code>.
      * @param value The list cell.
      * @param index The index in the list.
@@ -50,15 +51,10 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
      * @param hasFocus <code>false</code> if the given list cell has the focus.
      * @return The <code>ListCellRenderer</code>
      */
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean hasFocus) {
-        JLabel c;
+    public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                  boolean isSelected, boolean hasFocus) {
 
-        if (isSelected) {
-            c = SELECTED_COMPONENT;
-        } else {
-            c = NORMAL_COMPONENT;
-        }
-
+        JLabel c = isSelected ? SELECTED_COMPONENT : NORMAL_COMPONENT;
         c.setForeground(list.getForeground());
         c.setFont(list.getFont());
         setLabelValues(c, value);
@@ -71,7 +67,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
         if (value instanceof Icon) {
             c.setIcon((Icon) value);
         } else {
-            c.setText((value == null) ? "" : value.toString());
+            c.setText((value == null) ? null : value.toString());
         }
     }
 
@@ -90,11 +86,11 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
             g2d.fillRect(0, 0, getWidth(), getHeight());
             g2d.setComposite(oldComposite);
             g2d.setColor(oldColor);
-            
+
             super.paintComponent(g);
         }
     }
-    
+
 
     private class NormalComponent extends JLabel {
 
@@ -102,11 +98,5 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
             setOpaque(false);
         }
     }
-    
 
-    /**
-     * The <code>FreeColComboBoxRenderer</code> as an <code>UIResource</code>.
-     */
-    public static class UIResource extends FreeColComboBoxRenderer implements javax.swing.plaf.UIResource {
-    }
 }
