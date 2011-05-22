@@ -46,7 +46,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel displays the different founding fathers the player can work
  * towards recruiting.
- * 
+ *
  * @see FoundingFather
  */
 public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFather> implements ActionListener {
@@ -61,7 +61,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      * @param possibleFoundingFathers The founding fathers which can
      *        be selected. The length of the array is the same as the
@@ -104,7 +104,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -137,7 +137,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         /**
          * Creates a <code>FoundingFatherPanel</code> for a given type of
          * founding fathers.
-         * 
+         *
          * @param type The type of founding fathers to be displayed in this
          *            <code>FoundingFatherPanel</code>.
          */
@@ -164,9 +164,9 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             p3.add(ok, BorderLayout.CENTER);
             add(p3, BorderLayout.SOUTH);
         }
-        
+
         private JPanel createContentPanel(FoundingFatherType type) {
-            
+
             JPanel p1 = new JPanel();
             p1.setLayout(new BorderLayout(20, 20));
             p1.setOpaque(false);
@@ -216,7 +216,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             text.setWrapStyleWord(true);
             text.setFocusable(false);
             p2.add(text, BorderLayout.CENTER);
-            
+
             return p1;
         }
 
@@ -226,7 +226,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
         /**
          * Prepares this panel to be displayed.
-         * 
+         *
          * @param father The founding father to be displayed or
          *            <code>-1</code> if there is none.
          */
