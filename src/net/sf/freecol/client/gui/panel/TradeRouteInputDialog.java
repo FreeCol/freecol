@@ -277,16 +277,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
-    }
-
-    /**
      * Check that the trade route is valid.
      *
      * @return True if the trade route is valid.

@@ -150,16 +150,6 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
      * {@inheritDoc}
      */
     @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void requestFocus() {
         settlementList.requestFocus();
     }

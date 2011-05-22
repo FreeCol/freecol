@@ -168,21 +168,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         add(okButton, "newline 20, span, tag ok");
 
-        restoreSavedSize();
+        restoreSavedSize(850, 600);
         tree = buildTree();
         initialize(panelType, objectType);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
-    }
-
 
     /**
      * Prepares this panel to be displayed.

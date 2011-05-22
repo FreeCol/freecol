@@ -196,9 +196,17 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
+
     }
 
 
+    /**
+     * Return an <code>int</code> associated with the name of the
+     * panel's class plus the given key from the saved ClientOptions.
+     *
+     * @param key a <code>String</code> value
+     * @return an <code>int</code> value
+     */
     private int getInteger(String key) {
         return getClient().getClientOptions().getInteger(getClass().getName() + key);
     }
@@ -217,6 +225,14 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
 
+    /**
+     * Save an <code>int</code> value to the saved ClientOptions,
+     * using the name of the panel's class plus the given key as and
+     * ID.
+     *
+     * @param key a <code>String</code> value
+     * @param value an <code>int</code> value
+     */
     private void saveInteger(String key, int value) {
         Option o = getClient().getClientOptions().getOption(getClass().getName() + key);
         if (o == null) {
@@ -229,36 +245,10 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Save the current size of the panel.
-     *
-     */
-    protected void saveSize() {
-        saveSize(getSize());
-    }
-
-    /**
-     * Save the given Dimension as size of the panel.
-     *
-     * @param size a <code>Dimension</code> value
-     */
-    protected void saveSize(Dimension size) {
-        saveInteger(".w", size.width);
-        saveInteger(".h", size.height);
-    }
-
-
-    /**
-     * Set preferred size to saved size, or to [850, 600] if no saved
-     * size was found.
-     *
-     */
-    protected void restoreSavedSize() {
-        restoreSavedSize(850, 600);
-    }
-
-    /**
      * Set preferred size to saved size, or to the given
-     * <code>Dimension</code> if no saved size was found.
+     * <code>Dimension</code> if no saved size was found. Call this
+     * method in the constructor of a FreeColPanel in order to
+     * remember its size and position.
      *
      * @param d a <code>Dimension</code> value
      */
@@ -274,8 +264,9 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Set preferred size to saved size, or to [w, h] if no saved
-     * size was found.
+     * Set preferred size to saved size, or to [w, h] if no saved size
+     * was found. Call this method in the constructor of a
+     * FreeColPanel in order to remember its size and position.
      *
      * @param w an <code>int</code> value
      * @param h an <code>int</code> value
@@ -298,18 +289,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         }
     }
 
-    /**
-     * Save the current location of the <code>JInternalFrame</code>
-     * enclosing this panel.
-     *
-     */
-    protected void savePosition() {
-        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
-        if (frame != null) {
-            saveInteger(".x", frame.getLocation().x);
-            saveInteger(".y", frame.getLocation().y);
-        }
-    }
 
     /**
      * Get the <code>Canvas</code> value.
@@ -596,12 +575,42 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Notify that this panel is closing, (that is, is being removed
-     * from the canvas (see Canvas.remove())).
+     * Notify this panel that it is being removed from the
+     * canvas. Saves the current size and position of the panel to the
+     * ClientOptions, which are included in the savegame file.
+     *
+     * @see Canvas#remove()
      */
     public void notifyClose() {
         firePropertyChange("closing", false, true);
+        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
+        if (frame != null) {
+            saveInteger(".x", frame.getLocation().x);
+            saveInteger(".y", frame.getLocation().y);
+        }
+        saveSize();
     }
+
+    /**
+     * Save the current size of the panel.
+     *
+     */
+    private void saveSize() {
+        saveSize(getSize());
+    }
+
+    /**
+     * Save the given Dimension as size of the panel.
+     *
+     * @param size a <code>Dimension</code> value
+     */
+    private void saveSize(Dimension size) {
+        saveInteger(".w", size.width);
+        saveInteger(".h", size.height);
+    }
+
+
+
 
     /**
      * Add a routine to be called when this panel closes.

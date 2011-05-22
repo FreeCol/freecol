@@ -189,17 +189,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      * {@inheritDoc}
      */
     @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void requestFocus() {
         ok.requestFocus();
     }

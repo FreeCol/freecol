@@ -103,7 +103,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         add(scrollPane, "cell 0 1, height 100%, width 100%");
         add(okButton, "cell 0 2, tag ok");
 
-        restoreSavedSize();
+        restoreSavedSize(850, 600);
     }
 
     protected void setMainComponent(Component main) {
@@ -113,16 +113,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected Border createBorder() {
         return new EmptyBorder(20, 20, 20, 20);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
     }
 
     /**

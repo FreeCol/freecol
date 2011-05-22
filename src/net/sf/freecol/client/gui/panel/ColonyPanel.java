@@ -308,22 +308,12 @@ public final class ColonyPanel extends FreeColPanel
         add(exitButton);
 
         initialize(colony);
-        restoreSavedSize();
+        restoreSavedSize(850, 600);
     }
 
     @Override
     public void requestFocus() {
         exitButton.requestFocus();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
     }
 
     /**

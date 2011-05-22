@@ -243,16 +243,6 @@ public final class EuropePanel extends FreeColPanel {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyClose() {
-        super.notifyClose();
-        saveSize();
-        savePosition();
-    }
-
-    /**
      * What to do when requesting focus.
      */
     public void requestFocus() {
