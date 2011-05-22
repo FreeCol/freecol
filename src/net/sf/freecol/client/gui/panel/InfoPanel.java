@@ -56,23 +56,23 @@ import net.miginfocom.swing.MigLayout;
  * left and stuff like that.
  */
 public final class InfoPanel extends FreeColPanel {
-    
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
-    
+
     private static final int PANEL_WIDTH = 256;
-    
+
     private static final int PANEL_HEIGHT = 128;
-    
+
     private final EndTurnPanel endTurnPanel = new EndTurnPanel();
-    
+
     private final UnitInfoPanel unitInfoPanel;
-    
+
     private final TileInfoPanel tileInfoPanel = new TileInfoPanel();
-    
+
     private final JPanel mapEditorPanel;
-    
-    
+
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -80,10 +80,10 @@ public final class InfoPanel extends FreeColPanel {
      */
     public InfoPanel(final FreeColClient freeColClient) {
         super(freeColClient.getCanvas());
-        
+
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
-        
+
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
         Image skin = ResourceManager.getImage("InfoPanel.skin");
@@ -96,11 +96,11 @@ public final class InfoPanel extends FreeColPanel {
             internalPanelTop = 75;
             internalPanelHeight = 100;
         }
-        
+
         mapEditorPanel = new JPanel(null);
         mapEditorPanel.setSize(130, 100);
         mapEditorPanel.setOpaque(false);
-        
+
         add(unitInfoPanel, internalPanelTop, internalPanelHeight);
         add(endTurnPanel, internalPanelTop, internalPanelHeight);
         add(tileInfoPanel, internalPanelTop, internalPanelHeight);
@@ -116,7 +116,7 @@ public final class InfoPanel extends FreeColPanel {
                 }
             });
     }
-    
+
     /**
      * Adds a panel to show information
      */
@@ -126,7 +126,7 @@ public final class InfoPanel extends FreeColPanel {
                 + (internalPanelHeight - panel.getHeight()) / 2);
         add(panel);
     }
-    
+
     /**
      * Updates this <code>InfoPanel</code>.
      *
@@ -135,7 +135,7 @@ public final class InfoPanel extends FreeColPanel {
     public void update(Unit unit) {
         unitInfoPanel.update(unit);
     }
-    
+
     /**
      * Updates this <code>InfoPanel</code>.
      *
@@ -156,8 +156,8 @@ public final class InfoPanel extends FreeColPanel {
             }
         }
     }
-    
-    
+
+
     /**
      * Updates this <code>InfoPanel</code>.
      *
@@ -166,7 +166,7 @@ public final class InfoPanel extends FreeColPanel {
     public void update(Tile tile) {
         tileInfoPanel.update(tile);
     }
-    
+
     /**
      * Gets the <code>Unit</code> in which this <code>InfoPanel</code> is
      * displaying information about.
@@ -177,7 +177,7 @@ public final class InfoPanel extends FreeColPanel {
     public Unit getUnit() {
         return unitInfoPanel.getUnit();
     }
-    
+
     /**
      * Gets the <code>Tile</code> in which this <code>InfoPanel</code> is
      * displaying information about.
@@ -188,7 +188,7 @@ public final class InfoPanel extends FreeColPanel {
     public Tile getTile() {
         return tileInfoPanel.getTile();
     }
-    
+
     /**
      * Paints this component.
      *
@@ -230,32 +230,32 @@ public final class InfoPanel extends FreeColPanel {
                 tileInfoPanel.setVisible(false);
             }
         }
-        
+
         Image skin = ResourceManager.getImage("InfoPanel.skin");
         if (skin != null) {
             graphics.drawImage(skin, 0, 0, null);
         }
-        
+
         super.paintComponent(graphics);
     }
-    
-    
+
+
     /**
      * Panel for displaying <code>Tile</code>-information.
      */
     public class TileInfoPanel extends JPanel {
-        
+
         private Tile tile;
         private Font font = new JLabel().getFont().deriveFont(9f);
-        
+
         public TileInfoPanel() {
             super(null);
-            
+
             setSize(226, 100);
             setOpaque(false);
             setLayout(new MigLayout("fill, wrap 2, gap 0 0", "", "[][][][][nogrid]"));
         }
-        
+
         /**
          * Updates this <code>InfoPanel</code>.
          *
@@ -264,14 +264,14 @@ public final class InfoPanel extends FreeColPanel {
         public void update(Tile tile) {
 
             this.tile = tile;
-            
+
             removeAll();
 
             if (tile != null) {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                getClient().getGUI().displayTerrain(image.createGraphics(), 
+                getClient().getGUI().displayTerrain(image.createGraphics(),
                                                       tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
@@ -318,7 +318,7 @@ public final class InfoPanel extends FreeColPanel {
                 repaint();
             }
         }
-        
+
         /**
          * Gets the <code>Tile</code> in which this <code>InfoPanel</code>
          * is displaying information about.
@@ -330,22 +330,22 @@ public final class InfoPanel extends FreeColPanel {
             return tile;
         }
     }
-    
+
     /**
      * Panel for displaying <code>Unit</code>-information.
      */
     public class UnitInfoPanel extends JPanel {
-        
+
         private Unit unit;
-        
+
         public UnitInfoPanel() {
 
             super(new MigLayout("wrap 6, fill, gap 0 0", "", ""));
-            
+
             setSize(226, 100);
             setOpaque(false);
         }
-        
+
         /**
          * Updates this <code>InfoPanel</code>.
          *
@@ -353,7 +353,7 @@ public final class InfoPanel extends FreeColPanel {
          */
         public void update(Unit unit) {
             this.unit = unit;
-            
+
             removeAll();
             if (unit != null) {
                 add(new JLabel(getLibrary().getUnitImageIcon(unit)), "spany, gapafter 5px");
@@ -367,7 +367,7 @@ public final class InfoPanel extends FreeColPanel {
                     add(new JLabel(name.substring(index + 1)), "span");
                 }
                 add(new JLabel(Messages.message("moves") + " " + unit.getMovesAsString()), "span");
-                
+
                 // Handle the special cases. TODO: make this more generic
                 if (unit.canCarryTreasure()) {
                     add(new JLabel(unit.getTreasureAmount() + " " + Messages.message("gold")), "span");
@@ -389,7 +389,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (EquipmentType equipment : unit.getEquipment().keySet()) {
                         for (AbstractGoods goods : equipment.getGoodsRequired()) {
                             int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
-                            JLabel equipmentLabel = 
+                            JLabel equipmentLabel =
                                 new JLabel(Integer.toString(amount),
                                            getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
                                            JLabel.CENTER);
@@ -405,7 +405,7 @@ public final class InfoPanel extends FreeColPanel {
             revalidate();
             repaint();
         }
-        
+
         /**
          * Gets the <code>Unit</code> in which this <code>InfoPanel</code>
          * is displaying information about.
@@ -416,16 +416,16 @@ public final class InfoPanel extends FreeColPanel {
         public Unit getUnit() {
             return unit;
         }
-        
+
     }
-    
+
     /**
      * Panel for ending the turn.
      */
     public class EndTurnPanel extends JPanel {
-        
+
         private JButton endTurnButton = new JButton(Messages.message("infoPanel.endTurnPanel.endTurnButton"));
-        
+
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
@@ -447,7 +447,7 @@ public final class InfoPanel extends FreeColPanel {
             add(endTurnButton);
             setOpaque(false);
             setSize(getPreferredSize());
-            
+
             /*
              * TODO: The action listener does not work, because this button
              * looses it's focus. The reason why the focus gets lost should be
@@ -458,7 +458,7 @@ public final class InfoPanel extends FreeColPanel {
              * void actionPerformed(ActionEvent e) {
              * getClient().getInGameController().endTurn(); } });
              */
-            
+
             endTurnButton.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     getController().endTurn();
