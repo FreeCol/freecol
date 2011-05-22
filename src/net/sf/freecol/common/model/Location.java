@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * A place where a <code>Locatable</code> can be put.
- * 
+ *
  * @see Locatable
  */
 public interface Location {
@@ -33,7 +33,7 @@ public interface Location {
     /**
      * Returns the Tile where this Location is located. Or null if no Tile
      * applies.
-     * 
+     *
      * @return The Tile where this Location is located. Or null if no Tile
      *         applies.
      */
@@ -41,7 +41,7 @@ public interface Location {
 
     /**
      * Returns the name of this location.
-     * 
+     *
      * @return The name of this location.
      */
     public StringTemplate getLocationName();
@@ -56,7 +56,7 @@ public interface Location {
 
     /**
      * Adds a <code>Locatable</code> to this Location.
-     * 
+     *
      * @param locatable
      *            The <code>Locatable</code> to add to this Location.
      */
@@ -64,7 +64,7 @@ public interface Location {
 
     /**
      * Removes a <code>Locatable</code> from this Location.
-     * 
+     *
      * @param locatable
      *            The <code>Locatable</code> to remove from this Location.
      */
@@ -73,7 +73,7 @@ public interface Location {
     /**
      * Checks if this <code>Location</code> contains the specified
      * <code>Locatable</code>.
-     * 
+     *
      * @param locatable
      *            The <code>Locatable</code> to test the presence of.
      * @return
@@ -88,7 +88,7 @@ public interface Location {
     /**
      * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
-     * 
+     *
      * @param locatable
      *            The <code>Locatable</code> to add.
      * @return The result.
@@ -97,14 +97,14 @@ public interface Location {
 
     /**
      * Returns the amount of Units at this Location.
-     * 
+     *
      * @return The amount of Units at this Location.
      */
     public int getUnitCount();
 
     /**
      * Returns a list containing all the Units present at this Location.
-     * 
+     *
      * @return a list containing the Units present at this location.
      */
     public List<Unit> getUnitList();
@@ -112,14 +112,14 @@ public interface Location {
     /**
      * Gets a <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Location</code>.
-     * 
+     *
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator();
 
     /**
      * Gets the ID of this <code>Location</code>.
-     * 
+     *
      * @return The ID.
      * @see FreeColGameObject#getId
      */
@@ -128,7 +128,7 @@ public interface Location {
     /**
      * Gets the <code>GoodsContainer</code> this <code>Location</code> use
      * for storing it's goods.
-     * 
+     *
      * @return The <code>GoodsContainer</code> or <code>null</code> if the
      *         <code>Location</code> cannot store any goods.
      */

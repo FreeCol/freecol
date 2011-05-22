@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -4936,22 +4937,15 @@ public final class InGameController implements NetworkConstants {
     public void endTurn() {
         if (!requireOurTurn()) return;
 
-        int active = 0;
-        int skipped = 0;
+        List<Unit> units = new ArrayList<Unit>();
         for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
             if (unit.couldMove()) {
-                if (unit.getState() == UnitState.ACTIVE) {
-                    active++;
-                } else if (unit.getState() == UnitState.SKIPPED) {
-                    skipped++;
-                }
+                units.add(unit);
             }
         }
-        if (active + skipped > 0) {
-            StringTemplate t = StringTemplate.template("endTurnDialog.areYouSure")
-                .addAmount("%active%", active)
-                .addAmount("%skipped%", skipped);
-            if (!freeColClient.getCanvas().showConfirmDialog(null, t, "yes", "no")) {
+        if (units.size() > 0) {
+            Canvas canvas = freeColClient.getCanvas();
+            if (!canvas.showFreeColDialog(new EndTurnDialog(canvas, units))) {
                 return;
             }
         }
