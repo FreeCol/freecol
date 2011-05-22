@@ -144,8 +144,6 @@ public final class ColonyPanel extends FreeColPanel
 
     private UnitLabel selectedUnitLabel;
 
-    private JButton exitButton = new JButton(Messages.message("close"));
-
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
     private JButton fillButton = new JButton(Messages.message("fill"));
@@ -169,10 +167,10 @@ public final class ColonyPanel extends FreeColPanel
         setFocusCycleRoot(true);
 
         // Use ESCAPE for closing the ColonyPanel:
-        InputMap closeInputMap = new ComponentInputMap(exitButton);
+        InputMap closeInputMap = new ComponentInputMap(okButton);
         closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
         closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+        SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
 
         InputMap unloadInputMap = new ComponentInputMap(unloadButton);
         unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, false), "pressed");
@@ -253,9 +251,7 @@ public final class ColonyPanel extends FreeColPanel
         inPortScroll.setBorder(BorderFactory.createEtchedBorder());
         outsideColonyScroll.setBorder(BorderFactory.createEtchedBorder());
 
-        exitButton.setActionCommand(String.valueOf(EXIT));
-        enterPressesWhenFocused(exitButton);
-        exitButton.addActionListener(this);
+        okButton.setText(Messages.message("close"));
 
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
         enterPressesWhenFocused(unloadButton);
@@ -305,15 +301,10 @@ public final class ColonyPanel extends FreeColPanel
         add(warehouseButton);
         add(buildQueueButton);
         if (setGoodsButton != null) add(setGoodsButton);
-        add(exitButton);
+        add(okButton, "tag ok");
 
         initialize(colony);
         restoreSavedSize(850, 600);
-    }
-
-    @Override
-    public void requestFocus() {
-        exitButton.requestFocus();
     }
 
     /**
@@ -418,36 +409,37 @@ public final class ColonyPanel extends FreeColPanel
         Canvas canvas = getCanvas();
         Colony colony = getColony();
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case EXIT:
-                closeColonyPanel();
-                break;
-            case UNLOAD:
-                unload();
-                break;
-            case WAREHOUSE:
-                if (canvas.showFreeColDialog(new WarehouseDialog(canvas,
-                                                                 colony))) {
-                    updateWarehousePanel();
+        if (OK.equals(command)) {
+            closeColonyPanel();
+        } else {
+            try {
+                switch (Integer.valueOf(command).intValue()) {
+                case UNLOAD:
+                    unload();
+                    break;
+                case WAREHOUSE:
+                    if (canvas.showFreeColDialog(new WarehouseDialog(canvas,
+                                                                     colony))) {
+                        updateWarehousePanel();
+                    }
+                    break;
+                case BUILDQUEUE:
+                    canvas.showSubPanel(new BuildQueuePanel(colony, canvas));
+                    updateConstructionPanel();
+                    break;
+                case FILL:
+                    fill();
+                    break;
+                case SETGOODS:
+                    debugSetGoods(canvas, colony);
+                    break;
+                default:
+                    logger.warning("Invalid action");
+                    break;
                 }
-                break;
-            case BUILDQUEUE:
-                canvas.showSubPanel(new BuildQueuePanel(colony, canvas));
-                updateConstructionPanel();
-                break;
-            case FILL:
-                fill();
-                break;
-            case SETGOODS:
-                debugSetGoods(canvas, colony);
-                break;
-            default:
-                logger.warning("Invalid action");
-                break;
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid action number: " + command);
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid action number: " + command);
         }
     }
 

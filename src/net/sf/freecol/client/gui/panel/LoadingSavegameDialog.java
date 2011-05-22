@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -45,14 +44,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * Dialog for setting some options when loading a game.
  */
 public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
-
-
-
-    private static final int OK = 0, CANCEL = 1;
-
-    private JButton ok;
 
     private JPanel buttons = new JPanel(new FlowLayout());
 
@@ -71,27 +65,15 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public LoadingSavegameDialog(Canvas parent) {
         super(parent);
         setLayout(new BorderLayout());
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        ok.setMnemonic('O');
-        buttons.add(ok);
-
-        JButton cancel = new JButton(Messages.message("cancel"));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        cancel.addActionListener(this);
-        cancel.setMnemonic('C');
-        buttons.add(cancel);
-
-        FreeColPanel.enterPressesWhenFocused(ok);
-        setCancelComponent(cancel);
+        buttons.add(okButton);
+        buttons.add(cancelButton);
 
         // Header:
         header = new JLabel(Messages.message("LoadingSavegame.title"), JLabel.CENTER);
@@ -170,33 +152,22 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         this.serverNameField.setText("");
     }
 
-    public void requestFocus() {
-        ok.requestFocus();
-    }
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                getCanvas().remove(this);
-                setResponse(Boolean.TRUE);
-                break;
-            case CANCEL:
-                getCanvas().remove(this);
-                setResponse(Boolean.FALSE);
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        if (OK.equals(command)) {
+            getCanvas().remove(this);
+            setResponse(Boolean.TRUE);
+        } else if (CANCEL.equals(command)) {
+            getCanvas().remove(this);
+            setResponse(Boolean.FALSE);
+        } else {
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 }

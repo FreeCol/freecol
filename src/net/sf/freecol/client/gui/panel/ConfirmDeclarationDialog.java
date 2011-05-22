@@ -20,13 +20,11 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -39,12 +37,15 @@ import net.miginfocom.swing.MigLayout;
 
 public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
+    private JTextField nationField;
+    private JTextField countryField;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ConfirmDeclarationDialog(final Canvas parent) {
@@ -54,35 +55,16 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         StringTemplate nation
             = StringTemplate.template("declareIndependence.defaultNation")
                 .addStringTemplate("%nation%", player.getNationName());
-        final JTextField nationField
-            = new JTextField(Messages.message(nation), 20);
+        nationField = new JTextField(Messages.message(nation), 20);
         StringTemplate country
             = StringTemplate.template("declareIndependence.defaultCountry")
                 .add("%nation%", player.getNewLandName());
-        final JTextField countryField =
-            new JTextField(Messages.message(country), 20);
+        countryField = new JTextField(Messages.message(country), 20);
 
-        okButton = new JButton(Messages.message("declareIndependence.areYouSure.yes"));
+        okButton.setText(Messages.message("declareIndependence.areYouSure.yes"));
+        cancelButton.setText(Messages.message("declareIndependence.areYouSure.no"));
 
         setLayout(new MigLayout("wrap 1", "", ""));
-
-        okButton.addActionListener(new ActionListener() {
-                public void actionPerformed( ActionEvent event ) {
-                    List<String> result = new ArrayList<String>();
-                    // Sanitize user input, used in save file name
-                    result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));
-                    result.add(countryField.getText());
-                    setResponse(result);
-                }
-            });
-
-        cancelButton = new JButton(Messages.message("declareIndependence.areYouSure.no"));
-        cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed( ActionEvent event ) {
-                    setResponse(null);
-                }
-            });
-
 
         StringTemplate sure
             = StringTemplate.template("declareIndependence.areYouSure.text")
@@ -97,8 +79,18 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
     }
 
-    public void requestFocus() {
-        okButton.requestFocus();
+
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            List<String> result = new ArrayList<String>();
+            // Sanitize user input, used in save file name
+            result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));
+            result.add(countryField.getText());
+            setResponse(result);
+        } else {
+            super.actionPerformed(event);
+        }
     }
 
 }

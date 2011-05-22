@@ -49,8 +49,6 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
     private final JButton[] person = new JButton[NUMBER_OF_PERSONS];
 
-    private final JButton cancel;
-
     private final JTextArea question;
 
     /**
@@ -71,19 +69,10 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
             person[index].setIconTextGap(margin);
         }
 
-        cancel = new JButton(Messages.message("cancel"));
-        cancel.setActionCommand(String.valueOf(RECRUIT_CANCEL));
-        enterPressesWhenFocused(cancel);
-        cancel.addActionListener(this);
-        setCancelComponent(cancel);
-
         initialize();
 
     }
 
-    public void requestFocus() {
-        cancel.requestFocus();
-    }
 
     /**
      * Updates this panel's labels so that the information it displays is up to
@@ -129,34 +118,42 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
             }
         }
 
-        add(cancel, "newline 20, tag cancel");
+        add(cancelButton, "newline 20, tag cancel");
 
         setSize(getPreferredSize());
 
     }
 
+    @Override
+    public void requestFocus() {
+        cancelButton.requestFocus();
+    }
+
+
     /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
-     * 
+     *
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            int action = Integer.valueOf(command).intValue();
-            if (action == RECRUIT_CANCEL) {
-                setResponse(new Integer(-1));
-            } else if (action >= 0 && action < NUMBER_OF_PERSONS) {
-                getController().recruitUnitInEurope(action);
-                setResponse(new Integer(0));
-            } else {
-                logger.warning("Invalid action command");
+        if (CANCEL.equals(command)) {
+            setResponse(new Integer(-1));
+        } else {
+            try {
+                int action = Integer.parseInt(command);
+                if (action >= 0 && action < NUMBER_OF_PERSONS) {
+                    getController().recruitUnitInEurope(action);
+                    setResponse(new Integer(0));
+                } else {
+                    logger.warning("Invalid action command");
+                    setResponse(new Integer(-1));
+                }
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid action number");
                 setResponse(new Integer(-1));
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid action number");
-            setResponse(new Integer(-1));
         }
     }
 }

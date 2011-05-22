@@ -165,6 +165,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     }
 
+    @Override
     public void requestFocus() {
         start.requestFocus();
     }

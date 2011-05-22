@@ -38,9 +38,9 @@ import net.miginfocom.swing.MigLayout;
 public class InformationDialog extends FreeColDialog<Boolean> {
 
     /**
-     * Returns an information dialog that shows the given 
+     * Returns an information dialog that shows the given
      * texts and images, and an "OK" button.
-     * 
+     *
      * @param canvas The parent Canvas.
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
@@ -50,9 +50,9 @@ public class InformationDialog extends FreeColDialog<Boolean> {
     }
 
     /**
-     * Returns an information dialog that shows the given 
+     * Returns an information dialog that shows the given
      * texts and images, and an "OK" button.
-     * 
+     *
      * @param parent The parent Canvas.
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
@@ -101,13 +101,9 @@ public class InformationDialog extends FreeColDialog<Boolean> {
 
     }
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
     /**
      * Paints this component.
-     * 
+     *
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {

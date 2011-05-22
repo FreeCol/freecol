@@ -52,10 +52,6 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TrainDialog.class.getName());
 
-    private static final String TRAIN_DONE = "DONE";
-
-    private final JButton done = new JButton(Messages.message("trainDialog.done"));
-
     private final JLabel question;
 
     private final List<UnitType> trainableUnits = new ArrayList<UnitType>();
@@ -68,6 +64,8 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
     public TrainDialog(Canvas parent, EuropePanel.EuropeAction europeAction) {
 
         super(parent);
+
+        okButton.setText(Messages.message("trainDialog.done"));
 
         final Europe europe = getMyPlayer().getEurope();
         unitPriceComparator = new Comparator<UnitType>() {
@@ -89,10 +87,6 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             question  = new JLabel(Messages.message("purchaseDialog.clickOn"));
             setLayout(new MigLayout("wrap 2", "[sg]", ""));
         }
-
-        done.setActionCommand(String.valueOf(TRAIN_DONE));
-        done.addActionListener(this);
-        enterPressesWhenFocused(done);
 
     }
 
@@ -134,13 +128,9 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             enterPressesWhenFocused(newButton);
             add(newButton, "grow");
         }
-        add(done, "newline 20, span, tag ok");
+        add(okButton, "newline 20, span, tag ok");
         setSize(getPreferredSize());
         revalidate();
-    }
-
-    public void requestFocus() {
-        done.requestFocus();
     }
 
     /**
@@ -151,7 +141,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (TRAIN_DONE.equals(command)) {
+        if (OK.equals(command)) {
             setResponse(new Integer(-1));
         } else {
             UnitType unitType = getSpecification().getUnitType(command);

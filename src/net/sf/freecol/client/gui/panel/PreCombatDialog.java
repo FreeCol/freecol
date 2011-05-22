@@ -21,13 +21,9 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
@@ -57,33 +53,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         Set<Modifier> defence = sortModifiers(combatModel
                 .getDefensiveModifiers(attacker, defender));
 
-        final JButton okButton = new JButton();
-
-        Action okAction = new AbstractAction(Messages.message("ok")) {
-                public void actionPerformed( ActionEvent event ) {
-                    setResponse( Boolean.TRUE );
-                }
-            };
-        okButton.setAction(okAction);
-        okButton.requestFocus();
-
-        Action cancelAction = new AbstractAction(Messages.message("cancel")) {
-                public void actionPerformed( ActionEvent event ) {
-                    setResponse( Boolean.FALSE );
-                }
-            };
-        final JButton cancelButton = new JButton(cancelAction);
-
-        enterPressesWhenFocused(okButton);
-        enterPressesWhenFocused(cancelButton);
-        
-        okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    setResponse(Boolean.FALSE);
-                }
-            });
-
-        setLayout(new MigLayout("wrap 6", "[sg label]20[sg value, right]1px[sg percent]40" 
+        setLayout(new MigLayout("wrap 6", "[sg label]20[sg value, right]1px[sg percent]40"
                                 + "[sg label]20[sg value, right]1px[sg percent]", ""));
 
         // left hand side: attacker
@@ -207,12 +177,23 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             bonus = "\u00D7" + bonus;
             break;
         default:
-        }                
+        }
         add(new JLabel(bonus));
         if (percent) {
             add(new JLabel("%"));
         }
         return percent;
+    }
+
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            setResponse(Boolean.TRUE);
+        } else if (CANCEL.equals(command)) {
+            setResponse(Boolean.FALSE);
+        } else {
+            super.actionPerformed(event);
+        }
     }
 
 }

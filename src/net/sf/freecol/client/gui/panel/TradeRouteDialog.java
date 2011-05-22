@@ -56,9 +56,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
     private static enum Action { OK, CANCEL, DEASSIGN, DELETE }
 
-    private final JButton ok = new JButton(Messages.message("ok"));
-    private final JButton cancel = new JButton(Messages.message("cancel"));
-
     private final JButton editRouteButton = new JButton(Messages.message("traderouteDialog.editRoute"));
     private final JButton newRouteButton = new JButton(Messages.message("traderouteDialog.newRoute"));
     private final JButton removeRouteButton = new JButton(Messages.message("traderouteDialog.removeRoute"));
@@ -75,15 +72,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
     public TradeRouteDialog(final Canvas parent, TradeRoute selectedRoute) {
 
         super(parent);
-
-        ok.setActionCommand(Action.OK.toString());
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-
-        cancel.setActionCommand(Action.CANCEL.toString());
-        cancel.addActionListener(this);
-        enterPressesWhenFocused(cancel);
-        setCancelComponent(cancel);
 
         deassignRouteButton.addActionListener(this);
         deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
@@ -172,8 +160,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         add(removeRouteButton, "growx");
         add(deassignRouteButton);
 
-        add(ok, "newline 20, span, split 2, tag ok");
-        add(cancel, "tag cancel");
+        add(okButton, "newline 20, span, split 2, tag ok");
+        add(cancelButton, "tag cancel");
 
         restoreSavedSize(getPreferredSize());
 
@@ -184,14 +172,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
              return r1.getName().compareTo(r2.getName());
          }
      };
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void requestFocus() {
-        ok.requestFocus();
-    }
 
     public void updateButtons() {
         if (tradeRoutes.getSelectedIndex() == -1) {
