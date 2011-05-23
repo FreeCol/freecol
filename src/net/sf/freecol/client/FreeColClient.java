@@ -313,9 +313,12 @@ public final class FreeColClient {
                     }
                 });
         }
+
+        // Job deamon
         worker = new Worker();
         worker.start();
 
+        // loads an optional savegame from a file (client parameter)
         if (savegameFile != null) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -324,6 +327,7 @@ public final class FreeColClient {
                 });
         }
 
+        // -- I wonder if this has its right location here!
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
             if (!headless) {
@@ -386,6 +390,7 @@ public final class FreeColClient {
                           final boolean sound,
                           final boolean showOpeningVideo,
                           final boolean loadGame) {
+       // start the sound system
         if (sound) {
             final ClientOptions opts = getClientOptions();
             final AudioMixerOption amo
@@ -431,12 +436,13 @@ public final class FreeColClient {
         gui = new GUI(this, innerWindowSize, imageLibrary);
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
-
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
+
+        // run opening video or main panel
         if (showOpeningVideo && !loadGame) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    canvas.showOpeningVideoPanel();
+            canvas.showOpeningVideoPanel();
                 }
             });
         } else {

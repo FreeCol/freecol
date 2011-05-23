@@ -296,7 +296,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
 
-    private final GUI gui; 
+    private final GUI gui;
 
     private final ServerListPanel serverListPanel;
 
@@ -567,7 +567,7 @@ public final class Canvas extends JDesktopPane {
 
         return false;
     }
-    
+
     /**
      * Detailed view of a foreign colony when in debug mode.
      *
@@ -583,7 +583,7 @@ public final class Canvas extends JDesktopPane {
 
     public void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
-        
+
     }
 
     /**
@@ -870,7 +870,7 @@ public final class Canvas extends JDesktopPane {
 
     public void refreshPlayersTable() {
         startGamePanel.refreshPlayersTable();
-        
+
     }
 
     /**
@@ -1186,7 +1186,7 @@ public final class Canvas extends JDesktopPane {
             }
         }
     }
-    
+
 
     /**
      * Display a dialog to confirm a declaration of independence.
@@ -2225,7 +2225,7 @@ public final class Canvas extends JDesktopPane {
 
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();
-        
+
     }
 
     /**

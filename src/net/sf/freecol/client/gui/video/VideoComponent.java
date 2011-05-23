@@ -42,28 +42,25 @@ public class VideoComponent extends JPanel {
     /**
      * Creates a component for displaying the given video.
      * @param video The <code>Video</code> to be displayed.
+     * @param mute boolean silence
      */
     public VideoComponent(Video video, boolean mute) {
         final String url = video.getURL().toExternalForm();
-        
+
         setBorder(createBorder());
         final Insets insets = getInsets();
-        
+
         applet = new Cortado();
         applet.setSize(655, 480);
         // FIXME: -1 avoids transparent part of border.
         applet.setLocation(insets.left - 1, insets.top - 1);
-        
+
         applet.setParam ("url", url);
         applet.setParam ("local", "false");
         applet.setParam ("framerate", "60");
         applet.setParam ("keepaspect", "true");
         applet.setParam ("video", "true");
-        String withAudio = "true";
-        if(mute){
-            withAudio = "false";
-        }
-        applet.setParam ("audio", withAudio);
+        applet.setParam ("audio", mute ? "false" : "true");
         applet.setParam ("kateIndex", "0");
         applet.setParam ("bufferSize", "200");
         applet.setParam ("showStatus", "hide");
@@ -82,7 +79,7 @@ public class VideoComponent extends JPanel {
         //        });
         //    }
         //});
-        
+
         setLayout(null);
         add(applet);
 
@@ -90,7 +87,7 @@ public class VideoComponent extends JPanel {
         setSize(applet.getWidth() + insets.left + insets.right - 2,
                 applet.getHeight() + insets.top + insets.bottom - 2);
     }
-    
+
     /**
      * Adds a listener for video playback events.
      * @param videoListener A listener for video playback events.
@@ -98,7 +95,7 @@ public class VideoComponent extends JPanel {
     public void addVideoListener(VideoListener videoListener) {
         videoListeners.add(videoListener);
     }
-    
+
     /**
      * Removes the given listener.
      * @param videoListener The listener to be removed from this
@@ -107,33 +104,33 @@ public class VideoComponent extends JPanel {
     public void removeVideoListener(VideoListener videoListener) {
         videoListeners.remove(videoListener);
     }
-    
+
     @Override
     public void addMouseListener(MouseListener l) {
         super.addMouseListener(l);
         applet.addMouseListener(l);
     }
-    
+
     @Override
     public void removeMouseListener(MouseListener l) {
         super.removeMouseListener(l);
         applet.removeMouseListener(l);
     }
-    
+
     /**
      * Start playing the video.
      */
     public void play() {
         applet.start();
     }
-    
+
     /**
      * Stop playing the video.
      */
     public void stop() {
         applet.stop();
     }
-    
+
     private Border createBorder() {
         return FreeColImageBorder.imageBorder;
     }
