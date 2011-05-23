@@ -223,7 +223,7 @@ public final class TilePopup extends JPopupMenu {
             activateAllItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         Unit lastUnit = null;
-                        for (Unit unit: tile.getUnitList()) {
+                        for (Unit unit: new ArrayList<Unit>(tile.getUnitList())) {
                             freeColClient.getInGameController().clearOrders(unit);
                             lastUnit = unit;
                         }
@@ -598,9 +598,11 @@ public final class TilePopup extends JPopupMenu {
             = new ServerUnit(serverGame, serverTile, serverPlayer,
                              unitChoice, UnitState.ACTIVE,
                              unitChoice.getDefaultEquipment());
+        serverUnit.setMovesLeft(serverUnit.getInitialMovesLeft());
         Unit unit = new Unit(freeColClient.getGame(),
                 serverUnit.toXMLElement(Message.createNewDocument()));
         tile.add(unit);
+        gui.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
         canvas.refresh();
     }
