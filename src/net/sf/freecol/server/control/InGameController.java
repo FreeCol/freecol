@@ -3192,7 +3192,8 @@ public final class InGameController extends Controller {
             return Message.clientError("Not enough gold to train " + type);
         }
 
-        new ServerUnit(getGame(), europe, serverPlayer, type, UnitState.ACTIVE);
+        new ServerUnit(getGame(), europe, serverPlayer, type,
+                       (type.isNaval()) ? UnitState.ACTIVE : UnitState.SENTRY);
         serverPlayer.modifyGold(-price);
         ((ServerEurope) europe).increasePrice(type, price);
 

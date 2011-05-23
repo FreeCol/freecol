@@ -126,7 +126,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
         unitType = (newType == null) ? type : newType;
         this.owner = owner;
         owner.getNationID();
-        naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 
         workLeft = -1;

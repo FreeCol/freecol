@@ -172,8 +172,6 @@ public class Unit extends FreeColGameObject
 
     protected UnitType unitType;
 
-    protected boolean naval;
-
     protected int movesLeft;
 
     protected UnitState state = UnitState.ACTIVE;
@@ -2282,7 +2280,6 @@ public class Unit extends FreeColGameObject
                 owner.modifyScore(newUnitType.getScoreValue() - unitType.getScoreValue());
             }
             this.unitType = newUnitType;
-            naval = unitType.hasAbility("model.ability.navalUnit");
             if (getMovesLeft() > getInitialMovesLeft()) {
                 setMovesLeft(getInitialMovesLeft());
             }
@@ -2470,7 +2467,7 @@ public class Unit extends FreeColGameObject
      *         otherwise.
      */
     public boolean isNaval() {
-        return naval;
+        return getType().isNaval();
     }
 
     /**
@@ -3334,7 +3331,6 @@ public class Unit extends FreeColGameObject
         UnitType oldUnitType = unitType;
         unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
 
-        naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
         state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
         role = Enum.valueOf(Role.class, in.getAttributeValue(null, "role"));

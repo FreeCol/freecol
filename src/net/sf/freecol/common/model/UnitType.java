@@ -614,6 +614,15 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         return UNDEFINED;
     }
 
+    /**
+     * Is this a naval unit type?
+     *
+     * @return True if this is a naval unit type.
+     */
+    public boolean isNaval() {
+        return hasAbility("model.ability.navalUnit");
+    }
+
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         String extendString = in.getAttributeValue(null, "extends");
