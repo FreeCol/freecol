@@ -450,9 +450,9 @@ public final class ColonyPanel extends FreeColPanel
      * @param colony The <code>Colony</code> to set goods amounts in.
      */
     private void debugSetGoods(Canvas canvas, Colony colony) {
+        Specification spec = getSpecification();
         List<ChoiceItem<GoodsType>> gtl
             = new ArrayList<ChoiceItem<GoodsType>>();
-        Specification spec = getSpecification();
         for (GoodsType t : spec.getGoodsTypeList()) {
             if (t == spec.getPrimaryFoodType()) continue;
             gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
@@ -462,9 +462,9 @@ public final class ColonyPanel extends FreeColPanel
                                                       "Cancel", gtl);
         if (goodsType == null) return;
         String amount = canvas.showInputDialog(null,
-                                               StringTemplate.name("Select Goods Amount"),
-                                               Integer.toString(colony.getGoodsCount(goodsType)),
-                                               "ok", "cancel", true);
+                StringTemplate.name("Select Goods Amount"),
+                Integer.toString(colony.getGoodsCount(goodsType)),
+                "ok", "cancel", true);
         if (amount == null) return;
         int a;
         try {
@@ -472,11 +472,13 @@ public final class ColonyPanel extends FreeColPanel
         } catch (NumberFormatException nfe) {
             return;
         }
+        GoodsType sGoodsType = getClient().getFreeColServer()
+            .getSpecification().getGoodsType(goodsType.getId());
         GoodsContainer cgc = colony.getGoodsContainer();
-        cgc.setAmount(goodsType, a);
         GoodsContainer sgc = (GoodsContainer) getClient().getFreeColServer()
             .getGame().getFreeColGameObject(cgc.getId());
-        sgc.setAmount(goodsType, a);
+        cgc.setAmount(goodsType, a);
+        sgc.setAmount(sGoodsType, a);
         updateConstructionPanel();
         updateProductionPanel();
         updateWarehousePanel();

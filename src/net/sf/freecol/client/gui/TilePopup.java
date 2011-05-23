@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -578,8 +579,9 @@ public final class TilePopup extends JPopupMenu {
      * @param tile The <code>Tile</code> to add to.
      */
     private void debugAddNewUnitToTile(final Game serverGame, Tile tile) {
+        Specification spec = serverGame.getSpecification();
         List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
-        for (UnitType t : tile.getSpecification().getUnitTypeList()) {
+        for (UnitType t : spec.getUnitTypeList()) {
             uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString()
                                                               + ".name"), t));
         }
