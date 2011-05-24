@@ -121,9 +121,11 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             }
         }
         if (tb.getTabCount() > 0) {
+            /** ignore options that do not belong to an OptionGroup, e.g. window sizes and positions
             if (northPanel.getComponentCount() > 0) {
                 tb.addTab(" *** ", northPanel);
             }
+            */
             add(tb, BorderLayout.CENTER);
         } else {
             add(northPanel, BorderLayout.CENTER);
