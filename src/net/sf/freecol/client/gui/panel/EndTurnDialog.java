@@ -19,36 +19,31 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.PanelUI;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
@@ -82,7 +77,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
             .addAmount("%number%", units.size());
 
         unitList = new JList(units.toArray(new Unit[units.size()]));
-        unitList.setCellRenderer(new UnitRenderer());
+        unitList.setCellRenderer(new UnitCellRenderer());
         unitList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(unitList);
         listScroller.setPreferredSize(new Dimension(250, 250));
@@ -126,12 +121,12 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
 
     private void selectUnit() {
         Unit unit = (Unit) unitList.getSelectedValue();
-        Canvas canvas = getCanvas();
-        Location location = unit.getLocation();
-        if (location.getColony() != null) {
-            canvas.showColonyPanel(location.getColony());
-        } else {
-            canvas.getGUI().setFocus(location.getTile());
+        if (unit != null) {
+            if (unit.getColony() != null) {
+                getCanvas().showColonyPanel(unit.getColony());
+            } else if (unit.isInEurope()) {
+                getCanvas().showEuropePanel();
+            }
         }
     }
 
@@ -151,19 +146,10 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
      */
     public void valueChanged(ListSelectionEvent e) {
         Unit unit = (Unit) unitList.getSelectedValue();
-        getCanvas().getGUI().setFocus(unit.getTile());
-    }
-
-    private class UnitRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            Unit unit = (Unit) value;
-            label.setText(Messages.message(Messages.getLabel(unit)));
-            label.setIcon(getLibrary().getUnitImageIcon(unit, 0.5));
+        if (unit != null && unit.getTile() != null) {
+            getCanvas().getGUI().setFocus(unit.getTile());
         }
     }
-
 
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
@@ -173,6 +159,43 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
             setResponse(Boolean.FALSE);
         } else {
             super.actionPerformed(event);
+        }
+    }
+
+    private class UnitCellRenderer implements ListCellRenderer {
+
+        JPanel itemPanel = new JPanel();
+        JPanel selectedPanel = new JPanel();
+        JLabel imageLabel = new JLabel();
+        JLabel nameLabel = new JLabel();
+        JLabel locationLabel = new JLabel();
+
+        public UnitCellRenderer() {
+            itemPanel.setOpaque(false);
+            itemPanel.setLayout(new MigLayout("", "[60]"));
+            selectedPanel.setOpaque(false);
+            selectedPanel.setLayout(new MigLayout("", "[60]"));
+            selectedPanel.setUI((PanelUI) FreeColSelectedPanelUI.createUI(selectedPanel));
+            locationLabel.setFont(locationLabel.getFont().deriveFont(Font.ITALIC));
+        }
+
+        public Component getListCellRendererComponent(JList list,
+                                                      Object value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            Unit unit = (Unit) value;
+            JPanel panel = isSelected ? selectedPanel : itemPanel;
+            panel.removeAll();
+
+            imageLabel.setIcon(getLibrary().getUnitImageIcon(unit, 0.5));
+            nameLabel.setText(Messages.message(Messages.getLabel(unit)));
+            locationLabel.setText(Messages.message(unit.getLocation().getLocationName()));
+
+            panel.add(imageLabel, "center");
+            panel.add(nameLabel, "split 2, flowy");
+            panel.add(locationLabel);
+            return panel;
         }
     }
 

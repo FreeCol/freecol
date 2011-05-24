@@ -1688,7 +1688,10 @@ public class Unit extends FreeColGameObject
      */
     public boolean couldMove() {
         return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
-            && location instanceof Tile
+            && destination == null
+            && tradeRoute == null
+            && (location instanceof Tile
+                || location instanceof Europe)
             && getMovesLeft() > 0;
     }
 
