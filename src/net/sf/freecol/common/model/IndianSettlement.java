@@ -1050,23 +1050,34 @@ public class IndianSettlement extends Settlement {
         return true;
     }
 
+    /**
+     * Gets the production of a specified goods type for this settlement.
+     *
+     * @param type The <code>GoodsType</code> to produce.
+     * @return The production potention for the goods type.
+     */
     public int getProductionOf(GoodsType type) {
         int potential = 0;
-        for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
-            if (workTile.getOwningSettlement() == this
-                && !workTile.isOccupied()) {
+        int tiles = 1; // Always include center tile
+
+        for (Tile workTile : getOwnedTiles()) {
+            if (workTile != getTile() && !workTile.isOccupied()) {
                 // TODO: make unitType brave
                 potential += workTile.potential(type, null);
+                tiles++;
             }
         }
 
-        //TODO: This currently limits production _per_food_type_ to units*3.
-        //With multiple food types, this may lead to varying results.
-        //If hard-coded limiting makes sense at all, it should be done
-        //after adding up all food types.
-        if (type.isFoodType()) {
-            potential = Math.min(potential, ownedUnits.size()*3);
+        // When a native settlement has more tiles than units, pretend
+        // that they produce from their entire area at reduced
+        // efficiency.
+        if (tiles > units.size()) {
+            potential *= (float) units.size() / tiles;
         }
+
+        // Always add full potential for center tile.
+        potential += getTile().potential(type, null);
+
         return potential;
     }
 

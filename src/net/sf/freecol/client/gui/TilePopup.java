@@ -619,6 +619,7 @@ public final class TilePopup extends JPopupMenu {
      */
     private String debugSummarizeSettlement(final Game serverGame,
                                             final IndianSettlement sis) {
+        Specification spec = serverGame.getSpecification();
         StringBuilder sb = new StringBuilder(sis.getName() + "\n");
 
         sb.append("\nAlarm\n");
@@ -633,14 +634,23 @@ public final class TilePopup extends JPopupMenu {
                       + "\n");
         }
 
-        sb.append("\nGoods\n");
+        sb.append("\nGoods Present\n");
         for (Goods goods : sis.getCompactGoods()) {
             sb.append(Messages.message(goods.getLabel(true)) + "\n");
         }
 
+        sb.append("\nGoods Production\n");
+        for (GoodsType type : spec.getGoodsTypeList()) {
+            int prod = sis.getProductionOf(type);
+            if (prod > 0) {
+                sb.append(Messages.message(type.getNameKey())
+                          + " " + prod + "\n");
+            }
+        }
+
         sb.append("\nPrices (buy 1/100 / sell 1/100)\n");
         GoodsType[] wanted = sis.getWantedGoods();
-        for (GoodsType type : serverGame.getSpecification().getGoodsTypeList()) {
+        for (GoodsType type : spec.getGoodsTypeList()) {
             if (!type.isStorable()) continue;
             int i;
             for (i = wanted.length - 1; i >= 0; i--) {
