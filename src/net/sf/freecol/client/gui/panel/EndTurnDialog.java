@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -61,6 +62,29 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
 
     private JList unitList;
 
+    /**
+     * We need to wrap the Unit class in order to make the JList
+     * support keystroke navigation. JList.getNextMatch uses the
+     * toString() method, but the toString() method of FreeCol objects
+     * provides debugging information rather than a searchable name.
+     */
+    public class UnitWrapper {
+        public Unit unit;
+        public String name;
+        public String location;
+
+        public UnitWrapper(Unit unit) {
+            this.unit = unit;
+            name = Messages.message(Messages.getLabel(unit));
+            location = Messages.message(unit.getLocation().getLocationName());
+        }
+
+        public String toString() {
+            return name;
+        }
+    }
+
+
 
     /**
      * The constructor to use.
@@ -76,7 +100,11 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
         StringTemplate t = StringTemplate.template("endTurnDialog.areYouSure")
             .addAmount("%number%", units.size());
 
-        unitList = new JList(units.toArray(new Unit[units.size()]));
+        DefaultListModel model = new DefaultListModel();
+        for (Unit unit : units) {
+            model.addElement(new UnitWrapper(unit));
+        }
+        unitList = new JList(model);
         unitList.setCellRenderer(new UnitCellRenderer());
         unitList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(unitList);
@@ -145,12 +173,16 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
      * @param e a <code>ListSelectionEvent</code> value
      */
     public void valueChanged(ListSelectionEvent e) {
-        Unit unit = (Unit) unitList.getSelectedValue();
+        Unit unit = ((UnitWrapper) unitList.getSelectedValue()).unit;
         if (unit != null && unit.getTile() != null) {
             getCanvas().getGUI().setFocus(unit.getTile());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -184,13 +216,13 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            Unit unit = (Unit) value;
+            UnitWrapper unit = (UnitWrapper) value;
             JPanel panel = isSelected ? selectedPanel : itemPanel;
             panel.removeAll();
 
-            imageLabel.setIcon(getLibrary().getUnitImageIcon(unit, 0.5));
-            nameLabel.setText(Messages.message(Messages.getLabel(unit)));
-            locationLabel.setText(Messages.message(unit.getLocation().getLocationName()));
+            imageLabel.setIcon(getLibrary().getUnitImageIcon(unit.unit, 0.5));
+            nameLabel.setText(unit.name);
+            locationLabel.setText(unit.location);
 
             panel.add(imageLabel, "center");
             panel.add(nameLabel, "split 2, flowy");
