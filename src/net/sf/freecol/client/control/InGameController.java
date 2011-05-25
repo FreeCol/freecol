@@ -186,10 +186,10 @@ public final class InGameController implements NetworkConstants {
      */
     private HashMap<String, Integer> messagesToIgnore = new HashMap<String, Integer>();
 
-    /**
+    /*
      * A list of save game files.
-     */
     private ArrayList<File> allSaveGames = new ArrayList<File>();
+     */
 
     /**
      * The constructor to use.
@@ -234,9 +234,15 @@ public final class InGameController implements NetworkConstants {
     public boolean saveGame() {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        String fileName = player.getName() + "_" + Messages.message(player.getNationName())
-            + "_" + getSaveGameString(freeColClient.getGame().getTurn());
+        Game game = freeColClient.getGame();
+        String gid = Integer.toHexString(game.getUUID().hashCode());
+        String fileName = //player.getName() + "_"
+
+                gid + "_"
+                + Messages.message(player.getNationName()) + "_"
+                + getSaveGameString(game.getTurn());
         fileName = fileName.replaceAll(" ", "_");
+
         if (freeColClient.canSaveCurrentGame()) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
@@ -609,14 +615,17 @@ public final class InGameController implements NetworkConstants {
                 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
                 String playernation= "";
                 if (player != null) {
-                    playernation = player.getName() + "_"
-                        + Messages.message(player.getNation().getNameKey()) + "_";
+//                    playernation = player.getName() + "_"
+                   playernation =  Messages.message(player.getNation().getNameKey());
                 }
+                String gid = Integer.toHexString(game.getUUID().hashCode());
                 String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                    + '-' + playernation + getSaveGameString(game.getTurn()) + ".fsg";
+                    + '-' + gid  + "_" + playernation  + "_" + getSaveGameString(game.getTurn()) + ".fsg";
                 File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
                                              filename);
                 saveGame(saveGameFile);
+/*
+                // delete one file if allowed generations exceeded
                 int generations = options.getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
                 if (generations > 0) {
                     allSaveGames.add(saveGameFile);
@@ -625,6 +634,7 @@ public final class InGameController implements NetworkConstants {
                         fileToDelete.delete();
                     }
                 }
+  */
             }
 
             player.invalidateCanSeeTiles();

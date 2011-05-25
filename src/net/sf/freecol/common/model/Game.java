@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -59,6 +60,10 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
+    // TODO make it happen that UUID persists in save game files!
+
+    private UUID uuid = UUID.randomUUID();
+
     /**
      * A virtual player to use with enemy privateers
      */
@@ -79,7 +84,8 @@ public class Game extends FreeColGameObject {
     protected Player viewOwner = null;
 
     /** Contains references to all objects created in this game. */
-    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
+    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects =
+              new HashMap<String, WeakReference<FreeColGameObject>>(10000);
 
     /**
      * The next available ID, that can be given to a new
@@ -137,7 +143,10 @@ public class Game extends FreeColGameObject {
     /**
      * Minimal constructor,
      * Just necessary to call parent constructor
-     * @param game
+     *
+     * @param game <code>Game</code>
+     * @param in <code>XMLStreamReader</code>
+     * @throws XMLStreamException
      */
     protected Game(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
@@ -184,6 +193,14 @@ public class Game extends FreeColGameObject {
         this.viewOwner = getPlayerByName(viewOwnerUsername);
         // setId() does not add Games to the freeColGameObjects
         this.setFreeColGameObject(getId(), this);
+    }
+
+    /** Returns the unique identifier for this game. 
+     *  (A game UUID persists in save game files.)
+     * @return java.util.UUID
+     */
+    public UUID getUUID () {
+       return uuid;
     }
 
     /**
@@ -842,6 +859,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the <code>MapGeneratorOptions</code> that is associated with this
      * {@link Game}.
+     * @return <code>OptionGroup</code>
      */
     public OptionGroup getMapGeneratorOptions() {
         return specification.getOptionGroup("mapGeneratorOptions");
@@ -913,11 +931,15 @@ public class Game extends FreeColGameObject {
 
     /**
      * Need to overwrite behavior of equals inherited from FreeColGameObject,
-     * since two games are not the same if the have the same id.
+     * since two games are not the same if they have the same id.
      */
+    @Override
     public boolean equals(Object o) {
         return this == o;
     }
+
+    // comment of Janet: latter is a sick implementation as long as hashCode
+    // cannot be rooted back to class Object's functionality
 
     /**
      * This method writes an XML-representation of this object to the given

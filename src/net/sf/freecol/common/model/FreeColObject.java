@@ -143,6 +143,7 @@ public abstract class FreeColObject {
      * Writes the object to the given file.
      *
      * @param file the save file
+     * @throws FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
         save(new FileOutputStream(file));
@@ -170,7 +171,7 @@ public abstract class FreeColObject {
                     xsw.close();
                 }
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception while closing stream.", e);
+                logger.log(Level.WARNING, "Exception while closing save stream.", e);
             }
         }
     }

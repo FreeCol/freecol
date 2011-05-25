@@ -297,6 +297,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
+    @Override
     public final void toXML(XMLStreamWriter out, Player player, boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
         if (toSavedGame && !showAll) {
@@ -311,6 +312,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
+    @Override
     public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
         uninitialized = false;
         super.readFromXML(in);
@@ -346,6 +348,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      *
      * @param newID the unique ID of this object,
      */
+    @Override
     public final void setId(String newID) {
         if (game != null && !(this instanceof Game)) {
             if (!newID.equals(getId())) {
@@ -393,10 +396,12 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param o The <code>FreeColGameObject</code> to compare against this object.
      * @return <i>true</i> if the two <code>FreeColGameObject</code> are equal and <i>false</i> otherwise.
      */
+    @Override
     public boolean equals(Object o) {
         return (o instanceof FreeColGameObject) ? equals((FreeColGameObject) o) : false;
     }
 
+    @Override
     public int hashCode() {
         return getId().hashCode();
     }
@@ -406,6 +411,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      * Returns a string representation of the object.
      * @return The <code>String</code>
      */
+    @Override
     public String toString() {
         return getClass().getName() + ": " + getId() + " (super's hash code: " +
             Integer.toHexString(super.hashCode()) + ")";
