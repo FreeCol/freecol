@@ -60,8 +60,7 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    // TODO make it happen that UUID persists in save game files!
-
+    /** Game UUID, persistent in savegame files */
     private UUID uuid = UUID.randomUUID();
 
     /**
@@ -974,6 +973,7 @@ public class Game extends FreeColGameObject {
         }
 
         out.writeAttribute("ID", getId());
+        out.writeAttribute("UUID", getUUID().toString());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
         out.writeAttribute("spanishSuccession", Boolean.toString(spanishSuccession));
 
@@ -1025,8 +1025,14 @@ public class Game extends FreeColGameObject {
      *
      * @param in The input stream with the XML.
      */
+    @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
+
+        String hs = in.getAttributeValue(null, "UUID");
+        if (hs != null) {
+           uuid = UUID.fromString(hs);
+        }
 
         turn = new Turn(getAttribute(in, "turn", 1));
         setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
