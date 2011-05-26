@@ -141,8 +141,10 @@
       </selectOption>
       <!-- Option for setting the period of autosaves. The value 0 signals that autosaving is disabled -->
       <integerOption id="model.option.autosavePeriod" defaultValue="0" minimumValue="0" maximumValue="100"/>
+      <!-- Option for setting the number of days autosaves are kept (valid time). 0 to ignore this condition. -->
+      <integerOption id="model.option.autosaveValidity" defaultValue="30" minimumValue="0" maximumValue="360"/>
       <!-- Option for setting the number of autosaves to keep. If set to 0, all autosaves are kept. -->
-      <integerOption id="model.option.autosaveGenerations" defaultValue="10" minimumValue="0" maximumValue="100"/>
+      <!--<integerOption id="model.option.autosaveGenerations" defaultValue="10" minimumValue="0" maximumValue="100"/>-->
       <!-- Option to delete old save games when a new game is started -->
       <booleanOption id="model.option.autosaveDelete" defaultValue="false"/>
     </optionGroup>
