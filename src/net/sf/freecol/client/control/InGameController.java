@@ -186,11 +186,6 @@ public final class InGameController implements NetworkConstants {
      */
     private HashMap<String, Integer> messagesToIgnore = new HashMap<String, Integer>();
 
-    /*
-     * A list of save game files.
-    private ArrayList<File> allSaveGames = new ArrayList<File>();
-     */
-
     /**
      * The constructor to use.
      *
@@ -624,17 +619,6 @@ public final class InGameController implements NetworkConstants {
                 File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
                                              filename);
                 saveGame(saveGameFile);
-/*
-                // delete one file if allowed generations exceeded
-                int generations = options.getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
-                if (generations > 0) {
-                    allSaveGames.add(saveGameFile);
-                    if (allSaveGames.size() > generations) {
-                        File fileToDelete = allSaveGames.remove(0);
-                        fileToDelete.delete();
-                    }
-                }
-  */
             }
 
             player.invalidateCanSeeTiles();

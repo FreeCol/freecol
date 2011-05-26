@@ -252,6 +252,12 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String AUTOSAVE_GENERATIONS = "model.option.autosaveGenerations";
 
+    /**
+     * Option for setting the number of days autosaves are keep (valid time). If set to 0,
+     * valid time is not checked.
+     */
+    public static final String AUTOSAVE_VALIDITY = "model.option.autosaveValidity";
+
 
 
     /**

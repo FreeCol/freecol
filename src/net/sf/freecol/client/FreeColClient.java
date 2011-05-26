@@ -716,11 +716,40 @@ public final class FreeColClient {
         return gui;
     }
 
+    private void exitActions () {
+       try {
+          // action: delete outdated autosave files
+          int validDays = getClientOptions().getInteger(ClientOptions.AUTOSAVE_VALIDITY);
+          long validPeriod = (long)validDays * 86400 * 1000;  // millisecond equivalent of valid days
+          long timeNow = System.currentTimeMillis();
+          File autosaveDir = FreeCol.getAutosaveDirectory();
+
+          if (validPeriod != 0) {
+             // analyse all files in autosave directory
+             String[] flist = autosaveDir.list();
+             for ( int i = 0; flist != null && i < flist.length; i++ ) {
+                String filename = flist[i];
+                // delete files which are older than valid period set by user option
+                if (filename.endsWith(".fsg")) {
+                   File saveGameFile = new File(autosaveDir, filename);
+                   if (saveGameFile.lastModified() + validPeriod < timeNow) {
+                       saveGameFile.delete();
+                   }
+                }
+             }
+          }
+       } catch (Exception e) {
+          e.printStackTrace();
+       }
+    }
+
+
     /**
      * Quits the application without any questions.
      */
     public void quit() {
         getConnectController().quitGame(isSingleplayer());
+        exitActions();
         if (!windowed) {
             try {
                 gd.setFullScreenWindow(null);

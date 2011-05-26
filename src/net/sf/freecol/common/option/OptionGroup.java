@@ -128,7 +128,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      *
      * @param id The id of the option.
      * @param value the new value of the option.
-     * @return The value.
      * @exception IllegalArgumentException If there is no integer
      *            value associated with the specified option.
      * @exception NullPointerException if the given <code>Option</code> does not exist.
@@ -164,7 +163,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      *
      * @param id The id of the option.
      * @param value the new value of the option.
-     * @return The value.
      * @exception IllegalArgumentException If there is no boolean
      *            value associated with the specified option.
      * @exception NullPointerException if the given <code>Option</code> does not exist.
@@ -220,6 +218,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
+    @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id != null) {

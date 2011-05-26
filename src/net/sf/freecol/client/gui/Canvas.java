@@ -232,6 +232,7 @@ public final class Canvas extends JDesktopPane {
             this.f = f;
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
                 return;
@@ -244,6 +245,7 @@ public final class Canvas extends JDesktopPane {
             loc = p;
         }
 
+        @Override
         public void mouseMoved(MouseEvent arg0) {
         }
 
@@ -571,7 +573,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Detailed view of a foreign colony when in debug mode.
      *
-     * @param tile The <code>Settlement</code> with the colony.
+     * @param settlement The <code>Settlement</code> with the colony
      */
     public void debugForeignColony(Settlement settlement) {
         if (settlement instanceof Colony) {
@@ -1051,8 +1053,8 @@ public final class Canvas extends JDesktopPane {
      * Displays the <code>LootCargoDialog</code>.
      *
      * @param winner The <code>Unit</code> that is looting.
-     * @param goods The <code>Goods</code> to select from.
-     * @return The goods to loot.
+     * @param loot list of <code>Goods</code> to select from
+     * @return list of <code>Goods</code> to loot
      */
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
         CaptureGoodsDialog dialog = new CaptureGoodsDialog(this, winner, loot);
@@ -1174,7 +1176,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Describe <code>showColonyPanel</code> method here.
      *
-     * @param selectedTile a <code>Tile</code> value
+     * @param t a <code>Tile</code> value
      */
     public void showColonyPanel(Tile t) {
         if (gui.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
@@ -1264,8 +1266,7 @@ public final class Canvas extends JDesktopPane {
      * @param text The text that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
-     * @param replace An array of strings that will be inserted somewhere in the
-     *            text.
+     *
      * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
      *         otherwise.
      * @see FreeColDialog
@@ -1772,8 +1773,9 @@ public final class Canvas extends JDesktopPane {
                 showMainPanel();
                 freeColClient.playSound("sound.intro.general");
             }
-        };
-        final AbortListener l = new AbortListener();
+        }
+
+        AbortListener l = new AbortListener();
         addMouseListener(l);
         addKeyListener(l);
         vp.addMouseListener(l);
@@ -2120,7 +2122,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a <code>FreeColPanel</code>.
-     *
+     * @param panel <code>FreeColPanel</code>, panel to show
      */
     public void showSubPanel(FreeColPanel panel) {
         repaint();
@@ -2131,7 +2133,8 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
      *
-     * @param popupPosition The generalized position to place the panel.
+     * @param panel <code>FreeColPanel</code>, panel to show
+     * @param popupPosition <code>PopupPosition</code>, The generalized position to place the panel.
      */
     public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
         repaint();
