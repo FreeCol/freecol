@@ -454,7 +454,7 @@ public final class ColonyPanel extends FreeColPanel
         List<ChoiceItem<GoodsType>> gtl
             = new ArrayList<ChoiceItem<GoodsType>>();
         for (GoodsType t : spec.getGoodsTypeList()) {
-            if (t == spec.getPrimaryFoodType()) continue;
+            if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
             gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
                                               t));
         }
