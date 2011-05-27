@@ -139,4 +139,16 @@ public class ProductionCache {
         return productionAndConsumption.get(object);
     }
 
+
+    /**
+     * Gets a copy of the current production state.
+     *
+     * @return A copy of the current production state.
+     */
+    public TypeCountMap<GoodsType> getProductionMap() {
+        update();
+        TypeCountMap<GoodsType> result = new TypeCountMap<GoodsType>();
+        result.putAll(netProduction);
+        return result;
+    }
 }

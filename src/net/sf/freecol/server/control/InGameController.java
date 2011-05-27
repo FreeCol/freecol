@@ -3106,6 +3106,7 @@ public final class InGameController extends Controller {
                 container.addGoods(type, amount);
             }
         }
+        colony.invalidateCache();
 
         // Nothing to see for others, colony internal.
         serverPlayer.setGold(savedGold);

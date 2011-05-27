@@ -2164,11 +2164,23 @@ public class Colony extends Settlement implements Nameable {
         return productionCache.getProductionInfo(object);
     }
 
+    /**
+     * Invalidates the production cache.
+     */
     public void invalidateCache() {
         logger.finest("invalidating production cache");
         productionCache.invalidate();
     }
 
+    /**
+     * Gets a copy of the current production map.
+     * Useful in the server at the point net production is applied to a colony.
+     *
+     * @return A copy of the current production map.
+     */
+    protected TypeCountMap<GoodsType> getProductionMap() {
+        return productionCache.getProductionMap();
+    }
 
     /**
      * Returns a list of all {@link Consumer}s in the colony sorted by

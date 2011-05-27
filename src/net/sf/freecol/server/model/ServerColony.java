@@ -147,12 +147,11 @@ public class ServerColony extends Colony implements ServerModelObject {
         Specification spec = getSpecification();
 
         boolean tileDirty = false;
-        boolean colonyDirty = false;
         boolean newUnitBorn = false;
-        List<FreeColGameObject> updates = new ArrayList<FreeColGameObject>();
         GoodsContainer container = getGoodsContainer();
         container.saveState();
 
+        // Check for learning by experience
         for (WorkLocation workLocation : getWorkLocations()) {
             ProductionInfo productionInfo = getProductionInfo(workLocation);
             ((ServerModelObject) workLocation).csNewTurn(random, cs);
@@ -175,57 +174,72 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
-        for (BuildQueue queue : new BuildQueue[] { buildQueue, populationQueue }) {
+        // Check the build queues and build new stuff.  If a queue
+        // does a build add it to the built list, so that we can
+        // remove the item built from it *after* updating applying the
+        // production changes.
+        List<BuildQueue> built = new ArrayList<BuildQueue>();
+        for (BuildQueue queue
+                 : new BuildQueue[] { buildQueue, populationQueue }) {
             if (!getProductionInfo(queue).getConsumption().isEmpty()) {
-                // this means we are actually building something
-                BuildableType buildable = queue.getCurrentlyBuilding();
-                if (buildable instanceof UnitType) {
+                // Ready to build something.  TODO: OO!
+                BuildableType buildable = csNextBuildable(queue, random, cs);
+                if (buildable == null) {
+                    ; // It was invalid, ignore.
+                } else if (buildable instanceof UnitType) {
                     Unit newUnit = csBuildUnit(queue, random, cs);
                     if (newUnit.hasAbility("model.ability.bornInColony")) {
                         newUnitBorn = true;
                     }
-                    tileDirty = true;
+                    built.add(queue);
                 } else if (buildable instanceof BuildingType) {
-                    colonyDirty = buildBuilding(queue, cs, updates);
+                    if (csBuildBuilding(queue, cs)) {
+                        built.add(queue);
+                    }
                 } else {
-                    throw new IllegalStateException("Bogus buildable: " + buildable);
+                    throw new IllegalStateException("Bogus buildable: "
+                                                    + buildable);
                 }
-                // Having removed something from the build queue, nudge it again
-                // to see if there is a problem with the next item if any.
-                buildable = csGetBuildable(cs);
             }
         }
 
-        // Apply the changes accumulated in the netProduction map.
-        // Check for famine when total primary food goes negative.
+        // Apply the accumulated production changes.
+        // Beware that if you try to build something requiring hammers
+        // and tools, as soon as one is updated in the colony the
+        // current production cache is invalidated, and the
+        // recalculated one will see the build as incomplete due to
+        // missing the goods just updated.
+        // Hence the need for a copy of the current production map.
         int turnsToStarvation = INFINITY;
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            int net = getNetProductionOf(goodsType);
+        TypeCountMap<GoodsType> productionMap = getProductionMap();
+        for (GoodsType goodsType : productionMap.keySet()) {
+            int net = productionMap.getCount(goodsType);
             int stored = getGoodsCount(goodsType);
-            if (net + stored < 0) {
+            if (net + stored <= 0) {
                 removeGoods(goodsType, stored);
             } else {
                 addGoods(goodsType, net);
             }
+
+            // Handle the food situation
             if (goodsType == spec.getPrimaryFoodType()) {
-                // Handle the food situation
+                // Check for famine when total primary food goes negative.
                 if (net + stored < 0) {
                     if (getUnitCount() > 1) {
-                        Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                            getUnitList(), random);
-                        updates.add((FreeColGameObject) victim.getLocation());
+                        Unit victim = Utils.getRandomMember(logger,
+                            "Choose starver", getUnitList(), random);
                         cs.addDispose(owner, this, victim);
                         cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                       "model.colony.colonistStarved",
-                                                       this)
-                                      .addName("%colony%", getName()));
+                            new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                             "model.colony.colonistStarved",
+                                             this)
+                                .addName("%colony%", getName()));
                     } else { // Its dead, Jim.
                         cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                       "model.colony.colonyStarved",
-                                                       this)
-                                      .addName("%colony%", getName()));
+                            new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                             "model.colony.colonyStarved",
+                                             this)
+                                .addName("%colony%", getName()));
                         cs.addDispose(owner, getTile(), this);
                         return;
                     }
@@ -233,11 +247,11 @@ public class ServerColony extends Colony implements ServerModelObject {
                     int turns = stored / -net;
                     if (turns <= 3 && !newUnitBorn) {
                         cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                       "model.colony.famineFeared",
-                                                       this)
-                                      .addName("%colony%", getName())
-                                      .addAmount("%number%", turns));
+                            new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "model.colony.famineFeared",
+                                             this)
+                                .addName("%colony%", getName())
+                                .addAmount("%number%", turns));
                         logger.finest("Famine feared in " + getName()
                                       + " food=" + stored
                                       + " production=" + net
@@ -245,6 +259,28 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
             }
+        }
+
+        // Now that the goods have been updated it is safe to remove the
+        // built item from its build queue.
+        if (!built.isEmpty()) {
+            for (BuildQueue queue : built) {
+                BuildableType buildable = queue.getCurrentlyBuilding();
+                if (buildable instanceof UnitType) {
+                    if (((UnitType) buildable).hasAbility("model.ability.bornInColony")) {
+                        queue.remove(0);
+                        if (queue.size() > 1) { // Shuffle the colony queue
+                            Collections.shuffle(queue.getValues(), random);
+                        }
+                    } else { // Retain last entry if possible.
+                        if (queue.size() > 1) queue.remove(0);
+                    }
+                } else if (buildable instanceof BuildingType) {
+                    queue.remove(0);
+                }
+                csNextBuildable(queue, random, cs);
+            }
+            tileDirty = true;
         }
 
         // Export goods if custom house is built.
@@ -288,7 +324,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             int amount = goods.getAmount();
             int oldAmount = container.getOldGoodsCount(type);
 
-            if (amount < low && oldAmount >= low) {
+            if (amount < low && oldAmount >= low
+                && !(type == spec.getPrimaryFoodType() && newUnitBorn)) {
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                      "model.building.warehouseEmpty",
@@ -378,43 +415,6 @@ public class ServerColony extends Colony implements ServerModelObject {
     }
 
     /**
-     * Build a unit from a build queue.
-     *
-     * @param buildQueue The <code>BuildQueue</code> to find the unit in.
-     * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
-     * @return The unit that was built.
-     */
-    private Unit csBuildUnit(BuildQueue buildQueue, Random random,
-                             ChangeSet cs) {
-        Unit unit = new ServerUnit(getGame(), getTile(), owner,
-                                   (UnitType) buildQueue.getCurrentlyBuilding(),
-                                   UnitState.ACTIVE);
-        if (unit.hasAbility("model.ability.bornInColony")) {
-            cs.addMessage(See.only((ServerPlayer) owner),
-                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                           "model.colony.newColonist",
-                                           this, unit)
-                          .addName("%colony%", getName()));
-            if (buildQueue.size() > 1) {
-                Collections.shuffle(buildQueue.getValues(), random);
-            }
-        } else {
-            cs.addMessage(See.only((ServerPlayer) owner),
-                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                           "model.colony.unitReady",
-                                           this, unit)
-                          .addName("%colony%", getName())
-                          .addStringTemplate("%unit%", unit.getLabel()));
-            // Remove the unit-to-build unless it is the last entry.
-            if (buildQueue.size() > 1) buildQueue.remove(0);
-        }
-
-        logger.info("New unit created in " + getName() + ": " + unit);
-        return unit;
-    }
-
-    /**
      * Check a building to see if it is missing input.
      *
      * @param building The <code>Building</code> to check.
@@ -453,66 +453,102 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
     }
 
+    /**
+     * Build a unit from a build queue.
+     *
+     * @param buildQueue The <code>BuildQueue</code> to find the unit in.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return The unit that was built.
+     */
+    private Unit csBuildUnit(BuildQueue buildQueue, Random random,
+                             ChangeSet cs) {
+        Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                   (UnitType) buildQueue.getCurrentlyBuilding(),
+                                   UnitState.ACTIVE);
+        if (unit.hasAbility("model.ability.bornInColony")) {
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                           "model.colony.newColonist",
+                                           this, unit)
+                          .addName("%colony%", getName()));
+        } else {
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                           "model.colony.unitReady",
+                                           this, unit)
+                          .addName("%colony%", getName())
+                          .addStringTemplate("%unit%", unit.getLabel()));
+        }
 
-    private boolean buildBuilding(BuildQueue buildQueue, ChangeSet cs, List<FreeColGameObject> updates) {
+        logger.info("New unit created in " + getName() + ": " + unit);
+        return unit;
+    }
+
+    /**
+     * Builds a building from a build queue.
+     *
+     * @param queue The <code>BuildQueue</code> to build from.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the build was successful.
+     */
+    private boolean csBuildBuilding(BuildQueue buildQueue, ChangeSet cs) {
         BuildingType type = (BuildingType) buildQueue.getCurrentlyBuilding();
         BuildingType from = type.getUpgradesFrom();
         boolean success;
-        boolean colonyDirty = false;
         if (from == null) {
             addBuilding(new ServerBuilding(getGame(), this, type));
-            colonyDirty = true;
             success = true;
         } else {
             Building building = getBuilding(from);
             if (building.upgrade()) {
-                updates.add(building);
                 success = true;
             } else {
                 cs.addMessage(See.only((ServerPlayer) owner),
-                              new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                               "colonyPanel.unbuildable",
-                                               this)
-                              .addName("%colony%", getName())
-                              .add("%object%", type.getNameKey()));
+                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                     "colonyPanel.unbuildable",
+                                     this)
+                        .addName("%colony%", getName())
+                        .add("%object%", type.getNameKey()));
                 success = false;
             }
         }
         if (success) {
             tile.updatePlayerExploredTiles(); // See stockade changes
             cs.addMessage(See.only((ServerPlayer) owner),
-                          new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                           "model.colony.buildingReady",
-                                           this)
-                          .addName("%colony%", getName())
-                          .add("%building%", type.getNameKey()));
+                new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                 "model.colony.buildingReady",
+                                 this)
+                    .addName("%colony%", getName())
+                    .add("%building%", type.getNameKey()));
             if (buildQueue.size() == 1) {
                 cs.addMessage(See.only((ServerPlayer) owner),
-                              new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                               "model.colony.notBuildingAnything",
-                                               this)
-                              .addName("%colony%", getName())
-                              .add("%building%", type.getNameKey()));
+                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                     "model.colony.notBuildingAnything",
+                                     this)
+                        .addName("%colony%", getName())
+                        .add("%building%", type.getNameKey()));
             }
         }
-        buildQueue.remove(0);
-        return colonyDirty;
+        return success;
     }
 
-
     /**
-     * Gets what this colony really is building, removing anything that
-     * is currently impossible.
+     * Removes a buildable from a build queue, and updates the queue so that
+     * a valid buildable is now being built if possible.
      *
+     * @param queue The <code>BuildQueue</code> to update.
+     * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return A buildable that can be built, or null if nothing.
+     * @return The next buildable that can be built, or null if nothing.
      */
-    private BuildableType csGetBuildable(ChangeSet cs) {
-        ServerPlayer owner = (ServerPlayer) getOwner();
+    private BuildableType csNextBuildable(BuildQueue queue, Random random,
+                                          ChangeSet cs) {
         Specification spec = getSpecification();
+        ServerPlayer owner = (ServerPlayer) getOwner();
+        BuildableType buildable;
 
-        while (!buildQueue.isEmpty()) {
-            BuildableType buildable = buildQueue.getCurrentlyBuilding();
+        while ((buildable = queue.getCurrentlyBuilding()) != null) {
             switch (getNoBuildReason(buildable)) {
             case NONE:
                 return buildable;
@@ -523,35 +559,34 @@ public class ServerColony extends Colony implements ServerModelObject {
                         && getProductionOf(goodsType) > 0) {
                         // Production is idle
                         cs.addMessage(See.only(owner),
-                                      new ModelMessage(ModelMessage.MessageType.WARNING,
-                                                       "model.colony.cannotBuild",
-                                                       this)
-                                      .addName("%colony%", getName()));
+                            new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "model.colony.cannotBuild",
+                                             this)
+                                .addName("%colony%", getName()));
                     }
                 }
                 return null;
             case POPULATION_TOO_SMALL:
                 cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.WARNING,
-                                               "model.colony.buildNeedPop",
-                                               this)
-                              .addName("%colony%", getName())
-                              .add("%building%", buildable.getNameKey()));
+                    new ModelMessage(ModelMessage.MessageType.WARNING,
+                                     "model.colony.buildNeedPop",
+                                     this)
+                        .addName("%colony%", getName())
+                        .add("%building%", buildable.getNameKey()));
                 break;
             default: // Are there other warnings to send?
                 cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.WARNING,
-                                               "colonyPanel.unbuildable",
-                                               this, buildable)
-                              .addName("%colony%", getName())
-                              .add("%object%", buildable.getNameKey()));
+                    new ModelMessage(ModelMessage.MessageType.WARNING,
+                                     "colonyPanel.unbuildable",
+                                     this, buildable)
+                        .addName("%colony%", getName())
+                        .add("%object%", buildable.getNameKey()));
                 break;
             }
-            buildQueue.remove(0);
+            queue.remove(0);
         }
         return null;
     }
-
 
     /**
      * Evict the users from a tile used by this colony, due to military
