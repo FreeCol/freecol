@@ -1557,11 +1557,9 @@ public class Colony extends Settlement implements Nameable {
             return NoBuildReason.NOT_BUILDABLE;
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
             return NoBuildReason.POPULATION_TOO_SMALL;
-        } else if (!(buildableType instanceof BuildingType ||
-                     getFeatureContainer().hasAbility("model.ability.build", buildableType, getGame().getTurn()))) {
-            return NoBuildReason.MISSING_BUILD_ABILITY;
         } else {
-            java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
+            java.util.Map<String, Boolean> requiredAbilities
+                = buildableType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (hasAbility(entry.getKey()) != entry.getValue()) {
                     return NoBuildReason.MISSING_ABILITY;
@@ -1581,15 +1579,23 @@ public class Colony extends Settlement implements Nameable {
             if (colonyBuilding == null) {
                 // the colony has no similar building yet
                 if (newBuildingType.getUpgradesFrom() != null) {
-                    // we are trying to build an advanced factory, we should build lower level shop first
+                    // we are trying to build an advanced factory, we
+                    // should build lower level shop first
                     return NoBuildReason.WRONG_UPGRADE;
                 }
             } else {
                 // a building of the same family already exists
-                if (colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
-                    // the existing building's next upgrade is not the new one we want to build
+                if (colonyBuilding.getType().getUpgradesTo()
+                    != newBuildingType) {
+                    // the existing building's next upgrade is not the
+                    // new one we want to build
                     return NoBuildReason.WRONG_UPGRADE;
                 }
+            }
+        } else if (buildableType instanceof UnitType) {
+            if (!buildableType.hasAbility("model.ability.bornInColony")
+                && !hasAbility("model.ability.build", buildableType)) {
+                return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
         return NoBuildReason.NONE;
