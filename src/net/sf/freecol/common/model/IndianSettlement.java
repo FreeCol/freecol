@@ -1277,7 +1277,6 @@ public class IndianSettlement extends Settlement {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         owner.addSettlement(this);
-        setFeatureContainer(new FeatureContainer(getSpecification()));
         ownedUnits.clear();
 
         for (int i = 0; i < wantedGoods.length; i++) {

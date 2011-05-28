@@ -2309,7 +2309,6 @@ public class Colony extends Settlement implements Nameable {
         liberty = getAttribute(in, "liberty", 0);
         immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        setFeatureContainer(new FeatureContainer(getSpecification()));
         landLocked = getAttribute(in, "landLocked", true);
         if (!landLocked) {
             getFeatureContainer().addAbility(HAS_PORT);

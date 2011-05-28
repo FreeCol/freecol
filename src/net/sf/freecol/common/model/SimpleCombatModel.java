@@ -138,7 +138,6 @@ public class SimpleCombatModel extends CombatModel {
             result = FeatureContainer.applyModifierSet(0,
                     defender.getGame().getTurn(),
                     getDefensiveModifiers(attacker, defender));
-
         } else if (combatIsBombard(attacker, defender)) {
             result = ((Unit) defender).getType().getDefence();
 
@@ -307,16 +306,10 @@ public class SimpleCombatModel extends CombatModel {
             }
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
-            Unit attackerUnit = (Unit) attacker;
-            UnitType type = attackerUnit.getType();
-            Settlement settlement = (Settlement) defender;
-            if (settlement.getFeatureContainer() == null) {
-                // Client can not see inside the settlement
-                result.add(UNKNOWN_DEFENCE_MODIFIER);
-            } else {
-                result.addAll(settlement.getFeatureContainer()
-                              .getModifierSet(Modifier.DEFENCE, type));
-            }
+            // Not allowed to see inside the settlement.  This only applies 
+            // to the pre-combat dialog--- the actual attack is on the
+            // unit chosen to defend.
+            result.add(UNKNOWN_DEFENCE_MODIFIER);
 
         } else if (combatIsBombard(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
@@ -393,7 +386,8 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement
-                result.addAll(tile.getSettlement().getModifierSet(Modifier.DEFENCE));
+                result.addAll(tile.getSettlement()
+                              .getModifierSet(Modifier.DEFENCE));
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility("model.ability.bombard")
                     && attackerUnit.getOwner().isIndian()) {

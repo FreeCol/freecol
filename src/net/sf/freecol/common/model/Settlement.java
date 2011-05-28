@@ -152,7 +152,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             featureContainer.remove(type.getFeatureContainer());
         }
         this.type = newType;
-        featureContainer.add(type.getFeatureContainer());
+        if (newType != null) {
+            featureContainer.add(newType.getFeatureContainer());
+        }
     }
 
     public Set<Modifier> getModifierSet(String key) {
@@ -603,22 +605,21 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
+        featureContainer = new FeatureContainer(getGame().getSpecification());
 
         // TODO: remove 0.9.x compatibility code
         String typeStr = in.getAttributeValue(null, "settlementType");
+        SettlementType settlementType;
         if (typeStr == null) {
             // must be old style
             String capital = in.getAttributeValue(null, "isCapital");
-            if ("true".equals(capital)) {
-                type = owner.getNationType().getSettlementType(true);
-            } else {
-                type = owner.getNationType().getSettlementType(false);
-            }
+            settlementType = owner.getNationType()
+                .getSettlementType("true".equals(capital));
         } else {
-            type = owner.getNationType().getSettlementType(typeStr);
+            settlementType = owner.getNationType().getSettlementType(typeStr);
         }
         // end compatibility code
-
+        setType(settlementType);
     }
 
     protected void writeAttributes(XMLStreamWriter out)
