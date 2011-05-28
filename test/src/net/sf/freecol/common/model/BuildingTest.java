@@ -28,6 +28,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -273,8 +274,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testSerialize() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         for (Building building : colony.getBuildings()) {
@@ -291,32 +292,50 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testStockade() {
-
+        Game game = getGame();
+        game.setMap(getTestMap(true));
         Set<Modifier> modifierSet;
 
-        BuildingType stockade = spec().getBuildingType("model.building.stockade");
+        Colony colony = getStandardColony(2);
+        modifierSet = colony.getModifierSet("model.modifier.defence");
+        assertEquals(1, modifierSet.size());
+        Modifier modifier = modifierSet.iterator().next();
+        assertEquals(50f, modifier.getValue());
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+
+        BuildingType stockade = spec()
+            .getBuildingType("model.building.stockade");
         modifierSet = stockade.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
-        assertEquals(100f, modifierSet.iterator().next().getValue());
-        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
+        modifier = modifierSet.iterator().next();
+        assertEquals(100f, modifier.getValue());
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(0f, stockade.getFeatureContainer()
+                     .applyModifier(0, "model.modifier.minimumColonySize"));
 
         BuildingType fort = spec().getBuildingType("model.building.fort");
         modifierSet = fort.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
-        assertEquals(150f, modifierSet.iterator().next().getValue());
-        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
+        modifier = modifierSet.iterator().next();
+        assertEquals(150f, modifier.getValue());
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(0f, stockade.getFeatureContainer()
+                     .applyModifier(0, "model.modifier.minimumColonySize"));
 
-        BuildingType fortress = spec().getBuildingType("model.building.fortress");
+        BuildingType fortress = spec()
+            .getBuildingType("model.building.fortress");
         modifierSet = fortress.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
-        assertEquals(200f, modifierSet.iterator().next().getValue());
-        assertEquals(0f, stockade.getFeatureContainer().applyModifier(0, "model.modifier.minimumColonySize"));
-
+        modifier = modifierSet.iterator().next();
+        assertEquals(200f, modifier.getValue());
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(0f, stockade.getFeatureContainer()
+                     .applyModifier(0, "model.modifier.minimumColonySize"));
     }
 
     public void testCottonClothProduction() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(2);
         List<Unit> units = colony.getUnitList();
