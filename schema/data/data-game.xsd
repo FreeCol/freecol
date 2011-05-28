@@ -49,6 +49,7 @@
       </xs:choice>
 
       <xs:attribute name="ID" type="GameId" use="required" />
+      <xs:attribute name="UUID" type="xs:string" use="optional" />
       <xs:attribute name="turn" type="xs:int" use="required" />
       <xs:attribute name="spanishSuccession" type="xs:boolean" use="optional"
 		    default="false" />
