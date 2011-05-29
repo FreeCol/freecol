@@ -71,6 +71,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
@@ -462,6 +463,12 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setActionCommand(action);
+        return button;
+    }
+
+    public JButton createColonyButton(Colony colony) {
+        JButton button = getLinkButton(colony.getName(), null, colony.getId());
+        button.addActionListener(this);
         return button;
     }
 

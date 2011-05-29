@@ -71,13 +71,5 @@ public final class ReportReligiousPanel extends ReportPanel {
 
     }
 
-
-    private JButton createColonyButton(Colony colony) {
-        JButton button = FreeColPanel.getLinkButton(colony.getName(), null, colony.getId());
-        button.addActionListener(this);
-        return button;
-    }
-
-
 }
 

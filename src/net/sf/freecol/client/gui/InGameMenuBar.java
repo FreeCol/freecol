@@ -206,7 +206,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(WaitAction.id));
         menu.add(getMenuItem(SkipUnitAction.id));
         menu.add(getMenuItem(ChangeAction.id));
- 
+
         menu.addSeparator();
 
         menu.add(getMenuItem(ClearOrdersAction.id));
@@ -238,6 +238,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ReportExplorationAction.id));
         menu.add(getMenuItem(ReportHistoryAction.id));
         menu.add(getMenuItem(ReportProductionAction.id));
+        menu.add(getMenuItem(ReportEducationAction.id));
         menu.add(getMenuItem(ShowDifficultyAction.id));
         menu.add(getMenuItem(ShowGameOptionsAction.id));
         menu.add(getMenuItem(ShowMapGeneratorOptionsAction.id));

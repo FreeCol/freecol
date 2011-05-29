@@ -602,7 +602,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    private JButton createColonyButton(final Colony colony) {
+    public JButton createColonyButton(final Colony colony) {
         String text = colony.getName();
         if (!unitData.isSummary()) {
 //            int unitIndex = unitData.getUnitType().getIndex();
