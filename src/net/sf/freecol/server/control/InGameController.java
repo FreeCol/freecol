@@ -3368,8 +3368,9 @@ public final class InGameController extends Controller {
             oldStudent.setTeacher(null);
             cs.add(See.only(serverPlayer), oldStudent);
         }
-        student.setTeacher(teacher);
         teacher.setStudent(student);
+        teacher.setWorkType(null);
+        student.setTeacher(teacher);
         cs.add(See.only(serverPlayer), student, teacher);
         return cs.build(serverPlayer);
     }

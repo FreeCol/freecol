@@ -384,6 +384,7 @@ public class Building extends FreeColGameObject
                 unit.setStudent(student);
                 student.setTeacher(unit);
             }
+            unit.setWorkType(null);
         } else {
             Unit teacher = unit.getTeacher();
             if (teacher == null
