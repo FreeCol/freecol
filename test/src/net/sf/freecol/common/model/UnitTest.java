@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
@@ -475,14 +476,46 @@ public class UnitTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
 
         colonist.modifyExperience(10);
+        assertEquals(Role.DEFAULT, colonist.getRole());
         assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
 
         colonist.changeEquipment(musketsType, 1);
+        assertEquals(Role.SOLDIER, colonist.getRole());
         assertTrue("Colonist should have lost all experience, different role",colonist.getExperience() == 0);
 
         colonist.modifyExperience(10);
         colonist.changeEquipment(horsesType, 1);
+        assertEquals(Role.DRAGOON, colonist.getRole());
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
+    }
+
+    public void testCompatibleRoles() {
+        assertFalse(Role.SOLDIER.isCompatibleWith(Role.DEFAULT));
+        assertFalse(Role.SOLDIER.isCompatibleWith(Role.PIONEER));
+        assertFalse(Role.SOLDIER.isCompatibleWith(Role.MISSIONARY));
+        assertTrue(Role.SOLDIER.isCompatibleWith(Role.SOLDIER));
+        assertFalse(Role.SOLDIER.isCompatibleWith(Role.SCOUT));
+        assertTrue(Role.SOLDIER.isCompatibleWith(Role.DRAGOON));
+
+        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.DEFAULT));
+        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.PIONEER));
+        assertTrue(Role.MISSIONARY.isCompatibleWith(Role.MISSIONARY));
+        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.SOLDIER));
+        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.SCOUT));
+        assertFalse(Role.MISSIONARY.isCompatibleWith(Role.DRAGOON));
+    }
+
+    public void testNewRole() {
+        assertEquals(Role.PIONEER, Role.DEFAULT.newRole(Role.PIONEER));
+        assertEquals(Role.MISSIONARY, Role.DEFAULT.newRole(Role.MISSIONARY));
+        assertEquals(Role.SOLDIER, Role.DEFAULT.newRole(Role.SOLDIER));
+        assertEquals(Role.SCOUT, Role.DEFAULT.newRole(Role.SCOUT));
+        assertEquals(Role.DRAGOON, Role.DEFAULT.newRole(Role.DRAGOON));
+
+        assertEquals(Role.PIONEER, Role.SOLDIER.newRole(Role.PIONEER));
+        assertEquals(Role.MISSIONARY, Role.SOLDIER.newRole(Role.MISSIONARY));
+        assertEquals(Role.DRAGOON, Role.SOLDIER.newRole(Role.SCOUT));
+        assertEquals(Role.DRAGOON, Role.SCOUT.newRole(Role.SOLDIER));
     }
 
 

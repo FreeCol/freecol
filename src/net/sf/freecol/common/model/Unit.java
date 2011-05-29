@@ -99,6 +99,22 @@ public class Unit extends FreeColGameObject
     public static enum Role {
         DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
 
+        public boolean isCompatibleWith(Role oldRole) {
+            return (this == oldRole) ||
+                (this == SOLDIER && oldRole == DRAGOON) ||
+                (this == DRAGOON && oldRole == SOLDIER);
+        }
+
+        public Role newRole(Role role) {
+            if (this == SOLDIER && role == SCOUT) {
+                return DRAGOON;
+            } else if (this == SCOUT && role == SOLDIER) {
+                return DRAGOON;
+            } else {
+                return role;
+            }
+        }
+
         public String getId() {
             return toString().toLowerCase(Locale.US);
         }
@@ -2498,24 +2514,7 @@ public class Unit extends FreeColGameObject
         Role oldRole = role;
         role = Role.DEFAULT;
         for (EquipmentType type : equipment.keySet()) {
-            switch (type.getRole()) {
-            case SOLDIER:
-                if (role == Role.SCOUT) {
-                    role = Role.DRAGOON;
-                } else {
-                    role = Role.SOLDIER;
-                }
-                break;
-            case SCOUT:
-                if (role == Role.SOLDIER) {
-                    role = Role.DRAGOON;
-                } else {
-                    role = Role.SCOUT;
-                }
-                break;
-            default:
-                role = type.getRole();
-            }
+            role = role.newRole(type.getRole());
         }
         if (getState() == UnitState.IMPROVING && role != Role.PIONEER) {
             setStateUnchecked(UnitState.ACTIVE);
@@ -2524,11 +2523,7 @@ public class Unit extends FreeColGameObject
 
         //Check for role change for reseting the experience
         // Soldier and Dragoon are compatible, no loss of experience
-        boolean keepExperience = (role == oldRole) ||
-                                 (role == Role.SOLDIER && oldRole == Role.DRAGOON) ||
-                                 (role == Role.DRAGOON && oldRole == Role.SOLDIER);
-
-        if(!keepExperience){
+        if(!role.isCompatibleWith(oldRole)){
             experience = 0;
         }
     }
