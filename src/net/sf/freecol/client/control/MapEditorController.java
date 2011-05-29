@@ -220,6 +220,7 @@ public final class MapEditorController {
 
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
+            @Override
             public void run() {
                 try {
                     // create thumbnail

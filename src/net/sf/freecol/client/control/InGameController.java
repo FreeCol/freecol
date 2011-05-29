@@ -2534,7 +2534,7 @@ public final class InGameController implements NetworkConstants {
             throw new RuntimeException("Unit " + unit.getId()
                                        + " found no carrier to embark upon.");
         } else if (choices.size() == 1) {
-            ; // Use the default
+            // Use the default
         } else {
             carrier = canvas.showChoiceDialog(unit.getTile(),
                                               Messages.message("embark.text"),
@@ -2841,7 +2841,7 @@ public final class InGameController implements NetworkConstants {
             if (enemy == null) return;
             int gold = askIncite(unit, direction, enemy, -1);
             if (gold < 0) {
-                ; // protocol fail
+                // protocol fail
             } else if (!player.checkGold(gold)) {
                 canvas.showInformationMessage(settlement,
                                               StringTemplate.template("missionarySettlement.inciteGoldFail")
@@ -3690,9 +3690,12 @@ public final class InGameController implements NetworkConstants {
      * Leave a ship.  The ship must be in harbour.
      *
      * @param unit The <code>Unit</code> which is to leave the ship.
+     * @return boolean
      */
     public boolean leaveShip(Unit unit) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn()) {
+           return false;
+        }
 
         // Sanity check, and find our carrier before we get off.
         if (!(unit.getLocation() instanceof Unit)) {
@@ -3747,7 +3750,7 @@ public final class InGameController implements NetworkConstants {
         } else if (carrier == null) {
             throw new IllegalArgumentException("Null carrier.");
         } else if (carrier.isInEurope()) {
-            ;
+            // empty
         } else if (carrier.getColony() == null) {
             throw new IllegalArgumentException("Carrier not at colony or Europe.");
         }
@@ -4029,7 +4032,6 @@ public final class InGameController implements NetworkConstants {
             //                            oldType, newType);
             // but this routine is only called out of UnitLabel, where the
             // unit icon is always updated anyway.
-            ;
         }
         nextActiveUnit();
     }
@@ -4335,7 +4337,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (askChangeWorkImprovementType(unit, improvementType)) {
-            ;// Redisplay should work
+            // Redisplay should work
         }
         nextActiveUnit();
     }
@@ -4407,7 +4409,7 @@ public final class InGameController implements NetworkConstants {
      * Make the unit active and set a null destination and trade route.
      *
      * @param unit The <code>Unit</code> to clear the orders of.
-     * @param True if the orders were cleared.
+     * @return boolean
      */
     public boolean clearOrders(Unit unit) {
         if (!requireOurTurn() || unit == null
@@ -4971,8 +4973,6 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Execute goto orders command.
-     *
-     * @return True if all goto orders have been performed.
      */
     public void executeGotoOrders() {
         doExecuteGotoOrders();

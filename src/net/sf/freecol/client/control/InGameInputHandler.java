@@ -1033,8 +1033,10 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handle all the children of this element.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
+     * @param connection <code>Connection</code>
+     * @param element <code>Element</code>, the element (root element in a DOM-parsed XML tree)
+     *                that holds all the information.
+     * @return <code>Element</code>
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
@@ -1271,6 +1273,7 @@ public final class InGameInputHandler extends InputHandler {
             this.newTurn = newTurn;
         }
 
+        @Override
         public void doWork(Canvas canvas) {
             super.doWork(canvas);
             FreeColClient fcc = getFreeColClient();

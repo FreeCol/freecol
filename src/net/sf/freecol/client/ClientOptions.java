@@ -570,8 +570,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Reads the options from the given file.
      *
-     * @param loadFile The <code>File</code> to read the
-     *            options from.
+     * @param in <code>InputStream</code> from XML resource
      * @param update a <code>boolean</code> value
      */
     public void load(InputStream in, boolean update) {
@@ -624,7 +623,7 @@ public class ClientOptions extends OptionGroup {
                     // Ignore the option:
                     final String ignoredTag = in.getLocalName();
                     while (in.nextTag() != XMLStreamConstants.END_ELEMENT
-                           || !in.getLocalName().equals(ignoredTag));
+                           || !in.getLocalName().equals(ignoredTag)) {}
                 }
             }
         }

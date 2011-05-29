@@ -562,6 +562,7 @@ public final class FreeColClient {
     /**
      * Writes the client options to the default location.
      *
+     * @throws FileNotFoundException
      * @see ClientOptions
      */
     public void saveClientOptions() throws FileNotFoundException {
@@ -580,6 +581,7 @@ public final class FreeColClient {
      * Writes the client options to the given file.
      *
      * @param saveFile The file where the client options should be written.
+     * @throws FileNotFoundException
      * @see ClientOptions
      */
     public void saveClientOptions(File saveFile) throws FileNotFoundException {
@@ -935,6 +937,7 @@ public final class FreeColClient {
 
     /**
      * Verifies if the client can play sounds.
+     * @return boolean <b>true</b> if and only if client sound player has an instance
      */
     public boolean canPlaySound() {
         return soundPlayer != null;

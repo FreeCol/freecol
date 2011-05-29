@@ -329,6 +329,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
          * it can receive the map.
          */
         new Thread(FreeCol.CLIENT_THREAD+"Starting game") {
+            @Override
             public void run() {
                 while (getFreeColClient().getGame().getMap() == null) {
                     try {
@@ -390,8 +391,10 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     /**
      * Handle all the children of this element.
      *
+     * @param connection <code>Connection</code>
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information.
+     * @return <code>Element</code>
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
