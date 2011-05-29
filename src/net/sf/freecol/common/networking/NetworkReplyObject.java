@@ -26,14 +26,14 @@ package net.sf.freecol.common.networking;
 * will block until {@link #setResponse} has been called.
 */
 public class NetworkReplyObject {
-    
+
     private Object response = null;
     private boolean responseGiven = false;
     private int networkReplyId;
     private boolean streamed;
-    
-    
-    
+
+
+
     /**
     * The constructor.
     *
@@ -46,19 +46,19 @@ public class NetworkReplyObject {
         this.networkReplyId = networkReplyId;
         this.streamed = streamed;
     }
-    
+
 
     /**
-     * Checks if this <code>NetworkReplyObject</code> 
+     * Checks if this <code>NetworkReplyObject</code>
      * expects streamed data.
-     * 
+     *
      * @return <code>true</code> if the incoming data
      *      should be handled as a stream.
      */
     public boolean isStreamed() {
         return streamed;
     }
-    
+
     /**
     * Sets the response and continues <code>getResponse()</code>.
     *
@@ -73,8 +73,8 @@ public class NetworkReplyObject {
         this.responseGiven = true;
         notify();
     }
-    
-    
+
+
     /**
     * Gets the unique identifier for the network message this
     * object will store.
@@ -85,7 +85,7 @@ public class NetworkReplyObject {
         return networkReplyId;
     }
 
-    
+
     /**
     * Gets the response. If the response has not been set, this method
     * will block until {@link #setResponse} has been called.

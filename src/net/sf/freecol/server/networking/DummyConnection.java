@@ -48,7 +48,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sets up a dummy connection using the specified {@link MessageHandler}s.
-     * 
+     *
      * @param name The name that identifies the connection.
      * @param incomingMessageHandler The MessageHandler to call for each message
      *            received.
@@ -61,7 +61,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Closes this connection.
-     * 
+     *
      * @throws IOException Will not be thrown by a <code>DummyConnection</code>,
      *             but added because of the superclass' specification.
      */
@@ -71,7 +71,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sends the given message over this Connection.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
      * @throws IOException If an error occur while sending the message.
@@ -87,7 +87,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sends a message to the other peer and returns the reply.
-     * 
+     *
      * @param element The question for the other peer.
      * @return The reply from the other peer.
      * @throws IOException If an error occur while sending the message.
@@ -107,7 +107,7 @@ public final class DummyConnection extends Connection {
     /**
      * Sends the given message over this <code>Connection</code> and waits for
      * confirmation of receiveval before returning.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
      * @throws IOException If an error occur while sending the message.
@@ -120,7 +120,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sets the outgoing MessageHandler for this Connection.
-     * 
+     *
      * @param mh The new MessageHandler for this Connection.
      */
     private void setOutgoingMessageHandler(MessageHandler mh) {
@@ -129,7 +129,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Sets the outgoing MessageHandler for this Connection.
-     * 
+     *
      * @param c The connectio to get the messagehandler from.
      */
     public void setOutgoingMessageHandler(DummyConnection c) {
@@ -139,7 +139,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Gets the <code>DummyConnection</code> this object is connected to.
-     * 
+     *
      * @return The <code>DummyConnection</code> .
      */
     public DummyConnection getOtherConnection() {
@@ -148,7 +148,7 @@ public final class DummyConnection extends Connection {
 
     /**
      * Return a human-readable string with the dummy connection name.
-     * 
+     *
      * @return string for debugging.
      */
     public String toString() {

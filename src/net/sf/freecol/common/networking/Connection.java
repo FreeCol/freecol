@@ -45,19 +45,17 @@ import org.w3c.dom.Element;
 /**
  * A network connection. Responsible for both sending and receiving network
  * messages.
- * 
+ *
  * @see #send(Element)
  * @see #sendAndWait(Element)
  * @see #ask(Element)
  */
 public class Connection {
+
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
-
-
-
     private static final int TIMEOUT = 5000;
-    
+
     private final OutputStream out;
 
     private final InputStream in;
@@ -75,7 +73,7 @@ public class Connection {
     private XMLStreamWriter xmlOut = null;
 
     private int currentQuestionID = -1;
-    
+
     private String threadName;
 
 
@@ -93,7 +91,7 @@ public class Connection {
     /**
      * Sets up a new socket with specified host and port and uses
      * {@link #Connection(Socket, MessageHandler, String)}.
-     * 
+     *
      * @param host The host to connect to.
      * @param port The port to connect to.
      * @param messageHandler The MessageHandler to call for each message
@@ -107,7 +105,7 @@ public class Connection {
     /**
      * Creates a new <code>Connection</code> with the specified
      * <code>Socket</code> and {@link MessageHandler}.
-     * 
+     *
      * @param socket The socket to the client.
      * @param messageHandler The MessageHandler to call for each message
      *            received.
@@ -117,7 +115,7 @@ public class Connection {
         this.messageHandler = messageHandler;
         this.socket = socket;
         this.threadName = threadName;
-        
+
         out = socket.getOutputStream();
         in = socket.getInputStream();
 
@@ -140,13 +138,13 @@ public class Connection {
         Socket socket = new Socket();
         SocketAddress addr = new InetSocketAddress(host, port);
         socket.connect(addr, TIMEOUT);
-        
+
         return socket;
     }
-    
+
     /**
      * Sends a "disconnect"-message and closes this connection.
-     * 
+     *
      * @throws IOException
      */
     public void close() throws IOException {
@@ -158,7 +156,7 @@ public class Connection {
 
     /**
      * Closes this connection.
-     * 
+     *
      * @throws IOException
      */
     public void reallyClose() throws IOException {
@@ -183,7 +181,7 @@ public class Connection {
 
     /**
      * Sends the given message over this Connection.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
      * @throws IOException If an error occur while sending the message.
@@ -222,7 +220,7 @@ public class Connection {
 
     /**
      * Sends a message to the other peer and returns the reply.
-     * 
+     *
      * @param element The question for the other peer.
      * @return The reply from the other peer.
      * @throws IOException If an error occur while sending the message.
@@ -254,20 +252,20 @@ public class Connection {
      * simpler method for sending data using {@link #ask(Element) XML Elements}
      * that can be used when streaming is not required (that is: when the
      * messages to be transmitted are small).
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <b>Example:</b>
-     * 
+     *
      * <PRE>
-     * 
+     *
      * try { XMLStreamWriter out = ask(); // Write XML here XMLStreamReader in =
      * connection.getReply(); // Read XML here connection.endTransmission(in); }
      * catch (IOException e) { logger.warning("Could not send XML."); }
-     * 
+     *
      * </PRE>
-     * 
+     *
      * @return The <code>XMLStreamWriter</code> for sending the question. The
      *         method {@link #getReply()} should be called when the message has
      *         been written and the reply is required.
@@ -292,7 +290,7 @@ public class Connection {
     /**
      * Release a previously obtained question id. This is absolutely necessary
      * as other questions will be blocked as long as the old id is in place.
-     * 
+     *
      * @see #waitForAndSetNewQuestionId()
      */
     private void releaseQuestionId() {
@@ -333,20 +331,20 @@ public class Connection {
      * simpler method for sending data using {@link #send(Element) XML Elements}
      * that can be used when streaming is not required (that is: when the
      * messages to be transmitted are small).
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * <b>Example:</b>
-     * 
+     *
      * <PRE>
-     * 
+     *
      * try { XMLStreamWriter out = send(); // Write XML here
      * connection.endTransmission(in); } catch (IOException e) {
      * logger.warning("Could not send XML."); }
-     * 
+     *
      * </PRE>
-     * 
+     *
      * @return The <code>XMLStreamWriter</code> for sending the question. The
      *         method {@link #endTransmission(XMLStreamReader)} should be called
      *         when the message has been written.
@@ -368,7 +366,7 @@ public class Connection {
 
     /**
      * Gets the reply being received after sending a question.
-     * 
+     *
      * @return An <code>XMLStreamReader</code> for reading the incoming data.
      * @throws IOException if thrown by the underlying network stream.
      * @see #ask()
@@ -394,7 +392,7 @@ public class Connection {
 
     /**
      * Ends the transmission of a message or a ask/get-reply session.
-     * 
+     *
      * @throws IOException if thrown by the underlying network stream.
      * @see #ask()
      * @see #send()
@@ -425,7 +423,7 @@ public class Connection {
     /**
      * Sends the given message over this <code>Connection</code> and waits for
      * confirmation of receiveval before returning.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information
      * @throws IOException If an error occur while sending the message.
@@ -438,7 +436,7 @@ public class Connection {
 
     /**
      * Sets the MessageHandler for this Connection.
-     * 
+     *
      * @param mh The new MessageHandler for this Connection.
      */
     public void setMessageHandler(MessageHandler mh) {
@@ -447,7 +445,7 @@ public class Connection {
 
     /**
      * Gets the MessageHandler for this Connection.
-     * 
+     *
      * @return The MessageHandler for this Connection.
      */
     public MessageHandler getMessageHandler() {
@@ -456,7 +454,7 @@ public class Connection {
 
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
-     * 
+     *
      * @param in The stream containing the message.
      */
     public void handleAndSendReply(final BufferedInputStream in) {
@@ -541,27 +539,27 @@ public class Connection {
 
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
-     * 
+     *
      * @param element The message as a DOM-parsed XML-tree.
      */
     /*
      * public void handleAndSendReply(Element element) { try { if
      * (element.getTagName().equals("question")) { String networkReplyId =
      * element.getAttribute("networkReplyId");
-     * 
+     *
      * Element reply = messageHandler.handle(this, (Element)
      * element.getFirstChild());
-     * 
+     *
      * if (reply == null) { reply = Message.createNewRootElement("reply");
      * reply.setAttribute("networkReplyId", networkReplyId); logger.info("reply ==
      * null"); } else { Element replyHeader =
      * reply.getOwnerDocument().createElement("reply");
      * replyHeader.setAttribute("networkReplyId", networkReplyId);
      * replyHeader.appendChild(reply); reply = replyHeader; }
-     * 
+     *
      * send(reply); } else { Element reply = messageHandler.handle(this,
      * element);
-     * 
+     *
      * if (reply != null) { send(reply); } } } catch (FreeColException e) {
      * StringWriter sw = new StringWriter(); e.printStackTrace(new
      * PrintWriter(sw)); logger.warning(sw.toString()); } catch (IOException e) {
@@ -571,7 +569,7 @@ public class Connection {
 
     /**
      * Gets the socket.
-     * 
+     *
      * @return The <code>Socket</code> used while communicating with the other
      *         peer.
      */
@@ -581,7 +579,7 @@ public class Connection {
 
     /**
      * Override the default and return socket details.
-     * 
+     *
      * @return human-readable description of connection.
      */
     @Override
