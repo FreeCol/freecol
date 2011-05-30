@@ -514,7 +514,9 @@ public final class InGameController implements NetworkConstants {
                 if (location instanceof Building) {
                     Building building = (Building) location;
                     ProductionInfo info = building.getProductionInfo();
-                    return info.getProduction().get(0).getAmount();
+                    return (info == null || info.getProduction() == null
+                            || info.getProduction().size() == 0) ? 0
+                        : info.getProduction().get(0).getAmount();
                 } else if (location instanceof ColonyTile) {
                     return ((ColonyTile)location).getProductionOf(goodsType);
                 }
