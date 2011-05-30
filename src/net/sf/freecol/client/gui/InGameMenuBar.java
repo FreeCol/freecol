@@ -251,6 +251,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     /**
      * Paints information about gold, tax and year.
      */
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 

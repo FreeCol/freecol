@@ -48,6 +48,7 @@ public class ZoomInAction extends FreeColAction {
      * @return <code>true</code> if the mapboard is selected
      *      and can be zoomed onto.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) {
             return false;

@@ -258,6 +258,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         /**
          * Performs the actual scrolling.
          */
+        @Override
         public void run() {
             do {
                 try {

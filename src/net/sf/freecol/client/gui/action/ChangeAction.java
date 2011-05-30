@@ -62,6 +62,7 @@ public class ChangeAction extends UnitAction {
      * returned by {@link #shouldBeEnabled} and
      * updates the name of the action.
      */
+    @Override
     public void update() {
         super.update();
 
@@ -85,6 +86,7 @@ public class ChangeAction extends UnitAction {
      *
      * @return <code>false</code> if there is no active unit.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getFreeColClient().getGUI().getActiveUnit().getTile() != null;

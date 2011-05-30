@@ -59,6 +59,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
     * <code>FileOption</code>.
     *
     * @param option The <code>FileOption</code> to make a user interface for.
+    * @param editable boolean whether user can modify the setting
     */
     public FileOptionUI(final FileOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));

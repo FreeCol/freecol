@@ -68,6 +68,7 @@ public class DisplayTileTextAction extends SelectableAction {
      *
      * @return true if this action should be enabled.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return true;
     }

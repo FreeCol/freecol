@@ -45,6 +45,7 @@ public class RetireAction extends FreeColAction {
      *
      * @return true if this action should be enabled.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && freeColClient.getMyPlayer() != null

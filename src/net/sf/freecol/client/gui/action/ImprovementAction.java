@@ -39,6 +39,7 @@ public class ImprovementAction extends UnitAction {
      * Creates this action.
      * 
      * @param freeColClient The main controller object for the client.
+     * @param improvement <code>TileImprovementType</code> ??
      */
     public ImprovementAction(FreeColClient freeColClient, TileImprovementType improvement) {
         super(freeColClient, improvement.getShortId() + "Action");
@@ -52,6 +53,7 @@ public class ImprovementAction extends UnitAction {
      * @return <code>false</code> if there is no active unit or if the unit
      *         cannot plow/clear forest.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
             Unit selectedUnit = getFreeColClient().getGUI().getActiveUnit();

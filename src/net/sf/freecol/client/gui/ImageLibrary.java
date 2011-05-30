@@ -107,6 +107,7 @@ public final class ImageLibrary {
      * @param scalingFactor The factor used when scaling. 2 is twice
      *      the size of the original images and 0.5 is half.
      * @return A new <code>ImageLibrary</code>.
+     * @throws FreeColException
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         return new ImageLibrary(scalingFactor);
@@ -200,6 +201,7 @@ public final class ImageLibrary {
      * Returns the bonus-ImageIcon at the given index.
      *
      * @param type The type of the bonus-ImageIcon to return.
+     * @return <code>ImageIcon</code>
      */
     public ImageIcon getBonusImageIcon(ResourceType type) {
         return new ImageIcon(getBonusImage(type));

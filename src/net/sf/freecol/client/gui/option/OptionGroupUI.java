@@ -85,7 +85,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * Creates a new <code>OptionGroupUI</code> for the given
      * <code>OptionGroup</code>.
      *
-     * @param option The <code>OptionGroup</code> to make a user interface for.
+     * @param option The <code>OptionGroup</code> to make a user interface for
+     * @param editable boolean whether user can modify the setting
      */
     public OptionGroupUI(OptionGroup option, boolean editable) {
         super(new BorderLayout());

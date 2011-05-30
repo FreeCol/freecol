@@ -48,6 +48,7 @@ public class BuildColonyAction extends UnitAction {
      * @return <code>false</code> if there is no active unit or the active
      *         unit cannot build a colony, and <code>true</code> otherwise.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) {
             return false;

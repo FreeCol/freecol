@@ -47,6 +47,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      *
      * @return <code>true</code> if the player can declare independence.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         Player p = getFreeColClient().getMyPlayer();
         return super.shouldBeEnabled() && p != null && p.getPlayerType() == PlayerType.COLONIAL;

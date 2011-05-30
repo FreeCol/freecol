@@ -58,6 +58,7 @@ public class MiniMapZoomInAction extends MapboardAction {
      *
      * @return <code>true</code> if the minimap can be zoomed in.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
             .getFreeColAction(MapControlsAction.id);

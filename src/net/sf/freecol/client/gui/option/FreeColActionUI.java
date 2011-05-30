@@ -158,6 +158,9 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
     /**
     * Gets a string to represent the given <code>KeyStroke</code> to the user.
+    *
+    * @param keyStroke <code>java.awt.event.KeyStroke</code>
+    * @return String
     */
     public static String getHumanKeyStrokeText(KeyStroke keyStroke) {
         if (keyStroke == null) {
@@ -248,10 +251,12 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         public void mouseReleased(MouseEvent e) { /* No such event */ }
 
 
+        @Override
         public Dimension getMinimumSize() {
             return new Dimension(80, super.getMinimumSize().height);
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return getMinimumSize();
         }

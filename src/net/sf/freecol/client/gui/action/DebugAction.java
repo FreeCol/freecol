@@ -49,6 +49,7 @@ public class DebugAction extends FreeColAction {
      *
      * @return True if not already in debug mode.
      */
+    @Override
     public boolean shouldBeEnabled() {
         return !FreeCol.isInDebugMode();
     }

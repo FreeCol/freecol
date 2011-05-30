@@ -102,6 +102,7 @@ public class Rule {
 	return result;
     }
 
+    @Override
     public String toString() {
 
 	String result = new String();

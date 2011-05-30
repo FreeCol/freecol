@@ -69,6 +69,7 @@ public class UnloadAction extends MapboardAction {
      *
      * @return <code>true</code> if there is a carrier active
      */
+    @Override
     protected boolean shouldBeEnabled() {
         Unit carrier = getUnit();
         return super.shouldBeEnabled()

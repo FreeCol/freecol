@@ -51,6 +51,7 @@ public class MapControlsAction extends SelectableAction {
     /**
      * Updates the "enabled"-status and calls {@link #showMapControls(boolean)}.
      */
+    @Override
     public void update() {
         super.update();
 

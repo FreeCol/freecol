@@ -167,6 +167,7 @@ public class Messages {
      * Finds the message with a particular ID in the default locale.
      *
      * @param messageId The key of the message to find
+     * @return String
      */
     public static String message(String messageId) {
         // Check that all the values are correct.
@@ -597,6 +598,7 @@ public class Messages {
      * Creates a unique region name by fetching a new default name
      * from the list of default names if possible.
      *
+     * @param player <code>Player</code>
      * @param regionType a <code>RegionType</code> value
      * @return a <code>String</code> value
      */

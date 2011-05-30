@@ -108,6 +108,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
         final FreeColDialog<Parameters> inputDialog = new FreeColDialog<Parameters>(canvas)  {
+            @Override
             public void requestFocus() {
                 inputD.requestFocus();
             }

@@ -47,7 +47,9 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
 
     /**
     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
-    * @param option The <code>SelectOption</code> to make a user interface for.
+    *
+    * @param option The <code>SelectOption</code> to make a user interface for
+    * @param editable boolean whether user can modify the setting
     */
     public SelectOptionUI(final SelectOption option, boolean editable) {
 

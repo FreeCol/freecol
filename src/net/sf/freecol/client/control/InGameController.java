@@ -4408,8 +4408,8 @@ public final class InGameController implements NetworkConstants {
      * Clears the orders of the given unit.
      * Make the unit active and set a null destination and trade route.
      *
-     * @param unit The <code>Unit</code> to clear the orders of.
-     * @return boolean
+     * @param unit The <code>Unit</code> to clear the orders of
+     * @return boolean <b>true</b> if the orders were cleared
      */
     public boolean clearOrders(Unit unit) {
         if (!requireOurTurn() || unit == null
@@ -4436,7 +4436,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to change the state of.
      * @param state The new <code>UnitState</code>.
-     * @return True if the server interaction succeeded.
+     * @return boolean <b>true</b> if the server interaction succeeded.
      */
     private boolean askChangeState(Unit unit, UnitState state) {
         Client client = freeColClient.getClient();

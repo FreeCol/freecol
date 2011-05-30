@@ -46,6 +46,7 @@ public class EuropeAction extends MapboardAction {
      *
      * @return <code>true</code> if the player has access to Europe.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getFreeColClient().getMyPlayer() != null

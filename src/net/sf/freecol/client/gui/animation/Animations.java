@@ -43,7 +43,7 @@ public class Animations {
      * Common utility routine to retrieve animation speed.
      *
      * @param canvas The <code>Canvas</code> to draw the animation on.
-     * @param attacker The <code>Unit</code> to be animated.
+     * @param unit the <code>Unit</code> to be animated.
      * @return The animation speed.
      */
     public static int getAnimationSpeed(Canvas canvas, Unit unit) {

@@ -54,8 +54,8 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
      * Creates a new <code>PercentageOptionUI</code> for the given
      * <code>PercentageOption</code>.
      *
-     * @param option The <code>PercentageOption</code> to make a user interface
-     *            for.
+     * @param option The <code>PercentageOption</code> to make a user interface for
+     * @param editable boolean whether user can modify the setting
      */
     public PercentageOptionUI(final PercentageOption option, boolean editable) {
 

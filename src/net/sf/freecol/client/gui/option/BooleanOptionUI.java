@@ -46,7 +46,9 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
 
     /**
     * Creates a new <code>BooleanOptionUI</code> for the given <code>BooleanOption</code>.
+     *
     * @param option The <code>BooleanOption</code> to make a user interface for.
+    * @param editable boolean whether user can modify the setting
     */
     public BooleanOptionUI(final BooleanOption option, boolean editable) {
 

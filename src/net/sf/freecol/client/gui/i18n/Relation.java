@@ -78,6 +78,7 @@ public class Relation {
 	return (low <= value && value <= high) != negated;
     }
 
+    @Override
     public String toString() {
 	String result = new String("n ");
 	if (mod != 1) {

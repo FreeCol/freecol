@@ -77,7 +77,9 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
 
     /**
     * Creates a new <code>AudioMixerOptionUI</code> for the given <code>AudioMixerOption</code>.
-    * @param option The <code>AudioMixerOption</code> to make a user interface for.
+     *
+    *  @param option The <code>AudioMixerOption</code> to make a user interface for.
+     * @param editable boolean whether user can modify the setting
     */
     public AudioMixerOptionUI(final AudioMixerOption option, boolean editable) {
         super( new BorderLayout() );
@@ -110,7 +112,7 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
         cbox.setModel(new DefaultComboBoxModel(option.getOptions()));
         reset();
 
-        setEnabled(editable);
+        cbox.setEnabled(editable);
         cbox.addActionListener( aHandler );
 
         option.addPropertyChangeListener(this);
@@ -127,9 +129,6 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
         else
                 text = mixer.getMixerInfo().getName();
         currentMixerLabel.setText("Current:  ".concat(text));
-        // play a test sound
-//      FreeColClient.get().playSound("sound.intro.general");
-
     }
 
     /**

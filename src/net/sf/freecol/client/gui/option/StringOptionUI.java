@@ -50,7 +50,9 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
 
     /**
     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
-    * @param option The <code>StringOption</code> to make a user interface for.
+    *
+    * @param option The <code>StringOption</code> to make a user interface for
+    * @param editable boolean whether user can modify the setting
     */
     public StringOptionUI(final StringOption option, boolean editable) {
 

@@ -49,6 +49,7 @@ public class LoadAction extends MapboardAction {
      * 
      * @return <code>true</code> if there is a carrier active
      */
+    @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
             GUI gui = getFreeColClient().getGUI();

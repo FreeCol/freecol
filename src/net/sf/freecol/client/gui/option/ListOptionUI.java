@@ -77,6 +77,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
      *
      * @param option The <code>ListOption</code> to make a user interface
      *            for.
+     * @param editable boolean whether user can modify the setting
      */
     public ListOptionUI(final ListOption<T> option, boolean editable) {
 
@@ -162,6 +163,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
         final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(canvas) {
+            @Override
             public void requestFocus() {
                 addButton.requestFocus();
             }
@@ -291,6 +293,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
             this.text = text;
         }
 
+        @Override
         public String toString() {
             return text;
         }

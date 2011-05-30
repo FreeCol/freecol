@@ -50,6 +50,7 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
     /**
     * Creates a new <code>LanguageOptionUI</code> for the given <code>LanguageOption</code>.
     * @param option The <code>LanguageOption</code> to make a user interface for.
+    * @param editable boolean whether user can modify the setting
     */
     public LanguageOptionUI(final LanguageOption option, boolean editable) {
 

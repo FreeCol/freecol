@@ -98,7 +98,8 @@ public final class TilePopup extends JPopupMenu {
      * @param canvas The component containing the map.
      * @param gui An object with methods used for making the popup.
      */
-    public TilePopup(final Tile tile, final FreeColClient freeColClient, final Canvas canvas, final GUI gui) {
+    public TilePopup(final Tile tile, final FreeColClient freeColClient,
+                     final Canvas canvas, final GUI gui) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
@@ -119,14 +120,15 @@ public final class TilePopup extends JPopupMenu {
                     .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
 
                 String victoryPercent;
-                //If attacking a settlement, the true odds are never known because units may be hidden within
+                // If attacking a settlement, the true odds are never known because units
+                // may be hidden within
                 if (tile.getSettlement() != null || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
                     victoryPercent = "??";
                 } else {
                     victoryPercent = Integer.toString((int)(combatOdds.win * 100));
                 }
-                gotoMenuItem = new JMenuItem(Messages.message(StringTemplate.template("attackTileOdds")
-                                                              .addName("%chance%", victoryPercent)));
+                gotoMenuItem = new JMenuItem(Messages.message(StringTemplate.
+                         template("attackTileOdds").addName("%chance%", victoryPercent)));
             } else if (activeUnit.getSimpleMoveType(unitTile, tile, false).isLegal()) {
                 //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
                 //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));

@@ -52,6 +52,7 @@ public class NewEmptyMapAction extends MapboardAction {
      *      in map editor mode.
      * @see FreeColClient#isMapEditor()
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return freeColClient.isMapEditor();
     }

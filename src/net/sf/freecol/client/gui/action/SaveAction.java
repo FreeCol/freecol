@@ -46,6 +46,7 @@ public class SaveAction extends FreeColAction {
      *
      * @return true if this action should be enabled.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         if (freeColClient.isMapEditor()) {
             return true;

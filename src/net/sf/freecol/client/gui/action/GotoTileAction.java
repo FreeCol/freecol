@@ -50,6 +50,7 @@ public class GotoTileAction extends UnitAction {
      * @return <code>false</code> if there is no active unit, and
      *      <code>true</code> otherwise.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getFreeColClient().getGUI().getActiveUnit().getTile() != null;

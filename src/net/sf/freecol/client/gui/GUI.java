@@ -133,6 +133,7 @@ public final class GUI {
          * paints the message with icon (if available) and text.
          * @param g a <code>Graphics</code> value
          */
+        @Override
         public void paint(Graphics g) {
             Rectangle clipArea = g.getClipBounds();
             if (clipArea == null) {
@@ -1519,8 +1520,7 @@ public final class GUI {
      * If successful, the supplied position will either be at the center of
      * the left or right half of the map.
      *
-     * @param tilePos The <code>Position</code> of a tile of the
-     *                displayed map.
+     * @param tile <code>Tile</code> of the displayed map
      * @return Positive if the focus is on the right hand side, negative
      *         if on the left, zero on failure.
      * @see #getFocus
@@ -1561,10 +1561,9 @@ public final class GUI {
     * If a unit is active and is located on the selected tile,
     * then nothing (except perhaps a map reposition) will happen.
     *
-    * @param selectedPosition The <code>Position</code> of the tile
-    *                     to be selected.
+    * @param newTileToSelect The <code>Tile</code>, the tile to be selected
     * @param clearGoToOrders Use <code>true</code> to clear goto orders
-    *                        of the unit which is activated.
+    *                        of the unit which is activated
     * @see #getSelectedTile
     * @see #setActiveUnit
     * @see #setFocus(Map.Position)

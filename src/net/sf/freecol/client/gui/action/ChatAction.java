@@ -47,6 +47,7 @@ public class ChatAction extends FreeColAction {
      *
      * @return <code>true</code> if the mapboard is selected.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && !getFreeColClient().isSingleplayer()

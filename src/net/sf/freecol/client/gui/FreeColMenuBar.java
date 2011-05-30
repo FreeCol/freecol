@@ -207,6 +207,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      * When a <code>FreeColMenuBar</code> is disabled, it does not show the
      * "in game options".
      */
+    @Override
     public void setEnabled(boolean enabled) {
         // Not implemented (and possibly not needed).
 
@@ -232,6 +233,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     /**
      * Paints the background and borders of the menubar.
      */
+    @Override
     public void paintComponent(Graphics g) {
         if (isOpaque()) {
             super.paintComponent(g);

@@ -101,7 +101,11 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         return classString.substring(dotIndex+1);
     }
 
-    /** Returns an ImageIcon, or null if the path was invalid. */
+    /** Returns an ImageIcon, or null if the path was invalid.
+     *
+     * @param path String
+     * @return <code>ImageIcon</code>
+     */
     protected static ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = FreeColMenuTest.class.getResource(path);
         if (imgURL != null) {

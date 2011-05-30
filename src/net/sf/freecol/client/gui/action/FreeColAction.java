@@ -200,6 +200,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * @return The name of this <code>Option</code>.
      * @see #getName
      */
+    @Override
     public String toString() {
         return getName();
     }

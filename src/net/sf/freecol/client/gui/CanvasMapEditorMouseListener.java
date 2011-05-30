@@ -428,6 +428,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         /**
          * Performs the actual scrolling.
          */
+        @Override
         public void run() {
             do {
                 try {

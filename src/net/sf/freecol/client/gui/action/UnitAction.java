@@ -41,6 +41,7 @@ public abstract class UnitAction extends MapboardAction {
      *
      * @return <code>false</code> if there is no active unit.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
     }

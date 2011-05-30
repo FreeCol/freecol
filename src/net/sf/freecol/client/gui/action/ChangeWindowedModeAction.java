@@ -52,6 +52,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean shouldBeSelected() {
         return !getFreeColClient().isWindowed();
     }

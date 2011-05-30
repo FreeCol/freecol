@@ -48,6 +48,7 @@ public class FortifyAction extends UnitAction {
      *
      * @return <code>true</code> if there is an active unit.
      */
+    @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getFreeColClient().getGUI().getActiveUnit().checkSetState(UnitState.FORTIFYING);

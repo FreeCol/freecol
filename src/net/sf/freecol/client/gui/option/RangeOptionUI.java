@@ -54,8 +54,8 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater, Prope
      * Creates a new <code>RangeOptionUI</code> for the given
      * <code>RangeOption</code>.
      *
-     * @param option The <code>RangeOption</code> to make a user interface
-     *            for.
+     * @param option The <code>RangeOption</code> to make a user interface for
+     * @param editable boolean whether user can modify the setting
      */
     public RangeOptionUI(final RangeOption option, boolean editable) {
 
