@@ -36,6 +36,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -531,6 +532,18 @@ public final class Canvas extends JDesktopPane {
      */
     public void closeMenus() {
         for (JInternalFrame frame : getAllFrames()) {
+            for (Component c : frame.getContentPane().getComponents()) {
+                if (c instanceof FreeColPanel) {
+                    ((FreeColPanel) c).notifyClose();
+                }
+                if (c instanceof ReportTurnPanel) {
+                    try {
+                        throw new IllegalStateException();
+                    } catch (IllegalStateException e) {
+                        logger.log(Level.WARNING, "Probably BR#3206298", e);
+                    }
+                }
+            }
             frame.dispose();
         }
     }
@@ -1363,8 +1376,6 @@ public final class Canvas extends JDesktopPane {
      * @see EuropePanel
      */
     public void showEuropePanel() {
-        //closeMenus();
-
         if (freeColClient.getGame() == null) {
             errorMessage("europe.noGame");
         } else {
@@ -1798,7 +1809,6 @@ public final class Canvas extends JDesktopPane {
      * @param centered a <code>boolean</code> value
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
-        //closeMenus();
         repaint();
         addAsFrame(panel, false, (centered) ? PopupPosition.CENTERED
                    : PopupPosition.ORIGIN);

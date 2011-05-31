@@ -432,9 +432,8 @@ public final class InGameInputHandler extends InputHandler {
         Player player = getFreeColClient().getMyPlayer();
 
         new SetCurrentPlayerSwingTask(newPlayer,
-                                      player.equals(game.getCurrentPlayer()),
-                                      player.equals(newPlayer))
-            .invokeLater();
+            FreeCol.isInDebugMode() && player.equals(game.getCurrentPlayer()),
+            player.equals(newPlayer)).invokeLater();
         return null;
     }
 
