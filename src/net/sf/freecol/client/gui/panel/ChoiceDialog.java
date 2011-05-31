@@ -52,6 +52,11 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
 
     /**
      * The constructor to use.
+     *
+     * @param parent <code>Canvas</code>
+     * @param text <code>String</code>
+     * @param cancelText <code>String</code>
+     * @param choices List of <code>ChoiceItem<T></code>
      */
     public ChoiceDialog(Canvas parent, String text, String cancelText, List<ChoiceItem<T>> choices) {
         super(parent);
@@ -89,6 +94,7 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
 
         MouseListener mouseListener = new MouseAdapter() {
                 @SuppressWarnings("unchecked")
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         setResponse(((ChoiceItem<T>) choiceList.getSelectedValue()).getObject());
@@ -125,6 +131,7 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * @param event The incoming ActionEvent.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         ChoiceItem<T> item;

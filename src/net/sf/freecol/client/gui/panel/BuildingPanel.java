@@ -110,6 +110,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      *
      * @param g The graphics context in which to paint.
      */
+    @Override
     public void paintComponent(Graphics g) {
         BufferedImage bgImage = fadeImage(ResourceManager.getImage(building.getType().getId() + ".image"), 0.6f, 192.0f);
         g.drawImage(bgImage, 0, 0, this);
@@ -144,6 +145,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         return unitLabels;
     }
 
+    @Override
     public JToolTip createToolTip() {
         return new BuildingToolTip(building, parent);
     }

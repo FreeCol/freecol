@@ -143,6 +143,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * Set up the dialog.
      *
      */
+    @Override
     public void initialize() {
         
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
@@ -471,6 +472,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * 
      * @param event The incoming action event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (command.equals(CANCEL)) {
@@ -673,10 +675,14 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
         class StanceItem {
             private Stance value;
-            StanceItem(Stance value) {
-                this.value = value;
+
+            StanceItem (Stance value) {
+               if (value == null)
+                  throw new NullPointerException();
+               this.value = value;
             }
             
+            @Override
             public String toString() {
                 return Messages.getStanceAsString(value);
             }
@@ -685,11 +691,18 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 return value;
             }
             
+            @Override
             public boolean equals(Object other) {
                 if (other == null || !(other instanceof StanceItem)) {
                     return false;
                 }
                 return value.equals(((StanceItem) other).value);
+            }
+
+            @Override
+            public int hashCode()
+            {
+               return value.hashCode();
             }
         }
         
@@ -704,6 +717,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
          *
          * @param parent a <code>NegotiationDialog</code> value
          * @param source a <code>Player</code> value
+         * @param target <code>Player</code>
          */
         public StanceTradeItemPanel(NegotiationDialog parent, Player source, Player target) {
             this.negotiationDialog = parent;
@@ -766,6 +780,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
          *
          * @param parent a <code>NegotiationDialog</code> value
          * @param source a <code>Player</code> value
+         * @param gold int ??
          */
         public GoldTradeItemPanel(NegotiationDialog parent, Player source, int gold) {
             this.player = source;

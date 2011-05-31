@@ -121,6 +121,7 @@ public class ChoiceItem<T> {
      * Gets a textual presentation of this object.
      * @return The <code>text</code> set in the constructor.
      */
+    @Override
     public String toString() {
         return text;
     }

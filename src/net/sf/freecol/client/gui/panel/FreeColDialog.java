@@ -73,6 +73,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     /**
      * Constructor.
+     * @param parent <code>Canvas</code>
      */
     public FreeColDialog(Canvas parent) {
         super(parent);
@@ -152,10 +153,10 @@ public class FreeColDialog<T> extends FreeColPanel {
     * Creates a new <code>FreeColDialog</code> with a text and a cancel-button,
     * in addition to buttons for each of the objects in the given array.
     *
-    * @param text The text that explains the choice for the user.
-    * @param cancelText The text displayed on the "cancel"-button.
-    * @param choices The ChoiceItems.
-    * @return The <code>FreeColDialog</code>.
+    * @param text String, text that explains the choice for the user
+    * @param cancelText String, text displayed on the "cancel"-button
+    * @param choices List of <code>ChoiceItem<T> <code> the choice items
+    * @return <code>FreeColDialog</code>
     * @see ChoiceItem
     */
     public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text, String cancelText,
@@ -170,7 +171,8 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final FreeColDialog<ChoiceItem<T>> choiceDialog =
             new FreeColDialog<ChoiceItem<T>>(FreeCol.getFreeColClient().getCanvas()) {
-            public void requestFocus() {
+           @Override
+           public void requestFocus() {
             	for(JButton b : choiceBtnLst){
             		if(b.isEnabled()){
             			b.requestFocus();
@@ -316,6 +318,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final FreeColDialog<String> inputDialog =
             new FreeColDialog<String>(FreeCol.getFreeColClient().getCanvas())  {
+            @Override
             public void requestFocus() {
                 input.requestFocus();
             }
@@ -583,6 +586,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      *
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (CANCEL.equals(command)) {

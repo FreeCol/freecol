@@ -31,11 +31,14 @@ public final class NationCellEditor extends DefaultCellEditor {
 
     /**
      * A standard constructor.
+     *
+     * @param nations array of <code>Nation</code>
      */
     public NationCellEditor(Nation[] nations) {
         super(new JComboBox(nations));
     }
     
+    @Override
     public Object getCellEditorValue() {
         return ((JComboBox) getComponent()).getSelectedItem();
     }

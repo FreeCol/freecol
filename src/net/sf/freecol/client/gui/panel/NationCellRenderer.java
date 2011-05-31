@@ -47,6 +47,8 @@ public final class NationCellRenderer implements TableCellRenderer {
 
     /**
     * The default constructor.
+    *
+    * @param nations array of <code>Nation</code>
     */
     public NationCellRenderer(Nation[] nations) {
         this.nations = nations;

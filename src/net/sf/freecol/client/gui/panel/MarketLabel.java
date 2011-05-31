@@ -24,8 +24,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -93,6 +91,7 @@ public final class MarketLabel extends AbstractGoodsLabel {
      * Paints this MarketLabel.
      * @param g The graphics context in which to do the painting.
      */
+    @Override
     public void paintComponent(Graphics g) {
 
         Player player = market.getGame().getViewOwner();

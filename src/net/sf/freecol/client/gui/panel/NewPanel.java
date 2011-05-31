@@ -274,6 +274,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     * care of the user's requests.
     * @param event The incoming ActionEvent.
     */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {

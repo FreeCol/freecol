@@ -60,15 +60,14 @@ public class CargoPanel extends FreeColPanel
 
     private final TitledBorder border;
 
-    private boolean editable = true;
-
     private JPanel parentPanel;
 
 
     /**
      * Creates this CargoPanel.
      *
-     * @param parent The parent Canvas that holds this CargoPanel.
+     * @param parent The parent Canvas that holds this CargoPanel
+     * @param withTitle boolean
      */
     public CargoPanel(Canvas parent, boolean withTitle) {
         super(parent);
@@ -107,7 +106,9 @@ public class CargoPanel extends FreeColPanel
     }
 
     /**
-     * Is this panel active?
+     * Whether this panel is active.
+     *
+     * @return boolean <b>true</b> == active
      */
     public boolean isActive() {
         return carrier != null;
@@ -132,24 +133,6 @@ public class CargoPanel extends FreeColPanel
         this.carrier = newCarrier;
         addPropertyChangeListeners();
         update();
-    }
-
-    /**
-     * Get the <code>Editable</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isEditable() {
-        return editable;
-    }
-
-    /**
-     * Set the <code>Editable</code> value.
-     *
-     * @param newEditable The new Editable value.
-     */
-    public void setEditable(final boolean newEditable) {
-        this.editable = newEditable;
     }
 
     /**

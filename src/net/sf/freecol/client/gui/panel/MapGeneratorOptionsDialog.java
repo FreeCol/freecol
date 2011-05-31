@@ -156,6 +156,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      *
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
         String command = event.getActionCommand();

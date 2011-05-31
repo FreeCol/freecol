@@ -43,6 +43,8 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
 
     /**
     * The default constructor.
+    *
+    * @param advantages <code>Advantages</code> ??
     */
     public AdvantageCellRenderer(Advantages advantages) {
         this.advantages = advantages;

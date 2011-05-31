@@ -97,6 +97,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         setSize(tb.getPreferredSize());
     }
 
+    @Override
     public void requestFocus() {
         tb.requestFocus();
     }
@@ -107,6 +108,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      *
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String id = event.getActionCommand();
         for (FoundingFather father : possibleFathers) {
@@ -220,6 +222,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             return p1;
         }
 
+        @Override
         public void requestFocus() {
             ok.requestFocus();
         }
@@ -242,6 +245,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             }
         }
 
+        @Override
         public boolean isEnabled() {
             return (foundingFather != null);
         }

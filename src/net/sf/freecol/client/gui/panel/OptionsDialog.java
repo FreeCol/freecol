@@ -65,7 +65,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     private JPanel optionPanel;
 
     private List<JButton> buttons = new ArrayList<JButton>();
-    private boolean editable = true;
 
     protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
@@ -80,7 +79,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param parent The parent of this panel.
+     *
+     * @param parent <code>Canvas</code> The parent of this panel
+     * @param editable boolean
      */
     public OptionsDialog(Canvas parent, boolean editable) {
         super(parent);
@@ -121,7 +122,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(group, isGroupEditable());
+        ui = new OptionGroupUI(group, isEditable());
         optionPanel = new JPanel() {
             @Override
             public String getUIClassID() {
@@ -137,7 +138,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         add(scrollPane, "height 100%, width 100%");
 
         // Buttons:
-        if (editable) {
+        if ( isEditable() ) {
             int cells = buttons.size() + 2;
             add(okButton, "newline 20, tag ok, split " + cells);
             add(cancelButton, "tag cancel");
@@ -164,7 +165,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     }
 
     protected boolean isGroupEditable() {
-        return editable;
+        return isEditable();
     }
 
     protected List<JButton> getButtons() {
@@ -174,7 +175,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        ui = new OptionGroupUI(group, isGroupEditable());
+        ui = new OptionGroupUI(group, isEditable());
         optionPanel.add(ui);
         revalidate();
         repaint();
@@ -187,19 +188,22 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     /**
      * Returns the default name of the file to save the
      * <code>OptionGroup</code>.
+     * @return String
      */
     public abstract String getDefaultFileName();
 
     /**
      * Returns the ID of the <code>OptionGroup</code>.
+     * @return String
      */
     public abstract String getOptionGroupId();
 
     /**
      * This function analyses an event and calls the right methods to take
      * care of the user's requests.
-     * @param event The incoming ActionEvent.
+     * @param event <code>ActionEvent</code>, the incoming action event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {

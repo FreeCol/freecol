@@ -41,12 +41,15 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     
     /**
     * A standard constructor.
+    *
+    * @param nationTypes List of <code>EuropeanNationType></code>
     */
     public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
         super(new JComboBox(new Vector<EuropeanNationType>(nationTypes)));
         ((JComboBox) getComponent()).setRenderer(new AdvantageRenderer());
     }
     
+    @Override
     public Object getCellEditorValue() {
         return ((JComboBox) getComponent()).getSelectedItem();
     }

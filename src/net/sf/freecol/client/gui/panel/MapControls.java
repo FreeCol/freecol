@@ -115,6 +115,7 @@ public final class MapControls {
 
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     int x = e.getX() - compassRose.getWidth()/2;
                     int y = e.getY() - compassRose.getHeight()/2;
@@ -206,7 +207,9 @@ public final class MapControls {
 
 
     /**
-     * Removes the map controls from the parent component.
+     * Removes the map controls from the parent canvas component.
+     *
+     * @param canvas <code>Canvas</code> parent
      */
     public void removeFromComponent(Canvas canvas) {
         canvas.remove(infoPanel, false);

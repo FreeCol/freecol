@@ -560,6 +560,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      * care of the user's requests.
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         if (colony.getOwner() == getMyPlayer()) {
             String command = event.getActionCommand();
@@ -631,6 +632,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * @param data The build queue to import.
          * @return Whether the import was successful.
          */
+        @Override
         public boolean importData(JComponent comp, Transferable data) {
             if (!canImport(comp, data.getTransferDataFlavors())) {
                 return false;
@@ -785,6 +787,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * @param data The data exported.
          * @param action The transfer action, e.g. MOVE.
          */
+        @Override
         protected void exportDone(JComponent source, Transferable data, int action) {
             // clean up
             indices = null;
@@ -798,6 +801,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * @param comp The component to import data.
          * @param flavors An array of data flavors.
          */
+        @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
             if (flavors == null) {
                 return false;
@@ -818,6 +822,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * @return A Transferable suitable for wrapping the build
          * queue.
          */
+        @Override
         protected Transferable createTransferable(JComponent comp) {
             if (comp instanceof JList) {
                 source = (JList) comp;
@@ -834,6 +839,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * @param comp The source component.
          * @return The possible source actions of the component.
          */
+        @Override
         public int getSourceActions(JComponent comp) {
             if (comp == unitList) {
                 return COPY;
@@ -907,6 +913,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     class SimpleBuildQueueCellRenderer extends FreeColComboBoxRenderer {
 
+        @Override
         public void setLabelValues(JLabel c, Object value) {
             c.setText(Messages.message(((BuildableType) value).getNameKey()));
         }
@@ -982,6 +989,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             this.add = add;
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
                 enabled = true;

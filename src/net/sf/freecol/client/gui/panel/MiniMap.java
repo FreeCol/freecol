@@ -218,6 +218,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @param graphics The <code>Graphics</code> context in which
      *                 to draw this component.
      */
+    @Override
     public void paintComponent(Graphics graphics) {
         if (freeColClient.getGame() == null
             || freeColClient.getGame().getMap() == null) {

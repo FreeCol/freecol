@@ -108,13 +108,14 @@ public final class InfoPanel extends FreeColPanel {
         add(mapEditorPanel, internalPanelTop, internalPanelHeight);
 
         addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    GUI gui = getClient().getGUI();
-                    Unit activeUnit = gui.getActiveUnit();
-                    if (activeUnit != null && activeUnit.getTile() != null) {
-                        gui.setFocus(activeUnit.getTile());
-                    }
-                }
+           @Override
+           public void mousePressed(MouseEvent e) {
+              GUI gui = getClient().getGUI();
+              Unit activeUnit = gui.getActiveUnit();
+              if (activeUnit != null && activeUnit.getTile() != null) {
+                  gui.setFocus(activeUnit.getTile());
+              }
+          }
             });
     }
 
@@ -195,6 +196,7 @@ public final class InfoPanel extends FreeColPanel {
      *
      * @param graphics The Graphics context in which to draw this component.
      */
+    @Override
     public void paintComponent(Graphics graphics) {
         int viewMode = getClient().getGUI().getViewMode().getView();
         if (!getClient().isMapEditor()) {

@@ -85,6 +85,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
         goodsList.setListData(goods);
         goodsList.setCellRenderer(new CheckBoxRenderer());
         goodsList.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent me) {
                     int index = goodsList.locationToIndex(me.getPoint());
                     if (index < 0) return;
@@ -203,6 +204,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
             return good;
         }
 
+        @Override
         public String toString() {
             StringTemplate template
                 = StringTemplate.template("model.goods.goodsAmount")

@@ -106,6 +106,7 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      *
      * @param g The graphics context in which to paint.
      */
+    @Override
     public void paintComponent(Graphics g) {
         Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
         g.drawImage(bgImage, 0, 0, this);

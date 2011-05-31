@@ -63,6 +63,7 @@ public final class GameOptionsDialog extends OptionsDialog {
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
         String command = event.getActionCommand();

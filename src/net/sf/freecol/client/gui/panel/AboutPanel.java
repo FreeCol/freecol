@@ -95,6 +95,7 @@ public final class AboutPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String url = event.getActionCommand();
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {

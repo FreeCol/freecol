@@ -81,6 +81,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     * care of the user's requests.
     * @param event The incoming ActionEvent.
     */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
@@ -116,6 +117,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     /**
     * Requests that the chat textfield in this chat panel gets the focus.
     */
+    @Override
     public void requestFocus() {
         field.requestFocus();
     }

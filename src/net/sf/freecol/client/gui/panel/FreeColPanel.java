@@ -65,7 +65,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -169,6 +168,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     /**
      * Constructor.
+     *
+     * @param parent <code>Canvas</code>
      */
     public FreeColPanel(Canvas parent) {
         this(parent, new FlowLayout());
@@ -356,15 +357,26 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     /**
      * Checks if this panel is editable
+     * @return boolean
      */
     public boolean isEditable() {
         return editable;
     }
 
     /**
+     * Set the <code>Editable</code> value.
+     *
+     * @param newEditable boolean, the new Editable value
+     */
+    public void setEditable(boolean newEditable) {
+        this.editable = newEditable;
+    }
+
+    /**
      * The OK button requests focus.
      *
      */
+    @Override
     public void requestFocus() {
         okButton.requestFocus();
     }
@@ -387,19 +399,20 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public static JTextPane getDefaultTextPane(String text) {
 
         DefaultStyledDocument document = new DefaultStyledDocument(styleContext) {
-                public Font getFont(AttributeSet attr) {
-                    Font font = ResourceManager.getFont(StyleConstants.getFontFamily(attr),
-                                                        StyleConstants.getFontSize(attr));
-                    if (font == null) {
-                        return super.getFont(attr);
-                    } else {
-                        int fontStyle = Font.PLAIN;
-                        if (StyleConstants.isBold(attr)) fontStyle |= Font.BOLD;
-                        if (StyleConstants.isItalic(attr)) fontStyle |= Font.ITALIC;
-                        return (fontStyle == Font.PLAIN) ? font : font.deriveFont(fontStyle);
-                    }
-                }
-            };
+             @Override
+             public Font getFont(AttributeSet attr) {
+                 Font font = ResourceManager.getFont(StyleConstants.getFontFamily(attr),
+                                                     StyleConstants.getFontSize(attr));
+                 if (font == null) {
+                     return super.getFont(attr);
+                 } else {
+                     int fontStyle = Font.PLAIN;
+                     if (StyleConstants.isBold(attr)) fontStyle |= Font.BOLD;
+                     if (StyleConstants.isItalic(attr)) fontStyle |= Font.ITALIC;
+                     return (fontStyle == Font.PLAIN) ? font : font.deriveFont(fontStyle);
+                 }
+             }
+         };
 
         JTextPane textPane = new JTextPane(document);
         textPane.setOpaque(false);
@@ -550,7 +563,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Sort the given modifiers according to type.
      *
-     * @return a sorted Set of Modifiers
+     * @param result Set of <code>Modifier</code>
+     * @return a sorted Set of <code>Modifier</code>
      */
     public Set<Modifier> sortModifiers(Set<Modifier> result) {
         EnumMap<Modifier.Type, List<Modifier>> modifierMap =
@@ -640,6 +654,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * to the given <code>Component</code>.
      *
      * @param c The <code>Component</code> the events should be forwarded to.
+     * @return <code>MouseListener</code>
      */
     public static MouseListener createEventForwardingMouseListener(final Component c) {
         final MouseListener ml = new MouseListener() {
@@ -670,7 +685,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * Creates a <code>MouseMotionListener</code> which forwards events
      * to the given <code>Component</code>.
      *
-     * @param c The <code>Component</code> the events should be forwarded to.
+     * @param c The <code>Component</code> the events should be forwarded to
+     * @return <code>MouseMotionListener</code>
      */
     public static MouseMotionListener createEventForwardingMouseMotionListener(final Component c) {
         final MouseMotionListener ml = new MouseMotionListener() {

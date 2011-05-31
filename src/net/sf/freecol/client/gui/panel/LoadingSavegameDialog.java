@@ -131,6 +131,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         return ((Integer) portField.getValue()).intValue();
     }
 
+    @Override
     public String getName() {
         return serverNameField.getName();
     }
@@ -158,6 +159,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
      *
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
