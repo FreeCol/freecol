@@ -102,7 +102,7 @@ public class StringOption extends AbstractOption<String> {
         final String oldValue = this.value;
         this.value = value;
 
-        if (value != oldValue && isDefined) {
+        if ( value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;

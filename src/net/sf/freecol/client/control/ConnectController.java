@@ -452,6 +452,7 @@ public final class ConnectController {
                     freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
                     freeColClient.setSingleplayer(singleplayer);
+                    freeColClient.getInGameController().setGameConnected();
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             ResourceManager.setScenarioMapping(savegame.getResourceMapping());

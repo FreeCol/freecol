@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -157,6 +158,7 @@ import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -178,8 +180,12 @@ public final class InGameController implements NetworkConstants {
     private final int MODE_NEXT_ACTIVE_UNIT = 0;
     private final int MODE_EXECUTE_GOTO_ORDERS = 1;
     private final int MODE_END_TURN = 2;
-    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
 
+    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
+    private int turnsPlayed = 0;
+
+    /** The most recently saved game file, or <b>null</b>. */
+    private File lastSaveGameFile;
 
     /**
      * A hash map of messages to be ignored.
@@ -193,6 +199,8 @@ public final class InGameController implements NetworkConstants {
      */
     public InGameController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
+// TODO: fetch value of lastSaveGameFile from a persistent client value
+//        lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
     }
 
     private Specification getSpecification() {
@@ -218,6 +226,17 @@ public final class InGameController implements NetworkConstants {
         default:
             return Integer.toString(year);
         }
+    }
+
+
+    /** Returns the most recently saved game file, or <b>null</b>.
+     *  (This may be either from a recent arbitrary user operation or an
+     *  autosave function.)
+     *
+     *  @return File recent save game file
+     */
+    public File getLastSaveGameFile () {
+       return lastSaveGameFile;
     }
 
     /**
@@ -256,14 +275,14 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean saveGame(final File file) {
         Canvas canvas = freeColClient.getCanvas();
+        FreeColServer server = freeColClient.getFreeColServer();
         boolean result = false;
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
-            freeColClient.getFreeColServer()
-                .setActiveUnit(freeColClient.getGUI().getActiveUnit());
-            freeColClient.getFreeColServer()
-                .saveGame(file, freeColClient.getMyPlayer().getName(),
+            server.setActiveUnit(freeColClient.getGUI().getActiveUnit());
+            server.saveGame(file, freeColClient.getMyPlayer().getName(),
                           freeColClient.getClientOptions());
+            lastSaveGameFile = file;
             canvas.closeStatusPanel();
             result = true;
         } catch (IOException e) {
@@ -327,6 +346,11 @@ public final class InGameController implements NetworkConstants {
         FreeCol.setInDebugMode(debug);
         logger.info("Debug mode set to " + debug);
         freeColClient.updateMenuBar();
+    }
+
+    /** Informs this controller that a game has been newly loaded. */
+    public void setGameConnected () {
+       turnsPlayed = 0;
     }
 
     /**
@@ -591,6 +615,51 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
+    /** Creates at least one autosave game file of the currently played game 
+     *  in the autosave directory. Does nothing if there is no game running.
+     *
+     * @param game <code>Game</code> game to save
+     * @param player <code>Player</code> current player
+     */
+    private void autosave_game () {
+        Game game = freeColClient.getGame();
+        if (game == null) {
+           return;
+        }
+        Player player = game.getCurrentPlayer();
+
+        // unconditional save per round (fix file "last-turn")
+        String autosave_text = Messages.message("clientOptions.savegames.autosave.fileprefix");
+        String filename = autosave_text + "-" + Messages.message(
+                "clientOptions.savegames.autosave.lastturn") + ".fsg";
+        String beforeFilename = autosave_text + "-" + Messages.message(
+                "clientOptions.savegames.autosave.beforelastturn") + ".fsg";
+        File autosaveDir = FreeCol.getAutosaveDirectory();
+        File saveGameFile = new File(autosaveDir, filename);
+        File beforeSaveFile = new File(autosaveDir, beforeFilename);
+
+        // if "last-turn" file exists, shift it to "before-last-turn" file
+        if (saveGameFile.exists()) {
+           beforeSaveFile.delete();
+           saveGameFile.renameTo(beforeSaveFile);
+        }
+        saveGame(saveGameFile);
+
+        // conditional save after user-set period
+        ClientOptions options = freeColClient.getClientOptions();
+        int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
+        int turnNumber = game.getTurn().getNumber();
+        if (savegamePeriod <= 1
+            || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+            String playernation = player == null ? "" :
+                                  Messages.message(player.getNation().getNameKey());
+            String gid = Integer.toHexString(game.getUUID().hashCode());
+            filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
+                + '-' + gid  + "_" + playernation  + "_" + getSaveGameString(game.getTurn()) + ".fsg";
+            saveGameFile = new File(autosaveDir, filename);
+            saveGame(saveGameFile);
+        }
+    }
 
     /**
      * Set a player to be the new current player.
@@ -604,29 +673,16 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.getMyPlayer().equals(player)
             && freeColClient.getFreeColServer() != null) {
-            // Autosave the game.
-            ClientOptions options = freeColClient.getClientOptions();
-            int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
-            int turnNumber = game.getTurn().getNumber();
-            if (savegamePeriod <= 1
-                || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                String playernation= "";
-                if (player != null) {
-//                    playernation = player.getName() + "_"
-                   playernation =  Messages.message(player.getNation().getNameKey());
-                }
-                String gid = Integer.toHexString(game.getUUID().hashCode());
-                String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                    + '-' + gid  + "_" + playernation  + "_" + getSaveGameString(game.getTurn()) + ".fsg";
-                File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
-                                             filename);
-                saveGame(saveGameFile);
-            }
 
-            player.invalidateCanSeeTiles();
+           // auto-save the game (if it isn't newly loaded)
+           if ( turnsPlayed > 0 ) {
+              autosave_game();
+           }
 
-            // Check for emigration.
-            if (player.checkEmigrate()) {
+           player.invalidateCanSeeTiles();
+
+           // Check for emigration.
+           if (player.checkEmigrate()) {
                 if (player.hasAbility("model.ability.selectRecruit")
                     && player.getEurope().recruitablesDiffer()) {
                     Canvas canvas = freeColClient.getCanvas();
@@ -635,13 +691,13 @@ public final class InGameController implements NetworkConstants {
                 } else {
                     emigrate(player, 0);
                 }
-            }
+           }
 
-            // GUI management.
-            if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound("sound.anthem." + player.getNationID());
-            }
-            displayModelMessages(true);
+           // GUI management.
+           if (!freeColClient.isSingleplayer()) {
+               freeColClient.playSound("sound.anthem." + player.getNationID());
+           }
+           displayModelMessages(true);
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
     }
@@ -4501,6 +4557,7 @@ public final class InGameController implements NetworkConstants {
      * Changes the current construction project of a <code>Colony</code>.
      *
      * @param colony The <code>Colony</code>
+     * @param buildQueue List of <code>BuildableType</code>
      */
     public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
         if (!requireOurTurn()) return;
@@ -4971,6 +5028,7 @@ public final class InGameController implements NetworkConstants {
 
         // Restart the selection cycle
         moveMode = MODE_NEXT_ACTIVE_UNIT;
+        turnsPlayed++;
     }
 
     /**

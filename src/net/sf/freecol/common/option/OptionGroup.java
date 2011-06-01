@@ -176,6 +176,40 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
+     * Gets the string value of an option.
+     *
+     * @param id String, option ID
+     * @return String option value.
+     * @throws IllegalArgumentException If the specified option is not of String type
+     * @throws NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public String getString(String id) {
+        try {
+            return ((StringOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No String value associated with the specified option.");
+        }
+    }
+
+
+    /**
+     * Sets the string value of an option.
+     *
+     * @param id String, option ID
+     * @param value String, the new value of the option
+     * @throws IllegalArgumentException If the specified option is not of String type
+     * @throws NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public void setString(String id, String value) {
+        try {
+            ((StringOption) getOption(id)).setValue(value);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No String value associated with the specified option.");
+        }
+    }
+
+
+    /**
      * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
      */
     public void removeAll() {
