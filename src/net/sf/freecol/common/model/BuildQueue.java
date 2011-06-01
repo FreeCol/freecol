@@ -26,15 +26,51 @@ import java.util.List;
 
 public class BuildQueue<T extends BuildableType> implements Consumer {
 
+    public static enum CompletionAction {
+        /**
+         * Always remove the completed item. Not used by any build
+         * queue at the moment.
+         */
+        REMOVE,
+        /**
+         * Remove the completed item unless it is the last item and
+         * several instances of the item can co-exist (which is true
+         * for units, but not buildings). This is the strategy used by
+         * the colony build queue.
+         */
+        REMOVE_EXCEPT_LAST,
+        /**
+         * Shuffle the items rather than remove the completed
+         * item. This is the strategy used by the colony population
+         * queue.
+         */
+        SHUFFLE,
+        /**
+         * Remove the completed item and add a random new item. This
+         * is the strategy of the immigration queue (which is not
+         * implemented as a build queue at the moment, however).
+         */
+        ADD_RANDOM
+    };
+
+
     /** A list of Buildable items. */
     private List<T> buildQueue = new ArrayList<T>();
+
+    /**
+     * What to do when an item has been completed.
+     */
+    private CompletionAction completionAction = CompletionAction.REMOVE;
 
     private int priority = COLONY_PRIORITY;
 
     private Colony colony;
 
-    public BuildQueue(Colony colony, int priority, T... items) {
+
+
+    public BuildQueue(Colony colony, CompletionAction action, int priority, T... items) {
         this.colony = colony;
+        this.completionAction = action;
         this.priority = priority;
         for (T type : items) {
             buildQueue.add(type);
@@ -92,6 +128,23 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return buildQueue.isEmpty();
     }
 
+    /**
+     * Get the <code>CompletionAction</code> value.
+     *
+     * @return a <code>CompletionAction</code> value
+     */
+    public final CompletionAction getCompletionAction() {
+        return completionAction;
+    }
+
+    /**
+     * Set the <code>CompletionAction</code> value.
+     *
+     * @param newCompletionAction The new CompletionAction value.
+     */
+    public final void setCompletionAction(final CompletionAction newCompletionAction) {
+        this.completionAction = newCompletionAction;
+    }
 
     // Interface Consumer
 

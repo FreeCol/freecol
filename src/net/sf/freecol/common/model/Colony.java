@@ -144,11 +144,13 @@ public class Colony extends Settlement implements Nameable {
 
     /** A list of Buildable items. */
     protected BuildQueue<BuildableType> buildQueue =
-        new BuildQueue<BuildableType>(this, Consumer.COLONY_PRIORITY);
+        new BuildQueue<BuildableType>(this, BuildQueue.CompletionAction.REMOVE_EXCEPT_LAST,
+                                      Consumer.COLONY_PRIORITY);
 
     /** The colonists that may be born. */
     protected BuildQueue<UnitType> populationQueue =
-        new BuildQueue<UnitType>(this, Consumer.POPULATION_PRIORITY);
+        new BuildQueue<UnitType>(this, BuildQueue.CompletionAction.SHUFFLE,
+                                 Consumer.POPULATION_PRIORITY);
 
     /**
      * Contains information about production and consumption.

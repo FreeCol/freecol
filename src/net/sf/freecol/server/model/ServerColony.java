@@ -265,18 +265,21 @@ public class ServerColony extends Colony implements ServerModelObject {
         // built item from its build queue.
         if (!built.isEmpty()) {
             for (BuildQueue queue : built) {
-                BuildableType buildable = queue.getCurrentlyBuilding();
-                if (buildable instanceof UnitType) {
-                    if (((UnitType) buildable).hasAbility("model.ability.bornInColony")) {
-                        queue.remove(0);
-                        if (queue.size() > 1) { // Shuffle the colony queue
-                            Collections.shuffle(queue.getValues(), random);
-                        }
-                    } else { // Retain last entry if possible.
-                        if (queue.size() > 1) queue.remove(0);
+                switch(queue.getCompletionAction()) {
+                case SHUFFLE:
+                    if (queue.size() > 1) {
+                        Collections.shuffle(queue.getValues(), random);
                     }
-                } else if (buildable instanceof BuildingType) {
+                    break;
+                case REMOVE_EXCEPT_LAST:
+                    if (queue.size() == 1 && queue.getCurrentlyBuilding() instanceof UnitType) {
+                        // several units can co-exist
+                        break;
+                    }
+                case REMOVE:
+                default:
                     queue.remove(0);
+                    break;
                 }
                 csNextBuildable(queue, random, cs);
             }
