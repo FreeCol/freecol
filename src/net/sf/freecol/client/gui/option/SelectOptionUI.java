@@ -34,8 +34,9 @@ import net.sf.freecol.common.option.SelectOption;
 
 
 /**
- * This class provides visualization for an {@link SelectOption}. In order to
- * enable values to be both seen and changed.
+ * This class provides visualization for an {@link
+ * net.sf.freecol.common.option.SelectOption}. In order to enable
+ * values to be both seen and changed.
  */
 public final class SelectOptionUI extends JComboBox implements OptionUpdater, PropertyChangeListener {
 
@@ -115,7 +116,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link Option#isPreviewEnabled()} is rolled back
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
@@ -144,7 +145,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater, Pr
     }
 
     /**
-     * Updates the value of the {@link Option} this object keeps.
+     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         option.setValue(getSelectedIndex());

@@ -36,11 +36,11 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.option.RangeOption;
 
 /**
- * This class provides visualization for an {@link RangeOption}. In order to
- * enable values to be both seen and changed.
+ * This class provides visualization for an {@link
+ * net.sf.freecol.common.option.PercentageOption}. In order to enable
+ * values to be both seen and changed.
  */
 public final class PercentageOptionUI extends JSlider implements OptionUpdater, PropertyChangeListener {
 
@@ -107,7 +107,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link Option#isPreviewEnabled()} is rolled back
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
@@ -137,7 +137,7 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
     }
 
     /**
-     * Updates the value of the {@link Option} this object keeps.
+     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         option.setValue(getValue());

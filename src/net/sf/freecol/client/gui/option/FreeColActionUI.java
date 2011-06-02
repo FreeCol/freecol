@@ -106,7 +106,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link Option#isPreviewEnabled()} is rolled back
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
@@ -192,7 +192,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
 
     /**
-    * Updates the value of the {@link Option} this object keeps.
+    * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
     */
     public void updateOption() {
         option.setAccelerator(keyStroke);

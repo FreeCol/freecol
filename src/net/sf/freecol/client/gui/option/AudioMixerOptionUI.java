@@ -41,8 +41,9 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
 
 /**
- * This class provides visualization for an {@link AudioMixerOption}. In order to
- * enable values to be both seen and changed.
+ * This class provides visualization for an {@link
+ * net.sf.freecol.common.option.AudioMixerOption}. In order to enable
+ * values to be both seen and changed.
  */
 public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
 
@@ -153,7 +154,7 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link Option#isPreviewEnabled()} is rolled back
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
      * when an option dialog has been cancelled.
      */
     public void rollback() {
@@ -182,7 +183,7 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
     }
 
     /**
-     * Updates the value of the {@link Option} this object keeps.
+     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         option.setValue((MixerWrapper) cbox.getSelectedItem());

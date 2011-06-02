@@ -32,8 +32,9 @@ import net.sf.freecol.common.option.BooleanOption;
 
 
 /**
- * This class provides visualization for an {@link BooleanOption}. In order to
- * enable values to be both seen and changed.
+ * This class provides visualization for an {@link
+ * net.sf.freecol.common.option.BooleanOption}. In order to enable
+ * values to be both seen and changed.
  */
 public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, PropertyChangeListener {
 
@@ -81,7 +82,7 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link Option#isPreviewEnabled()} is rolled back
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
      * when an option dialoag has been cancelled.
      */
     public void rollback() {
@@ -110,7 +111,7 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater, P
     }
 
     /**
-     * Updates the value of the {@link Option} this object keeps.
+     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         option.setValue(isSelected());
