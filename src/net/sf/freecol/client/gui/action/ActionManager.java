@@ -32,7 +32,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
 /**
- * Stores the actions.
+ * Stores all <code>FreeColActions</code> and retrieves them by ID.
  */
 public class ActionManager extends OptionGroup {
 
@@ -56,8 +56,14 @@ public class ActionManager extends OptionGroup {
     }
 
 
+    /**
+     * This method adds all FreeColActions to the OptionGroup. If you
+     * implement a new <code>FreeColAction</code>, then you need to
+     * add it in this method. Localization and a possible accelerator
+     * need to be added to the strings file.
+     *
+     */
     private void initializeActions() {
-        //removeAll();
         // keep this list alphabetized.
 
         add(new AboutAction(freeColClient));
@@ -142,7 +148,9 @@ public class ActionManager extends OptionGroup {
     }
 
     /**
-     * Describe <code>addSpecificationActions</code> method here.
+     * Adds the <code>FreeColActions</code> that are provided by the
+     * <code>Specification</code>. At the moment, this includes only
+     * <code>TileImprovements</code>.
      *
      * @param specification a <code>Specification</code> value
      */
