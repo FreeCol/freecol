@@ -719,8 +719,8 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param fco The <code>FreeColObject</code> to update.
          */
-        OwnedChange(See vis, FreeColObject fco) {
-            super(vis);
+        OwnedChange(See see, FreeColObject fco) {
+            super(see);
             this.fco = fco;
         }
 
@@ -1052,7 +1052,7 @@ public class ChangeSet {
      *
      * @param owner The <code>ServerPlayer</code> that owns this object.
      * @param loc The <code>Location</code> where the object was.
-     * @param objects The <code>FreeColGameObject</code>s to remove.
+     * @param obj The <code>FreeColGameObject</code> to remove.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addDispose(ServerPlayer owner, Location loc,
@@ -1144,8 +1144,8 @@ public class ChangeSet {
      *
      * @param see The visibility of this change.
      * @param unit The <code>Unit</code> that is moving.
-     * @param oldLocation The location from which the unit is moving.
-     * @param newTile The <code>Tile</code> to which the unit is moving.
+     * @param loc The location from which the unit is moving.
+     * @param tile The <code>Tile</code> to which the unit is moving.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addMove(See see, Unit unit, Location loc, Tile tile) {
@@ -1207,7 +1207,7 @@ public class ChangeSet {
     /**
      * Helper function to add a spying change to a ChangeSet.
      *
-     * @param vis The visibility of this change.
+     * @param see The visibility of this change.
      * @param settlement The <code>Settlement</code> to spy on.
      * @return The updated <code>ChangeSet</code>.
      */
@@ -1219,7 +1219,7 @@ public class ChangeSet {
     /**
      * Helper function to add a stance change to a ChangeSet.
      *
-     * @param vis The visibility of this change.
+     * @param see The visibility of this change.
      * @param first The <code>Player</code> changing stance.
      * @param stance The <code>Stance</code> to change to.
      * @param second The <code>Player</code> wrt with to change.
@@ -1335,7 +1335,6 @@ public class ChangeSet {
      *
      * @param serverPlayer The <code>ServerPlayer</code> to send the
      *            update to.
-     * @param originalChanges A list of <code>Change</code>s to consider.
      * @return An element encapsulating an update of the objects to
      *         consider, or null if there is nothing to report.
      */
