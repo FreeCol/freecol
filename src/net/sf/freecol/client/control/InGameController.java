@@ -1408,10 +1408,13 @@ public final class InGameController implements NetworkConstants {
             && !showColonyWarnings(tile, unit)) {
             return;
         }
-        if (tile.getOwner() != player
-            && !player.canClaimToFoundSettlement(tile)
-            && !claimTile(player, tile, null, player.getLandPrice(tile), 0)) {
-            return;
+
+        if (tile.getOwner() != null && tile.getOwner() != player) {
+            // Claim tile from other owners before founding a settlement.
+            if (!claimTile(player, tile, null, player.getLandPrice(tile), 0))
+                return;
+            // One more check that founding can now proceed.
+            if (!player.canClaimToFoundSettlement(tile)) return;
         }
 
         // Get and check the name.
