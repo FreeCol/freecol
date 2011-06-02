@@ -23,7 +23,9 @@ package net.sf.freecol.client.gui.i18n;
  * Classes implementing this interface can determine the category and
  * the index of a double based on the number rules for a language.
  *
- * @See http://cldr.unicode.org/index/cldr-spec/plural-rules
+ * See the
+ * <a href="http://cldr.unicode.org/index/cldr-spec/plural-rules">
+ * Common Locale Data Repository</a>.
  */
 public abstract class Number implements Selector {
 

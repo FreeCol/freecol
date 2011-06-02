@@ -2141,8 +2141,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Extracts a convert from a native settlement.
      *
-     * @pamam attacker The <code>Unit</code> that is attacking.
-     * @param settlement The <code>IndianSettlement</code> under attack.
+     * @param attacker The <code>Unit</code> that is attacking.
+     * @param natives The <code>IndianSettlement</code> under attack.
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */

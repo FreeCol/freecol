@@ -35,8 +35,9 @@ import org.w3c.dom.Element;
 
 
 /**
-* Objects of this class contains AI-information for a single {@link WorkLocation}.
-*/
+ * Objects of this class contains AI-information for a single {@link
+ * net.sf.freecol.common.model.WorkLocation}.
+ */
 public class WorkLocationPlan extends ValuedAIObject {
 
     @SuppressWarnings("unused")
@@ -52,11 +53,11 @@ public class WorkLocationPlan extends ValuedAIObject {
 
     /**
      * Creates a new <code>WorkLocationPlan</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param workLocation The <code>WorkLocation</code> to create
      *      a plan for.
-     * @param goodsType The goodsType to be produced on the 
+     * @param goodsType The goodsType to be produced on the
      *      <code>workLocation</code> using this plan.
      */
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, GoodsType goodsType) {
@@ -69,7 +70,7 @@ public class WorkLocationPlan extends ValuedAIObject {
 
     /**
      * Creates a new <code>WorkLocationPlan</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
@@ -85,34 +86,34 @@ public class WorkLocationPlan extends ValuedAIObject {
      * Gets a <code>TileImprovementPlan</code> which will improve
      * the production of the goods type specified by this
      * <code>WorkLocationPlan</code>.
-     * 
+     *
      * @return The <code>TileImprovementPlan</code> if there is an
      *      improvement, plow or build road, which will increase
-     *      the production of the goods type specified by this 
-     *      plan. <code>null</code> gets returned if this plan is 
-     *      for a <code>Building</code> or that the <code>Tile</code> 
+     *      the production of the goods type specified by this
+     *      plan. <code>null</code> gets returned if this plan is
+     *      for a <code>Building</code> or that the <code>Tile</code>
      *      does not have an improvement.
      */
-    public TileImprovementPlan createTileImprovementPlan() {   
+    public TileImprovementPlan createTileImprovementPlan() {
         return updateTileImprovementPlan(null);
     }
-        
+
     /**
      * Updates the given <code>TileImprovementPlan</code>.
-     * 
+     *
      * @param tip The <code>TileImprovementPlan</code> to update.
      * @return The same <code>TileImprovementPlan</code>-object
-     *      as provided to the method or <code>null</code> if 
-     *      there is no more need for the improvement. 
+     *      as provided to the method or <code>null</code> if
+     *      there is no more need for the improvement.
      */
     public TileImprovementPlan updateTileImprovementPlan(TileImprovementPlan tip) {
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
-            
+
             if (tip != null && tip.getTarget() != tile) {
                 throw new IllegalArgumentException("The given TileImprovementPlan was not created for this Tile.");
             }
-            
+
             // Update to find the best thing to do now
             TileImprovementType impType = TileImprovement.findBestTileImprovementType(tile, goodsType);
             if (impType != null) {
@@ -130,23 +131,25 @@ public class WorkLocationPlan extends ValuedAIObject {
     }
 
     /**
-    * Gets the <code>WorkLocation</code> this 
+    * Gets the <code>WorkLocation</code> this
     * <code>WorkLocationPlan</code> controls.
-    * 
+    *
     * @return The <code>WorkLocation</code>.
     */
     public WorkLocation getWorkLocation() {
         return workLocation;
     }
 
-    
+
     /**
-     * Gets the production of the given type of goods according to this
-     * <code>WorkLocationPlan</code>. The plan has been created for either
-     * a {@link ColonyTile} or a {@link Building}. If this is a plan for a
-     * <code>ColonyTile</code> then the maximum possible production of the
-     * tile gets returned, while the <code>Building</code>-plans only returns
-     * a number used for identifying the value of the goods produced.
+     * Gets the production of the given type of goods according to
+     * this <code>WorkLocationPlan</code>. The plan has been created
+     * for either a {@link net.sf.freecol.common.model.ColonyTile} or
+     * a {@link net.sf.freecol.common.model.Building}. If this is a
+     * plan for a <code>ColonyTile</code> then the maximum possible
+     * production of the tile gets returned, while the
+     * <code>Building</code>-plans only returns a number used for
+     * identifying the value of the goods produced.
      *
      * @param goodsType The type of goods to get the production for.
      * @return The production.
@@ -155,7 +158,7 @@ public class WorkLocationPlan extends ValuedAIObject {
         if (goodsType == null || goodsType != this.goodsType) {
             return 0;
         }
-        
+
         if (workLocation instanceof ColonyTile) {
             if (!goodsType.isFarmed()) {
                 return 0;
@@ -203,33 +206,33 @@ public class WorkLocationPlan extends ValuedAIObject {
     * Gets the type of goods which should be produced at the <code>WorkLocation</code>.
     *
     * @return The type of goods.
-    * @see Goods
-    * @see WorkLocation
+    * @see net.sf.freecol.common.model.Goods
+    * @see net.sf.freecol.common.model.WorkLocation
     */
     public GoodsType getGoodsType() {
         return goodsType;
     }
-    
-    
+
+
     /**
     * Sets the type of goods to be produced at the <code>WorkLocation</code>.
     *
     * @param goodsType The type of goods.
-    * @see Goods
-    * @see WorkLocation
+    * @see net.sf.freecol.common.model.Goods
+    * @see net.sf.freecol.common.model.WorkLocation
     */
     public void setGoodsType(GoodsType goodsType) {
         this.goodsType = goodsType;
         setValue(getProductionOf(goodsType));
     }
 
-    
+
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
      *      the XML-representation should be created.
      * @return The XML-representation.
-     */    
+     */
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -244,9 +247,9 @@ public class WorkLocationPlan extends ValuedAIObject {
     /**
      * Updates this object from an XML-representation of
      * a <code>WorkLocationPlan</code>.
-     * 
+     *
      * @param element The XML-representation.
-     */    
+     */
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));

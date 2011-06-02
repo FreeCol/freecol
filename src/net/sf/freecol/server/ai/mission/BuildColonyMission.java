@@ -116,7 +116,7 @@ public class BuildColonyMission extends Mission {
      * Creates a <code>BuildColonyMission</code> for the given
      * <code>AIUnit</code>. The mission will try to find the closest and best
      * site for a colony, and build the colony there. It will not stop until a
-     * {@link Colony} gets built.
+     * {@link net.sf.freecol.common.model.Colony} gets built.
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
@@ -153,7 +153,7 @@ public class BuildColonyMission extends Mission {
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
-     * @see AIObject#readFromXML
+     * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public BuildColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);
@@ -240,10 +240,12 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Returns the destination for this <code>Transportable</code>. This can
-     * either be the target {@link Tile} of the transport or the target for the
-     * entire <code>Transportable</code>'s mission. The target for the
-     * transport is determined by {@link TransportMission} in the latter case.
+     * Returns the destination for this
+     * <code>Transportable</code>. This can either be the target
+     * {@link net.sf.freecol.common.model.Tile} of the transport or
+     * the target for the entire <code>Transportable</code>'s
+     * mission. The target for the transport is determined by {@link
+     * TransportMission} in the latter case.
      *
      * @return The destination for this <code>Transportable</code>.
      */

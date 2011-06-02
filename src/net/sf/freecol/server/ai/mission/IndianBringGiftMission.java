@@ -107,7 +107,7 @@ public class IndianBringGiftMission extends Mission {
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
-     * @see AIObject#readFromXML
+     * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public IndianBringGiftMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);
@@ -187,10 +187,12 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Checks if this mission is still valid to perform.
      *
-     * This mission will be invalidated when the gift has been delivered. In
-     * case of the stances {@link Stance#WAR WAR} or
-     * {@link Stance#CEASE_FIRE CEASE_FIRE} towards the target player, the
-     * mission would be invalidated as well.
+     * This mission will be invalidated when the gift has been
+     * delivered. In case of the stances {@link
+     * net.sf.freecol.common.model.Player.Stance#WAR WAR} or {@link
+     * net.sf.freecol.common.model.Player.Stance#CEASE_FIRE
+     * CEASE_FIRE} towards the target player, the mission would be
+     * invalidated as well.
      *
      * @return True if this mission is still valid.
      */

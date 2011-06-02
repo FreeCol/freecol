@@ -26,12 +26,12 @@ import net.sf.freecol.common.model.Location;
 
 
 /**
-* A single item in a carrier's transport list.
-* Any {@link Locatable} which should be able to be transported
-* by a carrier using the {@link TransportMission}, needs an
-* AI object implementing this interface.
+* A single item in a carrier's transport list.  Any {@link Locatable}
+* which should be able to be transported by a carrier using the {@link
+* net.sf.freecol.server.ai.mission.TransportMission}, needs an AI
+* object implementing this interface.
 *
-* @see TransportMission
+* @see net.sf.freecol.server.ai.mission.TransportMission
 */
 public interface Transportable {
 
@@ -44,14 +44,16 @@ public interface Transportable {
     * @return The source for this <code>Transportable</code>.
     */
     public Location getTransportSource();
-    
+
 
     /**
     * Returns the destination for this <code>Transportable</code>.
-    * This can either be the target {@link Tile} of the transport
-    * or the target for the entire <code>Transportable</code>'s
-    * mission. The target for the tansport is determined by
-    * {@link TransportMission} in the latter case.
+    * This can either be the target {@link
+    * net.sf.freecol.common.model.Tile} of the transport or the target
+    * for the entire <code>Transportable</code>'s mission. The target
+    * for the tansport is determined by {@link
+    * net.sf.freecol.server.ai.mission.TransportMission} in the latter
+    * case.
     *
     * @return The destination for this <code>Transportable</code>.
     */
@@ -65,7 +67,7 @@ public interface Transportable {
     * @return The priority of the transport.
     */
     public int getTransportPriority();
-    
+
 
     /**
     * Increases the transport priority of this <code>Transportable</code>.
@@ -74,14 +76,14 @@ public interface Transportable {
     */
     public void increaseTransportPriority();
 
-    
+
     /**
     * Gets the <code>Locatable</code> which should be transported.
     * @return The <code>Locatable</code>.
     */
     public Locatable getTransportLocatable();
-    
-    
+
+
     /**
     * Gets the carrier responsible for transporting this <code>Transportable</code>.
     *
@@ -91,8 +93,8 @@ public interface Transportable {
     *
     */
     public AIUnit getTransport();
-    
-    
+
+
     /**
     * Sets the carrier responsible for transporting this <code>Transportable</code>.
     * This method should also add this <code>Transportable</code> to the given
@@ -104,20 +106,21 @@ public interface Transportable {
     *
     */
     public void setTransport(AIUnit transport);
-    
+
     /**
      * Aborts the given <code>Wish</code>.
      * @param w The <code>Wish</code> to be aborted.
      */
     public void abortWish(Wish w);
-    
+
     /**
      * Returns the ID of the <code>AIObject</code> implementing
      * this interface.
-     * 
+     *
      * @return The ID of the <code>AIObject</code>. This is normally
-     *         the ID of the {@link FreeColGameObject} that object
-     *         represents.
-     */    
+     *         the ID of the {@link
+     *         net.sf.freecol.common.model.FreeColGameObject} that
+     *         object represents.
+     */
     public String getId();
 }

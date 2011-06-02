@@ -491,7 +491,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Builds a building from a build queue.
      *
-     * @param queue The <code>BuildQueue</code> to build from.
+     * @param buildQueue The <code>BuildQueue</code> to build from.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if the build was successful.
      */

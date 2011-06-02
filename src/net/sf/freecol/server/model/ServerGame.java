@@ -61,8 +61,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * Creates a new game model.
      *
      * @param specification The <code>Specification</code> to use in this game.
-     * @see net.sf.freecol.server.FreeColServer#FreeColServer(boolean, boolean,
-     *      int, String)
+     * @see net.sf.freecol.server.FreeColServer
      */
     public ServerGame(Specification specification) {
         super(specification);

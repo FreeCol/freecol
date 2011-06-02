@@ -74,7 +74,7 @@ public class UnitWanderMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see AIObject#readFromXML
+     * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public UnitWanderMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);

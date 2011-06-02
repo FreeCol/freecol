@@ -146,7 +146,7 @@ public class TransportMission extends Mission {
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
-     * @see AIObject#readFromXML
+     * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public TransportMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);

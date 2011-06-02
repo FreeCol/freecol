@@ -94,7 +94,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
      * @param state The initial state for this unit.
-     * @param initialEquipment The list of initial EquimentTypes
      */
     public ServerUnit(Game game, Location location, Player owner,
                       UnitType type, UnitState state) {

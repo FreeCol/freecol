@@ -112,7 +112,7 @@ public class PioneeringMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see AIObject#readFromXML
+     * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public PioneeringMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);
