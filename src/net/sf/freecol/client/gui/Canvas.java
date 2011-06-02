@@ -289,7 +289,7 @@ public final class Canvas extends JDesktopPane {
 
     private final FreeColClient freeColClient;
 
-    private final MainPanel mainPanel;
+    private MainPanel mainPanel;
 
     private final StartGamePanel startGamePanel;
 
@@ -347,7 +347,6 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        mainPanel = new MainPanel(this);
         startGamePanel = new StartGamePanel(this);
         serverListPanel = new ServerListPanel(this, freeColClient.getConnectController());
         europePanel = new EuropePanel(this);
@@ -524,7 +523,10 @@ public final class Canvas extends JDesktopPane {
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {
-        remove(mainPanel);
+       if (mainPanel != null) {
+          remove(mainPanel);
+          mainPanel = null;
+       }
     }
 
     /**
@@ -1643,6 +1645,7 @@ public final class Canvas extends JDesktopPane {
     public void showMainPanel() {
         closeMenus();
         freeColClient.getFrame().setJMenuBar(null);
+        mainPanel = new MainPanel(this);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }

@@ -164,10 +164,11 @@ public class Messages {
     }
 
     /**
-     * Finds the message with a particular ID in the default locale.
+     * Returns the text mapping for a particular ID in the default locale message bundle.
+     * Returns the key as the value if there is no mapping found!
      *
      * @param messageId The key of the message to find
-     * @return String
+     * @return String text mapping or the key
      */
     public static String message(String messageId) {
         // Check that all the values are correct.
@@ -178,10 +179,12 @@ public class Messages {
             setMessageBundle(Locale.getDefault());
         }
 
+        // return key as value if there is no mapping found
         String message = messageBundle.get(messageId);
         if (message == null) {
             return messageId;
         }
+        // otherwise replace variables in the text
         message = replaceChoices(message, null);
         return message.trim();
     }

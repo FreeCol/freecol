@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.action.ContinueAction;
 
 /**
 * A panel filled with 'main' items.
@@ -55,17 +56,20 @@ public final class MainPanel extends FreeColPanel {
     */
     public MainPanel(Canvas parent) {
         super(parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+        boolean canContinue = getClient().getInGameController().getLastSaveGameFile() != null;
 
         ActionManager am = getClient().getActionManager();
+        JButton newButton = new JButton(am.getFreeColAction(NewAction.id));
         JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
         JButton mapEditorButton = new JButton(am.getFreeColAction(MapEditorAction.id));
         JButton optionsButton = new JButton(am.getFreeColAction(PreferencesAction.id));
         JButton quitButton = new JButton(am.getFreeColAction(QuitAction.id));
 
         setCancelComponent(quitButton);
-        okButton.setAction(am.getFreeColAction(NewAction.id));
+        okButton.setAction(am.getFreeColAction( canContinue ? ContinueAction.id : NewAction.id));
 
         enterPressesWhenFocused(okButton);
+        enterPressesWhenFocused(newButton);
         enterPressesWhenFocused(mapEditorButton);
         enterPressesWhenFocused(openButton);
         enterPressesWhenFocused(optionsButton);
@@ -80,6 +84,9 @@ public final class MainPanel extends FreeColPanel {
         }
 
         add(okButton, "newline 20, width 70%");
+        if (canContinue) {
+           add(newButton, "width 70%");
+        }
         add(openButton, "width 70%");
         add(mapEditorButton, "width 70%");
         add(optionsButton, "width 70%");
@@ -87,6 +94,4 @@ public final class MainPanel extends FreeColPanel {
 
         setSize(getPreferredSize());
     }
-
-
 }

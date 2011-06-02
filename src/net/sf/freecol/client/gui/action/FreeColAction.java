@@ -90,7 +90,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         String descriptionKey = id + ".shortDescription";
         String shortDescription = Messages.message(descriptionKey);
         if (!shortDescription.equals(descriptionKey)) {
-            putValue(SHORT_DESCRIPTION, descriptionKey);
+            putValue(SHORT_DESCRIPTION, shortDescription);
         }
 
         String acceleratorKey = id + ".accelerator";

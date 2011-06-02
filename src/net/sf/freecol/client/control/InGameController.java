@@ -240,6 +240,50 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Saves the game to a fix-named file in the autosave directory, which may
+     * be used for quick-reload.
+     *
+     * @return boolean <b>true</b> if and only if the game was saved
+     */
+    public boolean quicksaveGame () {
+       Game game = freeColClient.getGame();
+       if (game != null) {
+          String gid = Integer.toHexString(game.getUUID().hashCode());
+          String filename = "quicksave-" + gid + ".fsg";
+          File file = new File(FreeCol.getAutosaveDirectory(), filename);
+          return saveGame(file);
+       }
+       return false;
+    }
+
+    /** Reloads a game state which was previously saved via <code>quicksaveGame</code>.
+     *
+     * @return boolean <b>true</b> if and only if a game was loaded
+     */
+    public boolean quickReload () {
+       Canvas canvas = freeColClient.getCanvas();
+       Game game = freeColClient.getGame();
+       if (game != null) {
+          String gid = Integer.toHexString(game.getUUID().hashCode());
+          String filename = "quicksave-" + gid + ".fsg";
+          File file = new File(FreeCol.getAutosaveDirectory(), filename);
+          if (file.isFile()) {
+             // ask user to confirm reload action
+             boolean ok = true; // canvas.showConfirmDialog(gid, gid, filename);
+
+             // perform loading game state if answer == ok
+             if (ok) {
+                freeColClient.getConnectController().quitGame(true);
+                canvas.removeInGameComponents();
+                freeColClient.getConnectController().loadGame(file);
+                return true;
+             }
+          }
+       }
+       return false;
+    }
+
+    /**
      * Opens a dialog where the user should specify the filename and
      * saves the game.
      *

@@ -105,6 +105,7 @@ public class ActionManager extends OptionGroup {
             add(new MoveAction(freeColClient, d, true));
         }
         add(new NewAction(freeColClient));
+        add(new ContinueAction(freeColClient));
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
