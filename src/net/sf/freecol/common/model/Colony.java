@@ -693,7 +693,7 @@ public class Colony extends Settlement implements Nameable {
         modifySpecialGoods(type, amount);
     }
 
-    private void modifySpecialGoods(GoodsType goodsType, int amount) {
+    protected void modifySpecialGoods(GoodsType goodsType, int amount) {
         FeatureContainer container = goodsType.getFeatureContainer();
         Set<Modifier> libertyModifiers = container.getModifierSet("model.modifier.liberty");
         if (!libertyModifiers.isEmpty()) {

@@ -216,9 +216,11 @@ public class ServerColony extends Colony implements ServerModelObject {
             int net = productionMap.getCount(goodsType);
             int stored = getGoodsCount(goodsType);
             if (net + stored <= 0) {
-                removeGoods(goodsType, stored);
+                goodsContainer.removeGoods(goodsType, stored);
+                modifySpecialGoods(goodsType, -stored);
             } else {
-                addGoods(goodsType, net);
+                goodsContainer.addGoods(goodsType, net);
+                modifySpecialGoods(goodsType, net);
             }
 
             // Handle the food situation
@@ -260,6 +262,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
             }
         }
+        invalidateCache();
 
         // Now that the goods have been updated it is safe to remove the
         // built item from its build queue.

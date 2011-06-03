@@ -80,7 +80,16 @@ public class ProductionCache {
             boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
-                AbstractGoods surplus = new AbstractGoods(production.get(g.getType()));
+                /*
+                 * Ugly work-around: We want the warehouse to store
+                 * food in order to make it unavailable for horse
+                 * production. On the other hand, we do not want the
+                 * food to become unavailable for the production of
+                 * new colonists. Any solution?
+                 */
+                AbstractGoods surplus = (consumer instanceof BuildQueue)
+                    ? new AbstractGoods(g.getType(), netProduction.getCount(g.getType()))
+                    : new AbstractGoods(production.get(g.getType()));
                 if (!surplusOnly) {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
                 }

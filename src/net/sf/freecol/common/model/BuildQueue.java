@@ -245,6 +245,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         for (BuildableType item : buildQueue) {
             result += " " + item.getId();
         }
+        result += " [" + colony.getName() + "]";
         return result;
 
     }
