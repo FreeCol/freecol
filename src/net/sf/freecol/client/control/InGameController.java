@@ -2050,7 +2050,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         final Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        Tile tile = unit.getTile();
+        final Tile tile = unit.getTile();
         if (reply.hasAttribute("slowedBy")) { // ship slowed
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
             StringTemplate enemy = slowedBy.getOwner().getNationName();
@@ -2094,9 +2094,15 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
+            Canvas.EventType event = null;
             if (askNewLandName(newLandName, welcomer, accept)
                 && newLandName.equals(player.getNewLandName())) {
-                canvas.showEventPanel(tile, EventType.FIRST_LANDING);
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            canvas.showEventPanel(tile, EventType.FIRST_LANDING);
+                        }
+                    });
+
                 String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient.getActionManager()
                                                                    .getFreeColAction("buildColonyAction").getAccelerator());
                 m = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
@@ -2109,7 +2115,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (reply.hasAttribute("discoverPacific")) {
-            canvas.showEventPanel(unit.getTile(), EventType.DISCOVER_PACIFIC);
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        canvas.showEventPanel(tile, EventType.DISCOVER_PACIFIC);
+                    }
+                });
         }
         if (reply.hasAttribute("discoverRegion")
             && reply.hasAttribute("regionType")) {
