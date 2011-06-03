@@ -518,14 +518,10 @@ auto-saving.
 
 \begin{itemize}
 
-\item The language\index{language} to use. Some languages are spoken in
-more than one country. In this case, you might also be able to select
-a specific country. If the translation you choose is not complete, the
-missing strings will be taken from another language file. This could
-be the default translation for your language or the English language
-version. If you selected Austrian German, for example, missing strings
-would be taken from the default German translation if available, and
-the English language version otherwise.
+\item The language\index{language} to use. Some languages are spoken
+  in more than one country. In this case, you might also be able to
+  select a specific country. See
+  \hyperlink{translations}{Translations} for further details.
 
 \item The minimum number of goods to display with a counter. If you
 accept the default setting of seven, for example, six hammers will be
@@ -588,6 +584,53 @@ Beware that some Java implementations have bugs that cause high CPU
 load and very slow performance if animation is enabled.  If this
 happens, either disable animation or experiment with the
 \texttt{-Dsun.java2d.pmoffscreen=false} Java command line option.
+
+
+\hypertarget{translations}{\subsection{Translations}}
+
+The FreeCol user interface has been translated into several languages,
+but not all translations are complete. If the translation you choose
+is not complete, the missing strings will be taken from another
+language file. This could be the default translation for your language
+or the English language version. If you selected Austrian German, for
+example, missing strings would be taken from the default German
+translation if available, and the English language version
+otherwise.
+
+Translations for the FreeCol user interface are kindly provided by
+\href{http://translatewiki.net}{\tt trans\-late\-wiki.net}. If you want to
+improve the translation you use, please get an account at the wiki and
+contribute. The translation available at the wiki may well be more
+complete than the one included in the latest FreeCol package, which
+may be several months old.
+
+If you want to install the latest translation available, go to {\tt
+  trans\-late\-wiki.net} and follow the link {\tt Special pages} from the
+navigation bar on the left. Scroll down to the section {\tt Wiki data
+  and tools} and follow the link {\tt Translate}, which takes you to a
+list of the projects for which the wiki provides translations. Choose
+{\tt FreeCol} to view a form. Select {\tt Export translations to file}
+from the dropdown box labelled {\tt I want to}. Select the language
+you are interested in and press the {\tt Fetch} button. Please take
+note of the abbreviation used for the language, which you will need
+during the next step.
+
+Now, save the result as a file. Find the directory where FreeCol is
+installed and open the sub-directory {\tt data}, then the
+sub-directory {\tt strings}, where you will find a large number of
+files called
+
+\begin{quotation}
+{\tt FreeColMessages\_}{\it abbreviation}{\tt
+  .properties}.
+\end{quotation}
+
+Overwrite the file with the correct abbreviation and
+you are done. The next time you start FreeCol, it will use the updated
+translation.
+
+
+
 
 \hypertarget{message options}{\subsection{Message Options}}
 
