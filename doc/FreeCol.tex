@@ -1361,6 +1361,63 @@ The ``buy building'' button allows you to buy the building at the top
 of the build queue, provided that you have enough gold.
 
 
+\hypertarget{customization}{\section{Customization}}
+
+The FreeCol user interface can be customized to a certain degree. In
+the directory where FreeCol is installed, you will find a
+sub-directory called {\tt data}, which contains configuration files
+and multimedia assets. These include the images used to represent
+units, goods, buildings and various other objects that appear in the
+game, sounds to play when certain events occur and so forth. You can
+replace them if you wish.
+
+The sub-directory {\tt data/base/} contains assets that are used for
+the user interface in general, independent of the rules used for a
+particular game. The sub-directory {\tt
+  data/\-base/\-resources/\-fonts} contains several fonts that are
+distributed with FreeCol, including the file {\tt ShadowedBlack.ttf},
+which contains the black letter font used to display headlines and the
+titles of panels. The file {\tt data/\-base/\-resources.properties}
+allows you to configure how the assets are used.
+
+The line
+
+\begin{quote}
+{\tt NormalFont=urn:font:Serif-PLAIN-13}
+\end{quote}
+
+for example, selects the font called ``Serif'' with font style
+``plain'' and font size 13. Instead of ``Serif'', you could use any
+other font that is known to the Java Virtual Machine of your
+system. In general, this includes all fonts installed by the operating
+system (rather than individual applications).
+
+Please note that FreeCol uses a Uniform Resource Identifier (URI) to
+identify the font. For this reason, you must obey the usual quoting
+rules. In particular, you must use the string {\tt \%20} instead of a
+space character in the font name.
+
+In order to use a TrueType font that is not available to the JVM, you
+must copy it to the fonts directory mentioned above and add it to the
+configuration file by adding a line like this:
+
+\begin{quote}
+{\tt MyFavouriteFont=resources/fonts/Chancery.ttf}
+\end{quote}
+
+Then you could say:
+
+\begin{quote}
+{\tt NormalFont=urn:font:Black\%20Chancery-PLAIN-13}
+\end{quote}
+
+Instead of {\tt MyFavouriteFont}, you can any key you like, as long as
+it is not being used for anything else. This line will add your font
+to the list of fonts known to the JVM, and you can then use its name,
+which is, however, likely to differ from the file name. The file {\tt
+  Chancery.ttf}, for example, contains a font called ``Black Chancery''.
+
+
 \hypertarget{The New World}{\chapter{The New World}}
 
 At the beginning of the game, you will start with a naval vessel and
