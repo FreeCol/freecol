@@ -20,6 +20,7 @@
 package net.sf.freecol.client.control;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -187,6 +187,12 @@ public final class InGameController implements NetworkConstants {
     /** The most recently saved game file, or <b>null</b>. */
     private File lastSaveGameFile;
 
+    private static FileFilter FSG_FILTER = new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(".fsg");
+            }
+        };
+
     /**
      * A hash map of messages to be ignored.
      */
@@ -236,7 +242,17 @@ public final class InGameController implements NetworkConstants {
      *  @return File recent save game file
      */
     public File getLastSaveGameFile () {
-       return lastSaveGameFile;
+        File lastSave = null;
+        for (File directory : new File[] { FreeCol.getSaveDirectory(), FreeCol.getAutosaveDirectory() }) {
+            for (File savegame : directory.listFiles(FSG_FILTER)) {
+                if (lastSave == null
+                    || savegame.lastModified() > lastSave.lastModified()) {
+                    lastSave = savegame;
+                }
+            }
+        }
+
+       return lastSave;
     }
 
     /**
