@@ -20,6 +20,7 @@
 package net.sf.freecol.common.resources;
 
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -61,9 +62,13 @@ public class FontResource extends Resource {
             String name = resourceLocator.getSchemeSpecificPart();
             font = Font.decode(name.substring(SCHEME.length()));
         }
-        logger.finest("Loaded font: "
-                      + ((font==null) ? "(null)" : font.getFontName())
-                      + " from: " + resourceLocator);
+        if (font != null) {
+            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .registerFont(font);
+        }
+        logger.info("Loaded font: "
+                    + ((font==null) ? "(null)" : font.getFontName())
+                    + " from: " + resourceLocator);
     }
 
     /**
