@@ -353,10 +353,10 @@ public class Player extends FreeColGameObject implements Nameable {
     private int maximumFoodConsumption = -1;
 
     private final UnitIterator nextActiveUnitIterator
-        = new UnitIterator(this, new ActivePredicate());
+        = new UnitIterator(this, new ActivePredicate(this));
 
     private final UnitIterator nextGoingToUnitIterator
-        = new UnitIterator(this, new GoingToPredicate());
+        = new UnitIterator(this, new GoingToPredicate(this));
 
     /**
      * A cache of settlement names, a capital for natives, and a fallback
@@ -3100,11 +3100,19 @@ public class Player extends FreeColGameObject implements Nameable {
      * A predicate for determining active units.
      */
     public class ActivePredicate extends UnitPredicate {
+
+        private final Player player;
+
+        public ActivePredicate(Player player) {
+            this.player = player;
+        }
+
         /**
          * Returns true if the unit is active (and going nowhere).
          */
         public boolean obtains(Unit unit) {
             return !unit.isDisposed()
+                && unit.getOwner() == player
                 && unit.getMovesLeft() > 0
                 && unit.getState() == UnitState.ACTIVE
                 && unit.getDestination() == null
@@ -3118,11 +3126,19 @@ public class Player extends FreeColGameObject implements Nameable {
      * A predicate for determining units going somewhere.
      */
     public class GoingToPredicate extends UnitPredicate {
+
+        private final Player player;
+
+        public GoingToPredicate(Player player) {
+            this.player = player;
+        }
+
         /**
          * Returns true if the unit has order to go somewhere.
          */
         public boolean obtains(Unit unit) {
             return !unit.isDisposed()
+                && unit.getOwner() == player
                 && unit.getMovesLeft() > 0
                 && (unit.getDestination() != null || unit.getTradeRoute() != null)
                 && !(unit.getLocation() instanceof WorkLocation)
