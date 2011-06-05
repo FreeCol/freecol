@@ -64,7 +64,7 @@ public class WorkerWish extends Wish {
         if (destination == null) {
             throw new NullPointerException("destination == null");
         }
-        
+
         this.destination = destination;
         setValue(value);
         this.unitType = unitType;
@@ -73,20 +73,20 @@ public class WorkerWish extends Wish {
 
 
     /**
-    * Creates a new <code>WorkerWish</code> from the given 
+    * Creates a new <code>WorkerWish</code> from the given
     * XML-representation.
     *
     * @param aiMain The main AI-object.
-    * @param element The root element for the XML-representation 
+    * @param element The root element for the XML-representation
     *       of a <code>WorkerWish</code>.
     */
     public WorkerWish(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
-    
+
     /**
-     * Creates a new <code>WorkerWish</code> from the given 
+     * Creates a new <code>WorkerWish</code> from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -95,9 +95,9 @@ public class WorkerWish extends Wish {
     public WorkerWish(AIMain aiMain, String id) {
         super(aiMain, id);
     }
-    
+
     /**
-     * Creates a new <code>WorkerWish</code> from the given 
+     * Creates a new <code>WorkerWish</code> from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -113,7 +113,7 @@ public class WorkerWish extends Wish {
     /**
      * Updates this <code>WorkerWish</code> with the
      * given attributes.
-     * 
+     *
      * @param value The value identifying the importance of
      *       this <code>Wish</code>.
      * @param unitType The type of unit needed for releasing this wish
@@ -129,7 +129,7 @@ public class WorkerWish extends Wish {
 
     /**
     * Returns the type of unit needed for releasing this wish.
-    * @return The {@link Unit#getType type of unit}.
+    * @return The type of unit.
     */
     public UnitType getUnitType() {
         return unitType;
@@ -169,11 +169,11 @@ public class WorkerWish extends Wish {
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
-        
-        final String transportableStr = in.getAttributeValue(null, "transportable"); 
+
+        final String transportableStr = in.getAttributeValue(null, "transportable");
         if (transportableStr != null) {
             transportable = (Transportable) getAIMain().getAIObject(transportableStr);
             if (transportable == null) {
@@ -197,7 +197,7 @@ public class WorkerWish extends Wish {
     public static String getXMLElementTagName() {
         return "workerWish";
     }
-    
+
     public String toString() {
         return "WorkerWish: " + unitType.getNameKey()
             + " (" + getValue() + (expertNeeded ? ", expert)" : ")");

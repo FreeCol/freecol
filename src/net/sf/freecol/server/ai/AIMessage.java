@@ -255,7 +255,7 @@ public class AIMessage {
     /**
      * Claims a tile for a colony.
      *
-     * @param connection The <code>Connection</code> to send on.
+     * @param conn The <code>Connection</code> to send on.
      * @param tile The <code>Tile</code> to claim.
      * @param colony The <code>Colony</code> claiming the tile.
      * @param price The price to pay.
@@ -523,7 +523,7 @@ public class AIMessage {
      * Train unit in Europe.
      *
      * @param connection The <code>Connection</code> to the server.
-     * @param unitType The <code>UnitType</code> to train.
+     * @param type The <code>UnitType</code> to train.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askTrainUnitInEurope(Connection connection,

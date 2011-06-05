@@ -216,7 +216,7 @@ public class StandardAIPlayer extends AIPlayer {
      * <code>TileImprovement</code>s needed by all of this player's colonies.
      *
      * @return The <code>Iterator</code>.
-     * @see TileImprovement
+     * @see net.sf.freecol.common.model.TileImprovement
      */
     public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
         ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();

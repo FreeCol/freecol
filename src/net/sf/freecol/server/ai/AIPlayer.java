@@ -253,7 +253,7 @@ public abstract class AIPlayer extends AIObject {
      * TODO: Move this to a specialized Handler class (AIEurope?)
      * TODO: Give protected access?
      *
-     * @param The index of the unit to recruit in the recruitables list.
+     * @param index The index of the unit to recruit in the recruitables list.
      * @return the new AIUnit created by this action. May be null.
      */
     public AIUnit recruitAIUnitInEurope(int index) {

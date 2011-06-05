@@ -23,7 +23,7 @@ package net.sf.freecol.server.generator;
  * Keeps track of the available map generator options.
  *
  * @see MapGenerator
- * @see OptionGroup
+ * @see net.sf.freecol.common.option.OptionGroup
  */
 public class MapGeneratorOptions {
 

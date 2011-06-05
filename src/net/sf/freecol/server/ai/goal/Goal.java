@@ -19,7 +19,7 @@
 
 /* *********************************************
  * Please see "Howto" at the end of this file! *
- **********************************************/ 
+ **********************************************/
 
 package net.sf.freecol.server.ai.goal;
 
@@ -43,7 +43,7 @@ import net.sf.freecol.server.ai.goal.GoalConstants;
 
 /**
  * A Goal is used to encapsulate a specific part of the decision-making process
- * of an AI. 
+ * of an AI.
  * </p><p>
  * Using a top-down approach, every {@link AIPlayer} has a set of Goals which,
  * in turn, may have further subgoals. In combination, this tree of goals
@@ -63,17 +63,17 @@ public abstract class Goal extends AIObject implements GoalConstants {
     protected boolean needsPlanning;
     protected boolean isFinished;
     protected List<AIUnit> availableUnitsList;
-    
+
     protected AIPlayer player;
     private Goal parentGoal;
-    
+
     /**
      * Standard constructor
-     * 
+     *
      * @param p The {@link AIPlayer} this goal belongs to
      * @param g The parent goal; may be null if we're a direct goal of the AIPlayer
      * @param w The relativeWeight of this goal
-     */                           
+     */
     public Goal(AIPlayer p, Goal g, float w) {
         super(p.getAIMain());
         player = p;
@@ -87,13 +87,13 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Alternate constructor - directly add a unit to this Goal.
-     * The calling object ensures that this unit is not currently part of another Goal.     
-     * 
+     * The calling object ensures that this unit is not currently part of another Goal.
+     *
      * @param p The {@link AIPlayer} this goal belongs to
      * @param g The parent goal; may be null if we're a direct goal of the AIPlayer
      * @param w The relativeWeight of this goal
-     * @param u An initial {@link AIUnit} given to this goal    
-     */ 
+     * @param u An initial {@link AIUnit} given to this goal
+     */
     public Goal (AIPlayer p, Goal g, float w, AIUnit u) {
         this(p,g,w);
         addUnit(u);
@@ -102,7 +102,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Determines whether this goal is finished.
      * If it is, this means it can be cancelled by its parent.
-     * 
+     *
      * @return true, if the goal is finished, false otherwise
      */
     public boolean isFinished() {
@@ -117,13 +117,13 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * to remove this goal from its list of subgoals.
      * </p><p>
      * NOTE: Preferably, only the direct parent should call this.
-     * 
-     * @return A list of all {@link AIUnit} being freed up by this action          
+     *
+     * @return A list of all {@link AIUnit} being freed up by this action
      */
     public List<AIUnit> cancelGoal() {
         logger.finest("Entering method cancelGoal() for "+getDebugDescription());
         List<AIUnit> cancelledUnitsList = new ArrayList<AIUnit>();
-        
+
         //get units from subgoals
         Iterator<Goal> git = getSubGoalIterator();
         while (git!=null && git.hasNext()) {
@@ -131,7 +131,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
             List<AIUnit> ulist = g.cancelGoal();
             cancelledUnitsList.addAll(ulist);
         }
-        
+
         //get own units
         Iterator<AIUnit> uit = getOwnedAIUnitsIterator();
         while (uit.hasNext()) {
@@ -145,13 +145,13 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Recursively calls {@link #doPlanning} in subgoals that {@link #needsPlanning()},
      * then calls its own planning method.
-     */              
+     */
     public void doPlanning() {
         logger.finest("Entering method doPlanning() for "+getDebugDescription());
         boolean subgoalsPlanned = false;
-        
+
         normalizeSubGoalWeights();
-        
+
         Iterator<Goal> git = getSubGoalIterator();
         while (git!=null && git.hasNext()) {
             Goal g = git.next();
@@ -160,7 +160,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
                 subgoalsPlanned = true;
             }
         }
-        
+
         //after all subgoals have been planned, let's plan ourselves
         if (needsPlanning || subgoalsPlanned) {
             plan();
@@ -170,7 +170,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Determines whether this or a subgoal {@link #needsPlanning}.
-     *          
+     *
      * @return true if this Goal or at least one subgoal needs planning, false otherwise
      */
     public boolean needsPlanning() {
@@ -193,14 +193,14 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * Sets the {@link #needsPlanning} status of this Goal and all its subgoals.
      * Should be called by the {@link AIPlayer} once for each of its subgoals
      * at the start of a turn. The Goal will handle all other instances of this
-     * flag needing to be reset internally.     
-     * 
+     * flag needing to be reset internally.
+     *
      * @param p Boolean determining whether to set needsPlanning =true or =false
      */
     public void setNeedsPlanningRecursive(boolean p) {
         logger.finest("Entering method setNeedsPlanningRecursive() for "+getDebugDescription());
         needsPlanning = p;
-        
+
         Iterator<Goal> git = getSubGoalIterator();
         while (git!=null && git.hasNext()) {
             Goal g = git.next();
@@ -212,8 +212,8 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * Returns the relativeWeight this goal has been weighted with by its parent.
      * </p><p>
      * NOTE: In many cases, you will want to use {@link #getAbsoluteWeight()} instead.
-     * 
-     * @return The relative weight {@link #relativeWeight} of this goal          
+     *
+     * @return The relative weight {@link #relativeWeight} of this goal
      */
     public float getWeight() {
         return relativeWeight;
@@ -221,9 +221,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Gets the weight of the parent goal, or 1 if there is no parent goal.
-     * 
-     * @return The absolute weight [0;1] of the parent goal, or 1 if a parent goal does not exist          
-     */         
+     *
+     * @return The absolute weight [0;1] of the parent goal, or 1 if a parent goal does not exist
+     */
     public float getParentWeight() {
         if (parentGoal == null) {
             //we must be a direct goal of our AIPlayer
@@ -236,23 +236,23 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Returns the absolute weight of this goal.
      * </p><p>
-     * The absolute weight is the weight of this goal in relation to the {@link AIPlayer}.          
+     * The absolute weight is the weight of this goal in relation to the {@link AIPlayer}.
      * This is used when making requests, to allow the AIPlayer to find the
      * "most important" request.
-     * 
+     *
      * @return The absolute weight [0;1] of this goal
-     */              
+     */
     public float getAbsoluteWeight() {
         return getParentWeight() * relativeWeight;
     }
 
     /**
-     * Sets a relative weight for this goal.    
+     * Sets a relative weight for this goal.
      * Each Goal is weighted by its parent goal.
      * The parent should assure that the sum of weights given to its subgoals is =1
-     * 
-     * @param w A relative weight, should be in range [0;1]          
-     */               
+     *
+     * @param w A relative weight, should be in range [0;1]
+     */
     public void setWeight(float w) {
         relativeWeight = w;
     }
@@ -262,17 +262,17 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * subgoals add up to 1.
      * </p><p>
      * NOTE: This allows for a small margin of error (+/- 0.05),
-     * to avoid recalculating too often.               
-     */     
+     * to avoid recalculating too often.
+     */
     public void normalizeSubGoalWeights() {
         float sumWeights = 0f;
-        
+
         Iterator<Goal> git = getSubGoalIterator();
         while (git!=null && git.hasNext()) {
             Goal g = git.next();
             sumWeights += g.getWeight();
         }
-        
+
         //allow for a small rounding or other error margin before normalizing
         if (sumWeights>0f && (sumWeights<0.95f || sumWeights>1.05f)) {
             git = getSubGoalIterator();
@@ -299,12 +299,12 @@ public abstract class Goal extends AIObject implements GoalConstants {
 //      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
 //      * means that {@link #plan()} will be called again during the turn,
 //      * the Goal will be able to request again.
-//      * 
-//      * @param ut The {@link UnitType} we'd like to request           
+//      *
+//      * @param ut The {@link UnitType} we'd like to request
 //      */
 //     protected void requestUnit(UnitType ut) {
 //         int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
-//         
+//
 //         //TODO: Uncomment after AIPlayer.addUnitWish() has been written.
 //         //player.addUnitWish(this, ut, getAbsoluteWeight(), turnsWithoutUnit);
 //     }
@@ -318,20 +318,20 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * of this goal, and the number of turns since a unit request has last been granted.
      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
      * </p><p>
-     * TODO: {@link AIPlayer#addUnitWish(Goal,GoodsType,int,float,int)}; should add
+     * TODO: AIPlayer#addUnitWish(Goal,GoodsType,int,float,int); should add
      * requests to a set-like structure, so that there's only one active request
      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
      * means that {@link #plan()} will be called again during the turn,
      * the Goal will be able to request again.
-     * 
+     *
      * @param gt The {@link GoodsType} we're requesting a worker for.
      * @param minProduction The minimum a unit needs to produce to be considered.
      * Should be 0 if any worker will do, or the value of
      * {@link UnitType#getProductionFor(GoodsType,int)} if an existing worker
-     * unit is supposed to be replaced.     
+     * unit is supposed to be replaced.
      */
     protected void requestWorker(GoodsType gt, int minProduction) {
-        
+
         //TODO: Uncomment after AIPlayer.addWorkerWish() has been written.
         //int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
         //player.addWorkerWish(this, gt, minProduction, getAbsoluteWeight(), turnsWithoutUnit);
@@ -343,10 +343,10 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * by the parent goal, or by a subgoal that no longer needs the unit.
      * </p><p>
      * Possible TODO: If the unit we're requesting is a high-interest one,
-     * such as a Galleon, {@link AIUnit#setLoaningGoal()} may be used to
+     * such as a Galleon, AIUnit#setLoaningGoal() may be used to
      * signal that this unit may _only_ be moved to subgoals, or back to
      * {@link AIPlayer}, but not further up the hierarchy or to any other requesting Goal.
-     * 
+     *
      * @param u The {@link AIUnit} being added to this goal
      */
     public void addUnit(AIUnit u) {
@@ -362,9 +362,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * Adds a unit to the parent goal.
      * If this goal doesn't have a parent goal,
      * the unit will be added to {@link AIPlayer} instead.
-     * 
-     * @param u The {@link AIUnit} to be added to the parent     
-     */                   
+     *
+     * @param u The {@link AIUnit} to be added to the parent
+     */
     protected void addUnitToParent(AIUnit u) {
         logger.finest("Entering method addUnitToParent() for "+getDebugDescription()+" with unit: "+u.getId());
         if (parentGoal != null) {
@@ -382,9 +382,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * </p><p>
      * This recursively checks its subgoals, if there's no match among the own units.
      * </p><p>
-     * Possible TODO: Check whether {@link AIUnit#isOnLoan()} - in which case, we mustn't
-     * yield a unit unless it's the {@link AIPlayer} that requests.     
-     * 
+     * Possible TODO: Check whether AIUnit#isOnLoan() - in which case, we mustn't
+     * yield a unit unless it's the {@link AIPlayer} that requests.
+     *
      * @param ut The {@link UnitType} wanted by the parent
      * @param o The {@link AIObject} (should be AIPlayer or another Goal) calling this
      * @return true if this goal or one of its subgoals can yield the specified {@link UnitType}, false otherwise
@@ -409,11 +409,11 @@ public abstract class Goal extends AIObject implements GoalConstants {
         //None found among subgoals
         return false;
     }
-    
+
     /**
      * Returns the absolute weight of the unit which would be yielded by {@link #yieldUnit(UnitType,AIObject)}.
      * This is the same as {@link #getAbsoluteWeight()} of the yielding goal.
-     * 
+     *
      * @param ut The {@link UnitType} wanted by the parent
      * @param o The {@link AIObject} (should be AIPlayer or another Goal) calling this
      * @return The absolute weight ([0;1]) of the goal currently owning
@@ -427,7 +427,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         //weights should normally be in range [0;1]
         //if there is a matching unit, this will be overwritten
         float unitWeight = 99f;
-        
+
         Iterator<AIUnit> uit = getOwnedAIUnitsIterator();
         while (uit.hasNext()) {
             AIUnit u = uit.next();
@@ -447,14 +447,14 @@ public abstract class Goal extends AIObject implements GoalConstants {
         }
         return unitWeight;
     }
-     
+
     /**
      * Removes a unit from the goal, potentially from a subgoal,
      * and yields it to the caller.
      * </p><p>
      * Returned unit should be the one with minimum absolute weight,
      * see {@link #getYieldedUnitWeight(UnitType,AIObject)}.
-     * 
+     *
      * @param ut The {@link UnitType} wanted by the parent
      * @param o The {@link AIObject} (should be AIPlayer or another Goal) calling this
      * @return The {@link AIUnit} with minimal absolute weight.
@@ -465,7 +465,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         AIUnit yieldedUnit = null;
         boolean isOwnUnit = false;
 
-        
+
         Iterator<AIUnit> uit = getOwnedAIUnitsIterator();
         while (uit.hasNext()) {
             AIUnit u = uit.next();
@@ -491,7 +491,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
             removeUnit(yieldedUnit);
             needsPlanning = true;
         }
-        return yieldedUnit;    
+        return yieldedUnit;
     }
 
     /**
@@ -499,31 +499,32 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * An AIUnit is supposed to be invalid if it no longer contains a valid Unit.
      * This may be the case if the Unit has been removed from the game between turns.
      * </p><p>
-     * NOTE: The assumption here is that {@link AIUnit#isValid()} will return true
+     * NOTE: The assumption here is that AIUnit#isValid() will return true
      * as long as the {@link net.sf.freecol.common.model.Unit} wrapped in it exists.
-     */          
+     */
     protected void validateOwnedUnits() {
         Iterator<AIUnit> uit = getOwnedAIUnitsIterator();
         while (uit.hasNext()) {
             AIUnit u = uit.next();
             if (!(u.getGoal()==this)) {
-                logger.warning("Goal "+getGoalDescription()+" owns unit with another goal: "+u.getGoal().getGoalDescription());
+                logger.warning("Goal "+ getGoalDescription() + " owns unit with another goal: "
+                               + u.getGoal().getGoalDescription());
                 removeUnit(u);
             }
             //TODO: Uncomment after AIUnit.isValid() has been written.
             //if (!u.isValid()) {
             //    removeUnit(u);
             //}
-        }    
+        }
     }
 
     /**
      * Returns a string describing just this goal.
-     * An implementing class may override this method to add specialized information.          
+     * An implementing class may override this method to add specialized information.
      * Used by {@link #getDebugDescription()}.
-     * 
+     *
      * @return a string describing this goal
-     */ 
+     */
     public String getGoalDescription() {
         String goalName = getClass().toString();
         goalName = goalName.substring(goalName.lastIndexOf('.') + 1,goalName.length()-4);
@@ -533,14 +534,14 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Build and return a string describing this goal including its parent goal.
      * Used by "Display AI-missions" in debug mode.
-     * 
+     *
      * @return a string describing this goal
-     */    
+     */
     public String getDebugDescription() {
         String descr = "";
-        
+
         //if goal has parent goal, add that as well
-        //no recursive call, to avoid lengthy descriptions        
+        //no recursive call, to avoid lengthy descriptions
         if (parentGoal!=null) {
             descr = parentGoal.getGoalDescription() + ">>";
         }
@@ -550,7 +551,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "aiGoal"
      */
     public static String getXMLElementTagName() {
@@ -563,39 +564,39 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Since internal implementation details may vary,
      * each Goal will define an iterator over all of its units.
-     * 
+     *
      * @return An Iterator over all {@link AIUnit} currently managed by this goal.
-     */          
+     */
     protected abstract Iterator<AIUnit> getOwnedAIUnitsIterator();
-    
+
     /**
      * Since internal implementation details may vary,
      * each Goal will define an iterator over all of its subgoals.
-     * 
+     *
      * @return An Iterator over all currently existing subgoals.
      */
     protected abstract Iterator<Goal> getSubGoalIterator();
 
     /**
-     * Ensures that a unit moved to another Goal is properly removed from this.    
+     * Ensures that a unit moved to another Goal is properly removed from this.
      * If a unit is removed from this goal via {@link #yieldUnit(UnitType,AIObject)},
-     * or if the Unit contained in the {@link AIUnit} no longer is valid,    
+     * or if the Unit contained in the {@link AIUnit} no longer is valid,
      * this method is called to clean up any remaining references to the unit.
      * </p><p>
      * Any implementation of this will need to iterate over all AIUnit object
      * references used by this goal, and remove those that equal the given parameter.
-     * 
-     * @param u The AIUnit supposed to be removed from this goal.          
-     */     
+     *
+     * @param u The AIUnit supposed to be removed from this goal.
+     */
     protected abstract void removeUnit(AIUnit u);
 
     /**
      * This is the method that actually does the planning for this goal.
-     * 
+     *
      * It should contain:
      * <ul>
      * <li>calling {@link #validateOwnedUnits()} to remove AIUnits no longer
-     * containing a valid unit</li>     
+     * containing a valid unit</li>
      * <li>putting units on the {@link #availableUnitsList} to work
      *   <ul><li>eventually by adding it to one of the subgoals, or</li>
      *   <li>by adding it back to the {@link AIPlayer}, or</li>
@@ -606,13 +607,13 @@ public abstract class Goal extends AIObject implements GoalConstants {
      *   <li>cancelling those with isFinished()==true</li>
      *   <li>setting new weights using {@link #setWeight(float)}</li></ul></li>
      * <li>setting our own isFinished status</li>
-     * </ul>          
-     */     
+     * </ul>
+     */
     protected abstract void plan();
 
     /**
      * Writes this object to an XML stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -621,7 +622,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Reads information for this object from an XML stream.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
@@ -634,22 +635,22 @@ public abstract class Goal extends AIObject implements GoalConstants {
  *
  * Assuming the AIPlayer has a set of goals...
  * At the start of a turn, it will call
- * 
+ *
  *    setNeedsPlanningRecursive(true);
- *    
+ *
  * for all its goals. This will set all goals in a state of needing a check.
  * After that, it will iterate through its goals in a WHILE-loop:
- * 
+ *
  *    boolean furtherPlanning = true;
  *    while (furtherPlanning) {
  *        FOR ALL GOALS g DO {
  *            g.doPlanning();
  *        }
- * 
+ *
  *        SATISFY_UNIT_REQUESTS();
- *        HANDLE_REMAINING_REQUESTS(); 
- *   
- *        furtherPlanning = false;  
+ *        HANDLE_REMAINING_REQUESTS();
+ *
+ *        furtherPlanning = false;
  *        FOR ALL GOALS g DO {
  *            furtherPlanning = (furtherPlanning || g.needsPlanning());
  *        }
@@ -657,15 +658,15 @@ public abstract class Goal extends AIObject implements GoalConstants {
  *
  * The first FOR-loop will recursively reach all existing goals and plan()
  * each of them once, bottom-up.
- *  
+ *
  * After that, unit requests from the goals will have piled up.
  * SATISFY_UNIT_REQUESTS() will try to satisfy as many as possible,
  * in order of importance, by using the units that were created between turns
  * or that have been given back by other goals.
- * 
+ *
  * HANDLE_REMAINING_REQUESTS() will try to do something about remaining requests,
- * for example by buying/building new units, setting up new goals etc. 
- *  
+ * for example by buying/building new units, setting up new goals etc.
+ *
  * This, as well as goals called later during this process moving a unit to a former goal,
  * may have set one or more of the goals to needsPlanning=true. In the second FOR-loop,
  * we check whether this is the case, to eventually repeat the process.

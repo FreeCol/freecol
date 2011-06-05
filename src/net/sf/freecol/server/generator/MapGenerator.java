@@ -25,7 +25,7 @@ public interface MapGenerator {
      *                or ocean on a given tile. This array also
      *                specifies the size of the map that is going
      *                to be created.
-     * @see Map
+     * @see net.sf.freecol.common.model.Map
      */
     public abstract void createEmptyMap(Game game, boolean[][] landMap);
 

@@ -40,7 +40,7 @@ public abstract class Wish extends ValuedAIObject {
     private static final Logger logger = Logger.getLogger(Wish.class.getName());
 
     protected Location destination = null;
-    
+
     /**
     * The <code>Transportable</code> which will realize the wish,
     * or <code>null</code> if no <code>Transportable</code> has
@@ -64,14 +64,14 @@ public abstract class Wish extends ValuedAIObject {
     * Creates a new <code>Wish</code> from the given XML-representation.
     *
     * @param aiMain The main AI-object.
-    * @param element The root element for the XML-representation 
+    * @param element The root element for the XML-representation
     *       of a <code>Wish</code>.
     */
     public Wish(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>Wish</code> from the given XML-representation.
      *
@@ -84,7 +84,7 @@ public abstract class Wish extends ValuedAIObject {
         super(aiMain, in.getAttributeValue(null, "ID"));
         readFromXML(in);
     }
-    
+
 
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.
@@ -93,13 +93,13 @@ public abstract class Wish extends ValuedAIObject {
     public boolean shouldBeStored() {
         return (transportable != null);
     }
-    
+
     /**
     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
     * @param transportable The <code>Transportable</code> which should
     *        realize this wish.
     * @see #getTransportable
-    * @see WishRealizationMission
+    * @see net.sf.freecol.server.ai.mission.WishRealizationMission
     */
     public void setTransportable(Transportable transportable) {
         this.transportable = transportable;
@@ -111,7 +111,7 @@ public abstract class Wish extends ValuedAIObject {
     * @return The <code>Transportable</code> which will realize this wish,
     *         or <code>null</code> if none has been assigned.
     * @see #setTransportable
-    * @see WishRealizationMission
+    * @see net.sf.freecol.server.ai.mission.WishRealizationMission
     */
     public Transportable getTransportable() {
         return transportable;

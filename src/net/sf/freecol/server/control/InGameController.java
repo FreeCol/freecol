@@ -230,7 +230,6 @@ public final class InGameController extends Controller {
      * @param stance The new <code>Stance</code>.
      * @param otherPlayer The <code>Player</code> wrt which the stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
-     * @return A <code>ChangeSet</code> encapsulating the resulting changes.
      */
     public void changeStance(Player player, Stance stance,
                              Player otherPlayer, boolean symmetric) {
@@ -1403,7 +1402,6 @@ public final class InGameController extends Controller {
      * Decline to investigate strange mounds.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to that is investigating.
      * @param tile The <code>Tile</code> where the mounds are.
      * @return An <code>Element</code> encapsulating this action.
      */

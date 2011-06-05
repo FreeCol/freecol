@@ -52,15 +52,15 @@ import org.w3c.dom.Element;
 
 /**
  * Objects of this class contains AI-information for a single {@link Unit}.
- * 
+ *
  * <br>
  * <br>
- * 
+ *
  * The method {@link #doMission(Connection)} is called once each turn, by
  * {@link AIPlayer#startWorking()}, to perform the assigned
  * <code>Mission</code>. Most of the methods in this class just delegates the
  * call to that mission.
- * 
+ *
  * @see Mission
  */
 public class AIUnit extends AIObject implements Transportable {
@@ -83,7 +83,7 @@ public class AIUnit extends AIObject implements Transportable {
      * The goal this AIUnit belongs to,
      * if one has been assigned.
      */
-    private Goal goal = null;              
+    private Goal goal = null;
 
     /**
      * The dynamic part of the transport priority.
@@ -100,7 +100,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param unit The unit to make an {@link AIObject} for.
      */
@@ -114,7 +114,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an XML-representation
      *            of this object.
@@ -126,7 +126,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -139,7 +139,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIUnit</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param id The unique ID of this object.
      */
@@ -154,7 +154,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
-     * 
+     *
      * @return The <code>Unit</code>.
      */
     public Unit getUnit() {
@@ -163,7 +163,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Aborts the given <code>Wish</code>.
-     * 
+     *
      * @param w The <code>Wish</code> to be aborted.
      */
     public void abortWish(Wish w) {
@@ -179,7 +179,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Gets the <code>Locatable</code> which should be transported.
-     * 
+     *
      * @return The <code>Locatable</code>.
      */
     public Locatable getTransportLocatable() {
@@ -189,7 +189,7 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Returns the source for this <code>Transportable</code>. This is
      * normally the location of the {@link #getTransportLocatable locatable}.
-     * 
+     *
      * @return The source for this <code>Transportable</code>.
      */
     public Location getTransportSource() {
@@ -197,11 +197,13 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Returns the destination for this <code>Transportable</code>. This can
-     * either be the target {@link Tile} of the transport or the target for the
-     * entire <code>Transportable</code>'s mission. The target for the
-     * tansport is determined by {@link TransportMission} in the latter case.
-     * 
+     * Returns the destination for this <code>Transportable</code>.
+     * This can either be the target {@link
+     * net.sf.freecol.common.model.Tile} of the transport or the
+     * target for the entire <code>Transportable</code>'s mission. The
+     * target for the tansport is determined by {@link
+     * TransportMission} in the latter case.
+     *
      * @return The destination for this <code>Transportable</code>.
      */
     public Location getTransportDestination() {
@@ -215,7 +217,7 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Gets the priority of transporting this <code>Transportable</code> to
      * it's destination.
-     * 
+     *
      * @return The priority of the transport.
      */
     public int getTransportPriority() {
@@ -240,12 +242,12 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Gets the carrier responsible for transporting this
      * <code>Transportable</code>.
-     * 
+     *
      * @return The <code>AIUnit</code> which has this
      *         <code>Transportable</code> in it's transport list. This
      *         <code>Transportable</code> has not been scheduled for transport
      *         if this value is <code>null</code>.
-     * 
+     *
      */
     public AIUnit getTransport() {
         return transport;
@@ -254,12 +256,12 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Sets the carrier responsible for transporting this
      * <code>Transportable</code>.
-     * 
+     *
      * @param transport The <code>AIUnit</code> which has this
      *            <code>Transportable</code> in it's transport list. This
      *            <code>Transportable</code> has not been scheduled for
      *            transport if this value is <code>null</code>.
-     * 
+     *
      */
     public void setTransport(AIUnit transport) {
         AIUnit oldTransport = this.transport;
@@ -284,7 +286,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Gets the mission this unit has been assigned.
-     * 
+     *
      * @return The <code>Mission</code>.
      */
     public Mission getMission() {
@@ -293,7 +295,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Checks if this unit has been assigned a mission.
-     * 
+     *
      * @return <code>true</code> if this unit has a mission.
      */
     public boolean hasMission() {
@@ -302,7 +304,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Assignes a mission to unit. The dynamic priority is reset.
-     * 
+     *
      * @param mission The new <code>Mission</code>.
      */
     public void setMission(Mission mission) {
@@ -316,7 +318,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Performs the mission this unit has been assigned.
-     * 
+     *
      * @param connection The <code>Connection</code> to use when communicating
      *            with the server.
      */
@@ -337,7 +339,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Returns the ID of this <code>AIObject</code>.
-     * 
+     *
      * @return The same ID as the <code>Unit</code> this <code>AIObject</code>
      *         controls.
      */
@@ -373,7 +375,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Writes this object to an XML stream.
-     * 
+     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
@@ -403,7 +405,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Reads information for this object from an XML stream.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
@@ -469,7 +471,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "aiUnit"
      */
     public static String getXMLElementTagName() {

@@ -34,11 +34,11 @@ import net.sf.freecol.common.resources.ResourceMapping;
 public class FreeColTcFile extends FreeColModFile {
 
     public static final String DIRECTORY = "rules";
-    
+
     /**
      * Opens the given file for reading.
-     * 
-     * @param id The file to load.
+     *
+     * @param file The file to load.
      * @throws IOException if thrown while opening the file.
      */
     public FreeColTcFile(final File file) {
@@ -47,7 +47,7 @@ public class FreeColTcFile extends FreeColModFile {
 
     /**
      * Opens the file with the given name for reading.
-     * 
+     *
      * @param id The id of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
@@ -91,7 +91,7 @@ public class FreeColTcFile extends FreeColModFile {
       Don't attempt this before specification handling is sorted out.
     public ResourceMapping getDefaultResourceMapping() throws Exception {
         Specification.createSpecification(getSpecificationInputStream());
-            
+
         ResourceMapping map = new ResourceMapping();
         String key, value, keyPrefix, urlPrefix, urlSuffix, roleId, shortId;
 

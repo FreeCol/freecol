@@ -41,13 +41,14 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *  The name of a properties file that contains information about
      *  the saved game, such as the size of the map, the date and time
      *  it was started, and so on. The map size is used in the {@link
-     *  MapGeneratorOptionsDialog}, for example.
+     *  net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
+     *  for example.
      */
     public static final String SAVEGAME_PROPERTIES = "savegame.properties";
 
     /**
-     * The name of the file that contains the {@link ClientOptions}
-     * saved with the game.
+     * The name of the file that contains the {@link
+     * net.sf.freecol.client.ClientOptions} saved with the game.
      */
     public static final String CLIENT_OPTIONS = "client-options.xml";
 
@@ -55,7 +56,8 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * The name of the image file that contains the map thumbnail,
      * i.e. a view of the game map as seen by the owner of the game
      * when saving. The thumbnail image is used by the {@link
-     * MapGeneratorOptionsDialog}, in particular.
+     * net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog}, in
+     * particular.
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";
 
