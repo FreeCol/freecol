@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -348,9 +349,20 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private <T extends FreeColGameObjectType> DefaultMutableTreeNode
                        buildSubTree(PanelType panelType, List<T> types, double scale) {
         DefaultMutableTreeNode parent = new DefaultMutableTreeNode(new ColopediaTreeItem(panelType));
+        int width = 0;
+        int height = 0;
         for (FreeColGameObjectType type : types) {
             Image image = getLibrary().getImage(type, scale);
-            parent.add(buildItem(type, new ImageIcon(image)));
+            width = Math.max(image.getWidth(null), width);
+            height = Math.max(image.getHeight(null), height);
+        }
+        for (FreeColGameObjectType type : types) {
+            BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Image image = getLibrary().getImage(type, scale);
+            int x = (width - image.getWidth(null)) / 2;
+            int y = (height - image.getHeight(null)) / 2;
+            centeredImage.getGraphics().drawImage(image, x, y, null);
+            parent.add(buildItem(type, new ImageIcon(centeredImage)));
         }
         nodeMap.put(panelType.toString(), parent);
         return parent;
