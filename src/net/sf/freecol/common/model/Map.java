@@ -329,7 +329,6 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, PathType)
      * @see Unit#findPath(Tile)
      * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
@@ -364,7 +363,6 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, PathType)
      * @see Unit#findPath(Tile)
      * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
@@ -1382,7 +1380,6 @@ public class Map extends FreeColGameObject {
          * Gets the position adjacent to a given position, in a given
          * direction.
          *
-         * @param position The position
          * @param direction The direction (N, NE, E, etc.)
          * @return Adjacent position
          */
@@ -1392,7 +1389,7 @@ public class Map extends FreeColGameObject {
              int y = this.y + ((this.y & 1) != 0 ?
                                    direction.getOddDY() : direction.getEvenDY());
              return new Position(x, y);
-    }
+         }
 
         /**
          * Gets the distance in tiles between two map positions. With an isometric
@@ -1413,12 +1410,10 @@ public class Map extends FreeColGameObject {
                 r++;
             } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
                 r--;
-    }
+            }
 
             return Math.max(Math.abs(ay - by + r), Math.abs(r));
         }
-
-
     }
 
     /**

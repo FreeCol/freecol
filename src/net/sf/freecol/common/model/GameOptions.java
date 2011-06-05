@@ -22,10 +22,10 @@ package net.sf.freecol.common.model;
 
 
 /**
-* Keeps track of the available game options. New options should be added to
-* {@link #addDefaultOptions()} and each option should be given an unique
-* identifier (defined as a constant in this class).
-*/
+ * Keeps track of the available game options. New options must be
+ * added to the {@link Specification} and each option should be given
+ * an unique identifier (defined as a constant in this class).
+ */
 public class GameOptions {
 
     /** The amount of money each player will receive before the game starts. */

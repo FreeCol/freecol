@@ -801,7 +801,7 @@ public class Unit extends FreeColGameObject
      * for the offenceAgainst and defenceAgainst modifiers.
      *
      * @param id a <code>String</code> value
-     * @param id a <code>Ownable</code> value
+     * @param ownable a <code>Ownable</code> value
      * @return a <code>Modifier</code> value
      */
     public Set<Modifier> getModifierSet(String id, Ownable ownable) {
@@ -1053,7 +1053,6 @@ public class Unit extends FreeColGameObject
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see Map#findPath(Tile, Tile, PathType)
      * @see Map#findPath(Unit, Tile , Tile)
      * @exception IllegalArgumentException if <code>end == null</code>
      */
@@ -1203,7 +1202,6 @@ public class Unit extends FreeColGameObject
      * @param target The <code>Tile</code> this <code>Unit</code> will move
      *            onto.
      * @return The cost of moving this unit onto the given <code>Tile</code>.
-     * @see Tile#getMoveCost
      */
     public int getMoveCost(Tile target) {
         return getMoveCost(getTile(), target, getMovesLeft());
@@ -1222,7 +1220,6 @@ public class Unit extends FreeColGameObject
      *            onto.
      * @param ml The amount of moves this Unit has left.
      * @return The cost of moving this unit onto the given <code>Tile</code>.
-     * @see Tile#getMoveCost
      */
     public int getMoveCost(Tile from, Tile target, int ml) {
         // Remember to also change map.findPath(...) if you change anything
@@ -2701,7 +2698,7 @@ public class Unit extends FreeColGameObject
     /**
      * Check if this unit can build a colony.  Does not consider whether
      * the tile where the unit is located is suitable,
-     * @see #Player.canClaimToFoundSettlement.
+     * @see Player#canClaimToFoundSettlement(Tile)
      *
      * @return <code>true</code> if this unit can build a colony.
      */

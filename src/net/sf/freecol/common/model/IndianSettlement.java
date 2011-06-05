@@ -867,8 +867,6 @@ public class IndianSettlement extends Settlement {
      *
      * @param type The type of goods for sale.
      * @param amount The amount of goods for sale.
-     * @param required The amount of goods required to arm fully.
-     * @param need The number of sets of equipment the settlement could use.
      * @return A price for the goods.
      */
     private int getMilitaryGoodsPriceToBuy(GoodsType type, int amount) {

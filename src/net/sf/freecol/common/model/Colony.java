@@ -1179,7 +1179,7 @@ public class Colony extends Settlement implements Nameable {
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
-     * @param goodsTypes <code>GoodsType</code> values
+     * @param goodsType <code>GoodsType</code> values
      * @return an <code>int</code> value
      */
     public int getConsumptionOf(GoodsType goodsType) {
@@ -1754,7 +1754,7 @@ public class Colony extends Settlement implements Nameable {
      * adds a message about insufficient production for a building
      *
      * @param warnings where to add the warnings
-     * @param building for this building
+     * @param info the <code>ProductionInfo</code> for this building
      */
     private void addInsufficientProductionMessage(List<StringTemplate> warnings, ProductionInfo info) {
         if (info != null && !info.getProduction().isEmpty()) {
@@ -1947,9 +1947,9 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns the capacity of this colony's warehouse. All goods above this
-     * limit, except Food, will be removed when calling
-     * {@link #newTurn}.
+     * Returns the capacity of this colony's warehouse. All goods
+     * above this limit, except Food, will be removed by the
+     * end-of-turn processing.
      *
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */

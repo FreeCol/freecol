@@ -240,7 +240,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Set the amount of goods in this container.
      *
      * @param goodsType The <code>GoodsType</code> to set the amount of.
-     * @param amount The new amount.
+     * @param newAmount The new amount.
      */
     public void setAmount(GoodsType goodsType, int newAmount) {
         if (newAmount == 0) {

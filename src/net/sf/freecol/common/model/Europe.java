@@ -35,11 +35,13 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 /**
- * Represents Europe in the game. Each <code>Player</code> has it's own
- * <code>Europe</code>. <p/> <br>
- * <br>
- * <p/> Europe is the place where you can {@link #recruit} and {@link #train}
- * new units. You may also sell/buy goods.
+ * Represents Europe in the game. Each <code>Player</code> has it's
+ * own <code>Europe</code>.
+ *
+ * <br><br>
+ *
+ * <p>In Europe, you can recruit, train and purchase new units. You
+ * can also equip units, as well as sell and buy goods.
  */
 public class Europe extends FreeColGameObject implements Location, Ownable, Named {
 

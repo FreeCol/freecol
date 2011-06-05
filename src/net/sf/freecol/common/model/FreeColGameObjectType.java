@@ -257,7 +257,6 @@ public class FreeColGameObjectType extends FreeColObject {
      * Reads a common child object, i.e. an Ability or Modifier.
      *
      * @param in a <code>XMLStreamReader</code> value
-     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {

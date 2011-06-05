@@ -96,7 +96,7 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * Return the type of this FoundingFather.
      *
-     * @param A new <code>FoundingFatherType</code>.
+     * @param type A new <code>FoundingFatherType</code>.
      */
     public void setType(FoundingFatherType type) {
         this.type = type;
