@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProductionCache {
 
@@ -77,21 +78,15 @@ public class ProductionCache {
         netProduction.incrementCount(bells, amount);
 
         for (Consumer consumer : colony.getConsumers()) {
-            boolean surplusOnly = consumer.hasAbility("model.ability.consumeOnlySurplusProduction");
+            Set<Modifier> modifier = consumer.getModifierSet("model.modifier.consumeOnlySurplusProduction");
             List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
-                /*
-                 * Ugly work-around: We want the warehouse to store
-                 * food in order to make it unavailable for horse
-                 * production. On the other hand, we do not want the
-                 * food to become unavailable for the production of
-                 * new colonists. Any solution?
-                 */
-                AbstractGoods surplus = (consumer instanceof BuildQueue)
-                    ? new AbstractGoods(g.getType(), netProduction.getCount(g.getType()))
-                    : new AbstractGoods(production.get(g.getType()));
-                if (!surplusOnly) {
+                AbstractGoods surplus = new AbstractGoods(production.get(g.getType()));
+                if (modifier.isEmpty()) {
                     surplus.setAmount(surplus.getAmount() + getGoodsCount(g.getType()));
+                } else {
+                    surplus.setAmount((int) FeatureContainer.applyModifierSet(surplus.getAmount(),
+                                                                              null, modifier));
                 }
                 goods.add(surplus);
             }
@@ -116,9 +111,6 @@ public class ProductionCache {
             }
             for (AbstractGoods g : info.getConsumption()) {
                 netProduction.incrementCount(g.getType().getStoredAs(), -g.getAmount());
-            }
-            for (AbstractGoods g : info.getStorage()) {
-                netProduction.incrementCount(g.getType().getStoredAs(), g.getAmount());
             }
             productionAndConsumption.put(consumer, info);
         }

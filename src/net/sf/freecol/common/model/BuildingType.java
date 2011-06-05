@@ -236,43 +236,33 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
      */
     public void fixup09x() {
         try {
-            if (hasAbility("model.ability.autoProduction")
-                && !hasAbility("model.ability.avoidExcessProduction")) {
-                // old-style auto-production
-                Ability ability = new Ability("model.ability.avoidExcessProduction");
-                addAbility(ability);
-                getFeatureContainer().removeModifiers("model.goods.horses");
-                float value = ("model.building.country".equals(getId()))
-                    ? 50 : 25;
-                Modifier modifier = new Modifier("model.modifier.breedingDivisor",
-                                                 this, value,
-                                                 Modifier.Type.ADDITIVE);
-                addModifier(modifier);
-                getSpecification().addModifier(modifier);
-                modifier = new Modifier("model.modifier.breedingFactor",
-                                        this, 2, Modifier.Type.ADDITIVE);
-                addModifier(modifier);
-                getSpecification().addModifier(modifier);
-            }
-        } catch(Exception e) {
-            // no such ability, we don't care
-        }
-        try {
-            if (!getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
-                if (getModifierSet("model.modifier.storeSurplus").isEmpty()) {
-                    Modifier modifier = new Modifier("model.modifier.storeSurplus",
-                                                     0.5f,
-                                                     Modifier.Type.MULTIPLICATIVE);
-                    Scope scope = new Scope();
-                    scope.setType("model.goods.food");
-                    List<Scope> scopes = new ArrayList<Scope>();
-                    scopes.add(scope);
-                    modifier.setScopes(scopes);
+            if (hasAbility("model.ability.autoProduction")) {
+                if (!hasAbility("model.ability.avoidExcessProduction")) {
+                    // old-style auto-production
+                    Ability ability = new Ability("model.ability.avoidExcessProduction");
+                    addAbility(ability);
+                    getFeatureContainer().removeModifiers("model.goods.horses");
+                    float value = ("model.building.country".equals(getId()))
+                        ? 50 : 25;
+                    Modifier modifier = new Modifier("model.modifier.breedingDivisor",
+                                                     this, value,
+                                                     Modifier.Type.ADDITIVE);
                     addModifier(modifier);
+                    getSpecification().addModifier(modifier);
+                    modifier = new Modifier("model.modifier.breedingFactor",
+                                            this, 2, Modifier.Type.ADDITIVE);
+                    addModifier(modifier);
+                    getSpecification().addModifier(modifier);
+                }
+                if (getModifierSet("model.modifier.consumeOnlySurplusProduction").isEmpty()) {
+                    Modifier modifier = new Modifier("model.modifier.consumeOnlySurplusProduction",
+                                                     this, 0.5f, Modifier.Type.MULTIPLICATIVE);
+                    addModifier(modifier);
+                    getSpecification().addModifier(modifier);
                 }
             }
         } catch(Exception e) {
-            // no such modifier, we don't care
+            // no such ability, we don't care
         }
     }
 

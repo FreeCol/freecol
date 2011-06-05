@@ -1134,10 +1134,6 @@
     </building-type>
     <building-type id="model.building.depot" workplaces="0" priority="750">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
-      <ability id="model.ability.consumeOnlySurplusProduction"/>
-      <modifier id="model.modifier.storeSurplus" type="multiplicative" value="0.5">
-        <scope type="model.goods.food"/>
-      </modifier>
     </building-type>
     <building-type id="model.building.warehouse" extends="model.building.depot"
                    upgradesFrom="model.building.depot" upkeep="5">
@@ -1155,8 +1151,8 @@
       <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
       <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
       <modifier id="model.goods.horses" type="multiplicative" value="1.0"/>
+      <modifier id="model.modifier.consumeOnlySurplusProduction" type="multiplicative" value="0.5" />
       <ability id="model.ability.autoProduction"/>
-      <ability id="model.ability.consumeOnlySurplusProduction"/>
       <ability id="model.ability.avoidExcessProduction"/>
       <ability id="model.ability.build">
         <scope type="model.equipment.horses"/>

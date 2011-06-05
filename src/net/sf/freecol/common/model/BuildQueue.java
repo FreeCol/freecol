@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Set;
 
 
 public class BuildQueue<T extends BuildableType> implements Consumer {
@@ -239,6 +240,14 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     public boolean hasAbility(String id) {
         return "model.ability.consumeAllOrNothing".equals(id);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Modifier> getModifierSet(String id) {
+        return Collections.emptySet();
+    }
+
 
     public String toString() {
         String result = "BuildQueue:";

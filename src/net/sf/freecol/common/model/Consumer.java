@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -80,16 +81,26 @@ public interface Consumer {
 
     /**
      * Returns whether the consumer has the ability with the given
-     * id. The two abilities most relevant to consumers are
+     * id. The ability most relevant to consumers is
      * "consumeAllOrNothing", which implies that the consumer will not
-     * consume any goods if its requirements can not be met (used by
-     * the Colony when building), as well as
-     * "consumeOnlySurplusProduction", which implies that the consumer
-     * does not consume stored goods (used by the country and stables).
+     * consume any goods if its requirements can not be met and is
+     * used by BuildQueues.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id);
+
+
+    /**
+     * Returns the modifier set with the given id. The modifier most
+     * relevant to consumers is "consumeOnlySurplusProduction", which
+     * implies that the consumer does not consume stored goods (used
+     * by the country and stables).
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public Set<Modifier> getModifierSet(String id);
 
 }

@@ -26,11 +26,6 @@ import java.util.List;
 public class ProductionInfo {
 
     /**
-     * The goods moved to storage.
-     */
-    private List<AbstractGoods> storage = new ArrayList<AbstractGoods>();
-
-    /**
      * The maximum production possible given unlimited input.
      */
     private List<AbstractGoods> maximumProduction = new ArrayList<AbstractGoods>();
@@ -184,36 +179,8 @@ public class ProductionInfo {
         maximumConsumption.add(goods);
     }
 
-    /**
-     * Get the <code>Storage</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
-    public final List<AbstractGoods> getStorage() {
-        return storage;
-    }
-
-    /**
-     * Set the <code>Storage</code> value.
-     *
-     * @param newStorage The new Storage value.
-     */
-    public final void setStorage(final List<AbstractGoods> newStorage) {
-        this.storage = newStorage;
-    }
-
-    /**
-     * Describe <code>addStorage</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
-    public void addStorage(AbstractGoods goods) {
-        storage.add(goods);
-    }
-
     public String toString() {
         StringBuilder result = new StringBuilder();
-        append(result, "Storage", storage);
         append(result, "Production", production);
         append(result, "Consumption", consumption);
         append(result, "Maximum Production", maximumProduction);

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -636,15 +637,6 @@ public class Building extends FreeColGameObject
                 }
             }
         }
-        for (AbstractGoods goods : input) {
-            for (Modifier modifier : buildingType.getFeatureContainer()
-                     .getModifierSet("model.modifier.storeSurplus", goods.getType())) {
-                int amount = (modifier.getType() == Modifier.Type.ADDITIVE) ? 0 : goods.getAmount();
-                amount = (int) Math.min(amount, modifier.applyTo(amount));
-                result.addStorage(new AbstractGoods(goods.getType(), amount));
-                result.addConsumption(new AbstractGoods(goods.getType(), amount));
-            }
-        }
         return result;
     }
 
@@ -899,10 +891,7 @@ public class Building extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean consumes(GoodsType goodsType) {
-        return goodsType == getGoodsInputType()
-            || !(buildingType.getFeatureContainer()
-                 .getModifierSet("model.modifier.storeSurplus", goodsType)
-                 .isEmpty());
+        return goodsType == getGoodsInputType();
     }
 
     /**
@@ -915,26 +904,6 @@ public class Building extends FreeColGameObject
         GoodsType inputType = getGoodsInputType();
         if (inputType != null) {
             result.add(new AbstractGoods(inputType, 0));
-        }
-        result.addAll(getStoredGoods());
-        return result;
-    }
-
-    /**
-     * Returns a list of GoodsTypes this Building stores.
-     *
-     * @return a <code>List</code> value
-     */
-    public List<AbstractGoods> getStoredGoods() {
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
-        for (Modifier modifier : buildingType.getFeatureContainer()
-                 .getModifierSet("model.modifier.storeSurplus")) {
-            for (Scope scope : modifier.getScopes()) {
-                GoodsType type = getSpecification().getGoodsType(scope.getType());
-                if (type != null) {
-                    result.add(new AbstractGoods(type, Integer.MAX_VALUE));
-                }
-            }
         }
         return result;
     }
@@ -950,6 +919,12 @@ public class Building extends FreeColGameObject
         return buildingType.getPriority();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Modifier> getModifierSet(String id) {
+        return buildingType.getModifierSet(id);
+    }
 
     // Serialization
 
