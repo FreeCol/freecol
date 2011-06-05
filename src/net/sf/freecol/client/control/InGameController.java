@@ -675,11 +675,11 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    /** Creates at least one autosave game file of the currently played game 
-     *  in the autosave directory. Does nothing if there is no game running.
+    /**
+     * Creates at least one autosave game file of the currently played
+     * game in the autosave directory. Does nothing if there is no
+     * game running.
      *
-     * @param game <code>Game</code> game to save
-     * @param player <code>Player</code> current player
      */
     private void autosave_game () {
         Game game = freeColClient.getGame();
@@ -4642,10 +4642,10 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Server query-response for changing a work location.
+     * Server query-response for changing a build queue.
      *
-     * @param unit The <code>Unit</code> to change the workLocation of.
-     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @param colony the Colony
+     * @param buildQueue the new values for the build queue
      * @return True if the server interaction succeeded.
      */
     private boolean askSetBuildQueue(Colony colony,

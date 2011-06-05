@@ -212,7 +212,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    /**
+    /*
      * distributes {@code value}, amount the number of {@code pocketCount}
      *
      * @param value
@@ -233,7 +233,7 @@ public final class CompactLabourReport extends ReportPanel {
         return pockets;
     }
      */
-    
+
     private JLabel createEmptyLabel() {
         JLabel empty = new JLabel("");
         empty.setBorder(CELLBORDER);
@@ -277,7 +277,7 @@ public final class CompactLabourReport extends ReportPanel {
         row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.onLand", row);
         row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.atSea", row);
 
-        reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")), 
+        reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
                         "cell " + 1 + " " + row + " " + COLUMNS + " " + 1);
     }
 

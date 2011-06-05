@@ -600,7 +600,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * canvas. Saves the current size and position of the panel to the
      * ClientOptions, which are included in the savegame file.
      *
-     * @see Canvas#remove()
+     * @see Canvas#remove(Component)
      */
     public void notifyClose() {
         firePropertyChange("closing", false, true);

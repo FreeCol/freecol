@@ -882,12 +882,12 @@ public final class GUI {
             }
         }
         Position position = new Map.Position(focus.getX() - diffLeft, focus.getY() - diffUp);
-        
+
         if (!freeColClient.getGame().getMap().isValid(position))
             return null;
-        
+
         return freeColClient.getGame().getMap().getTile(position);
-        
+
     }
 
     /**
@@ -1566,13 +1566,13 @@ public final class GUI {
     *                        of the unit which is activated
     * @see #getSelectedTile
     * @see #setActiveUnit
-    * @see #setFocus(Map.Position)
+    * @see #setFocus(Tile)
     */
     public void setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         Tile oldTile = this.selectedTile;
 
         selectedTile = newTileToSelect;
-        
+
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             if (noActiveUnitIsAt(selectedTile)) {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
@@ -1632,7 +1632,7 @@ public final class GUI {
         updateMapDisplayVariables();
     }
 
- 
+
 
     /**
      * Starts the unit-selection-cursor blinking animation.
@@ -1641,7 +1641,7 @@ public final class GUI {
 
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (!blinkingMarqueeEnabled) 
+                if (!blinkingMarqueeEnabled)
                     return;
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     Tile tile = getActiveUnit().getTile();
@@ -1892,7 +1892,7 @@ public final class GUI {
         double bar = size / 3.0;
         double inset = 0.0;
         double kludge = 0.0;
-        
+
         GeneralPath circle = new GeneralPath();
         GeneralPath cross = new GeneralPath();
         if (expertMissionary) {
@@ -1908,7 +1908,7 @@ public final class GUI {
         cross.lineTo(offset, extent - padding - inset);
         cross.moveTo(offset - bar, padding + bar + inset);
         cross.lineTo(offset + bar + 1, padding + bar + inset);
-        
+
         // draw everything
         BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
@@ -2569,7 +2569,7 @@ public final class GUI {
                 logger.warning("Requested to draw unknown settlement type.");
             }
         }
-        
+
     }
 
     /**
@@ -3006,7 +3006,7 @@ public final class GUI {
         int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
         int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
                     (int) (UNIT_OFFSET * lib.getScalingFactor());
-        
+
         return new Point(unitX, unitY);
     }
 
@@ -3205,7 +3205,7 @@ public final class GUI {
      * displayed at the center.
      */
     private void positionMap() {
-        if (focus != null) 
+        if (focus != null)
             positionMap(focus);
     }
 

@@ -68,7 +68,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      */
@@ -77,8 +77,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         gui = g;
         scrollThread = null;
     }
-    
-    
+
+
     /**
      * This method can be called to make sure the map is loaded
      * There is no point executing mouse events if the map is not loaded
@@ -92,7 +92,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * Invoked when a mouse button was clicked.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseClicked(MouseEvent e) {
@@ -113,7 +113,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * Invoked when the mouse enters the component.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseEntered(MouseEvent e) {
@@ -122,17 +122,17 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * Invoked when the mouse exits the component.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseExited(MouseEvent e) {
         // Ignore for now.
     }
-    
+
 
     /**
      * Invoked when a mouse button was pressed.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mousePressed(MouseEvent e) {
@@ -178,7 +178,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * Invoked when a mouse button was released.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseReleased(MouseEvent e) {
@@ -186,10 +186,10 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             return;
         }
         JComponent component = (JComponent)e.getSource();
-        
+
         MapEditorController controller = canvas.getClient().getMapEditorController();
-        boolean isTransformActive = controller.getMapTransform() != null; 
-        
+        boolean isTransformActive = controller.getMapTransform() != null;
+
         if(startPoint == null){
         	startPoint = e.getPoint();
         }
@@ -197,20 +197,20 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         	oldPoint = e.getPoint();
         }
         drawBox(component, startPoint, oldPoint);
-        if (gui.getFocus() != null) {	
+        if (gui.getFocus() != null) {
             Tile start = gui.convertToMapTile(startPoint.x, startPoint.y);
             Tile end = start;
             //Optimization, only check if the points are different
             if(startPoint.x != oldPoint.x || startPoint.y != oldPoint.y){
             	end = gui.convertToMapTile(oldPoint.x, oldPoint.y);
             }
-            
+
             // no option selected, just center map
             if(!isTransformActive){
             	gui.setFocus(end);
             	return;
             }
-            
+
             // find the area to transform
             int min_x, max_x, min_y, max_y;
             if (start.getX() < end.getX()) {
@@ -227,7 +227,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 min_y = end.getY();
                 max_y = start.getY();
             }
-            
+
             // apply transformation to all tiles in the area
             Tile t = null;
             for (int x = min_x; x <= max_x; x++) {
@@ -255,15 +255,15 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     /**
      * Invoked when the mouse has been moved.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
         if (getMap() == null) {
             return;
         }
-		
-        if (e.getComponent().isEnabled() && 
+
+        if (e.getComponent().isEnabled() &&
             canvas.getClient().getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
             auto_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
@@ -271,17 +271,17 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             scrollThread = null;
         }
     }
-	
+
     /**
      * Invoked when the mouse has been dragged.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
         if (getMap() == null) {
             return;
         }
-		
+
         JComponent component = (JComponent)e.getSource();
         drawBox(component, startPoint, oldPoint);
         oldPoint = e.getPoint();
@@ -295,7 +295,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         canvas.refresh();
     }
-	
+
     private void drawBox(JComponent component, Point startPoint, Point endPoint) {
         if(startPoint == null || endPoint == null){
         	return;
@@ -303,13 +303,13 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         if(startPoint.distance(endPoint) == 0){
         	return;
         }
-        
+
         // only bother to draw if a transformation is active
         MapEditorController controller = canvas.getClient().getMapEditorController();
-        if(controller.getMapTransform() == null){ 
+        if(controller.getMapTransform() == null){
         	return;
         }
-    	
+
     	Graphics2D graphics = (Graphics2D) component.getGraphics ();
         graphics.setColor(Color.WHITE);
         int x = Math.min(startPoint.x, endPoint.x);
@@ -322,7 +322,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
     private void auto_scroll(int x, int y){
         scroll(x, y, AUTO_SCROLLSPACE);
     }
-	
+
     private void drag_scroll(int x, int y){
         scroll(x, y, DRAG_SCROLLSPACE);
     }
@@ -331,14 +331,14 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         if (getMap() == null) {
             return;
         }
-		
+
         /*
          * if (y < canvas.getMenuBarHeight()) { if (scrollThread != null) {
          * scrollThread.stopScrolling(); scrollThread = null; } return; } else
          * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
          * canvas.getMenuBarHeight(); }
          */
-		 
+
         Direction direction;
         if ((x < scrollspace) && (y < scrollspace)) {
             // Upper-Left
@@ -399,8 +399,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
         /**
          * The constructor to use.
-         * 
-         * @param m The Map that needs to be scrolled.
+         *
          * @param g The GUI that holds information such as screen resolution.
          */
         public ScrollThread(GUI g) {
@@ -411,7 +410,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
         /**
          * Sets the direction in which this ScrollThread will scroll.
-         * 
+         *
          * @param d The direction in which this ScrollThread will scroll.
          */
         public void setDirection(Direction d) {

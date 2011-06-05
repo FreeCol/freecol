@@ -51,7 +51,7 @@ public class UnloadAction extends MapboardAction {
      *
      * @param freeColClient The main controller object for the client.
      * @param unit an <code>Unit</code> value
-     * @see GUI#getActiveUnit()
+     * @see net.sf.freecol.client.gui.GUI#getActiveUnit()
      */
     public UnloadAction(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, id);

@@ -28,7 +28,7 @@ import net.sf.freecol.client.FreeColClient;
  * An action for changing view mode between move units mode and view terrain
  * mode
  *
- * @see ViewMode
+ * @see net.sf.freecol.client.gui.ViewMode
  */
 public class ToggleViewModeAction extends MapboardAction {
 

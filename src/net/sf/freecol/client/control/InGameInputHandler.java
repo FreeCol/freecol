@@ -422,8 +422,9 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handles a "setCurrentPlayer"-message.
      *
-     * @param setCurrentPlayerElement The element (root element in a DOM-parsed
-     *            XML tree) that holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *            tree) that holds all the information.
+     * @return an <code>Element</code> value
      */
     private Element setCurrentPlayer(Element element) {
         Game game = getGame();
