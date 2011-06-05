@@ -62,9 +62,10 @@ public class NationOptions extends FreeColObject {
 
 
     /**
-     * Describe <code>getDefaults</code> method here.
+     * Creates a new <code>NationOptions</code> instance.
      *
-     * @return a <code>NationOptions</code> value
+     * @param specification a <code>Specification</code> value
+     * @param advantages an <code>Advantages</code> value
      */
     public NationOptions(Specification specification, Advantages advantages) {
         this.specification = specification;

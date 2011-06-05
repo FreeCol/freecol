@@ -1406,7 +1406,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The resource if it is exhausted by this call (so it can
      *     be used in a message), otherwise null.
      * @see ResourceType
-     * @see ColonyTile#newTurn
      */
     public Resource expendResource(GoodsType goodsType, UnitType unitType, Settlement settlement) {
         if (hasResource() && tileItemContainer.getResource().getQuantity() != -1) {

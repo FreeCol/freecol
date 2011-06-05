@@ -253,7 +253,7 @@ public class StringTemplate extends FreeColObject {
      * StringTemplate is of type TEMPLATE.
      *
      * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
+     * @param object a <code>FreeColObject</code> value
      * @return a <code>StringTemplate</code> value
      */
     public StringTemplate addName(String key, FreeColObject object) {

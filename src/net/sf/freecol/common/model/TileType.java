@@ -338,7 +338,7 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * Applies the difficulty level to this TileType.
      *
-     * @param difficulty difficulty level to apply
+     * @param difficultyLevel difficulty level to apply
      */
     @Override
     public void applyDifficultyLevel(OptionGroup difficultyLevel) {

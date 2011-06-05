@@ -553,7 +553,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
-     * @param goodsTypes <code>GoodsType</code> values
+     * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
      */
     public int getConsumptionOf(GoodsType goodsType) {
@@ -564,6 +564,13 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return Math.max(0, result);
     }
 
+    /**
+     * Returns the number of goods of all given types used by the
+     * settlement each turn.
+     *
+     * @param goodsTypes <code>GoodsType</code> values
+     * @return an <code>int</code> value
+     */
     public int getConsumptionOf(List<GoodsType> goodsTypes) {
         int result = 0;
         if (goodsTypes != null) {

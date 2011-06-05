@@ -143,16 +143,9 @@ public final class Specification {
 
     /**
      * Creates a new Specification object by loading it from the
-     * specification.xml.
+     * given <code>InputStream</code>.
      *
-     * This method is protected, since only one Specification object may exist.
-     * This is due to static links from type {@link Goods} to the most important
-     * GoodsTypes. If another specification object is created these links would
-     * not work anymore for the previously created specification.
-     *
-     * To get hold of an Specification object use the static method
-     * {@link #getSpecification()} which returns a singleton instance of the
-     * Specification class.
+     * @param in an <code>InputStream</code> value
      */
     public Specification(InputStream in) {
         this();

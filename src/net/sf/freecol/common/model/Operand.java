@@ -268,7 +268,7 @@ public class Operand extends Scope {
      * given Settlement, and <code>null</code> otherwise. Currently,
      * this only works for Colonies.
      *
-     * @param Settlement a <code>Settlement</code> value
+     * @param settlement a <code>Settlement</code> value
      * @return an <code>Integer</code> value
      */
     public Integer getValue(Settlement settlement) {

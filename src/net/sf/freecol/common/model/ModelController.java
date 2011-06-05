@@ -33,8 +33,6 @@ package net.sf.freecol.common.model;
 *
 * <br><br>
 *
-* Any {@link FreeColGameObject} may get access to the <code>ModelController</code>
-* by using {@link Game#getModelController getGame().getModelController()}.
 */
 public interface ModelController {
 

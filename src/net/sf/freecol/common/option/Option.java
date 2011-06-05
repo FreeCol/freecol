@@ -46,7 +46,6 @@ public interface Option {
     /**
     * Returns a textual representation of this object.
     * @return The name of this <code>Option</code>.
-    * @see #getShortDescription
     */
     public String toString() ;
 

@@ -201,7 +201,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Sets the sea support status.
      *
-     * @param seaSupport The new sea support status.
+     * @param supportSea The new sea support status.
      */
     public void setSupportSea(boolean supportSea) {
         this.supportSea = supportSea;
@@ -470,7 +470,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * Gets a additions to the colonial forces.
      *
      * @param random The <code>Random</code> number source to use.
-     * @param sea If the addition should be a naval unit.
+     * @param naval If the addition should be a naval unit.
      * @return An addition to the colonial forces.
      */
     public List<AbstractUnit> getSupport(Random random, boolean naval) {

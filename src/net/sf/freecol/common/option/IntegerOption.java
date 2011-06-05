@@ -131,7 +131,7 @@ public class IntegerOption extends AbstractOption<Integer> {
 
     /**
      * Converts the given <code>String</code> to an Integer and calls
-     * {@link #setValue(int)}.
+     * {@link #setValue(Integer)}.
      *
      * <br>
      * <br>

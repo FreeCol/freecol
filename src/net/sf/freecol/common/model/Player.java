@@ -1454,7 +1454,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * player's information about the tile.
      *
      * @param tile The <code>Tile</code> to set explored.
-     * @see Tile#updatePlayerExploredTile(Player)
+     * @see Tile#updatePlayerExploredTile(Player, boolean)
      */
     public void setExplored(Tile tile) {
         logger.warning("Implemented by ServerPlayer");
@@ -2716,7 +2716,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Set this player as having made initial contact with another player.
      * Always start with PEACE, which can go downhill fast.
      *
-     * @param player The <code>Player</code> to set contact with.
+     * @param player1 a <code>Player</code> value
+     * @param player2 a <code>Player</code> value
      */
     public static void makeContact(Player player1, Player player2) {
         player1.stance.put(player2.getId(), Stance.PEACE);
@@ -2779,7 +2780,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds to the current amount of liberty this player has.
      *
-     * @param liberty The additional amount of liberty.
+     * @param amount The additional amount of liberty.
      */
     public void incrementLiberty(int amount) {
         setLiberty(Math.max(0, getLiberty() + amount));

@@ -42,14 +42,12 @@ public class ProductionCache {
 
 
     /**
-     * Returns a data structure containing all relevant information
+     * Updates a data structure containing all relevant information
      * about the production and consumption of the colony. This
      * includes the production of all colony tiles and buildings, as
      * well as the consumption of all units, buildings and build
-     * queues. The method has no side-effects.
+     * queues. The method has no effects on other objects.
      *
-     * @return a map using units, work locations and build queues as
-     * keys, and <code>ProductionInfo</code> objects as values
      */
     private synchronized void update() {
         if (upToDate) return; // nothing to do

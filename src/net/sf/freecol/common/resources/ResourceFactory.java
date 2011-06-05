@@ -41,12 +41,12 @@ public class ResourceFactory {
      * <code>URI</code>.
      */
     private static Map<URI, WeakReference<Resource>> resources = new WeakHashMap<URI, WeakReference<Resource>>();
-    
+
 
     /**
      * Gets the resource with the given <code>URI</code> from
      * {@link #resources}.
-     * 
+     *
      * @param uri The <code>URI</code> to identify a previously created
      *      <code>Resource</code>.
      * @return The <code>Resource</code> identified by the given
@@ -63,11 +63,11 @@ public class ResourceFactory {
         }
         return null;
     }
-    
+
     /**
      * Returns an instance of <code>Resource</code> with the
      * given <code>URI</code> as the parameter.
-     * 
+     *
      * @param uri The <code>URI</code> used when creating the
      *      instance.
      * @return A previously created instance of <code>Resource</code>
