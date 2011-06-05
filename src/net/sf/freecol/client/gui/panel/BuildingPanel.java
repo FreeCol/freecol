@@ -88,6 +88,13 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         } else {
             AbstractGoods output = info.getProduction().get(0);
             if (output.getAmount() > 0) {
+                if (building.hasAbility("model.ability.avoidExcessProduction")) {
+                    int stored = building.getColony().getGoodsCount(output.getType());
+                    int capacity = building.getColony().getWarehouseCapacity();
+                    if (output.getAmount() + stored > capacity) {
+                        output = new AbstractGoods(output.getType(), capacity - stored);
+                    }
+                }
                 AbstractGoods maximum = info.getMaximumProduction().get(0);
                 productionOutput = new ProductionLabel(output, maximum, parent);
                 add(productionOutput, "span, align center");
