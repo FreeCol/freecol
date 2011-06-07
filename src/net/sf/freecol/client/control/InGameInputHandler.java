@@ -675,12 +675,12 @@ public final class InGameInputHandler extends InputHandler {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                          StringTemplate.template("indianDemand.gold.text")
-                                                          .addName("%nation%", nation)
-                                                          .addName("%colony%", colony.getName())
-                                                          .addAmount("%amount%", message.getGold()),
-                                                          "indianDemand.gold.yes",
-                                                          "indianDemand.gold.no").confirm();
+                    StringTemplate.template("indianDemand.gold.text")
+                    .addName("%nation%", nation)
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", message.getGold()),
+                    "indianDemand.gold.yes",
+                    "indianDemand.gold.no").confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
@@ -707,21 +707,21 @@ public final class InGameInputHandler extends InputHandler {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (goods.getType().isFoodType()) {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                              StringTemplate.template("indianDemand.food.text")
-                                                              .addName("%nation%", nation)
-                                                              .addName("%colony%", colony.getName())
-                                                              .addAmount("%amount%", goods.getAmount()),
-                                                              "indianDemand.food.yes", "indianDemand.food.no")
-                        .confirm();
+                        StringTemplate.template("indianDemand.food.text")
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", goods.getAmount()),
+                        "indianDemand.food.yes",
+                        "indianDemand.food.no").confirm();
                 } else {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                              StringTemplate.template("indianDemand.other.text")
-                                                              .addName("%nation%", nation)
-                                                              .addName("%colony%", colony.getName())
-                                                              .addAmount("%amount%", goods.getAmount())
-                                                              .addName("%goods%", goods),
-                                                              "indianDemand.other.yes", "indianDemand.other.no")
-                        .confirm();
+                        StringTemplate.template("indianDemand.other.text")
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", goods.getAmount())
+                        .add("%goods%", goods.getType().getNameKey()),
+                        "indianDemand.other.yes",
+                        "indianDemand.other.no").confirm();
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
@@ -750,7 +750,7 @@ public final class InGameInputHandler extends InputHandler {
                         .addName("%amount%", amount);
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                         "indianDemand.other.text", colony, unit)
+                        "indianDemand.other.text", colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", amount)
