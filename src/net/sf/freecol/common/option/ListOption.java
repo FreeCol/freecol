@@ -155,6 +155,7 @@ public class ListOption<T> extends AbstractOption<List<T>> {
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
+        value.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(VALUE_TAG)) {
                 // TODO: remove support for old format
