@@ -1382,10 +1382,8 @@ public final class InGameController implements NetworkConstants {
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
             name = canvas.showInputDialog(colony.getTile(),
-                                          StringTemplate.key("renameColony.text"),
-                                          colony.getName(),
-                                          "renameColony.yes", "renameColony.no",
-                                          true);
+                StringTemplate.key("renameColony.text"), colony.getName(),
+                "renameColony.yes", "renameColony.no", true);
             if (name == null) {
                 // User cancelled, 0-length invalid.
                 return;
@@ -1402,10 +1400,8 @@ public final class InGameController implements NetworkConstants {
         } else if (object instanceof Unit) {
             Unit unit = (Unit) object;
             name = canvas.showInputDialog(unit.getTile(),
-                                          StringTemplate.key("renameUnit.text"),
-                                          unit.getName(),
-                                          "renameUnit.yes", "renameUnit.no",
-                                          false);
+                StringTemplate.key("renameUnit.text"), unit.getName(),
+                "renameUnit.yes", "renameUnit.no", false);
             if (name == null) return; // User cancelled, 0-length clears name.
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
@@ -1484,15 +1480,16 @@ public final class InGameController implements NetworkConstants {
                                           null);
             name = player.getSettlementName();
         }
-        name = canvas.showInputDialog(tile, StringTemplate.key("nameColony.text"),
-                                      name, "nameColony.yes", "nameColony.no",
-                                      true);
+        name = canvas.showInputDialog(tile,
+            StringTemplate.key("nameColony.text"), name,
+            "nameColony.yes", "nameColony.no", true);
         if (name == null) return; // User cancelled, 0-length invalid.
 
         if (player.getSettlement(name) != null) {
             // Colony name must be unique.
-            canvas.showInformationMessage(tile, StringTemplate.template("nameColony.notUnique")
-                                          .addName("%name%", name));
+            canvas.showInformationMessage(tile,
+                StringTemplate.template("nameColony.notUnique")
+                .addName("%name%", name));
             return;
         }
 
@@ -2081,10 +2078,8 @@ public final class InGameController implements NetworkConstants {
         if (reply.hasAttribute("nameNewLand")) {
             String defaultName = reply.getAttribute("nameNewLand");
             String newLandName = canvas.showInputDialog(tile,
-                                                        StringTemplate.key("newLand.text"),
-                                                        defaultName,
-                                                        "newLand.yes", null,
-                                                        true);
+                StringTemplate.key("newLand.text"), defaultName,
+                "newLand.yes", null, true);
             // Default out on null, 0-length invalid.
             if (newLandName == null) newLandName = defaultName;
 
@@ -2142,9 +2137,9 @@ public final class InGameController implements NetworkConstants {
             String newRegionType = reply.getAttribute("regionType");
             String defaultName = reply.getAttribute("discoverRegion");
             String newRegionName = canvas.showInputDialog(unit.getTile(),
-                                                          StringTemplate.template("nameRegion.text")
-                                                          .addName("%name%", newRegionType),
-                                                          defaultName, "ok", null, true);
+                StringTemplate.template("nameRegion.text")
+                .addName("%name%", newRegionType),
+                defaultName, "ok", null, true);
             if (newRegionName == null || "".equals(newRegionName)) {
                 newRegionName = defaultName;
             }
