@@ -263,26 +263,19 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             String optionId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             Option option = getOption(optionId);
             if (option == null) {
-                // TODO: remove alternate tags. When were they last used?
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new OptionGroup(in));
-                } else if (IntegerOption.getXMLElementTagName().equals(optionType)
-                           || "integer-option".equals(optionType)) {
+                } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new IntegerOption(in));
-                } else if (BooleanOption.getXMLElementTagName().equals(optionType)
-                           || "boolean-option".equals(optionType)) {
+                } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new BooleanOption(in));
-                } else if (RangeOption.getXMLElementTagName().equals(optionType)
-                           || "range-option".equals(optionType)) {
+                } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new RangeOption(in));
-                } else if (SelectOption.getXMLElementTagName().equals(optionType)
-                           || "select-option".equals(optionType)) {
+                } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new SelectOption(in));
-                } else if (LanguageOption.getXMLElementTagName().equals(optionType)
-                           || "language-option".equals(optionType)) {
+                } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new LanguageOption(in));
-                } else if (FileOption.getXMLElementTagName().equals(optionType)
-                           || "file-option".equals(optionType)) {
+                } else if (FileOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new FileOption(in));
                 } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
                     addNewOption(new PercentageOption(in));
