@@ -483,7 +483,7 @@
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-location-ability id="model.ability.dressMissionary" value="true"/>
+      <required-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
     <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>

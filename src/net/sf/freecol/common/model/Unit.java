@@ -769,6 +769,15 @@ public class Unit extends FreeColGameObject
             result.addAll(getOwner().getFeatureContainer()
                           .getAbilitySet(id, equipmentType, getGame().getTurn()));
         }
+        // Location abilities may apply
+        // TODO: extend this to all locations? May simplify code.
+        if (getColony() != null) {
+            result.addAll(getColony().getFeatureContainer()
+                          .getAbilitySet(id, unitType, getGame().getTurn()));
+        } else if (isInEurope()) {
+            result.addAll(getOwner().getEurope().getFeatureContainer()
+                          .getAbilitySet(id, unitType, getGame().getTurn()));
+        }
         return FeatureContainer.hasAbility(result);
     }
 
@@ -2111,22 +2120,6 @@ public class Unit extends FreeColGameObject
         for (Entry<String, Boolean> entry : equipmentType.getUnitAbilitiesRequired().entrySet()) {
             if (hasAbility(entry.getKey()) != entry.getValue()) {
                 return false;
-            }
-        }
-        if (!equipmentType.getLocationAbilitiesRequired().isEmpty()) {
-            if (isInEurope()) {
-                return true;
-            } else {
-                Colony colony = getColony();
-                if (colony == null) {
-                    return false;
-                } else {
-                    for (Entry<String, Boolean> entry : equipmentType.getLocationAbilitiesRequired().entrySet()) {
-                        if (colony.getFeatureContainer().hasAbility(entry.getKey()) != entry.getValue()) {
-                            return false;
-                        }
-                    }
-                }
             }
         }
         if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {

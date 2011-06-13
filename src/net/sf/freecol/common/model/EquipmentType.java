@@ -65,12 +65,6 @@ public class EquipmentType extends BuildableType {
     private boolean militaryEquipment;
 
     /**
-     * Stores the abilities required of the location where the unit is
-     * to be equipped.
-     */
-    private HashMap<String, Boolean> requiredLocationAbilities = new HashMap<String, Boolean>();
-
-    /**
      * A List containing the IDs of equipment types compatible with this one.
      */
     private List<String> compatibleEquipment = new ArrayList<String>();
@@ -169,15 +163,6 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Returns the abilities required by this Type.
-     *
-     * @return the abilities required by this Type.
-     */
-    public Map<String, Boolean> getLocationAbilitiesRequired() {
-        return requiredLocationAbilities;
-    }
-
-    /**
      * Returns true if this type of equipment is compatible with the
      * given type of equipment.
      *
@@ -271,13 +256,7 @@ public class EquipmentType extends BuildableType {
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         String nodeName = in.getLocalName();
-        if ("required-location-ability".equals(nodeName)) {
-            String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            boolean value = getAttribute(in, VALUE_TAG, true);
-            getLocationAbilitiesRequired().put(abilityId, value);
-            getSpecification().addAbility(abilityId);
-            in.nextTag(); // close this element
-        } else if ("compatible-equipment".equals(nodeName)) {
+        if ("compatible-equipment".equals(nodeName)) {
             String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             compatibleEquipment.add(equipmentId);
             in.nextTag(); // close this element
@@ -310,13 +289,6 @@ public class EquipmentType extends BuildableType {
 
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
-        for (Map.Entry<String, Boolean> entry : getLocationAbilitiesRequired().entrySet()) {
-            out.writeStartElement("required-location-ability");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
-            out.writeAttribute(VALUE_TAG, Boolean.toString(entry.getValue()));
-            out.writeEndElement();
-        }
-
         for (String compatible : compatibleEquipment) {
             out.writeStartElement("compatible-equipment");
             out.writeAttribute(ID_ATTRIBUTE_TAG, compatible);

@@ -85,6 +85,8 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
 
     private Player owner;
 
+    private FeatureContainer featureContainer;
+
 
     /**
      * Constructor for ServerEurope.
@@ -106,6 +108,10 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
 
         recruitPrice = RECRUIT_PRICE_INITIAL;
         recruitLowerCap = LOWER_CAP_INITIAL;
+
+        featureContainer = new FeatureContainer(getSpecification());
+        // TODO: put this in the specification
+        featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
     }
 
     /**
@@ -144,6 +150,26 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
      */
     public Europe(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Describe <code>hasAbility</code> method here.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    @Override
+    public boolean hasAbility(String id) {
+        return featureContainer.hasAbility(id);
+    }
+
+    /**
+     * Describe <code>getFeatureContainer</code> method here.
+     *
+     * @return a <code>FeatureContainer</code> value
+     */
+    public FeatureContainer getFeatureContainer() {
+        return featureContainer;
     }
 
     /**
@@ -546,6 +572,14 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         Specification spec = getSpecification();
+
+        // TODO: remove 0.10.0 compatibility code
+        if (featureContainer == null) {
+            featureContainer = new FeatureContainer(spec);
+            featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
+        }
+        // end compatibility code
+
         for (int index = 0; index < recruitables.length; index++) {
             String unitTypeId = in.getAttributeValue(null, "recruit" + index);
             if (unitTypeId != null) {

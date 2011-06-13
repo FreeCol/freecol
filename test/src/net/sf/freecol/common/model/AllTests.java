@@ -29,11 +29,12 @@ public class AllTests {
         suite.addTestSuite(SpecificationTest.class);
 	//$JUnit-BEGIN$
 	suite.addTestSuite(AbstractUnitTest.class);
+	suite.addTestSuite(BaseCostDeciderTest.class);
 	suite.addTestSuite(BuildingTest.class);
 	suite.addTestSuite(ColonyTest.class);
 	suite.addTestSuite(ColonyProductionTest.class);
 	suite.addTestSuite(CombatTest.class);
-	suite.addTestSuite(BaseCostDeciderTest.class);
+	suite.addTestSuite(EuropeTest.class);
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);
 	suite.addTestSuite(GoodsTest.class);

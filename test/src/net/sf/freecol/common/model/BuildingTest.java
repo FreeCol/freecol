@@ -94,17 +94,25 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
+        Unit unit = colony.getUnitList().get(0);
+        EquipmentType missionary = spec().getEquipmentType("model.equipment.missionary");
+
         BuildingType churchType = spec().getBuildingType("model.building.chapel");
         assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+        assertFalse(unit.hasAbility("model.ability.dressMissionary"));
+        assertFalse(unit.canBeEquippedWith(missionary));
 
         Building church = colony.getBuilding(churchType);
         assertTrue(church != null);
         assertFalse(colony.hasAbility("model.ability.dressMissionary"));
+        assertFalse(unit.hasAbility("model.ability.dressMissionary"));
+        assertFalse(unit.canBeEquippedWith(missionary));
 
         church.upgrade();
         assertTrue(church.getType().hasAbility("model.ability.dressMissionary"));
         assertTrue(colony.hasAbility("model.ability.dressMissionary"));
-
+        assertTrue(unit.hasAbility("model.ability.dressMissionary"));
+        assertTrue(unit.canBeEquippedWith(missionary));
     }
 
     public void testCanAddToBuilding() {
