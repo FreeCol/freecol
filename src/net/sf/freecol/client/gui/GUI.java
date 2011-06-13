@@ -1364,13 +1364,11 @@ public final class GUI {
      *
      * @param direction a <code>Direction</code> value
      */
-    public void moveTileCursor(Direction direction){
-        if(selectedTile != null){
+    public void moveTileCursor(Direction direction) {
+        if (selectedTile != null) {
             Tile newTile = selectedTile.getNeighbourOrNull(direction);
-            if(newTile != null)
-                setSelectedTile(newTile, false);
-        }
-        else{
+            if (newTile != null) setSelectedTile(newTile, false);
+        } else {
             logger.warning("selectedTile is null");
         }
     }
@@ -1388,10 +1386,11 @@ public final class GUI {
      */
     public boolean onScreen(Tile tileToCheck) {
         repositionMapIfNeeded();
-        return tileToCheck.getY() - 2 > topRow && tileToCheck.getY() + 4 < bottomRow
-            && tileToCheck.getX() - 1 > leftColumn && tileToCheck.getX() + 2 < rightColumn;
+        return tileToCheck.getY() - 2 > topRow
+            && tileToCheck.getY() + 4 < bottomRow
+            && tileToCheck.getX() - 1 > leftColumn
+            && tileToCheck.getX() + 2 < rightColumn;
     }
-
 
     /**
      * Describe <code>restartBlinking</code> method here.
@@ -1429,15 +1428,17 @@ public final class GUI {
     * is located.
     *
     * @param activeUnit The new active unit.
+    * @return True if the focus was set.
     * @see #setSelectedTile(Tile, boolean)
     */
-    public void setActiveUnit(Unit activeUnit) {
+    public boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
+        boolean ret = false;
 
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
-            return;
+            return ret;
         }
 
         if (activeUnit != null && activeUnit.getTile() == null) {
@@ -1458,17 +1459,25 @@ public final class GUI {
         updateGotoPathForActiveUnit();
 
         // The user activated a unit
-        if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
+        if (viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE
+            && activeUnit != null) {
             viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
+        }
 
         if (activeUnit != null) {
-            setSelectedTile(activeUnit.getTile(), false);
+            Tile tile = activeUnit.getTile();
+            if (!setSelectedTile(tile, false)
+                || freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
+                setFocus(tile);
+                ret = true;
+            }
         } else {
             freeColClient.getActionManager().update();
             freeColClient.updateMenuBar();
-
             redrawMapControls();
         }
+        return ret;
     }
 
 
@@ -1564,12 +1573,14 @@ public final class GUI {
     * @param newTileToSelect The <code>Tile</code>, the tile to be selected
     * @param clearGoToOrders Use <code>true</code> to clear goto orders
     *                        of the unit which is activated
+    * @return True if the focus was set.
     * @see #getSelectedTile
     * @see #setActiveUnit
     * @see #setFocus(Tile)
     */
-    public void setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
+    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         Tile oldTile = this.selectedTile;
+        boolean ret = false;
 
         selectedTile = newTileToSelect;
 
@@ -1578,19 +1589,20 @@ public final class GUI {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
                     Settlement s = selectedTile.getSettlement();
                     freeColClient.getCanvas().showSettlement(s);
-                    return;
+                    return ret;
                 }
 
                 // else, just select a unit on the selected tile
                 Unit unitInFront = getUnitInFront(selectedTile);
                 if (unitInFront != null) {
-                    setActiveUnit(unitInFront);
+                    ret = setActiveUnit(unitInFront);
                     updateGotoPathForActiveUnit();
                 } else {
                     setFocus(selectedTile);
+                    ret = true;
                 }
-            } else if (activeUnit.getTile() != null &&
-                    activeUnit.getTile().equals(selectedTile)) {
+            } else if (activeUnit.getTile() != null
+                       && activeUnit.getTile().equals(selectedTile)) {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders && activeUnit.getDestination() != null) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
@@ -1604,12 +1616,11 @@ public final class GUI {
 
         redrawMapControls();
 
-        // Check if the gui needs to reposition:
-        ClientOptions options = freeColClient.getClientOptions();
-        if ((!onScreen(selectedTile)
-             && options.getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT))
-            || options.getBoolean(ClientOptions.ALWAYS_CENTER)) {
+        // Check for refocus
+        if (!onScreen(selectedTile) || freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER)) {
             setFocus(selectedTile);
+            ret = true;
         } else {
             if (oldTile != null) {
                 freeColClient.getCanvas().refreshTile(oldTile);
@@ -1619,6 +1630,7 @@ public final class GUI {
                 freeColClient.getCanvas().refreshTile(selectedTile);
             }
         }
+        return ret;
     }
 
 

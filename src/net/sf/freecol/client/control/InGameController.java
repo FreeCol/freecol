@@ -2186,6 +2186,8 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
+                GUI gui = freeColClient.getGUI();
+                if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
             }
         }
     }
