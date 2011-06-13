@@ -261,7 +261,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String optionType = in.getLocalName();
             String optionId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            AbstractOption option = (AbstractOption) getOption(optionId);
+            Option option = getOption(optionId);
             if (option == null) {
                 // TODO: remove alternate tags. When were they last used?
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
