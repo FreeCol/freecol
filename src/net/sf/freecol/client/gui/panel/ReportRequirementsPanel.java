@@ -279,15 +279,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                                     .addName("%unit%", workType)
                                                     .add("%work%", goodsType.getWorkingAsKey())) + " ",
                                  doc.getStyle("regular"));
-                int lastExpertsIndex = misusedExperts.size() - 1;
-                for (int index = 0; index <= lastExpertsIndex; index++) {
-                    Colony colony = misusedExperts.get(index);
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
-                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                    if (index != lastExpertsIndex) {
-                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
-                    }
-                }
+                insertColonyButtons(doc, misusedExperts);
             }
 
             if (!severalExperts.isEmpty()) {
@@ -295,15 +287,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                  "\n" + Messages.message(StringTemplate.template("report.requirements.severalExperts")
                                                          .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
-                int lastExpertsIndex = severalExperts.size() - 1;
-                for (int index = 0; index <= lastExpertsIndex; index++) {
-                    Colony colony = severalExperts.get(index);
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
-                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                    if (index != lastExpertsIndex) {
-                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
-                    }
-                }
+                insertColonyButtons(doc, severalExperts);
             }
 
             if (!canTrainExperts.isEmpty()) {
@@ -311,21 +295,22 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                  "\n" + Messages.message(StringTemplate.template("report.requirements.canTrainExperts")
                                                          .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
-                int lastExpertsIndex = canTrainExperts.size() - 1;
-                for (int index = 0; index <= lastExpertsIndex; index++) {
-                    Colony colony = canTrainExperts.get(index);
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
-                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                    if (index != lastExpertsIndex) {
-                        doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
-                    }
-                }
+                insertColonyButtons(doc, canTrainExperts);
             }
 
         } catch(Exception e) {
             logger.warning(e.toString());
         }
 
+    }
+
+    private void insertColonyButtons(StyledDocument doc, List<Colony> colonies) throws Exception {
+        for (Colony colony : colonies) {
+            StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
+            doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+            doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+        }
+        doc.remove(doc.getLength() - 2, 2);
     }
 
     private void addProductionWarning(StyledDocument doc, Colony colony, GoodsType output, GoodsType input) {
