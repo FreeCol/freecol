@@ -769,8 +769,10 @@ public class Unit extends FreeColGameObject
             result.addAll(getOwner().getFeatureContainer()
                           .getAbilitySet(id, equipmentType, getGame().getTurn()));
         }
-        // Location abilities may apply
-        // TODO: extend this to all locations? May simplify code.
+        // Location abilities may apply. TODO: extend this to all
+        // locations? May simplify code. Units are also Locations,
+        // however, which complicates the issue. We do not want Units
+        // aboard other Units to share the abilities of the carriers.
         if (getColony() != null) {
             result.addAll(getColony().getFeatureContainer()
                           .getAbilitySet(id, unitType, getGame().getTurn()));
