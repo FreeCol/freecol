@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.menu;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -36,12 +36,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FullScreenFrame;
 
 public class FreeColMenuTest implements ActionListener, ItemListener {
     JTextArea output;
     JScrollPane scrollPane;
     String newline = "\n";
-    
+
     public JMenuBar createMenuBar() {
         JMenuBar menuBar = null;
 

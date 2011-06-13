@@ -29,8 +29,8 @@ import javax.swing.JMenuBar;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
+import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.common.model.StringTemplate;
 
 

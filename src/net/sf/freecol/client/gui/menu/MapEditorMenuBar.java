@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui;
+package net.sf.freecol.client.gui.menu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
