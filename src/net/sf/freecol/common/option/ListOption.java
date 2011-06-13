@@ -173,6 +173,20 @@ public class ListOption<T> extends AbstractOption<List<T>> {
 
 
     /**
+     * Debug print helper.
+     *
+     * @return Human-readable description of this ListOption.
+     */
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+        b.append(getId() + "<");
+        for (String s : getValueIds()) b.append(" " + s);
+        b.append(" >");
+        return b.toString();
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      * @return "listOption".
      */

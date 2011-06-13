@@ -307,14 +307,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
 
     /**
-     * Gets the tag name of the root element representing this object.
-     * @return "optionGroup".
-     */
-    public static String getXMLElementTagName() {
-        return "optionGroup";
-    }
-
-    /**
      * Returns the name of this <code>Option</code>.
      *
      * @return The name as provided in the constructor.
@@ -357,4 +349,35 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
+    /**
+     * Debug print helper.
+     *
+     * @return Human-readable description of this OptionGroup.
+     */
+    @Override
+    public String toString() {
+        StringBuilder g = new StringBuilder();
+        g.append(getName() + "<");
+        for (Option o : getOptions()) {
+            g.append(" ");
+            if (o instanceof OptionGroup) {
+                g.append(((OptionGroup)o).toString());
+            } else if (o instanceof ListOption) {
+                g.append(((ListOption)o).toString());
+            } else {
+                g.append(o.getId()); // TODO: add useful toString() to others
+            }
+        }
+        g.append(" >\n");
+        return g.toString();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "optionGroup".
+     */
+    public static String getXMLElementTagName() {
+        return "optionGroup";
+    }
 }

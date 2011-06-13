@@ -479,34 +479,39 @@ public class ClientOptions extends OptionGroup {
     /**
      * Adds the options to this <code>GameOptions</code>.
      */
-    protected void addDefaultOptions() {
-        load(new File(new File(FreeCol.getDataDirectory(), "base"),
-                      "client-options.xml"), false);
+    private void addDefaultOptions() {
+        loadOptions(new File(new File(FreeCol.getDataDirectory(), "base"),
+                "client-options.xml"));
 
         final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
-        final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
-            private Map<String, ModInfo> mods = null;
+        final ListOptionSelector<ModInfo> selector
+            = new ListOptionSelector<ModInfo>() {
+
+            private final Map<String, ModInfo> mods
+                = new HashMap<String, ModInfo>();
+
             private void init() {
-                if (mods == null) {
-                    List<FreeColModFile> fcmfs = Mods.getAllMods();
-                    mods = new HashMap<String, ModInfo>();
-                    for (FreeColModFile f : fcmfs) {
-                        ModInfo modInfo = f.getModInfo();
-                        mods.put(modInfo.getId(), modInfo);
-                    }
+                mods.clear();
+                for (FreeColModFile f : Mods.getAllMods()) {
+                    ModInfo modInfo = f.getModInfo();
+                    mods.put(modInfo.getId(), modInfo);
                 }
             }
+
             public String getId(ModInfo t) {
                 return t.getId();
             }
+
             public ModInfo getObject(String id) {
                 init();
                 return mods.get(id);
             }
+
             public List<ModInfo> getOptions() {
                 init();
                 return new ArrayList<ModInfo>(mods.values());
             }
+
             public String toString(ModInfo t) {
                 return t.getName();
             }
@@ -538,67 +543,81 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Reads the options from the given file.
+     * Loads the options from the given file.
      *
-     * @param loadFile The <code>File</code> to read the
-     *            options from.
+     * @param optionsFile The <code>File</code> to read the options from.
      */
-    public void load(File loadFile) {
-        load(loadFile, true);
-    }
-
-    /**
-     * Reads the options from the given file.
-     *
-     * @param loadFile The <code>File</code> to read the
-     *            options from.
-     * @param update a <code>boolean</code> value
-     */
-    public void load(File loadFile, boolean update) {
-        if (loadFile == null || !loadFile.exists()) {
-            logger.warning("Could not find the client options file.");
-            return;
-        }
-        logger.finest((update ? "Updating" : "Loading") + " client options from " + loadFile.getPath());
+    public void loadOptions(File optionsFile) {
         try {
-            load(new BufferedInputStream(new FileInputStream(loadFile)), update);
-        } catch(FileNotFoundException e) {
-            logger.warning("Could not find the client options file.");
+            loadOptions(new BufferedInputStream(new FileInputStream(optionsFile)));
+        } catch (FileNotFoundException e) {
+            logger.warning("Could not find the client options file: "
+                + optionsFile.getPath());
         }
     }
 
     /**
-     * Reads the options from the given file.
+     * Loads the options from the given stream.
      *
-     * @param in <code>InputStream</code> from XML resource
-     * @param update a <code>boolean</code> value
+     * @param in The <code>InputStream</code> to read the options from.
      */
-    public void load(InputStream in, boolean update) {
+    public void loadOptions(InputStream in) {
+        if (in == null) return;
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in, "UTF-8");
+            XMLStreamReader xsr = XMLInputFactory.newInstance()
+                .createXMLStreamReader(in, "UTF-8");
             xsr.nextTag();
-            if (update) {
-                logger.finest("Updating " + getId());
-                updateFromXML(xsr);
-            } else {
-                logger.finest("Loading " + getId());
-                readFromXML(xsr);
-            }
+            readFromXML(xsr);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while loading options.", e);
+            logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
             try {
-                if (in != null) {
-                    in.close();
-                }
+                in.close();
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception while closing stream.", e);
+                logger.log(Level.WARNING, "Exception when closing stream.", e);
+            }
+        }
+    }
+
+    /**
+     * Updates the options from the given file.
+     *
+     * @param optionsFile The <code>File</code> to read the options from.
+     */
+    public void updateOptions(File optionsFile) {
+        try {
+            updateOptions(new BufferedInputStream(new FileInputStream(optionsFile)));
+        } catch (FileNotFoundException e) {
+            logger.warning("Could not find the client options file: "
+                + optionsFile.getPath());
+        }
+    }
+
+    /**
+     * Updates the options from the given stream.
+     *
+     * @param in The <code>InputStream</code> to read the options from.
+     */
+    public void updateOptions(InputStream in) {
+        try {
+            XMLStreamReader xsr = XMLInputFactory.newInstance()
+                .createXMLStreamReader(in, "UTF-8");
+            xsr.nextTag();
+            updateFromXML(xsr);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception when loading options.", e);
+        } finally {
+            try {
+                if (in != null) in.close();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception when closing stream.", e);
             }
         }
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -609,25 +628,21 @@ public class ClientOptions extends OptionGroup {
                 updateFromXML(in);
             } else {
                 String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                if (idStr == null) {
-                    idStr = in.getLocalName();
-                }
+                if (idStr == null) idStr = in.getLocalName();
                 Option o = getOption(idStr);
-
                 if (o != null) {
                     o.readFromXML(in);
                 } else {
-                    // Normal only if this option is from an old save game:
-                    logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
-
-                    // Ignore the option:
+                    // Ignore this option.  Usually only occurs if the
+                    // option is from an old save game.
                     final String ignoredTag = in.getLocalName();
+                    logger.info("Not updating new option \"" + idStr + "\" ("
+                        + ignoredTag + ") could not be found.");
                     while (in.nextTag() != XMLStreamConstants.END_ELEMENT
-                           || !in.getLocalName().equals(ignoredTag)) {}
+                        || !in.getLocalName().equals(ignoredTag));
                 }
             }
         }
-        // DONE BY while-loop: in.nextTag();
     }
 
 

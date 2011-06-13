@@ -64,10 +64,10 @@ import org.w3c.dom.NodeList;
 
 
 /**
-* The controller responsible for starting a server and
-* connecting to it. {@link PreGameInputHandler} will be set
-* as the input handler when a successful login has been completed,
-*/
+ * The controller responsible for starting a server and
+ * connecting to it. {@link PreGameInputHandler} will be set
+ * as the input handler when a successful login has been completed,
+ */
 public final class ConnectController {
 
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
@@ -351,6 +351,7 @@ public final class ConnectController {
 
     /**
      * Loads a game from the given file.
+     *
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
@@ -360,7 +361,7 @@ public final class ConnectController {
         freeColClient.setMapEditor(false);
 
         class ErrorJob implements Runnable {
-            private final  String  message;
+            private final String message;
             ErrorJob( String message ) {
                 this.message = message;
             }
@@ -389,13 +390,11 @@ public final class ConnectController {
                 defaultPublicServer = false;
             }
             xs.close();
-            try {
-                freeColClient.getClientOptions().load(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS), true);
-                freeColClient.getActionManager().update();
-            } catch(IOException e) {
-                // old savegame format, we don't care
-                logger.info("No saved client options available.");
-            }
+
+            // Reload the client options, including those specific to
+            // this game.
+            freeColClient.loadClientOptions(file);
+
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {

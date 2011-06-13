@@ -59,9 +59,9 @@ public class UnloadAction extends MapboardAction {
     }
 
     private Unit getUnit() {
-        return (unit == null)
-            ? getFreeColClient().getGUI().getActiveUnit()
-            : unit;
+        return (unit != null) ? unit
+            : (getFreeColClient().getGUI() == null) ? null
+            : getFreeColClient().getGUI().getActiveUnit();
     }
 
     /**

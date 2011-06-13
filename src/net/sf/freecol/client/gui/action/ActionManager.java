@@ -41,6 +41,7 @@ public class ActionManager extends OptionGroup {
 
     private FreeColClient freeColClient;
 
+
     /**
      * Creates a new <code>ActionManager</code>.
      *
@@ -48,22 +49,16 @@ public class ActionManager extends OptionGroup {
      */
     public ActionManager(FreeColClient freeColClient) {
         super("actionManager");
-
         this.freeColClient = freeColClient;
-
-        initializeActions();
-        freeColClient.getClientOptions().add(this);
     }
-
 
     /**
      * This method adds all FreeColActions to the OptionGroup. If you
      * implement a new <code>FreeColAction</code>, then you need to
-     * add it in this method. Localization and a possible accelerator
+     * add it in this method.  Localization and a possible accelerator
      * need to be added to the strings file.
-     *
      */
-    private void initializeActions() {
+    public void initializeActions() {
         // keep this list alphabetized.
 
         add(new AboutAction(freeColClient));
@@ -183,8 +178,7 @@ public class ActionManager extends OptionGroup {
     public void update() {
         Iterator<Option> it = iterator();
         while (it.hasNext()) {
-            FreeColAction fa = (FreeColAction) it.next();
-            fa.update();
+            ((FreeColAction) it.next()).update();
         }
     }
 }

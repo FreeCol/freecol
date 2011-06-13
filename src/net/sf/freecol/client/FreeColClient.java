@@ -85,15 +85,14 @@ import net.sf.freecol.server.FreeColServer.GameState;
 import org.w3c.dom.Element;
 
 /**
- * The main control class for the FreeCol client. This class both starts and
- * keeps references to the GUI and the control objects.
+ * The main control class for the FreeCol client.  This class both
+ * starts and keeps references to the GUI and the control objects.
  */
 public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
-    private static FreeColClient instance;
 
-    public static FreeColClient get () {return instance;}
+    private static FreeColClient instance;
 
     /**
      * The space not being used in windowed mode.
@@ -114,7 +113,7 @@ public final class FreeColClient {
     private MapEditorController mapEditorController;
 
 
-    // Gui:
+    // GUI:
     private GraphicsDevice gd;
 
     private JFrame frame;
@@ -142,12 +141,14 @@ public final class FreeColClient {
 
     private boolean isRetired = false;
 
-    /** Indicates if the game has started, has nothing to do with whether or not the
-    client is logged in. */
+    /**
+     * Indicates if the game has started, has nothing to do with
+     * whether or not the client is logged in.
+     */
     private boolean inGame = false;
 
 
-    /** The Server that has been started from the client-GUI. */
+    /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
 
     private boolean windowed;
@@ -163,9 +164,10 @@ public final class FreeColClient {
     public final Worker worker;
 
     /**
-     * Indicated whether or not there is an open connection to the server. This
-     * is not an indication of the existence of a Connection Object, but instead
-     * it is an indication of an approved login to a server.
+     * Indicated whether or not there is an open connection to the
+     * server. This is not an indication of the existence of a
+     * Connection Object, but instead it is an indication of an
+     * approved login to a server.
      */
     private boolean loggedIn = false;
 
@@ -181,55 +183,104 @@ public final class FreeColClient {
      * Creates a new <code>FreeColClient</code>. Creates the control objects
      * and starts the GUI.
      *
-     * @param savegameFile a <code>File</code> value
-     * @param size a <code>Dimension</code> value
+     * @param savedGame An optional saved game.
+     * @param size An optional window size.
      * @param sound True if sounds should be played
-     * @param splashFilename a <code>String</code> value
+     * @param splashFilename The name of the splash image.
      * @param showOpeningVideo Display the opening video.
-     * @param fontName a <code>String</code> value
+     * @param fontName An optional override of the main font.
      */
-    public FreeColClient(final File savegameFile, Dimension size,
+    public FreeColClient(final File savedGame, Dimension size,
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
 
-        headless = "true".equals(System.getProperty("java.awt.headless", "false"));
-
-        // look for data base directory
+        // Look for base data directory.  Failure is fatal.
         File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
         if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
             System.err.println("Could not find base data directory: "
                                + baseDirectory.getName());
+            System.err.println("  The data files could not be found by FreeCol. Please make sure");
+            System.err.println("  they are present. If FreeCol is looking in the wrong directory");
+            System.err.println("  then run the game with a command-line parameter:\n");
+            System.err.println("    --freecol-data <data-directory>\n");
             System.exit(1);
         }
 
-        // display the splash screen
-        JWindow splash = null;
-        if (splashFilename != null) {
-            splash = displaySplash(splashFilename);
+        headless = "true".equals(System.getProperty("java.awt.headless",
+                "false"));
+        // TODO: make headless operation work
+        if (headless) {
+            System.err.println("Headless operation disabled.\n");
+            System.exit(1);
         }
 
-        // load the resource mappings (whatever that is!)
-        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        mapEditor = false;
 
-        FreeColTcFile tcData = new FreeColTcFile("classic");
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        // Display the splash screen.
+        JWindow splash = null;
+        if (splashFilename != null) {
+            try {
+                Image im = Toolkit.getDefaultToolkit()
+                    .getImage(splashFilename);
+                splash = new JWindow();
+                splash.getContentPane().add(new JLabel(new ImageIcon(im)));
+                splash.pack();
+                Point center = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment().getCenterPoint();
+                splash.setLocation(center.x - splash.getWidth() / 2,
+                                   center.y - splash.getHeight() / 2);
+                splash.setVisible(true);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Splash fail", e);
+                splash = null;
+            }
+        }
 
-        imageLibrary = new ImageLibrary();
-
-        // calculate a window size (if "windowed" mode is opted)
-        windowed = (size != null);
+        // Determine the window size.
+        windowed = size != null;
         if (size != null && size.width < 0) {
-            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                     .getMaximumWindowBounds();
+            Rectangle bounds = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getMaximumWindowBounds();
             size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
                                  bounds.height - DEFAULT_WINDOW_SPACE);
         }
-        final Dimension windowSize = size;
-        logger.info("Window size is " + windowSize);
+        logger.info("Window size is " + size.getWidth()
+            + " x " + size.getHeight());
 
-        // Swing system + LAF init
+        // Control
+        connectController = new ConnectController(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameController = new InGameController(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        mapEditorController = new MapEditorController(this);
+        imageLibrary = new ImageLibrary();
+        actionManager = new ActionManager(this);
+        worker = new Worker();
+        worker.start();
+
+        // Load resources.
+        //   - base resources
+        //   - resources in the default "classic" ruleset,
+        //   - resources in the default actions
+        // TODO: probably should not need to load "classic", but there
+        // are a bunch of things in there (e.g. orderButton) that first
+        // need to move to base because the action manager requires them.
+        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
+        FreeColTcFile tcData = new FreeColTcFile("classic");
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        actionManager.initializeActions();
+
+        // Load the client options, which handle reloading the
+        // resources specified in the active mods.
+        loadClientOptions(savedGame);
+
+        // Once resources are in place, get preloading started.
+        ResourceManager.preload(size);
+
+        // Work out the main font now that resources are loaded.
         Font font = null;
         if (fontName != null) {
             font = Font.decode(fontName);
@@ -238,149 +289,49 @@ public final class FreeColClient {
             }
         }
         if (font == null) font = ResourceManager.getFont("NormalFont");
+
+        // Swing system and look-and-feel initialization.
         try {
             FreeColLookAndFeel fclaf
-                = new FreeColLookAndFeel(FreeCol.getDataDirectory(), windowSize);
-            try {
-                FreeColLookAndFeel.install(fclaf, font);
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                System.err.println("Unable to install FreeCol look-and-feel.");
-                System.exit(1);
-            }
+                = new FreeColLookAndFeel(FreeCol.getDataDirectory(), size);
+            FreeColLookAndFeel.install(fclaf, font);
         } catch (FreeColException e) {
-            removeSplash(splash);
+            System.err.println("Unable to install FreeCol look-and-feel.");
             e.printStackTrace();
-            System.err.println("\nThe data files could not be found by FreeCol. Please make sure");
-            System.err.println("they are present. If FreeCol is looking in the wrong directory");
-            System.err.println("then run the game with a command-line parameter:\n");
             System.exit(1);
         }
 
-        // TODO: don't use same datafolder for both images and
-        // music because the images are best kept inside the .JAR
-        // file.
-        logger.info("Now starting to load images.");
-
-        mapEditor = false;
-
-        // load options
-        clientOptions = new ClientOptions();
-        logger.info("Loaded default client options.");
-        try {
-            FreeColSavegameFile savegame = new FreeColSavegameFile(savegameFile);
-            clientOptions.load(savegame.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS), false);
-            logger.info("Loaded client options from savegame file.");
-        } catch(Exception e) {
-            logger.warning("Failed to read client options from savegame file.");
-        }
-
-        actionManager = new ActionManager(this);
-        File preferences = FreeCol.getClientOptionsFile();
-        if (preferences != null && preferences.exists()) {
-            clientOptions.load(preferences);
-            logger.info("Loaded client options from file " + preferences.getPath());
-        } else {
-            logger.warning("Unable to load client options.");
-        }
-
-        List<ResourceMapping> modMappings = new ArrayList<ResourceMapping>();
-        for (FreeColModFile f : clientOptions.getActiveMods()) {
-            modMappings.add(f.getResourceMapping());
-        }
-        ResourceManager.setModMappings(modMappings);
-        ResourceManager.preload(size);
-
-        //If modMappings change any UI resources related to actions,
-        //these would not become visible without a 2nd call to initializeActions()
-        //potential TODO: find a better way to untangle this.
-
-        // Control:
-        connectController = new ConnectController(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        mapEditorController = new MapEditorController(this);
-
-        removeSplash(splash);
-
-        // Gui:
-        if (!headless) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        startGUI(windowSize, sound, showOpeningVideo, savegameFile != null);
-                    }
-                });
-        }
-
-        // Job deamon
-        worker = new Worker();
-        worker.start();
-
-        // loads an optional savegame from a file (client parameter)
-        if (savegameFile != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        connectController.loadGame(savegameFile);
-                    }
-                });
-        }
-
-        // -- I wonder if this has its right location here!
-        if (FreeCol.getClientOptionsFile() != null
-                && FreeCol.getClientOptionsFile().exists()) {
-            if (!headless) {
-                Option o = clientOptions.getOption(ClientOptions.LANGUAGE);
-                o.addPropertyChangeListener(new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent e) {
-                            if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                                canvas.showInformationMessage("autodetectLanguageSelected");
-                            } else {
-                                Locale l = ((Language) e.getNewValue()).getLocale();
-                                Messages.setMessageBundle(l);
-                                canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
-                                                              .addName("%language%", l.getDisplayName()));
-                            }
-                        }
-                    });
-            }
-        }
-
-        // remember the first instance as (quasi) singleton
-        if ( instance == null )
-                instance = this;
-    }
-
-    /**
-     * Displays a splash screen.
-     * @return The splash screen. It should be removed by the caller
-     *      when no longer needed by a call to removeSplash().
-     */
-    private static JWindow displaySplash(String filename) {
-        try {
-            Image im = Toolkit.getDefaultToolkit().getImage(filename);
-            JWindow f = new JWindow();
-            f.getContentPane().add(new JLabel(new ImageIcon(im)));
-            f.pack();
-            Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-            f.setLocation(center.x - f.getWidth() / 2, center.y - f.getHeight() / 2);
-            f.setVisible(true);
-            return f;
-        } catch (Exception e) {
-            logger.warning(e.toString());
-            return null;
-        }
-    }
-
-    /**
-     * Removes splash screen.
-     */
-    private static void removeSplash(JWindow splash) {
+        // Start the GUI.
         if (splash != null) {
             splash.setVisible(false);
             splash.dispose();
         }
+        final Dimension windowSize = size;
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    startGUI(windowSize, sound, showOpeningVideo,
+                        savedGame != null);
+                }
+            });
+
+        // Load the optional saved game.
+        if (savedGame != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        connectController.loadGame(savedGame);
+                    }
+                });
+        }
+
+        // Remember the first instance as a quasi-singleton.
+        if (instance == null) instance = this;
+    }
+
+    /**
+     * Gets the quasi-singleton instance.
+     */
+    public static FreeColClient get() {
+        return instance;
     }
 
     /**
@@ -390,7 +341,7 @@ public final class FreeColClient {
                           final boolean sound,
                           final boolean showOpeningVideo,
                           final boolean loadGame) {
-       // start the sound system
+        // Prepare the sound system.
         if (sound) {
             final ClientOptions opts = getClientOptions();
             final AudioMixerOption amo
@@ -427,7 +378,7 @@ public final class FreeColClient {
                  * that full screen mode is not supported for this
                  * GraphicsDevice! Using windowed mode instead."); windowed =
                  * true; setWindowed(true); frame = new
-                 * WindowedFrame(windowSize);
+                 * WindowedFrame(size);
                  */
             }
             Rectangle bounds = gd.getDefaultConfiguration().getBounds();
@@ -438,11 +389,28 @@ public final class FreeColClient {
         changeWindowedMode(windowed);
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
+        // Now that there is a canvas, prepare for language changes.
+        Option o = getClientOptions().getOption(ClientOptions.LANGUAGE);
+        if (o != null) {
+            o.addPropertyChangeListener(new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent e) {
+                        if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
+                            canvas.showInformationMessage("autodetectLanguageSelected");
+                        } else {
+                            Locale l = ((Language) e.getNewValue()).getLocale();
+                            Messages.setMessageBundle(l);
+                            canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
+                                .addName("%language%", l.getDisplayName()));
+                        }
+                    }
+                });
+        }
+
         // run opening video or main panel
         if (showOpeningVideo && !loadGame) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-            canvas.showOpeningVideoPanel();
+                    canvas.showOpeningVideoPanel();
                 }
             });
         } else {
@@ -559,16 +527,6 @@ public final class FreeColClient {
         return windowed;
     }
 
-    /**
-     * Writes the client options to the default location.
-     *
-     * @throws FileNotFoundException
-     * @see ClientOptions
-     */
-    public void saveClientOptions() throws FileNotFoundException {
-        saveClientOptions(FreeCol.getClientOptionsFile());
-    }
-
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;
     }
@@ -578,40 +536,12 @@ public final class FreeColClient {
     }
 
     /**
-     * Writes the client options to the given file.
-     *
-     * @param saveFile The file where the client options should be written.
-     * @throws FileNotFoundException
-     * @see ClientOptions
-     */
-    public void saveClientOptions(File saveFile) throws FileNotFoundException {
-        getClientOptions().save(saveFile);
-    }
-
-    /**
      * Gets the <code>ImageLibrary</code>.
      *
      * @return The <code>ImageLibrary</code>.
      */
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
-    }
-
-    /**
-     * Reads the {@link ClientOptions} from the given file.
-     */
-    public void loadClientOptions() {
-        loadClientOptions(FreeCol.getClientOptionsFile());
-    }
-
-    /**
-     * Reads the {@link ClientOptions} from the given file.
-     *
-     * @param loadFile The <code>File</code> to read the
-     *            <code>ClientOptions</code> from.
-     */
-    public void loadClientOptions(File loadFile) {
-        getClientOptions().load(loadFile);
     }
 
     /**
@@ -631,6 +561,61 @@ public final class FreeColClient {
     public ClientOptions getClientOptions() {
         return clientOptions;
     }
+
+    /**
+     * Loads the client options.
+     * There are several sources:
+     *   1) Base options (set in the ClientOptions constructor with
+     *        ClientOptions.addDefaultOptions())
+     *   2) Standard action manager actions
+     *   3) Saved game
+     *   4) User options
+     *
+     * @param savedGame An optional <code>File</code> to load options from.
+     */
+    public void loadClientOptions(File savedGame) {
+        clientOptions = new ClientOptions();
+        logger.info("Loaded default client options.");
+
+        ActionManager actionManager = getActionManager();
+        if (actionManager != null) {
+            clientOptions.add(actionManager);
+            logger.info("Loaded client options from the action manager.");
+        }
+
+        if (savedGame != null) {
+            try {
+                FreeColSavegameFile save = new FreeColSavegameFile(savedGame);
+                String fileName = FreeColSavegameFile.CLIENT_OPTIONS;
+                clientOptions.loadOptions(save.getInputStream(fileName));
+                logger.info("Loaded client options from saved game:"
+                    + savedGame.getPath() + "(" + fileName + ")");
+            } catch (Exception e) {
+                logger.warning("Unable to read client options from: "
+                    + savedGame.getPath());
+            }
+        }
+
+        File userOptions = FreeCol.getClientOptionsFile();
+        if (userOptions != null && userOptions.exists()) {
+            clientOptions.updateOptions(userOptions);
+            logger.info("Updated client options from user options file: "
+                + userOptions.getPath());
+        } else {
+            logger.warning("User options file not present.");
+        }
+
+        // Reset the mod resources as a result of the client option update.
+        List<ResourceMapping> modMappings = new ArrayList<ResourceMapping>();
+        for (FreeColModFile f : clientOptions.getActiveMods()) {
+            modMappings.add(f.getResourceMapping());
+        }
+        ResourceManager.setModMappings(modMappings);
+
+        // Update the actions, resources may have changed.
+        if (actionManager != null) actionManager.update();
+    }
+
 
     public MapEditorController getMapEditorController() {
         return mapEditorController;
