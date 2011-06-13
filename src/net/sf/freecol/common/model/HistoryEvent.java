@@ -45,7 +45,7 @@ public class HistoryEvent extends StringTemplate {
         INDEPENDENCE,
         SPANISH_SUCCESSION
     }
-            
+
 
     /**
      * The turn in which the event took place
@@ -65,7 +65,7 @@ public class HistoryEvent extends StringTemplate {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
-    }        
+    }
 
     /**
      * Get the <code>int</code> value.
@@ -165,13 +165,13 @@ public class HistoryEvent extends StringTemplate {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.

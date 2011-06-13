@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 public class ModelMessage extends StringTemplate {
 
     /** Constants describing the type of message. */
-    public static enum MessageType { 
+    public static enum MessageType {
 
         DEFAULT(null),
         WARNING("model.option.guiShowWarning"),
@@ -200,7 +200,7 @@ public class ModelMessage extends StringTemplate {
      * Sets the <code>beenDisplayed</code> value of this
      * <code>ModelMessage</code>.  This is used to avoid showing the
      * same message twice.
-     * 
+     *
      * @param beenDisplayed Should be set to <code>true</code> after the
      *       message has been displayed.
      */
@@ -225,7 +225,7 @@ public class ModelMessage extends StringTemplate {
     public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
     }
-    
+
     /**
      * Gets the ID of the object to display.
      *
@@ -245,9 +245,9 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
-     * Gets the messageType of the message to display.   
+     * Gets the messageType of the message to display.
      *
-     * @return The messageType. 
+     * @return The messageType.
      */
     public MessageType getMessageType() {
         return messageType;
@@ -400,7 +400,7 @@ public class ModelMessage extends StringTemplate {
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         int value = 1;
@@ -410,7 +410,7 @@ public class ModelMessage extends StringTemplate {
         value = 37 * value + super.hashCode();
         return value;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode() + ", ");
@@ -453,7 +453,7 @@ public class ModelMessage extends StringTemplate {
 
         // Remove this when the 0.9.x save hack (in Game.java) is gone.
         ownerId = in.getAttributeValue(null, "owner");
-         
+
         messageType = Enum.valueOf(MessageType.class, getAttribute(in, "messageType", MessageType.DEFAULT.toString()));
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
         sourceId = in.getAttributeValue(null, "source");
