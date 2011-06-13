@@ -259,10 +259,14 @@ public final class ReportRequirementsPanel extends ReportPanel {
             for (Colony colony : colonies) {
                 for (Unit unit : colony.getUnitList()) {
                     GoodsType expertise = unit.getType().getExpertProduction();
-                    if ((unit.getSkillLevel() > 0)
-                        && (expertise == goodsType)
-                        && (expertise != unit.getWorkType())) {
-                        misusedExperts.add(colony);
+                    if ((unit.getSkillLevel() > 0) && (expertise == goodsType)) {
+                        if (unit.getLocation() instanceof Building) {
+                            if (((Building) unit.getLocation()).getGoodsOutputType() != goodsType) {
+                                misusedExperts.add(colony);
+                            }
+                        } else if (expertise != unit.getWorkType()) {
+                            misusedExperts.add(colony);
+                        }
                     }
                 }
                 if (unitCount.get(colony).getCount(workType) > 1) {
