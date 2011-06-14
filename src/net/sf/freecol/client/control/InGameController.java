@@ -1897,18 +1897,21 @@ public final class InGameController implements NetworkConstants {
     private boolean moveDirection(Unit unit, Direction direction,
                                   boolean interactive) {
         Canvas canvas = freeColClient.getCanvas();
+        Location destination = unit.getDestination();
 
         // Consider all the move types
         switch (unit.getMoveType(direction)) {
-        case MOVE:
-            moveMove(unit, direction);
-            return unit.getMovesLeft() > 0;
         case MOVE_HIGH_SEAS:
-            if (!interactive && unit.getDestination() instanceof Europe) {
+            if (destination == null) {
+                return moveHighSeas(unit, direction);
+            } else if (destination instanceof Europe) {
                 moveToEurope(unit);
                 return false;
             }
-            return moveHighSeas(unit, direction);
+            // Fall through
+        case MOVE:
+            moveMove(unit, direction);
+            return unit.getMovesLeft() > 0;
         case EXPLORE_LOST_CITY_RUMOUR:
             moveExplore(unit, direction);
             return false;
