@@ -244,9 +244,9 @@ public final class FreeColClient {
                 .getLocalGraphicsEnvironment().getMaximumWindowBounds();
             size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
                                  bounds.height - DEFAULT_WINDOW_SPACE);
+            logger.info("Window size is " + size.getWidth()
+                + " x " + size.getHeight());
         }
-        logger.info("Window size is " + size.getWidth()
-            + " x " + size.getHeight());
 
         // Control
         connectController = new ConnectController(this);
