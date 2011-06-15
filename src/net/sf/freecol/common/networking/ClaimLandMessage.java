@@ -118,10 +118,8 @@ public class ClaimLandMessage extends Message {
         if (owner == null) { // unclaimed, always free
             price = 0;
         } else if (owner == player) { // capture vacant colony tiles only
-            if (settlement != null
-                && ownerSettlement != null
-                && ownerSettlement instanceof Colony
-                && ((Colony) ownerSettlement).isTileInUse(tile)) {
+            if (settlement != null && ownerSettlement != null
+                && tile.isInUse()) {
                 return Message.createError("tileTakenSelf", null);
             }
             price = 0;

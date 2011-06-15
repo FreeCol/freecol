@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -324,7 +325,10 @@ public class BuildColonyMission extends Mission {
             }
 
             // Can we acquire the tile?
-            if (!player.canAcquireToFoundSettlement(tile)) {
+            switch (player.canClaimToFoundSettlementReason(tile)) {
+            case NONE: case NATIVES:
+                break;
+            default:
                 continue;
             }
 

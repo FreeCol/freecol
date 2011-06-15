@@ -828,6 +828,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Is this tile under active use?
+     *
+     * @return True if a colony is using this tile.
+     */
+    public boolean isInUse() {
+        return getOwningSettlement() instanceof Colony
+            && ((Colony) getOwningSettlement()).isTileInUse(this);
+    }
+
+    /**
      * Adds a tile item to this tile.
      *
      * @param item The <code>TileItem</code> to add.

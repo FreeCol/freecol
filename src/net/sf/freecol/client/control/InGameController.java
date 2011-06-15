@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,6 +78,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.ProductionInfo;
@@ -1454,8 +1456,12 @@ public final class InGameController implements NetworkConstants {
         if (tile.getColony() != null) {
             askJoinColony(unit, tile.getColony());
             return;
-        } else if (!player.canAcquireToFoundSettlement(tile)) {
-            canvas.showInformationMessage("buildColony.badTile");
+        }
+        NoClaimReason reason = player.canClaimToFoundSettlementReason(tile);
+        if (reason != NoClaimReason.NONE
+            && reason != NoClaimReason.NATIVES) {
+            canvas.showInformationMessage("badTileUse."
+                + reason.toString().toLowerCase(Locale.US));
             return;
         }
 
@@ -1467,6 +1473,8 @@ public final class InGameController implements NetworkConstants {
 
         if (tile.getOwner() != null && tile.getOwner() != player) {
             // Claim tile from other owners before founding a settlement.
+            // Only native owners that we can steal, buy from, or use a
+            // bonus center tile exception should be possible by this point.
             if (!claimTile(player, tile, null, player.getLandPrice(tile), 0))
                 return;
             // One more check that founding can now proceed.

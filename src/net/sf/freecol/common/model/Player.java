@@ -1049,73 +1049,96 @@ public class Player extends FreeColGameObject implements Nameable {
         return rebels;
     }
 
+
+    /**
+     * A variety of reasons why a tile can not be claimed, either
+     * to found a settlement or just to be used by one, including the
+     * double negative NONE == "no reason" case.
+     */
+    public static enum NoClaimReason {
+        NONE,            // Actually, tile can be claimed
+        TERRAIN,         // Not on settleable terrain
+        RUMOUR,          // Europeans can not claim tiles with LCR
+        WATER,           // Natives do not claim water
+        SETTLEMENT,      // Settlement present
+        WORKED,          // One of our settlements is working this tile
+        EUROPEANS,       // Owned by Europeans and not for sale
+        NATIVES,         // Owned by natives and they want payment for it
+    };
+
+    /**
+     * Can a tile be owned by this player?
+     *
+     * @param tile The <code>Tile</code> to consider.
+     * @return True if the tile can be owned by this player.
+     */
+    public boolean canOwnTile(Tile tile) {
+        return canOwnTileReason(tile) == NoClaimReason.NONE;
+    }
+
     /**
      * Can a tile be owned by this player?
      * This is a test of basic practicality and does not consider
      * the full complexity of tile ownership issues.
      *
      * @param tile The <code>Tile</code> to consider.
-     * @return True if the tile can be owned by this player.
+     * @return The reason why/not the tile can be owned by this player.
      */
-    public boolean canOwnTile(Tile tile) {
+    private NoClaimReason canOwnTileReason(Tile tile) {
         return (isEuropean())
-            ? !tile.hasLostCityRumour()
-            : tile.isLand();
+            ? ((tile.hasLostCityRumour())
+               ? NoClaimReason.RUMOUR
+               : NoClaimReason.NONE)
+            : ((tile.isLand())
+               ? NoClaimReason.NONE
+               : NoClaimReason.WATER);
+    }
+
+    /**
+     * Checks if a tile can be claimed for use by a settlement.
+     *
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be claimed to found a settlement.
+     */
+    public boolean canClaimForSettlement(Tile tile) {
+        return canClaimForSettlementReason(tile) == NoClaimReason.NONE;
     }
 
     /**
      * The test for whether a tile can be freely claimed by a player
-     * settlement (freely => not purchase or stealing).  The rule for
-     * the center tile is different, see below.
+     * settlement (freely => not by purchase or stealing).  The rule
+     * for the center tile is different, see below.
      *
      * The tile must be ownable by this player, settlement-free, and
      * either not currently owned, owned by this player and not by
-     * another settlement unless it is a colony that is not using the
-     * tile, or owned by someone else who does not want anything for
-     * it.  Got that?
+     * another settlement that is using the tile, or owned by someone
+     * else who does not want anything for it.  Got that?
      *
      * @param tile The <code>Tile</code> to try to claim.
-     * @return True if the tile can be claimed.
+     * @return The reason why/not the tile can be claimed.
      */
-    public boolean canClaimForSettlement(Tile tile) {
-        return canOwnTile(tile)
-            && tile.getSettlement() == null
-            && (tile.getOwner() == null
-                || (tile.getOwner() == this
-                    && (tile.getOwningSettlement() == null
-                        || (tile.getOwningSettlement() instanceof Colony
-                            && !(((Colony) tile.getOwningSettlement())
-                                 .isTileInUse(tile)))))
-                || (tile.getOwner() != null && tile.getOwner() != this
-                    && getLandPrice(tile) == 0));
+    public NoClaimReason canClaimForSettlementReason(Tile tile) {
+        int price;
+        NoClaimReason reason = canOwnTileReason(tile);
+        return (reason != NoClaimReason.NONE) ? reason
+            : (tile.getSettlement() != null) ? NoClaimReason.SETTLEMENT
+            : (tile.getOwner() == null) ? NoClaimReason.NONE
+            : (tile.getOwner() == this) ? ((tile.isInUse())
+                                           ? NoClaimReason.WORKED
+                                           : NoClaimReason.NONE)
+            : ((price = getLandPrice(tile)) < 0) ? NoClaimReason.EUROPEANS
+            : (price > 0) ? NoClaimReason.NATIVES
+            : NoClaimReason.NONE;
     }
 
     /**
-     * Is a tile acquirable by purchase or stealing?
-     * The tile must be ownable, without a settlement, and currently
-     * owned by someone else who is prepared to sell it.
+     * Can a tile be claimed to found a settlement on?
      *
-     * @param tile The <code>Tile</code> to acquire.
-     * @return True if the tile can be acquired by purchase or stealing.
+     * @param tile The <code>Tile</code> to try to claim.
+     * @return True if the tile can be claimed to found a settlement.
      */
-    private boolean canAcquireTile(Tile tile) {
-        return canOwnTile(tile)
-            && tile.getSettlement() == null
-            && tile.getOwner() != null
-            && tile.getOwner() != this
-            && getLandPrice(tile) > 0;
-    }
-
-    /**
-     * Can a tile be acquired for a settlement, either freely or by
-     * payment or stealing.
-     *
-     * @param tile The <code>Tile</code> to acquire.
-     * @return True if the tile can be acquired in some way.
-     */
-    public boolean canAcquireForSettlement(Tile tile) {
-        return canClaimForSettlement(tile)
-            || canAcquireTile(tile);
+    public boolean canClaimToFoundSettlement(Tile tile) {
+        return canClaimToFoundSettlementReason(tile) == NoClaimReason.NONE;
     }
 
     /**
@@ -1125,12 +1148,15 @@ public class Player extends FreeColGameObject implements Nameable {
      * relaxations that allow free center tile acquisition
      *
      * @param tile The <code>Tile</code> to try to claim.
-     * @return True if the tile can be claimed.
+     * @return The reason why/not the tile can be claimed.
      */
-    public boolean canClaimToFoundSettlement(Tile tile) {
-        return tile.getType().canSettle()
-            && (canClaimForSettlement(tile)
-                || canClaimFreeCenterTile(tile));
+    public NoClaimReason canClaimToFoundSettlementReason(Tile tile) {
+        NoClaimReason reason;
+        return (!tile.getType().canSettle()) ? NoClaimReason.TERRAIN
+            : ((reason = canClaimForSettlementReason(tile))
+               != NoClaimReason.NATIVES) ? reason
+            : (canClaimFreeCenterTile(tile)) ? NoClaimReason.NONE
+            : NoClaimReason.NATIVES;
     }
 
     /**
@@ -1144,10 +1170,8 @@ public class Player extends FreeColGameObject implements Nameable {
         String build = getGame().getSpecification()
             .getStringOption("model.option.buildOnNativeLand").getValue();
         return isEuropean()
-            && canOwnTile(tile)
-            && tile.getSettlement() == null
             && tile.getOwner() != null
-            && tile.getOwner() != this
+            && tile.getOwner().isIndian()
             && ("model.option.buildOnNativeLand.always".equals(build)
                 || ("model.option.buildOnNativeLand.first".equals(build)
                     && hasZeroSettlements())
@@ -1165,7 +1189,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * settlement is being placed and we are collecting the tiles to
      * claim, the settlement already exists and thus there will
      * already be one settlement--- so we have to check if that one
-     * settlement is located at the tile being tested.
+     * settlement is on the map yet.
      *
      * @return True if the player has no settlements (on the map) yet.
      */
@@ -1174,19 +1198,6 @@ public class Player extends FreeColGameObject implements Nameable {
         return settlements.isEmpty()
             || (settlements.size() == 1
                 && settlements.get(0).getTile().getSettlement() == null);
-    }
-
-    /**
-     * Can a tile be acquired from its owners and used to found a settlement?
-     * Slightly weakens canClaimToFoundSettlement to allow for purchase
-     * and/or stealing.
-     *
-     * @param tile The <code>Tile</code> to try to claim.
-     * @return True if the tile can be acquired.
-     */
-    public boolean canAcquireToFoundSettlement(Tile tile) {
-        return canClaimToFoundSettlement(tile)
-            || (tile.getType().canSettle() && canAcquireTile(tile));
     }
 
     /**
@@ -1215,7 +1226,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean canAcquireForImprovement(Tile tile) {
         return canClaimForImprovement(tile)
-            || canAcquireTile(tile);
+            || getLandPrice(tile) > 0;
     }
 
     /**

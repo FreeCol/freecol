@@ -40,6 +40,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -80,6 +81,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -1558,45 +1560,42 @@ public final class ColonyPanel extends FreeColPanel
                 Tile tile = colonyTile.getWorkTile();
                 Colony colony = getColony();
                 Player player = unit.getOwner();
+                Canvas canvas = getCanvas();
 
                 // May need to acquire the tile before working it.
-                if (tile.getOwningSettlement() != colony
-                    && player.canAcquireForSettlement(tile)) {
-                    if (getController().claimLand(tile, colony, 0)
-                        && tile.getOwningSettlement() == colony) {
-                        logger.info("Colony " + colony.getName()
-                                    + " claims tile " + tile.toString()
-                                    + " with unit " + unit.getId());
-                    } else {
-                        logger.warning("Colony " + colony.getName()
-                                       + " did not claim " + tile.toString()
-                                       + " with unit " + unit.getId());
+                if (tile.getOwningSettlement() != colony) {
+                    NoClaimReason reason
+                        = player.canClaimForSettlementReason(tile);
+                    switch (reason) {
+                    case NONE:
+                        break; // OK
+                    case NATIVES:
+                        if (getController().claimLand(tile, colony, 0)
+                            && tile.getOwningSettlement() == colony) {
+                            logger.info("Colony " + colony.getName()
+                                        + " claims tile " + tile.toString()
+                                        + " with unit " + unit.getId());
+                        } else {
+                            logger.warning("Colony " + colony.getName()
+                                           + " did not claim " + tile.toString()
+                                           + " with unit " + unit.getId());
+                            return false;
+                        }
+                        break;
+                    default: // Otherwise, can not use land
+                        canvas.errorMessage("badTileUse."
+                            + reason.toString().toLowerCase(Locale.US));
                         return false;
                     }
                 }
 
-                Canvas canvas = getCanvas();
                 if (!colonyTile.canAdd(unit)) {
-                    Settlement s = tile.getOwningSettlement();
-                    if (s != null && s != getColony()) {
-                        if (s.getOwner() == player) {
-                            // Its one of ours
-                            canvas.errorMessage("tileTakenSelf");
-                        } else if (s.getOwner().isEuropean()) {
-                            // occupied by a foreign european colony
-                            canvas.errorMessage("tileTakenEuro");
-                        } else if (s instanceof IndianSettlement) {
-                            // occupied by an indian settlement
-                            canvas.errorMessage("tileTakenInd");
-                        }
+                    if (colonyTile.getUnitCount() > 0) {
+                        canvas.errorMessage("badTileUse.already");
+                    } else if (!tile.isLand()) {
+                        canvas.errorMessage("badTileUse.docks");
                     } else {
-                        if (colonyTile.getUnitCount() > 0) {
-                            ; // Tile is already occupied
-                        } else if (!tile.isLand()) {
-                            canvas.errorMessage("tileNeedsDocks");
-                        } else if (tile.hasLostCityRumour()) {
-                            canvas.errorMessage("tileHasRumour");
-                        }
+                        logger.warning("Need another badTileUse message.");
                     }
                     return false;
                 }
