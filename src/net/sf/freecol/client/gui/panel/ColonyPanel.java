@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.ColonyTile.NoAddReason;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -1562,41 +1563,44 @@ public final class ColonyPanel extends FreeColPanel
                 Player player = unit.getOwner();
                 Canvas canvas = getCanvas();
 
-                // May need to acquire the tile before working it.
-                if (tile.getOwningSettlement() != colony) {
-                    NoClaimReason reason
+                NoAddReason reason = colonyTile.canAddReason(unit);
+                if (reason == NoAddReason.CLAIM) {
+                    // Need to acquire the tile before working it.
+                    NoClaimReason claim
                         = player.canClaimForSettlementReason(tile);
-                    switch (reason) {
+                    switch (claim) {
                     case NONE:
-                        break; // OK
+                        throw new IllegalStateException("NoAddReason=CLAIM"
+                            + "yet NoClaimReason=NONE");
                     case NATIVES:
                         if (getController().claimLand(tile, colony, 0)
                             && tile.getOwningSettlement() == colony) {
                             logger.info("Colony " + colony.getName()
-                                        + " claims tile " + tile.toString()
-                                        + " with unit " + unit.getId());
+                                + " claims tile " + tile.toString()
+                                + " with unit " + unit.getId());
                         } else {
                             logger.warning("Colony " + colony.getName()
-                                           + " did not claim " + tile.toString()
-                                           + " with unit " + unit.getId());
+                                + " did not claim " + tile.toString()
+                                + " with unit " + unit.getId());
                             return false;
                         }
                         break;
                     default: // Otherwise, can not use land
                         canvas.errorMessage("badTileUse."
-                            + reason.toString().toLowerCase(Locale.US));
+                            + claim.toString().toLowerCase(Locale.US));
                         return false;
+                    }
+                    // Check reason again, claim should be satisfied.
+                    reason = colonyTile.canAddReason(unit);
+                    if (reason == NoAddReason.CLAIM) {
+                        throw new IllegalStateException("Claim failed");
                     }
                 }
 
-                if (!colonyTile.canAdd(unit)) {
-                    if (colonyTile.getUnitCount() > 0) {
-                        canvas.errorMessage("badTileUse.already");
-                    } else if (!tile.isLand()) {
-                        canvas.errorMessage("badTileUse.docks");
-                    } else {
-                        logger.warning("Need another badTileUse message.");
-                    }
+                // Claim sorted, but complain about other failure.
+                if (reason != NoAddReason.NONE) {
+                    canvas.errorMessage("badTileUse."
+                        + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
 

@@ -34,8 +34,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Player.NoClaimReason;
 
 import org.w3c.dom.Element;
+
 
 /**
  * Represents a work location on a tile. Each ColonyTile except the
@@ -274,6 +276,40 @@ public class ColonyTile extends FreeColGameObject
     }
 
     /**
+       Reasons why a colony tile can not be worked or added to.
+    */
+    public static enum NoAddReason {
+        NONE,            // Actually, tile can be worked
+        SETTLEMENT,      // Settlement centre tile
+        OCCUPIED,        // Occupying unit fortified
+        PRODUCE,         // Does not have produceInWater ability
+        CLAIM,           // Does not own the tile, see NoClaimReason
+        FULL,            // Workable tile is full
+        NOTUNIT,         // Adding non-unit
+        NOSKILL,         // Adding unit with no skill
+    };
+
+    /**
+     * Checks if this colony tile is available to the colony to be worked.
+     * Checks ownership last because this can trigger a tile claim,
+     * which we should be conservative about.
+     *
+     * @return The reason why/not the tile can be worked.
+     */
+    public NoAddReason canBeWorkedReason() {
+        Player player = getOwner();
+        Tile tile = getWorkTile();
+
+        return (tile.getSettlement() != null) ? NoAddReason.SETTLEMENT
+            : (tile.getOccupyingUnit() != null) ? NoAddReason.OCCUPIED
+            : (!colony.hasAbility("model.ability.produceInWater")
+                && !tile.isLand()) ? NoAddReason.PRODUCE
+            : (tile.getOwningSettlement() != colony
+                && !player.canClaimForSettlement(tile)) ? NoAddReason.CLAIM
+            : NoAddReason.NONE;
+    }
+
+    /**
      * Check if this <code>WorkLocation</code> is available to the colony.
      * Used by canAdd() and the gui to decide whether to draw a border
      * on this tile in the colony panel.
@@ -281,22 +317,26 @@ public class ColonyTile extends FreeColGameObject
      * @return True if the location can be worked.
      */
     public boolean canBeWorked() {
-        Player player = getOwner();
-
-        // Not workable if there is a settlement, hostile occupation,
-        // or can not be claimed.
-        Tile tile = getWorkTile();
-        if (tile.getSettlement() != null
-            || tile.getOccupyingUnit() != null
-            || (tile.getOwningSettlement() != colony
-                && !player.canClaimForSettlement(tile))
-            || (!tile.isLand()
-                && !colony.hasAbility("model.ability.produceInWater"))) {
-            return false;
-        }
-        return true;
+        return canBeWorkedReason() == NoAddReason.NONE;
     }
 
+    /**
+     * Checks if this tile can have a specified locatable added to it.
+     *
+     * @param locatable The <code>Locatable</code> to add.
+     * @return The reason why/not the tile can be added to.
+     */
+    public NoAddReason canAddReason(Locatable locatable) {
+        NoAddReason reason;
+        Unit unit;
+
+        return (!(locatable instanceof Unit)) ? NoAddReason.NOTUNIT
+            : (!(unit = (Unit) locatable).getType()
+                .hasSkill()) ? NoAddReason.NOSKILL
+            : (getUnit() != null && getUnit() != unit) ? NoAddReason.FULL
+            : ((reason = canBeWorkedReason()) != NoAddReason.NONE) ? reason
+            : NoAddReason.NONE;
+    }
 
     /**
      * Checks if the specified <code>Locatable</code> may be added to
@@ -307,19 +347,8 @@ public class ColonyTile extends FreeColGameObject
      *         and <code>false</code> otherwise.
      */
     public boolean canAdd(Locatable locatable) {
-        if (!canBeWorked()) {
-            return false;
-        }
-        if (!(locatable instanceof Unit)) {
-            return false;
-        }
-        Unit unit = (Unit) locatable;
-        if (!unit.getType().hasSkill()) {
-            return false;
-        }
-        return getUnit() == null || unit == getUnit();
+        return canAddReason(locatable) == NoAddReason.NONE;
     }
-
 
     /**
      * Add the specified locatable to this colony tile.
@@ -327,18 +356,10 @@ public class ColonyTile extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to add.
      */
     public void add(final Locatable locatable) {
-        if (isColonyCenterTile()) {
-            throw new IllegalStateException("Can not add to colony center: "
-                                            + toString());
-        } else if (unit != null) {
-            throw new IllegalStateException("Can not add to occupied tile: "
-                                            + toString());
-        } else if (getWorkTile().getOwningSettlement() != getColony()) {
-            throw new IllegalStateException("Can not add to tile owned by another colony: "
-                                            + toString());
-        } else if (!canAdd(locatable)) {
-            throw new IllegalStateException("Can not add " + locatable
-                                            + " to " + toString());
+        NoAddReason reason = canAddReason(locatable);
+        if (reason != NoAddReason.NONE) {
+            throw new IllegalStateException("Can not add to colony tile: "
+                + toString() + " reason: " + reason);
         }
 
         final Unit unit = (Unit) locatable;
