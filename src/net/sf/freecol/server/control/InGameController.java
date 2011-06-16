@@ -483,6 +483,28 @@ public final class InGameController extends Controller {
         return null;
     }
 
+    /**
+     * Speaks to a chief in a native settlement, but only if it is as
+     * a result of a scout actually asking to speak to the chief, or
+     * for other settlement-contacting events such as missionary
+     * actions, demanding tribute, learning skills and trading if the
+     * settlementActionsContactChief game option is enabled.
+     * It is still unclear what Col1 did here.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is contacting
+     *     the settlement.
+     * @param is The <code>IndianSettlement</code> to contact.
+     * @param scout True if this contact is due to a scout asking to
+     *     speak to the chief.
+     */
+    private void speakToChief(ServerPlayer serverPlayer, IndianSettlement is,
+                              boolean scout) {
+        if (scout || getGame().getSpecification()
+            .getBooleanOption("model.option.settlementActionsContactChief")
+            .getValue()) {
+            is.setSpokenToChief(serverPlayer);
+        }
+    }
 
     // Routines that follow implement the controller response to
     // messages.
@@ -1654,6 +1676,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
         Tile tile = settlement.getTile();
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
@@ -1691,6 +1714,7 @@ public final class InGameController extends Controller {
 
         // Try to learn
         unit.setMovesLeft(0);
+        speakToChief(serverPlayer, settlement, false);
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed
             cs.add(See.perhaps().always(serverPlayer),
@@ -1704,14 +1728,14 @@ public final class InGameController extends Controller {
             // Teach the unit, and expend the skill if necessary.
             // Do a full information update as the unit is in the settlement.
             unit.setType(skill);
-            Tile tile = settlement.getTile();
             if (!settlement.isCapital()) {
                 settlement.setLearnableSkill(null);
-                tile.updatePlayerExploredTile(serverPlayer, true);
             }
-            cs.add(See.only(serverPlayer), unit, tile);
             break;
         }
+        Tile tile = settlement.getTile();
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.only(serverPlayer), unit, tile);
 
         // Others always see the unit, it may have died or been taught.
         sendToOthers(serverPlayer, cs);
@@ -1733,11 +1757,13 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         final int TURNS_PER_TRIBUTE = 5;
 
+        settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
+
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
         RandomRange gifts = settlement.getType().getGifts(unit);
-        settlement.makeContactSettlement(serverPlayer);
         if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
             && gifts != null) {
             switch (indianPlayer.getTension(serverPlayer).getLevel()) {
@@ -1776,6 +1802,9 @@ public final class InGameController extends Controller {
                                  unit, settlement);
         }
         cs.addMessage(See.only(serverPlayer), m);
+        Tile tile = settlement.getTile();
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
 
@@ -1796,10 +1825,11 @@ public final class InGameController extends Controller {
                                          Unit unit,
                                          IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
+        Tile tile = settlement.getTile();
+        boolean tileDirty = settlement.makeContactSettlement(serverPlayer);
         String result;
 
         // Hateful natives kill the scout right away.
-        settlement.makeContactSettlement(serverPlayer);
         Tension tension = settlement.getAlarm(serverPlayer);
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.add(See.perhaps().always(serverPlayer),
@@ -1808,12 +1838,10 @@ public final class InGameController extends Controller {
             result = "die";
         } else {
             // Otherwise player gets to visit, and learn about the settlement.
-            int gold = 0;
-            Tile tile = settlement.getTile();
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
             if (settlement.hasSpokenToChief()) {
-                // Pre-visited settlements are a noop.
+                // Do nothing if already spoken to.
                 result = "nothing";
             } else if (skill != null
                        && skill.hasAbility("model.ability.expertScout")
@@ -1821,36 +1849,36 @@ public final class InGameController extends Controller {
                                                        ChangeType.NATIVES)) {
                 // If the scout can be taught to be an expert it will be.
                 // TODO: in the old code the settlement retains the
-                // teaching ability.  Is this Col1 compliant?
+                // teaching ability.  WWC1D?
                 unit.setType(settlement.getLearnableSkill());
-                // settlement.setLearnableSkill(null);
-                cs.add(See.perhaps(), unit);
                 result = "expert";
-            } else if (Utils.randomInt(logger, "Tales choice", random, 3)
-                       == 0) {
-                // Otherwise 1/3 of cases are tales...
-                radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
-                result = "tales";
             } else {
-                // ...and the rest are beads.
+                // Choose tales 1/3 of the time, or if there are no beads.
                 RandomRange gifts = settlement.getType().getGifts(unit);
-                gold = (gifts == null) ? 0
+                int gold = (gifts == null) ? 0
                     : gifts.getAmount("Base beads amount", random, true);
-                if (unit.hasAbility("model.ability.expertScout")) {
-                    gold = (gold * 11) / 10;
+                if (gold <= 0
+                    || Utils.randomInt(logger, "Tales", random, 3) == 0) {
+                    radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
+                    result = "tales";
+                } else {
+                    if (unit.hasAbility("model.ability.expertScout")) {
+                        gold = (gold * 11) / 10; // TODO: magic number
+                    }
+                    serverPlayer.modifyGold(gold);
+                    settlement.getOwner().modifyGold(-gold);
+                    result = "beads";
                 }
-                serverPlayer.modifyGold(gold);
-                settlement.getOwner().modifyGold(-gold);
-                cs.addPartial(See.only(serverPlayer), serverPlayer,
-                              "gold", "score");
-                result = "beads";
+            }
+
+            // Have now spoken to the chief.
+            if (!"nothing".equals(result)) {
+                speakToChief(serverPlayer, settlement, true);
+                tileDirty = true;
             }
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            settlement.setSpokenToChief(serverPlayer);
-            tile.updatePlayerExploredTile(serverPlayer, true);
-            cs.add(See.only(serverPlayer), tile);
             for (Tile t : tile.getSurroundingTiles(radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
                     serverPlayer.setExplored(t);
@@ -1858,12 +1886,24 @@ public final class InGameController extends Controller {
                 }
             }
 
-            // If the unit did not get promoted, update it for moves.
+            // If the unit was promoted, update it completely, otherwise just
+            // update moves and possibly gold+score.
             unit.setMovesLeft(0);
-            if (!"expert".equals(result)) {
+            if ("expert".equals(result)) {
+                cs.add(See.perhaps(), unit);
+            } else {
                 cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+                if ("beads".equals(result)) {
+                    cs.addPartial(See.only(serverPlayer), serverPlayer,
+                                  "gold", "score");
+                }
             }
         }
+        if (tileDirty) {
+            tile.updatePlayerExploredTile(serverPlayer, true);
+            cs.add(See.only(serverPlayer), tile);
+        }
+
         // Always add result.
         cs.addAttribute(See.only(serverPlayer), "result", result);
 
@@ -1885,6 +1925,9 @@ public final class InGameController extends Controller {
      */
     public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
                                    IndianSettlement settlement) {
+        settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
+
         // Determine result
         Unit missionary = settlement.getMissionary();
         if (missionary == null) {
@@ -1908,7 +1951,6 @@ public final class InGameController extends Controller {
 
         // Denounce failed
         Player owner = settlement.getOwner();
-        settlement.makeContactSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), settlement);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -1943,6 +1985,9 @@ public final class InGameController extends Controller {
                                     IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
 
+        settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
+
         Unit missionary = settlement.getMissionary();
         Tile tile = settlement.getTile();
         ServerPlayer enemy = null;
@@ -1962,7 +2007,6 @@ public final class InGameController extends Controller {
 
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
-        settlement.makeContactSettlement(serverPlayer);
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
@@ -1982,9 +2026,10 @@ public final class InGameController extends Controller {
             if (!modifiedSettlements.isEmpty()) {
                 cs.add(See.only(serverPlayer), modifiedSettlements);
             }
-            cs.add(See.perhaps().always(serverPlayer), tile);
             break;
         }
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.perhaps().always(serverPlayer), tile);
         String messageId = "indianSettlement.mission."
             + settlement.getAlarm(serverPlayer).toString();
         cs.addMessage(See.only(serverPlayer),
@@ -2013,8 +2058,15 @@ public final class InGameController extends Controller {
                           Player enemy, int gold) {
         ChangeSet cs = new ChangeSet();
 
+        Tile tile = settlement.getTile();
+        if (settlement.makeContactSettlement(serverPlayer)
+            || !settlement.hasSpokenToChief(serverPlayer)) {
+            speakToChief(serverPlayer, settlement, false);
+            tile.updatePlayerExploredTile(serverPlayer, true);
+            cs.add(See.only(serverPlayer), tile);
+        }
+
         // How much gold will be needed?
-        settlement.makeContactSettlement(serverPlayer);
         ServerPlayer enemyPlayer = (ServerPlayer) enemy;
         Player nativePlayer = settlement.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
@@ -2126,6 +2178,9 @@ public final class InGameController extends Controller {
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
+        settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
+
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
@@ -2139,7 +2194,6 @@ public final class InGameController extends Controller {
         }
 
         // Check that this is the agreement that was made
-        settlement.makeContactSettlement(serverPlayer);
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.buyProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
@@ -2157,12 +2211,12 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
-        tile.updatePlayerExploredTile(serverPlayer, true);
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
         cs.add(See.only(serverPlayer),
             settlement.modifyAlarm(serverPlayer, -amount / 50));
-        cs.add(See.only(serverPlayer), settlement);
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canBuy", false);
@@ -2187,6 +2241,9 @@ public final class InGameController extends Controller {
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
+        settlement.makeContactSettlement(serverPlayer);
+        speakToChief(serverPlayer, settlement, false);
+
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
@@ -2196,7 +2253,6 @@ public final class InGameController extends Controller {
             return Message.clientError("Trying to sell in a session where selling is not allowed.");
         }
 
-        settlement.makeContactSettlement(serverPlayer);
         // Check that the gold is the agreed amount
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.sellProposition(unit, settlement, goods, amount);
@@ -2217,7 +2273,7 @@ public final class InGameController extends Controller {
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
         tile.updatePlayerExploredTile(serverPlayer, true);
-        cs.add(See.only(serverPlayer), settlement);
+        cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.put("actionTaken", true);
         session.put("canSell", false);
@@ -2258,12 +2314,13 @@ public final class InGameController extends Controller {
         if (settlement instanceof IndianSettlement) {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
             indianSettlement.makeContactSettlement(serverPlayer);
+            speakToChief(serverPlayer, indianSettlement, false);
             cs.add(See.only(serverPlayer),
                    indianSettlement.modifyAlarm(serverPlayer,
                    -indianSettlement.getPriceToBuy(goods) / 50));
             indianSettlement.updateWantedGoods();
             tile.updatePlayerExploredTile(serverPlayer, true);
-            cs.add(See.only(serverPlayer), settlement);
+            cs.add(See.only(serverPlayer), tile);
         }
         session.put("actionTaken", true);
         session.put("canGift", false);

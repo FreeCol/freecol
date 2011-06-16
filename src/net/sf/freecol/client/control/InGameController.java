@@ -2884,18 +2884,19 @@ public final class InGameController implements NetworkConstants {
             } else if ("expert".equals(result)) {
                 canvas.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.expertScout")
-                    .add("%unit%", unit.getType().getNameKey()));
+                        .add("%unit%", unit.getType().getNameKey()));
             } else if ("tales".equals(result)) {
                 canvas.showInformationMessage(settlement,
                                               "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
                 canvas.updateGoldLabel();
                 canvas.showInformationMessage(settlement,
-                                              StringTemplate.template("scoutSettlement.speakBeads")
-                                              .addAmount("%amount%", player.getGold() - oldGold));
+                    StringTemplate.template("scoutSettlement.speakBeads")
+                        .addAmount("%amount%", player.getGold() - oldGold));
             } else if ("nothing".equals(result)) {
                 canvas.showInformationMessage(settlement,
-                                              "scoutSettlement.speakNothing");
+                    StringTemplate.template("scoutSettlement.speakNothing")
+                        .addStringTemplate("%nation%", player.getNationName()));
             } else {
                 logger.warning("Invalid result from askScoutSpeak: " + result);
             }

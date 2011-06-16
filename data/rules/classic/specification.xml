@@ -1893,6 +1893,10 @@
         <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Whether amphibious moves are allowed. -->
         <booleanOption id="model.option.amphibiousMoves" defaultValue="false"/>
+        <!-- Whether all interactions with a native settlement contact the
+             chief and thus consume the scouting bonus -->
+        <booleanOption id="model.option.settlementActionsContactChief"
+                       defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

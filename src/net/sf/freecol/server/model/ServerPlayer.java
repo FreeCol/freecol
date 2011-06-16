@@ -1454,7 +1454,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else if (price < 0 && owner.isIndian()) {
             IndianSettlement is = (IndianSettlement) ownerSettlement;
             if (is != null) {
-                is.makeContactSettlement(this);
                 cs.add(See.only(null).perhaps(this),
                        owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
             }

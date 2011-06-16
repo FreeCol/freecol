@@ -886,6 +886,10 @@ public final class FreeColServer {
                                               -75.0f,
                                               Modifier.Type.PERCENTAGE));
             }
+            if (!specification.hasOption("model.option.settlementActionsContactChief")) {
+                // Introduced: SAVEGAME_VERSION == 11
+                addBooleanOption("model.option.settlementActionsContactChief", false);
+            }
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
