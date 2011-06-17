@@ -809,6 +809,11 @@
   </xs:element>
 
   <xs:element name="required-location-ability">
+    <xs:annotation>
+      <xs:documentation>
+        0.10.0 compatibility only
+      </xs:documentation>
+    </xs:annotation>
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="value" type="xs:boolean"/>

@@ -256,7 +256,15 @@ public class EquipmentType extends BuildableType {
 
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         String nodeName = in.getLocalName();
-        if ("compatible-equipment".equals(nodeName)) {
+        if ("required-location-ability".equals(nodeName)) {
+            // TODO: remove 0.10.0 compatibility code
+            String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+            boolean value = getAttribute(in, VALUE_TAG, true);
+            getAbilitiesRequired().put(abilityId, value);
+            getSpecification().addAbility(abilityId);
+            in.nextTag(); // close this element
+            // end compatibility code
+        } else if ("compatible-equipment".equals(nodeName)) {
             String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             compatibleEquipment.add(equipmentId);
             in.nextTag(); // close this element
