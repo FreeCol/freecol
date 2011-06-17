@@ -3464,7 +3464,8 @@ public class Unit extends FreeColGameObject
             }
         }
 
-        if (goodsContainer == null && canCarryGoods()) {
+        // TODO: why do we add this random plausibility check?
+        if (goodsContainer == null && getType().canCarryGoods()) {
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);
         }
