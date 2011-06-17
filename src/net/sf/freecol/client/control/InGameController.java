@@ -3719,7 +3719,7 @@ public final class InGameController implements NetworkConstants {
         boolean cash;
         Tile tile = unit.getTile();
         Europe europe = unit.getOwner().getEurope();
-        if (europe == null || unit.getLocation() == europe) {
+        if (europe == null || unit.isInEurope()) {
             cash = true; // No need to check for transport.
         } else {
             int fee = getSpecification()

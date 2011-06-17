@@ -428,7 +428,7 @@ public final class DragListener extends MouseAdapter {
                                 && !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
 
-        if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
+        if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
             menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

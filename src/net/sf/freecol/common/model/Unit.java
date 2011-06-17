@@ -522,7 +522,7 @@ public class Unit extends FreeColGameObject
         }
         // Otherwise, cash in if in Europe.
         return loc instanceof Europe
-            || (loc instanceof Unit && ((Unit) loc).getLocation() instanceof Europe);
+            || (loc instanceof Unit && ((Unit) loc).isInEurope());
     }
 
     /**
