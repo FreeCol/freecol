@@ -777,8 +777,14 @@ public class Unit extends FreeColGameObject
             result.addAll(getColony().getFeatureContainer()
                           .getAbilitySet(id, unitType, getGame().getTurn()));
         } else if (isInEurope()) {
-            result.addAll(getOwner().getEurope().getFeatureContainer()
-                          .getAbilitySet(id, unitType, getGame().getTurn()));
+            // TODO: the following check should not be necessary
+            // Presumably, it will become redundant as soon as
+            // Europe abilities are in the spec
+            if (getOwner().getEurope() != null
+                && getOwner().getEurope().getFeatureContainer() != null) {
+                result.addAll(getOwner().getEurope().getFeatureContainer()
+                              .getAbilitySet(id, unitType, getGame().getTurn()));
+            }
         }
         return FeatureContainer.hasAbility(result);
     }

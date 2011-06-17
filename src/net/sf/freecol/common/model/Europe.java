@@ -108,10 +108,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
 
         recruitPrice = RECRUIT_PRICE_INITIAL;
         recruitLowerCap = LOWER_CAP_INITIAL;
-
-        featureContainer = new FeatureContainer(getSpecification());
-        // TODO: put this in the specification
-        featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
     }
 
     /**
@@ -170,6 +166,10 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
      */
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
+    }
+
+    protected void setFeatureContainer(FeatureContainer container) {
+        featureContainer = container;
     }
 
     /**
