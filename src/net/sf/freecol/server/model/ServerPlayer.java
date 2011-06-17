@@ -1557,14 +1557,26 @@ public class ServerPlayer extends Player implements ServerModelObject {
             defenderUnit = (Unit) defender;
             defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
+            boolean bombard = attackerUnit.hasAbility("model.ability.bombard");
             cs.addAttribute(See.only(this), "sound",
-                (attackerUnit.isNaval())
-                ? "sound.attack.naval"
-                : (attackerUnit.hasAbility("model.ability.bombard"))
-                ? "sound.attack.artillery"
-                : (attackerUnit.isMounted())
-                ? "sound.attack.mounted"
+                (attackerUnit.isNaval()) ? "sound.attack.naval"
+                : (bombard) ? "sound.attack.artillery"
+                : (attackerUnit.isMounted()) ? "sound.attack.mounted"
                 : "sound.attack.foot");
+            if (attackerUnit.getOwner().isIndian()
+                && defenderPlayer.isEuropean()
+                && defenderUnit.getLocation().getColony() != null
+                && !defenderPlayer.atWarWith(attackerUnit.getOwner())) {
+                StringTemplate attackerNation = attackerUnit.getOwner()
+                    .getNationName();
+                Colony colony = defenderUnit.getLocation().getColony();
+                cs.addMessage(See.only(defenderPlayer),
+                    new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                        "model.unit.indianSurprise",
+                        colony)
+                    .addStringTemplate("%nation%", attackerNation)
+                    .addName("%colony%", colony.getName()));
+            }
         } else if (isBombard) {
             attackerSettlement = (Settlement) attacker;
             attackerTile = attackerSettlement.getTile();
@@ -2849,6 +2861,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
+        StringTemplate colonyNation = colonyPlayer.getNationName();
 
         // Collect the damagable buildings, ships, movable goods.
         List<Building> buildingList = colony.getBurnableBuildingList();
@@ -2911,6 +2924,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                           .addStringTemplate("%enemyNation%", attackerNation)
                           .addStringTemplate("%enemyUnit%", attacker.getLabel()));
         }
+        cs.addMessage(See.all().except(colonyPlayer),
+                      new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                       "model.unit.indianRaid",
+                                       attackerPlayer)
+                      .addStringTemplate("%nation%", attackerNation)
+                      .addName("%colony%", colony.getName())
+                      .addStringTemplate("%colonyNation%", colonyNation));
     }
 
     /**
