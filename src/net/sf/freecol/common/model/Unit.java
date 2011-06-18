@@ -3293,11 +3293,11 @@ public class Unit extends FreeColGameObject
         // Do not show enemy units hidden in a carrier:
         if (getGame().isClientTrusted() || showAll || getOwner().equals(player)) {
             unitsToXML(out, player, showAll, toSavedGame);
-            if (canCarryGoods()) {
+            if (getType().canCarryGoods()) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
             }
         } else {
-            if (canCarryGoods()) {
+            if (getType().canCarryGoods()) {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
             }
