@@ -64,8 +64,11 @@ import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -106,6 +109,8 @@ public class DebugMenu extends JMenu {
         debugFixMenu.setMnemonic(KeyEvent.VK_F);
         this.add(debugFixMenu);
 
+        // TODO: remove this one day unless someone remembers what this
+        // bug was and whether it is still relevant.
         final JMenuItem crossBug
             = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
         crossBug.setOpaque(false);
@@ -126,13 +131,14 @@ public class DebugMenu extends JMenu {
 
         final JCheckBoxMenuItem sc
             = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"),
-                                    gui.displayCoordinates);
+                gui.displayCoordinates);
         sc.setOpaque(false);
         sc.setMnemonic(KeyEvent.VK_S);
         this.add(sc);
         sc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    gui.displayCoordinates
+                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     canvas.refresh();
                 }
             });
@@ -140,16 +146,17 @@ public class DebugMenu extends JMenu {
 
         final JCheckBoxMenuItem dam
             = new JCheckBoxMenuItem("Display AI-missions",
-                                    gui.debugShowMission);
+                gui.debugShowMission);
         final JCheckBoxMenuItem dami
             = new JCheckBoxMenuItem("Additional AI-mission info",
-                                    gui.debugShowMissionInfo);
+                gui.debugShowMissionInfo);
         dam.setOpaque(false);
         dam.setMnemonic(KeyEvent.VK_M);
         this.add(dam);
         dam.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.debugShowMission = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    gui.debugShowMission
+                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     dami.setEnabled(gui.debugShowMission);
                     canvas.refresh();
                 }
@@ -161,7 +168,8 @@ public class DebugMenu extends JMenu {
         this.add(dami);
         dami.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.debugShowMissionInfo = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    gui.debugShowMissionInfo
+                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     canvas.refresh();
                 }
             });
@@ -189,7 +197,7 @@ public class DebugMenu extends JMenu {
         ButtonGroup bg = new ButtonGroup();
         final JRadioButtonMenuItem cv1
             = new JRadioButtonMenuItem("Do not display",
-                                       !gui.displayColonyValue);
+                !gui.displayColonyValue);
         cv1.setOpaque(false);
         cv1.setMnemonic(KeyEvent.VK_C);
         cvpMenu.add(cv1);
@@ -204,8 +212,9 @@ public class DebugMenu extends JMenu {
         this.add(cvpMenu);
 
         final JRadioButtonMenuItem cv3
-            = new JRadioButtonMenuItem("Common outpost value",
-                gui.displayColonyValue && gui.displayColonyValuePlayer == null);
+            = new JRadioButtonMenuItem(Messages.message("menuBar.debug.showCommonOutputValue"),
+                gui.displayColonyValue
+                && gui.displayColonyValuePlayer == null);
         cv3.setOpaque(false);
         cv3.setMnemonic(KeyEvent.VK_C);
         cvpMenu.add(cv3);
@@ -227,7 +236,8 @@ public class DebugMenu extends JMenu {
             if (p.isEuropean() && p.canBuildColonies()) {
                 final JRadioButtonMenuItem cv2
                     = new JRadioButtonMenuItem(Messages.message(p.getNationName()),
-                        gui.displayColonyValue && gui.displayColonyValuePlayer == p);
+                        gui.displayColonyValue
+                        && gui.displayColonyValuePlayer == p);
                 cv2.setOpaque(false);
                 cv2.setMnemonic(KeyEvent.VK_C);
                 cvpMenu.add(cv2);
@@ -244,7 +254,8 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenuItem skipTurns = new JMenuItem("Skip turns");
+        final JMenuItem skipTurns
+            = new JMenuItem(Messages.message("menuBar.debug.skipTurns"));
         skipTurns.setOpaque(false);
         skipTurns.setMnemonic(KeyEvent.VK_S);
         this.add(skipTurns);
@@ -256,10 +267,10 @@ public class DebugMenu extends JMenu {
                         igc.setSkippedTurns(0);
                         return;
                     }
-
                     String response = canvas.showInputDialog(null,
-                                                             StringTemplate.name("How many turns should be skipped:"),
-                                                             Integer.toString(10), "ok", "cancel", true);
+                        StringTemplate.key("menuBar.debug.skipTurns"),
+                        Integer.toString(10),
+                        "ok", "cancel", true);
                     if (response == null) return;
                     int skip;
                     try {
@@ -274,8 +285,9 @@ public class DebugMenu extends JMenu {
                 public void stateChanged(ChangeEvent e) {
                     boolean skipping = server.getInGameController()
                         .getSkippedTurns() > 0;
-                    skipTurns.setText((skipping) ? "Stop skipping"
-                                      : "Skip turns");
+                    skipTurns.setText(Messages.message((skipping)
+                            ? "menuBar.debug.stopSkippingTurns"
+                            : "menuBar.debug.skipTurns"));
                 }
             });
         skipTurns.setEnabled(server != null);
@@ -288,24 +300,8 @@ public class DebugMenu extends JMenu {
         this.add(addFather);
         addFather.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    List<ChoiceItem<FoundingFather>> fathers
-                        = new ArrayList<ChoiceItem<FoundingFather>>();
-                    for (FoundingFather father : game.getSpecification().getFoundingFathers()) {
-                        if (!player.hasFather(father)) {
-                            fathers.add(new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
-                                                                       father));
-                        }
-                    }
-                    ChoiceDialog<FoundingFather> choiceDialog =
-                        new ChoiceDialog<FoundingFather>(canvas, fatherTitle,
-                                                         "Cancel", fathers);
-                    FoundingFather father
-                        = canvas.showFreeColDialog(choiceDialog, null);
-                    if (father != null) {
-                        InGameController igc = server.getInGameController();
-                        igc.addFoundingFather((ServerPlayer) serverPlayer,
-                                              father);
-                    }
+                    addFatherAction(game, server.getInGameController(),
+                        serverPlayer, fatherTitle);
                 }
             });
         addFather.setEnabled(server != null);
@@ -334,16 +330,21 @@ public class DebugMenu extends JMenu {
             });
         runMonarch.setEnabled(server != null);
 
-        final JMenuItem addGold = new JMenuItem(Messages.message("menuBar.debug.addGold"));
+        final JMenuItem addGold
+            = new JMenuItem(Messages.message("menuBar.debug.addGold"));
         addGold.setOpaque(false);
         this.add(addGold);
         addGold.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response
-                        = canvas.showInputDialog(null, StringTemplate.key("menuBar.debug.addGold"),
-                                                 Integer.toString(1000),
-                                                 "ok", "cancel", true);
-                    int gold = Integer.parseInt(response);
+                    String response = canvas.showInputDialog(null,
+                        StringTemplate.key("menuBar.debug.addGold"),
+                        Integer.toString(1000), "ok", "cancel", true);
+                    int gold;
+                    try {
+                        gold = Integer.parseInt(response);
+                    } catch (NumberFormatException x) {
+                        return;
+                    }
                     player.modifyGold(gold);
                     serverPlayer.modifyGold(gold);
                 }
@@ -358,12 +359,15 @@ public class DebugMenu extends JMenu {
         this.add(addCrosses);
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response
-                        = canvas.showInputDialog(null,
-                                                 StringTemplate.key("menuBar.debug.addImmigration"),
-                                                 Integer.toString(100),
-                                                 "ok", "cancel", true);
-                    int crosses = Integer.parseInt(response);
+                    String response = canvas.showInputDialog(null,
+                        StringTemplate.key("menuBar.debug.addImmigration"),
+                        Integer.toString(100), "ok", "cancel", true);
+                    int crosses;
+                    try {
+                        crosses = Integer.parseInt(response);
+                    } catch (NumberFormatException x) {
+                        return;
+                    }
                     player.incrementImmigration(crosses);
                     serverPlayer.incrementImmigration(crosses);
                 }
@@ -377,17 +381,27 @@ public class DebugMenu extends JMenu {
         this.add(giveBells);
         giveBells.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    for (Colony c : player.getColonies()) {
-                        c.addLiberty(100);
-                        Colony sc = (Colony) serverGame.getFreeColGameObject(c.getId());
-                            sc.addLiberty(100);
-                        }
+                    String response = canvas.showInputDialog(null,
+                        StringTemplate.key("menuBar.debug.addLiberty"),
+                        Integer.toString(100), "ok", "cancel", true);
+                    int liberty;
+                    try {
+                        liberty = Integer.parseInt(response);
+                    } catch (NumberFormatException x) {
+                        return;
                     }
-                });
+                    for (Colony c : player.getColonies()) {
+                        c.addLiberty(liberty);
+                        ((Colony) serverGame.getFreeColGameObject(c.getId()))
+                            .addLiberty(liberty);
+                    }
+                }
+            });
         giveBells.setEnabled(server != null);
 
         // random number generator
-        final JMenuItem rng = new JMenuItem("Step random number generator");
+        final JMenuItem rng
+            = new JMenuItem("menuBar.debug.stepRandomNumberGenerator");
         rng.setOpaque(false);
         rng.setMnemonic(KeyEvent.VK_X);
         this.add(rng);
@@ -398,9 +412,8 @@ public class DebugMenu extends JMenu {
                     while (more) {
                         int val = igc.stepRandom();
                         more = canvas.showConfirmDialog(null,
-                                                        StringTemplate.template("menuBar.debug.stepRandomNumberGenerator")
-                                                        .addAmount("%value%", val),
-                                                        "more", "ok");
+                            StringTemplate.template("menuBar.debug.randomValue")
+                            .addAmount("%value%", val), "more", "ok");
                     }
                 }
             });
@@ -408,18 +421,22 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenu panelMenu = new JMenu("Display panels");
+        final JMenu panelMenu
+            = new JMenu(Messages.message("menuBar.debug.displayPanels"));
         panelMenu.setOpaque(false);
 
-        final JMenuItem monarchPanel = new JMenuItem("Display Monarch panel");
+        final JMenuItem monarchPanel
+            = new JMenuItem(Messages.message("menuBar.debug.displayMonarchPanel"));
         monarchPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showFreeColDialog(new MonarchPanel(canvas, Monarch.MonarchAction.RAISE_TAX));
+                    canvas.showFreeColDialog(new MonarchPanel(canvas,
+                            Monarch.MonarchAction.RAISE_TAX));
                 }
             });
         panelMenu.add(monarchPanel);
 
-        final JMenuItem victoryPanel = new JMenuItem("Display Victory panel");
+        final JMenuItem victoryPanel
+            = new JMenuItem(Messages.message("menuBar.debug.displayVictoryPanel"));
         victoryPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     canvas.showPanel(new VictoryPanel(canvas));
@@ -428,7 +445,8 @@ public class DebugMenu extends JMenu {
         panelMenu.add(victoryPanel);
 
         for (final Canvas.EventType eventType : Canvas.EventType.values()) {
-            final JMenuItem mItem = new JMenuItem("Display " + eventType + " panel");
+            final JMenuItem mItem = new JMenuItem("Display " + eventType
+                + " panel");
             mItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         canvas.showEventPanel(eventType);
@@ -438,82 +456,30 @@ public class DebugMenu extends JMenu {
         }
         this.add(panelMenu);
 
-        final JMenuItem europeStatus = new JMenuItem("Display Europe Status");
+        final JMenuItem europeStatus
+            = new JMenuItem(Messages.message("menuBar.debug.displayEuropeStatus"));
         europeStatus.setOpaque(false);
         europeStatus.setMnemonic(KeyEvent.VK_E);
         this.add(europeStatus);
         europeStatus.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    net.sf.freecol.server.ai.AIMain aiMain = server.getAIMain();
-                    StringBuilder sb = new StringBuilder();
-                    for (Player tp : game.getPlayers()) {
-                        final Player p = (Player) serverGame.getFreeColGameObject(tp.getId());
-                        if (p.getEurope() == null) {
-                            continue;
-                        }
-                        List<Unit> inEurope = new ArrayList<Unit>();
-                        List<Unit> toEurope = new ArrayList<Unit>();
-                        List<Unit> toAmerica = new ArrayList<Unit>();
-                        LinkedHashMap<String,List<Unit>> units = new LinkedHashMap<String, List<Unit>>();
-                        units.put("To Europe", toEurope);
-                        units.put("In Europe", inEurope);
-                        units.put("To America", toAmerica);
-
-                        sb.append("\n==");
-                        sb.append(Messages.message(p.getNationName()));
-                        sb.append("==\n");
-
-                        for(Unit u : p.getEurope().getUnitList()){
-                            if (u.getState() == UnitState.TO_AMERICA) {
-                                toAmerica.add(u);
-                                continue;
-                            }
-                            if (u.getState() == UnitState.TO_EUROPE) {
-                                toEurope.add(u);
-                                continue;
-                            }
-                            inEurope.add(u);
-                        }
-
-                        for (String label : units.keySet()) {
-                            List<Unit> list = units.get(label);
-                            if (list.size() > 0){
-                                sb.append("\n->" + label + "\n");
-                                for (Unit u : list) {
-                                    sb.append('\n');
-                                    sb.append(Messages.message(Messages.getLabel(u)));
-                                    if (u.isUnderRepair()) {
-                                        sb.append(" (Repairing)");
-                                    } else {
-                                        sb.append("    ");
-                                        AIUnit aiu = aiMain.getAIUnit(u);
-                                        if (aiu.getMission() == null) {
-                                            sb.append(" (None)");
-                                        } else{
-                                            sb.append(aiu.getMission().toString().replaceAll("\n", "    \n"));
-                                        }
-                                    }
-                                }
-                                sb.append('\n');
-                            }
-                        }
-                    }
-                    canvas.showInformationMessage(sb.toString());
+                    displayEuropeAction(serverGame, server.getAIMain());
                 }
             });
         europeStatus.setEnabled(server != null);
 
-        final JMenuItem useAI = new JMenuItem("Use AI");
+        final JMenuItem useAI
+            = new JMenuItem(Messages.message("menuBar.debug.useAI"));
         useAI.setOpaque(false);
         useAI.setMnemonic(KeyEvent.VK_A);
         useAI.setAccelerator(KeyStroke.getKeyStroke('A',
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                                                    | InputEvent.ALT_MASK));
+                | InputEvent.ALT_MASK));
         this.add(useAI);
         useAI.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    net.sf.freecol.server.ai.AIMain aiMain = server.getAIMain();
-                    net.sf.freecol.server.ai.AIPlayer ap = aiMain.getAIPlayer(player);
+                    AIMain aiMain = server.getAIMain();
+                    AIPlayer ap = aiMain.getAIPlayer(player);
                     ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                     ap.startWorking();
                     freeColClient.getConnectController().reconnect();
@@ -523,68 +489,52 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
+        final JMenuItem compareMaps
+            = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
         compareMaps.setOpaque(false);
         compareMaps.setMnemonic(KeyEvent.VK_C);
         compareMaps.setAccelerator(KeyStroke.getKeyStroke('C',
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
-                                                          | InputEvent.ALT_MASK));
+                | InputEvent.ALT_MASK));
         this.add(compareMaps);
         compareMaps.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    boolean problemDetected = false;
-                    Map serverMap = serverGame.getMap();
-                    for (Tile t: serverMap.getAllTiles()) {
-                        if (serverPlayer.canSee(t)) {
-                            Iterator<Unit> unitIterator = t.getUnitIterator();
-                            while (unitIterator.hasNext()) {
-                                Unit u = unitIterator.next();
-                                if (u.isVisibleTo(serverPlayer)) {
-                                    if (game.getFreeColGameObject(u.getId()) == null) {
-                                        System.out.println("Unsynchronization detected: Unit missing on client-side");
-                                        System.out.println(Messages.message(Messages.getLabel(u))
-                                                           + "(" + u.getId() + "). Position: "
-                                                           + u.getTile().getPosition());
-                                        try {
-                                            System.out.println("Possible unit on client-side: "
-                                                               + game.getMap().getTile(u.getTile().getPosition())
-                                                               .getFirstUnit().getId());
-                                        } catch (NullPointerException npe) {
-                                        }
-                                        System.out.println();
-                                        problemDetected = true;
-                                    } else {
-                                        Unit clientSideUnit = (Unit) game.getFreeColGameObject(u.getId());
-                                        if (clientSideUnit.getTile() != null
-                                            && !clientSideUnit.getTile().getId().equals(u.getTile().getId())) {
-                                            System.out.println("Unsynchronization detected: Unit located on different tiles");
-                                            System.out.println("Server: " + Messages.message(Messages.getLabel(u))
-                                                               + "(" + u.getId() + "). Position: "
-                                                               + u.getTile().getPosition());
-                                            System.out.println("Client: "
-                                                               + Messages.message(Messages.getLabel(clientSideUnit))
-                                                               + "(" + clientSideUnit.getId() + "). Position: "
-                                                               + clientSideUnit.getTile().getPosition());
-                                            System.out.println();
-                                            problemDetected = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (problemDetected) {
-                        canvas.showInformationMessage("menuBar.debug.compareMaps.problem");
-                    } else {
-                        canvas.showInformationMessage("menuBar.debug.compareMaps.checkComplete");
-                    }
+                    checkDesyncAction(serverGame, serverPlayer);
                 }
             });
         compareMaps.setEnabled(server != null);
 
+        final JMenuItem showResourceKeys
+            = new JMenuItem(Messages.message("menuBar.debug.showResourceKeys"));
+        showResourceKeys.setOpaque(false);
+        this.add(showResourceKeys);
+        showResourceKeys.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    java.util.Map<String, Resource> resources
+                        = ResourceManager.getResources();
+                    List<String> keys
+                        = new ArrayList<String>(resources.keySet());
+                    Collections.sort(keys);
+                    StringBuilder builder = new StringBuilder();
+                    for (String key : keys) {
+                        builder.append(key);
+                        Resource resource = resources.get(key);
+                        if (resource instanceof ImageResource) {
+                            ImageResource ir = (ImageResource) resource;
+                            builder.append(" (");
+                            builder.append(ir.getCount());
+                            builder.append(")");
+                        }
+                        builder.append("\n");
+                    }
+                    canvas.showInformationMessage(builder.toString());
+                }
+            });
+        showResourceKeys.setEnabled(true);
+
         // statistics
-        final JMenuItem statistics = new JMenuItem("Statistics");
+        final JMenuItem statistics
+            = new JMenuItem(Messages.message("menuBar.debug.statistics"));
         statistics.setOpaque(false);
         statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
@@ -609,45 +559,134 @@ public class DebugMenu extends JMenu {
         gc.setEnabled(true);
 
         this.addSeparator();
+    }
 
-        final JMenuItem showResourceKeys = new JMenuItem("Show resource keys");
-        showResourceKeys.setOpaque(false);
-        this.add(showResourceKeys);
-        showResourceKeys.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    java.util.Map<String, Resource> resources = ResourceManager.getResources();
-                    List<String> keys = new ArrayList<String>(resources.keySet());
-                    Collections.sort(keys);
-                    StringBuilder builder = new StringBuilder();
-                    for (String key : keys) {
-                        builder.append(key);
-                        Resource resource = resources.get(key);
-                        if (resource instanceof ImageResource) {
-                            builder.append(" (");
-                            builder.append(((ImageResource) resource).getCount());
-                            builder.append(")");
+    private void addFatherAction(final Game game, final InGameController igc,
+                                 final Player player, String fatherTitle) {
+        List<ChoiceItem<FoundingFather>> fathers
+            = new ArrayList<ChoiceItem<FoundingFather>>();
+        for (FoundingFather father : game.getSpecification()
+                 .getFoundingFathers()) {
+            if (!player.hasFather(father)) {
+                ChoiceItem<FoundingFather> choice
+                    = new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
+                                                     father);
+                fathers.add(choice);
+            }
+        }
+        ChoiceDialog<FoundingFather> choiceDialog
+            = new ChoiceDialog<FoundingFather>(canvas, fatherTitle, "Cancel",
+                fathers);
+        FoundingFather father = canvas.showFreeColDialog(choiceDialog, null);
+        if (father != null) {
+            igc.addFoundingFather((ServerPlayer) player, father);
+        }
+    }
+
+    private void checkDesyncAction(final Game serverGame,
+                                   final Player serverPlayer) {
+        Game game = freeColClient.getGame();
+        boolean problemDetected = false;
+        Map serverMap = serverGame.getMap();
+        for (Tile t : serverMap.getAllTiles()) {
+            if (serverPlayer.canSee(t)) {
+                Iterator<Unit> unitIterator = t.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit u = unitIterator.next();
+                    if (u.isVisibleTo(serverPlayer)) {
+                        if (game.getFreeColGameObject(u.getId()) == null) {
+                            System.out.println("Desynchronization detected: Unit missing on client-side");
+                            System.out.println(Messages.message(Messages.getLabel(u))
+                                + "(" + u.getId() + "). Position: "
+                                + u.getTile().getPosition());
+                            try {
+                                System.out.println("Possible unit on client-side: "
+                                    + game.getMap().getTile(u.getTile().getPosition())
+                                    .getFirstUnit().getId());
+                            } catch (NullPointerException npe) {
+                            }
+                            System.out.println();
+                            problemDetected = true;
+                        } else {
+                            Unit clientSideUnit = (Unit) game.getFreeColGameObject(u.getId());
+                            if (clientSideUnit.getTile() != null
+                                && !clientSideUnit.getTile().getId().equals(u.getTile().getId())) {
+                                System.out.println("Unsynchronization detected: Unit located on different tiles");
+                                System.out.println("Server: " + Messages.message(Messages.getLabel(u))
+                                    + "(" + u.getId() + "). Position: "
+                                    + u.getTile().getPosition());
+                                System.out.println("Client: "
+                                    + Messages.message(Messages.getLabel(clientSideUnit))
+                                    + "(" + clientSideUnit.getId() + "). Position: "
+                                    + clientSideUnit.getTile().getPosition());
+                                System.out.println();
+                                problemDetected = true;
+                            }
                         }
-                        builder.append("\n");
                     }
-                    canvas.showInformationMessage(builder.toString());
                 }
-            });
-        showResourceKeys.setEnabled(true);
+            }
+        }
 
-        /*
-          TODO: how do we force the ResourceManager to reload images?
-        final JMenuItem loadResource = new JMenuItem("Reload images");
-        loadResource.setOpaque(false);
-        this.add(loadResource);
-        loadResource.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        canvas.getImageLibrary().init();
-                    } catch (Exception ex) {
-                        System.out.println("Failed to reload images.");
-                    }
+        canvas.showInformationMessage((problemDetected)
+            ? "menuBar.debug.compareMaps.problem"
+            : "menuBar.debug.compareMaps.checkComplete");
+    }
+
+    private void displayEuropeAction(Game serverGame, AIMain aiMain) {
+        StringBuilder sb = new StringBuilder();
+        for (Player tp : serverGame.getPlayers()) {
+            Player p = (Player) serverGame.getFreeColGameObject(tp.getId());
+            if (p.getEurope() == null) continue;
+            List<Unit> inEurope = new ArrayList<Unit>();
+            List<Unit> toEurope = new ArrayList<Unit>();
+            List<Unit> toAmerica = new ArrayList<Unit>();
+            LinkedHashMap<String,List<Unit>> units
+                = new LinkedHashMap<String, List<Unit>>();
+            units.put("To Europe", toEurope);
+            units.put("In Europe", inEurope);
+            units.put("To America", toAmerica);
+
+            sb.append("\n==");
+            sb.append(Messages.message(p.getNationName()));
+            sb.append("==\n");
+
+            for (Unit u : p.getEurope().getUnitList()) {
+                if (u.getState() == UnitState.TO_AMERICA) {
+                    toAmerica.add(u);
+                    continue;
                 }
-            });
-        */
+                if (u.getState() == UnitState.TO_EUROPE) {
+                    toEurope.add(u);
+                    continue;
+                }
+                inEurope.add(u);
+            }
+
+            for (String label : units.keySet()) {
+                List<Unit> list = units.get(label);
+                if (list.size() > 0){
+                    sb.append("\n->" + label + "\n");
+                    for (Unit u : list) {
+                        sb.append('\n');
+                        sb.append(Messages.message(Messages.getLabel(u)));
+                        if (u.isUnderRepair()) {
+                            sb.append(" (Repairing)");
+                        } else {
+                            sb.append("    ");
+                            AIUnit aiu = aiMain.getAIUnit(u);
+                            if (aiu.getMission() == null) {
+                                sb.append(" (None)");
+                            } else {
+                                sb.append(aiu.getMission().toString()
+                                    .replaceAll("\n", "    \n"));
+                            }
+                        }
+                    }
+                    sb.append('\n');
+                }
+            }
+        }
+        canvas.showInformationMessage(sb.toString());
     }
 }
