@@ -80,7 +80,7 @@ public final class FreeCol {
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
     public static final String DEFAULT_TC = "freecol";
 
-    private static final String FREECOL_VERSION = "0.10.0-alpha2";
+    private static final String FREECOL_VERSION = "0.10.0-trunk";
     private static String FREECOL_REVISION;
 
     private static final String MIN_JDK_VERSION = "1.5";
