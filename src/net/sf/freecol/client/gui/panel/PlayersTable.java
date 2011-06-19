@@ -103,7 +103,7 @@ public final class PlayersTable extends JTable {
 
         library = canvas.getImageLibrary();
 
-        setModel(new PlayersTableModel(canvas.getClient().getPreGameController(), nationOptions, myPlayer));
+        setModel(new PlayersTableModel(canvas.getFreeColClient().getPreGameController(), nationOptions, myPlayer));
         setRowHeight(47);
 
         JButton nationButton = new JButton(Messages.message("nation"));

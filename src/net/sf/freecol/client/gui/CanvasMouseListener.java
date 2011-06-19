@@ -138,9 +138,12 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                         gui.stopGoto();
                         // Move the unit:
                         Unit unit = gui.getActiveUnit();
-                        canvas.getClient().getInGameController().setDestination(unit, path.getLastNode().getTile());
-                        if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
-                            canvas.getClient().getInGameController().moveToDestination(unit);
+                        canvas.getFreeColClient().getInGameController()
+                            .setDestination(unit, path.getLastNode().getTile());
+                        if (canvas.getFreeColClient().getGame()
+                            .getCurrentPlayer() == canvas.getFreeColClient().getMyPlayer()) {
+                            canvas.getFreeColClient().getInGameController()
+                                .moveToDestination(unit);
                         }
                     }
                 } else if (doubleClickTimer.isRunning()) {
@@ -173,9 +176,11 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
                 // Move the unit:
                 Unit unit = gui.getActiveUnit();
-                InGameController ctlr = canvas.getClient().getInGameController();
+                InGameController ctlr = canvas.getFreeColClient()
+                    .getInGameController();
                 ctlr.setDestination(unit, temp.getLastNode().getTile());
-                if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
+                if (canvas.getFreeColClient().getGame().getCurrentPlayer()
+                    == canvas.getFreeColClient().getMyPlayer()) {
                     ctlr.moveToDestination(unit);
                     boolean canStayActive = unit.getState() == UnitState.ACTIVE
                     						&& unit.getDestination() == null

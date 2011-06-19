@@ -137,7 +137,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     public ProductionLabel(AbstractGoods goods, int maximum, Canvas parent) {
         super(goods, parent, false);
         this.maximumProduction = maximumProduction;
-        ClientOptions options = parent.getClient().getClientOptions();
+        ClientOptions options = parent.getFreeColClient().getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 

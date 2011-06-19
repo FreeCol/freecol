@@ -62,11 +62,10 @@ public final class ReportColonyPanel extends ReportPanel {
 
         super(parent, Messages.message("reportColonyAction.name"));
         Player player = getMyPlayer();
-        colonies = player.getColonies();
+        colonies = getFreeColClient().getClientOptions()
+            .getSortedColonies(player);
 
         // Display Panel
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
-
         reportPanel.setLayout(new MigLayout("fill"));
 
         for (Colony colony : colonies) {

@@ -616,7 +616,6 @@ public final class FreeColClient {
         if (actionManager != null) actionManager.update();
     }
 
-
     public MapEditorController getMapEditorController() {
         return mapEditorController;
     }

@@ -55,7 +55,7 @@ public final class GameOptionsDialog extends OptionsDialog {
         // Set special cases
         // Disable victory option "All humans defeated"
         // when playing single player
-        if (editable && getClient().isSingleplayer()) {
+        if (editable && getFreeColClient().isSingleplayer()) {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI().getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
 
             comp.setValue(false);
@@ -68,8 +68,8 @@ public final class GameOptionsDialog extends OptionsDialog {
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            if (!getClient().isMapEditor()) {
-                getClient().getPreGameController().sendGameOptions();
+            if (!getFreeColClient().isMapEditor()) {
+                getFreeColClient().getPreGameController().sendGameOptions();
             }
         }
     }

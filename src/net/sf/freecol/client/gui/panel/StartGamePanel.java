@@ -174,9 +174,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * Updates the map generator options displayed on this panel.
      */
     public void updateMapGeneratorOptions() {
-        getClient().getGame().getMapGeneratorOptions()
+        getFreeColClient().getGame().getMapGeneratorOptions()
             .getOption("model.option.mapWidth");
-        getClient().getGame().getMapGeneratorOptions()
+        getFreeColClient().getGame().getMapGeneratorOptions()
             .getOption("model.option.mapHeight");
     }
 
@@ -207,7 +207,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         }
 
         if (enabled) {
-            start.setEnabled(getClient().isAdmin());
+            start.setEnabled(getFreeColClient().isAdmin());
         }
 
         gameOptions.setEnabled(enabled);
@@ -259,32 +259,35 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     getMyPlayer().setReady(true);
                 }
 
-                getClient().getPreGameController().requestLaunch();
+                getFreeColClient().getPreGameController().requestLaunch();
                 break;
             case CANCEL:
-                getClient().getConnectController().quitGame(true);
+                getFreeColClient().getConnectController().quitGame(true);
                 getCanvas().remove(this);
                 getCanvas().showPanel(new NewPanel(getCanvas()));
                 break;
             case READY:
-                getClient().getPreGameController().setReady(readyBox.isSelected());
+                getFreeColClient().getPreGameController()
+                    .setReady(readyBox.isSelected());
                 refreshPlayersTable();
                 break;
             case CHAT:
                 if (chat.getText().trim().length() > 0) {
-                    getClient().getPreGameController().chat(chat.getText());
+                    getFreeColClient().getPreGameController()
+                        .chat(chat.getText());
                     displayChat(getMyPlayer().getName(), chat.getText(), false);
                     chat.setText("");
                 }
                 break;
             case GAME_OPTIONS:
-                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getClient().isAdmin(), true));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getFreeColClient().isAdmin(), true));
                 break;
             case MAP_GENERATOR_OPTIONS:
-                OptionGroup mgo = getClient().getGame().getMapGeneratorOptions();
+                OptionGroup mgo = getFreeColClient().getGame()
+                    .getMapGeneratorOptions();
                 FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
                 boolean loadCustomOptions = (importFile.getValue() == null);
-                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getCanvas(), mgo, getClient().isAdmin(),
+                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getCanvas(), mgo, getFreeColClient().isAdmin(),
                                                                             loadCustomOptions));
                 break;
             default:

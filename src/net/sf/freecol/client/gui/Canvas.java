@@ -424,7 +424,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         if (update) {
-            getClient().updateMenuBar();
+            freeColClient.updateMenuBar();
             freeColClient.getActionManager().update();
         }
     }
@@ -663,7 +663,7 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>freeColClient</code> associated with this
      *         <code>Canvas</code>.
      */
-    public FreeColClient getClient() {
+    public FreeColClient getFreeColClient() {
         return freeColClient;
     }
 
@@ -939,7 +939,7 @@ public final class Canvas extends JDesktopPane {
 
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
-            getClient().updateMenuBar();
+            freeColClient.updateMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
@@ -1752,7 +1752,7 @@ public final class Canvas extends JDesktopPane {
     public void showOpeningVideoPanel() {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !getClient().canPlaySound();
+        boolean muteAudio = !getFreeColClient().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
         addCentered(vp, MAIN_LAYER);
         vp.play();
@@ -2236,7 +2236,7 @@ public final class Canvas extends JDesktopPane {
      * Updates the label displaying the current amount of gold.
      */
     public void updateGoldLabel() {
-        getClient().getFrame().getJMenuBar().repaint();
+        getFreeColClient().getFrame().getJMenuBar().repaint();
     }
 
     public void updateMapGeneratorOptions() {

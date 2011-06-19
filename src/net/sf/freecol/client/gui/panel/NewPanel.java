@@ -135,7 +135,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     public NewPanel(Canvas parent, Specification specification) {
         super(parent);
         this.specification = specification;
-        this.connectController = getClient().getConnectController();
+        this.connectController = getFreeColClient().getConnectController();
 
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc.getModInfo());

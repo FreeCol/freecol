@@ -656,6 +656,18 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
+     * Gets a fresh list of sorted colonies for a player.
+     * Helper function for a common idiom.
+     *
+     * @param p The <code>Player</code> to get the colony list for.
+     * @return A fresh list of colonies sorted according to the
+     *    current comparator.
+     */
+    public List<Colony> getSortedColonies(Player p) {
+        return p.getSortedColonies(getColonyComparator());
+    }
+
+    /**
      * Return the client's preferred comparator for colonies.
      *
      * @return a <code>Comparator</code> value

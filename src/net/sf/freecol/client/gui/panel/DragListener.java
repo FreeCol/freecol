@@ -102,7 +102,8 @@ public final class DragListener extends MouseAdapter {
                 } else if (comp instanceof MarketLabel
                            && parentPanel instanceof EuropePanel) {
                     GoodsType goodsType = ((MarketLabel) comp).getType();
-                    if (canvas.getClient().getInGameController().payArrears(goodsType)) {
+                    if (canvas.getFreeColClient().getInGameController()
+                        .payArrears(goodsType)) {
                         ((EuropePanel) parentPanel).revalidate();
                         ((EuropePanel) parentPanel).refresh();
                     }
@@ -432,7 +433,7 @@ public final class DragListener extends MouseAdapter {
             menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        canvas.getClient().getInGameController()
+                        canvas.getFreeColClient().getInGameController()
                             .checkCashInTreasureTrain(tempUnit);
                     }
                 });
@@ -444,7 +445,8 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addEquipmentItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
-        final InGameController igc = canvas.getClient().getInGameController();
+        final InGameController igc = canvas.getFreeColClient()
+            .getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
         if (tempUnit.getEquipment().size() > 1) {
@@ -579,7 +581,8 @@ public final class DragListener extends MouseAdapter {
     public JPopupMenu getGoodsMenu(final GoodsLabel goodsLabel) {
 
         final Goods goods = goodsLabel.getGoods();
-        final InGameController inGameController = canvas.getClient().getInGameController();
+        final InGameController inGameController = canvas.getFreeColClient()
+            .getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
         JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey()) + " (" +
@@ -594,7 +597,7 @@ public final class DragListener extends MouseAdapter {
         menu.add(name);
 
         if (!(goods.getLocation() instanceof Colony)) {
-            if (canvas.getClient().getMyPlayer().canTrade(goods)) {
+            if (canvas.getFreeColClient().getMyPlayer().canTrade(goods)) {
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {

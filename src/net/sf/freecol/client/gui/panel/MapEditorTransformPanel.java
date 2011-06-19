@@ -99,7 +99,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         // assume we have only native players for the moment
         if (getGame().getPlayers().isEmpty()) {
-            FreeColServer server = getClient().getFreeColServer();
+            FreeColServer server = getFreeColClient().getFreeColServer();
             if (server.getAIMain() == null) {
                 server.setAIMain(new AIMain(server));
             }
@@ -174,7 +174,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         group.add(button);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	MapEditorController ctlr = getClient().getMapEditorController();
+            	MapEditorController ctlr = getFreeColClient().getMapEditorController();
             	MapTransform newMapTransform = null;
             	if(ctlr.getMapTransform() != mt){
             		newMapTransform = mt;

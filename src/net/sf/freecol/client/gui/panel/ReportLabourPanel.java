@@ -62,7 +62,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      */
     public ReportLabourPanel(Canvas parent) {
         super(parent, Messages.message("reportLabourAction.name"));
-        colonies = getMyPlayer().getColonies();
+        colonies = getFreeColClient().getClientOptions()
+              .getSortedColonies(getMyPlayer());
         gatherData();
         displayData();
     }
@@ -78,8 +79,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         for (UnitType type : getSpecification().getUnitTypeList()) {
             unitLocations.put(type, new HashMap<Colony, Integer>());
         }
-
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         Iterator<Unit> units = getMyPlayer().getUnitIterator();
         while (units.hasNext()) {

@@ -47,7 +47,7 @@ public class Animations {
      * @return The animation speed.
      */
     public static int getAnimationSpeed(Canvas canvas, Unit unit) {
-        FreeColClient client = canvas.getClient();
+        FreeColClient client = canvas.getFreeColClient();
         String key = (client.getMyPlayer() == unit.getOwner())
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;

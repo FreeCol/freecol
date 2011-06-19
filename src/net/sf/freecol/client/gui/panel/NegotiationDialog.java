@@ -539,8 +539,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             colonyBox.removeAllItems();
                 
             Iterator<Colony> coloniesInAgreement = agreement.getColoniesGivenBy(player).iterator();
-            List<Colony> coloniesAvail = new ArrayList<Colony>();
-            coloniesAvail.addAll(player.getColonies());
+            List<Colony> coloniesAvail = getFreeColClient().getClientOptions()
+                .getSortedColonies(player);
                 
             //remove the ones already on the table
             while(coloniesInAgreement.hasNext()){
@@ -559,10 +559,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 addButton.setEnabled(false);
                 colonyBox.setEnabled(false);
             } else {
-                Collections.sort(coloniesAvail, getClient().getClientOptions().getColonyComparator());
-                Iterator<Colony> colonyIterator = coloniesAvail.iterator();
-                while (colonyIterator.hasNext()) {
-                    colonyBox.addItem(colonyIterator.next());
+                for (Colony c : coloniesAvail) {
+                    colonyBox.addItem(c);
                 }
                 for(ActionListener al : listeners) {
                     colonyBox.addActionListener(al);

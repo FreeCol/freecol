@@ -56,9 +56,10 @@ public final class MainPanel extends FreeColPanel {
     */
     public MainPanel(Canvas parent) {
         super(parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
-        boolean canContinue = getClient().getInGameController().getLastSaveGameFile() != null;
+        boolean canContinue = getFreeColClient().getInGameController()
+            .getLastSaveGameFile() != null;
 
-        ActionManager am = getClient().getActionManager();
+        ActionManager am = getFreeColClient().getActionManager();
         JButton newButton = new JButton(am.getFreeColAction(NewAction.id));
         JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
         JButton mapEditorButton = new JButton(am.getFreeColAction(MapEditorAction.id));

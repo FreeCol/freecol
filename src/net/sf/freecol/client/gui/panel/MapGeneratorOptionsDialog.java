@@ -161,8 +161,9 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            if (!getClient().isMapEditor()) {
-                getClient().getPreGameController().sendMapGeneratorOptions();
+            if (!getFreeColClient().isMapEditor()) {
+                getFreeColClient().getPreGameController()
+                    .sendMapGeneratorOptions();
                 //getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
             }
         } else {

@@ -84,7 +84,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public UnitLabel(Unit unit, Canvas parent) {
         this.unit = unit;
         this.parent = parent;
-        this.inGameController = parent.getClient().getInGameController();
+        this.inGameController = parent.getFreeColClient().getInGameController();
 
         selected = false;
         setSmall(false);
@@ -233,7 +233,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
-        } else if (unit.getOwner() != parent.getClient().getMyPlayer() && unit.getColony() == null) {
+        } else if (unit.getOwner() != parent.getFreeColClient().getMyPlayer()
+            && unit.getColony() == null) {
             setEnabled(true);
         } else {
             setEnabled(false);
@@ -371,7 +372,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             if (uc instanceof ColonyPanel) {
                 if (unit.getColony() == null) {
                     parent.remove(uc);
-                    parent.getClient().getActionManager().update();
+                    parent.getFreeColClient().getActionManager().update();
                 } else {
                     // ((ColonyPanel) uc).reinitialize();
                 }

@@ -528,7 +528,7 @@ public final class EuropePanel extends FreeColPanel {
                     return null;
                 }
                 final Unit unit = ((UnitLabel) comp).getUnit();
-                final ClientOptions co = getClient().getClientOptions();
+                final ClientOptions co = getFreeColClient().getClientOptions();
                 boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
                 if (!autoload
                     && docksPanel.getComponentCount() > 0

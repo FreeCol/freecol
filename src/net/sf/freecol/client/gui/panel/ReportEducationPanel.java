@@ -55,10 +55,8 @@ public final class ReportEducationPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
         Player player = getMyPlayer();
-
-        List<Colony> colonies = player.getColonies();
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
-
+        List<Colony> colonies = getFreeColClient().getClientOptions()
+            .getSortedColonies(player);
         int production = 0;
         for (Colony colony : colonies) {
             for (Building building : colony.getBuildings()) {

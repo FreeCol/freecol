@@ -74,19 +74,20 @@ public final class ReportTurnPanel extends ReportPanel {
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("reportTurnAction.name"));
 
+        ClientOptions options = getFreeColClient().getClientOptions();
         this._messages = messages;
 
-        Comparator<ModelMessage> comparator = getClient().getClientOptions().getModelMessageComparator();
+        Comparator<ModelMessage> comparator
+            = options.getModelMessageComparator();
         if (comparator != null) {
             Arrays.sort(messages, comparator);
         }
 
-        ClientOptions options = getClient().getClientOptions();
         int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
 
         Object source = this;
         ModelMessage.MessageType type = null;
-        Game game = getClient().getGame();
+        Game game = getFreeColClient().getGame();
 
         // count number of headlines
         for (final ModelMessage message : messages) {
@@ -306,7 +307,7 @@ public final class ReportTurnPanel extends ReportPanel {
             while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
                 String[] item = findReplacementData(message, var);
-                FreeColGameObject messageSource = getClient().getGame().getMessageSource(message);
+                FreeColGameObject messageSource = getFreeColClient().getGame().getMessageSource(message);
                 if (item != null && var.equals(item[0])) {
                     // found variable to replace
                     if (var.equals("%colony%")) {

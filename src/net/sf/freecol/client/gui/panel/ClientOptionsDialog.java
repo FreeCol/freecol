@@ -50,7 +50,8 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     public ClientOptionsDialog(Canvas parent) {
         super(parent, true);
         getButtons().clear();
-        initialize(getClient().getClientOptions(), getClient().getClientOptions().getName(), null);
+        initialize(getFreeColClient().getClientOptions(),
+            getFreeColClient().getClientOptions().getName(), null);
     }
 
     /**
@@ -77,14 +78,14 @@ public final class ClientOptionsDialog extends OptionsDialog  {
             File file = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
             try {
                 getGroup().save(file);
-                getClient().getActionManager().update();
-                JMenuBar menuBar = getClient().getFrame().getJMenuBar();
+                getFreeColClient().getActionManager().update();
+                JMenuBar menuBar = getFreeColClient().getFrame().getJMenuBar();
                 if (menuBar != null) {
                     ((FreeColMenuBar) menuBar).reset();
                 }
 
                 // Immediately redraw the minimap if that was updated.
-                MapControlsAction mca = (MapControlsAction) getClient()
+                MapControlsAction mca = (MapControlsAction) getFreeColClient()
                     .getActionManager().getFreeColAction(MapControlsAction.id);
                 if (mca.getMapControls() != null) {
                     mca.getMapControls().update();

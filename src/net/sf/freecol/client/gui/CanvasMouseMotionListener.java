@@ -81,8 +81,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      */
     public void mouseMoved(MouseEvent e) {
       
-    	if (e.getComponent().isEnabled() && 
-   			canvas.getClient().getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
+    	if (e.getComponent().isEnabled()
+          && canvas.getFreeColClient().getClientOptions()
+          .getBoolean(ClientOptions.AUTO_SCROLL)) {
 				auto_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
             scrollThread.stopScrolling();
@@ -118,8 +119,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      */
     public void mouseDragged(MouseEvent e) {
 
-        if (e.getComponent().isEnabled() &&
-			 canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
+        if (e.getComponent().isEnabled()
+            && canvas.getFreeColClient().getClientOptions()
+            .getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
 				drag_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
             scrollThread.stopScrolling();

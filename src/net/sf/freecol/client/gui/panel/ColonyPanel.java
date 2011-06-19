@@ -398,7 +398,7 @@ public final class ColonyPanel extends FreeColPanel
     }
 
     private void sortColonies(List<Colony> colonies) {
-        Collections.sort(colonies, getClient().getClientOptions()
+        Collections.sort(colonies, getFreeColClient().getClientOptions()
                          .getColonyComparator());
     }
 
@@ -475,11 +475,11 @@ public final class ColonyPanel extends FreeColPanel
         } catch (NumberFormatException nfe) {
             return;
         }
-        GoodsType sGoodsType = getClient().getFreeColServer()
+        GoodsType sGoodsType = getFreeColClient().getFreeColServer()
             .getSpecification().getGoodsType(goodsType.getId());
         GoodsContainer cgc = colony.getGoodsContainer();
-        GoodsContainer sgc = (GoodsContainer) getClient().getFreeColServer()
-            .getGame().getFreeColGameObject(cgc.getId());
+        GoodsContainer sgc = (GoodsContainer) getFreeColClient()
+            .getFreeColServer().getGame().getFreeColGameObject(cgc.getId());
         cgc.setAmount(goodsType, a);
         sgc.setAmount(sGoodsType, a);
         updateConstructionPanel();
@@ -712,7 +712,7 @@ public final class ColonyPanel extends FreeColPanel
                     getController().nextActiveUnit();
                 }
             }
-            getClient().getGUI().restartBlinking();
+            getFreeColClient().getGUI().restartBlinking();
         }
     }
 
@@ -1247,7 +1247,7 @@ public final class ColonyPanel extends FreeColPanel
          * Update this WarehousePanel.
          */
         private void update() {
-            final int threshold = getClient().getClientOptions()
+            final int threshold = getFreeColClient().getClientOptions()
                 .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
@@ -1627,7 +1627,7 @@ public final class ColonyPanel extends FreeColPanel
                     getController().changeWorkType(unit, workType);
                 }
 
-                if (getClient().getClientOptions()
+                if (getFreeColClient().getClientOptions()
                     .getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
                     ColonyTile best = colony.getVacantColonyTileFor(unit, false,
                                                                     workType);

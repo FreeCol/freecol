@@ -719,9 +719,9 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns a list of all Colonies this player owns.
+     * Gets a fresh list of all colonies this player owns.
      *
-     * @return The colonies this player owns.
+     * @return A fresh list of the colonies this player owns.
      */
     public List<Colony> getColonies() {
         ArrayList<Colony> colonies = new ArrayList<Colony>();
@@ -736,7 +736,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the sum of units currently working in the colonies of this player.
+     * Returns a sorted list of all Colonies this player owns.
+     *
+     * @param c A comparator to operate on the colony list.
+     * @return A fresh list of the colonies this player owns.
+     */
+    public List<Colony> getSortedColonies(Comparator<Colony> c) {
+        List<Colony> colonies = new ArrayList<Colony>();
+        Collections.sort(colonies, c);
+        return colonies;
+    }
+
+    /**
+     * Returns the sum of units currently working in the colonies of
+     * this player.
      *
      * @return Sum of units currently working in the colonies.
      */

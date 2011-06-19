@@ -110,7 +110,7 @@ public final class InfoPanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
            @Override
            public void mousePressed(MouseEvent e) {
-              GUI gui = getClient().getGUI();
+              GUI gui = getFreeColClient().getGUI();
               Unit activeUnit = gui.getActiveUnit();
               if (activeUnit != null && activeUnit.getTile() != null) {
                   gui.setFocus(activeUnit.getTile());
@@ -198,8 +198,8 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = getClient().getGUI().getViewMode().getView();
-        if (!getClient().isMapEditor()) {
+        int viewMode = getFreeColClient().getGUI().getViewMode().getView();
+        if (!getFreeColClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);
             }
@@ -274,8 +274,8 @@ public final class InfoPanel extends FreeColPanel {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                getClient().getGUI().displayTerrain(image.createGraphics(),
-                                                      tile);
+                getFreeColClient().getGUI()
+                    .displayTerrain(image.createGraphics(), tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.add(tile.getNameKey());
@@ -445,7 +445,8 @@ public final class InfoPanel extends FreeColPanel {
                 add(new JLabel(labelString));
             }
 
-            add(new JButton(getClient().getActionManager().getFreeColAction(EndTurnAction.id)));
+            add(new JButton(getFreeColClient().getActionManager()
+                    .getFreeColAction(EndTurnAction.id)));
             setOpaque(false);
             setSize(getPreferredSize());
 

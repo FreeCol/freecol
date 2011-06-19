@@ -210,7 +210,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return an <code>int</code> value
      */
     private int getInteger(String key) {
-        return getClient().getClientOptions().getInteger(getClass().getName() + key);
+        return getFreeColClient().getClientOptions()
+            .getInteger(getClass().getName() + key);
     }
 
     /**
@@ -236,11 +237,12 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param value an <code>int</code> value
      */
     private void saveInteger(String key, int value) {
-        Option o = getClient().getClientOptions().getOption(getClass().getName() + key);
+        Option o = getFreeColClient().getClientOptions()
+            .getOption(getClass().getName() + key);
         if (o == null) {
             IntegerOption io = new IntegerOption(getClass().getName() + key);
             io.setValue(value);
-            getClient().getClientOptions().add(io);
+            getFreeColClient().getClientOptions().add(io);
         } else if (o instanceof IntegerOption) {
             ((IntegerOption) o).setValue(value);
         }
@@ -311,12 +313,12 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Describe <code>getClient</code> method here.
+     * Gets the FreeColClient from the canvas.
      *
-     * @return a <code>FreeColClient</code> value
+     * @return A current <code>FreeColClient</code>.
      */
-    public FreeColClient getClient() {
-        return canvas.getClient();
+    public FreeColClient getFreeColClient() {
+        return canvas.getFreeColClient();
     }
 
     /**
@@ -325,7 +327,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Game</code> value
      */
     public Game getGame() {
-        return canvas.getClient().getGame();
+        return canvas.getFreeColClient().getGame();
     }
 
     /**
@@ -343,7 +345,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return an <code>InGameController</code> value
      */
     public InGameController getController() {
-        return canvas.getClient().getInGameController();
+        return canvas.getFreeColClient().getInGameController();
     }
 
     /**
@@ -352,7 +354,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Player</code> value
      */
     public Player getMyPlayer() {
-        return canvas.getClient().getMyPlayer();
+        return canvas.getFreeColClient().getMyPlayer();
     }
 
     /**

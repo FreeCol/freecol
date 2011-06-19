@@ -189,8 +189,8 @@ public final class ReportMilitaryPanel extends ReportPanel {
     private void gatherData() {
         Player player = getMyPlayer();
         locations = new HashMap<String, ArrayList<Unit>>();
-        List<Colony> colonies = new ArrayList<Colony>(player.getColonies());
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
+        List<Colony> colonies = getFreeColClient().getClientOptions()
+            .getSortedColonies(player);
         colonyNames = new ArrayList<String>();
         for (Colony colony : colonies) {
             colonyNames.add(colony.getName());

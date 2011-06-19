@@ -213,15 +213,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }
-        List<Settlement> settlements = player.getSettlements();
-        final Comparator<Colony> comparator = getClient().getClientOptions().getColonyComparator();
-        Collections.sort(settlements, new Comparator<Settlement>() {
-                public int compare(final Settlement s1, final Settlement s2) {
-                    return comparator.compare((Colony) s1, (Colony) s2);
-                }
-            });
-        for (Settlement settlement : settlements) {
-            destinationSelector.addItem(settlement);
+        for (Colony colony : getFreeColClient().getClientOptions()
+                 .getSortedColonies(player)) {
+            destinationSelector.addItem((Settlement) colony);
         }
 
         // add stops if any
@@ -264,7 +258,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @return True if the trade route is valid.
      */
     private boolean verifyNewTradeRoute() {
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getCanvas().getFreeColClient().getMyPlayer();
 
         // Check that the name is unique
         for (TradeRoute route : player.getTradeRoutes()) {

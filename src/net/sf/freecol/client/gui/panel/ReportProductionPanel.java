@@ -109,7 +109,6 @@ public final class ReportProductionPanel extends ReportPanel {
 
         if (!selectedTypes.isEmpty()) {
             Player player = getMyPlayer();
-            List<Colony> colonies = new ArrayList<Colony>(player.getColonies());
 
             TypeCountMap<BuildingType> buildingCount = new TypeCountMap<BuildingType>();
             List<List<BuildingType>> basicBuildingTypes = new ArrayList<List<BuildingType>>();
@@ -147,12 +146,9 @@ public final class ReportProductionPanel extends ReportPanel {
             }
 
 
-            Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
-
             int[] totalProduction = new int[selectedTypes.size()];
-
-            for (Colony colony : colonies) {
-
+            for (Colony colony : getFreeColClient().getClientOptions()
+                     .getSortedColonies(player)) {
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
                 colonyButton.setBorder(FreeColPanel.LEFTCELLBORDER);

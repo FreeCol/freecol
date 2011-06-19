@@ -56,9 +56,8 @@ public final class ReportReligiousPanel extends ReportPanel {
         FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), crosses);
         reportPanel.add(progressBar, "span");
 
-        List<Colony> colonies = player.getColonies();
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
-
+        List<Colony> colonies = getFreeColClient().getClientOptions()
+            .getSortedColonies(player);
         int production = 0;
         for (Colony colony : colonies) {
             Building building = colony.getBuildingForProducing(crosses);

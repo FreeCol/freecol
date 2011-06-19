@@ -75,6 +75,10 @@ public final class ReportTradePanel extends ReportPanel {
         super(parent, Messages.message("reportTradeAction.name"));
         setSize(getMinimumSize());
 
+        Player player = getMyPlayer();
+        colonies = getFreeColClient().getClientOptions()
+            .getSortedColonies(player);
+
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
 
@@ -83,15 +87,11 @@ public final class ReportTradePanel extends ReportPanel {
                 storableGoods.add(goodsType);
             }
         }
-        Player player = getMyPlayer();
         Market market = player.getMarket();
 
         // Display Panel
         reportPanel.removeAll();
         goodsHeader.removeAll();
-
-        colonies = player.getColonies();
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         String layoutConstraints = "insets 0, gap 0 0";
         String columnConstraints = "[170!, fill][42!, fill]";

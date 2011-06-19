@@ -369,7 +369,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     && requiredGoods.getAmount() <= goods.getAmount()) {
                                     int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
                                                           equipment.getMaximumCount());
-                                    unitLabel.getCanvas().getClient().getInGameController()
+                                    unitLabel.getCanvas().getFreeColClient().getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
                                     return true;
@@ -435,7 +435,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     && requiredGoods.getAmount() <= label.getAmount()) {
                                     int amount = Math.min(label.getAmount() / requiredGoods.getAmount(),
                                                           equipment.getMaximumCount());
-                                    unitLabel.getCanvas().getClient().getInGameController()
+                                    unitLabel.getCanvas().getFreeColClient().getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
                                     return true;

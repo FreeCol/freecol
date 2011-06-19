@@ -89,7 +89,7 @@ public final class CompactLabourReport extends ReportPanel {
     public CompactLabourReport(Canvas parent) {
         this(parent, null);
 
-        labourData = new LabourData(parent.getClient());
+        labourData = new LabourData(parent.getFreeColClient());
         initialize();
     }
 
@@ -251,11 +251,8 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(unitTotal, null, row);
 
-        List<Colony> colonies = getMyPlayer().getColonies();
-
-        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
-
-        for (Colony colony : colonies) {
+        for (Colony colony : getFreeColClient().getClientOptions()
+                 .getSortedColonies(getMyPlayer())) {
             LabourData.LocationData colonyData = unitData.getDetails().get(colony);
             if (colonyData != null) {
                 reportPanel.add(createColonyButton(colony),

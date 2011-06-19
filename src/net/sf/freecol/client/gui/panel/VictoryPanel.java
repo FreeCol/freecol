@@ -70,7 +70,7 @@ public final class VictoryPanel extends FreeColPanel {
         continueButton.addActionListener(this);
         enterPressesWhenFocused(continueButton);
 
-        if (parent.getClient().isSingleplayer()) {
+        if (parent.getFreeColClient().isSingleplayer()) {
             add(okButton, "newline 20, split 2, tag ok");
             add(continueButton);
         } else {
@@ -89,13 +89,13 @@ public final class VictoryPanel extends FreeColPanel {
         String command = event.getActionCommand();
         Canvas canvas = getCanvas();
         if (OK.equals(command)) {
-            boolean high = getClient().retire();
+            boolean high = getFreeColClient().retire();
             canvas.showPanel(new ReportHighScoresPanel(canvas), false);
             canvas.showInformationMessage((high) ? "highscores.yes"
                                           : "highscores.no");
-            getClient().quit();
+            getFreeColClient().quit();
         } else {
-            getClient().continuePlaying();
+            getFreeColClient().continuePlaying();
             canvas.remove(this);
         }
     }
