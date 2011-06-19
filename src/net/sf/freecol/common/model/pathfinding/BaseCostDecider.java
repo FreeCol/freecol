@@ -48,11 +48,8 @@ class BaseCostDecider implements CostDecider {
      * @return The cost of moving the given unit from the
      *      <code>oldTile</code> to the <code>newTile</code>.
      */    
-    public int getCost(final Unit unit,
-            final Tile oldTile,
-            final Tile newTile,
-            int movesLeftBefore,
-            final int turns) {
+    public int getCost(final Unit unit, final Tile oldTile, final Tile newTile,
+                       int movesLeftBefore) {
         newTurn = false;
               
         // Not allowed to use an unexplored tile.

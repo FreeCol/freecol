@@ -59,12 +59,12 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         final CostDecider decider = CostDeciders.avoidSettlements();
         Tile start = game.getMap().getTile(5, 5);
         Unit unit = new ServerUnit(game, start, game.getCurrentPlayer(),
-                                   spec().getUnitType("model.unit.hardyPioneer"),
-                                   Unit.UnitState.ACTIVE);
+                                   pioneerType, Unit.UnitState.ACTIVE);
         for (Map.Direction dir : Map.Direction.values()) {
             Tile end = start.getNeighbourOrNull(dir);
             assertNotNull(end);
-            int cost = decider.getCost(unit, start, game.getMap().getTile(5, 6), 100, 0);
+            int cost = decider.getCost(unit, start, game.getMap().getTile(5, 6),
+                                       100);
             assertEquals(plainsType.getBasicMoveCost(), cost);
         }
     }
@@ -81,10 +81,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         
         final CostDecider decider = CostDeciders.avoidSettlements();
         Unit unit = new ServerUnit(game, game.getMap().getTile(1, 1), game.getCurrentPlayer(),
-                spec().getUnitType("model.unit.hardyPioneer"),
-                UnitState.ACTIVE);
-        int cost = decider.getCost(unit, game.getMap().getTile(1, 1), game.getMap().getTile(2, 2), 4,
-                4);
+                                   pioneerType, UnitState.ACTIVE);
+        int cost = decider.getCost(unit, game.getMap().getTile(1, 1),
+                                   game.getMap().getTile(2, 2), 4);
         assertEquals(plainsType.getBasicMoveCost(), cost);
         assertEquals(4 - plainsType.getBasicMoveCost(), decider.getMovesLeft());
         assertFalse(decider.isNewTurn());
@@ -109,8 +108,8 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         
         // Execute
         CostDecider decider = CostDeciders.avoidSettlements();
-        int cost = decider.getCost(unit, unitTile, seaTile, 4,4);
-        assertTrue("Move should be invalid",cost == CostDecider.ILLEGAL_MOVE);
+        int cost = decider.getCost(unit, unitTile, seaTile, 4);
+        assertTrue("Move should be invalid", cost == CostDecider.ILLEGAL_MOVE);
     }
     
     /**
@@ -133,7 +132,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         
         // Execute
         final CostDecider decider = CostDeciders.avoidSettlements();
-        int cost = decider.getCost(unit, unitTile, landTile, 4,4);
+        int cost = decider.getCost(unit, unitTile, landTile, 4);
         assertTrue("Move should be invalid",cost == CostDecider.ILLEGAL_MOVE);
     }
     
@@ -159,7 +158,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         
         // Execute
         final CostDecider decider = CostDeciders.avoidSettlements();
-        int cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
+        int cost = decider.getCost(unit, unitTile, settlementTile, 4);
 
         assertEquals("Move should be invalid", CostDecider.ILLEGAL_MOVE, cost);
     }
@@ -191,20 +190,20 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         int cost;
 
         // Try to find a path
-        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4);
         assertTrue("Move should be invalid, no contact or goods to trade",
                    cost == CostDecider.ILLEGAL_MOVE);
 
         // Add contact
         Player.makeContact(galleon.getOwner(), settlement.getOwner());
-        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4);
         assertTrue("Move should be invalid, no goods to trade",
                    cost == CostDecider.ILLEGAL_MOVE);
 
         // Add goods to trade
         Goods goods = new Goods(game, null, tradeGoodsType, 50);
         galleon.add(goods);
-        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4);
         assertTrue("Move should be valid, has contact and goods to trade",
                    cost != CostDecider.ILLEGAL_MOVE);
         assertTrue("Move should consume whole turn",
@@ -213,7 +212,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         // Try with colonist on galleon
         Unit colonist = new ServerUnit(game, galleon, game.getCurrentPlayer(),
                                        colonistType, UnitState.ACTIVE);
-        cost = base.getCost(colonist, unitTile, settlementTile, 4,4);
+        cost = base.getCost(colonist, unitTile, settlementTile, 4);
         if (spec().getBooleanOption("model.option.amphibiousMoves")
             .getValue()) {
             assertFalse("Move valid, direct from carrier to settlement",
@@ -230,7 +229,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Player indianPlayer = settlement.getOwner();
         indianPlayer.setStance(galleon.getOwner(), Stance.WAR);
         galleon.getOwner().setStance(indianPlayer, Stance.WAR);
-        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4);
         assertTrue("Move should be invalid, players at war",
                    cost == CostDecider.ILLEGAL_MOVE);
     }

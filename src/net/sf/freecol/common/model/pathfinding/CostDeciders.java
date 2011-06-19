@@ -37,12 +37,13 @@ public final class CostDeciders {
     private static final CostDecider tileCostDecider
         = new CostDecider() {
             public int getCost(Unit unit, Tile oldTile, Tile newTile,
-                               int movesLeft, int turns) {
+                               int movesLeft) {
                 if (unit.isNaval()) {
                     if (!newTile.isLand()) return 1;
                     Settlement settlement = newTile.getSettlement();
                     return (settlement != null
-                            && settlement.getOwner().equals(unit.getOwner())) ? 1
+                            && settlement.getOwner().equals(unit.getOwner()))
+                        ? 1
                         : ILLEGAL_MOVE;
                 } else {
                     return (newTile.isLand()) ? 1 : ILLEGAL_MOVE;
@@ -72,9 +73,8 @@ public final class CostDeciders {
         extends BaseCostDecider {
         @Override
         public int getCost(Unit unit, Tile oldTile, Tile newTile,
-                           int movesLeft, int turns) {
-            int cost = super.getCost(unit, oldTile, newTile,
-                                     movesLeft, turns);
+                           int movesLeft) {
+            int cost = super.getCost(unit, oldTile, newTile, movesLeft);
             if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
                 Settlement settlement = newTile.getSettlement();
                 if (settlement != null
@@ -98,9 +98,8 @@ public final class CostDeciders {
         extends BaseCostDecider {
         @Override
         public int getCost(Unit unit, Tile oldTile, Tile newTile,
-                               int movesLeft, int turns) {
-            int cost = super.getCost(unit, oldTile, newTile,
-                                     movesLeft, turns);
+                           int movesLeft) {
+            int cost = super.getCost(unit, oldTile, newTile, movesLeft);
             if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
                 Settlement settlement = newTile.getSettlement();
                 if (settlement != null
@@ -110,17 +109,14 @@ public final class CostDeciders {
                 final Unit defender = newTile.getFirstUnit();
                 if (defender != null
                     && defender.getOwner() != unit.getOwner()) {
-                    if (turns == 0) {
-                        return ILLEGAL_MOVE;
-                    }
-                    cost += Math.max(0, 20 - turns * 4);
+                    return ILLEGAL_MOVE;
                 } else if (newTile.isLand()
                            && newTile.getFirstUnit() != null
                            && newTile.getFirstUnit().isNaval()
                            && newTile.getFirstUnit().getOwner() != unit.getOwner()) {
                     // An enemy ship in land tile without a settlement
                     // is blocking the path:
-                    cost += Math.max(0, 20 - turns * 4);
+                    return ILLEGAL_MOVE;
                 } else if (unit.getTradeRoute() != null
                            && unit.getMoveType(newTile)
                            == Unit.MoveType.EXPLORE_LOST_CITY_RUMOUR) {
@@ -193,5 +189,4 @@ public final class CostDeciders {
     public static CostDecider avoidSettlementsAndBlockingUnits() {
         return avoidSettlementsAndBlockingUnitsCostDecider;
     }
-
 }

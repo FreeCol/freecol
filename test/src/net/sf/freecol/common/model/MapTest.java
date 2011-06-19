@@ -40,11 +40,22 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class MapTest extends FreeColTestCase {
-    TileType oceanType = spec().getTileType("model.tile.ocean");
-    TileType plainsType = spec().getTileType("model.tile.plains");
 
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    
+    private final TileType oceanType
+        = spec().getTileType("model.tile.ocean");
+    private final TileType plainsType
+        = spec().getTileType("model.tile.plains");
+
+    private final UnitType artilleryType
+        = spec().getUnitType("model.unit.artillery");
+    private final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private final UnitType pioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
+
+
     private Map getSingleLandPathMap(Game game){
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
@@ -175,7 +186,7 @@ public class MapTest extends FreeColTestCase {
         
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 6; y++) {
-                Tile tile = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
+                Tile tile = new Tile(game, plainsType, x, y);
                 tiles[x][y] = tile;
                 allTiles.add(tile);
                 positions.add(new Position(x, y));
@@ -335,7 +346,6 @@ public class MapTest extends FreeColTestCase {
     }
     
     public void testMoveThroughTileWithEnemyUnit() {
-        final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
@@ -347,6 +357,7 @@ public class MapTest extends FreeColTestCase {
                        UnitState.ACTIVE);
         
         Tile unitTile = map.getTile(1, 1);
+        Tile otherTile = map.getTile(1, 2);
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Unit unit = new ServerUnit(game, unitTile, dutchPlayer, pioneerType,
                                    UnitState.ACTIVE);
@@ -355,11 +366,13 @@ public class MapTest extends FreeColTestCase {
         unit.setDestination(unitDestination);
         
         // Execute
-        final CostDecider decider = CostDeciders.avoidSettlementsAndBlockingUnits();
-        final int cost = decider.getCost(unit, unitTile, enemyUnitTile, 4, 0);
-        assertTrue("Move should be invalid", cost == CostDecider.ILLEGAL_MOVE);
-        final int cost2 = decider.getCost(unit, unitTile, enemyUnitTile, 4, 1);
-        assertTrue("Move should be valid", cost2 != CostDecider.ILLEGAL_MOVE);
+        CostDecider decider = CostDeciders.avoidSettlementsAndBlockingUnits();
+        assertTrue("No blocking unit, should be legal",
+                   decider.getCost(unit, unitTile, otherTile, 4)
+                   != CostDecider.ILLEGAL_MOVE);
+        assertTrue("Blocking unit, should be illegal",
+                   decider.getCost(unit, unitTile, enemyUnitTile, 4)
+                   == CostDecider.ILLEGAL_MOVE);
     }
 
     /**
@@ -418,8 +431,6 @@ public class MapTest extends FreeColTestCase {
 
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Player frenchPlayer = game.getPlayer("model.nation.french");
-        UnitType artilleryType = spec().getUnitType("model.unit.artillery");
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
         Tile unitTile = map.getTile(15, 5);
         Tile colonyTile = map.getTile(9, 9); // should be on coast
         Unit galleon = new ServerUnit(game, unitTile, dutchPlayer, galleonType,

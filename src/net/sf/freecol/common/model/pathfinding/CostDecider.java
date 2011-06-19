@@ -45,11 +45,11 @@ public interface CostDecider {
      * @param movesLeftBefore The remaining moves left. The
      *      <code>CostDecider</code> can use this information
      *      if needed.
-     * @param turns The number of turns spent so far.
      * @return The cost of moving the given unit from the
      *      <code>oldTile</code> to the <code>newTile</code>.
      */
-    public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeftBefore, int turns);   
+    public int getCost(Unit unit, Tile oldTile, Tile newTile,
+                       int movesLeftBefore);
     
     /**
      * Gets the number of moves left. This method should be

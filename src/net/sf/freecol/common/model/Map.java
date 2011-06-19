@@ -531,7 +531,7 @@ public class Map extends FreeColGameObject {
 
                 // Update parameters for the new tile.
                 int extraCost = costDecider.getCost(moveUnit,
-                    currentTile, newTile, movesLeft, turns);
+                    currentTile, newTile, movesLeft);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     // Do not let the CostDecider (which may be
                     // conservative) block the final destination if it
@@ -885,7 +885,7 @@ public class Map extends FreeColGameObject {
 
                 // Update parameters for the new tile.
                 int extraCost = costDecider.getCost(moveUnit,
-                        currentTile, newTile, movesLeft, turns);
+                        currentTile, newTile, movesLeft);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) continue;
                 cost += extraCost;
                 movesLeft = costDecider.getMovesLeft();
@@ -970,16 +970,6 @@ public class Map extends FreeColGameObject {
                     goal = pathNode;
                     return true;
                 }
-
-                //TODO: This may make invalid assumptions about map topology!
-                //Solution: Add booleans, defining which edges are considered
-                //  connected to europe
-                //or make sure during map generation that high seas tiles
-                //  exist in all sensible spots, then remove this check.
-                if (pathNode.getTile().isAdjacentToVerticalMapEdge()) {
-                    goal = pathNode;
-                    return true;
-                }
                 return false;
             }
         };
@@ -1014,22 +1004,12 @@ public class Map extends FreeColGameObject {
                     goal = pathNode;
                     return true;
                 }
-
-                //TODO: This may make invalid assumptions about map topology!
-                //Solution: Add booleans, defining which edges are considered
-                //  connected to europe
-                //or make sure during map generation that high seas tiles
-                //  exist in all sensible spots, then remove this check.
-                if (t.isAdjacentToVerticalMapEdge()) {
-                    goal = pathNode;
-                    return true;
-                }
                 return false;
             }
         };
         final CostDecider cd = new CostDecider() {
             public int getCost(Unit unit, Tile oldTile, Tile newTile,
-                               int movesLeft, int turns) {
+                               int movesLeft) {
                 if (newTile.isLand()) {
                     return ILLEGAL_MOVE;
                 } else {
