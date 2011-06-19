@@ -40,6 +40,7 @@ public class AllTests {
 	suite.addTestSuite(GoodsTest.class);
 	suite.addTestSuite(GoodsContainerTest.class);
 	suite.addTestSuite(IndianSettlementTest.class);
+	suite.addTestSuite(IndividualFatherTest.class);
 	suite.addTestSuite(LimitTest.class);
 	suite.addTestSuite(MapTest.class);
 	suite.addTestSuite(MarketTest.class);
