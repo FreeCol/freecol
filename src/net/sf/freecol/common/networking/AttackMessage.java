@@ -105,7 +105,7 @@ public class AttackMessage extends Message {
         if (((moveType == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
               || moveType == MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT)
              && unit.getRole() == Unit.Role.SCOUT)
-            || moveType == MoveType.ATTACK) {
+            || moveType.isAttack()) {
             ; // OK
         } else {
             return Message.clientError("Illegal attack move for: " + unitId

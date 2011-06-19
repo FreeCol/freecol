@@ -168,9 +168,9 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testScoutColony() {
-    	Game game = getGame();
-    	Map map = getTestMap(true);
-    	game.setMap(map);
+        Game game = getGame();
+        Map map = getTestMap(true);
+        game.setMap(map);
 
         Player french = game.getPlayer("model.nation.french");
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -194,30 +194,33 @@ public class MovementTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile2, french, colonistType,
                                        UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
+                     colonist.getMoveType(tile1));
         colonist.changeEquipment(horses, 1);
-        assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT,
+                     colonist.getMoveType(tile1));
         colonist.changeEquipment(muskets, 1);
-        assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
+                     colonist.getMoveType(tile1));
 
         Unit brave = new ServerUnit(game, tile3, iroquois, braveType,
                                     UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianHorses, 1);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianMuskets, 1);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
     }
 
     public void testScoutIndianSettlement() {
-
         Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+
         Player french = game.getPlayer("model.nation.french");
         Player inca = game.getPlayer("model.nation.inca");
         Player iroquois = game.getPlayer("model.nation.iroquois");
-        Map map = getTestMap(plains);
-        game.setMap(map);
+
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(6, 8);
@@ -228,26 +231,30 @@ public class MovementTest extends FreeColTestCase {
         tile3.setExploredBy(iroquois, true);
 
         // Build settlement
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
 
         Unit colonist = new ServerUnit(game, tile2, french, colonistType,
                                        UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_CONTACT, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_CONTACT,
+                     colonist.getMoveType(tile1));
         Player.makeContact(french, inca);
-        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST,
+                     colonist.getMoveType(tile1));
         colonist.changeEquipment(horses, 1);
-        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT,
+                     colonist.getMoveType(tile1));
         colonist.changeEquipment(muskets, 1);
-        assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
+                     colonist.getMoveType(tile1));
 
         Unit brave = new ServerUnit(game, tile3, iroquois, braveType,
                                     UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianHorses, 1);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianMuskets, 1);
-        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-
+        assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
     }
 }

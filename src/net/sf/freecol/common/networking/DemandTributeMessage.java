@@ -112,7 +112,7 @@ public class DemandTributeMessage extends Message {
                                        + tile.getId());
         }
         MoveType type = unit.getMoveType(tile);
-        if (type != MoveType.ATTACK
+        if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return Message.clientError("Unable to demand tribute at: "
                                        + is.getName()

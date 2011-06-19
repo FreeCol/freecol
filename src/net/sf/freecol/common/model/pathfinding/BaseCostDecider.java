@@ -63,14 +63,17 @@ class BaseCostDecider implements CostDecider {
         // Disallow illegal moves.
         // Special moves and moving off a carrier consume a whole turn.
         boolean consumeMove = false;
-        switch (unit.getSimpleMoveType(oldTile, newTile, true)) {
+        switch (unit.getSimpleMoveType(oldTile, newTile)) {
         case MOVE_HIGH_SEAS:
             break;
+        case ATTACK_UNIT:
+            // Ignore hostile units in the base case, treating attacks
+            // as moves.
         case MOVE:
             if (!(unit.getLocation() instanceof Unit)) break;
-            // // fall through if disembarking
+            // Fall through if disembarking.
+        case ATTACK_SETTLEMENT:
         case EXPLORE_LOST_CITY_RUMOUR:
-        case ATTACK:
         case EMBARK:
         case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:

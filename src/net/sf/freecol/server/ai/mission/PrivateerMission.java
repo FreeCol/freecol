@@ -148,7 +148,8 @@ public class PrivateerMission extends Mission {
         // Found a target
         if (pathToTarget != null) {
         	target = pathToTarget.getLastNode().getTile();
-            logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " found target at " + target);
+            logger.finest("Privateer (" + unit.getId() + ") at "
+                          + unit.getTile() + " found target at " + target);
             // We need to find an updated path to target
             pathToTarget = unit.findPath(target);
             Direction direction = moveTowards(pathToTarget);
@@ -157,19 +158,22 @@ public class PrivateerMission extends Mission {
                 // block or just not enough points for next node we need
                 // to make sure the unit has no points left, so the game
                 // can move to next unit
-                logger.finest("Ending privateer (" + unit.getId() + ") turn, moves=" + unit.getMovesLeft());
+                logger.finest("Ending privateer (" + unit.getId()
+                              + ") turn, moves=" + unit.getMovesLeft());
                 unit.setMovesLeft(0);
                 return;
             }
             // catch up with the prey
-            if (unit.getMoveType(direction) == MoveType.ATTACK) {
-                logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " attacking target");
+            if (unit.getMoveType(direction) == MoveType.ATTACK_UNIT) {
+                logger.finest("Privateer (" + unit.getId() + ") at "
+                              + unit.getTile() + " attacking target");
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {
             // No target found, just make a random move
             target = null;
-            logger.finest("Privateer at " + unit.getTile() + " without target, wandering");
+            logger.finest("Privateer at " + unit.getTile()
+                          + " without target, wandering");
         	moveRandomly(connection);
         }
         // some movement points may still remain

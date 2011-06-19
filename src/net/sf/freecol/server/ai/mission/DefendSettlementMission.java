@@ -125,12 +125,11 @@ public class DefendSettlementMission extends Mission {
             Direction[] directions = Direction.getRandomDirectionArray(getAIRandom());
             for (Direction direction : directions) {
                 Tile t = unit.getTile().getNeighbourOrNull(direction);
-                if (t==null)
-                    continue;
+                if (t == null) continue;
                 Unit defender = t.getFirstUnit();
                 if (defender != null
                     && defender.getOwner().atWarWith(unit.getOwner())
-                    && unit.getMoveType(direction) == MoveType.ATTACK) {
+                    && unit.getMoveType(direction).isAttack()) {
                     Unit enemyUnit = t.getDefendingUnit(unit);
                     float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
                     float weAttack = combatModel.getOffencePower(unit, enemyUnit);

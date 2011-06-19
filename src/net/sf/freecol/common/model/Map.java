@@ -338,7 +338,8 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
-        return findPath(unit, start, end, null, CostDeciders.defaultFor(unit));
+        return findPath(unit, start, end, null,
+            CostDeciders.defaultCostDeciderFor(unit));
     }
 
     /**
@@ -373,7 +374,7 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
         return findPath(unit, start, end, carrier,
-                        CostDeciders.defaultFor(unit));
+            CostDeciders.defaultCostDeciderFor(unit));
     }
 
     /**
@@ -438,12 +439,12 @@ public class Map extends FreeColGameObject {
         final PathNode firstNode;
         if (currentUnit != null) {
             firstNode = new PathNode(start, 0,
-                                     start.getDistanceTo(end),
-                                     Direction.N, currentUnit.getMovesLeft(), 0);
+                start.getDistanceTo(end),
+                Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
             firstNode = new PathNode(start, 0, start.getDistanceTo(end),
-                                     Direction.N, -1, -1);
+                Direction.N, -1, -1);
         }
 
         final HashMap<String, PathNode> openList
@@ -485,8 +486,8 @@ public class Map extends FreeColGameObject {
             // (isProgress()).
             if (currentNode.previous != null) {
                 Tile previousTile = currentNode.previous.getTile();
-                if (!currentUnit.getSimpleMoveType(previousTile, currentTile,
-                                                   false).isProgress()) {
+                if (!currentUnit.getSimpleMoveType(previousTile,
+                        currentTile).isProgress()) {
                     continue;
                 }
             }
@@ -530,15 +531,14 @@ public class Map extends FreeColGameObject {
 
                 // Update parameters for the new tile.
                 int extraCost = costDecider.getCost(moveUnit,
-                                                    currentTile, newTile,
-                                                    movesLeft, turns);
+                    currentTile, newTile, movesLeft, turns);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     // Do not let the CostDecider (which may be
                     // conservative) block the final destination if it
                     // is still a legal move.
                     if (newTile == end
-                        && moveUnit.getSimpleMoveType(currentTile, newTile,
-                                                      false).isLegal()) {
+                        && moveUnit.getSimpleMoveType(currentTile,
+                            newTile).isLegal()) {
                         cost += moveUnit.getInitialMovesLeft();
                         movesLeft = 0;
                     } else {
@@ -563,7 +563,7 @@ public class Map extends FreeColGameObject {
 
                 // Queue new node with updated parameters.
                 successor = new PathNode(newTile, cost, f, direction,
-                                         movesLeft, turns);
+                    movesLeft, turns);
                 successor.previous = currentNode;
                 successor.setOnCarrier(carrier != null && moveUnit == carrier);
                 openList.put(newTile.getId(), successor);
@@ -595,7 +595,8 @@ public class Map extends FreeColGameObject {
      *         <code>GoalDecider</code>.
      */
     public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
-        return search(unit, unit.getTile(), gd, CostDeciders.defaultFor(unit), maxTurns);
+        return search(unit, unit.getTile(), gd,
+            CostDeciders.defaultCostDeciderFor(unit), maxTurns);
     }
 
     /**
@@ -622,7 +623,8 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
             int maxTurns) {
-        return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns);
+        return search(unit, startTile, gd,
+            CostDeciders.defaultCostDeciderFor(unit), maxTurns);
     }
 
     /**
@@ -652,7 +654,9 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, GoalDecider gd,
             int maxTurns, Unit carrier) {
-        return search(unit, unit.getTile(), gd, CostDeciders.defaultFor(unit), maxTurns, carrier);
+        return search(unit, unit.getTile(), gd,
+            CostDeciders.defaultCostDeciderFor(unit), maxTurns,
+            carrier);
     }
 
     /**
@@ -740,7 +744,8 @@ public class Map extends FreeColGameObject {
     public PathNode search(final Unit unit, final Tile startTile,
             final GoalDecider gd, final int maxTurns,
             final Unit carrier) {
-        return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns, carrier);
+        return search(unit, startTile, gd,
+            CostDeciders.defaultCostDeciderFor(unit), maxTurns, carrier);
     }
 
     /**
@@ -802,8 +807,7 @@ public class Map extends FreeColGameObject {
                 });
         final PathNode firstNode
             = new PathNode(startTile, 0, 0, Direction.N,
-                           (currentUnit != null) ? currentUnit.getMovesLeft() : -1,
-                           0);
+                (currentUnit != null) ? currentUnit.getMovesLeft() : -1, 0);
         firstNode.setOnCarrier(carrier != null);
         openList.put(startTile.getId(), firstNode);
         openListQueue.offer(firstNode);
@@ -834,8 +838,8 @@ public class Map extends FreeColGameObject {
             if (currentUnit != null
                 && currentNode.previous != null) {
                 Tile previousTile = currentNode.previous.getTile();
-                if (!currentUnit.getSimpleMoveType(previousTile, currentTile,
-                                                   false).isProgress()) {
+                if (!currentUnit.getSimpleMoveType(previousTile,
+                        currentTile).isProgress()) {
                     continue;
                 }
             }
@@ -901,7 +905,7 @@ public class Map extends FreeColGameObject {
 
                 // Queue new node with updated parameters.
                 successor = new PathNode(newTile, cost, cost, direction,
-                                         movesLeft, turns);
+                    movesLeft, turns);
                 successor.previous = currentNode;
                 successor.setOnCarrier(carrier != null && moveUnit == carrier);
                 openList.put(newTile.getId(), successor);
@@ -933,7 +937,8 @@ public class Map extends FreeColGameObject {
      * @see Europe
      */
     public PathNode findPathToEurope(Unit unit, Tile start) {
-        return findPathToEurope(unit, start, CostDeciders.defaultFor(unit));
+        return findPathToEurope(unit, start,
+            CostDeciders.defaultCostDeciderFor(unit));
     }
 
     /**
@@ -961,7 +966,6 @@ public class Map extends FreeColGameObject {
             }
 
             public boolean check(Unit u, PathNode pathNode) {
-
                 if (pathNode.getTile().canMoveToEurope()) {
                     goal = pathNode;
                     return true;
@@ -983,11 +987,11 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Finds the best path to <code>Europe</code> independently of any unit.
-     * This method is meant to be executed by the server/AI code, with complete knowledge of the map
+     * Finds the best path to <code>Europe</code> independently of any
+     * unit.  This method is meant to be executed by the server/AI
+     * code, with complete knowledge of the map
      *
-     * @param start
-     *            The starting <code>Tile</code>.
+     * @param start The starting <code>Tile</code>.
      * @return The path to the target or <code>null</code> if no target can be
      *         found.
      * @see Europe
@@ -1024,7 +1028,8 @@ public class Map extends FreeColGameObject {
             }
         };
         final CostDecider cd = new CostDecider() {
-            public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeft, int turns) {
+            public int getCost(Unit unit, Tile oldTile, Tile newTile,
+                               int movesLeft, int turns) {
                 if (newTile.isLand()) {
                     return ILLEGAL_MOVE;
                 } else {
@@ -1157,7 +1162,6 @@ public class Map extends FreeColGameObject {
     }
 
 
-
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
      *
@@ -1166,9 +1170,6 @@ public class Map extends FreeColGameObject {
     public WholeMapIterator getWholeMapIterator() {
         return new WholeMapIterator();
     }
-
-
-
 
 
     /**

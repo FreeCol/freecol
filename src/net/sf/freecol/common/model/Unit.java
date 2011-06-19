@@ -129,7 +129,8 @@ public class Unit extends FreeColGameObject
         MOVE(null, true),
         MOVE_HIGH_SEAS(null, true),
         EXPLORE_LOST_CITY_RUMOUR(null, true),
-        ATTACK(null, false),
+        ATTACK_UNIT(null, false),
+        ATTACK_SETTLEMENT(null, false),
         EMBARK(null, false),
         ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST(null, false),
         ENTER_INDIAN_SETTLEMENT_WITH_SCOUT(null, false),
@@ -183,6 +184,10 @@ public class Unit extends FreeColGameObject
 
         public boolean isProgress() {
             return progress;
+        }
+
+        public boolean isAttack() {
+            return this == ATTACK_UNIT || this == ATTACK_SETTLEMENT;
         }
     }
 
@@ -1304,31 +1309,12 @@ public class Unit extends FreeColGameObject
      * @return The move type.
      */
     public MoveType getMoveType(Tile from, Tile target, int ml) {
-        return getMoveType(from, target, ml, false);
-    }
-
-    /**
-     * Gets the type of a move that is made when moving from one tile
-     * to another.
-     *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
-     * @param ml The amount of moves this unit has left.
-     * @param ignoreEnemyUnits Should be <code>true</code> if enemy
-     *      units should be ignored when determining the move type.
-     * @return The move type.
-     */
-    public MoveType getMoveType(Tile from, Tile target, int ml, boolean ignoreEnemyUnits) {
-        MoveType move = getSimpleMoveType(from, target, ignoreEnemyUnits);
-
+        MoveType move = getSimpleMoveType(from, target);
         if (move.isLegal()) {
-            switch(move) {
-                //case DISEMBARK:
-                // doesn't really move and may ignore movement points
-                // break;
-            case ATTACK:
-                // needs only a single movement point, regardless of
-                // terrain, but suffers penalty
+            switch (move) {
+            case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+                // Needs only a single movement point, regardless of
+                // terrain, but suffers penalty.
                 if (ml <= 0) {
                     move = MoveType.MOVE_NO_MOVES;
                 }
@@ -1350,15 +1336,12 @@ public class Unit extends FreeColGameObject
      *
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
-     * @param ignoreEnemyUnits Should be <code>true</code> if enemy
-     *      units should be ignored when determining the move type.
      * @return The move type, which will be one of the extended illegal move
      *         types on failure.
      */
-    public MoveType getSimpleMoveType(Tile from, Tile target, boolean ignoreEnemyUnits) {
-        return (isNaval())
-            ? getNavalMoveType(from, target, ignoreEnemyUnits)
-            : getLandMoveType(from, target, ignoreEnemyUnits);
+    public MoveType getSimpleMoveType(Tile from, Tile target) {
+        return (isNaval()) ? getNavalMoveType(from, target)
+            : getLandMoveType(from, target);
     }
 
     /**
@@ -1375,7 +1358,7 @@ public class Unit extends FreeColGameObject
         if (tile == null) {
             throw new IllegalStateException("Null tile");
         }
-        return getSimpleMoveType(tile, target, false);
+        return getSimpleMoveType(tile, target);
     }
 
     /**
@@ -1392,7 +1375,7 @@ public class Unit extends FreeColGameObject
         }
 
         Tile target = tile.getNeighbourOrNull(direction);
-        return getSimpleMoveType(tile, target, false);
+        return getSimpleMoveType(tile, target);
     }
 
     /**
@@ -1401,12 +1384,9 @@ public class Unit extends FreeColGameObject
      *
      * @param from The origin <code>Tile<code> of the move.
      * @param target The target <code>Tile</code> of the move.
-     * @param ignoreEnemyUnits Should be <code>true</code> if enemy
-     *      units should be ignored when determining the move type.
      * @return The move type.
      */
-    private MoveType getNavalMoveType(Tile from, Tile target,
-                                      boolean ignoreEnemyUnits) {
+    private MoveType getNavalMoveType(Tile from, Tile target) {
         if (target == null) {
             return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
                 : MoveType.MOVE_NO_EUROPE;
@@ -1427,10 +1407,9 @@ public class Unit extends FreeColGameObject
             }
         } else { // target at sea
             Unit defender = target.getFirstUnit();
-            if (defender != null && !ignoreEnemyUnits
-                && defender.getOwner() != getOwner()) {
+            if (defender != null && defender.getOwner() != getOwner()) {
                 return (isOffensiveUnit())
-                    ? MoveType.ATTACK
+                    ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
             } else if (target.canMoveToEurope()
                        && getOwner().canMoveToEurope()) {
@@ -1447,12 +1426,9 @@ public class Unit extends FreeColGameObject
      *
      * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
-     * @param ignoreEnemyUnits Should be <code>true</code> if enemy
-     *      units should be ignored when determining the move type.
      * @return The move type.
      */
-    private MoveType getLandMoveType(Tile from, Tile target,
-                                     boolean ignoreEnemyUnits) {
+    private MoveType getLandMoveType(Tile from, Tile target) {
         if (target == null) {
             return MoveType.MOVE_ILLEGAL;
         }
@@ -1463,15 +1439,14 @@ public class Unit extends FreeColGameObject
         if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement == null) {
-                if (defender != null && owner != defender.getOwner()
-                    && !ignoreEnemyUnits) {
+                if (defender != null && owner != defender.getOwner()) {
                     if (defender.isNaval()) {
-                        return MoveType.ATTACK;
+                        return MoveType.ATTACK_UNIT;
                     } else if (!isOffensiveUnit()) {
                         return MoveType.MOVE_NO_ATTACK_CIVILIAN;
                     } else {
                         return (from.isLand())
-                            ? MoveType.ATTACK
+                            ? MoveType.ATTACK_UNIT
                             : MoveType.MOVE_NO_ATTACK_MARINE;
                     }
                 } else if (target.hasLostCityRumour() && owner.isEuropean()) {
@@ -1495,13 +1470,13 @@ public class Unit extends FreeColGameObject
                     return getScoutMoveType(from, settlement);
                 case SOLDIER: case DRAGOON:
                     return (allowMoveFrom(from))
-                        ? MoveType.ATTACK
+                        ? MoveType.ATTACK_SETTLEMENT
                         : MoveType.MOVE_NO_ATTACK_MARINE;
                 }
                 return MoveType.MOVE_ILLEGAL; // should not happen
             } else if (isOffensiveUnit()) {
                 return (allowMoveFrom(from))
-                    ? MoveType.ATTACK
+                    ? MoveType.ATTACK_SETTLEMENT
                     : MoveType.MOVE_NO_ATTACK_MARINE;
             } else {
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;

@@ -143,7 +143,7 @@ public final class CostDeciders {
      * @param unit The <code>Unit</code> to choose a CostDecider for.
      * @return A suitable <code>CostDecider</code>.
      */
-    public static CostDecider defaultFor(final Unit unit) {
+    public static CostDecider defaultCostDeciderFor(final Unit unit) {
         return (unit == null
                 || !unit.getOwner().isAI()
                 || !unit.isOffensiveUnit())

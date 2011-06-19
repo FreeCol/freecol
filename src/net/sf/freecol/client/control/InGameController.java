@@ -1923,7 +1923,7 @@ public final class InGameController implements NetworkConstants {
         case EXPLORE_LOST_CITY_RUMOUR:
             moveExplore(unit, direction);
             return false;
-        case ATTACK:
+        case ATTACK_UNIT: case ATTACK_SETTLEMENT:
             moveAttack(unit, direction);
             return false;
         case EMBARK:
@@ -2425,7 +2425,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Confirm attack or demand a tribute from a native settlement, following
-     * a move of MoveType.ATTACK.
+     * an attacking move.
      *
      * @param unit The <code>Unit</code> to perform the attack.
      * @param direction The direction in which to attack.

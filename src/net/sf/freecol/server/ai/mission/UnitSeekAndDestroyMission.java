@@ -144,8 +144,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         if (pathToTarget != null) {
             Direction direction = moveTowards(pathToTarget);
-            if (direction != null
-                && unit.getMoveType(direction) == MoveType.ATTACK) {
+            if (direction != null && unit.getMoveType(direction).isAttack()) {
                 Tile newTile = unit.getTile().getNeighbourOrNull(direction);
                 Unit defender = newTile.getDefendingUnit(unit);
                 if (defender == null) {

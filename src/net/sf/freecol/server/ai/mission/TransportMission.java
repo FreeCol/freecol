@@ -466,7 +466,7 @@ public class TransportMission extends Mission {
                                                 Direction direction) {
         final Unit carrier = getUnit();
         if (canAttackEnemyShips()
-                && carrier.getMoveType(direction) == MoveType.ATTACK) {
+                && carrier.getMoveType(direction) == MoveType.ATTACK_UNIT) {
             final Tile newTile = carrier.getTile().getNeighbourOrNull(direction);
             final Unit defender = newTile.getDefendingUnit(carrier);
             if (canAttackPlayer(defender.getOwner())) {
@@ -494,7 +494,7 @@ public class TransportMission extends Mission {
         if (pathToTarget != null) {
             final Direction direction = moveTowards(pathToTarget);
             if (direction != null
-                && carrier.getMoveType(direction) == MoveType.ATTACK) {
+                && carrier.getMoveType(direction) == MoveType.ATTACK_UNIT) {
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         }

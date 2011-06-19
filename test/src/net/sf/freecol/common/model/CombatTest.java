@@ -238,7 +238,8 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
         // Verify that the move is correctly interpreted
-        assertEquals("Wrong move type",MoveType.ATTACK, privateer.getMoveType(tile1));
+        assertEquals("Wrong move type", MoveType.ATTACK_UNIT,
+                     privateer.getMoveType(tile1));
     }
 
 
@@ -375,9 +376,12 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(tile1, colonist.getLocation());
         assertEquals(tile2, soldier.getLocation());
 
-        assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 9, false));
-        assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 1, false));
-        assertEquals(Unit.MoveType.MOVE_NO_MOVES, soldier.getMoveType(tile2, tile1, 0, false));
+        assertEquals(Unit.MoveType.ATTACK_UNIT,
+                     soldier.getMoveType(tile2, tile1, 9));
+        assertEquals(Unit.MoveType.ATTACK_UNIT,
+                     soldier.getMoveType(tile2, tile1, 1));
+        assertEquals(Unit.MoveType.MOVE_NO_MOVES,
+                     soldier.getMoveType(tile2, tile1, 0));
 
     }
 
