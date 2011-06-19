@@ -742,7 +742,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A fresh list of the colonies this player owns.
      */
     public List<Colony> getSortedColonies(Comparator<Colony> c) {
-        List<Colony> colonies = new ArrayList<Colony>();
+        List<Colony> colonies = getColonies();
         Collections.sort(colonies, c);
         return colonies;
     }
