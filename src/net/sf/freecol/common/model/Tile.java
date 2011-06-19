@@ -626,6 +626,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return (getMoveToEurope() != null) ? getMoveToEurope()
             : (type == null) ? false
             : (type.hasAbility("model.ability.moveToEurope")) ? true
+            // TODO: remove this when we are confident all the maps have
+            // appropriate moveToEurope overrides.
             : isAdjacentToMapEdge() && type.isWater();
     }
 

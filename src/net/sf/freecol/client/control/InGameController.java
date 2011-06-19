@@ -1276,8 +1276,7 @@ public final class InGameController implements NetworkConstants {
             && freeColClient.getGame().getCurrentPlayer()
                 == freeColClient.getMyPlayer()) {
             if (destination instanceof Europe && unit.getTile() != null
-                && (unit.getTile().canMoveToEurope()
-                    || unit.getTile().isAdjacentToMapEdge())) {
+                && unit.getTile().canMoveToEurope()) {
                 moveToEurope(unit);
             } else {
                 moveToDestination(unit);
@@ -1847,7 +1846,7 @@ public final class InGameController implements NetworkConstants {
             // surrounded by high seas.
             if (unit.getDestination() instanceof Europe
                 && unit.getTile() != null
-                && unit.getTile().isAdjacentToMapEdge()) {
+                && unit.getTile().canMoveToEurope()) {
                 moveToEurope(unit);
                 return false;
             }
