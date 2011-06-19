@@ -650,11 +650,7 @@ public class Building extends FreeColGameObject
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        if (canAutoProduce()) {
-            return getAutoProduction(getGoodsInput());
-        } else {
-            return getProductionAdding(getStoredInput());
-        }
+        return getProductionInfo().getProduction().get(0).getAmount();
     }
 
     /**
