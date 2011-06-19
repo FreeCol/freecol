@@ -274,7 +274,7 @@ public class FeatureContainer {
      * @return a <code>float</code> value
      */
     public static float applyModifiers(float number, Turn turn, List<Modifier> modifierSet) {
-        if (modifierSet == null) {
+        if (modifierSet == null || modifierSet.isEmpty()) {
             return number;
         }
         float result = number;
