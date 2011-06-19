@@ -1662,6 +1662,9 @@ public class Player extends FreeColGameObject implements Nameable {
     public void addFather(FoundingFather father) {
         allFathers.add(father);
         featureContainer.add(father.getFeatureContainer());
+        for (Colony colony : getColonies()) {
+            colony.invalidateCache();
+        }
     }
 
     /**

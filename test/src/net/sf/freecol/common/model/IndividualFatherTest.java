@@ -134,8 +134,6 @@ public class IndividualFatherTest extends FreeColTestCase {
         statesman1.setType(spec().getUnitType("model.unit.elderStatesman"));
         statesman1.setLocation(townHall);
         assertEquals(6 + 1, townHall.getProductionOf(bells));
-        ProductionInfo info = townHall.getProductionInfo(new AbstractGoods(bells, 0), empty);
-        assertEquals(6 + 1, info.getProduction().get(0).getAmount());
 
         statesman2.setType(spec().getUnitType("model.unit.elderStatesman"));
         statesman2.setLocation(townHall);
@@ -276,4 +274,30 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     }
 
+    public void testJefferson() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(true));
+
+        FoundingFather jefferson = spec().getFoundingFather("model.foundingFather.thomasJefferson");
+        assertEquals(1, jefferson.getModifierSet("model.goods.bells").size());
+        Modifier modifier = jefferson.getModifierSet("model.goods.bells").iterator().next();
+        BuildingType townHallType = spec().getBuildingType("model.building.townHall");
+        assertTrue(modifier.appliesTo(townHallType));
+
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        Building townHall = colony.getBuilding(townHallType);
+        townHall.add(colony.getUnitList().get(0));
+
+        assertEquals(0, player.getModifierSet("model.goods.bells").size());
+        assertEquals(1, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(4, townHall.getProduction());
+
+        player.addFather(jefferson);
+        assertEquals(1, player.getModifierSet("model.goods.bells").size());
+        assertEquals(2, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(2, townHall.getProductionModifiers().size());
+        assertEquals(5, townHall.getProduction());
+
+    }
 }

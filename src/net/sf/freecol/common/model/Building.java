@@ -793,6 +793,11 @@ public class Building extends FreeColGameObject
      * animals.
      *
      * TODO: make this more generic
+     *
+     * @param available the amount of <b>output goods</b> available
+     * (generally, this means already in the warehouse)
+     * @return the maximum production of this building, given
+     * unlimited input goods
      */
     private int getMaximumAutoProduction(int available) {
         if (available < getGoodsOutputType().getBreedingNumber()) {
@@ -840,12 +845,20 @@ public class Building extends FreeColGameObject
                                                                      goodsOutputType.getId(),
                                                                      buildingType, getGame().getTurn()));
         */
-        List<Modifier> modifiers =
-            new ArrayList<Modifier>(colony.getFeatureContainer().
-                                    getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
-        Collections.sort(modifiers);
-        return (int) FeatureContainer.applyModifiers(productivity, getGame().getTurn(), modifiers);
+        return (int) FeatureContainer.applyModifiers(productivity, getGame().getTurn(),
+                                                     getProductionModifiers());
 
+    }
+
+    public List<Modifier> getProductionModifiers() {
+        List<Modifier> modifiers = new ArrayList<Modifier>();
+        GoodsType goodsOutputType = getGoodsOutputType();
+        if (goodsOutputType != null) {
+            modifiers.addAll(colony.getFeatureContainer().
+                             getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+            Collections.sort(modifiers);
+        }
+        return modifiers;
     }
 
     public int compareTo(Building other) {

@@ -474,6 +474,8 @@ public class BuildingTest extends FreeColTestCase {
         owner.addFather(jefferson);
         assertTrue(colony.getOwner().getFeatureContainer().getModifierSet("model.goods.bells")
                    .contains(bellsModifier));
+        assertTrue(colony.getFeatureContainer().getModifierSet("model.goods.bells", townHall, game.getTurn()).
+                   contains(bellsModifier));
         assertTrue(colony.getModifierSet("model.goods.bells").contains(bellsModifier));
 
         assertEquals(3, building.getUnitProductivity(colonist));
