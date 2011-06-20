@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +40,13 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -60,16 +66,14 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private Map<Colony, TypeCountMap<UnitType>> unitCount =
-        new HashMap<Colony, TypeCountMap<UnitType>>();
+    private Map<Colony, TypeCountMap<UnitType>> unitCount
+        = new HashMap<Colony, TypeCountMap<UnitType>>();
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private Map<Colony, Set<UnitType>> canTrain =
-        new HashMap<Colony, Set<UnitType>>();
-
-
+    private Map<Colony, Set<UnitType>> canTrain
+        = new HashMap<Colony, Set<UnitType>>();
 
 
     /**
@@ -104,122 +108,268 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
 
         for (Colony colony : colonies) {
+            checkColony(colony, doc);
+        }
+        // text area
+        int width = ((JViewport) reportPanel.getParent()).getWidth();
+        reportPanel.setLayout(new MigLayout("width " + width + "!"));
+        reportPanel.add(textPane);
+        textPane.setCaretPosition(0);
+    }
 
-            // colonyLabel
-            try {
-                if (doc.getLength() > 0) {
-                    doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
+    private void checkColony(Colony colony, StyledDocument doc) {
+        final Specification spec = getSpecification();
+
+        try {
+            if (doc.getLength() > 0) {
+                doc.insertString(doc.getLength(), "\n\n",
+                    doc.getStyle("regular"));
+            }
+            StyleConstants.setComponent(doc.getStyle("button"),
+                createColonyButton(colony, true));
+            doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+        } catch (Exception e) {
+            logger.warning(e.toString());
+        }
+
+        Set<UnitType> missingExpertWarning = new HashSet<UnitType>();
+        Set<UnitType> badAssignmentWarning = new HashSet<UnitType>();
+        Set<GoodsType> productionWarning = new HashSet<GoodsType>();
+
+        // Check if all unit requirements are met.
+        for (Unit expert : colony.getUnitList()) {
+            if (expert.getSkillLevel() <= 0) continue;
+
+            GoodsType production = expert.getWorkType();
+            GoodsType expertise = expert.getType().getExpertProduction();
+            if (production == null || expertise == null
+                || production == expertise) continue;
+
+            // We have an expert not doing the job of their expertise.
+            // Check if there is a non-expert doing the job instead.
+            for (Unit nonExpert : colony.getUnitList()) {
+                if (nonExpert.getWorkType() != expertise
+                    || nonExpert.getType() == expert.getType()) continue;
+
+                // We have found a unit of a different type doing the
+                // job of this expert's expertise now check if the
+                // production would be better if the units swapped
+                // positions.
+                int expertProductionNow = 0;
+                int nonExpertProductionNow = 0;
+                int expertProductionPotential = 0;
+                int nonExpertProductionPotential = 0;
+
+                // Get the current and potential productions for the
+                // work location of the expert.
+                if (expert.getWorkTile() != null) {
+                    ColonyTile ct = expert.getWorkTile();
+                    expertProductionNow = ct.getProductionOf(expert, expertise);
+                    nonExpertProductionPotential = ct.getProductionOf(nonExpert, expertise);
+                } else if (expert.getWorkBuilding() != null) {
+                    Building b = expert.getWorkBuilding();
+                    expertProductionNow = b.getUnitProductivity(expert);
+                    nonExpertProductionPotential = b.getUnitProductivity(nonExpert);
                 }
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, true));
-                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-            } catch(Exception e) {
+
+                // Get the current and potential productions for the
+                // work location of the non-expert.
+                if (nonExpert.getWorkTile() != null) {
+                    ColonyTile ct = nonExpert.getWorkTile();
+                    nonExpertProductionNow = ct.getProductionOf(nonExpert, expertise);
+                    expertProductionPotential = ct.getProductionOf(expert, expertise);
+                } else if (nonExpert.getWorkBuilding() != null) {
+                    Building b = nonExpert.getWorkBuilding();
+                    nonExpertProductionNow = b.getUnitProductivity(nonExpert);
+                    expertProductionPotential = b.getUnitProductivity(expert);
+                }
+
+                // Let the player know if the two units would be more
+                // productive were they to swap roles.
+                if ((expertProductionNow + nonExpertProductionNow)
+                    < (expertProductionPotential + nonExpertProductionPotential)
+                    && !badAssignmentWarning.contains(expert)) {
+                    addBadAssignmentWarning(doc, colony, expert, nonExpert);
+                    badAssignmentWarning.add(expert.getType());
+                }
+            }
+        }
+
+        for (ColonyTile colonyTile : colony.getColonyTiles()) {
+            Unit unit = colonyTile.getUnit();
+            if (unit == null) continue;
+            GoodsType workType = unit.getWorkType();
+            UnitType expert = spec.getExpertForProducing(workType);
+            if (unitCount.get(colony).getCount(expert) == 0
+                && !missingExpertWarning.contains(expert)) {
+                addExpertWarning(doc, colony, workType, expert);
+                missingExpertWarning.add(expert);
+            }
+        }
+
+        for (Building building : colony.getBuildings()) {
+            GoodsType goodsType = building.getGoodsOutputType();
+            UnitType expert = building.getExpertUnitType();
+
+            // check if this building has no expert producing goods
+            if (goodsType != null && expert != null
+                && building.getFirstUnit() != null
+                && !missingExpertWarning.contains(expert)
+                && unitCount.get(colony).getCount(expert) == 0) {
+                addExpertWarning(doc, colony, goodsType, expert);
+                missingExpertWarning.add(expert);
+            }
+            // not enough input
+            if (goodsType != null
+                && !building.getProductionInfo().hasMaximumProduction()
+                && !productionWarning.contains(goodsType)) {
+                addProductionWarning(doc, colony, goodsType,
+                    building.getGoodsInputType());
+                productionWarning.add(goodsType);
+            }
+        }
+
+        List<Tile> exploreTiles = new ArrayList<Tile>();
+        List<Tile> clearTiles = new ArrayList<Tile>();
+        List<Tile> plowTiles = new ArrayList<Tile>();
+        List<Tile> roadTiles = new ArrayList<Tile>();
+        getColonyTileTodo(colony, exploreTiles, clearTiles, plowTiles,
+            roadTiles);
+        for (Tile t : exploreTiles) {
+            addTileWarning(doc, colony, "report.requirements.exploreTile", t);
+        }
+        for (Tile t : clearTiles) {
+            addTileWarning(doc, colony, "report.requirements.clearTile", t);
+        }
+        for (Tile t : plowTiles) {
+            if (t == colony.getTile()) {
+                addPlowCenterWarning(doc, colony);
+            } else {
+                addTileWarning(doc, colony, "report.requirements.plowTile", t);
+            }
+        }
+        for (Tile t : roadTiles) {
+            addTileWarning(doc, colony, "report.requirements.roadTile", t);
+        }
+
+        if (exploreTiles.isEmpty()
+            && clearTiles.isEmpty()
+            && plowTiles.isEmpty()
+            && roadTiles.isEmpty()
+            && missingExpertWarning.isEmpty()
+            && badAssignmentWarning.isEmpty()
+            && productionWarning.isEmpty()) {
+            try {
+                doc.insertString(doc.getLength(), "\n\n"
+                    + Messages.message("report.requirements.met"),
+                    doc.getStyle("regular"));
+            } catch (Exception e) {
                 logger.warning(e.toString());
             }
-
-            Set<UnitType> missingExpertWarning = new HashSet<UnitType>();
-            Set<UnitType> badAssignmentWarning = new HashSet<UnitType>();
-            Set<GoodsType> productionWarning = new HashSet<GoodsType>();
-
-            // check if all unit requirements are met
-            for (Unit expert : colony.getUnitList()) {
-                if (expert.getSkillLevel() > 0) {
-                    GoodsType production = expert.getWorkType();
-                    GoodsType expertise = expert.getType().getExpertProduction();
-                    if (production != null && expertise != null && production != expertise) {
-                        // we have an expert not doing the job of their expertise
-                        //    check if there is a non-expert doing the job instead
-                        for (Unit nonExpert : colony.getUnitList()) {
-                            if ((nonExpert.getWorkType() == expertise) && (nonExpert.getType() != expert.getType())) {
-                                // we've found a unit of a different type doing the job of this expert's expertise
-                                //  now check if the production would be better if the units swapped positions
-                                int expertProductionNow = 0;
-                                int nonExpertProductionNow = 0;
-                                int expertProductionPotential = 0;
-                                int nonExpertProductionPotential = 0;
-
-                                // get the current and potential productions for the work location of the expert
-                                if (expert.getWorkTile() != null) {
-                                    expertProductionNow = expert.getWorkTile().getProductionOf(expert, expertise);
-                                    nonExpertProductionPotential = expert.getWorkTile().getProductionOf(nonExpert, expertise);
-                                } else if (expert.getWorkBuilding() != null) {
-                                    expertProductionNow = expert.getWorkBuilding().getUnitProductivity(expert);
-                                    nonExpertProductionPotential = expert.getWorkBuilding().getUnitProductivity(nonExpert);
-                                }
-
-                                // get the current and potential productions for the work location of the non-expert
-                                if (nonExpert.getWorkTile() != null) {
-                                    nonExpertProductionNow = nonExpert.getWorkTile().getProductionOf(nonExpert, expertise);
-                                    expertProductionPotential = nonExpert.getWorkTile().getProductionOf(expert, expertise);
-                                } else if (nonExpert.getWorkBuilding() != null) {
-                                    nonExpertProductionNow = nonExpert.getWorkBuilding().getUnitProductivity(nonExpert);
-                                    expertProductionPotential = nonExpert.getWorkBuilding().getUnitProductivity(expert);
-                                }
-
-                                // let the player know if the two units would be more productive were they to swap roles
-                                if ((expertProductionNow + nonExpertProductionNow)
-                                    < (expertProductionPotential + nonExpertProductionPotential)
-                                    && !badAssignmentWarning.contains(expert)) {
-                                    addBadAssignmentWarning(doc, colony, expert, nonExpert);
-                                    badAssignmentWarning.add(expert.getType());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                Unit unit = colonyTile.getUnit();
-                if (unit != null) {
-                    GoodsType workType = unit.getWorkType();
-                    UnitType expert = getSpecification().getExpertForProducing(workType);
-                    if (unitCount.get(colony).getCount(expert) == 0
-                        && !missingExpertWarning.contains(expert)) {
-                        addExpertWarning(doc, colony, workType, expert);
-                        missingExpertWarning.add(expert);
-                    }
-                }
-            }
-            for (Building building : colony.getBuildings()) {
-                GoodsType goodsType = building.getGoodsOutputType();
-                UnitType expert = building.getExpertUnitType();
-
-                // check if this building has no expert producing goods
-                if (goodsType != null && expert != null
-                    && building.getFirstUnit() != null
-                    && !missingExpertWarning.contains(expert)
-                    && unitCount.get(colony).getCount(expert) == 0) {
-                    addExpertWarning(doc, colony, goodsType, expert);
-                    missingExpertWarning.add(expert);
-                }
-                // not enough input
-                if (goodsType != null
-                    && !building.getProductionInfo().hasMaximumProduction()
-                    && !productionWarning.contains(goodsType)) {
-                    addProductionWarning(doc, colony, goodsType, building.getGoodsInputType());
-                    productionWarning.add(goodsType);
-                }
-            }
-
-            if (missingExpertWarning.isEmpty()
-                && badAssignmentWarning.isEmpty()
-                && productionWarning.isEmpty()) {
-                try {
-                    doc.insertString(doc.getLength(), "\n\n" + Messages.message("report.requirements.met"),
-                                     doc.getStyle("regular"));
-                } catch(Exception e) {
-                    logger.warning(e.toString());
-                }
-            }
-
-            // text area
-            int width = ((JViewport) reportPanel.getParent()).getWidth();
-            reportPanel.setLayout(new MigLayout("width " + width + "!"));
-            reportPanel.add(textPane);
-
         }
-        textPane.setCaretPosition(0);
+    }
 
+    /**
+     * Collects tiles that need exploring, plowing or road building
+     * (may depend on current use within the colony).
+     *
+     * @param colony The <code>Colony</code> to examine.
+     * @param exploreTiles A list of <code>Tile</code>s to update with tiles
+     *     to explore.
+     * @param clearTiles A list of <code>Tile</code>s to update with tiles
+     *     to clear.
+     * @param plowTiles A list of <code>Tile</code>s to update with tiles
+     *     to plow.
+     * @param roadTiles A list of <code>Tile</code>s to update with tiles
+     *     to build roads on.
+     */
+    public void getColonyTileTodo(Colony colony, List<Tile> exploreTiles,
+                                  List<Tile> clearTiles, List<Tile> plowTiles,
+                                  List<Tile> roadTiles) {
+        final Specification spec = getSpecification();
+        final TileImprovementType clearImprovement
+            = spec.getTileImprovementType("model.improvement.clearForest");
+        final TileImprovementType plowImprovement
+            = spec.getTileImprovementType("model.improvement.plow");
+        final TileImprovementType roadImprovement
+            = spec.getTileImprovementType("model.improvement.road");
+        Tile tile = colony.getTile();
+
+        for (Tile t : colony.getTile().getSurroundingTiles(1)) {
+            if (t.hasLostCityRumour()) exploreTiles.add(t);
+        }
+
+        for (ColonyTile ct : colony.getColonyTiles()) {
+            Unit u = ct.getUnit();
+            Tile t = ct.getWorkTile();
+            if (t == null) continue; // Colony has not claimed the tile yet.
+
+            if ((t.getTileItemContainer() == null
+                    || t.getTileItemContainer()
+                    .getImprovement(plowImprovement) == null)
+                && plowImprovement.isTileTypeAllowed(t.getType())) {
+                if (ct.isColonyCenterTile()) {
+                    plowTiles.add(t);
+                } else if (u != null && u.getWorkType() != null
+                    && plowImprovement.getBonus(u.getWorkType()) > 0) {
+                    plowTiles.add(t);
+                }
+            }
+
+            // To assess whether other improvements are beneficial we
+            // really need a unit, doing work, so we can compare the output
+            // with and without the improvement.  This means we can skip
+            // further consideration of the colony center tile.
+            if (ct.isColonyCenterTile()
+                || u == null || u.getWorkType() == null) continue;
+
+            TileType oldType = t.getType();
+            TileType newType;
+            if ((t.getTileItemContainer() == null
+                    || t.getTileItemContainer()
+                    .getImprovement(clearImprovement) == null)
+                && clearImprovement.isTileTypeAllowed(t.getType())
+                && u != null
+                && (newType = clearImprovement.getChange(oldType)) != null
+                && (newType.getProductionOf(u.getWorkType(), u.getType())
+                    > oldType.getProductionOf(u.getWorkType(), u.getType()))) {
+                clearTiles.add(t);
+            }
+
+            if (t.getRoad() == null
+                && u != null
+                && roadImprovement.isTileTypeAllowed(t.getType())
+                && roadImprovement.getBonus(u.getWorkType()) > 0) {
+                roadTiles.add(t);
+            }
+        }
+    }
+
+    private void addTileWarning(StyledDocument doc, Colony colony,
+                                String messageId, Tile tile) {
+        Direction direction = tile.getMap()
+            .getDirection(colony.getTile(), tile);
+        String message = Messages.message(StringTemplate.template(messageId)
+            .add("%type%", tile.getType().getNameKey())
+            .add("%direction%", direction.getNameKey())
+            .addName("%colony%", colony.getName()));
+        try {
+            doc.insertString(doc.getLength(), "\n\n" + message,
+                doc.getStyle("regular"));
+        } catch (Exception e) {
+            logger.warning(e.toString());
+        }
+    }
+
+    private void addPlowCenterWarning(StyledDocument doc, Colony colony) {
+        String message = Messages.message(StringTemplate.template("report.requirements.plowCenter")
+            .addName("%colony%", colony.getName()));
+        try {
+            doc.insertString(doc.getLength(), "\n\n" + message,
+                doc.getStyle("regular"));
+        } catch (Exception e) {
+            logger.warning(e.toString());
+        }
     }
 
     private void addBadAssignmentWarning(StyledDocument doc, Colony colony, Unit expert, Unit nonExpert) {

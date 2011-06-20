@@ -183,6 +183,23 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
+     * Gets the tile improvement of the given type if any.
+     *
+     * @param type The <code>TileImprovementType</code> to look for.
+     * @return The tile improvement of the given type if present,
+     *     otherwise null.
+     */
+    public TileImprovement getImprovement(TileImprovementType type) {
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement
+                && ((TileImprovement) item).getType() == type) {
+                return (TileImprovement) item;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the road improvement or null.
      *
      * @return a <code>TileImprovement</code> value

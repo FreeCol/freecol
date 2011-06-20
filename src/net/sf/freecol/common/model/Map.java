@@ -118,6 +118,10 @@ public class Map extends FreeColGameObject {
             return values()[(ordinal() + 4) % 8];
         }
 
+        public String getNameKey() {
+            return "direction." + this.toString();
+        }
+
         /**
          * Returns a random Direction.
          *
