@@ -598,6 +598,7 @@ public class FreeColTestCase extends TestCase {
             Field productionBonus = Colony.class.getDeclaredField("productionBonus");
             productionBonus.setAccessible(true);
             productionBonus.setInt(colony, value);
+            colony.invalidateCache();
         } catch (Exception e) {
             // do nothing
         }
