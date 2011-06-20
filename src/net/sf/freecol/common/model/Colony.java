@@ -263,6 +263,7 @@ public class Colony extends Settlement implements Nameable {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
         getFeatureContainer().add(building.getType().getFeatureContainer());
+        invalidateCache();
     }
 
     /**
@@ -275,6 +276,7 @@ public class Colony extends Settlement implements Nameable {
         BuildingType buildingType = building.getType().getFirstLevel();
         boolean result = buildingMap.remove(buildingType.getId()) != null;
         getFeatureContainer().remove(building.getType().getFeatureContainer());
+        invalidateCache();
         return result;
     }
 
