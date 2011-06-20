@@ -366,8 +366,8 @@ public class BuildingTest extends FreeColTestCase {
 
         colony.addGoods(cottonType, 2);
         assertEquals(2, colony.getProductionOf(cottonType));
-        assertEquals(2, weaver.getProductionOf(clothType));
-        assertEquals(2, colony.getProductionOf(clothType));
+        assertEquals(3, weaver.getProductionOf(clothType));
+        assertEquals(3, colony.getProductionOf(clothType));
         assertEquals(-1, colony.getNetProductionOf(cottonType));
         assertEquals(3, colony.getNetProductionOf(clothType));
 
@@ -474,8 +474,6 @@ public class BuildingTest extends FreeColTestCase {
         owner.addFather(jefferson);
         assertTrue(colony.getOwner().getFeatureContainer().getModifierSet("model.goods.bells")
                    .contains(bellsModifier));
-        assertTrue(colony.getFeatureContainer().getModifierSet("model.goods.bells", townHall, game.getTurn()).
-                   contains(bellsModifier));
         assertTrue(colony.getModifierSet("model.goods.bells").contains(bellsModifier));
 
         assertEquals(3, building.getUnitProductivity(colonist));
