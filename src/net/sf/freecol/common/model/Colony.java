@@ -650,7 +650,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void removeGoods(GoodsType type, int amount) {
         Goods removed = goodsContainer.removeGoods(type, amount);
-        invalidateCache();
+        productionCache.invalidate(type);
         modifySpecialGoods(type, -removed.getAmount());
     }
 
@@ -670,7 +670,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void removeGoods(GoodsType type) {
         Goods removed = goodsContainer.removeGoods(type);
-        invalidateCache();
+        productionCache.invalidate(type);
         modifySpecialGoods(type, -removed.getAmount());
     }
 
@@ -691,7 +691,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public void addGoods(GoodsType type, int amount) {
         goodsContainer.addGoods(type, amount);
-        invalidateCache();
+        productionCache.invalidate(type);
         modifySpecialGoods(type, amount);
     }
 
