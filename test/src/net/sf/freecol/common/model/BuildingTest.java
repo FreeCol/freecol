@@ -415,22 +415,27 @@ public class BuildingTest extends FreeColTestCase {
         colony.removeGoods(horsesType);
 
         colony.addGoods(horsesType, 25);
+        assertEquals(25, colony.getGoodsCount(horsesType));
         assertEquals(2, pasture.getProductionOf(horsesType));
         assertEquals(2, pasture.getMaximumProduction());
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
+        assertEquals(26, colony.getGoodsCount(horsesType));
         assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProduction());
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 24);
+        assertEquals(50, colony.getGoodsCount(horsesType));
         assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(4, pasture.getMaximumProduction());
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
-        assertEquals(6, pasture.getProductionOf(horsesType));
+        assertEquals(51, colony.getGoodsCount(horsesType));
+        // no more than half the surplus production!
+        assertEquals(4, pasture.getProductionOf(horsesType));
         assertEquals(6, pasture.getMaximumProduction());
         assertEquals("Horse production should equal food surplus.",
                      colony.getNetProductionOf(foodType),
