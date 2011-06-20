@@ -212,7 +212,7 @@ public class DebugMenu extends JMenu {
         this.add(cvpMenu);
 
         final JRadioButtonMenuItem cv3
-            = new JRadioButtonMenuItem(Messages.message("menuBar.debug.showCommonOutputValue"),
+            = new JRadioButtonMenuItem(Messages.message("menuBar.debug.showCommonOutpostValue"),
                 gui.displayColonyValue
                 && gui.displayColonyValuePlayer == null);
         cv3.setOpaque(false);
@@ -401,7 +401,7 @@ public class DebugMenu extends JMenu {
 
         // random number generator
         final JMenuItem rng
-            = new JMenuItem("menuBar.debug.stepRandomNumberGenerator");
+            = new JMenuItem(Messages.message("menuBar.debug.stepRandomNumberGenerator"));
         rng.setOpaque(false);
         rng.setMnemonic(KeyEvent.VK_X);
         this.add(rng);
