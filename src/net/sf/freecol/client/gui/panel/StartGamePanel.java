@@ -250,6 +250,11 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         try {
             switch (Integer.valueOf(command).intValue()) {
             case START:
+                int row = table.getSelectedRow();
+                int col = table.getSelectedColumn();
+                if (row > -1 && col > -1){
+                    table.getCellEditor(row, col).stopCellEditing();
+                }
                 if (!checkVictoryConditions()) break;
 
                 // The ready flag was set to false for single player
