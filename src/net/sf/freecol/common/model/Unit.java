@@ -1445,7 +1445,7 @@ public class Unit extends FreeColGameObject
                     } else if (!isOffensiveUnit()) {
                         return MoveType.MOVE_NO_ATTACK_CIVILIAN;
                     } else {
-                        return (from.isLand())
+                        return (allowMoveFrom(from))
                             ? MoveType.ATTACK_UNIT
                             : MoveType.MOVE_NO_ATTACK_MARINE;
                     }
