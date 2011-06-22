@@ -725,6 +725,15 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the storage capacity of this settlement.
+     *
+     * @return The storage capacity of this settlement.
+     */
+    public int getWarehouseCapacity() {
+        return getType().getWarehouseCapacity();
+    }
+
+    /**
      * Gets the amount of gold this <code>IndianSettlment</code>
      * is willing to pay for the given <code>Goods</code>.
      *

@@ -137,7 +137,7 @@ public class ServerIndianSettlement extends IndianSettlement
         for (GoodsType g : goodsList) {
             consumeGoods(g, getConsumptionOf(g));
         }
-        getGoodsContainer().removeAbove(500);
+        getGoodsContainer().removeAbove(getWarehouseCapacity());
 
         // Check for new resident.
         // Alcohol also contributes to create children.

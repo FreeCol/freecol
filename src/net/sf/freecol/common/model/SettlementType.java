@@ -283,7 +283,6 @@ public class SettlementType extends FreeColGameObjectType {
         return null;
     }
 
-
     /**
      * Set the <code>Gifts</code> value.
      *
@@ -292,6 +291,17 @@ public class SettlementType extends FreeColGameObjectType {
     public final void setGifts(final RandomRange newGifts) {
         gifts.add(newGifts);
     }
+
+
+    /**
+     * Gets the warehouse capacity of this settlement.
+     *
+     * @return The warehouse capacity of this settlement.
+     */
+    public int getWarehouseCapacity() {
+        return 100 * getClaimableRadius();
+    }
+
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXMLImpl(out, getXMLElementTagName());

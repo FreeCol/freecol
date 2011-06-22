@@ -489,6 +489,13 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public abstract boolean propagateAlarm(Player player, int addToAlarm);
 
     /**
+     * Gets the storage capacity of this settlement.
+     *
+     * @return The storage capacity of this settlement.
+     */
+    public abstract int getWarehouseCapacity();
+
+    /**
      * Removes a specified amount of a type of Goods from this Settlement.
      *
      * @param type The type of Goods to remove from this settlement.
