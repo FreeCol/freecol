@@ -846,6 +846,8 @@ public final class Canvas extends JDesktopPane {
                                          "stopCurrentGame.no")) {
                 freeColClient.getConnectController().quitGame(true);
                 FreeCol.incrementFreeColSeed();
+            } else {
+                return;
             }
             removeInGameComponents();
         }
