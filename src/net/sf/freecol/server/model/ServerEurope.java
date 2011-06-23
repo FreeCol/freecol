@@ -49,7 +49,6 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public ServerEurope(Game game, String id) {
         super(game, id);
-        initialize(game.getSpecification());
     }
 
     /**
@@ -61,11 +60,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
-        initialize(game.getSpecification());
-    }
-
-    private void initialize(Specification specification) {
-        FeatureContainer featureContainer = new FeatureContainer(specification);
+        FeatureContainer featureContainer = new FeatureContainer();
         // TODO: put this in the specification
         featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
         setFeatureContainer(featureContainer);

@@ -34,12 +34,6 @@ public class FeatureContainer {
     private Map<String, Set<Ability>> abilities = new HashMap<String, Set<Ability>>();
     private Map<String, Set<Modifier>> modifiers = new HashMap<String, Set<Modifier>>();
 
-    private Specification specification;
-
-
-    public FeatureContainer(Specification specification) {
-        this.specification = specification;
-    }
 
     public Set<Ability> getAbilities() {
         Set<Ability> result = new HashSet<Ability>();
@@ -89,9 +83,6 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Ability> getAbilitySet(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (specification.getAbilities(id) == null) {
-            throw new IllegalArgumentException("Unknown ability key: " + id);
-        }
         Set<Ability> abilitySet = abilities.get(id);
         if (abilitySet == null) {
             return new HashSet<Ability>();
@@ -136,10 +127,6 @@ public class FeatureContainer {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id, FreeColGameObjectType objectType, Turn turn) {
-        if (specification.getAbilities(id) == null) {
-            logger.warning("Unknown ability key: " + id + ". Possible spelling error?");
-            return false;
-        }
         Set<Ability> abilitySet = abilities.get(id);
         if (abilitySet == null) {
             return false;
@@ -211,10 +198,6 @@ public class FeatureContainer {
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
         HashSet<Modifier> result = new HashSet<Modifier>();
 
-        if (specification.getModifiers(id) == null) {
-            logger.warning("Unknown modifier key: " + id + ". Possible spelling error?");
-            return result;
-        }
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
             return result;

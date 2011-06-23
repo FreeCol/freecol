@@ -74,7 +74,7 @@ public class FreeColGameObjectType extends FreeColObject {
     public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
         this.specification = specification;
-        featureContainer = new FeatureContainer(specification);
+        featureContainer = new FeatureContainer();
     }
 
     /**

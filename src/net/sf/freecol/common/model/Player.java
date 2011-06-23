@@ -3506,7 +3506,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (index > 0) setNameIndex(key, index);
         }
 
-        featureContainer = new FeatureContainer(getSpecification());
+        featureContainer = new FeatureContainer();
         if (nationType != null) {
             featureContainer.add(nationType.getFeatureContainer());
         }

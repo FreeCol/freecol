@@ -575,7 +575,7 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
 
         // TODO: remove 0.10.0 compatibility code
         if (featureContainer == null) {
-            featureContainer = new FeatureContainer(spec);
+            featureContainer = new FeatureContainer();
             featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
         }
         // end compatibility code

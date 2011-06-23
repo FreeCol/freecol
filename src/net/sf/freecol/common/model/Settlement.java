@@ -88,7 +88,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.name = name;
         this.tile = tile;
 
-        featureContainer = new FeatureContainer(game.getSpecification());
+        featureContainer = new FeatureContainer();
         setType(owner.getNationType().getSettlementType(false));
 
         owner.addSettlement(this);
@@ -619,7 +619,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        featureContainer = new FeatureContainer(getGame().getSpecification());
+        featureContainer = new FeatureContainer();
 
         // TODO: remove 0.9.x compatibility code
         String typeStr = in.getAttributeValue(null, "settlementType");

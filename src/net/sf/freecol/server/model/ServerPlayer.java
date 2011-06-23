@@ -135,7 +135,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.name = name;
         this.admin = admin;
-        featureContainer = new FeatureContainer(game.getSpecification());
+        featureContainer = new FeatureContainer();
         europe = null;
         if (nation != null && nation.getType() != null) {
             this.nationType = nation.getType();
