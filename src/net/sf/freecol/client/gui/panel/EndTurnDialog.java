@@ -79,6 +79,10 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
             location = Messages.message(unit.getLocation().getLocationName());
         }
 
+        public Unit getUnit() {
+            return unit;
+        }
+
         public String toString() {
             return name;
         }
@@ -148,7 +152,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
     }
 
     private void selectUnit() {
-        Unit unit = (Unit) unitList.getSelectedValue();
+        Unit unit = ((UnitWrapper) unitList.getSelectedValue()).getUnit();
         if (unit != null) {
             if (unit.getColony() != null) {
                 getCanvas().showColonyPanel(unit.getColony());
