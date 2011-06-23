@@ -906,9 +906,9 @@ public final class FreeColClient {
      */
     public void playSound(String sound) {
         if (canPlaySound()) {
-            if (sound == null)
-               soundPlayer.fade();
-            else {
+            if (sound == null) {
+               soundPlayer.stop();
+            } else {
                File file = ResourceManager.getAudio(sound);
                if (file != null) {
                    soundPlayer.playOnce(file);
