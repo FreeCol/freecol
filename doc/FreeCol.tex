@@ -14,7 +14,12 @@
 \usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{index}
-\usepackage[colorlinks=true,hyperindex=true]{hyperref}
+\usepackage[
+  colorlinks=true,
+  hyperindex=true,
+  pdftitle={FreeCol Documentation, User Guide for Version v0.10.0},
+  pdfauthor={The FreeCol Team}
+]{hyperref}
 \makeindex
 
 \begin{document}
@@ -995,7 +1000,7 @@ The main map shows you the New World in greater detail. You can see
 the different types of terrain, forested and otherwise, hills,
 mountains, rivers, and, of course, the various units and settlements
 of the native and European players.  Sometimes units will be all
-grey--- this shows the position of the unit when you could last see
+grey---this shows the position of the unit when you could last see
 that tile, but does not guarantee that the unit is still there.  Left
 click on a tile in order to center the main map, or on a unit in order
 to select it (a \hyperlink{display options}{display option} allows you
@@ -1076,7 +1081,7 @@ middle mouse button, or both mouse buttons if your mouse only has two
 buttons, in order to give the selected unit a movement order.
 
 In the original Colonization game, a unit always used up all movement
-points when entering a colony. In FreeCol, this is not the case --- a
+points when entering a colony. In FreeCol, this is not the case---a
 unit can enter a colony just like any other tile. If the unit is
 placed in a building, or on a colony tile, or if a carrier is loaded
 or unloaded, however, it will lose all its movement points.
@@ -1133,7 +1138,7 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 \begin{itemize}
 \item\verb$a$: assign a trade route.
 \item\verb$b$: build a colony, or join an existing colony.
-\item\verb$c$: center on the currently selected unit.
+\item\verb$c$: clear forest (requires 20 tools)
 \item\verb$d$: disband the active unit.
 \item\verb$e$: show the Europe panel.
 \item\verb$f$: fortify.
@@ -1154,6 +1159,7 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 \item\verb$enter$: end the turn.
 \item\verb$plus$ or \verb$equals$: zoom in.
 \item\verb$minus$ or \verb$underscore$: zoom out.
+\item\verb$ctrl-c$: center on the currently selected unit.
 \item\verb$ctrl-d$: display tile names.
 \item\verb$ctrl-f$: find a colony.
 \item\verb$ctrl-g$: display grid.
@@ -1248,7 +1254,7 @@ right. You can drag and drop a unit on a tile or a building. The tiles
 surrounding the colony can produce several kinds of goods, however. If
 the unit is not producing the right kind of goods, you can right click
 on the unit to select a different kind of work. If a tile has a red
-border, then it can not be used --- it is either assigned to another
+border, then it can not be used---it is either assigned to another
 colony or settlement, or is occupied by a hostile unit, or is a water
 tile which can not be used until you have built \hyperlink{Dock}{docks}.
 Note that if you drag a unit onto a tile used by the natives you may
@@ -1627,7 +1633,7 @@ peacefully coexist with the natives, or to wipe them out. The
 half the alarm among the natives. The \hyperlink{Spain}{Spanish}
 player has the advantage of greater military efficiency against the
 natives. Your choice of \hyperlink{Home Country}{Home Country} may
-influence your strategy --- or vice versa.
+influence your strategy---or vice versa.
 
 Small Native Settlements use the tile they are built on and all the
 adjacent tiles, just like your \hyperlink{Colonies}{Colonies} do, and
@@ -2085,7 +2091,7 @@ starting units. In the original game, these abilities and units were
 tied to particular nations. FreeCol, however, optionally allows you to
 select your national advantage.
 
-At the moment, FreeCol defines the following six advantages, and also
+At the moment, FreeCol defines the following eight advantages, and also
 allows you to select no advantage at all:
 
 \begin{itemize}
@@ -2299,11 +2305,12 @@ the lumber into buildings than the \Unit{Master Carpenter}.
 The more advanced buildings you can construct in the your colonies
 require not only lumber but also \hyperlink{Tools}{Tools}, which are
 produced from \hyperlink{Ore}{Ore}. This is the job the \Unit{Master
-Blacksmith} excels in.  Tools are also used by your \Unit{Pioneer} to
-clear forests and plow fields, but none of your other colonists can
-match the outdoors skills of your \Unit{Hardy Pioneer}. And finally,
-Tools are required for the production of \hyperlink{Muskets}{Muskets},
-a demanding task best left to the \Unit{Master Gunsmith}.
+Blacksmith} excels in. Tools are also used by your \Unit{Pioneer} to
+clear forests, to plow fields and to build roads, but none of your 
+other colonists can match the outdoors skills of your 
+\Unit{Hardy Pioneer}. And finally, Tools are required for the 
+production of \hyperlink{Muskets}{Muskets}, a demanding task best 
+left to the \Unit{Master Gunsmith}.
 
 All your units are able to explore the New World, but the colonist
 most suited to this dangerous endeavour is the \Unit{Scout}, a mounted
@@ -2916,7 +2923,7 @@ the Royal Expeditionary Force by capturing or destroying nearly all of
 their land forces and by taking back any colonies they might have
 captured. You do not need to destroy the fleet.  However, you do need
 to maintain at least one independent colony that is on the coast and
-accessible from Europe--- if the Royal Expeditionary Force captures
+accessible from Europe---if the Royal Expeditionary Force captures
 all your coastal colonies you have lost.
 
 At the declaration, colonies with strong support for the Sons of
@@ -2960,7 +2967,7 @@ reconnect problem, more detail is available in the java log file
 (usually called \texttt{FreeCol.log}) which is very helpful to the
 developers if attached to the bug report.  The log file can sometimes
 be large enough to exceed the attachment limit at SourceForge, in
-which case feel free to omit the bulk of the file--- the critical
+which case feel free to omit the bulk of the file---the critical
 information is likely to be near the end (in the form of a
 java exception message), but you should always retain the first few
 lines which contain the FreeCol version and system information.
