@@ -26,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+//import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -78,6 +80,7 @@ public class SoundPlayer {
             });
         mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
         soundPlayerThread = new SoundPlayerThread();
+        soundPlayerThread.start();
     }
 
     public Mixer getCurrentMixer () {
@@ -91,7 +94,8 @@ public class SoundPlayer {
      */
     public void playOnce(File file) {
         soundPlayerThread.add(file);
-        soundPlayerThread.stopPlaying();
+        soundPlayerThread.startPlaying();
+        soundPlayerThread.awaken();
     }
 
     /**
@@ -99,6 +103,11 @@ public class SoundPlayer {
      */
     public void stop() {
         soundPlayerThread.stopPlaying();
+        soundPlayerThread.awaken();
+    }
+
+    public boolean isPlaying() {
+        return soundPlayerThread.keepPlaying();
     }
 
     /**
@@ -110,11 +119,20 @@ public class SoundPlayer {
 
         private boolean playDone = true;
 
+
         public SoundPlayerThread() {
             super(FreeCol.CLIENT_THREAD + "SoundPlayer");
         }
 
-        private synchronized boolean keepPlaying() {
+        private synchronized void awaken() {
+            this.notify();
+        }
+
+        private synchronized void goToSleep() throws InterruptedException {
+            this.wait();
+        }
+
+        public synchronized boolean keepPlaying() {
             return !playDone;
         }
 
@@ -133,7 +151,11 @@ public class SoundPlayer {
         public void run() {
             for (;;) {
                 if (playList.isEmpty()) {
-                    sleep(250);
+                    try {
+                        goToSleep();
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
                 } else {
                     playSound(playList.remove(0));
                 }
@@ -142,34 +164,6 @@ public class SoundPlayer {
 
         private void sleep(int t) {
             try { Thread.sleep(t); } catch (InterruptedException e) {}
-        }
-
-        private void playSound(File file) {
-            try {
-                BufferedInputStream bis = new BufferedInputStream( new FileInputStream(file) );
-                bis.mark(1000); bis.skip(1); bis.reset();
-                AudioInputStream in = AudioSystem.getAudioInputStream(bis);
-                if (in != null) {
-                    AudioFormat baseFormat = in.getFormat();
-                    AudioFormat decodedFormat = new AudioFormat(
-                            AudioFormat.Encoding.PCM_SIGNED,
-                            baseFormat.getSampleRate(),
-                            16,
-                            baseFormat.getChannels(),
-                            baseFormat.getChannels() * (16 / 8),
-                            baseFormat.getSampleRate(),
-                            baseFormat.isBigEndian());
-                    AudioInputStream din
-                        = AudioSystem.getAudioInputStream(decodedFormat, in);
-                    startPlaying();
-                    rawplay(decodedFormat, din);
-                    din.close();
-                    in.close();
-                }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not play audio file: "
-                           + file.getName(), e);
-            }
         }
 
         private void setVolume(SourceDataLine line, int vol) {
@@ -185,40 +179,100 @@ public class SoundPlayer {
                     float gain = 20 * (float)Math.log10(vol / 100);
                     control.setValue(gain);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not set volume", e);
+            }
         }
 
-        private void rawplay(AudioFormat targetFormat, AudioInputStream din)
-            throws IOException, LineUnavailableException {
+        private SourceDataLine openLine(AudioFormat audioFormat) {
+            SourceDataLine line = null;
             DataLine.Info info = new DataLine.Info(SourceDataLine.class,
-                                                   targetFormat);
-            // Open the line
-            SourceDataLine line;
+                                                   audioFormat);
             try {
                 line = (SourceDataLine) mixer.getLine(info);
-            } catch (IllegalArgumentException e) {
-                throw new LineUnavailableException(e.toString());
+                line.open(audioFormat);
+                line.start();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Can not open SourceDataLine", e);
             }
-            if (line == null) return;
-            line.open(targetFormat);
-            line.start();
+            return line;
+        }
 
-            // Read and write audio data.
+        private boolean playSound(File file) {
+            BufferedInputStream bis;
+            try {
+                bis = new BufferedInputStream(new FileInputStream(file));
+                bis.mark(1000);
+                bis.skip(1);
+                bis.reset();
+            } catch (FileNotFoundException e) {
+                logger.warning("Could not find audio file: " + file.getName());
+                return false;
+            } catch (IOException e) {
+                logger.warning("Could not prepare stream for: "
+                    + file.getName());
+                return false;
+            }
+
+            AudioInputStream in;
+            try {
+                in = AudioSystem.getAudioInputStream(bis);
+            } catch (Exception e) {
+                logger.warning("Could not get audio input stream for: "
+                    + file.getName());
+                return false;
+            }
+
+            boolean ret = false;
+            AudioFormat baseFormat = in.getFormat();
+            AudioFormat decodedFormat
+                = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+                    baseFormat.getSampleRate(),
+                    16,
+                    baseFormat.getChannels(),
+                    baseFormat.getChannels() * (16 / 8),
+                    baseFormat.getSampleRate(),
+                    baseFormat.isBigEndian());
+            AudioInputStream din
+                = AudioSystem.getAudioInputStream(decodedFormat, in);
+            if (din == null) {
+                logger.warning("Can not get decoded audio input stream");
+            } else {
+                SourceDataLine line = openLine(decodedFormat);
+                if (line != null) {
+                    try { 
+                        rawplay(din, line);
+                        ret = true;
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Error playing: "
+                            + file.getName(), e);
+                    } finally {
+                        line.drain();
+                        line.stop();
+                        line.close();
+                    }
+                }
+            }
+            try {
+                if (din != null) din.close();
+                in.close();
+            } catch (IOException e) {} // Ignore errors on close
+            return ret;
+        }
+
+        private void rawplay(AudioInputStream din, SourceDataLine lin)
+            throws IOException {
             byte[] data = new byte[8192];
             while (keepPlaying()) {
                 int read = din.read(data, 0, data.length);
                 if (read < 0) {
                     break;
                 } else if (read > 0) {
-                    line.write(data, 0, read);
+                    lin.write(data, 0, read);
                 } else {
                     sleep(50);
                 }
             }
-
-            line.drain();
-            line.stop();
-            line.close();
         }
     }
 }
