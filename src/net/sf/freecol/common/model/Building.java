@@ -527,7 +527,7 @@ public class Building extends FreeColGameObject
      * @see #getGoodsInput
      * @see #getProduction
      */
-    public int getMaximumGoodsInput() {
+    private int getMaximumGoodsInput() {
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
@@ -544,27 +544,6 @@ public class Building extends FreeColGameObject
             return colony.getGoodsCount(getGoodsInputType());
         }
     }
-
-    /**
-     * Returns the amount of goods being used to get the current
-     * {@link #getProduction production}.
-     *
-     * @return The actual amount of goods that is being used to support the
-     *         current production.
-     * @see #getMaximumGoodsInput
-     * @see #getProduction
-     */
-    public int getGoodsInput() {
-        GoodsType inputType = getGoodsInputType();
-        if (inputType == null) {
-            return 0;
-        } else if (canAutoProduce()) {
-            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
-        } else {
-            return Math.min(getMaximumGoodsInput(), getStoredInput());
-        }
-    }
-
 
     /**
      * Returns the actual production of this building given the number
@@ -608,10 +587,24 @@ public class Building extends FreeColGameObject
         }
     }
 
+    /**
+     * Returns the ProductionInfo for this Building from the Colony's
+     * cache.
+     *
+     * @return a <code>ProductionInfo</code> object
+     */
     public ProductionInfo getProductionInfo() {
         return colony.getProductionInfo(this);
     }
 
+    /**
+     * Returns the ProductionInfo for this Building.
+     *
+     * @param output the output goods already available in the colony,
+     *        necessary in order to avoid excess production
+     * @param input the input goods available
+     * @return a <code>ProductionInfo</code> object
+     */
     public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
         if (getGoodsOutputType() != null) {
