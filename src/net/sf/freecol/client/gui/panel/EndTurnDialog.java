@@ -152,8 +152,9 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
     }
 
     private void selectUnit() {
-        Unit unit = ((UnitWrapper) unitList.getSelectedValue()).getUnit();
-        if (unit != null) {
+        UnitWrapper wrapper = (UnitWrapper) unitList.getSelectedValue();
+        if (wrapper != null && wrapper.getUnit() != null) {
+            Unit unit = wrapper.getUnit();
             if (unit.getColony() != null) {
                 getCanvas().showColonyPanel(unit.getColony());
             } else if (unit.isInEurope()) {
