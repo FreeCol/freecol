@@ -94,7 +94,6 @@ public class SoundPlayer {
      */
     public void playOnce(File file) {
         soundPlayerThread.add(file);
-        soundPlayerThread.startPlaying();
         soundPlayerThread.awaken();
     }
 
@@ -241,12 +240,14 @@ public class SoundPlayer {
                 SourceDataLine line = openLine(decodedFormat);
                 if (line != null) {
                     try { 
+                        startPlaying();
                         rawplay(din, line);
                         ret = true;
                     } catch (IOException e) {
                         logger.log(Level.WARNING, "Error playing: "
                             + file.getName(), e);
                     } finally {
+                        stopPlaying();
                         line.drain();
                         line.stop();
                         line.close();
@@ -263,7 +264,10 @@ public class SoundPlayer {
         private void rawplay(AudioInputStream din, SourceDataLine lin)
             throws IOException {
             byte[] data = new byte[8192];
-            while (keepPlaying()) {
+            for (;;) {
+                if (!keepPlaying()) {
+                    break;
+                }
                 int read = din.read(data, 0, data.length);
                 if (read < 0) {
                     break;
