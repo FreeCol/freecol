@@ -2344,18 +2344,18 @@ public final class GUI {
                                 }
                             }
 
-                            int width = nameImage.getWidth(null)
-                                + (leftImage != null ? leftImage.getWidth(null) + spacing : 0)
-                                + (rightImage != null ? rightImage.getWidth(null) + spacing : 0);
+                            int width = (int) ((nameImage.getWidth(null)*lib.getScalingFactor())
+                                + (leftImage != null ? (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0)
+                                + (rightImage != null ? (rightImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0));
                             int labelOffset = (tileWidth - width)/2;
-                            yOffset -= nameImage.getHeight(null)/2;
+                            yOffset -= (nameImage.getHeight(null)*lib.getScalingFactor())/2;
                             if (leftImage != null) {
                                 g.drawImage(leftImage, labelOffset, yOffset, null);
-                                labelOffset += leftImage.getWidth(null) + spacing;
+                                labelOffset += (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing;
                             }
                             g.drawImage(nameImage, labelOffset, yOffset, null);
                             if (rightImage != null) {
-                                labelOffset += nameImage.getWidth(null) + spacing;
+                                labelOffset += (nameImage.getWidth(null)*lib.getScalingFactor()) + spacing;
                                 g.drawImage(rightImage, labelOffset, yOffset, null);
                             }
                             break;
