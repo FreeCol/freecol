@@ -341,7 +341,8 @@ public class Game extends FreeColGameObject {
                 currentPlayer = player;
             }
         } else {
-            logger.warning("Tried to add a new player, but the game was already full.");
+            logger.warning("Game already full, but tried to add: "
+                + player.getName());
         }
     }
 

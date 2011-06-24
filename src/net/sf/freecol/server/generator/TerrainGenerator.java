@@ -805,7 +805,7 @@ public class TerrainGenerator {
                     break;
                 }
             }
-            logger.info("Created land region " + sr.getNameKey()
+            logger.fine("Created land region " + sr.getNameKey()
                         + " (size " + sr.getSize()
                         + ", score " + sr.getScoreValue()
                         + ", parent " + ((sr.getParent() == null) ? "(null)"
@@ -814,7 +814,7 @@ public class TerrainGenerator {
         }
 
         for (ServerRegion gr : geographicRegions) {
-            logger.info("Geographic region " + gr.getNameKey()
+            logger.fine("Geographic region " + gr.getNameKey()
                         + " (size " + gr.getSize()
                         + ", children " + gr.getChildren().size()
                         + ")");
@@ -1038,7 +1038,7 @@ public class TerrainGenerator {
                 }
                 int scoreValue = 2 * mountainRegion.getSize();
                 mountainRegion.setScoreValue(scoreValue);
-                logger.info("Created mountain region (direction " + direction +
+                logger.fine("Created mountain region (direction " + direction +
                             ", length " + length + ", size " + mountainRegion.getSize() +
                             ", score value " + scoreValue + ").");
             }
@@ -1145,7 +1145,7 @@ public class TerrainGenerator {
             }
             scoreValue *= 2;
             region.setScoreValue(scoreValue);
-            logger.info("Created river region (length " + river.getLength() +
+            logger.fine("Created river region (length " + river.getLength() +
                         ", score value " + scoreValue + ").");
         }
     }

@@ -156,7 +156,7 @@ public final class Specification {
     }
 
     public Specification() {
-        logger.info("Initializing Specification");
+        logger.fine("Initializing Specification");
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
                 ARTILLERY_PENALTY_SOURCE,
@@ -1020,7 +1020,7 @@ public final class Specification {
      * @param level difficulty level to apply
      */
     public void applyDifficultyLevel(OptionGroup level) {
-        logger.info("Applying difficulty level " + level.getId());
+        logger.fine("Applying difficulty level " + level.getId());
         addOptionGroup(level, true);
 
         for (FreeColGameObjectType type : allTypes.values()) {
@@ -1128,12 +1128,12 @@ public final class Specification {
         if (difficultyLevel == null) {
             difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");
         }
-        logger.info("Difficulty level is " + difficultyLevel);
+        logger.fine("Difficulty level is " + difficultyLevel);
         if (id == null) {
             // don't overwrite id with parent id!
             id = newId;
         }
-        logger.info("Reading specification " + newId);
+        logger.fine("Reading specification " + newId);
         String parentId = xsr.getAttributeValue(null, "extends");
         if (parentId != null) {
             try {

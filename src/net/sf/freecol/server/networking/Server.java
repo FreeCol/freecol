@@ -210,7 +210,7 @@ public final class Server extends Thread {
 
         try {
             serverSocket.close();
-            logger.info("Closed server socket.");
+            logger.fine("Closed server socket.");
         } catch (IOException e) {
             logger.warning("Could not close the server socket!");
         }
@@ -236,7 +236,7 @@ public final class Server extends Thread {
 
         freeColServer.removeFromMetaServer();
 
-        logger.info("Server shutdown.");
+        logger.fine("Server shutdown.");
     }
 
     /**

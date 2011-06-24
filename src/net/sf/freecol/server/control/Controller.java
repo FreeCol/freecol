@@ -48,7 +48,7 @@ public abstract class Controller extends FreeColServerHolder {
         Server server = getFreeColServer().getServer();
         if (server != null) {
             server.shutdown();
-            logger.info("Shut down server.");
+            logger.fine("Shut down server.");
         } else {
             logger.warning("Server object is null while trying to shut down server.");
         }

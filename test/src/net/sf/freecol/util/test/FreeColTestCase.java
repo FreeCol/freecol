@@ -165,8 +165,9 @@ public class FreeColTestCase extends TestCase {
         for (Nation n : specification.getNations()) {
             Player p = new ServerPlayer(game, n.getRulerNameKey(), false, n,
                                         null, null);
-            p.setAI(!n.getType().isEuropean() || n.getType().isREF());
-            game.addPlayer(p);
+            boolean ai = !n.getType().isEuropean() || n.getType().isREF();
+            p.setAI(ai);
+            if (ai || game.canAddNewPlayer()) game.addPlayer(p);
         }
         return game;
     }
