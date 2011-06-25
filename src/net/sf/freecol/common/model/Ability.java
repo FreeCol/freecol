@@ -95,6 +95,25 @@ public final class Ability extends Feature {
     public static final String CARRY_TREASURE = "model.ability.carryTreasure";
 
     /**
+     * The ability of certain units (e.g. privateers) to capture goods
+     * carried by another player's units.
+     */
+    public static final String CAPTURE_GOODS = "model.ability.captureGoods";
+
+    /**
+     * The ability of certain armed units to capture another player's
+     * units.
+     */
+    public static final String CAPTURE_UNITS = "model.ability.captureUnits";
+
+    /**
+     * The ability of certain unarmed units to be captured by another
+     * player's units. Units lacking this ability (e.g. braves) will
+     * be destroyed instead.
+     */
+    public static final String CAN_BE_CAPTURED = "model.ability.canBeCaptured";
+
+    /**
      * The ability of certain units (e.g. privateers) to plunder
      * another player's units without causing war.
      */

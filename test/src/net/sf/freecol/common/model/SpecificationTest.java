@@ -63,7 +63,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(colonist.hasAbility(Ability.NAVAL_UNIT));
         assertFalse(colonist.hasAbility(Ability.CARRY_GOODS));
         assertFalse(colonist.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(colonist.hasAbility("model.ability.captureGoods"));
+        assertFalse(colonist.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType wagon = spec.getUnitType("model.unit.wagonTrain");
         assertFalse(wagon.hasAbility("model.ability.foundColony"));
@@ -71,7 +71,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(wagon.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(wagon.hasAbility(Ability.CARRY_GOODS));
         assertFalse(wagon.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(wagon.hasAbility("model.ability.captureGoods"));
+        assertFalse(wagon.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType brave = spec.getUnitType("model.unit.brave");
         //assertFalse(brave.hasAbility("model.ability.foundColony"));
@@ -80,7 +80,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(brave.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(brave.hasAbility(Ability.CARRY_GOODS));
         assertFalse(brave.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(brave.hasAbility("model.ability.captureGoods"));
+        assertFalse(brave.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType caravel = spec.getUnitType("model.unit.caravel");
         assertFalse(caravel.hasAbility("model.ability.foundColony"));
@@ -88,7 +88,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(caravel.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(caravel.hasAbility(Ability.CARRY_GOODS));
         assertTrue(caravel.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(caravel.hasAbility("model.ability.captureGoods"));
+        assertFalse(caravel.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType privateer = spec.getUnitType("model.unit.privateer");
         assertFalse(privateer.hasAbility("model.ability.foundColony"));
@@ -96,7 +96,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(privateer.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(privateer.hasAbility(Ability.CARRY_GOODS));
         assertTrue(privateer.hasAbility(Ability.CARRY_UNITS));
-        assertTrue(privateer.hasAbility("model.ability.captureGoods"));
+        assertTrue(privateer.hasAbility(Ability.CAPTURE_GOODS));
 
     }
 

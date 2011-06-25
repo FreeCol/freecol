@@ -1161,14 +1161,14 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
                                        UnitState.ACTIVE);
         assertTrue("Colonists should be capturable",
-                   colonist.hasAbility("model.ability.canBeCaptured"));
+                   colonist.hasAbility(Ability.CAN_BE_CAPTURED));
         Unit soldier = new ServerUnit(game, tile2, french, colonistType,
                                       UnitState.ACTIVE);
         assertTrue("Soldier should be capturable",
-                   soldier.hasAbility("model.ability.canBeCaptured"));
+                   soldier.hasAbility(Ability.CAN_BE_CAPTURED));
         soldier.changeEquipment(muskets, 1);
         assertFalse("Armed soldier should not be capturable",
-                    soldier.hasAbility("model.ability.canBeCaptured"));
+                    soldier.hasAbility(Ability.CAN_BE_CAPTURED));
 
         // Colonist loses and is captured
         crs = fakeAttackResult(CombatResult.LOSE, colonist, soldier);

@@ -644,8 +644,8 @@ public class SimpleCombatModel extends CombatModel {
                 crs.add(CombatResult.DEMOTE_UNIT);
 
             // Capture suitable units if the winner is capable.
-            } else if (loser.hasAbility("model.ability.canBeCaptured")
-                       && winner.hasAbility("model.ability.captureUnits")
+            } else if (loser.hasAbility(Ability.CAN_BE_CAPTURED)
+                       && winner.hasAbility(Ability.CAPTURE_UNITS)
                        && !combatIsAmphibious(winner, loser)) {
                 crs.add(CombatResult.CAPTURE_UNIT);
 

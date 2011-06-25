@@ -2859,7 +2859,7 @@ public class Unit extends FreeColGameObject
      *         capturing goods.
      */
     public boolean canCaptureGoods() {
-        return unitType.hasAbility("model.ability.captureGoods");
+        return unitType.hasAbility(Ability.CAPTURE_GOODS);
     }
 
     /**
