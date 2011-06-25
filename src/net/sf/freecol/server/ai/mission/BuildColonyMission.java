@@ -282,15 +282,6 @@ public class BuildColonyMission extends Mission {
     }
 
 
-    private static float pathLen(Unit unit, Tile startTile,
-                                 Tile tile, Unit carrier) {
-        Map map = unit.getGame().getMap();
-        PathNode path = (carrier == null)
-            ? map.findPath(unit, startTile, tile)
-            : map.findPath(unit, startTile, tile, carrier);
-        return (path == null) ? -1.0f : path.getTotalTurns() + 1.0f;
-    }
-
     /**
      * Finds a site for a new colony.  Favour closer sites.
      *
@@ -328,8 +319,16 @@ public class BuildColonyMission extends Mission {
         Iterator<Position> it = map.getCircleIterator(startTile.getPosition(),
                                                       true, 12);
         while (it.hasNext()) {
+            // Stop after checking a fixed number of tiles unless
+            // this is the first/sole colony, in which case continue
+            // until we found *some* location, except if there is no
+            // carrier available which may mean we are marooned on
+            // land with no available sites.
+            if (++tileCounter >= maxNumberofTiles) {
+                if (!noFail || bestTile != null || carrier == null) break;
+            }
+ 
             Tile tile = map.getTile(it.next());
-
             // No initial polar colonies
             if (gameStart && map.isPolar(tile)) {
                 continue;
@@ -346,27 +345,22 @@ public class BuildColonyMission extends Mission {
             // Score is proportional to tile value and inversely proportional
             // to distance.
             int val = unit.getOwner().getColonyValue(tile);
+            if (val <= 0) continue;
 
             // Work out the number of turns to the target tile.
-            float len = (val <= 0) ? -1.0f
-                : (tile == startTile) ? 1.0f
-                : pathLen(unit, startTile, tile, carrier);
-
-            if (val > 0 && len > 0.0f) {
-                float value = val / len;
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestTile = tile;
-                }
+            float len = 1.0f;
+            if (tile != startTile) {
+                PathNode path = (carrier == null)
+                    ? map.findPath(unit, startTile, tile)
+                    : map.findPath(unit, startTile, tile, carrier);
+                if (path == null) continue;
+                len += path.getTotalTurns();
             }
 
-            // Break after checking a fixed number of tiles unless
-            // this may be the first colony, in which case continue
-            // until we found *some* location, except if there is no
-            // carrier available which may mean we are marooned on
-            // land with no available sites.
-            if (++tileCounter >= maxNumberofTiles) {
-                if (!noFail || bestTile != null || carrier == null) break;
+            float value = val / len;
+            if (value > bestValue) {
+                bestValue = value;
+                bestTile = tile;
             }
         }
         logger.finest("findColonyLocation(" + unit.getId()
