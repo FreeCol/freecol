@@ -236,10 +236,10 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
      */
     public void fixup09x() {
         try {
-            if (hasAbility("model.ability.autoProduction")) {
-                if (!hasAbility("model.ability.avoidExcessProduction")) {
+            if (hasAbility(Ability.AUTO_PRODUCTION)) {
+                if (!hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
                     // old-style auto-production
-                    Ability ability = new Ability("model.ability.avoidExcessProduction");
+                    Ability ability = new Ability(Ability.AVOID_EXCESS_PRODUCTION);
                     addAbility(ability);
                     getFeatureContainer().removeModifiers("model.goods.horses");
                     float value = ("model.building.country".equals(getId()))

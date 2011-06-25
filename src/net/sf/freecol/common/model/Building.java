@@ -574,7 +574,7 @@ public class Building extends FreeColGameObject
                 if (availableGoodsInput < maximumGoodsInput) {
                     maximumGoodsInput = availableGoodsInput;
                 }
-                if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
+                if (buildingType.hasAbility(Ability.EXPERTS_USE_CONNECTIONS) &&
                     getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                     int minimumGoodsInput = 0;
                     for (Unit unit: units) {
@@ -662,7 +662,7 @@ public class Building extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canAutoProduce() {
-        return buildingType.hasAbility("model.ability.autoProduction");
+        return buildingType.hasAbility(Ability.AUTO_PRODUCTION);
     }
 
     /**
@@ -784,7 +784,7 @@ public class Building extends FreeColGameObject
         int production = canAutoProduce()
             ? getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()))
             : applyModifiers(getProductivity());
-        if (getType().hasAbility("model.ability.avoidExcessProduction")) {
+        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
             int capacity = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
             production = Math.min(capacity, production);
         }
@@ -813,8 +813,9 @@ public class Building extends FreeColGameObject
         int factor = (int) getType().getFeatureContainer()
             .applyModifier(0, "model.modifier.breedingFactor");
         int result = ((available - 1) / divisor + 1) * factor;
-        if (getType().hasAbility("model.ability.avoidExcessProduction")) {
-            int capacity = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
+        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
+            int capacity = colony.getWarehouseCapacity()
+                - colony.getGoodsCount(getGoodsOutputType());
             result = Math.min(capacity, result);
         }
         return result;

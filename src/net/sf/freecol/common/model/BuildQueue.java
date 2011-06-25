@@ -238,7 +238,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     * @return a <code>boolean</code> value
     */
     public boolean hasAbility(String id) {
-        return "model.ability.consumeAllOrNothing".equals(id);
+        return Ability.CONSUME_ALL_OR_NOTHING.equals(id);
     }
 
     /**

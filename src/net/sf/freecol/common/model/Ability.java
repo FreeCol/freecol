@@ -37,9 +37,42 @@ public final class Ability extends Feature {
     public static final String ADD_TAX_TO_BELLS = "model.ability.addTaxToBells";
 
     /**
-     * The ability of some buildings to teach skills.
+     * The ability of some buildings (e.g. the schoolhouse) to teach
+     * skills.
      */
     public static final String CAN_TEACH = "model.ability.teach";
+
+    /**
+     * The somewhat controversial ability of expert units in factory
+     * level buildings to produce a certain amount of goods even when
+     * no raw materials are available. Allegedly, this is a feature of
+     * the original game.
+     */
+    public static final String EXPERTS_USE_CONNECTIONS =
+        "model.ability.expertsUseConnections";
+
+    /**
+     * The ability of certain buildings (e.g. the stables) to produce
+     * goods even if no units are present.
+     */
+    public static final String AUTO_PRODUCTION =
+        "model.ability.autoProduction";
+
+    /**
+     * The ability of certain buildings (e.g. the stables) to avoid
+     * producing more goods than the colony can store, which would
+     * normally go to waste.
+     */
+    public static final String AVOID_EXCESS_PRODUCTION =
+        "model.ability.avoidExcessProduction";
+
+    /**
+     * The ability of certain consumers (e.g. BuildQueues) to consume
+     * a large amount of goods at once instead of turn by turn.
+     */
+    public static final String CONSUME_ALL_OR_NOTHING =
+        "model.ability.consumeAllOrNothing";
+
 
     private boolean value = true;
 
