@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
@@ -2502,7 +2503,7 @@ public final class InGameController implements NetworkConstants {
      * @return True to attack, false to abort.
      */
     private boolean confirmHostileAction(Unit attacker, Tile target) {
-        if (attacker.hasAbility("model.ability.piracy")) {
+        if (attacker.hasAbility(Ability.PIRACY)) {
             // Privateers can attack and remain at peace
             return true;
         }
@@ -2520,7 +2521,7 @@ public final class InGameController implements NetworkConstants {
                 logger.warning("Attacking, but no defender - will try!");
                 return true;
             }
-            if (defender.hasAbility("model.ability.piracy")) {
+            if (defender.hasAbility(Ability.PIRACY)) {
                 // Privateers can be attacked and remain at peace
                 return true;
             }
@@ -4519,7 +4520,7 @@ public final class InGameController implements NetworkConstants {
         // a chance to confirm.
         Player player = freeColClient.getMyPlayer();
         if (state == UnitState.FORTIFYING && unit.isOffensiveUnit()
-            && !unit.hasAbility("model.ability.piracy")) {
+            && !unit.hasAbility(Ability.PIRACY)) {
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwningSettlement() != null) {
                 Player enemy = tile.getOwningSettlement().getOwner();

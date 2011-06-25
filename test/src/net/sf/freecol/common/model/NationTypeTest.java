@@ -120,7 +120,7 @@ public class NationTypeTest extends FreeColTestCase {
                         break;
                     case DEFAULT:
                         assertTrue("Ship is not naval: " + type.toString(),
-                                   unit.getUnitType(spec()).hasAbility("model.ability.navalUnit"));
+                                   unit.getUnitType(spec()).hasAbility(Ability.NAVAL_UNIT));
                         if ("model.nationType.trade".equals(type.getId())
                             || "model.nationType.naval".equals(type.getId())) {
                             assertEquals("Wrong type of ship: " + type.toString(),

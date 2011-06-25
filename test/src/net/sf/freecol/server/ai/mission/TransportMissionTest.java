@@ -84,7 +84,7 @@ public class TransportMissionTest extends FreeColTestCase {
                                       UnitState.ACTIVE);
         AIUnit aiUnit = aiMain.getAIUnit(galleon);
         assertNotNull(aiUnit);
-        assertTrue(galleon.hasAbility("model.ability.navalUnit"));
+        assertTrue(galleon.hasAbility(Ability.NAVAL_UNIT));
         assertEquals("Galleon should be repaired in Europe",
                      dutch.getEurope(), galleon.getRepairLocation());
         Unit colonist = new ServerUnit(game, galleon, dutch, colonistType,

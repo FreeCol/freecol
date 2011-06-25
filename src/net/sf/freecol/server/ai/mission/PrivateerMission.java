@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
@@ -335,7 +336,7 @@ public class PrivateerMission extends Mission {
         Unit unit = aiUnit.getUnit();
         AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(unit.getOwner());
         return unit != null
-            && unit.isNaval() && unit.hasAbility("model.ability.piracy")
+            && unit.isNaval() && unit.hasAbility(Ability.PIRACY)
             && !unit.isUnderRepair()
         		&& unit.getGoodsCount() == 0
             && unit.getUnitCount() == 0

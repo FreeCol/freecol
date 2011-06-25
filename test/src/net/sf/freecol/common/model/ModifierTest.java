@@ -123,7 +123,7 @@ public class ModifierTest extends FreeColTestCase {
         scope1.setType("model.unit.frigate");
         // applies to carpenter
         Scope scope2 = new Scope();
-        scope2.setAbilityID("model.ability.navalUnit");
+        scope2.setAbilityID(Ability.NAVAL_UNIT);
         scope2.setAbilityValue(false);
         // applies to frigate
         Scope scope3 = new Scope();

@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
@@ -183,14 +184,14 @@ public class StringOption extends AbstractOption<String> {
                 break;
             case NAVAL_UNITS:
                 for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (unitType.hasAbility("model.ability.navalUnit")) {
+                    if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                         objects.add(unitType);
                     }
                 }
                 break;
             case LAND_UNITS:
                 for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (!unitType.hasAbility("model.ability.navalUnit")) {
+                    if (!unitType.hasAbility(Ability.NAVAL_UNIT)) {
                         objects.add(unitType);
                     }
                 }

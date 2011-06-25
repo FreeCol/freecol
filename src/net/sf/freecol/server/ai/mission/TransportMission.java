@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
@@ -503,7 +504,7 @@ public class TransportMission extends Mission {
 
     private boolean canAttackPlayer(Player target) {
         return getUnit().getOwner().atWarWith(target)
-            || getUnit().hasAbility("model.ability.piracy");
+            || getUnit().hasAbility(Ability.PIRACY);
     }
 
     /**
@@ -1372,7 +1373,7 @@ public class TransportMission extends Mission {
         }
 
         // Verify if empty unit is a privateer and able to be assigned a PrivateerMisison
-        if(unit.hasAbility("model.ability.piracy")){
+        if(unit.hasAbility(Ability.PIRACY)){
             AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(unit.getOwner());
             // Do not consider this unit mission
             int transportMissions = getPlayerNavalTransportMissionCount(aiPlayer,unit);

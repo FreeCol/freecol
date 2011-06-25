@@ -63,6 +63,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -2723,7 +2724,7 @@ public final class GUI {
         if (debugShowMission
             && freeColClient.getFreeColServer() != null
             && (unit.getOwner().isAI()
-                || unit.hasAbility("model.ability.piracy"))) {
+                || unit.hasAbility(Ability.PIRACY))) {
             net.sf.freecol.server.ai.AIUnit au = freeColClient
                 .getFreeColServer().getAIMain().getAIUnit(unit);
             if (au != null) {

@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -332,7 +333,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
                 if ((bestDefender == null
                      || bestDefender.getDefence() < unitType.getDefence())
-                    && !unitType.hasAbility("model.ability.navalUnit")
+                    && !unitType.hasAbility(Ability.NAVAL_UNIT)
                     && unitType.isAvailableTo(colony.getOwner())) {
                     bestDefender = unitType;
                 }

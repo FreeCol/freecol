@@ -145,7 +145,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @return a <code>boolean</code> value
      */
     public boolean canCarryUnits() {
-        return hasAbility("model.ability.carryUnits");
+        return hasAbility(Ability.CARRY_UNITS);
     }
 
     /**
@@ -154,7 +154,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @return a <code>boolean</code> value
      */
     public boolean canCarryGoods() {
-        return hasAbility("model.ability.carryGoods");
+        return hasAbility(Ability.CARRY_GOODS);
     }
 
     /**
@@ -620,7 +620,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      * @return True if this is a naval unit type.
      */
     public boolean isNaval() {
-        return hasAbility("model.ability.navalUnit");
+        return hasAbility(Ability.NAVAL_UNIT);
     }
 
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {

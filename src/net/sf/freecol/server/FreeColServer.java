@@ -56,6 +56,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -375,7 +376,7 @@ public final class FreeColServer {
             ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
             ArrayList<UnitType> landUnits = new ArrayList<UnitType>();
             for (UnitType undead : undeads) {
-                if (undead.hasAbility("model.ability.navalUnit")) {
+                if (undead.hasAbility(Ability.NAVAL_UNIT)) {
                     navalUnits.add(undead);
                 } else if (undead.getId().equals("model.unit.revenger")) { // TODO: softcode this
                     landUnits.add(undead);

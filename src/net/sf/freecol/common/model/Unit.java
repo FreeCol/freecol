@@ -331,7 +331,7 @@ public class Unit extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canCarryUnits() {
-        return hasAbility("model.ability.carryUnits");
+        return hasAbility(Ability.CARRY_UNITS);
     }
 
     /**
@@ -340,7 +340,7 @@ public class Unit extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean canCarryGoods() {
-        return hasAbility("model.ability.carryGoods");
+        return hasAbility(Ability.CARRY_GOODS);
     }
 
     /**
@@ -2202,7 +2202,7 @@ public class Unit extends FreeColGameObject
      * @return The name of the owner of this Unit unless this is hidden.
      */
     public StringTemplate getApparentOwnerName() {
-        return ((hasAbility("model.ability.piracy"))
+        return ((hasAbility(Ability.PIRACY))
                 ? getGame().getUnknownEnemy()
                 : owner).getNationName();
     }
@@ -2849,7 +2849,7 @@ public class Unit extends FreeColGameObject
      *         carrying treasure.
      */
     public boolean canCarryTreasure() {
-        return unitType.hasAbility("model.ability.carryTreasure");
+        return unitType.hasAbility(Ability.CARRY_TREASURE);
     }
 
     /**
@@ -3221,7 +3221,7 @@ public class Unit extends FreeColGameObject
         out.writeAttribute("state", state.toString());
         out.writeAttribute("role", role.toString());
         Player who = (getOwner().equals(player)
-                      || !hasAbility("model.ability.piracy") || showAll)
+                      || !hasAbility(Ability.PIRACY) || showAll)
             ? owner
             : getGame().getUnknownEnemy();
         out.writeAttribute("owner", who.getId());

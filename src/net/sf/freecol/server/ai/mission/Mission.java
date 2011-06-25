@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Goods;
@@ -242,7 +243,7 @@ public abstract class Mission extends AIObject {
                         !defender.isArmed()) {
                     tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
                 }
-                if (unit.hasAbility("model.ability.piracy")){
+                if (unit.hasAbility(Ability.PIRACY)){
                     tension += PrivateerMission.getModifierValueForTarget(combatModel, unit, defender);
                 }
                 // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:

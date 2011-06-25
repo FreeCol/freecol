@@ -60,42 +60,42 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
         assertFalse(colonist.hasAbility("model.ability.bornInIndianSettlement"));
         assertTrue(colonist.isRecruitable());
-        assertFalse(colonist.hasAbility("model.ability.navalUnit"));
-        assertFalse(colonist.hasAbility("model.ability.carryGoods"));
-        assertFalse(colonist.hasAbility("model.ability.carryUnits"));
+        assertFalse(colonist.hasAbility(Ability.NAVAL_UNIT));
+        assertFalse(colonist.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(colonist.hasAbility(Ability.CARRY_UNITS));
         assertFalse(colonist.hasAbility("model.ability.captureGoods"));
 
         UnitType wagon = spec.getUnitType("model.unit.wagonTrain");
         assertFalse(wagon.hasAbility("model.ability.foundColony"));
         assertFalse(wagon.isRecruitable());
-        assertFalse(wagon.hasAbility("model.ability.navalUnit"));
-        assertTrue(wagon.hasAbility("model.ability.carryGoods"));
-        assertFalse(wagon.hasAbility("model.ability.carryUnits"));
+        assertFalse(wagon.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(wagon.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(wagon.hasAbility(Ability.CARRY_UNITS));
         assertFalse(wagon.hasAbility("model.ability.captureGoods"));
 
         UnitType brave = spec.getUnitType("model.unit.brave");
         //assertFalse(brave.hasAbility("model.ability.foundColony"));
         assertTrue(brave.hasAbility("model.ability.bornInIndianSettlement"));
         assertFalse(brave.isRecruitable());
-        assertFalse(brave.hasAbility("model.ability.navalUnit"));
-        assertTrue(brave.hasAbility("model.ability.carryGoods"));
-        assertFalse(brave.hasAbility("model.ability.carryUnits"));
+        assertFalse(brave.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(brave.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(brave.hasAbility(Ability.CARRY_UNITS));
         assertFalse(brave.hasAbility("model.ability.captureGoods"));
 
         UnitType caravel = spec.getUnitType("model.unit.caravel");
         assertFalse(caravel.hasAbility("model.ability.foundColony"));
         assertFalse(caravel.isRecruitable());
-        assertTrue(caravel.hasAbility("model.ability.navalUnit"));
-        assertTrue(caravel.hasAbility("model.ability.carryGoods"));
-        assertTrue(caravel.hasAbility("model.ability.carryUnits"));
+        assertTrue(caravel.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(caravel.hasAbility(Ability.CARRY_GOODS));
+        assertTrue(caravel.hasAbility(Ability.CARRY_UNITS));
         assertFalse(caravel.hasAbility("model.ability.captureGoods"));
 
         UnitType privateer = spec.getUnitType("model.unit.privateer");
         assertFalse(privateer.hasAbility("model.ability.foundColony"));
         assertFalse(privateer.isRecruitable());
-        assertTrue(privateer.hasAbility("model.ability.navalUnit"));
-        assertTrue(privateer.hasAbility("model.ability.carryGoods"));
-        assertTrue(privateer.hasAbility("model.ability.carryUnits"));
+        assertTrue(privateer.hasAbility(Ability.NAVAL_UNIT));
+        assertTrue(privateer.hasAbility(Ability.CARRY_GOODS));
+        assertTrue(privateer.hasAbility(Ability.CARRY_UNITS));
         assertTrue(privateer.hasAbility("model.ability.captureGoods"));
 
     }

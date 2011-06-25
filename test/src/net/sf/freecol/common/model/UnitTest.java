@@ -223,7 +223,7 @@ public class UnitTest extends FreeColTestCase {
         UnitType frigateType = spec().getUnitType("model.unit.frigate");
         Unit frigate = new ServerUnit(game, tile, player, frigateType, UnitState.ACTIVE);
         assertEquals(2, frigate.getLineOfSight());
-        assertTrue(frigate.hasAbility("model.ability.navalUnit"));
+        assertTrue(frigate.hasAbility(Ability.NAVAL_UNIT));
 
         UnitType revengerType = spec().getUnitType("model.unit.revenger");
         Unit revenger = new ServerUnit(game, tile, player, revengerType, UnitState.ACTIVE);

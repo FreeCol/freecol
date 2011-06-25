@@ -73,6 +73,33 @@ public final class Ability extends Feature {
     public static final String CONSUME_ALL_OR_NOTHING =
         "model.ability.consumeAllOrNothing";
 
+    /**
+     * The ability of ships to move across water tiles.
+     */
+    public static final String NAVAL_UNIT = "model.ability.navalUnit";
+
+    /**
+     * The ability of certain units (e.g. wagon trains) to carry goods.
+     */
+    public static final String CARRY_GOODS = "model.ability.carryGoods";
+
+    /**
+     * The ability of certain units (e.g. ships) to carry other units.
+     */
+    public static final String CARRY_UNITS = "model.ability.carryUnits";
+
+    /**
+     * The ability of certain units (e.g. treasure trains) to carry
+     * treasures.
+     */
+    public static final String CARRY_TREASURE = "model.ability.carryTreasure";
+
+    /**
+     * The ability of certain units (e.g. privateers) to plunder
+     * another player's units without causing war.
+     */
+    public static final String PIRACY = "model.ability.piracy";
+
 
     private boolean value = true;
 

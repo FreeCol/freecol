@@ -118,7 +118,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.refUnit")) {
-                if (unitType.hasAbility("model.ability.navalUnit")) {
+                if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
                 } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
                     landUnits.add(new AbstractUnit(unitType, Role.SOLDIER, number));
@@ -442,7 +442,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         for (AbstractUnit unitToAdd : units) {
             UnitType unitType = spec.getUnitType(unitToAdd.getId());
             int n = unitToAdd.getNumber();
-            if (unitType.hasAbility("model.ability.navalUnit")) {
+            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
                     if (refUnit.getId().equals(unitToAdd.getId())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
@@ -481,7 +481,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         List<UnitType> mountedTypes = new ArrayList<UnitType>();
         for (UnitType unitType : spec.getUnitTypeList()) {
             if (unitType.hasAbility("model.ability.supportUnit")) {
-                if (unitType.hasAbility("model.ability.navalUnit")) {
+                if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                     navalTypes.add(unitType);
                 } else if (unitType.hasAbility("model.ability.bombard")) {
                     bombardTypes.add(unitType);

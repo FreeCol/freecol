@@ -37,6 +37,7 @@ import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ProductionInfo;

@@ -28,6 +28,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
@@ -436,7 +437,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         Player player = getOwner();
         Game game = getGame();
         CombatModel combatModel = game.getCombatModel();
-        boolean pirate = hasAbility("model.ability.piracy");
+        boolean pirate = hasAbility(Ability.PIRACY);
         Unit attacker = null;
         float attackPower = 0, totalAttackPower = 0;
 
@@ -450,7 +451,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 || tile.getFirstUnit() == null
                 || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
             for (Unit enemyUnit : tile.getUnitList()) {
-                if ((pirate || enemyUnit.hasAbility("model.ability.piracy")
+                if ((pirate || enemyUnit.hasAbility(Ability.PIRACY)
                      || (enemyUnit.isOffensiveUnit() && player.atWarWith(enemy)))
                     && enemyUnit.isNaval()
                     && combatModel.getOffencePower(enemyUnit, this) > attackPower) {
@@ -516,7 +517,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         UnitType unitType;
         Unit newUnit = null;
         List<UnitType> treasureUnitTypes
-            = spec.getUnitTypesWithAbility("model.ability.carryTreasure");
+            = spec.getUnitTypesWithAbility(Ability.CARRY_TREASURE);
 
         RumourType rumour = lostCity.getType();
         if (rumour == null) {

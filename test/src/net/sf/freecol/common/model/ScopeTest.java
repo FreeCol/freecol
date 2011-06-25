@@ -69,10 +69,10 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope = new Scope();
 
-        testScope.setAbilityID("model.ability.navalUnit");
-        assertEquals(frigate.hasAbility("model.ability.navalUnit"),
+        testScope.setAbilityID(Ability.NAVAL_UNIT);
+        assertEquals(frigate.hasAbility(Ability.NAVAL_UNIT),
                      testScope.appliesTo(frigate));
-        assertEquals(carpenter.hasAbility("model.ability.navalUnit"),
+        assertEquals(carpenter.hasAbility(Ability.NAVAL_UNIT),
                      testScope.appliesTo(carpenter));
 
     }
@@ -95,7 +95,7 @@ public class ScopeTest extends FreeColTestCase {
         Scope testScope = new Scope();
 
         testScope.setType("model.unit.frigate");
-        testScope.setAbilityID("model.ability.navalUnit");
+        testScope.setAbilityID(Ability.NAVAL_UNIT);
         testScope.setMethodName("getLineOfSight");
         testScope.setMethodValue("2");
         assertTrue(testScope.appliesTo(frigate));
@@ -125,7 +125,7 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope1 = new Scope();
         testScope1.setType("model.unit.frigate");
-        testScope1.setAbilityID("model.ability.navalUnit");
+        testScope1.setAbilityID(Ability.NAVAL_UNIT);
         testScope1.setMethodName("getLineOfSight");
         testScope1.setMethodValue("2");
         testScope1.setMatchesNull(true);
@@ -134,7 +134,7 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope2 = new Scope();
         testScope2.setType("model.unit.frigate");
-        testScope2.setAbilityID("model.ability.navalUnit");
+        testScope2.setAbilityID(Ability.NAVAL_UNIT);
         testScope2.setMethodName("getLineOfSight");
         testScope2.setMethodValue("2");
         testScope2.setMatchesNull(true);
@@ -155,7 +155,7 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope1.equals(testScope2));
         assertFalse(testScope2.equals(testScope1));
 
-        testScope1.setAbilityID("model.ability.navalUnit");
+        testScope1.setAbilityID(Ability.NAVAL_UNIT);
         testScope1.setAbilityValue(false);
 
         assertFalse(testScope1.equals(testScope2));

@@ -34,6 +34,7 @@ import javax.swing.JSeparator;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Player;
@@ -111,7 +112,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit unit : refUnits) {
-                if (!unit.getUnitType(getSpecification()).hasAbility("model.ability.navalUnit")) {
+                if (!unit.getUnitType(getSpecification()).hasAbility(Ability.NAVAL_UNIT)) {
                     reportPanel.add(createUnitTypeLabel(unit), "sg");
                 }
             }
@@ -128,7 +129,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) &&
-                !unitType.hasAbility("model.ability.navalUnit") && 
+                !unitType.hasAbility(Ability.NAVAL_UNIT) && 
                 (unitType.hasAbility("model.ability.expertSoldier") ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility("model.ability.canBeEquipped")) {

@@ -61,7 +61,7 @@ public class REFTest extends FreeColTestCase {
         int shipsBeforeIndependence = 0; 
         for(AbstractUnit unit : refUnitsBeforeIndependence){
             UnitType unitType = unit.getUnitType(spec());
-            if(unitType.hasAbility("model.ability.navalUnit")){
+            if(unitType.hasAbility(Ability.NAVAL_UNIT)){
                 shipsBeforeIndependence += unit.getNumber();
                 continue;
             }
@@ -103,7 +103,7 @@ public class REFTest extends FreeColTestCase {
         int shipsAfterIndependence = 0; 
         for(Unit unit : refUnitsAfterIndependence){
             UnitType unitType = unit.getType();
-            if(unitType.hasAbility("model.ability.navalUnit")){
+            if(unitType.hasAbility(Ability.NAVAL_UNIT)){
                 shipsAfterIndependence++;
                 continue;
             }

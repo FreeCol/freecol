@@ -42,6 +42,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -704,7 +705,7 @@ public class StandardAIPlayer extends AIPlayer {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
-                    if (unitType.hasAbility("model.ability.navalUnit") && unitType.hasPrice()) {
+                    if (unitType.hasAbility(Ability.NAVAL_UNIT) && unitType.hasPrice()) {
                         navalUnits.add(unitType);
                         total += europe.getUnitPrice(unitType);
                     }

@@ -242,12 +242,12 @@ public class ColonyPlan {
         UnitType bestWagon = null;
         for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
             if (unitType.getDefence() > UnitType.DEFAULT_DEFENCE
-                && !unitType.hasAbility("model.ability.navalUnit")
+                && !unitType.hasAbility(Ability.NAVAL_UNIT)
                 && !unitType.getGoodsRequired().isEmpty()) {
                 buildableDefenders.add(unitType);
             }
-            if (unitType.hasAbility("model.ability.carryGoods")
-                && !unitType.hasAbility("model.ability.navalUnit")
+            if (unitType.hasAbility(Ability.CARRY_GOODS)
+                && !unitType.hasAbility(Ability.NAVAL_UNIT)
                 && colony.canBuild(unitType)
                 && (bestWagon == null || unitType.getSpace() > bestWagon.getSpace())) {
                 bestWagon = unitType;
@@ -256,7 +256,7 @@ public class ColonyPlan {
 
         int wagonTrains = 0;
         for (Unit unit: colony.getOwner().getUnits()) {
-            if (unit.hasAbility("model.ability.carryGoods") && !unit.isNaval()) {
+            if (unit.hasAbility(Ability.CARRY_GOODS) && !unit.isNaval()) {
                 wagonTrains++;
             }
         }

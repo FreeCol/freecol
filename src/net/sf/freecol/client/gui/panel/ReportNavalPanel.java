@@ -34,6 +34,7 @@ import javax.swing.JSeparator;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -82,7 +83,7 @@ public final class ReportNavalPanel extends ReportPanel {
         List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit unit : refUnits) {
-                if (unit.getUnitType(getSpecification()).hasAbility("model.ability.navalUnit")) {
+                if (unit.getUnitType(getSpecification()).hasAbility(Ability.NAVAL_UNIT)) {
                     reportPanel.add(createUnitTypeLabel(unit), "sg");
                 }
             }
@@ -95,7 +96,7 @@ public final class ReportNavalPanel extends ReportPanel {
 
         List<AbstractUnit> ships = new ArrayList<AbstractUnit>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isAvailableTo(player) && unitType.hasAbility("model.ability.navalUnit")) {
+            if (unitType.isAvailableTo(player) && unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 ships.add(new AbstractUnit(unitType, Role.DEFAULT, navalUnits.getCount(unitType)));
             }
         }

@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -363,7 +364,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
              */
 
             Iterator<UnitType> navalUnits = getSpecification()
-                .getUnitTypesWithAbility("model.ability.navalUnit").iterator();
+                .getUnitTypesWithAbility(Ability.NAVAL_UNIT).iterator();
 
             int lowerPrice = Integer.MAX_VALUE;
 
@@ -1220,7 +1221,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         && tile.getFirstUnit().getOwner() != this) {
                         for (Unit unit : new ArrayList<Unit>(tile.getUnitList())) {
                             if (atWarWith(unit.getOwner())
-                                || unit.hasAbility("model.ability.piracy")) {
+                                || unit.hasAbility(Ability.PIRACY)) {
                                 csCombat(colony, unit, null, random, cs);
                             }
                         }
@@ -1905,13 +1906,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // - Other attacks involving natives do not imply war, but
         //     changes in Tension can drive Stance, however this is
         //     decided by the native AI in their turn so just adjust tension.
-        if (attacker.hasAbility("model.ability.piracy")) {
+        if (attacker.hasAbility(Ability.PIRACY)) {
             if (!defenderPlayer.getAttackedByPrivateers()) {
                 defenderPlayer.setAttackedByPrivateers(true);
                 cs.addPartial(See.only(defenderPlayer), defenderPlayer,
                               "attackedByPrivateers");
             }
-        } else if (defender.hasAbility("model.ability.piracy")) {
+        } else if (defender.hasAbility(Ability.PIRACY)) {
             ; // do nothing
         } else if (isEuropean() && defenderPlayer.isEuropean()) {
             csChangeStance(Stance.WAR, defenderPlayer, true, cs);
@@ -2531,7 +2532,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Make the treasure train if there is treasure.
         if (plunder > 0) {
             List<UnitType> unitTypes = game.getSpecification()
-                .getUnitTypesWithAbility("model.ability.carryTreasure");
+                .getUnitTypesWithAbility(Ability.CARRY_TREASURE);
             UnitType type = Utils.getRandomMember(logger, "Choose train",
                                                   unitTypes, random);
             Unit train = new ServerUnit(game, tile, attackerPlayer, type,
