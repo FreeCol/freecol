@@ -69,10 +69,8 @@ public class SoundTest extends FreeColTestCase {
             SoundPlayer soundPlayer = getSoundPlayer();
             soundPlayer.playOnce(file);
             try {
-                do {
-                    // Just play the beginning of the sound to check it works
-                    Thread.sleep(300);
-                } while (!soundPlayer.isPlaying());
+                // Just play the beginning of the sound to check it works
+                Thread.sleep(300);
             } catch (InterruptedException e) {}
             soundPlayer.stop();
         }

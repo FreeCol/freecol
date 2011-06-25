@@ -105,10 +105,6 @@ public class SoundPlayer {
         soundPlayerThread.awaken();
     }
 
-    public boolean isPlaying() {
-        return soundPlayerThread.keepPlaying();
-    }
-
     /**
      * Thread for playing sound files.
      */
