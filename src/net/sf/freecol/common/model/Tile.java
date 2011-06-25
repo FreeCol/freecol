@@ -462,7 +462,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // to throw.
                 u = settlement.getDefendingUnit(attacker);
             } catch (IllegalStateException e) {
-                logger.log(Level.WARNING, "No defender", e);
+                logger.warning("Empty settlement: " + settlement.getName());
             }
             // This routine can be called on the client for the pre-combat
             // popup where enemy settlement defenders are not visible,

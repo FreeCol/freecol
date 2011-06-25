@@ -146,6 +146,15 @@ public class ServerColony extends Colony implements ServerModelObject {
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
 
+        // The AI is prone to removing all units from a colony.
+        // Clean up such cases, to avoid other players seeing the
+        // nonsensical 0-unit colony.
+        if (getUnitCount() <= 0) {
+            logger.warning("Cleaning up 0-unit colony: " + getName());
+            cs.addDispose(owner, getTile(), this);
+            return;
+        }
+
         boolean tileDirty = false;
         boolean newUnitBorn = false;
         GoodsContainer container = getGoodsContainer();
