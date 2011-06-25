@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -214,7 +215,7 @@ public class ColonyPlan {
             if (type.hasAbility("model.ability.export")) {
                 customs.add(type);
             }
-            if (type.hasAbility("model.ability.teach")) {
+            if (type.hasAbility(Ability.CAN_TEACH)) {
                 schools.add(type);
             }
             if (!type.getModifierSet("model.modifier.defence").isEmpty()) {

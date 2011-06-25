@@ -538,7 +538,7 @@ public class LabourData {
         if (location instanceof Building) {
             Building building = (Building) location;
 
-            if (building.getType().hasAbility("model.ability.teach")) {
+            if (building.canTeach()) {
                 colonyData.teachers++;
                 return;
             }

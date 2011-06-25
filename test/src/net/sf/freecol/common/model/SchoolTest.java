@@ -135,7 +135,7 @@ public class SchoolTest extends FreeColTestCase {
 
         colony.addBuilding(new ServerBuilding(getGame(), colony, schoolType));
         Building school = colony.getBuilding(schoolType);
-        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(school.canTeach());
         assertTrue(colony.canTrain(lumberJack));
         assertTrue(spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
         lumberJack.setLocation(school);

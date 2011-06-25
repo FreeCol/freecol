@@ -143,7 +143,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.SCHOOLHOUSE);
         Building school = colony.getBuilding(schoolType);
-        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(school.canTeach());
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit colonist = units.next();
@@ -1129,7 +1129,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         student.setType(pettyCriminalType);
         student.setLocation(colony.getBuilding(townHallType));
 
-        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(school.canTeach());
         assertTrue(colony.canTrain(lumber));
         lumber.setLocation(school);
 

@@ -36,6 +36,11 @@ public final class Ability extends Feature {
 
     public static final String ADD_TAX_TO_BELLS = "model.ability.addTaxToBells";
 
+    /**
+     * The ability of some buildings to teach skills.
+     */
+    public static final String CAN_TEACH = "model.ability.teach";
+
     private boolean value = true;
 
     /**

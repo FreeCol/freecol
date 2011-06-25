@@ -814,12 +814,12 @@ public class Colony extends Settlement implements Nameable {
      * @return <code>true</code> if this unit type could be added.
      */
     public boolean canTrain(UnitType unitType) {
-        if (!hasAbility("model.ability.teach")) {
+        if (!hasAbility(Ability.CAN_TEACH)) {
             return false;
         }
 
         for (Building building : buildingMap.values()) {
-            if (building.getType().hasAbility("model.ability.teach") &&
+            if (building.canTeach() &&
                 building.canAdd(unitType)) {
                 return true;
             }
@@ -833,7 +833,7 @@ public class Colony extends Settlement implements Nameable {
     public List<Unit> getTeachers() {
         List<Unit> teachers = new ArrayList<Unit>();
         for (Building building : buildingMap.values()) {
-            if (building.getType().hasAbility("model.ability.teach")) {
+            if (building.canTeach()) {
                 teachers.addAll(building.getUnitList());
             }
         }
@@ -852,7 +852,7 @@ public class Colony extends Settlement implements Nameable {
         if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
             return null; // No automatic assignment
         for (Building building : getBuildings()) {
-            if (building.getType().hasAbility("model.ability.teach")) {
+            if (building.canTeach()) {
                 for (Unit unit : building.getUnitList()) {
                     if (unit.getStudent() == null
                         && student.canBeStudent(unit)) return unit;

@@ -125,7 +125,7 @@ public class BuildingTest extends FreeColTestCase {
         for (Building building : colony.getBuildings()) {
 
             // schoolhouse is special, see testCanAddToSchool
-            if (building.getType().hasAbility("model.ability.teach"))
+            if (building.canTeach())
             	continue;
 
             int maxUnits = building.getMaxUnits();

@@ -235,6 +235,16 @@ public class Building extends FreeColGameObject
     }
 
     /**
+     * Returns <code>true</code> if this Building has the Ability to
+     * teach skills.
+     *
+     * @see Ability#CAN_TEACH
+     */
+    public boolean canTeach() {
+        return hasAbility(Ability.CAN_TEACH);
+    }
+
+    /**
      * Returns whether this building can be damaged
      *
      * @return <code>true</code> if can be damaged
@@ -378,7 +388,7 @@ public class Building extends FreeColGameObject
         unit.setWorkType(getGoodsOutputType());
         getColony().invalidateCache();
 
-        if (buildingType.hasAbility("model.ability.teach")) {
+        if (canTeach()) {
             Unit student = unit.getStudent();
             if (student == null
                 && (student = getColony().findStudent(unit)) != null) {
@@ -412,7 +422,7 @@ public class Building extends FreeColGameObject
             unit.setState(Unit.UnitState.ACTIVE);
             getColony().invalidateCache();
 
-            if (buildingType.hasAbility("model.ability.teach")) {
+            if (canTeach()) {
                 Unit student = unit.getStudent();
                 if (student != null) {
                     student.setTeacher(null);

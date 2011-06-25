@@ -689,8 +689,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
             List<BuildingType> schools = new ArrayList<BuildingType>();
             for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
-                if (buildingType.hasAbility("model.ability.teach") &&
-                    buildingType.canAdd(type)) {
+                if (buildingType.hasAbility(Ability.CAN_TEACH) && buildingType.canAdd(type)) {
                     schools.add(buildingType);
                 }
             }
@@ -1002,7 +1001,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         // Production - Needs & Produces
-        if (buildingType.hasAbility("model.ability.teach")) {
+        if (buildingType.hasAbility(Ability.CAN_TEACH)) {
             detailPanel.add(localizedLabel("colopedia.buildings.teaches"), "newline, top");
             int count = 0;
             for (UnitType unitType2 : getSpecification().getUnitTypeList()) {

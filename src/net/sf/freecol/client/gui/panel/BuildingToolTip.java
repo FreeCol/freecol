@@ -66,8 +66,6 @@ public class BuildingToolTip extends JToolTip {
                                          columns, "[][][align bottom]");
         setLayout(layout);
 
-        boolean canTeach = building.getType().hasAbility("model.ability.teach");
-
         JLabel buildingName = new JLabel(Messages.message(building.getNameKey()));
         buildingName.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 16f));
         add(buildingName, "span");
@@ -104,7 +102,7 @@ public class BuildingToolTip extends JToolTip {
 
         for (Unit unit : building.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(unit, parent, false);
-            if (canTeach && unit.getStudent() != null) {
+            if (building.canTeach() && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                              unit.getNeededTurnsOfTraining());
                 UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);

@@ -75,7 +75,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         BuildingType type = getType();
         ServerPlayer owner = (ServerPlayer) getColony().getOwner();
 
-        if (type.hasAbility("model.ability.teach")) {
+        if (canTeach()) {
             teach(cs, owner);
         }
 
