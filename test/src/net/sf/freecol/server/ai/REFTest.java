@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai;
 
 import java.util.List;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
