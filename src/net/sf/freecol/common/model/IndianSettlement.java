@@ -678,22 +678,6 @@ public class IndianSettlement extends Settlement {
         return units.iterator();
     }
 
-    public Unit getFirstUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(0);
-        }
-    }
-
-    public Unit getLastUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(units.size() - 1);
-        }
-    }
-
     /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>IndianSettlement</code>.

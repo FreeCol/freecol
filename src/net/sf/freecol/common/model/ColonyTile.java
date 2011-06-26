@@ -435,28 +435,6 @@ public class ColonyTile extends FreeColGameObject
         return (locatable == unit) ? true:false;
     }
 
-
-    /**
-     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
-     *
-     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-     * @see #setUnit
-     */
-    public Unit getFirstUnit() {
-        return getUnit();
-    }
-
-
-    /**
-     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
-     *
-     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-     * @see #setUnit
-     */
-    public Unit getLastUnit() {
-        return getUnit();
-    }
-
     /**
      * Returns the unit who is occupying the tile
      * @return the unit who is occupying the tile

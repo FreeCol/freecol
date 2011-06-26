@@ -213,7 +213,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             // check if this building has no expert producing goods
             if (goodsType != null && expert != null
-                && building.getFirstUnit() != null
+                && !building.getUnitList().isEmpty()
                 && !missingExpertWarning.contains(expert)
                 && unitCount.get(colony).getCount(expert) == 0) {
                 addExpertWarning(doc, colony, goodsType, expert);

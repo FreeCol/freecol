@@ -186,7 +186,7 @@ public class IndianAIPlayer extends NewAIPlayer {
                     }
                 }
                 if (threat > defenders) {
-                    Unit newDefender = is.getFirstUnit();
+                    Unit newDefender = is.getUnitList().get(0);
                     newDefender.setState(UnitState.ACTIVE);
                     newDefender.setLocation(is.getTile());
                     AIUnit newDefenderAI = getAIUnit(newDefender);

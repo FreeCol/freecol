@@ -310,8 +310,10 @@ public class Building extends FreeColGameObject
         }
 
         // Colonists exceding units limit must be put outside
-        while (units.size() > getMaxUnits()) {
-            getLastUnit().putOutsideColony();
+        if (units.size() > getMaxUnits()) {
+            for (Unit unit : new ArrayList<Unit>(units.subList(getMaxUnits(), units.size()))) {
+                unit.putOutsideColony();
+            }
         }
     }
 
@@ -461,32 +463,6 @@ public class Building extends FreeColGameObject
      */
     public boolean contains(final Locatable locatable) {
         return units.contains(locatable);
-    }
-
-    /**
-     * Gets the first unit in this building.
-     *
-     * @return The <code>Unit</code>.
-     */
-    public Unit getFirstUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(0);
-        }
-    }
-
-    /**
-     * Gets the last unit in this building.
-     *
-     * @return The <code>Unit</code>.
-     */
-    public Unit getLastUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(units.size() - 1);
-        }
     }
 
     /**

@@ -327,7 +327,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(map);
 
         Colony colony = getStandardColony();
-        Unit colonist = colony.getRandomUnit();
+        Unit colonist = colony.getUnitList().get(0);
 
         assertEquals("Colonist should not have any experience",
                      0, colonist.getExperience());
@@ -351,7 +351,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertTrue("Colony should only have 1 colonist for test setup",
                    colony.getUnitCount() == 1);
 
-        Unit colonist = colony.getRandomUnit();
+        Unit colonist = colony.getUnitList().get(0);
         String errMsg = "Error setting test, colonist should not be an expert";
         assertTrue(errMsg, colonist.getType() == colonistType);
 

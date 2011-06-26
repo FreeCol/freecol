@@ -1779,32 +1779,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns a random unit from this colony. At this moment, this method
-     * always returns the first unit in the colony.
-     *
-     * @return A random unit from this <code>Colony</code>. This
-     *         <code>Unit</code> will either be working in a {@link Building}
-     *         or a {@link ColonyTile}.
-     */
-    public Unit getRandomUnit() {
-        return getFirstUnit();
-        // return getUnitIterator().hasNext() ? getUnitIterator().next() : null;
-    }
-
-    private Unit getFirstUnit() {
-        for (WorkLocation wl : getWorkLocations()) {
-            Iterator<Unit> unitIterator = wl.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit o = unitIterator.next();
-                if (o != null) {
-                    return o;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns 1, 0, or -1 to indicate that government would improve,
      * remain the same, or deteriorate if the colony had the given
      * population.

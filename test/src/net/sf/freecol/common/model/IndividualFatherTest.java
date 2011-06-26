@@ -90,7 +90,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
-        Unit unit = colony.getRandomUnit();
+        Unit unit = colony.getUnitList().get(0);
         Player player = colony.getOwner();
         Player iroquois = getGame().getPlayer("model.nation.iroquois");
         Tile colonyCenterTile = colony.getTile();
@@ -167,7 +167,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         Colony colony = getStandardColony();
         Player player = colony.getOwner();
-        Unit colonist = colony.getRandomUnit();
+        Unit colonist = colony.getUnitList().get(0);
 
         String errMsg = "Unit should not be able to automatically arm, Revere not in congress yet";
         assertTrue(errMsg, colonist.getAutomaticEquipment() == null);

@@ -403,7 +403,7 @@ public class UnitTest extends FreeColTestCase {
         church.upgrade();
         assertTrue(colony.hasAbility("model.ability.dressMissionary"));
 
-        Unit colonist = colony.getRandomUnit();
+        Unit colonist = colony.getUnitList().get(0);
         EquipmentType missionaryEquipmentType = spec().getEquipmentType("model.equipment.missionary");
         EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
         assertEquals(0, colonist.getEquipmentCount(missionaryEquipmentType));

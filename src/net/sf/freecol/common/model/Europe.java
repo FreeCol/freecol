@@ -384,32 +384,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     }
 
     /**
-     * Gets the first <code>Unit</code> in this <code>Europe</code>.
-     *
-     * @return The first <code>Unit</code> in this <code>Europe</code>.
-     */
-    public Unit getFirstUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(0);
-        }
-    }
-
-    /**
-     * Gets the last <code>Unit</code> in this <code>Europe</code>.
-     *
-     * @return The last <code>Unit</code> in this <code>Europe</code>.
-     */
-    public Unit getLastUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(units.size() - 1);
-        }
-    }
-
-    /**
      * Returns the price of a unit in Europe.
      *
      * @param unitType The type of unit of which you need the price.

@@ -1189,7 +1189,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Settlement colony = settlement.getTile()
                         .getNearestSettlement(other, MAX_CONVERT_DISTANCE);
                     if (colony != null && converts.size() > 0) {
-                        Unit brave = settlement.getFirstUnit();
+                        Unit brave = settlement.getUnitList().get(0);
                         brave.clearEquipment();
                         brave.setOwner(other);
                         brave.setType(Utils.getRandomMember(logger,
@@ -2166,7 +2166,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .getUnitTypesWithAbility("model.ability.convert");
         UnitType type = Utils.getRandomMember(logger, "Choose convert",
                                               converts, random);
-        Unit convert = natives.getLastUnit();
+        Unit convert = natives.getUnitList().get(0);
         convert.clearEquipment();
 
         cs.addMessage(See.only(attackerPlayer),

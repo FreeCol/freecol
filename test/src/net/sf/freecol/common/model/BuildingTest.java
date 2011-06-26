@@ -141,7 +141,7 @@ public class BuildingTest extends FreeColTestCase {
                         building.getType(),
                         building.canAdd(units.get(maxUnits)));
             for (int index = 0; index < maxUnits; index++) {
-                building.remove(building.getFirstUnit());
+                building.remove(building.getUnitList().get(0));
             }
         }
     }
@@ -514,7 +514,7 @@ public class BuildingTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
-        Unit unit = colony.getRandomUnit();
+        Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
 
         int bellProduction = building.getProduction();
@@ -539,7 +539,7 @@ public class BuildingTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
-        Unit unit = colony.getRandomUnit();
+        Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
 
         int bellProduction = building.getProduction();
