@@ -1759,7 +1759,7 @@ public class Colony extends Settlement implements Nameable {
      * @param info the <code>ProductionInfo</code> for this building
      */
     private void addInsufficientProductionMessage(List<StringTemplate> warnings, ProductionInfo info) {
-        if (info != null && !info.getProduction().isEmpty()) {
+        if (info != null && !info.getMaximumProduction().isEmpty()) {
             int missingOutput = info.getMaximumProduction().get(0).getAmount()
                 - info.getProduction().get(0).getAmount();
             if (missingOutput > 0) {
