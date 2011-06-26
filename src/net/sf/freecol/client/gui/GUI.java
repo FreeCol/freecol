@@ -62,6 +62,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
@@ -181,11 +182,10 @@ public final class GUI {
 
             Dimension size = getSize();
             textBounds.x = (size.width - textBounds.width) / 2;
-            textBounds.y = (size.height - textBounds.height - iconBounds.height) / 2;
+            textBounds.y = size.height - InfoPanel.PANEL_HEIGHT - 2 * textBounds.height;
 
             iconBounds.x = (size.width - iconBounds.width) / 2;
-            iconBounds.y = (size.height - iconBounds.height) / 2
-                    + textBounds.height;
+            iconBounds.y = textBounds.y + 3 * textBounds.height / 2;
 
             if (textBounds.intersects(clipArea)) {
                 // show message

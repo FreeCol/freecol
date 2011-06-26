@@ -63,7 +63,7 @@ public final class InfoPanel extends FreeColPanel {
 
     private static final int PANEL_WIDTH = 256;
 
-    private static final int PANEL_HEIGHT = 128;
+    public static final int PANEL_HEIGHT = 128;
 
     private final EndTurnPanel endTurnPanel = new EndTurnPanel();
 
