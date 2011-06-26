@@ -283,18 +283,11 @@ public final class DragListener extends MouseAdapter {
                     JMenuItem menuItem = new JMenuItem(locName);
                     if (goodsType != null) {
                         menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                        int addOutput = building.getAdditionalProductionNextTurn(tempUnit);
-                        locName += " (" + addOutput;
-                        int potential = building.getAdditionalProduction(tempUnit);
-                        if (addOutput < potential) {
-                            // Not reaching full potential, show full potential
-                            locName += "/" + potential;
-                        }
-                        locName +=  " " + Messages.message(goodsType.getNameKey()) +")";
+                        StringTemplate t = StringTemplate.template("model.goods.goodsAmount")
+                            .addAmount("%amount%", building.getAdditionalProductionNextTurn(tempUnit))
+                            .addName("%goods%", goodsType);
+                        locName += " (" + Messages.message(t) +")";
                         menuItem.setText(locName);
-                        if (addOutput == 0) {
-                            menuItem.setForeground(FreeColPanel.WARNING_COLOR);
-                        }
                     }
                     menuItem.setActionCommand(UnitAction.WORK_BUILDING.toString() + ":" +
                                               building.getType().getId());

@@ -543,7 +543,7 @@ public class LabourData {
                 return;
             }
 
-            production = building.applyModifiers(building.getUnitProductivity(unit));
+            production = building.getUnitProductivity(unit);
         } else {
             production = ((ColonyTile) location).getProductionOf(unit, currentlyWorking);
         }

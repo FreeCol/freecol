@@ -283,6 +283,14 @@ public class Building extends FreeColGameObject
         return false;
     }
 
+    /**
+     * Changes the type of the Building. The type of a building may
+     * change when it is upgraded or damaged.
+     *
+     * @param newBuildingType
+     * @see #upgrade
+     * @see #damage
+     */
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
         colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
@@ -361,7 +369,7 @@ public class Building extends FreeColGameObject
      * Checks if the specified <code>UnitType</code> may be added to this
      * <code>WorkLocation</code>.
      *
-     * @param unitType the <code>UnitTYpe</code>.
+     * @param unitType the <code>UnitType</code>.
      * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
      *         otherwise.
      */
@@ -491,12 +499,20 @@ public class Building extends FreeColGameObject
         return units.iterator();
     }
 
+    /**
+     * Returns a new <code>List</code> containing all the Units
+     * present in the Building.
+     *
+     * @return a new <code>List</code> containing all the Units
+     * present in the Building.
+     */
     public List<Unit> getUnitList() {
         return new ArrayList<Unit>(units);
     }
 
     /**
-     * Gets this <code>Location</code>'s <code>GoodsContainer</code>.
+     * Returns this <code>Building</code>'s
+     * <code>GoodsContainer</code>, which is always <code>null</code>.
      *
      * @return <code>null</code>.
      */
@@ -505,96 +521,25 @@ public class Building extends FreeColGameObject
     }
 
     /**
-     * Returns the type of goods this <code>Building</code> produces.
+     * Returns the type of goods this <code>Building</code> produces,
+     * or <code>null</code> if the Building does not produce any
+     * goods.
      *
-     * @return The type of goods this <code>Building</code> produces or
-     *         <code>-1</code> if there is no goods production by this
-     *         <code>Building</code>.
+     * @return The type of goods this <code>Building</code> produces
      */
     public GoodsType getGoodsOutputType() {
         return getType().getProducedGoodsType();
     }
 
     /**
-     * Returns the type of goods this building needs for input.
+     * Returns the type of goods this building needs for input, or
+     * <code>null</code> if the Building does not consume any goods.
      *
      * @return The type of goods this <code>Building</code> requires as input
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
     public GoodsType getGoodsInputType() {
         return getType().getConsumedGoodsType();
-    }
-
-    /**
-     * Returns the amount of goods needed to have a full production.
-     *
-     * @return The maximum level of goods needed in order to have the maximum
-     *         possible production with the current configuration of workers and
-     *         improvements. This is actually the {@link #getGoodsInput input}
-     *         being used this turn, provided that the amount of goods in the
-     *         <code>Colony</code> is either larger or the same as the value
-     *         returned by this method.
-     * @see #getGoodsInput
-     * @see #getProduction
-     */
-    private int getMaximumGoodsInput() {
-        if (getGoodsInputType() == null) {
-            return 0;
-        } else if (canAutoProduce()) {
-            return getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
-        } else {
-            return getProductivity();
-        }
-    }
-
-    protected int getStoredInput() {
-        if (getGoodsInputType() == null) {
-            return 0;
-        } else {
-            return colony.getGoodsCount(getGoodsInputType());
-        }
-    }
-
-    /**
-     * Returns the actual production of this building given the number
-     * of input goods available, and optionally adding any number of
-     * <Code>Unit</code>s.
-     *
-     * @param availableGoodsInput The amount of input goods available
-     * @param additionalUnits The Units to be added
-     * @return The amount of goods being produced by this <code>Building</code>
-     */
-    protected int getProductionAdding(int availableGoodsInput, Unit... additionalUnits) {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        } else {
-            int maximumGoodsInput = getProductivity(additionalUnits);
-            if (getGoodsInputType() != null) {
-                // only consider alternatives if we really need input
-                if (availableGoodsInput < maximumGoodsInput) {
-                    maximumGoodsInput = availableGoodsInput;
-                }
-                if (buildingType.hasAbility(Ability.EXPERTS_USE_CONNECTIONS) &&
-                    getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-                    int minimumGoodsInput = 0;
-                    for (Unit unit: units) {
-                        if (unit.getType() == getExpertUnitType()) {
-                            minimumGoodsInput += 4;
-                        }
-                    }
-                    for (Unit unit : additionalUnits) {
-                        if (canAdd(unit) && unit.getType() == getExpertUnitType()) {
-                            minimumGoodsInput += 4;
-                        }
-                    }
-                    if (maximumGoodsInput < minimumGoodsInput) {
-                        maximumGoodsInput = minimumGoodsInput;
-                    }
-                }
-            }
-            // output is the same as input, plus production bonuses
-            return applyModifiers(maximumGoodsInput);
-        }
     }
 
     /**
@@ -617,32 +562,111 @@ public class Building extends FreeColGameObject
      */
     public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
-        if (getGoodsOutputType() != null) {
-            if (getGoodsInputType() == null) {
-                int amount = canAutoProduce()
-                    ? getAutoProduction(0)
-                    : getProductionAdding(0);
-                result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
-                result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), amount));
+        GoodsType outputType = getGoodsOutputType();
+        GoodsType inputType = getGoodsInputType();
+        if (outputType != null && outputType != output.getType()) {
+            throw new IllegalArgumentException("Wrong output type: " + output.getType()
+                                               + " should have been: " + outputType);
+        }
+        int capacity = colony.getWarehouseCapacity();
+        if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)
+            && output.getAmount() >= capacity) {
+            // warehouse is already full: produce nothing
+            return result;
+        }
+
+        int availableInput = 0;
+        if (inputType != null) {
+            boolean found = false;
+            for (AbstractGoods goods : input) {
+                if (goods.getType() == inputType) {
+                    availableInput = goods.getAmount();
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new IllegalArgumentException("No input goods of type "
+                                                   + inputType + " available.");
+            }
+        }
+
+        if (outputType != null) {
+            int maximumInput = 0;
+            if (inputType != null && canAutoProduce()) {
+                int available = colony.getGoodsCount(outputType);
+                if (available >= outputType.getBreedingNumber()) {
+                    // we need at least these many horses/animals to breed
+                    int divisor = (int) getType().getFeatureContainer()
+                        .applyModifier(0, "model.modifier.breedingDivisor");
+                    int factor = (int) getType().getFeatureContainer()
+                        .applyModifier(0, "model.modifier.breedingFactor");
+                    maximumInput = ((available - 1) / divisor + 1) * factor;
+                }
             } else {
-                for (AbstractGoods goods : input) {
-                    if (goods.getType() == getGoodsInputType()) {
-                        int amount = canAutoProduce()
-                            ? getAutoProduction(goods.getAmount())
-                            : getProductionAdding(goods.getAmount());
-                        result.addProduction(new AbstractGoods(getGoodsOutputType(), amount));
-                        result.addConsumption(new AbstractGoods(getGoodsInputType(),
-                                                                Math.min(getMaximumGoodsInput(), goods.getAmount())));
-                        result.addMaximumProduction(new AbstractGoods(getGoodsOutputType(), getMaximumProduction()));
-                        result.addMaximumConsumption(new AbstractGoods(getGoodsInputType(), getMaximumGoodsInput()));
-                        break;
+                maximumInput = getProductivity();
+            }
+            List<Modifier> productionModifiers = getProductionModifiers();
+            int maximumProduction = (int) FeatureContainer
+                .applyModifiers(maximumInput, getGame().getTurn(),
+                                productionModifiers);
+            int actualInput = (inputType == null)
+                ? maximumInput
+                : Math.min(maximumInput, availableInput);
+            // experts in factory level buildings may produce a
+            // certain amount of goods even when no input is available
+            if (availableInput < maximumInput
+                && buildingType.hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
+                && getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                int minimumGoodsInput = 0;
+                for (Unit unit: units) {
+                    if (unit.getType() == getExpertUnitType()) {
+                        // TODO: put magic number in specification
+                        minimumGoodsInput += 4;
+                    }
+                }
+                if (minimumGoodsInput > availableInput) {
+                    actualInput = minimumGoodsInput;
+                }
+            }
+            // output is the same as input, plus production bonuses
+            int production = (int) FeatureContainer
+                .applyModifiers(actualInput, getGame().getTurn(),
+                                productionModifiers);
+            if (production > 0) {
+                if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
+                    int total = output.getAmount() + production;
+                    while (total > capacity) {
+                        if (actualInput <= 0) {
+                            // produce nothing
+                            return result;
+                        } else {
+                            actualInput--;
+                        }
+                        production = (int) FeatureContainer
+                            .applyModifiers(actualInput, getGame().getTurn(),
+                                            productionModifiers);
+                        total = output.getAmount() + production;
+                        // in this case, maximum production does not
+                        // exceed actual production
+                        maximumInput = actualInput;
+                        maximumProduction = production;
+                    }
+                }
+                result.addProduction(new AbstractGoods(outputType, production));
+                if (maximumProduction > production) {
+                    result.addMaximumProduction(new AbstractGoods(outputType, maximumProduction));
+                }
+                if (inputType != null) {
+                    result.addConsumption(new AbstractGoods(inputType, actualInput));
+                    if (maximumInput > actualInput) {
+                        result.addMaximumConsumption(new AbstractGoods(inputType, maximumInput));
                     }
                 }
             }
         }
         return result;
     }
-
 
     /**
      * Returns the actual production of this building.
@@ -653,7 +677,44 @@ public class Building extends FreeColGameObject
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        return getProductionInfo().getProduction().get(0).getAmount();
+        List<AbstractGoods> production = getProductionInfo().getProduction();
+        if (production == null || production.isEmpty()) {
+            return 0;
+        } else {
+            return production.get(0).getAmount();
+        }
+    }
+
+    /**
+     * Returns the maximum production of this building.
+     *
+     * @return The production of this building, with the current amount of
+     *         workers, when there is enough "input goods".
+     */
+    public int getMaximumProduction() {
+        List<AbstractGoods> production = getProductionInfo().getMaximumProduction();
+        if (production == null || production.isEmpty()) {
+            return getProduction();
+        } else {
+            return production.get(0).getAmount();
+        }
+    }
+
+    /**
+     * Returns the additional production of new <code>Unit</code> at
+     * this building for next turn.
+     *
+     * TODO: Make this work properly. In the past, the method never
+     * worked correctly anyway, since it did not take the possible
+     * decrease in the production of input goods into account that
+     * might be caused by moving a unit to this Building from another
+     * WorkLocation. To do this right, it would be necessary to
+     * re-calculate the production for the whole colony.
+     *
+     * @return The production of this building the next turn.
+     */
+    public int getAdditionalProductionNextTurn(Unit addUnit) {
+        return getUnitProductivity(addUnit);
     }
 
     /**
@@ -663,51 +724,6 @@ public class Building extends FreeColGameObject
      */
     public boolean canAutoProduce() {
         return buildingType.hasAbility(Ability.AUTO_PRODUCTION);
-    }
-
-    /**
-     * Returns the production of a building with no workplaces with
-     * given input. Unlike other buildings, buildings with no
-     * workplaces stop producing as soon as the warehouse capacity has
-     * been reached. In the original game, the only building of this
-     * type is the pasture/stable.
-     *
-     * @param availableInput an <code>int</code> value
-     * @return an <code>int</code> value
-     */
-    protected int getAutoProduction(int availableInput) {
-        if (getGoodsOutputType() == null ||
-            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
-            return 0;
-        }
-
-        int goodsOutput = getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()));
-
-        // Limit production to available raw materials
-        if (getGoodsInputType() != null && availableInput < goodsOutput) {
-            goodsOutput = availableInput;
-        }
-
-        // apply modifiers, if any
-        goodsOutput = applyModifiers(goodsOutput);
-
-        // auto-produced goods should not overflow
-        int availSpace = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
-        if (goodsOutput > availSpace) {
-            goodsOutput = availSpace;
-        }
-        return goodsOutput;
-    }
-
-    /**
-     * Returns the additional production of new <code>Unit</code> at this building for next turn.
-     *
-     * @return The production of this building the next turn.
-     * @see #getProduction
-     */
-    public int getAdditionalProductionNextTurn(Unit addUnit) {
-        // TODO: restore calculation of actual production
-        return getUnitProductivity(addUnit);
     }
 
     /**
@@ -774,86 +790,17 @@ public class Building extends FreeColGameObject
         }
     }
 
-    /**
-     * Returns the maximum production of this building.
-     *
-     * @return The production of this building, with the current amount of
-     *         workers, when there is enough "input goods".
-     */
-    public int getMaximumProduction() {
-        int production = canAutoProduce()
-            ? getMaximumAutoProduction(colony.getGoodsCount(getGoodsOutputType()))
-            : applyModifiers(getProductivity());
-        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-            int capacity = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
-            production = Math.min(capacity, production);
-        }
-        return production;
-    }
 
     /**
-     * Returns the maximum production of a building that breeds
-     * animals.
+     * Returns a List of all Modifiers that influence the total
+     * production of the Building. In particular, the method does not
+     * return any Modifiers that influence of the productivity of
+     * individual units present in the Building, such as the colony
+     * production bonus.
      *
-     * TODO: make this more generic
-     *
-     * @param available the amount of <b>output goods</b> available
-     * (generally, this means already in the warehouse)
-     * @return the maximum production of this building, given
-     * unlimited input goods
+     * @return a List of all Modifiers that influence the total
+     * production of the Building
      */
-    private int getMaximumAutoProduction(int available) {
-        if (available < getGoodsOutputType().getBreedingNumber()) {
-            // we need at least these many horses/animals to breed
-            return 0;
-        }
-
-        int divisor = (int) getType().getFeatureContainer()
-            .applyModifier(0, "model.modifier.breedingDivisor");
-        int factor = (int) getType().getFeatureContainer()
-            .applyModifier(0, "model.modifier.breedingFactor");
-        int result = ((available - 1) / divisor + 1) * factor;
-        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-            int capacity = colony.getWarehouseCapacity()
-                - colony.getGoodsCount(getGoodsOutputType());
-            result = Math.min(capacity, result);
-        }
-        return result;
-    }
-
-    /**
-     * Returns the maximum production of a given unit to be added to this building.
-     *
-     * @return If unit can be added, will return the maximum production potential
-     *         if it cannot be added, will return <code>0</code>.
-     */
-    public int getAdditionalProduction(Unit addUnit) {
-        return getProductionAdding(getStoredInput(), addUnit) - getProduction();
-    }
-
-    /**
-     * Returns the Production from this building applying the production bonus
-     * of the colony to the given productivity of the worker(s).
-     *
-     * @param productivity From {@link #getProductivity}
-     * @return Production based on Productivity
-     */
-    // TODO: this really should not be public
-    public int applyModifiers(int productivity) {
-        GoodsType goodsOutputType = getGoodsOutputType();
-        if (goodsOutputType == null) {
-            return 0;
-        }
-        /*
-        return Math.round(colony.getFeatureContainer().applyModifier(productivity,
-                                                                     goodsOutputType.getId(),
-                                                                     buildingType, getGame().getTurn()));
-        */
-        return (int) FeatureContainer.applyModifiers(productivity, getGame().getTurn(),
-                                                     getProductionModifiers());
-
-    }
-
     public List<Modifier> getProductionModifiers() {
         List<Modifier> modifiers = new ArrayList<Modifier>();
         GoodsType goodsOutputType = getGoodsOutputType();
@@ -865,6 +812,9 @@ public class Building extends FreeColGameObject
         return modifiers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int compareTo(Building other) {
         return getType().compareTo(other.getType());
     }

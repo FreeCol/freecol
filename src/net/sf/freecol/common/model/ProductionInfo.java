@@ -142,6 +142,9 @@ public class ProductionInfo {
      * @return a <code>boolean</code> value
      */
     public boolean hasMaximumProduction() {
+        if (maximumProduction.isEmpty()) {
+            return true;
+        }
         for (int index = 0; index < production.size(); index++) {
             if (maximumProduction.size() < index) {
                 return true;
