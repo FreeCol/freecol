@@ -120,7 +120,10 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
     public boolean canAdd(UnitType unitType) {
-        return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
+        return workPlaces > 0
+            && unitType.hasSkill()
+            && unitType.getSkill() >= minSkill
+            && unitType.getSkill() <= maxSkill;
     }
 
     /**
