@@ -559,4 +559,49 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
     }
 
+
+    public void testUnitProductivity() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        Colony colony = getStandardColony(4);
+        Unit unit = colony.getUnitList().get(0);
+
+        UnitType servant = spec().getUnitType("model.unit.indenturedServant");
+        UnitType convert = spec().getUnitType("model.unit.indianConvert");
+        UnitType criminal = spec().getUnitType("model.unit.pettyCriminal");
+
+        for (Building building : colony.getBuildings()) {
+            GoodsType outputType = building.getGoodsOutputType();
+            if (outputType != null) {
+                for (UnitType type : spec().getUnitTypeList()) {
+                    if (building.getType().canAdd(type)
+                        && type.isAvailableTo(colony.getOwner())) {
+                        unit.setType(type);
+                        int productivity = building.getUnitProductivity(unit);
+                        int expected = building.getType().getBasicProduction();
+                        if (type == building.getExpertUnitType()) {
+                            expected = 6;
+                        } else if (type == servant) {
+                            expected = 2;
+                        } else if (type == convert) {
+                            expected = 1;
+                        } else if (type == criminal) {
+                            expected = 1;
+                        }
+                        if (expected != building.getType().getBasicProduction()) {
+                            Set<Modifier> modifierSet = type.getModifierSet(outputType.getId());
+                            assertFalse("ModifierSet should not be empty!",
+                                        modifierSet.isEmpty());
+                        }
+                        assertEquals("Wrong productivity for " + type,
+                                     expected, productivity);
+                    }
+                }
+            }
+        }
+
+
+    }
+
 }
