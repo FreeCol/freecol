@@ -159,13 +159,18 @@ public final class MapControls {
         miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
         compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
 
-        final int SPACE = unitButton[0].getWidth() + 5;
+        final int WIDTH = unitButton[0].getWidth();
+        final int SPACE = 5;
+
         for(int i=0; i<unitButton.length; i++) {
-            unitButton[i].setLocation(miniMap.getWidth() +
-                                      (infoPanel.getX() - miniMap.getWidth() -
-                                       unitButton.length*SPACE)/2 +
-                                      i*SPACE,
-                                      component.getHeight() - 40);
+            int x = miniMap.getWidth() + 1 +
+                    ((infoPanel.getX() - miniMap.getWidth() -
+                      unitButton.length * WIDTH -
+                      (unitButton.length-1) * SPACE - WIDTH) / 2) +
+                    i * (WIDTH + SPACE);
+            int y = component.getHeight() - 40;
+
+            unitButton[i].setLocation(x, y);
         }
 
         //
