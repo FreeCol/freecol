@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
@@ -760,7 +761,7 @@ public final class InGameController implements NetworkConstants {
            if (!freeColClient.isSingleplayer()) {
                freeColClient.playSound("sound.anthem." + player.getNationID());
            }
-           displayModelMessages(true);
+           displayModelMessages(true, true);
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
     }
@@ -5259,79 +5260,90 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Displays the next <code>ModelMessage</code>.
-     *
-     * @see net.sf.freecol.common.model.ModelMessage ModelMessage
      */
     public void nextModelMessage() {
         displayModelMessages(false);
     }
 
-    public void displayModelMessages(final boolean allMessages) {
+    /**
+     * Displays pending <code>ModelMessage</code>s.
+     *
+     * @param allMessages Display all messages or just the undisplayed ones.
+     */
+    public void displayModelMessages(boolean allMessages) {
+        displayModelMessages(allMessages, false);
+    }
 
+    /**
+     * Displays pending <code>ModelMessage</code>s.
+     *
+     * @param allMessages Display all messages or just the undisplayed ones.
+     * @param endOfTurn Use a turn report panel if necessary.
+     */
+    public void displayModelMessages(final boolean allMessages,
+                                     final boolean endOfTurn) {
+        Player player = freeColClient.getMyPlayer();
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
+        final ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
 
-        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
-        List<ModelMessage> inputList;
-        if (allMessages) {
-            inputList = freeColClient.getMyPlayer().getModelMessages();
-        } else {
-            inputList = freeColClient.getMyPlayer().getNewModelMessages();
-        }
-
-        for (ModelMessage message : inputList) {
-            if (shouldAllowMessage(message)) {
-                if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
-                    String key = message.getSourceId();
-                    if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
-                        for (String otherkey : message.getKeys()) {
+        for (ModelMessage m : ((allMessages) ? player.getModelMessages()
+                : player.getNewModelMessages())) {
+            if (shouldAllowMessage(m)) {
+                if (m.getMessageType() == MessageType.WAREHOUSE_CAPACITY) {
+                    String key = m.getSourceId();
+                    switch (m.getTemplateType()) {
+                    case TEMPLATE:
+                        for (String otherkey : m.getKeys()) {
                             if ("%goods%".equals(otherkey)) {
                                 key += otherkey;
                                 break;
                             }
                         }
+                        break;
+                    default:
+                        break;
                     }
 
                     Integer turn = getTurnForMessageIgnored(key);
                     if (turn != null && turn.intValue() == thisTurn - 1) {
                         startIgnoringMessage(key, thisTurn);
-                        message.setBeenDisplayed(true);
+                        m.setBeenDisplayed(true);
                         continue;
                     }
-                } else if (message.getMessageType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
-                    freeColClient.playSound("sound.event.buildingComplete");
                 }
-                messageList.add(message);
+                messages.add(m);
             }
 
             // flag all messages delivered as "beenDisplayed".
-            message.setBeenDisplayed(true);
+            m.setBeenDisplayed(true);
         }
 
         purgeOldMessagesFromMessagesToIgnore(thisTurn);
-        final ModelMessage[] messages = messageList.toArray(new ModelMessage[0]);
 
-        Runnable uiTask = new Runnable() {
-                public void run() {
-                    Canvas canvas = freeColClient.getCanvas();
-                    if (messageList.size() > 0) {
-                        if (allMessages || messageList.size() > 5) {
-                            canvas.showReportTurnPanel(messages);
+        if (messages.size() > 0) {
+            Runnable uiTask = new Runnable() {
+                    public void run() {
+                        Canvas canvas = freeColClient.getCanvas();
+                        final ModelMessage[] a
+                            = messages.toArray(new ModelMessage[0]);
+                        if (endOfTurn) {
+                            canvas.showReportTurnPanel(a);
                         } else {
-                            canvas.showModelMessages(messages);
+                            canvas.showModelMessages(a);
                         }
                     }
-                    freeColClient.getActionManager().update();
+                };
+            freeColClient.getActionManager().update();
+            if (SwingUtilities.isEventDispatchThread()) {
+                uiTask.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(uiTask);
+                } catch (InterruptedException e) {
+                    // Ignore
+                } catch (InvocationTargetException e) {
+                    // Ignore
                 }
-            };
-        if (SwingUtilities.isEventDispatchThread()) {
-            uiTask.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(uiTask);
-            } catch (InterruptedException e) {
-                // Ignore
-            } catch (InvocationTargetException e) {
-                // Ignore
             }
         }
     }
@@ -5346,7 +5358,8 @@ public final class InGameController implements NetworkConstants {
     }
 
     private synchronized void stopIgnoringMessage(String key) {
-        logger.finer("Removing model message with key " + key + " from ignored messages.");
+        logger.finer("Removing model message with key " + key
+            + " from ignored messages.");
         messagesToIgnore.remove(key);
     }
 
@@ -5355,7 +5368,8 @@ public final class InGameController implements NetworkConstants {
         for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
             if (entry.getValue().intValue() < thisTurn - 1) {
                 if (logger.isLoggable(Level.FINER)) {
-                    logger.finer("Removing old model message with key " + entry.getKey() + " from ignored messages.");
+                    logger.finer("Removing old model message with key "
+                        + entry.getKey() + " from ignored messages.");
                 }
                 keysToRemove.add(entry.getKey());
             }
@@ -5372,11 +5386,8 @@ public final class InGameController implements NetworkConstants {
      * @return true if the message should be delivered
      */
     private boolean shouldAllowMessage(ModelMessage message) {
-        BooleanOption option = freeColClient.getClientOptions().getBooleanOption(message);
-        if (option == null) {
-            return true;
-        } else {
-            return option.getValue();
-        }
+        BooleanOption option = freeColClient.getClientOptions()
+            .getBooleanOption(message);
+        return (option == null) ? true : option.getValue();
     }
 }
