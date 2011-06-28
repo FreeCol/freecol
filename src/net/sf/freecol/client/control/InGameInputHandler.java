@@ -1716,7 +1716,7 @@ public final class InGameInputHandler extends InputHandler {
          */
         public boolean confirm() {
             try {
-                Object result = invokeAndWait();
+                Object result = invokeSpecial();
                 return ((Boolean) result).booleanValue();
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof RuntimeException) {
