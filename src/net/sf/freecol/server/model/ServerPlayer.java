@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
@@ -1508,9 +1509,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
             throw new IllegalArgumentException("Bogus migration type");
         }
 
-        // Replace the recruit we used.
+        // Replace the recruit we used.  Shuffle them down first
+        // as AI is always recruiting slot 0.
+        for (int i = index; i < Europe.RECRUIT_COUNT-1; i++) {
+            europe.setRecruitable(i, europe.getRecruitable(i+1));
+        }
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
-        europe.setRecruitable(index,
+        europe.setRecruitable(Europe.RECRUIT_COUNT-1,
             RandomChoice.getWeightedRandom(logger,
                 "Replace recruit", random, recruits));
         cs.add(See.only(this), europe);
@@ -2715,31 +2720,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
-        List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        if (capture.size() <= 0) return;
-        if (winnerPlayer.isAI()) {
-            // This should be in the AI code.
-            // Just loot in order of sale value.
-            final Market market = winnerPlayer.getMarket();
-            Collections.sort(capture, new Comparator<Goods>() {
-                    public int compare(Goods g1, Goods g2) {
-                        int p1 = market.getPaidForSale(g1.getType())
-                            * g1.getAmount();
-                        int p2 = market.getPaidForSale(g2.getType())
-                            * g2.getAmount();
-                        return p2 - p1;
-                    }
-                });
-            while (capture.size() > 0) {
-                Goods g = capture.remove(0);
-                if (!winner.canAdd(g)) break;
-                winner.add(g);
-            }
-        } else if (winner.getSpaceLeft() > 0) {
+        if (loser.getGoodsList().size() > 0 && winner.getSpaceLeft() > 0) {
+            List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
             for (Goods g : capture) g.setLocation(null);
             TransactionSession.establishLootSession(winner, loser, capture);
-            cs.addAttribute(See.only(winnerPlayer), "loot", "true");
+            cs.add(See.only(winnerPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                new LootCargoMessage(winner, loser.getId(), capture));
         }
         loser.getGoodsContainer().removeAll();
         loser.setState(UnitState.ACTIVE);

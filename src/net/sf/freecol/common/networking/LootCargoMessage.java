@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -85,6 +86,25 @@ public class LootCargoMessage extends Message {
                 this.goods.add(new Goods(game, (Element) children.item(i)));
             }
         }
+    }
+
+    /**
+     * Public accessor to help the client igc.
+     *
+     * @return The winner unit.
+     */
+    public Unit getUnit(Game game) {
+        FreeColGameObject o = game.getFreeColGameObjectSafely(winnerId);
+        return (o instanceof Unit) ? ((Unit) o) : null;
+    }
+
+    /**
+     * Public accessor to help the client igc.
+     *
+     * @return The defender Id.
+     */
+    public String getDefenderId() {
+        return loserId;
     }
 
     /**

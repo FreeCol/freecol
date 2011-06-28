@@ -97,6 +97,7 @@ import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -892,7 +893,6 @@ public final class InGameController extends Controller {
         }
     }
 
-
     /**
      * Handle a player retiring.
      *
@@ -1441,41 +1441,32 @@ public final class InGameController extends Controller {
      * Set land name.
      *
      * @param serverPlayer The <code>ServerPlayer</code> who landed.
+     * @param unit The <code>Unit</code> that has come ashore.
      * @param name The new land name.
      * @param welcomer An optional <code>ServerPlayer</code> that has offered
      *            a treaty.
+     * @param camps An optional number of camps for the welcome message.
      * @param accept True if the treaty has been accepted.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element setNewLandName(ServerPlayer serverPlayer, String name,
-                                  ServerPlayer welcomer, boolean accept) {
+    public Element setNewLandName(ServerPlayer serverPlayer, Unit unit,
+                                  String name, ServerPlayer welcomer, int camps,
+                                  boolean accept) {
         ChangeSet cs = new ChangeSet();
 
         // Special case of a welcome from an adjacent native unit,
         // offering the land the landing unit is on if a peace treaty
-        // is accepted.  Slight awkwardness that we have to find the
-        // unit that landed, which relies on this code being triggered
-        // from the first landing and thus there is only one land unit
-        // in the new world (which is not the case in a debug game).
+        // is accepted.
         serverPlayer.setNewLandName(name);
         if (welcomer != null) {
             if (accept) { // Claim land
-                for (Unit u : serverPlayer.getUnits()) {
-                    if (u.isNaval()) continue;
-                    Tile tile = u.getTile();
-                    if (tile == null) continue;
-                    if (tile.isLand() && tile.getOwner() == welcomer) {
-                        tile.changeOwnership(serverPlayer, null);
-                        cs.add(See.perhaps(), tile);
-                        break;
-                    }
-                }
-                welcomer = null;
-            } else {
-                // Consider not accepting the treaty to be an insult.  WWC1D?
+                Tile tile = unit.getTile();
+                tile.changeOwnership(serverPlayer, null);
+                cs.add(See.perhaps(), tile);
+            } else { // Consider not accepting the treaty to be an insult.
                 cs.add(See.only(null).perhaps(serverPlayer),
-                       welcomer.modifyTension(serverPlayer,
-                                              Tension.TENSION_ADD_MAJOR));
+                    welcomer.modifyTension(serverPlayer,
+                        Tension.TENSION_ADD_MAJOR));
             }
         }
 
@@ -3588,5 +3579,30 @@ public final class InGameController extends Controller {
                      new ChatMessage(serverPlayer, message, false)
                      .toXMLElement());
         return null;
+    }
+
+    /**
+     * Get the current game statistics.
+     *
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element getStatistics(ServerPlayer serverPlayer) {
+        // Convert statistics map to a list.
+        java.util.Map<String, String> stats = getGame()
+            .getStatistics(getFreeColServer().getAIMain());
+        List<String> all = new ArrayList<String>();
+        List<String> keys = new ArrayList<String>(stats.keySet());
+        Collections.sort(keys);
+        for (String k : keys) {
+            all.add(k);
+            all.add(stats.get(k));
+        }
+
+        // Return as statistics element.
+        ChangeSet cs = new ChangeSet();
+        cs.addTrivial(See.only(serverPlayer), "statistics",
+                      ChangePriority.CHANGE_NORMAL,
+                      all.toArray(new String[0]));
+        return cs.build(serverPlayer);
     }
 }

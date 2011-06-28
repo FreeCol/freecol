@@ -24,7 +24,11 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -37,12 +41,15 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.networking.StatisticsMessage;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.server.ai.AIMain;
+
 
 /**
- * This is the StatisticsPanel panel 
+ * Display the current game statistics.
  */
-public final class StatisticsPanel extends FreeColPanel implements ActionListener {
+public final class StatisticsPanel extends FreeColPanel
+    implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
@@ -61,14 +68,17 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         }
 
         /**
-         * Gives this table model the data that is being used in the table. This
-         * method should only be called to initialize the data set. To modify or
-         * extend the data set use other methods.
+         * Gives this table model the data that is being used in the
+         * table. This method should only be called to initialize the
+         * data set. To modify or extend the data set use other
+         * methods.
          */
-        public void setData(HashMap<String,Long> statsData) {
+        public void setData(java.util.Map<String, String> statsData) {
             this.data = new Object[2][statsData.size()];
             int i=0;
-            for (String s : statsData.keySet()) {
+            List<String> keys = new ArrayList<String>(statsData.keySet());
+            Collections.sort(keys);
+            for (String s : keys) {
                 data[NAME_COLUMN][i] = s;
                 data[VALUE_COLUMN][i] = statsData.get(s);
                 i++;
@@ -110,7 +120,8 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
          * @return The value at the requested location.
          */
         public Object getValueAt(int row, int column) {
-            if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+            if ((row < getRowCount()) && (column < getColumnCount())
+                && (row >= 0) && (column >= 0)) {
                 switch (column) {
                 case StatisticsModel.NAME_COLUMN:
                     return data[NAME_COLUMN][row];
@@ -136,7 +147,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
          * Returns the Class of the objects in the given column.
          */
         public Class<?> getColumnClass(int column) {
-            return getValueAt(0, column).getClass();
+            return String.class;
         }
     }
     
@@ -149,8 +160,10 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         super(parent, new BorderLayout());
         
         // Retrieve the client and server data
-        StatisticsMessage serverStatistics = getController().getServerStatistics();
-        StatisticsMessage clientStatistics = new StatisticsMessage(getGame(), null);
+        Map<String, String> serverStatistics
+            = getController().getServerStatistics();
+        Map<String, String> clientStatistics
+            = getController().getClientStatistics();
 
         // Title
         JPanel header = new JPanel();
@@ -175,22 +188,37 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         setSize(getPreferredSize());
     }
     
-    private JPanel displayStatsMessage(String title, StatisticsMessage statistics) {
+    private JPanel displayStatsMessage(String title,
+                                       Map<String, String> stats) {
+        final String[] memoryKeys = {
+            "freeMemory", "totalMemory", "maxMemory"
+        };
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
         Box b = new Box(BoxLayout.Y_AXIS);
         panel.add(b);
-        b.add(createStatsTable("Memory", statistics.getMemoryStatistics()));
-        b.add(createStatsTable("Game", statistics.getGameStatistics()));
-        if (statistics.getAIStatistics()!=null) {
-            b.add(createStatsTable("AI", statistics.getAIStatistics()));
-        } else {
+        Map<String, String> memory = new HashMap<String, String>();
+        Map<String, String> ai = new HashMap<String, String>();
+        for (String k : memoryKeys) {
+            memory.put(Messages.message("menuBar.debug.memoryManager." + k),
+                       stats.remove(k));
+        }
+        for (String k : new ArrayList<String>(stats.keySet())) {
+            if (k.startsWith("AI")) { // TODO: AIMain.aiStatisticsPrefix
+                ai.put(k, stats.remove(k));
+            }
+        }
+        b.add(createStatsTable("Memory", memory));
+        b.add(createStatsTable("Game", stats));
+        if (ai.isEmpty()) {
             b.add(new JLabel());
+        } else {
+            b.add(createStatsTable("AI", ai));
         }
         return panel;
     }
     
-    private JPanel createStatsTable(String title, HashMap<String,Long> data) {
+    private JPanel createStatsTable(String title, Map<String, String> data) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(new JLabel(title), BorderLayout.NORTH);
@@ -208,5 +236,4 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         panel.setPreferredSize(new Dimension(300, (data.size()+2)*17));
         return panel;
     }
-    
 }

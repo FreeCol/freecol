@@ -20,6 +20,8 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,13 +37,17 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.NewLandNameMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -141,6 +147,14 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("diplomacy")) {
                     reply = diplomaticTrade((DummyConnection) connection, element);
                 } else if (type.equals("addObject")) {
+                } else if (type.equals("newLandName")) {
+                    reply = newLandName((DummyConnection) connection, element);
+                } else if (type.equals("newRegionName")) {
+                    reply = newRegionName((DummyConnection) connection, element);
+                } else if (type.equals("fountainOfYouth")) {
+                    reply = fountainOfYouth((DummyConnection) connection, element);
+                } else if (type.equals("lootCargo")) {
+                    reply = lootCargo(connection, element);
                 } else if (type.equals("multiple")) {
                     reply = multiple((DummyConnection) connection, element);
                 } else {
@@ -152,6 +166,26 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     + element.getTagName(), e);
         }
         return reply;
+    }
+
+    /**
+     * Gets the <code>AIPlayer</code> using this
+     * <code>AIInGameInputHandler</code>.
+     *
+     * @return The <code>AIPlayer</code>.
+     */
+    private AIPlayer getAIPlayer() {
+        return aiMain.getAIPlayer(serverPlayer);
+    }
+
+    /**
+     * Gets the AI unit corresponding to a given unit, if any.
+     *
+     * @param unit The <code>Unit</code> to look up.
+     * @return The corresponding AI unit or null if not found.
+     */
+    private AIUnit getAIUnit(Unit unit) {
+        return aiMain.getAIUnit(unit);
     }
 
     /**
@@ -196,7 +230,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "AI player failed while working!", e);
                     }
-                    AIMessage.sendTrivial(connection, "endTurn");
+                    AIMessage.askEndTurn(connection);
                 }
             };
             t.start();
@@ -235,9 +269,10 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
         FoundingFather foundingFather = getAIPlayer()
             .selectFoundingFather(possibleFoundingFathers);
-        return (foundingFather == null) ? null
-            : AIMessage.makeTrivial("chooseFoundingFather",
-                                    "foundingFather", foundingFather.getId());
+        if (foundingFather != null) {
+            AIMessage.askChooseFoundingFather(connection, foundingFather);
+        }
+        return null;
     }
 
     /**
@@ -309,13 +344,100 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      */
     private Element diplomaticTrade(DummyConnection connection, Element element) {
         // TODO: make an informed decision
-        DiplomacyMessage message = new DiplomacyMessage(freeColServer.getGame(), element);
+        DiplomacyMessage message
+            = new DiplomacyMessage(freeColServer.getGame(), element);
         DiplomaticTrade agreement = message.getAgreement();
         boolean accept = getAIPlayer().acceptDiplomaticTrade(agreement);
         agreement.setStatus((accept) ? TradeStatus.ACCEPT_TRADE
                             : TradeStatus.REJECT_TRADE);
         return message.toXMLElement();
     }
+
+    /**
+     * Replies to offer to name the new land.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The default offer.
+     */
+    private Element newLandName(DummyConnection connection, Element element) {
+        NewLandNameMessage message
+            = new NewLandNameMessage(freeColServer.getGame(), element);
+        message.setAccept(true); // Always accept new land
+        return message.toXMLElement();
+    }
+
+    /**
+     * Replies to offer to name a new region name.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return The default offer.
+     */
+    private Element newRegionName(DummyConnection connection, Element element) {
+        return new NewRegionNameMessage(freeColServer.getGame(), element)
+            .toXMLElement();
+    }
+
+    /**
+     * Replies to fountain of youth offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element fountainOfYouth(DummyConnection connection, Element element) {
+        String migrants = element.getAttribute("migrants");
+        int n;
+        try {
+            n = Integer.parseInt(migrants);
+        } catch (NumberFormatException e) {
+            n = -1;
+        }
+        for (int i = 0; i < n; i++) {
+            AIMessage.askEmigrate(connection, 0);
+        }
+        return null;
+    }
+
+    /**
+     * Replies to loot cargo offer.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return Null.
+     */
+    private Element lootCargo(Connection connection, Element element) {
+        Game game = freeColServer.getGame();
+        LootCargoMessage message = new LootCargoMessage(game, element);
+        Unit unit = message.getUnit(game);
+        List<Goods> goods = message.getGoods();
+        final Market market = serverPlayer.getMarket();
+        Collections.sort(goods, new Comparator<Goods>() {
+                public int compare(Goods g1, Goods g2) {
+                    int p1 = market.getPaidForSale(g1.getType())
+                        * g1.getAmount();
+                    int p2 = market.getPaidForSale(g2.getType())
+                        * g2.getAmount();
+                    return p2 - p1;
+                }
+            });
+        List<Goods> loot = new ArrayList<Goods>();
+        int space = unit.getSpaceLeft();
+        while (!goods.isEmpty() && space > 0) {
+            Goods g = goods.remove(0);
+            if (g.getSpaceTaken() > space) continue;
+            loot.add(g);
+            space -= g.getSpaceTaken();
+        }
+        AIMessage.askLoot(getAIUnit(unit), message.getDefenderId(), loot);
+        return null;
+    }
+
 
     /**
      * Handle all the children of this element.
@@ -331,15 +453,5 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             reply = handle(connection, (Element) nodes.item(i));
         }
         return reply;
-    }
-
-    /**
-     * Gets the <code>AIPlayer</code> using this
-     * <code>AIInGameInputHandler</code>.
-     * 
-     * @return The <code>AIPlayer</code>.
-     */
-    private AIPlayer getAIPlayer() {
-        return aiMain.getAIPlayer(serverPlayer);
     }
 }

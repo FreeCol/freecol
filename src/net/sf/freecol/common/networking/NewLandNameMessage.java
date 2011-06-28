@@ -21,6 +21,8 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -33,6 +35,11 @@ import org.w3c.dom.Element;
 public class NewLandNameMessage extends Message {
 
     /**
+     * The unit that has come ashore.
+     */
+    private String unitId;
+
+    /**
      * The name to use.
      */
     private String newLandName;
@@ -43,6 +50,11 @@ public class NewLandNameMessage extends Message {
     private String welcomerId;
 
     /**
+     * An optional number of camps for the welcome message.
+     */
+    private String campCount;
+
+    /**
      * Has a treaty been accepted with the welcomer?
      */
     private String acceptString;
@@ -51,13 +63,24 @@ public class NewLandNameMessage extends Message {
      * Create a new <code>NewLandNameMessage</code> with the
      * supplied name.
      *
+     * @param unit The <code>Unit</code> that has come ashore.
      * @param newLandName The new land name.
+     * @param welcomer The optional <Player>welcomer</code> nation.
+     * @param camps The optional number of camps of the welcomer nation.
+     * @param accept Accept the welcomer offer?
      */
-    public NewLandNameMessage(String newLandName, Player welcomer,
-                              boolean accept) {
+    public NewLandNameMessage(Unit unit, String newLandName,
+                              Player welcomer, int camps, boolean accept) {
+        this.unitId = unit.getId();
         this.newLandName = newLandName;
-        this.welcomerId = (welcomer == null) ? null : welcomer.getId();
-        this.acceptString = Boolean.toString(accept);
+        if (welcomer == null) {
+            this.welcomerId = null;
+            this.campCount = null;
+        } else {
+            this.welcomerId = welcomer.getId();
+            this.campCount = Integer.toString(camps);
+        }
+        this.acceptString = null;
     }
 
     /**
@@ -68,10 +91,65 @@ public class NewLandNameMessage extends Message {
      * @param element The <code>Element</code> to use to create the message.
      */
     public NewLandNameMessage(Game game, Element element) {
+        this.unitId = element.getAttribute("unit");
         this.newLandName = element.getAttribute("newLandName");
-        this.welcomerId = (element.hasAttribute("welcomer"))
-            ? element.getAttribute("welcomer") : null;
+        if (element.hasAttribute("welcomer")) {
+            this.welcomerId = element.getAttribute("welcomer");
+            this.campCount = element.getAttribute("camps");
+        } else {
+            this.welcomerId = null;
+            this.campCount = null;
+        }
         this.acceptString = element.getAttribute("accept");
+    }
+
+    /**
+     * Public accessor for the unit.
+     *
+     * @param game The <code>Game</code> to look for a unit in.
+     * @return The unit of this message.
+     */
+    public Unit getUnit(Game game) {
+        Object o = game.getFreeColGameObjectSafely(unitId);
+        return (o instanceof Unit) ? (Unit) o : null;
+    }
+
+    /**
+     * Public accessor for the new land name.
+     *
+     * @return The new land name of this message.
+     */
+    public String getNewLandName() {
+        return newLandName;
+    }
+
+    /**
+     * Public accessor for the welcomer.
+     *
+     * @param game The <code>Game</code> to look for a welcomer in.
+     * @return The welcomer of this message.
+     */
+    public Player getWelcomer(Game game) {
+        Object o = game.getFreeColGameObjectSafely(welcomerId);
+        return (o instanceof Player) ? (Player) o : null;
+    }
+
+    /**
+     * Sets the accept value of this message.
+     *
+     * @param accept The new accept value.
+     */
+    public void setAccept(boolean accept) {
+        this.acceptString = Boolean.toString(accept);
+    }
+
+    /**
+     * Public accessor for the camp count.
+     *
+     * @return The camp count of this message.
+     */
+    public String getCamps() {
+        return campCount;
     }
 
     /**
@@ -89,23 +167,64 @@ public class NewLandNameMessage extends Message {
         Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
+        Unit unit;
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+        Tile tile = unit.getTile();
+        if (tile == null) {
+            return Message.clientError("Unit is not on the map: " + unitId);
+        }
+        if (!tile.isLand()) {
+            return Message.clientError("Unit is not in the new world: "
+                + unitId);
+        }
         if (newLandName == null || newLandName.length() == 0) {
             return Message.clientError("Empty new land name");
         }
+        if (serverPlayer.isNewLandNamed()) {
+            return Message.clientError("Player has named the new land already.");
+        }
         ServerPlayer welcomer = null;
-        boolean accept = false;
+        int camps = 0;
         if (welcomerId != null) {
             if (game.getFreeColGameObjectSafely(welcomerId) instanceof ServerPlayer) {
                 welcomer = (ServerPlayer) game.getFreeColGameObjectSafely(welcomerId);
-                accept = Boolean.valueOf(acceptString);
+                if (!welcomer.isIndian()) {
+                    return Message.clientError("Not a native player: "
+                        + welcomerId);
+                }
             } else {
                 return Message.clientError("Not a player: " + welcomerId);
             }
+            boolean foundWelcomer = false;
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                if (t.getFirstUnit().getOwner() == welcomer) {
+                    foundWelcomer = true;
+                    break;
+                }
+            }
+            if (!foundWelcomer) {
+                return Message.clientError("Unit is not next to welcomer.");
+            }
+            if (tile.getOwner() != welcomer) {
+                return Message.clientError("Welcomer offers unowned tile: "
+                    + tile.getId());
+            }
+            try {
+                camps = Integer.parseInt(campCount);
+            } catch (NumberFormatException e) {
+                return Message.clientError("Invalid camp count: " + campCount);
+            }
         }
+        boolean accept = Boolean.valueOf(acceptString);
 
         // Set name.
         return server.getInGameController()
-            .setNewLandName(serverPlayer, newLandName, welcomer, accept);
+            .setNewLandName(serverPlayer, unit, newLandName, welcomer, camps,
+                accept);
     }
 
     /**
@@ -115,9 +234,11 @@ public class NewLandNameMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
+        result.setAttribute("unit", unitId);
         result.setAttribute("newLandName", newLandName);
         if (welcomerId != null) result.setAttribute("welcomer", welcomerId);
-        result.setAttribute("accept", acceptString);
+        if (campCount != null) result.setAttribute("camps", campCount);
+        if (acceptString != null) result.setAttribute("accept", acceptString);
         return result;
     }
 

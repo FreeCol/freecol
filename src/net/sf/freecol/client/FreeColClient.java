@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
@@ -111,6 +112,8 @@ public final class FreeColClient {
     private InGameInputHandler inGameInputHandler;
 
     private MapEditorController mapEditorController;
+
+    private ServerAPI serverAPI;
 
 
     // GUI:
@@ -946,6 +949,16 @@ public final class FreeColClient {
      */
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
+    }
+
+    /**
+     * Meaningfully named access to the ServerAPI.
+     *
+     * @return A ServerAPI.
+     */
+    public ServerAPI askServer() {
+        if (serverAPI == null) serverAPI = new ServerAPI(this);
+        return serverAPI;
     }
 
     /**

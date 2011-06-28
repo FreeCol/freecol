@@ -79,7 +79,6 @@ import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
-import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
@@ -618,13 +617,12 @@ public final class InGameInputHandler extends InputHandler
                 return new SpySettlementMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
-        register(StatisticsMessage.getXMLElementTagName(),
+        register("getStatistics",
                  new NetworkRequestHandler() {
             @Override
             public Element handle(Connection connection, Element element) {
-                return new StatisticsMessage(getGame(),
-                                             freeColServer.getAIMain())
-                    .toXMLElement();
+                return freeColServer.getInGameController()
+                    .getStatistics(freeColServer.getPlayer(connection));
             }});
         register(UpdateCurrentStopMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {

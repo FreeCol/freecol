@@ -35,6 +35,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.animation.Animations;
+import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
@@ -50,11 +51,13 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -66,8 +69,11 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.NewLandNameMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -151,6 +157,14 @@ public final class InGameInputHandler extends InputHandler {
                 reply = addPlayer(element);
             } else if (type.equals("addObject")) {
                 reply = addObject(element);
+            } else if (type.equals("newLandName")) {
+                reply = newLandName(element);
+            } else if (type.equals("newRegionName")) {
+                reply = newRegionName(element);
+            } else if (type.equals("fountainOfYouth")) {
+                reply = fountainOfYouth(element);
+            } else if (type.equals("lootCargo")) {
+                reply = lootCargo(element);
             } else if (type.equals("multiple")) {
                 reply = multiple(connection, element);
             } else {
@@ -1029,19 +1043,140 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Ask the player to name the new land.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element newLandName(Element element) {
+        Game game = getGame();
+        Player player = getFreeColClient().getMyPlayer();
+        NewLandNameMessage message = new NewLandNameMessage(game, element);
+        Unit unit = message.getUnit(game);
+        String defaultName = message.getNewLandName();
+        final Tile tile = unit.getTile();
+        if (unit == null || defaultName == null || tile == null) return null;
+
+        // Player names the land.
+        String name = new ShowInputDialogSwingTask(tile,
+            StringTemplate.template("newLand.text"), defaultName,
+            "newLand.yes", null, true).show();
+
+        // Check if there is a welcoming native offering land.
+        Player welcomer = message.getWelcomer(game);
+        boolean accept = false;
+        if (welcomer != null) {
+            String messageId = (tile.getOwner() == welcomer)
+                ? "welcomeOffer.text" : "welcomeSimple.text";
+            String type = ((IndianNationType) welcomer
+                .getNationType()).getSettlementTypeKey(true);
+            accept = new ShowConfirmDialogSwingTask(tile,
+                StringTemplate.template(messageId)
+                    .addStringTemplate("%nation%", welcomer.getNationName())
+                    .addName("%camps%", message.getCamps())
+                    .add("%settlementType%", type),
+                "welcome.yes", "welcome.no").confirm();
+        }
+
+        // Respond to the server.
+        getFreeColClient().askServer()
+            .newLandName(unit, name, welcomer, accept);
+
+        // Add tutorial message.
+        String key = FreeColActionUI.getHumanKeyStrokeText(getFreeColClient()
+            .getActionManager().getFreeColAction("buildColonyAction")
+            .getAccelerator());
+        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                "tutorial.buildColony", player)
+            .addName("%build_colony_key%", key)
+            .add("%build_colony_menu_item%", "buildColonyAction.name")
+            .add("%orders_menu_item%", "menuBar.orders"));
+        return null;
+    }
+
+    /**
+     * Ask the player to name a new region.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element newRegionName(Element element) {
+        Game game = getGame();
+        NewRegionNameMessage message = new NewRegionNameMessage(game, element);
+        String name = message.getNewRegionName();
+        Region region = message.getRegion(game);
+        Unit unit = message.getUnit(game);
+        if (name == null || region == null) return null;
+        name = new ShowInputDialogSwingTask((unit == null) ? null
+            : unit.getTile(),
+            StringTemplate.template("nameRegion.text")
+                .addName("%type%", Messages.message(region.getLabel())),
+            name, "ok", null, false).show();
+        if (name == null || "".equals(name)) name = message.getNewRegionName();
+        getFreeColClient().askServer().newRegionName(region, unit, name);
+        return null;
+    }
+
+    /**
+     * Ask the player to choose migrants from a fountain of youth event.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element fountainOfYouth(Element element) {
+        String migrants = element.getAttribute("migrants");
+        int n;
+        try {
+            n = Integer.parseInt(migrants);
+        } catch (NumberFormatException e) {
+            n = -1;
+        }
+        if (n > 0) {
+            // Without Brewster, the migrants have already been selected
+            // and were updated to the European docks by the server.
+            final Canvas canvas = getFreeColClient().getCanvas();
+            final int m = n;
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (int i = 0; i < m; i++) {
+                            int index = canvas.showEmigrationPanel(true);
+                            getFreeColClient().askServer().emigrate(index + 1);
+                        }
+                    }
+                });
+        }
+        return null;
+    }
+
+    /**
+     * Ask the player to choose something to loot.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element lootCargo(Element element) {
+        Game game = getGame();
+        LootCargoMessage message = new LootCargoMessage(game, element);
+        Unit unit = message.getUnit(game);
+        List<Goods> goods = message.getGoods();
+        if (unit == null || goods == null) return null;
+        new LootCargoSwingTask(unit, message.getDefenderId(), goods)
+            .invokeLater();
+        return null;
+    }
 
     /**
      * Handle all the children of this element.
      *
      * @param connection <code>Connection</code>
-     * @param element <code>Element</code>, the element (root element in a DOM-parsed XML tree)
-     *                that holds all the information.
+     * @param element <code>Element</code>, the element (root element
+     *     in a DOM-parsed XML tree) that holds all the information.
      * @return <code>Element</code>
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
         Element reply = null;
-
         for (int i = 0; i < nodes.getLength(); i++) {
             reply = handle(connection, (Element) nodes.item(i));
         }
@@ -1331,9 +1466,37 @@ public final class InGameInputHandler extends InputHandler {
             if (ff != null) {
                 FreeColClient freeColClient = getFreeColClient();
                 freeColClient.getMyPlayer().setCurrentFather(ff);
-                Element e = Message.createNewRootElement("chooseFoundingFather");
-                e.setAttribute("foundingFather", ff.getId());
-                freeColClient.getClient().send(e);
+                freeColClient.askServer().chooseFoundingFather(ff);
+            }
+        }
+    }
+
+    /**
+     * This class displays a dialog that lets the player choose goods to loot.
+     */
+    class LootCargoSwingTask extends NoResultCanvasSwingTask {
+
+        private Unit unit;
+        private String defenderId;
+        private List<Goods> goods;
+
+
+        /**
+         * Constructor.
+         *
+         * @param goods A list of <code>Goods</code> to choose from.
+         */
+        public LootCargoSwingTask(Unit unit, String defenderId,
+                                  List<Goods> goods) {
+            this.unit = unit;
+            this.defenderId = defenderId;
+            this.goods = goods;
+        }
+
+        protected void doWork(Canvas canvas) {
+            goods = canvas.showCaptureGoodsDialog(unit, goods);
+            if (!goods.isEmpty()) {
+                getFreeColClient().askServer().loot(unit, defenderId, goods);
             }
         }
     }
@@ -1530,7 +1693,6 @@ public final class InGameInputHandler extends InputHandler {
         private String cancelText;
 
 
-
         /**
          * Constructor.
          *
@@ -1539,7 +1701,8 @@ public final class InGameInputHandler extends InputHandler {
          * @param okText The key for the OK button.
          * @param cancelText The key for the Cancel button.
          */
-        public ShowConfirmDialogSwingTask(Tile tile, StringTemplate text, String okText, String cancelText) {
+        public ShowConfirmDialogSwingTask(Tile tile, StringTemplate text,
+                                          String okText, String cancelText) {
             this.tile = tile;
             this.text = text;
             this.okText = okText;
@@ -1566,8 +1729,75 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            boolean choice = canvas.showConfirmDialog(tile, text, okText, cancelText);
+            boolean choice = canvas.showConfirmDialog(tile, text, okText,
+                cancelText);
             return Boolean.valueOf(choice);
+        }
+    }
+
+    /**
+     * This class shows a an input dialog and saves the answer (ok/cancel).
+     */
+    class ShowInputDialogSwingTask extends SwingTask {
+
+        private Tile tile;
+
+        private StringTemplate text;
+
+        private String defaultValue;
+
+        private String okText;
+
+        private String cancelText;
+
+        private boolean rejectEmpty;
+
+
+        /**
+         * Constructor.
+         *
+         * @param tile An optional tile to make visible.
+         * @param text A <code>StringTemplate</code> for the question.
+         * @param defaultValue The default value.
+         * @param okText The key for the OK button.
+         * @param cancelText The key for the Cancel button.
+         * @param rejectEmpty Reject the empty response.
+         */
+        public ShowInputDialogSwingTask(Tile tile, StringTemplate text,
+                                        String defaultValue,
+                                        String okText, String cancelText,
+                                        boolean rejectEmpty) {
+            this.tile = tile;
+            this.text = text;
+            this.defaultValue = defaultValue;
+            this.okText = okText;
+            this.cancelText = cancelText;
+            this.rejectEmpty = rejectEmpty;
+        }
+
+        /**
+         * Show dialog and wait for selection.
+         *
+         * @return The result string.
+         */
+        public String show() {
+            try {
+                Object result = invokeSpecial();
+                return (result instanceof String) ? (String) result : null;
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
+
+        protected Object doWork() {
+            Canvas canvas = getFreeColClient().getCanvas();
+            String choice = canvas.showInputDialog(tile, text, defaultValue,
+                okText, cancelText, rejectEmpty);
+            return choice;
         }
     }
 

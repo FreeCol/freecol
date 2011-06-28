@@ -34,10 +34,11 @@ import org.w3c.dom.Element;
  * The message sent when naming a new region.
  */
 public class NewRegionNameMessage extends Message {
+
     /**
-     * The new name.
+     * The ID of the region being discovered.
      */
-    private String newRegionName;
+    private String regionId;
 
     /**
      * The ID of the unit that discovered the region.
@@ -45,14 +46,23 @@ public class NewRegionNameMessage extends Message {
     private String unitId;
 
     /**
+     * The new name.
+     */
+    private String newRegionName;
+
+    /**
      * Create a new <code>NewRegionNameMessage</code> with the
      * supplied name.
      *
-     * @param newRegionName The new region name.
+     * @param region The <code>Region</code> being discovered.
+     * @param unit The <code>Unit</code> that is discovering.
+     * @param newRegionName The default new region name.
      */
-    public NewRegionNameMessage(String newRegionName, Unit unit) {
-        this.newRegionName = newRegionName;
+    public NewRegionNameMessage(Region region, Unit unit,
+                                String newRegionName) {
+        this.regionId = region.getId();
         this.unitId = unit.getId();
+        this.newRegionName = newRegionName;
     }
 
     /**
@@ -63,8 +73,40 @@ public class NewRegionNameMessage extends Message {
      * @param element The <code>Element</code> to use to create the message.
      */
     public NewRegionNameMessage(Game game, Element element) {
-        this.newRegionName = element.getAttribute("newRegionName");
+        this.regionId = element.getAttribute("region");
         this.unitId = element.getAttribute("unit");
+        this.newRegionName = element.getAttribute("newRegionName");
+    }
+
+    /**
+     * Public accessor for the region.
+     *
+     * @param game The <code>Game</code> to look for a region in.
+     * @return The region of this message.
+     */
+    public Region getRegion(Game game) {
+        Object o = game.getFreeColGameObjectSafely(regionId);
+        return (o instanceof Region) ? (Region) o : null;
+    }
+
+    /**
+     * Public accessor for the unit.
+     *
+     * @param game The <code>Game</code> to look for a unit in.
+     * @return The unit of this message.
+     */
+    public Unit getUnit(Game game) {
+        Object o = game.getFreeColGameObjectSafely(unitId);
+        return (o instanceof Unit) ? (Unit) o : null;
+    }
+
+    /**
+     * Public accessor for the new region name.
+     *
+     * @return The new region name of this message.
+     */
+    public String getNewRegionName() {
+        return newRegionName;
     }
 
     /**
@@ -74,8 +116,7 @@ public class NewRegionNameMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return An update containing the newRegionNamed unit,
-     *         or an error <code>Element</code> on failure.
+     * @return Null.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -97,6 +138,10 @@ public class NewRegionNameMessage extends Message {
         if (region.isPacific()) {
             return Message.clientError("Can not rename the Pacific!");
         }
+        if (!region.getId().equals(regionId)) {
+            return Message.clientError("Region mismatch, " + region.getId()
+                + " != " + regionId);
+        }
 
         // Do the discovery
         return server.getInGameController()
@@ -110,8 +155,9 @@ public class NewRegionNameMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("newRegionName", newRegionName);
+        result.setAttribute("region", regionId);
         result.setAttribute("unit", unitId);
+        result.setAttribute("newRegionName", newRegionName);
         return result;
     }
 

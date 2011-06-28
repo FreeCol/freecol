@@ -51,7 +51,6 @@ import org.w3c.dom.Element;
 public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     private static final Logger logger = Logger.getLogger(AIMain.class.getName());
 
-
     private FreeColServer freeColServer;
     private int nextID = 1;
 
@@ -60,9 +59,6 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     * and <code>AIObject</code>s.
     */
     private HashMap<String, AIObject> aiObjects = new HashMap<String, AIObject>();
-
-
-
 
     /**
     * Creates a new <code>AIMain</code> and searches the current
@@ -484,23 +480,26 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
      * Computes how many objects of each class have been created, 
      * to track memory leaks over time
      */
-    public HashMap<String, Long> getAIStatistics() {
-        
-        HashMap<String, Long> map = new HashMap<String, Long>();
+    public HashMap<String, String> getAIStatistics() {
+        HashMap<String, String> stats = new HashMap<String, String>();
+        HashMap<String, Long> objStats = new HashMap<String, Long>();
         Iterator<AIObject> iter = aiObjects.values().iterator();
         while (iter.hasNext()) {
             AIObject obj = iter.next();
             String className = obj.getClass().getSimpleName();
-            if (map.containsKey(className)) {
-                Long count = map.get(className);
+            if (objStats.containsKey(className)) {
+                Long count = objStats.get(className);
                 count++;
-                map.put(className, count);
+                objStats.put(className, count);
             } else {
                 Long count = new Long(1);
-                map.put(className, count);
+                objStats.put(className, count);
             }
         }
-        
-        return map;
+        for (String k : objStats.keySet()) {
+            stats.put(k, Long.toString(objStats.get(k)));
+        }
+
+        return stats;
     }
 }

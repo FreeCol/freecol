@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
@@ -56,6 +57,7 @@ import net.sf.freecol.common.networking.EquipUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -76,6 +78,7 @@ import org.w3c.dom.Element;
  * Wrapper class for AI message handling.
  */
 public class AIMessage {
+
     private static final Logger logger = Logger.getLogger(AIMessage.class.getName());
 
     /**
@@ -253,6 +256,25 @@ public class AIMessage {
 
 
     /**
+     * Choose a new founding father.
+     *
+     * @param conn The <code>Connection</code> to send on.
+     * @param ff The <code>FoundingFather</code> to choose.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askChooseFoundingFather(Connection conn,
+                                                  FoundingFather ff) {
+        return sendTrivial(conn, "chooseFoundingFather",
+            "foundingFather", ff.getId());
+    }
+
+
+    /**
+      * Claims a tile for a colony.
+      *
+      * @param conn The <code>Connection</code> to send on.
+
+    /**
      * Claims a tile for a colony.
      *
      * @param conn The <code>Connection</code> to send on.
@@ -345,7 +367,18 @@ public class AIMessage {
      */
     public static boolean askEmigrate(Connection connection, int slot) {
         return sendMessage(connection,
-                           new EmigrateUnitMessage(slot));
+            new EmigrateUnitMessage(slot));
+    }
+
+
+    /**
+     * Ends the player turn.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askEndTurn(Connection connection) {
+        return sendTrivial(connection, "endTurn");
     }
 
 
@@ -424,6 +457,21 @@ public class AIMessage {
     public static boolean askLoadCargo(AIUnit aiUnit, Goods goods) {
         return sendMessage(aiUnit.getConnection(),
                            new LoadCargoMessage(goods, aiUnit.getUnit()));
+    }
+
+
+    /**
+     * An AI unit loots some cargo.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is looting.
+     * @param defenderId The id of the defending unit.
+     * @param goods A list of <code>Goods</code> to loot.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askLoot(AIUnit aiUnit, String defenderId,
+                                  List<Goods> goods) {
+        return sendMessage(aiUnit.getConnection(),
+            new LootCargoMessage(aiUnit.getUnit(), defenderId, goods));
     }
 
 

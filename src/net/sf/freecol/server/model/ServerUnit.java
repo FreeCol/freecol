@@ -65,9 +65,12 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.NewLandNameMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 
 
@@ -680,8 +683,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     && !serverPlayer.isAI()) { // TODO: let the AI select
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "fountainOfYouth", Integer.toString(dx));
+                    cs.addTrivial(See.only(serverPlayer), "fountainOfYouth",
+                        ChangeSet.ChangePriority.CHANGE_LATE,
+                        "migrants", Integer.toString(dx));
                 } else {
                     List<RandomChoice<UnitType>> recruitables
                         = serverPlayer.generateRecruitablesList();
@@ -835,18 +839,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
 
             // Check for first landing
+            String newLand = null;
             if (serverPlayer.isEuropean()
                 && !serverPlayer.isNewLandNamed()) {
-                String newLand = Messages.getNewLandName(serverPlayer);
-                if (serverPlayer.isAI()) {
-                    // TODO: Not convinced shortcutting the AI like
-                    // this is a good idea, this really should be in
-                    // the AI code.
-                    serverPlayer.setNewLandName(newLand);
-                } else { // Ask player to name the land.
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "nameNewLand", newLand);
-                }
+                newLand = Messages.getNewLandName(serverPlayer);
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                        "EventPanel.FIRST_LANDING", serverPlayer));
             }
 
             // Check for new contacts.
@@ -919,15 +918,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 // Now make the contact properly.
                 serverPlayer.csChangeStance(Stance.PEACE, other, true, cs);
                 serverPlayer.setTension(other,
-                                        new Tension(Tension.TENSION_MIN));
+                    new Tension(Tension.TENSION_MIN));
                 other.setTension(serverPlayer,
-                                 new Tension(Tension.TENSION_MIN));
+                    new Tension(Tension.TENSION_MIN));
             }
-            if (welcomer != null) {
-                cs.addAttribute(See.only(serverPlayer), "welcome",
-                    welcomer.getId());
-                cs.addAttribute(See.only(serverPlayer), "camps",
-                    Integer.toString(welcomer.getNumberOfSettlements()));
+            if (newLand != null) {
+                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                    new NewLandNameMessage(this, newLand, welcomer,
+                        ((welcomer == null) ? -1
+                            : welcomer.getNumberOfSettlements()), false));
             }
         } else { // water
             for (Tile t : newTile.getSurroundingTiles(1, 1)) {
@@ -942,35 +941,32 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Check for slowing units.
         Unit slowedBy = getSlowedBy(newTile, random);
         if (slowedBy != null) {
-            cs.addAttribute(See.only(serverPlayer), "slowedBy",
-                            slowedBy.getId());
+            StringTemplate enemy = slowedBy.getApparentOwnerName();
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    "model.unit.slowed", this, slowedBy)
+                .addStringTemplate("%unit%", Messages.getLabel(this))
+                .addStringTemplate("%enemyUnit%", Messages.getLabel(slowedBy))
+                .addStringTemplate("%enemyNation%", enemy));
         }
 
         // Check for region discovery
         Region region = newTile.getDiscoverableRegion();
         if (serverPlayer.isEuropean() && region != null) {
             if (region.isPacific()) {
-                cs.addAttribute(See.only(serverPlayer),
-                                "discoverPacific", "true");
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                        "EventPanel.DISCOVER_PACIFIC", serverPlayer));
                 cs.addRegion(serverPlayer, region,
-                             Messages.message("model.region.pacific"));
+                    Messages.message("model.region.pacific"));
             } else {
-                String regionName = Messages.getDefaultRegionName(serverPlayer,
-                                                                  region.getType());
-                if (serverPlayer.isAI()) {
-                    // TODO: here is another dubious AI shortcut.
-                    cs.addRegion(serverPlayer, region, regionName);
-                } else { // Ask player to name the region.
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "discoverRegion", regionName);
-                    cs.addAttribute(See.only(serverPlayer),
-                                    "regionType",
-                                    Messages.message(region.getLabel()));
-                }
+                String defaultName = Messages.getDefaultRegionName(serverPlayer,
+                    region.getType());
+                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                    new NewRegionNameMessage(region, this, defaultName));
             }
         }
     }
-
 
     /**
      * Remove equipment from a unit.

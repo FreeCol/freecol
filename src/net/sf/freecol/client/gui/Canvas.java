@@ -1653,56 +1653,73 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Filters out and displays the EventPanel messages.
+     *
+     * @param messages The list of <code>ModelMessage</code> to filter.
+     * @return The list of messages without any EventPanel messages.
+     */
+    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
+        final String eventMatch = "EventPanel.";
+        List<ModelMessage> normal = new ArrayList<ModelMessage>();
+        for (int i = 0; i < messages.length; i++) {
+            String id = messages[i].getId();
+            if (id.startsWith(eventMatch)) {
+                id = id.substring(eventMatch.length());
+                final EventType e = EventType.valueOf(id);
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            showEventPanel(e);
+                        }
+                    });
+            } else {
+                normal.add(messages[i]);
+            }
+        }
+        return normal;
+    }
+
+    /**
      * Displays a number of ModelMessages.
      *
      * @param modelMessages
      */
     public void showModelMessages(ModelMessage... modelMessages) {
-        if (modelMessages.length == 1) {
-            // If this singleton message is an event, use an event panel
-            final String toMatch = "EventPanel.";
-            String id = modelMessages[0].getId();
-            if (id.startsWith(toMatch)) {
-                id = id.substring(toMatch.length());
-                try {
-                    EventType e = EventType.valueOf(id);
-                    showEventPanel(e);
-                    return;
-                } catch (IllegalArgumentException e) {} // ignore
-            }
-        }
-
+        List<ModelMessage> messages = filterEventPanels(modelMessages);
         Game game = freeColClient.getGame();
         String okText = "ok";
         String cancelText = "display";
-        String[] messageText = new String[modelMessages.length];
-        ImageIcon[] messageIcon = new ImageIcon[modelMessages.length];
+        String[] messageText = new String[messages.size()];
+        ImageIcon[] messageIcon = new ImageIcon[messages.size()];
         try {
             okText = Messages.message(okText);
         } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + okText + ".");
+            logger.warning("could not find message with id: "
+                + okText + ".");
         }
         try {
             cancelText = Messages.message(cancelText);
         } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + cancelText + ".");
+            logger.warning("could not find message with id: "
+                + cancelText + ".");
         }
-        for (int i = 0; i < modelMessages.length; i++) {
+        for (int i = 0; i < messages.size(); i++) {
             try {
-                messageText[i] = Messages.message(modelMessages[i]);
+                messageText[i] = Messages.message(messages.get(i));
             } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + modelMessages[i].getId() + ".");
+                logger.warning("could not find message with id: "
+                    + messages.get(i).getId() + ".");
             }
-            messageIcon[i] = getImageIcon(game.getMessageDisplay(modelMessages[i]), false);
+            messageIcon[i] = getImageIcon(game
+                .getMessageDisplay(messages.get(i)), false);
         }
 
         // source should be the same for all messages
-        FreeColGameObject source = game.getMessageSource(modelMessages[0]);
+        FreeColGameObject source = game.getMessageSource(messages.get(0));
         if ((source instanceof Europe && !europePanel.isShowing())
-                || (source instanceof Colony || source instanceof WorkLocation)) {
-
-            FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText,
-                    cancelText);
+            || (source instanceof Colony || source instanceof WorkLocation)) {
+            FreeColDialog<Boolean> confirmDialog
+                = FreeColDialog.createConfirmDialog(messageText, messageIcon,
+                    okText, cancelText);
             if (showFreeColDialog(confirmDialog)) {
                 if (!isShowingSubPanel()) {
                     freeColClient.getInGameController().nextModelMessage();
@@ -1718,7 +1735,7 @@ public final class Canvas extends JDesktopPane {
             }
         } else {
             showFreeColDialog(new InformationDialog(this,
-                                                    messageText, messageIcon));
+                    messageText, messageIcon));
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
             }

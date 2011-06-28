@@ -39,6 +39,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.server.model.ServerModelObject;
 
@@ -937,6 +938,56 @@ public class Game extends FreeColGameObject {
     public boolean equals(Object o) {
         return this == o;
     }
+
+
+    /**
+     * Gets the statistics of this game.
+     *
+     * @param aiMain The (optional) AI.
+     * @return A <code>Map</code> of the statistics.
+     */
+    public java.util.Map<String, String> getStatistics(AIMain aiMain) {
+        java.util.Map<String, String> stats = new HashMap<String, String>();
+
+        // Memory
+        System.gc();
+        long free = Runtime.getRuntime().freeMemory()/(1024*1024);
+        long total = Runtime.getRuntime().totalMemory()/(1024*1024);
+        long max = Runtime.getRuntime().maxMemory()/(1024*1024);
+        stats.put("freeMemory", Long.toString(free));
+        stats.put("totalMemory", Long.toString(total));
+        stats.put("maxMemory", Long.toString(max));
+
+        // Game objects
+        java.util.Map<String, Long> objStats = new HashMap<String, Long>();
+        long disposed = 0;
+        Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
+        while (iter.hasNext()) {
+            FreeColGameObject obj = iter.next();
+            String className = obj.getClass().getSimpleName();
+            if (objStats.containsKey(className)) {
+                Long count = objStats.get(className);
+                count++;
+                objStats.put(className, count);
+            } else {
+                Long count = new Long(1);
+                objStats.put(className, count);
+            }
+            if (obj.isDisposed()) disposed++;
+        }
+        stats.put("disposed", Long.toString(disposed));
+        for (String k : objStats.keySet()) {
+            stats.put(k, Long.toString(objStats.get(k)));
+        }
+
+        // Add AI if supplied.
+        if (aiMain != null) {
+            stats.putAll(aiMain.getAIStatistics());
+        }
+
+        return stats;
+    }
+
 
     // comment of Janet: latter is a sick implementation as long as hashCode
     // cannot be rooted back to class Object's functionality
