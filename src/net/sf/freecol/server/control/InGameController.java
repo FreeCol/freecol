@@ -497,9 +497,12 @@ public final class InGameController extends Controller {
      * @param is The <code>IndianSettlement</code> to contact.
      * @param scout True if this contact is due to a scout asking to
      *     speak to the chief.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    private void speakToChief(ServerPlayer serverPlayer, IndianSettlement is,
-                              boolean scout) {
+    private void csSpeakToChief(ServerPlayer serverPlayer, IndianSettlement is,
+                                boolean scout, ChangeSet cs) {
+        serverPlayer.csContact((ServerPlayer) is.getOwner(), null, cs);
+        is.makeContactSettlement(serverPlayer);
         if (scout || getGame().getSpecification()
             .getBooleanOption("model.option.settlementActionsContactChief")
             .getValue()) {
@@ -1666,8 +1669,7 @@ public final class InGameController extends Controller {
                                  IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        csSpeakToChief(serverPlayer, settlement, false, cs);
         Tile tile = settlement.getTile();
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
@@ -1701,11 +1703,10 @@ public final class InGameController extends Controller {
                                        + " at " + settlement.getName());
         }
 
-        ChangeSet cs = new ChangeSet();
-
         // Try to learn
+        ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
-        speakToChief(serverPlayer, settlement, false);
+        csSpeakToChief(serverPlayer, settlement, false, cs);
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed
             cs.add(See.perhaps().always(serverPlayer),
@@ -1748,8 +1749,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         final int TURNS_PER_TRIBUTE = 5;
 
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        csSpeakToChief(serverPlayer, settlement, false, cs);
 
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
@@ -1863,10 +1863,8 @@ public final class InGameController extends Controller {
             }
 
             // Have now spoken to the chief.
-            if (!"nothing".equals(result)) {
-                speakToChief(serverPlayer, settlement, true);
-                tileDirty = true;
-            }
+            csSpeakToChief(serverPlayer, settlement, true, cs);
+            if (!"nothing".equals(result)) tileDirty = true;
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
@@ -1916,8 +1914,8 @@ public final class InGameController extends Controller {
      */
     public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
                                    IndianSettlement settlement) {
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        ChangeSet cs = new ChangeSet();
+        csSpeakToChief(serverPlayer, settlement, false, cs);
 
         // Determine result
         Unit missionary = settlement.getMissionary();
@@ -1937,8 +1935,6 @@ public final class InGameController extends Controller {
         if (denounce < 0.5) { // Success, remove old mission and establish ours
             return establishMission(serverPlayer, unit, settlement);
         }
-
-        ChangeSet cs = new ChangeSet();
 
         // Denounce failed
         Player owner = settlement.getOwner();
@@ -1975,9 +1971,7 @@ public final class InGameController extends Controller {
     public Element establishMission(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
-
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        csSpeakToChief(serverPlayer, settlement, false, cs);
 
         Unit missionary = settlement.getMissionary();
         Tile tile = settlement.getTile();
@@ -2050,12 +2044,9 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = settlement.getTile();
-        if (settlement.makeContactSettlement(serverPlayer)
-            || !settlement.hasSpokenToChief(serverPlayer)) {
-            speakToChief(serverPlayer, settlement, false);
-            tile.updatePlayerExploredTile(serverPlayer, true);
-            cs.add(See.only(serverPlayer), tile);
-        }
+        csSpeakToChief(serverPlayer, settlement, false, cs);
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
         ServerPlayer enemyPlayer = (ServerPlayer) enemy;
@@ -2169,8 +2160,8 @@ public final class InGameController extends Controller {
     public Element buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        ChangeSet cs = new ChangeSet();
+        csSpeakToChief(serverPlayer, settlement, false, cs);
 
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
@@ -2194,7 +2185,6 @@ public final class InGameController extends Controller {
             return Message.clientError("Insufficient gold to buy.");
         }
 
-        ChangeSet cs = new ChangeSet();
         // Valid, make the trade.
         moveGoods(goods, unit);
         cs.add(See.perhaps(), unit);
@@ -2232,8 +2222,8 @@ public final class InGameController extends Controller {
     public Element sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
-        settlement.makeContactSettlement(serverPlayer);
-        speakToChief(serverPlayer, settlement, false);
+        ChangeSet cs = new ChangeSet();
+        csSpeakToChief(serverPlayer, settlement, false, cs);
 
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
@@ -2251,7 +2241,6 @@ public final class InGameController extends Controller {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }
 
-        ChangeSet cs = new ChangeSet();
         // Valid, make the trade.
         moveGoods(goods, settlement);
         cs.add(See.perhaps(), unit);
@@ -2304,8 +2293,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         if (settlement instanceof IndianSettlement) {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            indianSettlement.makeContactSettlement(serverPlayer);
-            speakToChief(serverPlayer, indianSettlement, false);
+            csSpeakToChief(serverPlayer, indianSettlement, false, cs);
             cs.add(See.only(serverPlayer),
                    indianSettlement.modifyAlarm(serverPlayer,
                    -indianSettlement.getPriceToBuy(goods) / 50));

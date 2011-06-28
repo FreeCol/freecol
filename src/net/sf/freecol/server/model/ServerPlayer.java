@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -3130,6 +3131,86 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else {
             cs.addPartial(See.only(this), this, "tax");
         }
+    }
+
+
+    /**
+     * Check for a special contact panel for a nation.  If not found,
+     * check for a more general one if allowed.
+     * Assumes this player is European.
+     *
+     * @param other The <code>Player</code> nation to being contacted.
+     * @return An <code>EventPanel</code> key, or null if none appropriate.
+     */
+    private String getContactKey(ServerPlayer other) {
+        String key = "EventPanel.MEETING_" + other.getNationNameKey();
+        if (!Messages.containsKey(key)) {
+            if (other.isEuropean()) {
+                key = (hasContactedEuropeans()) ? null
+                    : "EventPanel.MEETING_EUROPEANS";
+            } else {
+                key = (hasContactedIndians()) ? null
+                    : "EventPanel.MEETING_NATIVES";
+            }
+        }
+        return key;
+    }
+
+    /**
+     * Make contact between two nations if necessary.
+     *
+     * @param other The other <code>ServerPlayer</code>.
+     * @param tile The <code>Tile</code> contact is made at.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return The other nation if it is welcoming this nation on first landing.
+     */
+    public ServerPlayer csContact(ServerPlayer other, Tile tile, ChangeSet cs) {
+        if (hasContacted(other)) return null;
+
+        // Must be a first contact!
+        Game game = getGame();
+        Turn turn = game.getTurn();
+        ServerPlayer welcomer = null;
+        if (isIndian()) {
+            // Ignore native-to-native contacts.
+            if (!other.isIndian()) {
+                String key = other.getContactKey(this);
+                if (key != null) {
+                    cs.addMessage(See.only(other),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            key, other, this));
+                }
+                cs.addHistory(other, new HistoryEvent(turn,
+                        HistoryEvent.EventType.MEET_NATION)
+                    .addStringTemplate("%nation%", getNationName()));
+            }
+        } else { // (serverPlayer.isEuropean)
+            String key = getContactKey(other);
+            if (key != null) {
+                cs.addMessage(See.only(this),
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                        key, this, other));
+            }
+
+            // History event for European players.
+            cs.addHistory(this, new HistoryEvent(turn,
+                    HistoryEvent.EventType.MEET_NATION)
+                .addStringTemplate("%nation%", other.getNationName()));
+
+            // Extra special meeting on first landing!
+            if (other.isIndian()
+                && !isNewLandNamed()
+                && tile != null && tile.getOwner() == other) {
+                welcomer = other;
+            }
+        }
+
+        // Now make the contact properly.
+        csChangeStance(Stance.PEACE, other, true, cs);
+        setTension(other, new Tension(Tension.TENSION_MIN));
+        other.setTension(this, new Tension(Tension.TENSION_MIN));
+
+        return welcomer;
     }
 
 

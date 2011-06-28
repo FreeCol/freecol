@@ -730,28 +730,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
     /**
-     * Check for a special contact panel for a nation.  If not found,
-     * check for a more general one if allowed.
-     *
-     * @param player A European <code>Player</code> making contact.
-     * @param other The <code>Player</code> nation to being contacted.
-     * @return An <code>EventPanel</code> key, or null if none appropriate.
-     */
-    private String getContactKey(Player player, Player other) {
-        String key = "EventPanel.MEETING_" + other.getNationNameKey();
-        if (!Messages.containsKey(key)) {
-            if (other.isEuropean()) {
-                key = (player.hasContactedEuropeans()) ? null
-                    : "EventPanel.MEETING_EUROPEANS";
-            } else {
-                key = (player.hasContactedIndians()) ? null
-                    : "EventPanel.MEETING_NATIVES";
-            }
-        }
-        return key;
-    }
-
-    /**
      * Collects the tiles surrounding this unit that the player
      * can not currently see, but now should as a result of a move.
      *
@@ -859,6 +837,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 settlement = t.getSettlement();
                 if (settlement != null) {
                     other = (ServerPlayer) t.getSettlement().getOwner();
+                    // Initialize alarm for native settlements.
+                    if (other.isIndian()) {
+                        IndianSettlement is = (IndianSettlement) settlement;
+                        if (!is.hasContactedSettlement(serverPlayer)) {
+                            is.makeContactSettlement(serverPlayer);
+                            cs.add(See.only(serverPlayer), is);
+                        }
+                    }
                 } else if (t.getFirstUnit() != null) {
                     other = (ServerPlayer) t.getFirstUnit().getOwner();
                 }
@@ -868,59 +854,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
                 csActivateSentries(t, cs);
 
-                // Ignore previously contacted nations.
-                if (serverPlayer.hasContacted(other)) continue;
-
-                // Must be a first contact!
-                if (serverPlayer.isIndian()) {
-                    // Ignore native-to-native contacts.
-                    if (!other.isIndian()) {
-                        String key = getContactKey(other, serverPlayer);
-                        if (key != null) {
-                            cs.addMessage(See.only(other),
-                                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                 key, other, serverPlayer));
-                        }
-                        cs.addHistory(other, new HistoryEvent(turn,
-                                HistoryEvent.EventType.MEET_NATION)
-                                .addStringTemplate("%nation%", serverPlayer.getNationName()));
-                    }
-                } else { // (serverPlayer.isEuropean)
-                    // Initialize alarm for native settlements.
-                    if (other.isIndian() && settlement != null) {
-                        IndianSettlement is = (IndianSettlement) settlement;
-                        if (!is.hasContactedSettlement(serverPlayer)) {
-                            is.makeContactSettlement(serverPlayer);
-                            cs.add(See.only(serverPlayer), is);
-                        }
-                    }
-
-                    // Add first contact messages.
-                    String key = getContactKey(serverPlayer, other);
-                    if (key != null) {
-                        cs.addMessage(See.only(serverPlayer),
-                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                             key, serverPlayer, other));
-                    }
-
-                    // History event for European players.
-                    cs.addHistory(serverPlayer, new HistoryEvent(turn,
-                            HistoryEvent.EventType.MEET_NATION)
-                            .addStringTemplate("%nation%", other.getNationName()));
-                    // Extra special meeting on first landing!
-                    if (other.isIndian()
-                        && !serverPlayer.isNewLandNamed()
-                        && (welcomer == null || newTile.getOwner() == other)) {
-                        welcomer = other;
-                    }
+                if (serverPlayer.csContact(other, newTile, cs) != null) {
+                    welcomer = other;
                 }
-
-                // Now make the contact properly.
-                serverPlayer.csChangeStance(Stance.PEACE, other, true, cs);
-                serverPlayer.setTension(other,
-                    new Tension(Tension.TENSION_MIN));
-                other.setTension(serverPlayer,
-                    new Tension(Tension.TENSION_MIN));
             }
             if (newLand != null) {
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
