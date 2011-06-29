@@ -40,7 +40,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ChipResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -78,7 +78,7 @@ public final class PreGameController {
         freeColClient.getMyPlayer().setReady(ready);
 
         // Inform the server:
-        Element readyElement = Message.createNewRootElement("ready");
+        Element readyElement = DOMMessage.createNewRootElement("ready");
         readyElement.setAttribute("value", Boolean.toString(ready));
 
         freeColClient.getClient().send(readyElement);
@@ -94,7 +94,7 @@ public final class PreGameController {
         freeColClient.getMyPlayer().setNation(nation);
 
         // Inform the server:
-        Element nationElement = Message.createNewRootElement("setNation");
+        Element nationElement = DOMMessage.createNewRootElement("setNation");
         nationElement.setAttribute("value", nation.getId());
 
         freeColClient.getClient().sendAndWait(nationElement);
@@ -110,7 +110,7 @@ public final class PreGameController {
         freeColClient.getMyPlayer().setNationType(nationType);
 
         // Inform the server:
-        Element nationTypeElement = Message.createNewRootElement("setNationType");
+        Element nationTypeElement = DOMMessage.createNewRootElement("setNationType");
         nationTypeElement.setAttribute("value", nationType.getId());
 
         freeColClient.getClient().sendAndWait(nationTypeElement);
@@ -119,7 +119,7 @@ public final class PreGameController {
 
     public void setAvailable(Nation nation, NationState state) {
         freeColClient.getGame().getNationOptions().getNations().put(nation, state);
-        Element availableElement = Message.createNewRootElement("setAvailable");
+        Element availableElement = DOMMessage.createNewRootElement("setAvailable");
         availableElement.setAttribute("nation", nation.getId());
         availableElement.setAttribute("state", state.toString());
         freeColClient.getClient().sendAndWait(availableElement);
@@ -138,7 +138,7 @@ public final class PreGameController {
             return;
         }
 
-        Element requestLaunchElement = Message.createNewRootElement("requestLaunch");
+        Element requestLaunchElement = DOMMessage.createNewRootElement("requestLaunch");
         freeColClient.getClient().send(requestLaunchElement);
 
         canvas.showStatusPanel( Messages.message("status.startingGame") );
@@ -163,7 +163,7 @@ public final class PreGameController {
     * This method should be called after updating that object.
     */
     public void sendGameOptions() {
-        Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
+        Element updateGameOptionsElement = DOMMessage.createNewRootElement("updateGameOptions");
         OptionGroup gameOptions = freeColClient.getGame().getSpecification().getOptionGroup("gameOptions");
         updateGameOptionsElement.appendChild(gameOptions.toXMLElement(updateGameOptionsElement.getOwnerDocument()));
         freeColClient.getClient().send(updateGameOptionsElement);
@@ -175,7 +175,7 @@ public final class PreGameController {
      */
      public void sendMapGeneratorOptions() {
          OptionGroup mapGeneratorOptions = freeColClient.getGame().getMapGeneratorOptions();
-         Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
+         Element updateMapGeneratorOptionsElement = DOMMessage.createNewRootElement("updateMapGeneratorOptions");
          updateMapGeneratorOptionsElement
              .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
          //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);

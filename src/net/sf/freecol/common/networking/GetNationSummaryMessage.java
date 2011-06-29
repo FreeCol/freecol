@@ -34,7 +34,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when summarizing a nation.
  */
-public class GetNationSummaryMessage extends Message {
+public class GetNationSummaryMessage extends DOMMessage {
 
     /**
      * The id of the player to summarize.
@@ -99,10 +99,10 @@ public class GetNationSummaryMessage extends Message {
         if (fcgo instanceof Player) {
             player = (Player) fcgo;
         } else {
-            return Message.clientError("Not a player: " + playerId);
+            return DOMMessage.clientError("Not a player: " + playerId);
         }
         if (player.isIndian() && !serverPlayer.hasContacted(player)) {
-            return Message.clientError("Not contacted: " + playerId);
+            return DOMMessage.clientError("Not contacted: " + playerId);
         }
 
         // Proceed to get the summary.

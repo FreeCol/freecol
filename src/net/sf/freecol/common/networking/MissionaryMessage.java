@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a missionary establishes/denounces a mission.
  */
-public class MissionaryMessage extends Message {
+public class MissionaryMessage extends DOMMessage {
     /**
      * The id of the missionary.
      */
@@ -96,43 +96,41 @@ public class MissionaryMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction + " from unit: " + unitId);
         }
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return Message.clientError("There is no native settlement at: "
-                                       + tile.getId());
+            return DOMMessage.clientError("There is no native settlement at: "
+                + tile.getId());
         }
         Unit missionary = is.getMissionary();
         if (denounce) {
             if (missionary == null) {
-                return Message.clientError("Denouncing an empty mission at: "
-                                           + is.getId());
+                return DOMMessage.clientError("Denouncing an empty mission at: "
+                    + is.getId());
             } else if (missionary.getOwner() == player) {
-                return Message.clientError("Denouncing our own missionary at: "
-                                           + is.getId());
+                return DOMMessage.clientError("Denouncing our own missionary at: "
+                    + is.getId());
             }
         } else {
             if (missionary != null) {
-                return Message.clientError("Establishing extra mission at: "
-                                           + is.getId());
+                return DOMMessage.clientError("Establishing extra mission at: "
+                    + is.getId());
             }
         }
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            return Message.clientError("Unable to enter "
-                                       + is.getName()
-                                       + ": " + type.whyIllegal());
+            return DOMMessage.clientError("Unable to enter " + is.getName()
+                + ": " + type.whyIllegal());
         }
 
         // Valid, proceed to denounce/establish.

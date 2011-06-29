@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when executing a diplomatic trade.
  */
-public class DiplomacyMessage extends Message {
+public class DiplomacyMessage extends DOMMessage {
 
     /**
      * The id of the object doing the trading.
@@ -145,49 +145,50 @@ public class DiplomacyMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Settlement settlement;
         try {
             settlement = server.getAdjacentSettlementSafely(settlementId, unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!(settlement instanceof Colony)) {
-            return Message.clientError("Settlement is not a colony: "
-                                       + settlementId);
+            return DOMMessage.clientError("Settlement is not a colony: "
+                + settlementId);
         }
         MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
-            return Message.clientError("Unable to enter "
-                                       + settlement.getName()
-                                       + ": " + type.whyIllegal());
+            return DOMMessage.clientError("Unable to enter "
+                + settlement.getName() + ": " + type.whyIllegal());
         }
         if (agreement == null) {
-            return Message.clientError("DiplomaticTrade with null agreement.");
+            return DOMMessage.clientError("DiplomaticTrade with null agreement.");
         }
         if (agreement.getSender() != serverPlayer) {
-            return Message.clientError("DiplomaticTrade received from player who is not the sender: " + serverPlayer.getId());
+            return DOMMessage.clientError("DiplomaticTrade received from player who is not the sender: "
+                + serverPlayer.getId());
         }
         ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
         if (enemyPlayer == null) {
-            return Message.clientError("DiplomaticTrade recipient is null");
+            return DOMMessage.clientError("DiplomaticTrade recipient is null");
         }
         if (enemyPlayer == serverPlayer) {
-            return Message.clientError("DiplomaticTrade recipient matches sender: "
-                                       + serverPlayer.getId());
+            return DOMMessage.clientError("DiplomaticTrade recipient matches sender: "
+                + serverPlayer.getId());
         }
         Player settlementPlayer = settlement.getOwner();
         if (settlementPlayer != (Player) enemyPlayer) {
-            return Message.clientError("DiplomaticTrade recipient: " + enemyPlayer.getId()
-                                       + " does not match Settlement owner: " + settlementPlayer);
+            return DOMMessage.clientError("DiplomaticTrade recipient: "
+                + enemyPlayer.getId()
+                + " does not match Settlement owner: " + settlementPlayer);
         }
         if (enemyPlayer == serverPlayer.getREFPlayer()) {
-            return Message.clientError("Player can not negotiate with the REF: "
-                                       + serverPlayer.getId());
+            return DOMMessage.clientError("Player can not negotiate with the REF: "
+                + serverPlayer.getId());
         }
 
         // Valid, try to trade.

@@ -79,7 +79,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -391,7 +391,7 @@ public final class FreeColServer {
                 }
                 p.setDead(false);
                 p.setPlayerType(PlayerType.UNDEAD);
-                Element updateElement = Message.createNewRootElement("update");
+                Element updateElement = DOMMessage.createNewRootElement("update");
                 updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
                                                                                                   .getOwnerDocument()));
                 updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
@@ -473,9 +473,9 @@ public final class FreeColServer {
         try {
             Element element;
             if (firstTime) {
-                element = Message.createNewRootElement("register");
+                element = DOMMessage.createNewRootElement("register");
             } else {
-                element = Message.createNewRootElement("update");
+                element = DOMMessage.createNewRootElement("update");
             }
             // TODO: Add possibility of choosing a name:
             if (name != null) {
@@ -524,7 +524,7 @@ public final class FreeColServer {
             return;
         }
         try {
-            Element element = Message.createNewRootElement("remove");
+            Element element = DOMMessage.createNewRootElement("remove");
             element.setAttribute("port", Integer.toString(port));
             mc.send(element);
         } catch (IOException e) {
@@ -1065,7 +1065,7 @@ public final class FreeColServer {
         playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            Element reconnect = Message.createNewRootElement("reconnect");
+            Element reconnect = DOMMessage.createNewRootElement("reconnect");
             try {
                 player.getConnection().send(reconnect);
             } catch (IOException ex) {
@@ -1356,7 +1356,7 @@ public final class FreeColServer {
 
         // Send message to all players except to the new player:
         // TODO: null-destination-player is unnecessarily generous visibility
-        Element addNewPlayer = Message.createNewRootElement("addPlayer");
+        Element addNewPlayer = DOMMessage.createNewRootElement("addPlayer");
         addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
         getServer().sendToAll(addNewPlayer, theConnection);
         return aiPlayer;

@@ -31,7 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
@@ -41,20 +41,24 @@ import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Element;
 
+
 /**
-* Handles a new client connection. {@link PreGameInputHandler} is set
-* as the message handler when the client has successfully logged on.
-*/
-public final class UserConnectionHandler implements MessageHandler, StreamedMessageHandler {
+ * Handles a new client connection. {@link PreGameInputHandler} is set
+ * as the message handler when the client has successfully logged on.
+ */
+public final class UserConnectionHandler
+    implements MessageHandler, StreamedMessageHandler {
+
     private static Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 
 
     private final FreeColServer freeColServer;
 
+
     /**
-    * The constructor to use.
-    * @param freeColServer The main control object.
-    */
+     * The constructor to use.
+     * @param freeColServer The main control object.
+     */
     public UserConnectionHandler(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
     }
@@ -122,7 +126,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             return null;
         }
 
-        Element reply = Message.createNewRootElement("vacantPlayers");
+        Element reply = DOMMessage.createNewRootElement("vacantPlayers");
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
@@ -163,20 +167,20 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         }
 
         if (!freeColVersion.equals(FreeCol.getVersion())) {
-            Message.createError(out, "server.wrongFreeColVersion", "The game versions do not match.");
+            DOMMessage.createError(out, "server.wrongFreeColVersion", "The game versions do not match.");
             return;
         }
 
         if (freeColServer.getGameState() != FreeColServer.GameState.STARTING_GAME) {
             if (game.getPlayerByName(username) == null) {
-                Message.createError(out, "server.alreadyStarted", "The game has already been started!");
+                DOMMessage.createError(out, "server.alreadyStarted", "The game has already been started!");
                 logger.warning("game state: " + freeColServer.getGameState().toString());
                 return;
             }
 
             ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
             if (player.isConnected() && !player.isAI()) {
-                Message.createError(out, "server.usernameInUse", "The specified username is already in use.");
+                DOMMessage.createError(out, "server.usernameInUse", "The specified username is already in use.");
                 return;
             }
             player.setConnection(connection);
@@ -184,7 +188,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
             if (player.isAI()) {
                 player.setAI(false);
-                Element setAIElement = Message.createNewRootElement("setAI");
+                Element setAIElement = DOMMessage.createNewRootElement("setAI");
                 setAIElement.setAttribute("player", player.getId());
                 setAIElement.setAttribute("ai", Boolean.toString(false));
                 server.sendToAll(setAIElement);
@@ -237,18 +241,18 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             timeOut -= 1000;
 
             if (timeOut <= 0) {
-                Message.createError(out, "server.timeOut", "Timeout when connecting to the server.");
+                DOMMessage.createError(out, "server.timeOut", "Timeout when connecting to the server.");
                 return;
             }
         }
 
         if (!game.canAddNewPlayer()) {
-            Message.createError(out, "server.maximumPlayers", "Sorry, the maximum number of players reached.");
+            DOMMessage.createError(out, "server.maximumPlayers", "Sorry, the maximum number of players reached.");
             return;
         }
 
         if (game.playerNameInUse(username)) {
-            Message.createError(out, "server.usernameInUse", "The specified username is already in use.");
+            DOMMessage.createError(out, "server.usernameInUse", "The specified username is already in use.");
             return;
         }
 
@@ -262,7 +266,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         freeColServer.getGame().addPlayer(newPlayer);
 
         // Send message to all players except to the new player:
-        Element addNewPlayer = Message.createNewRootElement("addPlayer");
+        Element addNewPlayer = DOMMessage.createNewRootElement("addPlayer");
         addNewPlayer.appendChild(newPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
         freeColServer.getServer().sendToAll(addNewPlayer, connection);
 

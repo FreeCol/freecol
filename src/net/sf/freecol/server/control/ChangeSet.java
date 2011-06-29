@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -371,7 +371,7 @@ public class ChangeSet {
      */
     private static class MessageChange extends Change {
         private ChangePriority priority;
-        private Message message;
+        private DOMMessage message;
 
         /**
          * Build a new MessageChange.
@@ -380,7 +380,7 @@ public class ChangeSet {
          * @param priority The priority of the change.
          * @param message The <code>Message</code> to add.
          */
-        MessageChange(See see, ChangePriority priority, Message message) {
+        MessageChange(See see, ChangePriority priority, DOMMessage message) {
             super(see);
             this.priority = priority;
             this.message = message;
@@ -1001,7 +1001,7 @@ public class ChangeSet {
      * @param message The <code>Message</code> to add.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet add(See see, ChangePriority cp, Message message) {
+    public ChangeSet add(See see, ChangePriority cp, DOMMessage message) {
         changes.add(new MessageChange(see, cp, message));
         return this;
     }
@@ -1342,7 +1342,7 @@ public class ChangeSet {
         List<Change> c = new ArrayList<Change>(changes);
         List<Element> elements = new ArrayList<Element>();
         List<Change> diverted = new ArrayList<Change>();
-        Document doc = Message.createNewDocument();
+        Document doc = DOMMessage.createNewDocument();
 
         // For all sorted changes, if it is notifiable to the target
         // player then convert it to an Element, or divert for later

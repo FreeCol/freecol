@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit to Europe.
  */
-public class MoveToEuropeMessage extends Message {
+public class MoveToEuropeMessage extends DOMMessage {
 
     /**
      * The id of the object to be moved.
@@ -73,23 +73,23 @@ public class MoveToEuropeMessage extends Message {
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         if (!serverPlayer.canMoveToEurope()) {
-            return Message.clientError("Player " + player.getId()
-                                       + " can not move units to Europe.");
+            return DOMMessage.clientError("Player " + player.getId()
+                + " can not move units to Europe.");
         }
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.canMoveToEurope()) {
-            return Message.clientError("Unit can not move to Europe: "
-                                       + unitId);
+            return DOMMessage.clientError("Unit can not move to Europe: "
+                + unitId);
         }
         if (unit.getLocation() instanceof Europe || unit.getTile() != null) {
             ; // OK
         } else {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
 
         // Proceed to move.

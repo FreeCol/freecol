@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new region.
  */
-public class NewRegionNameMessage extends Message {
+public class NewRegionNameMessage extends DOMMessage {
 
     /**
      * The ID of the region being discovered.
@@ -125,21 +125,22 @@ public class NewRegionNameMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile tile = unit.getTile();
         if (tile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
-            return Message.clientError("No discoverable region for: " + unitId);
+            return DOMMessage.clientError("No discoverable region for: "
+                + unitId);
         }
         if (region.isPacific()) {
-            return Message.clientError("Can not rename the Pacific!");
+            return DOMMessage.clientError("Can not rename the Pacific!");
         }
         if (!region.getId().equals(regionId)) {
-            return Message.clientError("Region mismatch, " + region.getId()
+            return DOMMessage.clientError("Region mismatch, " + region.getId()
                 + " != " + regionId);
         }
 

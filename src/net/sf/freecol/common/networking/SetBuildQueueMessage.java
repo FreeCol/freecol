@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when setting the build queue.
  */
-public class SetBuildQueueMessage extends Message {
+public class SetBuildQueueMessage extends DOMMessage {
 
     /**
      * The id of the colony containing the queue.
@@ -109,14 +109,14 @@ public class SetBuildQueueMessage extends Message {
         if (game.getFreeColGameObject(colonyId) instanceof Colony) {
             colony = (Colony) game.getFreeColGameObject(colonyId);
         } else {
-            return Message.clientError("Not a colony: " + colonyId);
+            return DOMMessage.clientError("Not a colony: " + colonyId);
         }
         if (player != colony.getOwner()) {
-            return Message.clientError("Player does not own colony: "
-                                       + colonyId);
+            return DOMMessage.clientError("Player does not own colony: "
+                + colonyId);
         }
         if (queue == null) {
-            return Message.clientError("Empty queue");
+            return DOMMessage.clientError("Empty queue");
         }
         List<BuildableType> buildQueue = new ArrayList<BuildableType>();
         for (int i = 0; i < queue.length; i++) {
@@ -124,8 +124,8 @@ public class SetBuildQueueMessage extends Message {
             if (type instanceof BuildableType) {
                 buildQueue.add(i, (BuildableType) type);
             } else {
-                return Message.clientError("Not a buildable type id: "
-                                           + queue[i]);
+                return DOMMessage.clientError("Not a buildable type id: "
+                    + queue[i]);
             }
         }
 

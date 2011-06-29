@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests abandoning of a colony.
  */
-public class AbandonColonyMessage extends Message {
+public class AbandonColonyMessage extends DOMMessage {
 
     /**
      * The colony to abandon.
@@ -79,15 +79,16 @@ public class AbandonColonyMessage extends Message {
         if (game.getFreeColGameObject(colonyId) instanceof Colony) {
             colony = (Colony) game.getFreeColGameObject(colonyId);
         } else {
-            return Message.clientError("Not a colony: " + colonyId);
+            return DOMMessage.clientError("Not a colony: " + colonyId);
         }
         if (player != colony.getOwner()) {
-            return Message.clientError("Player does not own colony: " + colonyId);
+            return DOMMessage.clientError("Player does not own colony: "
+                + colonyId);
         }
         if (colony.getUnitCount() != 0) {
-            return Message.clientError("Attempt to abandon colony " + colonyId
-                                       + " with non-zero unit count "
-                                       + Integer.toString(colony.getUnitCount()));
+            return DOMMessage.clientError("Attempt to abandon colony "
+                + colonyId + " with non-zero unit count "
+                + Integer.toString(colony.getUnitCount()));
         }
 
         // Proceed to abandon

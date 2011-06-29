@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a trade route to a unit.
  */
-public class AssignTradeRouteMessage extends Message {
+public class AssignTradeRouteMessage extends DOMMessage {
 
     /**
      * The id of the unit.
@@ -86,10 +86,10 @@ public class AssignTradeRouteMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         TradeRoute tradeRoute;
         if (tradeRouteId == null) {
@@ -99,7 +99,8 @@ public class AssignTradeRouteMessage extends Message {
             tradeRoute
                 = (TradeRoute) game.getFreeColGameObjectSafely(tradeRouteId);
         } else {
-            return Message.clientError("Not a trade route: " + tradeRouteId);
+            return DOMMessage.clientError("Not a trade route: "
+                + tradeRouteId);
         }
 
         // Proceed to assign.

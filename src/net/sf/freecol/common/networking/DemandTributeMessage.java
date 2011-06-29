@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when demanding tribute from a native settlement.
  */
-public class DemandTributeMessage extends Message {
+public class DemandTributeMessage extends DOMMessage {
 
     /**
      * The id of the object demanding.
@@ -90,33 +90,32 @@ public class DemandTributeMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         if (!unit.isArmed() && unit.getRole() != Unit.Role.SCOUT) {
-            return Message.clientError("Unit is neither armed nor a scout: "
-                                       + unitId);
+            return DOMMessage.clientError("Unit is neither armed nor a scout: "
+                + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction
+                + " from unit: " + unitId);
         }
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return Message.clientError("There is no native settlement at: "
-                                       + tile.getId());
+            return DOMMessage.clientError("There is no native settlement at: "
+                + tile.getId());
         }
         MoveType type = unit.getMoveType(tile);
         if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-            return Message.clientError("Unable to demand tribute at: "
-                                       + is.getName()
-                                       + ": " + type.whyIllegal());
+            return DOMMessage.clientError("Unable to demand tribute at: "
+                + is.getName() + ": " + type.whyIllegal());
         }
 
         // Do the demand

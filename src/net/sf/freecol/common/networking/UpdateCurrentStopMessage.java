@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent updating a unit's current stop.
  */
-public class UpdateCurrentStopMessage extends Message {
+public class UpdateCurrentStopMessage extends DOMMessage {
     /**
      * The id of the unit whose stop is to be updated.
      */
@@ -73,7 +73,7 @@ public class UpdateCurrentStopMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Valid, update.

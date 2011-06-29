@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when purchasing at an IndianSettlement.
  */
-public class BuyMessage extends Message {
+public class BuyMessage extends DOMMessage {
     /**
      * The ID of the unit that is buying.
      */
@@ -80,7 +80,8 @@ public class BuyMessage extends Message {
     public BuyMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        this.goods = new Goods(game,
+            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
         this.goldString = element.getAttribute("gold");
     }
 
@@ -102,19 +103,18 @@ public class BuyMessage extends Message {
             unit = server.getUnitSafely(unitId, serverPlayer);
             settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
-            return Message.createError("server.trade.noGoods",
-                                       "Goods " + goods.getId()
-                                       + " is not at settlement " + settlementId);
+            return DOMMessage.createError("server.trade.noGoods", "Goods "
+                + goods.getId() + " is not at settlement " + settlementId);
         }
         int gold;
         try {
             gold = Integer.parseInt(goldString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad gold: " + goldString);
+            return DOMMessage.clientError("Bad gold: " + goldString);
         }
 
         // Try to buy.

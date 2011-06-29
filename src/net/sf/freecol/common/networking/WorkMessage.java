@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * Class to handle changes in work location.
  */
-public class WorkMessage extends Message {
+public class WorkMessage extends DOMMessage {
 
     /**
      * The id of the unit.
@@ -88,15 +88,17 @@ public class WorkMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile tile = unit.getTile();
         if (tile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: "
+                + unitId);
         }
         Colony colony = tile.getColony();
         if (colony == null) {
-            return Message.clientError("Unit is not at a colony: " + unitId);
+            return DOMMessage.clientError("Unit is not at a colony: "
+                + unitId);
         }
         WorkLocation workLocation;
         if (game.getFreeColGameObjectSafely(workLocationId)
@@ -104,15 +106,16 @@ public class WorkMessage extends Message {
             workLocation = (WorkLocation) game
                 .getFreeColGameObjectSafely(workLocationId);
         } else {
-            return Message.clientError("Not a work location: "
-                                       + workLocationId);
+            return DOMMessage.clientError("Not a work location: "
+                + workLocationId);
         }
         if (workLocation.getColony() != colony) {
-            return Message.clientError("Work location is not in the colony where the unit is: " + workLocationId);
+            return DOMMessage.clientError("Work location is not in the colony where the unit is: "
+                + workLocationId);
         }
         if (!workLocation.canAdd(unit)) {
-            return Message.clientError("Can not add " + unit.toString()
-                                       + " to " + workLocation.toString());
+            return DOMMessage.clientError("Can not add " + unit.toString()
+                + " to " + workLocation.toString());
         }
 
         // Work.

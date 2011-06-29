@@ -30,13 +30,14 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
+
 
 /**
  * Handles the network messages that arrives before the game starts.
@@ -113,7 +114,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
         OptionGroup gameOptions = getFreeColServer().getGame().getSpecification().getOptionGroup("gameOptions");
         gameOptions.readFromXMLElement((Element) element.getChildNodes().item(0));
-        Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
+        Element updateGameOptionsElement = DOMMessage.createNewRootElement("updateGameOptions");
         updateGameOptionsElement.appendChild(gameOptions.toXMLElement(
                 updateGameOptionsElement.getOwnerDocument()));
         getFreeColServer().getServer().sendToAll(updateGameOptionsElement, connection);
@@ -134,7 +135,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
         getFreeColServer().getMapGenerator().getMapGeneratorOptions().readFromXMLElement(
                 (Element) element.getChildNodes().item(0));
-        Element umge = Message.createNewRootElement("updateMapGeneratorOptions");
+        Element umge = DOMMessage.createNewRootElement("updateMapGeneratorOptions");
         umge.appendChild(getFreeColServer().getMapGenerator().getMapGeneratorOptions().toXMLElement(
                 umge.getOwnerDocument()));
         getFreeColServer().getServer().sendToAll(umge, connection);
@@ -152,7 +153,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (player != null) {
             boolean ready = (new Boolean(element.getAttribute("value"))).booleanValue();
             player.setReady(ready);
-            Element playerReady = Message.createNewRootElement("playerReady");
+            Element playerReady = DOMMessage.createNewRootElement("playerReady");
             playerReady.setAttribute("player", player.getId());
             playerReady.setAttribute("value", Boolean.toString(ready));
             getFreeColServer().getServer().sendToAll(playerReady, player.getConnection());
@@ -175,7 +176,7 @@ public final class PreGameInputHandler extends InputHandler {
             if (getFreeColServer().getGame().getNationOptions().getNations().get(nation) ==
                 NationState.AVAILABLE) {
                 player.setNation(nation);
-                Element updateNation = Message.createNewRootElement("updateNation");
+                Element updateNation = DOMMessage.createNewRootElement("updateNation");
                 updateNation.setAttribute("player", player.getId());
                 updateNation.setAttribute("value", nation.getId());
                 getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
@@ -203,7 +204,7 @@ public final class PreGameInputHandler extends InputHandler {
             if (advantages == Advantages.SELECTABLE
                 || (advantages == Advantages.FIXED && nationType.equals(fixedNationType))) {
                 player.setNationType(nationType);
-                Element updateNationType = Message.createNewRootElement("updateNationType");
+                Element updateNationType = DOMMessage.createNewRootElement("updateNationType");
                 updateNationType.setAttribute("player", player.getId());
                 updateNationType.setAttribute("value", nationType.getId());
                 getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
@@ -246,7 +247,7 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
         // Check if launching player is an admin.
         if (!launchingPlayer.isAdmin()) {
-            Element reply = Message.createNewRootElement("error");
+            Element reply = DOMMessage.createNewRootElement("error");
             reply.setAttribute("message", "Sorry, only the server admin can launch the game.");
             reply.setAttribute("messageID", "server.onlyAdminCanLaunch");
             return reply;
@@ -264,10 +265,9 @@ public final class PreGameInputHandler extends InputHandler {
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
                 if (nations.get(i) == nation) {
-                    Element reply = Message.createNewRootElement("error");
-                    reply
-                            .setAttribute("message",
-                                    "All players need to pick a unique nation before the game can start.");
+                    Element reply = DOMMessage.createNewRootElement("error");
+                    reply.setAttribute("message",
+                        "All players need to pick a unique nation before the game can start.");
                     reply.setAttribute("messageID", "server.invalidPlayerNations");
                     return reply;
                 }
@@ -276,7 +276,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
         // Check if all players are ready.
         if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {
-            Element reply = Message.createNewRootElement("error");
+            Element reply = DOMMessage.createNewRootElement("error");
             reply.setAttribute("message", "Not all players are ready to begin the game!");
             reply.setAttribute("messageID", "server.notAllReady");
             return reply;
@@ -285,7 +285,7 @@ public final class PreGameInputHandler extends InputHandler {
             ((PreGameController) freeColServer.getController()).startGame();
         } catch (FreeColException e) {
             // send an error message to the client(s)
-            Element reply = Message.createNewRootElement("error");
+            Element reply = DOMMessage.createNewRootElement("error");
             reply.setAttribute("message", "An error occurred while starting the game!");
             reply.setAttribute("messageID", "server.errorStartingGame");
             return reply;
@@ -305,7 +305,7 @@ public final class PreGameInputHandler extends InputHandler {
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
-        Element logoutMessage = Message.createNewRootElement("logout");
+        Element logoutMessage = DOMMessage.createNewRootElement("logout");
         logoutMessage.setAttribute("reason", "User has logged out.");
         logoutMessage.setAttribute("player", player.getId());
         player.setConnected(false);

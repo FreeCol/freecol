@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * The message that contains a chat string.
  */
-public class ChatMessage extends Message {
+public class ChatMessage extends DOMMessage {
     /**
      * The sending player.
      */

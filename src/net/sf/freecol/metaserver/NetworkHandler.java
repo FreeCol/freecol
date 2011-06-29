@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 
 import org.w3c.dom.Element;
@@ -126,7 +126,7 @@ public final class NetworkHandler implements MessageHandler {
             metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
         } catch (IOException e) {
             if (version.compareTo("0.6.0") > 0) {
-                Element reply = Message.createNewRootElement("noRouteToServer");
+                Element reply = DOMMessage.createNewRootElement("noRouteToServer");
                 return reply;
             } else {
                 return null;
@@ -134,7 +134,7 @@ public final class NetworkHandler implements MessageHandler {
         }
 
         if (version.compareTo("0.6.0") > 0) {
-            Element reply = Message.createNewRootElement("ok");
+            Element reply = DOMMessage.createNewRootElement("ok");
             return reply;
         } else {
             return null;

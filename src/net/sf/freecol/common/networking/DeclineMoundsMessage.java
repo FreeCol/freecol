@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when declining to investigate strange mounds.
  */
-public class DeclineMoundsMessage extends Message {
+public class DeclineMoundsMessage extends DOMMessage {
 
     /**
      * The id of the unit that is exploring.
@@ -88,23 +88,22 @@ public class DeclineMoundsMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction + " from unit: " + unitId);
         }
         LostCityRumour rumour = tile.getLostCityRumour();
         if (rumour == null
             || rumour.getType() != LostCityRumour.RumourType.MOUNDS) {
-            return Message.clientError("No mounds rumour on tile: "
-                                       + tile.getId());
+            return DOMMessage.clientError("No mounds rumour on tile: "
+                + tile.getId());
         }
 
         // Clear the mounds.

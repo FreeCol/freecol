@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -323,7 +324,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
         int gold = 0;
         Goods goods = null;
-        Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
+        Element goodsElement = DOMMessage.getChildElement(element, Goods.getXMLElementTagName());
         if (goodsElement == null) {
             gold = Integer.parseInt(element.getAttribute("gold"));
         } else {

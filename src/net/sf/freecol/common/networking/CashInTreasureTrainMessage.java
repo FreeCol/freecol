@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when cashing in a treasure train.
  */
-public class CashInTreasureTrainMessage extends Message {
+public class CashInTreasureTrainMessage extends DOMMessage {
     /**
      * The id of the object to be cashed in.
      */
@@ -76,15 +76,15 @@ public class CashInTreasureTrainMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.canCarryTreasure()) {
-            return Message.clientError("Can not cash in unit " + unitId
-                                       + ", can not carry treasure.");
+            return DOMMessage.clientError("Can not cash in unit " + unitId
+                + ", can not carry treasure.");
         }
         if (!unit.canCashInTreasureTrain()) {
-            return Message.clientError("Can not cash in unit " + unitId
-                                       + ", unsuitable location.");
+            return DOMMessage.clientError("Can not cash in unit " + unitId
+                + ", unsuitable location.");
         }
 
         // Cash in.

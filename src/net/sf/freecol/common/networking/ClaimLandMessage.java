@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests claiming land.
  */
-public class ClaimLandMessage extends Message {
+public class ClaimLandMessage extends DOMMessage {
 
     /**
      * The ID of the tile to claim.
@@ -95,7 +95,7 @@ public class ClaimLandMessage extends Message {
         if (game.getFreeColGameObjectSafely(tileId) instanceof Tile) {
             tile = (Tile) game.getFreeColGameObjectSafely(tileId);
         } else {
-            return Message.clientError("Invalid tileId");
+            return DOMMessage.clientError("Invalid tileId");
         }
         Settlement settlement;
         if (settlementId == null) {
@@ -103,13 +103,13 @@ public class ClaimLandMessage extends Message {
         } else if (game.getFreeColGameObjectSafely(settlementId) instanceof Settlement) {
             settlement = (Settlement) game.getFreeColGameObjectSafely(settlementId);
         } else {
-            return Message.clientError("Invalid settlementId");
+            return DOMMessage.clientError("Invalid settlementId");
         }
         int price;
         try {
             price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad price: " + priceString);
+            return DOMMessage.clientError("Bad price: " + priceString);
         }
         // Request is well formed, but there are more possibilities...
         int value = player.getLandPrice(tile);
@@ -120,7 +120,7 @@ public class ClaimLandMessage extends Message {
         } else if (owner == player) { // capture vacant colony tiles only
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
-                return Message.createError("tileTakenSelf", null);
+                return DOMMessage.createError("tileTakenSelf", null);
             }
             price = 0;
         } else if (owner.isEuropean()) {
@@ -128,13 +128,13 @@ public class ClaimLandMessage extends Message {
                 || tile.getOwningSettlement() == settlement) { // pre-attached
                 price = 0;
             } else { // must fail
-                return Message.createError("tileTakenEuro", null);
+                return DOMMessage.createError("tileTakenEuro", null);
             }
         } else { // natives
             if (price < 0 || price >= value) { // price is valid
                 ;
             } else { // refuse
-                return Message.createError("tileTakenInd", null);
+                return DOMMessage.createError("tileTakenInd", null);
             }
         }
 

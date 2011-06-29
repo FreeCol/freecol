@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when negotiating a sale at an IndianSettlement.
  */
-public class SellPropositionMessage extends Message {
+public class SellPropositionMessage extends DOMMessage {
     /**
      * The ID of the unit that is selling.
      */
@@ -82,7 +82,8 @@ public class SellPropositionMessage extends Message {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goldString = element.getAttribute("gold");
-        this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        this.goods = new Goods(game,
+            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
     }
 
     /**
@@ -118,19 +119,18 @@ public class SellPropositionMessage extends Message {
             settlement = server.getAdjacentIndianSettlementSafely(settlementId,
                                                                   unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         // Make sure we are trying to sell something that is there
         if (goods.getLocation() != unit) {
-            return Message.createError("server.trade.noGoods", "Goods "
-                                       + goods.getId()
-                                       + " are not with unit " + unitId);
+            return DOMMessage.createError("server.trade.noGoods", "Goods "
+                + goods.getId() + " are not with unit " + unitId);
         }
         int gold;
         try {
             gold = Integer.parseInt(goldString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad gold: " + goldString);
+            return DOMMessage.clientError("Bad gold: " + goldString);
         }
 
         // Proceed to price.

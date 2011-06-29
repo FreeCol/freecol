@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -266,7 +266,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Colony colony = getStandardColony();
         Goods goods1 = new Goods(game, colony, cottonType, 75);
-        Document document = Message.createNewDocument();
+        Document document = DOMMessage.createNewDocument();
         Element element = goods1.toXMLElement(null, document, true, true);
 
         element.setAttribute("ID", "newID");

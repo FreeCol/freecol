@@ -38,7 +38,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when looting cargo.
  */
-public class LootCargoMessage extends Message {
+public class LootCargoMessage extends DOMMessage {
     /**
      * The ID of the unit that is looting.
      */
@@ -132,7 +132,7 @@ public class LootCargoMessage extends Message {
         try {
             winner = server.getUnitSafely(winnerId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         // Do not check loserId, as it might have sunk.  It is enough
         // that the attacker knows it.  Similarly the server is better

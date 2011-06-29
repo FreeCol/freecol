@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when doing a monarch action.
  */
-public class MonarchActionMessage extends Message {
+public class MonarchActionMessage extends DOMMessage {
 
     // The monarch action.
     private MonarchAction action;

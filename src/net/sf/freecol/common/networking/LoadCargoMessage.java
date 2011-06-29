@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when loading cargo onto a carrier.
  */
-public class LoadCargoMessage extends Message {
+public class LoadCargoMessage extends DOMMessage {
     /**
      * The goods to be loaded.
      */
@@ -84,7 +84,7 @@ public class LoadCargoMessage extends Message {
         try {
             unit = server.getUnitSafely(carrierId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Perform the load.

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when unloading cargo onto a carrier.
  */
-public class UnloadCargoMessage extends Message {
+public class UnloadCargoMessage extends DOMMessage {
 
     /**
      * The goods to be unloaded.
@@ -77,13 +77,13 @@ public class UnloadCargoMessage extends Message {
         // Sanity checks.
         Location loc = goods.getLocation();
         if (loc == null) {
-            return Message.clientError("Goods in a null location.");
+            return DOMMessage.clientError("Goods in a null location.");
         } else if (!(loc instanceof Unit)) {
-            return Message.clientError("Unload from non-unit.");
+            return DOMMessage.clientError("Unload from non-unit.");
         }
         Unit unit = (Unit) loc;
         if (unit.getOwner() != player) {
-            return Message.clientError("Unload from non-owned unit.");
+            return DOMMessage.clientError("Unload from non-owned unit.");
         }
 
         // Perform the unload.

@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
@@ -121,7 +121,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      */
     private void sendReconnectSafely(Connection connection) {
         try {
-            connection.send(Message.createNewRootElement("reconnect"));
+            connection.send(DOMMessage.createNewRootElement("reconnect"));
         } catch (IOException ex) {
             logger.warning("Could not send reconnect message!");
         }
@@ -147,7 +147,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * @return reply element with message.
      */
     protected Element createErrorReply(String message) {
-        Element reply = Message.createNewRootElement("error");
+        Element reply = DOMMessage.createNewRootElement("error");
         // TODO: should this be localized (return message name)?
         reply.setAttribute("message", message);
         return reply;

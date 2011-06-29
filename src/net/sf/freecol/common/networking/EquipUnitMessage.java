@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * Class to handle equipping a unit.
  */
-public class EquipUnitMessage extends Message {
+public class EquipUnitMessage extends DOMMessage {
 
     /**
      * The id of the unit.
@@ -94,38 +94,40 @@ public class EquipUnitMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.isInEurope()) {
             ; // Always OK
         } else if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: "
+                + unitId);
         } else if (unit.getSettlement() == null) {
-            return Message.clientError("Unit is not in a settlement: " + unitId);
+            return DOMMessage.clientError("Unit is not in a settlement: "
+                + unitId);
         }
         EquipmentType type = game.getSpecification().getEquipmentType(typeId);
         if (type == null) {
-            return Message.clientError("Bad equipment type: " + typeId);
+            return DOMMessage.clientError("Bad equipment type: " + typeId);
         }
         int amount;
         try {
             amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad amount: " + amountString);
+            return DOMMessage.clientError("Bad amount: " + amountString);
         }
         if (amount == 0) {
-            return Message.clientError("Amount must be non-zero: "
-                                       + amountString);
+            return DOMMessage.clientError("Amount must be non-zero: "
+                + amountString);
         } else if (amount > 0) {
             if (!unit.canBeEquippedWith(type)) {
-                return Message.clientError("Unable to equip unit " + unitId
-                                           + " with " + typeId);
+                return DOMMessage.clientError("Unable to equip unit " + unitId
+                    + " with " + typeId);
             }
         } else {
             if (-amount > unit.getEquipmentCount(type)) {
-                return Message.clientError("Too much to remove (" + (-amount)
-                                           + ") of " + typeId
-                                           + " from unit " + unitId);
+                return DOMMessage.clientError("Too much to remove ("
+                    + (-amount) + ") of " + typeId
+                    + " from unit " + unitId);
             }
         }
 

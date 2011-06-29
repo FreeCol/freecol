@@ -97,7 +97,7 @@ import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToAmericaMessage;
@@ -153,7 +153,7 @@ public class ServerAPI {
 
 
     /** Temporary trivial message wrapper. */
-    private class TrivialMessage extends Message {
+    private class TrivialMessage extends DOMMessage {
 
         private String tag;
         private String[] attributes;
@@ -186,12 +186,12 @@ public class ServerAPI {
     }
 
     /**
-     * Sends a Message to the server.
+     * Sends a DOMMessage to the server.
      *
-     * @param message The <code>Message</code> to send.
+     * @param message The <code>DOMMessage</code> to send.
      * @return True if the send succeeded.
      */
-    private boolean send(Message message) {
+    private boolean send(DOMMessage message) {
         freeColClient.getClient().send(message.toXMLElement());
         return true;
     }
@@ -210,13 +210,13 @@ public class ServerAPI {
      * allowed (e.g. a move may result in the death of a unit rather
      * than actually moving).
      *
-     * @param message A <code>Message</code> to send.
+     * @param message A <code>DOMMessage</code> to send.
      * @param tag The expected tag
      * @param results A <code>Map</code> to store special attribute results in.
      * @return The answer from the server if it has the specified tag,
      *         otherwise <code>null</code>.
      */
-    private Element askExpecting(Message message, String tag,
+    private Element askExpecting(DOMMessage message, String tag,
                                  HashMap<String, String> results) {
         // Send the element, return null on failure or null return.
         Client client = freeColClient.getClient();
@@ -298,12 +298,12 @@ public class ServerAPI {
     /**
      * Extends askExpecting to also handle returns from the server.
      *
-     * @param message A <code>Message</code> to send.
+     * @param message A <code>DOMMessage</code> to send.
      * @param tag The expected tag
      * @param results A <code>Map</code> to store special attribute results in.
      * @return True if the server interaction succeeded, else false.
      */
-    private boolean askHandling(Message message, String tag,
+    private boolean askHandling(DOMMessage message, String tag,
                                 HashMap<String, String> results) {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
@@ -619,7 +619,7 @@ public class ServerAPI {
             diplomacy = reply;
             reply = null;
         } else {
-            diplomacy = Message.getChildElement(reply, "diplomacy");
+            diplomacy = DOMMessage.getChildElement(reply, "diplomacy");
             if (diplomacy != null) {
                 reply.removeChild(diplomacy);
             }

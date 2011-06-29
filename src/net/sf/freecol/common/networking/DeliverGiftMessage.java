@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when delivering a gift to a Settlement.
  */
-public class DeliverGiftMessage extends Message {
+public class DeliverGiftMessage extends DOMMessage {
     /**
      * The ID of the unit that is delivering the gift.
      */
@@ -72,7 +72,8 @@ public class DeliverGiftMessage extends Message {
     public DeliverGiftMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        this.goods = new Goods(game,
+            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
     }
 
     /**
@@ -126,24 +127,26 @@ public class DeliverGiftMessage extends Message {
      * @return An update containing the unit and settlement,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Settlement settlement;
         try {
             settlement = server.getAdjacentSettlementSafely(settlementId, unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Make sure we are trying to deliver something that is there
         if (goods.getLocation() != unit) {
-            return Message.createError("server.trade.noGoods", "deliverGift of non-existent goods");
+            return DOMMessage.createError("server.trade.noGoods",
+                "deliverGift of non-existent goods");
         }
 
         // Proceed to deliver.

@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when updating a trade route.
  */
-public class UpdateTradeRouteMessage extends Message {
+public class UpdateTradeRouteMessage extends DOMMessage {
 
     /**
      * The trade route to update.
@@ -77,15 +77,15 @@ public class UpdateTradeRouteMessage extends Message {
 
         if (tradeRoute == null || tradeRoute.getId() == null
             || !SetTradeRoutesMessage.hasPrefix(tradeRoute)) {
-            return Message.clientError("Bogus route");
+            return DOMMessage.clientError("Bogus route");
         }
         String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
         if (!(game.getFreeColGameObject(id) instanceof TradeRoute)) {
-            return Message.clientError("Not a trade route: " + id);
+            return DOMMessage.clientError("Not a trade route: " + id);
         }
         TradeRoute realRoute = (TradeRoute) game.getFreeColGameObject(id);
         if (tradeRoute.getOwner() != (Player) serverPlayer) {
-            return Message.clientError("Not your trade route: " + id);
+            return DOMMessage.clientError("Not your trade route: " + id);
         }
         realRoute.updateFrom(tradeRoute);
         tradeRoute.dispose();

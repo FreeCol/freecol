@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests building of a colony.
  */
-public class BuildColonyMessage extends Message {
+public class BuildColonyMessage extends DOMMessage {
 
     /**
      * The name of the new colony.
@@ -87,23 +87,24 @@ public class BuildColonyMessage extends Message {
         try {
             unit = server.getUnitSafely(builderId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (colonyName == null) {
-            return Message.clientError("Null colony name");
+            return DOMMessage.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
         } else if (player.getColony(colonyName) != null) {
-            return Message.clientError("Non-unique colony name " + colonyName);
+            return DOMMessage.clientError("Non-unique colony name "
+                + colonyName);
         }
         if (!unit.canBuildColony()) {
-            return Message.clientError("Unit " + builderId
-                                       + " can not build colony.");
+            return DOMMessage.clientError("Unit " + builderId
+                + " can not build colony.");
         }
         Tile tile = unit.getTile();
         if (!player.canClaimToFoundSettlement(tile)) {
-            return Message.clientError("Can not build colony on tile: "
-                                       + tile);
+            return DOMMessage.clientError("Can not build colony on tile: "
+                + tile);
         }
 
         // Build can proceed.

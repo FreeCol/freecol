@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests building of a colony.
  */
-public class JoinColonyMessage extends Message {
+public class JoinColonyMessage extends DOMMessage {
 
     /**
      * The id of the colony.
@@ -79,7 +79,8 @@ public class JoinColonyMessage extends Message {
      *         and updating its surrounding tiles,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
@@ -88,12 +89,11 @@ public class JoinColonyMessage extends Message {
             unit = server.getUnitSafely(builderId, serverPlayer);
             colony = (Colony) unit.getGame().getFreeColGameObject(colonyId);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (colony == null || unit.getOwner() != colony.getOwner()) {
-            return Message.createError("server.buildColony.badUnit",
-                                       "Unit " + builderId
-                                       + " can not join colony " + colony.getName());
+            return DOMMessage.createError("server.buildColony.badUnit", "Unit "
+                + builderId + " can not join colony " + colony.getName());
         }
 
         // Try to buy.

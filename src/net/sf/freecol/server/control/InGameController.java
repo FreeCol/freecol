@@ -95,7 +95,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.RandomChoice;
@@ -582,7 +582,7 @@ public final class InGameController extends Controller {
 
             if ((player = (ServerPlayer) game.getNextPlayer()) == null) {
                 // "can not happen"
-                return Message.clientError("Can not get next player");
+                return DOMMessage.clientError("Can not get next player");
             }
             if (player.checkForDeath()) { // Remove dead players and retry
                 player.csWithdraw(cs);
@@ -967,12 +967,12 @@ public final class InGameController extends Controller {
         FoundingFather father = getGame().getSpecification()
             .getFoundingFather(id);
         if (father == null) {
-            return Message.clientError("Not a founding father: " + id);
+            return DOMMessage.clientError("Not a founding father: " + id);
         } else if (serverPlayer.getCurrentFather() != null) {
-            return Message.clientError("Already recruiting: "
-                    + serverPlayer.getCurrentFather().getId());
+            return DOMMessage.clientError("Already recruiting: "
+                + serverPlayer.getCurrentFather().getId());
         } else if (!serverPlayer.getOfferedFathers().contains(father)) {
-            return Message.clientError("Not an offered father: " + id);
+            return DOMMessage.clientError("Not an offered father: " + id);
         } else {
             serverPlayer.setCurrentFather(father);
             serverPlayer.setOfferedFathers(new ArrayList<FoundingFather>());
@@ -1187,8 +1187,8 @@ public final class InGameController extends Controller {
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
-                return Message.clientError("Unit " + unit.getId()
-                                           + " has no moves left.");
+                return DOMMessage.clientError("Unit " + unit.getId()
+                    + " has no moves left.");
             }
             session = TransactionSession.establishTradeSession(unit,
                                                                settlement);
@@ -1225,7 +1225,7 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("No such transaction session.");
+            return DOMMessage.clientError("No such transaction session.");
         }
 
         ChangeSet cs = new ChangeSet();
@@ -1266,7 +1266,7 @@ public final class InGameController extends Controller {
                 }
             }
         } else { // Colony might be supported one day?
-            return Message.clientError("Bogus settlement");
+            return DOMMessage.clientError("Bogus settlement");
         }
         return new GoodsForSaleMessage(unit, settlement, sellGoods)
             .toXMLElement();
@@ -1289,10 +1289,10 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("Proposing to buy without opening a transaction session?!");
+            return DOMMessage.clientError("Proposing to buy without opening a transaction session?!");
         }
         if (!(Boolean) session.get("canBuy")) {
-            return Message.clientError("Proposing to buy in a session where buying is not allowed.");
+            return DOMMessage.clientError("Proposing to buy in a session where buying is not allowed.");
         }
 
         // AI considers the proposition, return with a gold value
@@ -1322,10 +1322,10 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("Proposing to sell without opening a transaction session");
+            return DOMMessage.clientError("Proposing to sell without opening a transaction session");
         }
         if (!(Boolean) session.get("canSell")) {
-            return Message.clientError("Proposing to sell in a session where selling is not allowed.");
+            return DOMMessage.clientError("Proposing to sell in a session where selling is not allowed.");
         }
 
         // AI considers the proposition, return with a gold value
@@ -1351,7 +1351,7 @@ public final class InGameController extends Controller {
     public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
                             GoodsType type, int amount) {
         if (!serverPlayer.canTrade(type, Access.EUROPE)) {
-            return Message.clientError("Can not trade boycotted goods");
+            return DOMMessage.clientError("Can not trade boycotted goods");
         }
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
@@ -1376,7 +1376,7 @@ public final class InGameController extends Controller {
     public Element sellGoods(ServerPlayer serverPlayer, Unit unit,
                              GoodsType type, int amount) {
         if (!serverPlayer.canTrade(type, Access.EUROPE)) {
-            return Message.clientError("Can not trade boycotted goods");
+            return DOMMessage.clientError("Can not trade boycotted goods");
         }
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = unit.getGoodsContainer();
@@ -1565,12 +1565,12 @@ public final class InGameController extends Controller {
     public Element embarkUnit(ServerPlayer serverPlayer, Unit unit,
                               Unit carrier) {
         if (unit.isNaval()) {
-            return Message.clientError("Naval unit " + unit.getId()
-                                       + " can not embark.");
+            return DOMMessage.clientError("Naval unit " + unit.getId()
+                + " can not embark.");
         }
         if (carrier.getSpaceLeft() < unit.getSpaceTaken()) {
-            return Message.clientError("No space available for unit "
-                                       + unit.getId() + " to embark.");
+            return DOMMessage.clientError("No space available for unit "
+                + unit.getId() + " to embark.");
         }
 
         ChangeSet cs = new ChangeSet();
@@ -1604,12 +1604,12 @@ public final class InGameController extends Controller {
      */
     public Element disembarkUnit(ServerPlayer serverPlayer, Unit unit) {
         if (unit.isNaval()) {
-            return Message.clientError("Naval unit " + unit.getId()
-                                       + " can not disembark.");
+            return DOMMessage.clientError("Naval unit " + unit.getId()
+                + " can not disembark.");
         }
         if (!(unit.getLocation() instanceof Unit)) {
-            return Message.clientError("Unit " + unit.getId()
-                                       + " is not embarked.");
+            return DOMMessage.clientError("Unit " + unit.getId()
+                + " is not embarked.");
         }
 
         ChangeSet cs = new ChangeSet();
@@ -1650,7 +1650,7 @@ public final class InGameController extends Controller {
             attackerPlayer.csCombat(attacker, defender, crs, random, cs);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Combat FAIL", e);
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         sendToOthers(attackerPlayer, cs);
         return cs.build(attackerPlayer);
@@ -1694,13 +1694,13 @@ public final class InGameController extends Controller {
         // Sanity checks.
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            return Message.clientError("No skill to learn at "
-                                       + settlement.getName());
+            return DOMMessage.clientError("No skill to learn at "
+                + settlement.getName());
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            return Message.clientError("Unit " + unit.toString()
-                                       + " can not learn skill " + skill
-                                       + " at " + settlement.getName());
+            return DOMMessage.clientError("Unit " + unit.toString()
+                + " can not learn skill " + skill
+                + " at " + settlement.getName());
         }
 
         // Try to learn
@@ -1920,7 +1920,7 @@ public final class InGameController extends Controller {
         // Determine result
         Unit missionary = settlement.getMissionary();
         if (missionary == null) {
-            return Message.clientError("Denouncing null missionary");
+            return DOMMessage.clientError("Denouncing null missionary");
         }
         ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
         double denounce = Utils.randomDouble(logger, "Denounce base", random)
@@ -2166,23 +2166,23 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("Trying to buy without opening a transaction session");
+            return DOMMessage.clientError("Trying to buy without opening a transaction session");
         }
         if (!(Boolean) session.get("canBuy")) {
-            return Message.clientError("Trying to buy in a session where buying is not allowed.");
+            return DOMMessage.clientError("Trying to buy in a session where buying is not allowed.");
         }
         if (unit.getSpaceLeft() <= 0) {
-            return Message.clientError("Unit is full, unable to buy.");
+            return DOMMessage.clientError("Unit is full, unable to buy.");
         }
 
         // Check that this is the agreement that was made
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.buyProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
-            return Message.clientError("This was not the price we agreed upon! Cheater?");
+            return DOMMessage.clientError("This was not the price we agreed upon! Cheater?");
         }
         if (!serverPlayer.checkGold(amount)) { // Check this is funded.
-            return Message.clientError("Insufficient gold to buy.");
+            return DOMMessage.clientError("Insufficient gold to buy.");
         }
 
         // Valid, make the trade.
@@ -2228,17 +2228,17 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("Trying to sell without opening a transaction session");
+            return DOMMessage.clientError("Trying to sell without opening a transaction session");
         }
         if (!(Boolean) session.get("canSell")) {
-            return Message.clientError("Trying to sell in a session where selling is not allowed.");
+            return DOMMessage.clientError("Trying to sell in a session where selling is not allowed.");
         }
 
         // Check that the gold is the agreed amount
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int returnGold = ai.sellProposition(unit, settlement, goods, amount);
         if (returnGold != amount) {
-            return Message.clientError("This was not the price we agreed upon! Cheater?");
+            return DOMMessage.clientError("This was not the price we agreed upon! Cheater?");
         }
 
         // Valid, make the trade.
@@ -2281,10 +2281,10 @@ public final class InGameController extends Controller {
         TransactionSession session
             = TransactionSession.lookup(unit, settlement);
         if (session == null) {
-            return Message.clientError("Trying to deliverGift without opening a transaction session");
+            return DOMMessage.clientError("Trying to deliverGift without opening a transaction session");
         }
         if (!(Boolean) session.get("canGift")) {
-            return Message.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
+            return DOMMessage.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
         }
 
         ChangeSet cs = new ChangeSet();
@@ -2380,7 +2380,7 @@ public final class InGameController extends Controller {
         if (unit.isInEurope()) { // Must be a dump of boycotted goods
             loc = null;
         } else if (unit.getTile() == null) {
-            return Message.clientError("Unit not on the map.");
+            return DOMMessage.clientError("Unit not on the map.");
         } else if (unit.getSettlement() != null) {
             settlement = unit.getTile().getSettlement();
             loc = settlement;
@@ -2420,8 +2420,8 @@ public final class InGameController extends Controller {
         UnitType newType = unit.getTypeChange(ChangeType.CLEAR_SKILL,
                                               serverPlayer);
         if (newType == null) {
-            return Message.clientError("Can not clear unit speciality: "
-                                       + unit.getId());
+            return DOMMessage.clientError("Can not clear unit speciality: "
+                + unit.getId());
         }
         // There can be some restrictions that may prevent the
         // clearing of the speciality.  For example, teachers cannot
@@ -2429,7 +2429,7 @@ public final class InGameController extends Controller {
         Location oldLocation = unit.getLocation();
         if (oldLocation instanceof Building
             && !((Building) oldLocation).canAdd(newType)) {
-            return Message.clientError("Cannot clear speciality, building does not allow new unit type");
+            return DOMMessage.clientError("Cannot clear speciality, building does not allow new unit type");
         }
 
         // Valid, change type.
@@ -2764,7 +2764,7 @@ public final class InGameController extends Controller {
         case ACCEPT_TRADE:
             session = TransactionSession.lookup(unit, settlement);
             if (session == null) {
-                return Message.clientError("Accepting without open session.");
+                return DOMMessage.clientError("Accepting without open session.");
             }
             // Act on what was proposed, not what is in the accept
             // message to frustrate tricksy client changing the conditions.
@@ -2779,7 +2779,7 @@ public final class InGameController extends Controller {
         case REJECT_TRADE:
             session = TransactionSession.lookup(unit, settlement);
             if (session == null) {
-                return Message.clientError("Rejecting without open session.");
+                return DOMMessage.clientError("Rejecting without open session.");
             }
             current = (DiplomaticTrade) session.get("agreement");
             current.setStatus(TradeStatus.REJECT_TRADE);
@@ -2845,7 +2845,7 @@ public final class InGameController extends Controller {
             }
 
         default:
-            return Message.clientError("Bogus trade");
+            return DOMMessage.clientError("Bogus trade");
         }
     }
 
@@ -2934,11 +2934,11 @@ public final class InGameController extends Controller {
         TransactionSession ts = TransactionSession.lookup(winner.getId(),
                                                           loserId);
         if (ts == null) {
-            return Message.clientError("Bogus looting!");
+            return DOMMessage.clientError("Bogus looting!");
         }
         if (winner.getSpaceLeft() == 0) {
-            return Message.clientError("No space to loot to: "
-                                       + winner.getId());
+            return DOMMessage.clientError("No space to loot to: "
+                + winner.getId());
         }
 
         ChangeSet cs = new ChangeSet();
@@ -2950,13 +2950,13 @@ public final class InGameController extends Controller {
             TransactionSession.forget(winner.getId(), loserId);
             for (Goods g : loot) {
                 if (!available.contains(g)) {
-                    return Message.clientError("Invalid loot: "
-                                               + g.toString());
+                    return DOMMessage.clientError("Invalid loot: "
+                        + g.toString());
                 }
                 available.remove(g);
                 if (!winner.canAdd(g)) {
-                    return Message.clientError("Loot failed: "
-                                               + g.toString());
+                    return DOMMessage.clientError("Loot failed: "
+                        + g.toString());
                 }
                 winner.add(g);
             }
@@ -2979,11 +2979,11 @@ public final class InGameController extends Controller {
     public Element payArrears(ServerPlayer serverPlayer, GoodsType type) {
         int arrears = serverPlayer.getArrears(type);
         if (arrears <= 0) {
-            return Message.clientError("No arrears for pay for: "
-                                       + type.getId());
+            return DOMMessage.clientError("No arrears for pay for: "
+                + type.getId());
         } else if (!serverPlayer.checkGold(arrears)) {
-            return Message.clientError("Not enough gold to pay arrears for: "
-                                       + type.getId());
+            return DOMMessage.clientError("Not enough gold to pay arrears for: "
+                + type.getId());
         }
 
         ChangeSet cs = new ChangeSet();
@@ -3020,9 +3020,8 @@ public final class InGameController extends Controller {
             for (AbstractGoods goods : type.getGoodsRequired()) {
                 GoodsType goodsType = goods.getType();
                 if (!serverPlayer.canTrade(goodsType)) {
-                    return Message.clientError("No equip of " + type.getId()
-                                               + " due to boycott of "
-                                               + goodsType.getId());
+                    return DOMMessage.clientError("No equip of " + type.getId()
+                        + " due to boycott of " + goodsType.getId());
                 }
             }
             // Will need a fake container to contain the goods to buy
@@ -3051,13 +3050,12 @@ public final class InGameController extends Controller {
                         serverPlayer.buy(container, goodsType, n, random);
                         serverPlayer.csFlushMarket(goodsType, cs);
                     } catch (IllegalStateException e) {
-                        return Message.clientError(e.getMessage());
+                        return DOMMessage.clientError(e.getMessage());
                     }
                 } else if (settlement != null) {
                     if (settlement.getGoodsCount(goodsType) < n) {
-                        return Message.clientError("Failed to equip: "
-                            + unit.getId()
-                            + " not enough " + goodsType
+                        return DOMMessage.clientError("Failed to equip: "
+                            + unit.getId() + " not enough " + goodsType
                             + " in settlement " + settlement.getId());
                     }
                     settlement.removeGoods(goodsType, n);
@@ -3111,14 +3109,14 @@ public final class InGameController extends Controller {
     public Element payForBuilding(ServerPlayer serverPlayer, Colony colony) {
         BuildableType build = colony.getCurrentlyBuilding();
         if (build == null) {
-            return Message.clientError("Colony " + colony.getId()
-                                       + " is not building anything!");
+            return DOMMessage.clientError("Colony " + colony.getId()
+                + " is not building anything!");
         }
         HashMap<GoodsType, Integer> required
             = colony.getGoodsForBuilding(build);
         int price = colony.priceGoodsForBuilding(required);
         if (!serverPlayer.checkGold(price)) {
-            return Message.clientError("Insufficient funds to pay for build.");
+            return DOMMessage.clientError("Insufficient funds to pay for build.");
         }
 
         // Save the correct final gold for the player, as we are going to
@@ -3164,7 +3162,7 @@ public final class InGameController extends Controller {
                                 Colony colony, Goods goods, int gold) {
         ServerPlayer receiver = (ServerPlayer) colony.getOwner();
         if (!receiver.isConnected()) {
-            return Message.clientError("No connection to colony owner");
+            return DOMMessage.clientError("No connection to colony owner");
         }
         boolean accepted;
         ChangeSet cs = new ChangeSet();
@@ -3175,7 +3173,7 @@ public final class InGameController extends Controller {
             accepted = Boolean.valueOf(reply.getAttribute("accepted"))
                 .booleanValue();
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         cs = new ChangeSet();
@@ -3218,13 +3216,13 @@ public final class InGameController extends Controller {
     public Element trainUnitInEurope(ServerPlayer serverPlayer, UnitType type) {
         Europe europe = serverPlayer.getEurope();
         if (europe == null) {
-            return Message.clientError("No Europe to train in.");
+            return DOMMessage.clientError("No Europe to train in.");
         }
         int price = europe.getUnitPrice(type);
         if (price <= 0) {
-            return Message.clientError("Bogus price: " + price);
+            return DOMMessage.clientError("Bogus price: " + price);
         } else if (!serverPlayer.checkGold(price)) {
-            return Message.clientError("Not enough gold to train " + type);
+            return DOMMessage.clientError("Not enough gold to train " + type);
         }
 
         new ServerUnit(getGame(), europe, serverPlayer, type,

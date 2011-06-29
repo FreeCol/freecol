@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when assigning a teacher.
  */
-public class AssignTeacherMessage extends Message {
+public class AssignTeacherMessage extends DOMMessage {
 
     /**
      * The id of the student.
@@ -86,30 +86,33 @@ public class AssignTeacherMessage extends Message {
         try {
             student = server.getUnitSafely(studentId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Unit teacher;
         try {
             teacher = server.getUnitSafely(teacherId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         if (student.getColony() == null) {
-            return Message.clientError("Student not in colony: " + studentId);
+            return DOMMessage.clientError("Student not in colony: "
+                + studentId);
         } else if (!(student.getLocation() instanceof WorkLocation)) {
-            return Message.clientError("Student not working colony: "
-                                       + studentId);
+            return DOMMessage.clientError("Student not working colony: "
+                + studentId);
         } else if (teacher.getColony() == null) {
-            return Message.clientError("Teacher not in colony: " + teacherId);
+            return DOMMessage.clientError("Teacher not in colony: "
+                + teacherId);
         } else if (!teacher.getColony().canTrain(teacher)) {
-            return Message.clientError("Teacher can not teach: " + teacherId);
+            return DOMMessage.clientError("Teacher can not teach: "
+                + teacherId);
         } else if (student.getColony() != teacher.getColony()) {
-            return Message.clientError("Student and teacher not in same colony: "
-                                       + studentId);
+            return DOMMessage.clientError("Student and teacher not in same colony: "
+                + studentId);
         } else if (!student.canBeStudent(teacher)) {
-            return Message.clientError("Student can not be taught by teacher: "
-                                       + studentId);
+            return DOMMessage.clientError("Student can not be taught by teacher: "
+                + studentId);
         }
 
         // Proceed to assign.

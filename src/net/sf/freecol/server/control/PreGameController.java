@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
@@ -117,7 +117,7 @@ public final class PreGameController extends Controller {
         // TODO: This might not be the best way to do it, the
         // createMap should not really use the entire loadGame method
         OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
-        Element oldGameOptions = gameOptions.toXMLElement(Message.createNewRootElement("oldGameOptions")
+        Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createNewRootElement("oldGameOptions")
                                                           .getOwnerDocument());
 
         // Make the map.
@@ -164,7 +164,7 @@ public final class PreGameController extends Controller {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
 
-        Element startGameElement = Message.createNewRootElement("startGame");
+        Element startGameElement = DOMMessage.createNewRootElement("startGame");
         freeColServer.getServer().sendToAll(startGameElement);
         freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
     }

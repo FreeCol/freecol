@@ -71,7 +71,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -757,7 +757,7 @@ public final class FreeColClient {
      * @return True if the player achieved a new high score.
      */
     public boolean retire() {
-        Element retireElement = Message.createNewRootElement("retire");
+        Element retireElement = DOMMessage.createNewRootElement("retire");
         Element reply = client.ask(retireElement);
         boolean result = reply != null
             && "true".equals(reply.getAttribute("highScore"));
@@ -769,7 +769,7 @@ public final class FreeColClient {
      * Continue playing after winning the game.
      */
     public void continuePlaying() {
-        client.send(Message.createNewRootElement("continuePlaying"));
+        client.send(DOMMessage.createNewRootElement("continuePlaying"));
     }
 
 

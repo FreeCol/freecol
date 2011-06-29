@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a unit is to emigrate.
  */
-public class EmigrateUnitMessage extends Message {
+public class EmigrateUnitMessage extends DOMMessage {
 
     /**
      * The slot from which to select the unit.
@@ -73,13 +73,13 @@ public class EmigrateUnitMessage extends Message {
 
         Europe europe = player.getEurope();
         if (europe == null) {
-            return Message.clientError("No Europe to migrate from.");
+            return DOMMessage.clientError("No Europe to migrate from.");
         }
         int slot;
         try {
             slot = Integer.parseInt(slotString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad slot: " + slotString);
+            return DOMMessage.clientError("Bad slot: " + slotString);
         }
 
         boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
@@ -87,25 +87,25 @@ public class EmigrateUnitMessage extends Message {
         int remaining = serverPlayer.getRemainingEmigrants();
         if (remaining > 0) {
             if (!selected) {
-                return Message.clientError("Invalid slot for FoY migration.");
+                return DOMMessage.clientError("Invalid slot for FoY migration.");
             }
             type = MigrationType.FOUNTAIN;
         } else if (player.checkEmigrate()) {
             if (selected) {
                 if (!player.hasAbility("model.ability.selectRecruit")) {
-                    return Message.clientError("selectRecruit ability absent.");
+                    return DOMMessage.clientError("selectRecruit ability absent.");
                 }
             } else if (slot != 0) {
-                return Message.clientError("Invalid slot for normal migration.");
+                return DOMMessage.clientError("Invalid slot for normal migration.");
             }
             type = MigrationType.NORMAL;
         } else if (player.checkGold(europe.getRecruitPrice())) {
             if (!selected) {
-                return Message.clientError("Invalid slot for recruitment.");
+                return DOMMessage.clientError("Invalid slot for recruitment.");
             }
             type = MigrationType.RECRUIT;
         } else {
-            return Message.clientError("No migrants available.");
+            return DOMMessage.clientError("No migrants available.");
         }
 
         // Proceed to emigrate.

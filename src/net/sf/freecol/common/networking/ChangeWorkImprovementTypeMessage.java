@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing a work improvement type.
  */
-public class ChangeWorkImprovementTypeMessage extends Message {
+public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
     /**
      * The id of the unit that is working.
@@ -89,39 +89,40 @@ public class ChangeWorkImprovementTypeMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile tile = unit.getTile();
         if (tile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         if (!unit.hasAbility("model.ability.improveTerrain")) {
-            return Message.clientError("Unit can not improve tiles: " + unitId);
+            return DOMMessage.clientError("Unit can not improve tiles: "
+                + unitId);
         }
 
         TileImprovementType type = server.getSpecification()
             .getTileImprovementType(improvementId);
         TileImprovement improvement;
         if (type == null) {
-            return Message.clientError("Not a tile improvement type: "
-                                       + improvementId);
+            return DOMMessage.clientError("Not a tile improvement type: "
+                + improvementId);
         } else if (type.isNatural()) {
-            return Message.clientError("ImprovementType must not be natural: "
-                                       + improvementId);
+            return DOMMessage.clientError("ImprovementType must not be natural: "
+                + improvementId);
         } else if (!type.isTileTypeAllowed(tile.getType())) {
-            return Message.clientError("ImprovementType not allowed on tile: "
-                                       + improvementId);
+            return DOMMessage.clientError("ImprovementType not allowed on tile: "
+                + improvementId);
         } else if ((improvement = tile.findTileImprovementType(type)) == null) {
             // TODO: This does not check if the tile (not TileType
             // accepts the improvement).
             if (!type.isWorkerAllowed(unit)) {
-                return Message.clientError("Unit can not to create improvement: "
-                                           + improvementId);
+                return DOMMessage.clientError("Unit can not to create improvement: "
+                    + improvementId);
             }
         } else { // Has improvement, check if worker can contribute to it
             if (!improvement.isWorkerAllowed(unit)) {
-                return Message.clientError("Unit can not work on improvement: "
-                                           + improvementId);
+                return DOMMessage.clientError("Unit can not work on improvement: "
+                    + improvementId);
             }
         }
 

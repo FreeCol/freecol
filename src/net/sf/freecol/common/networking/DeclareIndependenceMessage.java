@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when a player declares independence.
  */
-public class DeclareIndependenceMessage extends Message {
+public class DeclareIndependenceMessage extends DOMMessage {
 
     /**
      * The new name for the rebelling nation
@@ -84,17 +84,17 @@ public class DeclareIndependenceMessage extends Message {
 
         if (nationName == null || nationName.length() == 0
             || countryName == null || countryName.length() == 0) {
-            return Message.clientError("Empty nation or country name.");
+            return DOMMessage.clientError("Empty nation or country name.");
         }
         Event event = player.getSpecification().getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
-                return Message.clientError(limit.getDescriptionKey() + " "
+                return DOMMessage.clientError(limit.getDescriptionKey() + " "
                                            + Integer.toString(limit.getRightHandSide().getValue()));
             }
         }
         if (player.getPlayerType() != PlayerType.COLONIAL) {
-            return Message.clientError("Only colonial players can declare independence.");
+            return DOMMessage.clientError("Only colonial players can declare independence.");
         }
 
         // Declare.

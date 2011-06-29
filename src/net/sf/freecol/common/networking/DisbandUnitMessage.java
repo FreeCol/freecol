@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when clearing a unit speciality.
  */
-public class DisbandUnitMessage extends Message {
+public class DisbandUnitMessage extends DOMMessage {
 
     /**
      * The id of the unit to be disbanded.
@@ -77,7 +77,7 @@ public class DisbandUnitMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Try to clear.

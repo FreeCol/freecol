@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying for a building.
  */
-public class PayForBuildingMessage extends Message {
+public class PayForBuildingMessage extends DOMMessage {
 
     /**
      * The id of the colony that is building.
@@ -78,10 +78,10 @@ public class PayForBuildingMessage extends Message {
         if (game.getFreeColGameObject(colonyId) instanceof Colony) {
             colony = (Colony) game.getFreeColGameObject(colonyId);
         } else {
-            return Message.clientError("Not a colony: " + colonyId);
+            return DOMMessage.clientError("Not a colony: " + colonyId);
         }
         if (colony.getOwner() != player) {
-            return Message.clientError("Not your colony: " + colonyId);
+            return DOMMessage.clientError("Not your colony: " + colonyId);
         }
 
         // Proceed to pay.

@@ -28,7 +28,7 @@ import java.util.logging.LogRecord;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 
 /**
  * The default handler for FreeCol's log records. It currently only logs to a
@@ -84,7 +84,7 @@ public final class DefaultHandler extends Handler {
 
         try {
             String str = "FreeCol game version: " + FreeCol.getRevision() + "\n" + "FreeCol protocol version: "
-                    + Message.getFreeColProtocolVersion() + "\n\n" + "Java vendor: "
+                    + DOMMessage.getFreeColProtocolVersion() + "\n\n" + "Java vendor: "
                     + System.getProperty("java.vendor") + "\n" + "Java version: " + System.getProperty("java.version")
                     + "\n" + "Java WM name: " + System.getProperty("java.vm.name") + "\n" + "Java WM vendor: "
                     + System.getProperty("java.vm.vendor") + "\n" + "Java WM version: "

@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when negotiating a purchase at an IndianSettlement.
  */
-public class BuyPropositionMessage extends Message {
+public class BuyPropositionMessage extends DOMMessage {
 
     /**
      * The ID of the unit that is buying.
@@ -83,7 +83,8 @@ public class BuyPropositionMessage extends Message {
     public BuyPropositionMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        this.goods = new Goods(game,
+            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
         this.goldString = element.getAttribute("gold");
     }
 
@@ -121,22 +122,22 @@ public class BuyPropositionMessage extends Message {
             settlement = server.getAdjacentIndianSettlementSafely(settlementId,
                                                                   unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
-            return Message.createError("server.trade.noGoods", "Goods " + goods.getId()
-                                       + " are not in settlement " + settlementId);
+            return DOMMessage.createError("server.trade.noGoods", "Goods "
+                + goods.getId() + " are not in settlement " + settlementId);
         }
         if (unit.getSpaceLeft() == 0) {
-            return Message.clientError("No space left on unit: "
-                                       + unit.getId());
+            return DOMMessage.clientError("No space left on unit: "
+                + unit.getId());
         }
         int gold;
         try {
             gold = Integer.parseInt(goldString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad gold: " + goldString);
+            return DOMMessage.clientError("Bad gold: " + goldString);
         }
 
         // Proceed to price.

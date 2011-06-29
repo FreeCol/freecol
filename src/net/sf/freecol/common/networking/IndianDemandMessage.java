@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when natives are making demands of a colony.
  */
-public class IndianDemandMessage extends Message {
+public class IndianDemandMessage extends DOMMessage {
 
     // The id of the unit that is demanding.
     private String unitId;
@@ -79,7 +79,8 @@ public class IndianDemandMessage extends Message {
         this.goldString = (!element.hasAttribute("gold")) ? null
             : element.getAttribute("gold");
         this.goods = (!element.hasChildNodes()) ? null
-            : new Goods(game, Message.getChildElement(element,
+            : new Goods(game,
+                DOMMessage.getChildElement(element,
                     Goods.getXMLElementTagName()));
     }
 
@@ -125,17 +126,18 @@ public class IndianDemandMessage extends Message {
      * @return An update containing the indianDemandd unit,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getMovesLeft() <= 0) {
-            return Message.clientError("Unit has no moves left: " + unitId);
+            return DOMMessage.clientError("Unit has no moves left: " + unitId);
         }
         Colony colony;
         try {
@@ -144,27 +146,28 @@ public class IndianDemandMessage extends Message {
             if (settlement instanceof Colony) {
                 colony = (Colony) settlement;
             } else {
-                return Message.clientError("Not a colony: " + colonyId);
+                return DOMMessage.clientError("Not a colony: " + colonyId);
             }
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         int gold = 0;
         if (goods != null) {
             if (goods.getLocation() != colony) {
-                return Message.clientError("Demand of goods that are not in colony: " + colonyId);
+                return DOMMessage.clientError("Demand of goods that are not in colony: "
+                    + colonyId);
             }
         } else if (goldString != null) {
             try {
                 gold = Integer.parseInt(goldString);
             } catch (NumberFormatException e) {
-                return Message.clientError(e.getMessage());
+                return DOMMessage.clientError(e.getMessage());
             }
             if (gold <= 0) {
-                return Message.clientError("Bad gold: " + goldString);
+                return DOMMessage.clientError("Bad gold: " + goldString);
             }
         } else {
-            return Message.clientError("Both goods and gold can not be empty");
+            return DOMMessage.clientError("Both goods and gold can not be empty");
         }
 
         // Proceed to indianDemand.

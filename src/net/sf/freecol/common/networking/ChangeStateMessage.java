@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing a unit state.
  */
-public class ChangeStateMessage extends Message {
+public class ChangeStateMessage extends DOMMessage {
 
     /**
      * The id of the unit to change.
@@ -86,7 +86,7 @@ public class ChangeStateMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         // Do not test if it is on the map, units in Europe can change state.
 
@@ -94,11 +94,11 @@ public class ChangeStateMessage extends Message {
         try {
             state = Enum.valueOf(UnitState.class, stateString);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.checkSetState(state)) {
-            return Message.clientError("Unit " + unitId + " can not set state: "
-                                       + stateString);
+            return DOMMessage.clientError("Unit " + unitId
+                + " can not set state: " + stateString);
         }
 
         // Proceed to change.

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when the client requests setting a unit destination.
  */
-public class SetDestinationMessage extends Message {
+public class SetDestinationMessage extends DOMMessage {
     /**
      * The ID of the unit whose destination is to be set.
      **/
@@ -83,13 +83,14 @@ public class SetDestinationMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Location destination;
         if (destinationId == null || destinationId.length() == 0) {
             destination = null;
         } else if (!(game.getFreeColGameObject(destinationId) instanceof Location)) {
-            return Message.clientError("Not a location ID: " + destinationId);
+            return DOMMessage.clientError("Not a location ID: "
+                + destinationId);
         } else {
             destination = (Location) game.getFreeColGameObject(destinationId);
         }

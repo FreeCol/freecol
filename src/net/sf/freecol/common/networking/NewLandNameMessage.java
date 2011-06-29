@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when naming a new land.
  */
-public class NewLandNameMessage extends Message {
+public class NewLandNameMessage extends DOMMessage {
 
     /**
      * The unit that has come ashore.
@@ -171,21 +171,21 @@ public class NewLandNameMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile tile = unit.getTile();
         if (tile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         if (!tile.isLand()) {
-            return Message.clientError("Unit is not in the new world: "
+            return DOMMessage.clientError("Unit is not in the new world: "
                 + unitId);
         }
         if (newLandName == null || newLandName.length() == 0) {
-            return Message.clientError("Empty new land name");
+            return DOMMessage.clientError("Empty new land name");
         }
         if (serverPlayer.isNewLandNamed()) {
-            return Message.clientError("Player has named the new land already.");
+            return DOMMessage.clientError("Player has named the new land already.");
         }
         ServerPlayer welcomer = null;
         int camps = 0;
@@ -193,11 +193,11 @@ public class NewLandNameMessage extends Message {
             if (game.getFreeColGameObjectSafely(welcomerId) instanceof ServerPlayer) {
                 welcomer = (ServerPlayer) game.getFreeColGameObjectSafely(welcomerId);
                 if (!welcomer.isIndian()) {
-                    return Message.clientError("Not a native player: "
+                    return DOMMessage.clientError("Not a native player: "
                         + welcomerId);
                 }
             } else {
-                return Message.clientError("Not a player: " + welcomerId);
+                return DOMMessage.clientError("Not a player: " + welcomerId);
             }
             boolean foundWelcomer = false;
             for (Tile t : tile.getSurroundingTiles(1)) {
@@ -207,16 +207,17 @@ public class NewLandNameMessage extends Message {
                 }
             }
             if (!foundWelcomer) {
-                return Message.clientError("Unit is not next to welcomer.");
+                return DOMMessage.clientError("Unit is not next to welcomer.");
             }
             if (tile.getOwner() != welcomer) {
-                return Message.clientError("Welcomer offers unowned tile: "
+                return DOMMessage.clientError("Welcomer offers unowned tile: "
                     + tile.getId());
             }
             try {
                 camps = Integer.parseInt(campCount);
             } catch (NumberFormatException e) {
-                return Message.clientError("Invalid camp count: " + campCount);
+                return DOMMessage.clientError("Invalid camp count: "
+                    + campCount);
             }
         }
         boolean accept = Boolean.valueOf(acceptString);

@@ -58,6 +58,7 @@ import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -82,7 +83,7 @@ public class AIMessage {
     private static final Logger logger = Logger.getLogger(AIMessage.class.getName());
 
     /**
-     * Send a message to the server.
+     * Sends a DOMMessage to the server.
      *
      * @param connection The <code>Connection</code> to use
      *     when communicating with the server.
@@ -90,7 +91,8 @@ public class AIMessage {
      * @return True if the message was sent, and a non-null, non-error
      *     reply returned.
      */
-    private static boolean sendMessage(Connection connection, Element request) {
+    private static boolean sendMessage(Connection connection,
+                                       Element request) {
         try {
             Element reply = connection.ask(request);
             if (reply == null) {
@@ -123,7 +125,7 @@ public class AIMessage {
      *     reply returned.
      */
     private static boolean sendMessage(Connection connection,
-                                       Message message) {
+                                       DOMMessage message) {
         return (connection != null && message != null)
             ? sendMessage(connection, message.toXMLElement())
             : false;
@@ -153,7 +155,7 @@ public class AIMessage {
         if ((attributes.length & 1) == 1) {
             throw new IllegalArgumentException("Attributes list must have even length");
         }
-        Element element = Message.createNewRootElement(tag);
+        Element element = DOMMessage.createNewRootElement(tag);
         for (int i = 0; i < attributes.length; i += 2) {
             element.setAttribute(attributes[i], attributes[i+1]);
         }

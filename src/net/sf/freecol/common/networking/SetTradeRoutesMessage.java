@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when setting the trade routes.
  */
-public class SetTradeRoutesMessage extends Message {
+public class SetTradeRoutesMessage extends DOMMessage {
 
     private static final String idPrefix = "shadow-";
 
@@ -140,7 +140,7 @@ public class SetTradeRoutesMessage extends Message {
                 continue;
             }
         }
-        if (!"".equals(errors)) return Message.clientError(errors);
+        if (!"".equals(errors)) return DOMMessage.clientError(errors);
         
         for (TradeRoute tradeRoute : tradeRoutes) {
             TradeRoute realRoute = (TradeRoute) game

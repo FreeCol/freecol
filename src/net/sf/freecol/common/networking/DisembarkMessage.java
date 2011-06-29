@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when disembarking.
  */
-public class DisembarkMessage extends Message {
+public class DisembarkMessage extends DOMMessage {
     /**
      * The id of the object disembarking.
      */
@@ -75,7 +75,7 @@ public class DisembarkMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Do the disembark.

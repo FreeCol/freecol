@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent to initiate a transaction.
  */
-public class GetTransactionMessage extends Message {
+public class GetTransactionMessage extends DOMMessage {
 
     /**
      * The ID of the unit performing the transaction.
@@ -86,13 +86,13 @@ public class GetTransactionMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Settlement settlement;
         try {
             settlement = server.getAdjacentSettlementSafely(settlementId, unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         return server.getInGameController()

@@ -52,7 +52,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -506,7 +506,7 @@ public final class ConnectController {
     */
     public void logout(boolean notifyServer) {
         if (notifyServer) {
-            Element logoutMessage = Message.createNewRootElement("logout");
+            Element logoutMessage = DOMMessage.createNewRootElement("logout");
             logoutMessage.setAttribute("reason", "User has quit the client.");
 
             freeColClient.getClient().sendAndWait(logoutMessage);
@@ -597,7 +597,7 @@ public final class ConnectController {
         }
 
         ArrayList<String> items = new ArrayList<String>();
-        Element element = Message.createNewRootElement("getVacantPlayers");
+        Element element = DOMMessage.createNewRootElement("getVacantPlayers");
         try {
             Element reply = mc.ask(element);
             if (reply == null) {
@@ -644,7 +644,7 @@ public final class ConnectController {
         }
 
         try {
-            Element gslElement = Message.createNewRootElement("getServerList");
+            Element gslElement = DOMMessage.createNewRootElement("getServerList");
             Element reply = mc.ask(gslElement);
             if (reply == null) {
                 logger.warning("The meta-server did not return a list.");

@@ -60,7 +60,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIUnit;
@@ -602,7 +602,7 @@ public final class TilePopup extends JPopupMenu {
                              unitChoice.getDefaultEquipment());
         serverUnit.setMovesLeft(serverUnit.getInitialMovesLeft());
         Unit unit = new Unit(freeColClient.getGame(),
-                serverUnit.toXMLElement(Message.createNewDocument()));
+                serverUnit.toXMLElement(DOMMessage.createNewDocument()));
         tile.add(unit);
         gui.setActiveUnit(unit);
         player.invalidateCanSeeTiles();

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when attacking.
  */
-public class AttackMessage extends Message {
+public class AttackMessage extends DOMMessage {
 
     /**
      * The id of the attacker.
@@ -88,18 +88,17 @@ public class AttackMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile oldTile = unit.getTile();
         if (oldTile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = oldTile.getNeighbourOrNull(direction);
         if (tile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction + " from unit: " + unitId);
         }
         MoveType moveType = unit.getMoveType(direction);
         if (((moveType == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
@@ -108,16 +107,16 @@ public class AttackMessage extends Message {
             || moveType.isAttack()) {
             ; // OK
         } else {
-            return Message.clientError("Illegal attack move for: " + unitId
-                                       + " type: " + moveType
-                                       + " from: " + unit.getLocation().getId()
-                                       + " to: " + tile.getId());
+            return DOMMessage.clientError("Illegal attack move for: " + unitId
+                + " type: " + moveType
+                + " from: " + unit.getLocation().getId()
+                + " to: " + tile.getId());
         }
         Unit defender = tile.getDefendingUnit(unit);
         if (defender == null) {
-            return Message.clientError("Could not find defender"
-                                       + " in tile: " + tile.getId()
-                                       + " from: " + unit.getLocation().getId());
+            return DOMMessage.clientError("Could not find defender"
+                + " in tile: " + tile.getId()
+                + " from: " + unit.getLocation().getId());
         }
 
         // Proceed to attack.

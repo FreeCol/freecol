@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when setting goods levels.
  */
-public class SetGoodsLevelsMessage extends Message {
+public class SetGoodsLevelsMessage extends DOMMessage {
 
     /**
      * The id of the colony where the goods levels are set.
@@ -88,11 +88,11 @@ public class SetGoodsLevelsMessage extends Message {
         if (game.getFreeColGameObject(colonyId) instanceof Colony) {
             colony = (Colony) game.getFreeColGameObject(colonyId);
         } else {
-            return Message.clientError("Not a colony: " + colonyId);
+            return DOMMessage.clientError("Not a colony: " + colonyId);
         }
         if (player != colony.getOwner()) {
-            return Message.clientError("Player does not own colony: "
-                                       + colonyId);
+            return DOMMessage.clientError("Player does not own colony: "
+                + colonyId);
         }
 
         // Proceed to set.

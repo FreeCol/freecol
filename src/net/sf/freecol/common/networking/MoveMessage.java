@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit.
  */
-public class MoveMessage extends Message {
+public class MoveMessage extends DOMMessage {
     /**
      * The id of the object to be moved.
      */
@@ -88,26 +88,25 @@ public class MoveMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Tile oldTile = unit.getTile();
         if (oldTile == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Location oldLocation = unit.getLocation();
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile newTile = oldTile.getNeighbourOrNull(direction);
         if (newTile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction + " from unit: " + unitId);
         }
         MoveType moveType = unit.getMoveType(direction);
         if (!moveType.isProgress()) {
-            return Message.clientError("Illegal move for: " + unitId
-                                       + " type: " + moveType
-                                       + " from: " + oldLocation.getId()
-                                       + " to: " + newTile.getId());
+            return DOMMessage.clientError("Illegal move for: " + unitId
+                + " type: " + moveType
+                + " from: " + oldLocation.getId()
+                + " to: " + newTile.getId());
         }
 
         // Proceed to move.

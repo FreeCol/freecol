@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when moving a unit to America.
  */
-public class MoveToAmericaMessage extends Message {
+public class MoveToAmericaMessage extends DOMMessage {
 
     /**
      * The id of the object to be moved.
@@ -76,11 +76,11 @@ public class MoveToAmericaMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!(unit.getLocation() instanceof Europe)) {
-            return Message.clientError("Unit must be in Europe to move to America: "
-                                       + unitId);
+            return DOMMessage.clientError("Unit must be in Europe to move to America: "
+                + unitId);
         }
 
         // Proceed to move.

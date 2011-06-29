@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DOMMessage;
 
 import org.w3c.dom.Element;
 
@@ -117,7 +117,7 @@ public final class MetaRegister {
             Connection mc = null;
             try {                
                 mc = new Connection(address, port, null, FreeCol.METASERVER_THREAD);
-                Element element = Message.createNewRootElement("disconnect");
+                Element element = DOMMessage.createNewRootElement("disconnect");
                 mc.send(element);
             } catch (IOException e) {
                 logger.info("Server rejected (no route to destination):" + address + ":" + port);
@@ -182,7 +182,7 @@ public final class MetaRegister {
     * @return The server list as an XML DOM Element.
     */
     public synchronized Element createServerList() {
-        Element element = Message.createNewRootElement("serverList");
+        Element element = DOMMessage.createNewRootElement("serverList");
         for (int i=0; i<items.size(); i++) {
             element.appendChild(items.get(i).toXMLElement(element.getOwnerDocument()));
         }

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when paying tax arrears.
  */
-public class PayArrearsMessage extends Message {
+public class PayArrearsMessage extends DOMMessage {
 
     /**
      * The id of the GoodsType to pay arrears for.

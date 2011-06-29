@@ -243,7 +243,7 @@ final class ReceivingThread extends Thread {
                     xmlIn = null;
                     bis.reset();
 
-                    final Message msg = new Message(bis);
+                    final DOMMessage msg = new DOMMessage(bis);
                     nro.setResponse(msg);
                 }
             } else {
@@ -288,7 +288,7 @@ final class ReceivingThread extends Thread {
         if (connection.getMessageHandler() != null) {
             try {
                 Element disconnectElement =
-                        Message.createNewRootElement("disconnect");
+                        DOMMessage.createNewRootElement("disconnect");
                 disconnectElement.setAttribute("reason", "reception exception");
                 connection.getMessageHandler().handle(connection,
                         disconnectElement);

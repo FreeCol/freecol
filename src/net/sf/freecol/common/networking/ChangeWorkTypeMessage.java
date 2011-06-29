@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when changing the work type of a unit.
  */
-public class ChangeWorkTypeMessage extends Message {
+public class ChangeWorkTypeMessage extends DOMMessage {
 
     /**
      * The id of the unit that is working.
@@ -86,14 +86,14 @@ public class ChangeWorkTypeMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         GoodsType type = server.getSpecification().getGoodsType(workTypeId);
         if (type == null) {
-            return Message.clientError("Not a goods type: " + workTypeId);
+            return DOMMessage.clientError("Not a goods type: " + workTypeId);
         }
 
         // Proceed to changeWorkType.

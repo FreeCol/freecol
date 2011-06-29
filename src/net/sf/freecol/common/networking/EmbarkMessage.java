@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when embarking.
  */
-public class EmbarkMessage extends Message {
+public class EmbarkMessage extends DOMMessage {
 
     /**
      * The id of the unit embarking.
@@ -98,13 +98,13 @@ public class EmbarkMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Unit carrier;
         try {
             carrier = server.getUnitSafely(carrierId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         Location sourceLocation = unit.getLocation();
         Tile sourceTile = null;
@@ -117,9 +117,8 @@ public class EmbarkMessage extends Message {
             if (sourceLocation != carrier.getLocation()
             		&& (sourceLocation.getTile() == null
                     || sourceLocation.getTile() != carrier.getTile())) {
-                return Message.clientError("Unit: " + unitId
-                                           + " and carrier: " + carrierId
-                                           + " are not co-located.");
+                return DOMMessage.clientError("Unit: " + unitId
+                    + " and carrier: " + carrierId + " are not co-located.");
             }
             direction = null;
         } else {
@@ -128,25 +127,26 @@ public class EmbarkMessage extends Message {
             try {
                 direction = Enum.valueOf(Direction.class, directionString);
             } catch (Exception e) {
-                return Message.clientError(e.getMessage());
+                return DOMMessage.clientError(e.getMessage());
             }
             sourceTile = unit.getTile();
             if (sourceTile == null) {
-                return Message.clientError("Unit is not on the map: " + unitId);
+                return DOMMessage.clientError("Unit is not on the map: "
+                    + unitId);
             }
             if (unit.getMovesLeft() <= 0) {
-                return Message.clientError("Unit has no moves left: " + unitId);
+                return DOMMessage.clientError("Unit has no moves left: "
+                    + unitId);
             }
             destinationTile = sourceTile.getNeighbourOrNull(direction);
             if (destinationTile == null) {
-                return Message.clientError("Could not find tile"
-                                           + " in direction: " + direction
-                                           + " from unit: " + unitId);
+                return DOMMessage.clientError("Could not find tile"
+                    + " in direction: " + direction + " from unit: " + unitId);
             }
             if (carrier.getTile() != destinationTile) {
-                return Message.clientError("Carrier: " + carrierId
-                                           + " is not at destination tile: "
-                                           + destinationTile.toString());
+                return DOMMessage.clientError("Carrier: " + carrierId
+                    + " is not at destination tile: "
+                    + destinationTile.toString());
             }
         }
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when renaming a FreeColGameObject.
  */
-public class RenameMessage extends Message {
+public class RenameMessage extends DOMMessage {
 
     /**
      * The id of the object to be renamed.
@@ -84,12 +84,12 @@ public class RenameMessage extends Message {
 
         Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
         if (object == null) {
-            return Message.clientError("Tried to rename an object with id " + id
-                                       + " which could not be found.");
+            return DOMMessage.clientError("Tried to rename an object with id "
+                + id + " which could not be found.");
         }
         if (!(object instanceof Ownable)
             || ((Ownable) object).getOwner() != serverPlayer) {
-            return Message.clientError("Not the owner of nameable: " + id);
+            return DOMMessage.clientError("Not the owner of nameable: " + id);
         }
 
         // Proceed to rename.

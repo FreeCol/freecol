@@ -148,7 +148,7 @@ public class Connection {
      * @throws IOException
      */
     public void close() throws IOException {
-        Element disconnectElement = Message.createNewRootElement("disconnect");
+        Element disconnectElement = DOMMessage.createNewRootElement("disconnect");
         send(disconnectElement);
 
         reallyClose();
@@ -240,7 +240,7 @@ public class Connection {
         } else {
             NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
             send(questionElement);
-            Message response = (Message) nro.getResponse();
+            DOMMessage response = (DOMMessage) nro.getResponse();
             if (response == null) return null;
             Element rootElement = response.getDocument().getDocumentElement();
             return (Element) rootElement.getFirstChild();
@@ -492,7 +492,7 @@ public class Connection {
             if (!messagedConsumed) {
                 xmlIn.close();
                 in.reset();
-                final Message msg = new Message(in);
+                final DOMMessage msg = new DOMMessage(in);
 
                 final Connection connection = this;
                 Thread t = new Thread(msg.getType()) {
@@ -505,7 +505,7 @@ public class Connection {
                                 Element reply = messageHandler.handle(connection, (Element) element.getFirstChild());
 
                                 if (reply == null) {
-                                    reply = Message.createNewRootElement("reply");
+                                    reply = DOMMessage.createNewRootElement("reply");
                                     reply.setAttribute("networkReplyId", networkReplyId);
                                     logger.finest("reply == null");
                                 } else {

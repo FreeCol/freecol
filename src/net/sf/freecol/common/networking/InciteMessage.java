@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when inciting a native settlement.
  */
-public class InciteMessage extends Message {
+public class InciteMessage extends DOMMessage {
     /**
      * The id of the unit inciting.
      */
@@ -107,48 +107,46 @@ public class InciteMessage extends Message {
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
-            return Message.clientError("Unit is not on the map: " + unitId);
+            return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile == null) {
-            return Message.clientError("Could not find tile"
-                                       + " in direction: " + direction
-                                       + " from unit: " + unitId);
+            return DOMMessage.clientError("Could not find tile"
+                + " in direction: " + direction + " from unit: " + unitId);
         }
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return Message.clientError("There is no native settlement at: "
-                                       + tile.getId());
+            return DOMMessage.clientError("There is no native settlement at: "
+                + tile.getId());
         }
         Player enemy;
         if (enemyId == null || enemyId.length() == 0) {
-            return Message.clientError("Empty enemyId.");
+            return DOMMessage.clientError("Empty enemyId.");
         }
         if (!(game.getFreeColGameObjectSafely(enemyId) instanceof Player)) {
-            return Message.clientError("Not a player: " + enemyId);
+            return DOMMessage.clientError("Not a player: " + enemyId);
         }
         enemy = (Player) game.getFreeColGameObjectSafely(enemyId);
         if (enemy == player) {
-            return Message.clientError("Inciting against oneself!");
+            return DOMMessage.clientError("Inciting against oneself!");
         }
         if (!enemy.isEuropean()) {
-            return Message.clientError("Inciting against non-European!");
+            return DOMMessage.clientError("Inciting against non-European!");
         }
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            return Message.clientError("Unable to enter "
-                                       + is.getName()
-                                       + ": " + type.whyIllegal());
+            return DOMMessage.clientError("Unable to enter "
+                + is.getName() + ": " + type.whyIllegal());
         }
         int gold;
         try {
             gold = Integer.parseInt(goldString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad gold: " + goldString);
+            return DOMMessage.clientError("Bad gold: " + goldString);
         }
 
         // Valid, proceed to incite.

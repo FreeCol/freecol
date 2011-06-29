@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when training a unit in Europe.
  */
-public class TrainUnitInEuropeMessage extends Message {
+public class TrainUnitInEuropeMessage extends DOMMessage {
 
     /**
      * The id of the unit type.
@@ -75,7 +75,7 @@ public class TrainUnitInEuropeMessage extends Message {
 
         UnitType type = server.getSpecification().getUnitType(typeId);
         if (type == null) {
-            return Message.clientError("Not a unit type: " + typeId);
+            return DOMMessage.clientError("Not a unit type: " + typeId);
         }
 
         // Proceed to train a unit.

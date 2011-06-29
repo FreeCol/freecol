@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
 /**
  * The message sent when querying a settlement for what it has for sale.
  */
-public class GoodsForSaleMessage extends Message {
+public class GoodsForSaleMessage extends DOMMessage {
 
     /**
      * The id of the unit that is trading.
@@ -110,7 +110,7 @@ public class GoodsForSaleMessage extends Message {
             settlement = server.getAdjacentIndianSettlementSafely(settlementId,
                                                                   unit);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Try to collect the goods for sale.

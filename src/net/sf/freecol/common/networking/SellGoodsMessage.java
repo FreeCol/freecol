@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * The message sent when selling goods in Europe.
  */
-public class SellGoodsMessage extends Message {
+public class SellGoodsMessage extends DOMMessage {
 
     /**
      * The id of the carrier to unload to goods from.
@@ -93,36 +93,37 @@ public class SellGoodsMessage extends Message {
         try {
             carrier = server.getUnitSafely(carrierId, serverPlayer);
         } catch (Exception e) {
-            return Message.clientError(e.getMessage());
+            return DOMMessage.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {
-            return Message.clientError("Not a carrier: " + carrierId);
+            return DOMMessage.clientError("Not a carrier: " + carrierId);
         }
         if (!carrier.isInEurope()) {
-            return Message.clientError("Not in Europe: " + carrierId);
+            return DOMMessage.clientError("Not in Europe: " + carrierId);
         }
         GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
-            return Message.clientError("Not a goods type: " + goodsTypeId);
+            return DOMMessage.clientError("Not a goods type: " + goodsTypeId);
         }
         if (!player.canTrade(type)) {
-            return Message.clientError("Goods are boycotted: " + goodsTypeId);
+            return DOMMessage.clientError("Goods are boycotted: "
+                + goodsTypeId);
         }
         int amount;
         try {
             amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return Message.clientError("Bad amount: " + amountString);
+            return DOMMessage.clientError("Bad amount: " + amountString);
         }
         if (amount <= 0) {
-            return Message.clientError("Amount must be positive: "
+            return DOMMessage.clientError("Amount must be positive: "
                                        + amountString);
         }
         int present = carrier.getGoodsContainer().getGoodsCount(type);
         if (present < amount) {
-            return Message.clientError("Attempt to sell " + Integer.toString(amount)
-                                       + " " + type.getId() + " but only "
-                                       + Integer.toString(present) + " present.");
+            return DOMMessage.clientError("Attempt to sell "
+                + Integer.toString(amount) + " " + type.getId()
+                + " but only " + Integer.toString(present) + " present.");
         }
 
         // Try to sell.
