@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -81,7 +80,7 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     /**
      * Contains the units on this location.
      */
-    private List<Unit> units = Collections.emptyList();
+    private final List<Unit> units = new ArrayList<Unit>();
 
     private Player owner;
 
@@ -274,9 +273,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         if (!(locatable instanceof Unit)) {
             throw new IllegalArgumentException("Only units can be added to Europe.");
         } else if (!units.contains(locatable)) {
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
-            }
             Unit newUnit = (Unit) locatable;
             units.add(newUnit);
             if (!newUnit.isBetweenEuropeAndNewWorld()) {
@@ -359,8 +355,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         while (units.size() > 0) {
             objects.addAll(units.remove(0).disposeList());
         }
-        units = null;
-
         objects.addAll(super.disposeList());
         return objects;
     }
@@ -570,7 +564,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         unitPrices.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                         units.add(updateFreeColGameObject(in, Unit.class));
