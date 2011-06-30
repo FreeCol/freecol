@@ -576,14 +576,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csWithdraw(ChangeSet cs) {
-        // Notify everyone.
-        cs.addMessage(See.all().except(this),
+        cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             ((isEuropean())
-                              ? "model.diplomacy.dead.european"
-                              : "model.diplomacy.dead.native"),
-                             this)
-                .addStringTemplate("%nation%", getNationName()));
+                ((isEuropean() && getPlayerType() == PlayerType.COLONIAL)
+                    ? "model.diplomacy.dead.european"
+                    : "model.diplomacy.dead.native"),
+                this)
+            .addStringTemplate("%nation%", getNationName()));
+        Game game = getGame();
+        cs.addGlobalHistory(game,
+            new HistoryEvent(game.getTurn(),
+                HistoryEvent.EventType.NATION_DESTROYED)
+            .addStringTemplate("%nation%", getNationName()));
         csKill(cs);
     }
 

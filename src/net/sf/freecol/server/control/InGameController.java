@@ -3594,4 +3594,62 @@ public final class InGameController extends Controller {
                       all.toArray(new String[0]));
         return cs.build(serverPlayer);
     }
+
+    /**
+     * Enters revenge mode against those evil AIs.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> entering revenge mode.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element enterRevengeMode(ServerPlayer serverPlayer) {
+        if (!getFreeColServer().isSingleplayer()) {
+            return DOMMessage.clientError("Can not enter revenge mode,"
+                + " as this is not a single player game.");
+        }
+        Game game = getGame();
+        List<UnitType> undeads = game.getSpecification()
+            .getUnitTypesWithAbility("model.ability.undead");
+        List<UnitType> navalUnits = new ArrayList<UnitType>();
+        List<UnitType> landUnits = new ArrayList<UnitType>();
+        for (UnitType undead : undeads) {
+            if (undead.hasAbility(Ability.NAVAL_UNIT)) {
+                navalUnits.add(undead);
+            } else if (undead.hasAbility("model.ability.multipleAttacks")) {
+                landUnits.add(undead);
+            }
+        }
+        if (navalUnits.size() == 0 || landUnits.size() == 0) {
+            return DOMMessage.clientError("Can not enter revenge mode,"
+                + " because we can not find the undead units.");
+        }
+
+        ChangeSet cs = new ChangeSet();
+        UnitType navalType = navalUnits.get(Utils.randomInt(logger,
+                "Choose undead navy", random, navalUnits.size()));
+        Tile start = ((Tile) serverPlayer.getEntryLocation())
+            .getSafeTile(serverPlayer, random);
+        Unit theFlyingDutchman = new ServerUnit(game, start, serverPlayer,
+            navalType, UnitState.ACTIVE);
+        UnitType landType = landUnits.get(Utils.randomInt(logger,
+                "Choose undead army", random, landUnits.size()));
+        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType,
+            UnitState.SENTRY);
+        serverPlayer.setDead(false);
+        serverPlayer.setPlayerType(PlayerType.UNDEAD);
+
+        // No one likes the undead.
+        for (Player p : game.getPlayers()) {
+            if (serverPlayer != (ServerPlayer) p
+                && serverPlayer.hasContacted(p)) {
+                serverPlayer.csChangeStance(Stance.WAR, p, true, cs);
+            }
+        }
+
+        // Others can tell something has happened to the player,
+        // and possibly see the units.
+        cs.add(See.all(), serverPlayer);
+        cs.add(See.perhaps(), start);
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
 }

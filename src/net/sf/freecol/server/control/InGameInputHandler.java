@@ -567,6 +567,13 @@ public final class InGameInputHandler extends InputHandler
                 return new DiplomacyMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register("enterRevengeMode",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .enterRevengeMode(freeColServer.getPlayer(connection));
+            }});
         register("getHighScores",
                  new NetworkRequestHandler() {
             @Override

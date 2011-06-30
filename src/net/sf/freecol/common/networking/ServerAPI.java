@@ -692,6 +692,16 @@ public class ServerAPI {
     }
 
     /**
+     * Server query-response for asking to enter revenge mode.
+     *
+     * @return True if the server interaction succeeded.
+     */
+    public boolean enterRevengeMode() {
+        return askHandling(new TrivialMessage("enterRevengeMode"),
+            null, null);
+    }
+
+    /**
      * Server query-response for equipping a unit.
      *
      * @param unit The <code>Unit</code> to equip on.

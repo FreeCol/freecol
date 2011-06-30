@@ -362,49 +362,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Enters revenge mode against those evil AIs.
-     *
-     * @param username The player to enter revenge mode.
-     */
-    public void enterRevengeMode(String username) {
-        if (!singleplayer) {
-            throw new IllegalStateException("Cannot enter revenge mode when not singleplayer.");
-        }
-        final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(username);
-        synchronized (p) {
-            List<UnitType> undeads = getSpecification().getUnitTypesWithAbility("model.ability.undead");
-            ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
-            ArrayList<UnitType> landUnits = new ArrayList<UnitType>();
-            for (UnitType undead : undeads) {
-                if (undead.hasAbility(Ability.NAVAL_UNIT)) {
-                    navalUnits.add(undead);
-                } else if (undead.getId().equals("model.unit.revenger")) { // TODO: softcode this
-                    landUnits.add(undead);
-                }
-            }
-            if (navalUnits.size() > 0) {
-                UnitType navalType = navalUnits.get(Utils.randomInt(logger, "Choose undead navy", random, navalUnits.size()));
-                Unit theFlyingDutchman = new ServerUnit(game, ((Tile) p.getEntryLocation()).getSafeTile(p, random), p, navalType, UnitState.ACTIVE);
-                if (landUnits.size() > 0) {
-                    UnitType landType = landUnits.get(random.nextInt(landUnits.size()));
-                    new ServerUnit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
-                }
-                p.setDead(false);
-                p.setPlayerType(PlayerType.UNDEAD);
-                Element updateElement = DOMMessage.createNewRootElement("update");
-                updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
-                                                                                                  .getOwnerDocument()));
-                updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
-                try {
-                    p.getConnection().sendAndWait(updateElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send update");
-                }
-            }
-        }
-    }
-
-    /**
      * Gets the <code>MapGenerator</code> this <code>FreeColServer</code> is
      * using when creating random maps.
      *
