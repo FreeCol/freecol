@@ -188,7 +188,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                                             BRAVE, UnitState.ACTIVE));
                 }
             } else if (numberOfUnits < 0) {
-                List<Unit> unitList = new ArrayList<Unit>(settlement.getUnitList().subList(0, -numberOfUnits));
+                List<Unit> unitList = settlement.getUnitList().subList(0, -numberOfUnits);
                 for (Unit unit : unitList) {
                     unit.dispose();
                 }
@@ -202,12 +202,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         	}
         	// Dispose of units and settlement on tile
         	Tile t = settlement.getTile();
-        	List<Unit> unitList = new ArrayList<Unit>(t.getUnitList());
-            for (Unit unit : unitList) {
-                unit.dispose();
-            }
+          for (Unit unit : t.getUnitList()) {
+              unit.dispose();
+          }
         	t.setSettlement(null);
-            settlement.dispose();
+          settlement.dispose();
         }
         getCanvas().remove(this);
     }

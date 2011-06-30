@@ -320,7 +320,7 @@ public class PrivateerMission extends Mission {
             }
         }
 
-        for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
+        for (Unit u : unit.getUnitList()) {
             unitLeavesShip(getAIMain().getAIUnit(u));
         }
     }

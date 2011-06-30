@@ -1087,7 +1087,7 @@ public final class InGameController extends Controller {
             int sol = colony.getSoL();
             if (sol > 50) {
                 java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<UnitType, List<Unit>>();
-                List<Unit> allUnits = new ArrayList<Unit>(colony.getTile().getUnitList());
+                List<Unit> allUnits = colony.getTile().getUnitList();
                 allUnits.addAll(colony.getUnitList());
                 for (Unit unit : allUnits) {
                     if (upgrades.containsKey(unit.getType())) {

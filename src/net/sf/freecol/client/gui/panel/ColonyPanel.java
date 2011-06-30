@@ -496,7 +496,7 @@ public final class ColonyPanel extends FreeColPanel
             for (Goods goods : unit.getGoodsContainer().getGoods()) {
                 getController().unloadCargo(goods, false);
             }
-            for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
+            for (Unit u : unit.getUnitList()) {
                 getController().leaveShip(u);
             }
             cargoPanel.initialize();

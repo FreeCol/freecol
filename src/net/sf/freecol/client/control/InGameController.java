@@ -1275,8 +1275,7 @@ public final class InGameController implements NetworkConstants {
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
-            ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
-            for (Unit unitInTile : units) {
+            for (Unit unitInTile : tile.getUnitList()) {
                 checkCashInTreasureTrain(unitInTile);
             }
         }
@@ -1725,7 +1724,7 @@ public final class InGameController implements NetworkConstants {
         // If we are in a colony, or Europe, load sentries.
         if (unit.canCarryUnits() && unit.getSpaceLeft() > 0
             && (unit.getColony() != null || unit.isInEurope())) {
-            for (Unit sentry : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
+            for (Unit sentry : unit.getLocation().getUnitList()) {
                 if (sentry.getState() == UnitState.SENTRY) {
                     if (sentry.getSpaceTaken() <= unit.getSpaceLeft()) {
                         boardShip(sentry, unit);
@@ -1827,7 +1826,7 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
             int spaceLeft = unit.getSpaceLeft();
-            for (Unit u : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
+            for (Unit u : unit.getLocation().getUnitList()) {
                 if (!u.isNaval()) {
                     if (u.getType().getSpaceTaken() > spaceLeft) break;
                     boardShip(u, unit);
@@ -2926,7 +2925,7 @@ public final class InGameController implements NetworkConstants {
         boolean inEurope = unit.isInEurope();
         if (unit.getColony() != null) {
             // In colony, unload units and goods.
-            for (Unit u : new ArrayList<Unit>(unit.getUnitList())) {
+            for (Unit u : unit.getUnitList()) {
                 leaveShip(u);
             }
             for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {

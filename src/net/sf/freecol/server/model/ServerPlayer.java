@@ -1221,7 +1221,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
                     if (!tile.isLand() && tile.getFirstUnit() != null
                         && tile.getFirstUnit().getOwner() != this) {
-                        for (Unit unit : new ArrayList<Unit>(tile.getUnitList())) {
+                        for (Unit unit : tile.getUnitList()) {
                             if (atWarWith(unit.getOwner())
                                 || unit.hasAbility(Ability.PIRACY)) {
                                 csCombat(colony, unit, null, random, cs);
@@ -2304,7 +2304,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
-        List<Unit> units = new ArrayList<Unit>(colony.getTile().getUnitList());
+        List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
             if (unit.isNaval()) {
@@ -2935,7 +2935,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
-        List<Unit> units = new ArrayList<Unit>(colony.getTile().getUnitList());
+        List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
             if (unit.isNaval()) {

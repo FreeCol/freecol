@@ -1949,8 +1949,13 @@ public class Unit extends FreeColGameObject
         return new ArrayList<Unit>(units).iterator();
     }
 
+    /**
+     * Gets a list of the units in this carrier unit.
+     *
+     * @return The list of units in this carrier unit.
+     */
     public List<Unit> getUnitList() {
-        return units;
+        return new ArrayList<Unit>(units);
     }
 
     /**

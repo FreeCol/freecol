@@ -411,13 +411,15 @@ public class ColonyTile extends FreeColGameObject
         }
     }
 
-
+    /**
+     * Gets a list of units in this colony tile.
+     *
+     * @return A list of units in this colony tile.
+     */
     public List<Unit> getUnitList() {
-        if(getUnit() == null) {
-            return new ArrayList<Unit>();
-        } else {
-            return Collections.singletonList(getUnit());
-        }
+        List<Unit> units = new ArrayList<Unit>();
+        if (getUnit() != null) units.add(getUnit());
+        return units;
     }
 
     public Iterator <Unit> getUnitIterator() {

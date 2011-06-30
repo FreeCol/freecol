@@ -199,7 +199,7 @@ public final class TilePopup extends JPopupMenu {
         int maxUnits = UNIT_LINES_IN_FIRST_MENU;
         Container currentMenu = this;
         boolean moreUnits = false;
-        List<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+        List<Unit> units = tile.getUnitList();
         Collections.sort(units, ReportPanel.unitTypeComparator);
         for (final Unit currentUnit : units) {
 
@@ -225,7 +225,7 @@ public final class TilePopup extends JPopupMenu {
             activateAllItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         Unit lastUnit = null;
-                        for (Unit unit: new ArrayList<Unit>(tile.getUnitList())) {
+                        for (Unit unit : tile.getUnitList()) {
                             freeColClient.getInGameController().clearOrders(unit);
                             lastUnit = unit;
                         }

@@ -1162,7 +1162,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The <code>List</code>.
      */
     public List<Unit> getUnitList() {
-        return units;
+        return new ArrayList<Unit>(units);
     }
 
     /**

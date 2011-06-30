@@ -342,7 +342,7 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
      * @return The <code>List</code>.
      */
     public List<Unit> getUnitList() {
-        return units;
+        return new ArrayList<Unit>(units);
     }
 
     /**
@@ -374,7 +374,7 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
-        return units.iterator();
+        return getUnitList().iterator();
     }
 
     /**

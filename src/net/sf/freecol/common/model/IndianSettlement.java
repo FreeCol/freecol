@@ -670,8 +670,13 @@ public class IndianSettlement extends Settlement {
         return units.size();
     }
 
+    /**
+     * Gets a list of units in this settlement.
+     *
+     * @return A list of units in this settlement.
+     */
     public List<Unit> getUnitList() {
-        return units;
+        return new ArrayList<Unit>(units);
     }
 
     public Iterator<Unit> getUnitIterator() {
