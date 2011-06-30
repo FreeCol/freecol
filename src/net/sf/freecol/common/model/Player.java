@@ -1057,7 +1057,8 @@ public class Player extends FreeColGameObject implements Nameable {
         List<Player> rebels = new ArrayList<Player>();
         for (Player p : getGame().getLiveEuropeanPlayers()) {
             if (p.getREFPlayer() == this
-                && p.getPlayerType() == PlayerType.REBEL) rebels.add(p);
+                && (p.getPlayerType() == PlayerType.REBEL
+                    || p.getPlayerType() == PlayerType.UNDEAD)) rebels.add(p);
         }
         return rebels;
     }

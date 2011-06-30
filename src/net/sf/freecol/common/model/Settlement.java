@@ -342,7 +342,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
         List<Unit> units = getUnitList();
         units.addAll(getTile().getUnitList());
-        for (Unit u : units) {
+        while (!units.isEmpty()) {
+            Unit u = units.remove(0);
+            units.addAll(u.getUnitList());
             u.setState(UnitState.ACTIVE);
             UnitType type = u.getTypeChange((newOwner.isUndead())
                                             ? ChangeType.UNDEAD

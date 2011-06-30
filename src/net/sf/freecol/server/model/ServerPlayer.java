@@ -535,7 +535,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         && ((ServerPlayer) unit.getOwner()) == this) {
                         s.changeMissionary(null);
                         cs.addDispose(this, s.getTile(), unit);
-                        cs.add(See.perhaps(), s.getTile());
+                        cs.add(See.perhaps().always(this), s.getTile());
                     }
                     s.removeAlarm(this);
                 }
@@ -553,7 +553,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Clean up remaining tile ownerships
         for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (tile.getOwner() == this) tile.changeOwnership(null, null);
+            if (tile.getOwner() == this) {
+                tile.changeOwnership(null, null);
+                cs.add(See.perhaps().always(this), tile);
+            }
         }
 
         // Remove units
@@ -561,7 +564,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
             if (unit.getLocation() instanceof Tile) {
-                cs.add(See.perhaps(), unit.getTile());
+                cs.add(See.perhaps().always(this), unit.getTile());
             }
             cs.addDispose(this, unit.getLocation(), unit);
         }
@@ -2134,6 +2137,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Hand over the colony
         colony.changeOwner(attackerPlayer);
+
+        // Dispose of the units
+        List<Unit> units = colony.getUnitList();
+        units.addAll(colony.getTile().getUnitList());
+        while (!units.isEmpty()) {
+            Unit u = units.remove(0);
+            units.addAll(u.getUnitList());
+            cs.addDispose(colonyPlayer, u.getLocation(), u);
+        }
 
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.

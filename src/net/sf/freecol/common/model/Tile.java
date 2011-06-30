@@ -824,9 +824,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param settlement The <code>Settlement</code> to own the tile.
      */
     public void changeOwnership(Player player, Settlement settlement) {
+        Player old = getOwner();
         setOwner(player);
         setOwningSettlement(settlement);
-        updatePlayerExploredTiles();
+        updatePlayerExploredTiles(old);
     }
 
     /**
@@ -1113,11 +1114,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *            Location.
      */
     public void remove(Locatable locatable) {
+        Player old = getOwner();
         if (locatable instanceof Unit) {
             units.remove(locatable);
         } else if (locatable instanceof TileItem) {
             tileItemContainer.addTileItem((TileItem) locatable);
-            updatePlayerExploredTiles();
+            updatePlayerExploredTiles(old);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
@@ -1446,11 +1448,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
      */
     public void updatePlayerExploredTiles() {
+        updatePlayerExploredTiles(null);
+    }
+
+    /**
+     * Updates the <code>PlayerExploredTile</code> for each player. This
+     * update will only be performed if the player
+     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
+     *
+     * @param oldPlayer The optional <code>Player</code> that formerly
+     *     had visibility of this tile and should see the change.
+     */
+    public void updatePlayerExploredTiles(Player oldPlayer) {
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
             return;
         }
         for (Player player : getGame().getLiveEuropeanPlayers()) {
-            if (player.canSee(this)) updatePlayerExploredTile(player, false);
+            if (player == oldPlayer || player.canSee(this)) {
+                updatePlayerExploredTile(player, false);
+            }
         }
     }
 
