@@ -1054,6 +1054,9 @@ public final class InGameController extends Controller {
         serverPlayer.addHistory(new HistoryEvent(turn,
                 HistoryEvent.EventType.DECLARE_INDEPENDENCE));
         serverPlayer.clearModelMessages();
+        cs.addMessage(See.only(serverPlayer),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                "warOfIndependence.independenceDeclared", serverPlayer));
 
         // Dispose of units in Europe.
         Europe europe = serverPlayer.getEurope();
