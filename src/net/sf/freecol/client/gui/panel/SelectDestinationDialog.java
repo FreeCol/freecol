@@ -101,11 +101,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Settlement inSettlement = unit.getSettlement();
 
         // Collect the goods the unit is carrying.
-        List<GoodsType> goodsTypeList = new ArrayList<GoodsType>();
+        final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();
         for (Goods goods : unit.getGoodsList()) {
-            goodsTypeList.add(goods.getType());
+            if (!goodsTypes.contains(goods.getType())) {
+                goodsTypes.add(goods.getType());
+            }
         }
-        final List<GoodsType> goodsTypes = goodsTypeList;
 
         // Search for destinations we can reach:
         getGame().getMap().search(unit, unit.getTile(), new GoalDecider() {
