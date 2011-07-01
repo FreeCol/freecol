@@ -2241,12 +2241,13 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     private int getTurns(Transportable t, TransportMission tm) {
-        if (t.getDestination() != null
-            && t.getDestination().getTile() == tm.getUnit().getTile()) {
+        if (t.getTransportDestination() != null
+            && t.getTransportDestination().getTile()
+            == tm.getUnit().getTile()) {
             return 0;
         }
         PathNode path = tm.getPath(t);
-        return (path == null) ? -1 : tm.getTotalTurns();
+        return (path == null) ? -1 : path.getTotalTurns();
     }
 
     /**
@@ -2352,8 +2353,8 @@ public class StandardAIPlayer extends AIPlayer {
                 }
                 int totalTurns = getTurns(t, tm);
                 if (totalTurns <= 0) continue;
-                if (totalTurns() < bestTransportTurns
-                    || (totalTurns() == bestTransportTurns
+                if (totalTurns < bestTransportTurns
+                    || (totalTurns == bestTransportTurns
                         && transportSpace > bestTransportSpace)) {
                     bestTransport = tm;
                     bestTransportSpace = transportSpace;
