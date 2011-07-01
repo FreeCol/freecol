@@ -86,12 +86,7 @@ public final class GoodsType extends FreeColGameObjectType {
     // ----------------------------------------------------------- retriveal methods
 
     public StringTemplate getLabel(boolean sellable) {
-        if (sellable) {
-            return StringTemplate.key(getNameKey());
-        } else {
-            return StringTemplate.template("model.goods.goodsBoycotted")
-                .add("%goods%", getNameKey());
-        }
+        return StringTemplate.key(getNameKey());
     }
 
     public boolean isRawMaterial() {
