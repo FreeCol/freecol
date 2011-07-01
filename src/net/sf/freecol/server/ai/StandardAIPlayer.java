@@ -2240,6 +2240,15 @@ public class StandardAIPlayer extends AIPlayer {
                       + " for unit: " + aiUnit);
     }
 
+    private int getTurns(Transportable t, TransportMission tm) {
+        if (t.getDestination() != null
+            && t.getDestination().getTile() == tm.getUnit().getTile()) {
+            return 0;
+        }
+        PathNode path = tm.getPath(t);
+        return (path == null) ? -1 : tm.getTotalTurns();
+    }
+
     /**
      * Assign transportable units and goods to available carriers
      * transport lists.
@@ -2341,14 +2350,14 @@ public class StandardAIPlayer extends AIPlayer {
                     }
                     continue;
                 }
-                PathNode path = tm.getPath(t);
-                if (path == null) continue;
-                if (path.getTotalTurns() < bestTransportTurns
-                    || (path.getTotalTurns() == bestTransportTurns
+                int totalTurns = getTurns(t, tm);
+                if (totalTurns <= 0) continue;
+                if (totalTurns() < bestTransportTurns
+                    || (totalTurns() == bestTransportTurns
                         && transportSpace > bestTransportSpace)) {
                     bestTransport = tm;
                     bestTransportSpace = transportSpace;
-                    bestTransportTurns = path.getTotalTurns();
+                    bestTransportTurns = totalTurns;
                 }
             }
             if (bestTransport == null) {
