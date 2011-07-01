@@ -667,8 +667,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (rc != null) {
                 FoundingFather f = RandomChoice.getWeightedRandom(logger,
                     "Choose founding father", random, rc);
-                randomFathers.add(f);
-                logMessage += ":" + f.getNameKey();
+                if (f != null) {
+                    randomFathers.add(f);
+                    logMessage += ":" + f.getNameKey();
+                }
             }
         }
         logger.info(logMessage);

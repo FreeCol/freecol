@@ -48,13 +48,14 @@ public class RandomChoice<T> {
     public static <T> T getWeightedRandom(Logger logger, String logMe,
                                           Random random,
                                           Collection<RandomChoice<T>> input) {
-        if (input == null || input.isEmpty()) {
+        int n;
+        if (input == null || input.isEmpty()
+            || (n = getTotalProbability(input)) <= 0) {
             return null;
         } else if (input.size() == 1) {
             return input.iterator().next().getObject();
         } else {
-            return select(input, Utils.randomInt(logger, logMe, random,
-                                                 getTotalProbability(input)));
+            return select(input, Utils.randomInt(logger, logMe, random, n));
         }
     }
 
