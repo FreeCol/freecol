@@ -687,7 +687,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                             .getWeightedRandom(logger,
                                 "Choose FoY", random, recruitables);
                         new ServerUnit(game, europe, serverPlayer, type,
-                            UnitState.ACTIVE);
+                            UnitState.SENTRY);
                     }
                     cs.add(See.only(serverPlayer), europe);
                 }
