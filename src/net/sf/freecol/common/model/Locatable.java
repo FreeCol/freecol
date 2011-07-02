@@ -37,8 +37,8 @@ public interface Locatable {
      * @return The location of this <code>Locatable</code>.
      */
     public Location getLocation();
-    
-    
+
+
     /**
      * Returns the <code>Tile</code> where this <code>Locatable</code> is located,
      * or <code>null</code> if it's location is <code>Europe</code>.
@@ -48,11 +48,11 @@ public interface Locatable {
      */
     public Tile getTile();
 
-    
+
     /**
      * Gets the amount of space this <code>Locatable</code> take.
      * @return The space it takes on a carrier.
      */
     public int getSpaceTaken();
-    
+
 }

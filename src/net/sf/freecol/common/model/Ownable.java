@@ -36,7 +36,7 @@ public interface Ownable {
      *         {@link Ownable}.
      */
     public Player getOwner();
-    
+
     /**
      * Sets the owner of this <code>Ownable</code>.
      *
