@@ -38,11 +38,6 @@ import org.w3c.dom.Element;
  */
 public interface Option {
 
-
-    public static final String NO_ID = "NO_ID";
-
-
-
     /**
     * Returns a textual representation of this object.
     * @return The name of this <code>Option</code>.

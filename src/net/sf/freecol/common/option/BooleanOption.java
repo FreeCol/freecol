@@ -111,7 +111,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, VALUE_TAG);
 
-        if (id == null && getId().equals("NO_ID")){
+        if (id == null && getId().equals(NO_ID)){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {

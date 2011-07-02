@@ -152,7 +152,7 @@ public class ListOption<T> extends AbstractOption<List<T>> {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
 
-        if (id == null && getId().equals("NO_ID")){
+        if (id == null && getId().equals(NO_ID)){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         value.clear();

@@ -215,7 +215,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         if (editable) {
             optionUpdaters.add((OptionUpdater) ui);
         }
-        if (!option.getId().equals(Option.NO_ID)) {
+        if (!option.getId().equals(IntegerOption.NO_ID)) {
             optionUIs.put(option.getId(), ui);
         }
     }

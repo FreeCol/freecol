@@ -76,7 +76,7 @@ public class PercentageOption extends IntegerOption {
         final String value = in.getAttributeValue(null, VALUE_TAG);
         final String previewEnabled = in.getAttributeValue(null, "previewEnabled");
 
-        if (id == null && getId().equals("NO_ID")) {
+        if (id == null && getId().equals(NO_ID)) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {

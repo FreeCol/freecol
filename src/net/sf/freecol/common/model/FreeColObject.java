@@ -64,6 +64,8 @@ public abstract class FreeColObject {
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
+    public static final String NO_ID = "NO_ID";
+
     protected static final String ID_ATTRIBUTE = "ID";
 
     /**

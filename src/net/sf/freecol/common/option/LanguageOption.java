@@ -242,7 +242,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         findLanguages();
 
-        if (id == null && getId().equals("NO_ID")){
+        if (id == null && getId().equals(NO_ID)){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         } else if(getId() == NO_ID) {
             setId(id);
