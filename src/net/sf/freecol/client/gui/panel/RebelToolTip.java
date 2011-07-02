@@ -81,18 +81,18 @@ public class RebelToolTip extends JToolTip {
             int requiredLiberty = Colony.LIBERTY_PER_REBEL * colony.getUnitCount();
 
             if (liberty < requiredLiberty) {
-                turns100 = (requiredLiberty - liberty) / libertyProduction;
+                turns100 = (requiredLiberty - liberty) / (float)libertyProduction;
             }
 
             requiredLiberty = requiredLiberty / 2;
             if (liberty < requiredLiberty) {
-                turns50 = (requiredLiberty - liberty) / libertyProduction;
+                turns50 = (requiredLiberty - liberty) / (float)libertyProduction;
             }
 
             if (members < colony.getUnitCount()) {
                 requiredLiberty  = Colony.LIBERTY_PER_REBEL * (members + 1);
                 if (liberty < requiredLiberty) {
-                    turnsNext = (requiredLiberty - liberty) / libertyProduction;
+                    turnsNext = (requiredLiberty - liberty) / (float)libertyProduction;
                 }
             }
         }
