@@ -160,6 +160,8 @@ public class IntegerOption extends AbstractOption<Integer> {
 
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute(VALUE_TAG, Integer.toString(value));
+        out.writeAttribute("minimumValue", Integer.toString(minimumValue));
+        out.writeAttribute("maximumValue", Integer.toString(maximumValue));
 
         out.writeEndElement();
     }
