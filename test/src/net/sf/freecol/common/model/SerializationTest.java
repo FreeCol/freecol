@@ -74,8 +74,8 @@ public class SerializationTest extends FreeColTestCase {
             mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
         }
         catch(SAXParseException e){
-            String errMsg = e.getMessage() 
-                + " at line=" + e.getLineNumber() 
+            String errMsg = e.getMessage()
+                + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
@@ -94,8 +94,8 @@ public class SerializationTest extends FreeColTestCase {
             Validator validator = buildValidator("schema/data/data-game.xsd");
             validator.validate(buildSource(game, player, true, true));
         } catch(SAXParseException e){
-            String errMsg = e.getMessage() 
-                + " at line=" + e.getLineNumber() 
+            String errMsg = e.getMessage()
+                + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
@@ -135,8 +135,8 @@ public class SerializationTest extends FreeColTestCase {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");
             validator.validate(buildSource(t2, player, true, true));
         } catch (SAXParseException e){
-            String errMsg = e.getMessage() 
-                + " at line=" + e.getLineNumber() 
+            String errMsg = e.getMessage()
+                + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
@@ -153,8 +153,8 @@ public class SerializationTest extends FreeColTestCase {
             out.close();
             validator.validate(new StreamSource(new FileReader(filename)));
         } catch (SAXParseException e) {
-            String errMsg = e.getMessage() 
-                + " at line=" + e.getLineNumber() 
+            String errMsg = e.getMessage()
+                + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
