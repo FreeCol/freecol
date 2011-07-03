@@ -2801,6 +2801,9 @@ public class Unit extends FreeColGameObject
      * @return The entry location.
      */
     public Location getEntryLocation() {
+        if (entryLocation == null) {
+            entryLocation = owner.getEntryLocation();
+        }
         return entryLocation;
     }
 
