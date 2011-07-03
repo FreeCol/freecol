@@ -265,6 +265,9 @@
     <xs:complexType>
       <xs:attribute name="id" type="OptionId" use="required" />
       <xs:attribute name="value" type="xs:int" use="required" />
+      <xs:attribute name="defaultValue" type="xs:int"/>
+      <xs:attribute name="minimumValue" type="xs:int"/>
+      <xs:attribute name="maximumValue" type="xs:int"/>
     </xs:complexType>
   </xs:element>
 
