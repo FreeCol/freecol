@@ -803,16 +803,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
         return price != UNDEFINED;
     }
 
-    public int getProductionFor(GoodsType goodsType, int base) {
-        if (base == 0) {
-            return 0;
-        }
-
-        base = (int) getFeatureContainer().applyModifier(base, goodsType.getId());
-        return Math.max(base, 1);
-    }
-
-     /**
+    /**
      * Returns the number of units of the given GoodsType this
      * UnitType consumes per turn (when in a settlement).
      *

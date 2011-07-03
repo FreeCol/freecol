@@ -180,7 +180,13 @@ public class WorkLocationPlan extends ValuedAIObject {
              *
              * return expertUnitType.getProductionFor(goodsType, base) * ((goodsType == Goods.FURS) ? 2 : 1);
              */
-            return expertUnitType.getProductionFor(goodsType, base);
+            if (base == 0) {
+                return 0;
+            }
+
+            base = (int) expertUnitType.getFeatureContainer().applyModifier(base, goodsType.getId());
+            return Math.max(base, 1);
+
         } else {
             if (goodsType.isFarmed()) {
                 return 0;
