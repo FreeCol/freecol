@@ -1833,7 +1833,7 @@ public final class InGameController extends Controller {
             // Otherwise player gets to visit, and learn about the settlement.
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
-            if (settlement.hasSpokenToChief()) {
+            if (settlement.hasSpokenToChief(serverPlayer)) {
                 // Do nothing if already spoken to.
                 result = "nothing";
             } else if (skill != null
