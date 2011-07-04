@@ -359,9 +359,6 @@ public final class DragListener extends MouseAdapter {
 
         int experience = unit.getExperience();
         GoodsType goods = unit.getExperienceType();
-        if (goods == null) {
-            goods = unit.getWorkType();
-        }
         if (experience > 0 && goods != null) {
             UnitType expertType = canvas.getSpecification().getExpertForProducing(goods);
             if (unit.getType().canBeUpgraded(expertType, ChangeType.EXPERIENCE)) {
