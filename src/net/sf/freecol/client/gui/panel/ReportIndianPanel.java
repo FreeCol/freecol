@@ -49,10 +49,15 @@ public final class ReportIndianPanel extends ReportPanel {
     public ReportIndianPanel(Canvas parent) {
         super(parent, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
-        reportPanel.setLayout(new MigLayout("wrap 5, fillx", "[]20px[center]", ""));
+        reportPanel.setLayout(new MigLayout("wrap 5, fillx, insets 0", "[]20px[center]", ""));
+        boolean needsSeperator = false;
         for (Player opponent : getGame().getPlayers()) {
             if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
+                if(needsSeperator == true) {
+                    reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline 20, span, growx, wrap 20");
+                }
                 buildIndianAdvisorPanel(player, opponent);
+                needsSeperator = true;
             }
         }
         scrollPane.getViewport().setOpaque(false);
@@ -68,19 +73,24 @@ public final class ReportIndianPanel extends ReportPanel {
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
 
-        reportPanel.add(localizedLabel("report.indian.nameOfTribe"));
-        reportPanel.add(localizedLabel(opponent.getNationName()), "span 2, wrap");
+        JLabel villageLabel = new JLabel();
+        villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
+        reportPanel.add(villageLabel, "span, split 2");
+        JLabel headline = localizedLabel(opponent.getNationName());
+        headline.setFont(smallHeaderFont);
+        reportPanel.add(headline, "wrap 20");
+//        reportPanel.add(localizedLabel("report.indian.nameOfTribe"));
+//        reportPanel.add(localizedLabel(opponent.getNationName()), "wrap");
         reportPanel.add(localizedLabel("report.indian.chieftain"));
-        reportPanel.add(new JLabel(Messages.message(opponent.getName())), "span 2, wrap");
+        reportPanel.add(new JLabel(Messages.message(opponent.getName())), "left, wrap");
         reportPanel.add(localizedLabel("report.indian.typeOfSettlements"));
-        reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"),
-                        "span 2, wrap");
+        reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"), "left, wrap");
         reportPanel.add(localizedLabel("report.indian.numberOfSettlements"));
-        reportPanel.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span 2, wrap");
-        reportPanel.add(new JLabel(Messages.message("report.indian.tension")+":"));
-        reportPanel.add(localizedLabel(opponent.getTension(player).toString()), "span 2, wrap");
+        reportPanel.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "left, wrap");
+        reportPanel.add(new JLabel(Messages.message("report.indian.tribeTension")));
+        reportPanel.add(localizedLabel(opponent.getTension(player).toString()), "left, wrap 20");
 
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
+//        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
 
         int numberOfSettlements = opponent.getIndianSettlements().size();
         if (numberOfSettlements > 0) {
@@ -110,7 +120,9 @@ public final class ReportIndianPanel extends ReportPanel {
 
                 JLabel missionLabel = new JLabel();
                 Unit missionary = settlement.getMissionary();
-                if (missionary != null) {
+                if (missionary == null) {
+                    missionLabel.setText(Messages.message("indianSettlement.skillNone"));   // FIXME
+                } else {
                     boolean expert = missionary.hasAbility("model.ability.expertMissionary");
                     missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1)));
                     String text = Messages.message(StringTemplate.template("model.unit.nationUnit")
@@ -162,6 +174,5 @@ public final class ReportIndianPanel extends ReportPanel {
         } else {
             reportPanel.add(localizedLabel("report.indian.noKnownSettlements"));
         }
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline 10, span, growx");
     }
 }
