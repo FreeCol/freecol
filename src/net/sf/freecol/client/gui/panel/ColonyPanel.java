@@ -804,7 +804,7 @@ public final class ColonyPanel extends FreeColPanel
 
         public ColonyCargoPanel(Canvas canvas) {
             super(canvas, true);
-            //setLayout(new MigLayout("wrap 4, fill"));
+            setLayout(new MigLayout("wrap 6, fill, insets 0"));
         }
 
         @Override
@@ -834,7 +834,7 @@ public final class ColonyPanel extends FreeColPanel
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new MigLayout("fill, wrap 4, gap 0:10:10:push"));
+            setLayout(new MigLayout("fill, wrap 4, insets 0, gap 0:10:10:push"));
             this.colonyPanel = colonyPanel;
         }
 
@@ -1039,7 +1039,7 @@ public final class ColonyPanel extends FreeColPanel
         private Colony colony;
 
         public OutsideColonyPanel() {
-            super(new MigLayout("wrap 4, fill"));
+            super(new MigLayout("wrap 4, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("outsideColony")));
         }
@@ -1163,7 +1163,7 @@ public final class ColonyPanel extends FreeColPanel
     public final class InPortPanel extends JPanel {
 
         public InPortPanel() {
-            super(new MigLayout("wrap 3, fill"));
+            super(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
         }
@@ -1223,7 +1223,7 @@ public final class ColonyPanel extends FreeColPanel
          */
         public WarehousePanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
-            setLayout(new MigLayout("fill, gap push"));
+            setLayout(new MigLayout("fill, gap push, insets 0"));
         }
 
         /**
