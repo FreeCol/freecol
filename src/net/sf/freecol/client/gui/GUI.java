@@ -1026,7 +1026,7 @@ public final class GUI {
             ColonyTile colonyTile = colony.getColonyTile(tile);
             occupyingUnit = colonyTile.getOccupyingUnit();
             price = colony.getOwner().getLandPrice(tile);
-            if (!colonyTile.canBeWorked()) {
+            if (!colonyTile.canBeWorked() && !colonyTile.isColonyCenterTile()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
             }
         }
