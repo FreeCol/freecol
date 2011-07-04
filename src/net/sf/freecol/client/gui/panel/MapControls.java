@@ -111,7 +111,7 @@ public final class MapControls {
     }
 
 
-    public void updateUnitButtons() {
+    private void updateUnitButtons() {
 
         final ActionManager am = freeColClient.getActionManager();
 
