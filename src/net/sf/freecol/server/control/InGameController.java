@@ -652,18 +652,18 @@ public final class InGameController extends Controller {
                                     ServerPlayer independent, ChangeSet cs) {
         serverPlayer.csChangeStance(Stance.PEACE, independent, true, cs);
         independent.setPlayerType(PlayerType.INDEPENDENT);
-        Turn turn = getGame().getTurn();
+        Game game = getGame();
+        Turn turn = game.getTurn();
         independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
         independent.setTax(0);
         independent.recalculateBellsBonus();
         independent.reinitialiseMarket();
-        independent.addHistory(new HistoryEvent(turn,
-                HistoryEvent.EventType.INDEPENDENCE));
+        cs.addGlobalHistory(game,
+            new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE));
         cs.addMessage(See.only(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.player.independence",
-                             independent)
-                .addStringTemplate("%ref%", serverPlayer.getNationName()));
+                "model.player.independence", independent)
+            .addStringTemplate("%ref%", serverPlayer.getNationName()));
 
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<Unit>();
@@ -683,19 +683,16 @@ public final class InGameController extends Controller {
             }
             cs.addMessage(See.only(independent),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "model.player.independence.unitsAcquired",
-                                 independent)
-                    .addStringTemplate("%units%", surrender));
+                    "model.player.independence.unitsAcquired", independent)
+                .addStringTemplate("%units%", surrender));
         }
 
         // Update player type.  Again, a pity to have to do a whole
         // player update, but a partial update works for other players.
-        cs.addPartial(See.all().except(independent), independent,
-                      "playerType");
+        cs.addPartial(See.all().except(independent), independent, "playerType");
         cs.addMessage(See.all().except(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.player.independence.announce",
-                             independent)
+                "model.player.independence.announce", independent)
                 .addStringTemplate("%nation%", independent.getNationName())
                 .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
@@ -1051,7 +1048,7 @@ public final class InGameController extends Controller {
         // Do not add history event to cs as we are going to update the
         // entire player.  Likewise clear model messages.
         Turn turn = getGame().getTurn();
-        serverPlayer.addHistory(new HistoryEvent(turn,
+        cs.addGlobalHistory(getGame(), new HistoryEvent(turn,
                 HistoryEvent.EventType.DECLARE_INDEPENDENCE));
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),
@@ -2522,10 +2519,9 @@ public final class InGameController extends Controller {
         tiles.addAll(settlement.getOwnedTiles());
         cs.add(See.perhaps(), tiles);
 
-        cs.addHistory(serverPlayer,
-            new HistoryEvent(game.getTurn(),
-                             HistoryEvent.EventType.FOUND_COLONY)
-                .addName("%colony%", settlement.getName()));
+        cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
+                HistoryEvent.EventType.FOUND_COLONY)
+            .addName("%colony%", settlement.getName()));
 
         // Also send any tiles that can now be seen because the colony
         // can perhaps see further than the founding unit.

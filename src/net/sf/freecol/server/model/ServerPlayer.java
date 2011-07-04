@@ -2606,7 +2606,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nation%", nativeNation));
         }
         if (nativePlayer.checkForDeath()) {
-            cs.addHistory(attackerPlayer,
+            cs.addGlobalHistory(game,
                 new HistoryEvent(game.getTurn(),
                     HistoryEvent.EventType.DESTROY_NATION)
                 .addStringTemplate("%nation%", nativeNation));
@@ -3100,7 +3100,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", loserLocation));
         if (loserPlayer.isIndian() && loserPlayer.checkForDeath()) {
             StringTemplate nativeNation = loserPlayer.getNationName();
-            cs.addHistory(winnerPlayer,
+            cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.EventType.DESTROY_NATION)
                 .addStringTemplate("%nation%", nativeNation));

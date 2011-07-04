@@ -859,22 +859,23 @@ public class ChangeSet {
         public List<Change> consequences(ServerPlayer serverPlayer) {
             List<Change> changes = new ArrayList<Change>();
             String sta = stance.toString();
-            ModelMessage m = ((ServerPlayer) first == serverPlayer)
+            ModelMessage m = (stance == Stance.UNCONTACTED)
+                ? null
+                : ((ServerPlayer) first == serverPlayer)
                 ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                   "model.diplomacy." + sta + ".declared",
-                                   second)
+                    "model.diplomacy." + sta + ".declared", second)
                     .addStringTemplate("%nation%", second.getNationName())
                 : ((ServerPlayer) second == serverPlayer)
                 ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                   "model.diplomacy." + sta + ".declared",
-                                   first)
+                    "model.diplomacy." + sta + ".declared", first)
                     .addStringTemplate("%nation%", first.getNationName())
                 : new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                   "model.diplomacy." + sta + ".others",
-                                   first)
+                    "model.diplomacy." + sta + ".others", first)
                     .addStringTemplate("%attacker%", first.getNationName())
                     .addStringTemplate("%defender%", second.getNationName());
-            changes.add(new OwnedChange(See.only(serverPlayer), m));
+            if (m != null) {
+                changes.add(new OwnedChange(See.only(serverPlayer), m));
+            }
             return changes;
         }
 

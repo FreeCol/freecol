@@ -447,11 +447,9 @@ public class Region extends FreeColGameObject implements Nameable {
             isPacific()) {
             player.modifyScore(getScoreValue());
         }
-        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_REGION)
+        return new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_REGION)
             .addStringTemplate("%nation%", player.getNationName())
             .addName("%region%", newName);
-        player.getHistory().add(h);
-        return h;
     }
 
     /**
