@@ -114,6 +114,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** Remaining emigrants to select due to a fountain of youth */
     private int remainingEmigrants = 0;
 
+    /** Players with respect to which stance has changed. */
+    private List<ServerPlayer> stanceDirty = new ArrayList<ServerPlayer>();
+
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -946,12 +949,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Change stance and collect changes that need updating.
+     * Adds a player to the list of players for whom the stance has changed.
+     *
+     * @param other The <code>ServerPlayer</code> to add.
+     */
+    public void addStanceChange(ServerPlayer other) {
+        if (!stanceDirty.contains(other)) stanceDirty.add(other);
+    }
+
+    /**
+     * Modifies stance.
      *
      * @param stance The new <code>Stance</code>.
      * @param otherPlayer The <code>Player</code> wrt which the stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
-     * @param cs A <code>ChangeSet</code> containing the changes.
+     * @param cs A <code>ChangeSet</code> to update.
      * @return True if there was a change in stance at all.
      */
     public boolean csChangeStance(Stance stance, Player otherPlayer,
@@ -960,46 +972,31 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Stance old = getStance(otherPlayer);
 
         if (old != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                setStance(otherPlayer, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
-                           modifyTension(otherPlayer, modifier));
-                }
-                cs.addStance(See.perhaps(), this, stance, otherPlayer,
-                             stance == Stance.WAR || old == Stance.WAR);
-                logger.info("Stance change " + getName()
-                            + " " + old.toString()
-                            + " -> " + stance.toString()
-                            + " wrt " + otherPlayer.getName());
-                change = true;
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
+            int modifier = old.getTensionModifier(stance);
+            setStance(otherPlayer, stance);
+            if (modifier != 0) {
+                cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
+                    modifyTension(otherPlayer, modifier));
             }
+            logger.info("Stance modification " + getName()
+                + " " + old.toString() + " -> " + stance.toString()
+                + " wrt " + otherPlayer.getName());
+            addStanceChange((ServerPlayer) otherPlayer);
+            change = true;
         }
         if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
-            try {
-                int modifier = old.getTensionModifier(stance);
-                otherPlayer.setStance(this, stance);
-                if (modifier != 0) {
-                    cs.add(See.only(null).perhaps(this),
-                           otherPlayer.modifyTension(this, modifier));
-                }
-                if (!change) {
-                    cs.addStance(See.perhaps(), otherPlayer, stance, this,
-                                 stance == Stance.WAR || old == Stance.WAR);
-                }
-                logger.info("Stance change " + otherPlayer.getName()
-                            + " " + old.toString()
-                            + " -> " + stance.toString()
-                            + " wrt " + getName()
-                            + " (symmetric)"
-                            + ((change) ? "(suppressed)" : ""));
-                change = true;
-            } catch (IllegalStateException e) { // Catch illegal transitions
-                logger.log(Level.WARNING, "Illegal stance transition", e);
+            int modifier = old.getTensionModifier(stance);
+            otherPlayer.setStance(this, stance);
+            if (modifier != 0) {
+                cs.add(See.only(null).perhaps(this),
+                    otherPlayer.modifyTension(this, modifier));
             }
+            logger.info("Stance modification " + otherPlayer.getName()
+                + " " + old.toString() + " -> " + stance.toString()
+                + " wrt " + getName() + " (symmetric)"
+                + ((change) ? "(suppressed)" : ""));
+            ((ServerPlayer) otherPlayer).addStanceChange(this);
+            change = true;
         }
 
         return change;
@@ -1059,6 +1056,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 cs.addPartial(See.only(this), this, "immigration");
             }
             cs.addPartial(See.only(this), this, "liberty");
+        }
+
+        // Update stances
+        while (!stanceDirty.isEmpty()) {
+            ServerPlayer s = stanceDirty.remove(0);
+            cs.addStance(See.perhaps(), this, getStance(s), s,
+                getStance(s) == Stance.WAR || s.getStance(this) == Stance.WAR);
         }
     }
 

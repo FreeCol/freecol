@@ -1180,7 +1180,12 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         Element reply = null;
         for (int i = 0; i < nodes.getLength(); i++) {
-            reply = handle(connection, (Element) nodes.item(i));
+            try {
+                reply = handle(connection, (Element) nodes.item(i));
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Caught crash in multiple item " + i
+                    + ", continuing.", e);
+            }
         }
         return reply;
     }

@@ -2663,8 +2663,10 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param player The <code>Player</code>.
      * @param newStance The new <code>Stance</code>.
+     * @return True if the stance change was valid.
+     * @throws IllegalArgumentException if player is null or this.
      */
-    public void setStance(Player player, Stance newStance) {
+    public boolean setStance(Player player, Stance newStance) {
         if (player == null) {
             throw new IllegalArgumentException("Player must not be 'null'.");
         }
@@ -2673,19 +2675,18 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (newStance == null) {
             stance.remove(player.getId());
-            return;
+            return true;
         }
         Stance oldStance = stance.get(player.getId());
-        if (newStance.equals(oldStance)) {
-            return;
-        }
-        if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
-            throw new IllegalStateException("Cease fire can only be declared when at war.");
-        }
-        if (newStance == Stance.UNCONTACTED) {
-            throw new IllegalStateException("Attempt to set UNCONTACTED stance");
+        if (newStance.equals(oldStance)) return true;
+
+        boolean valid = true;;
+        if ((newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR)
+            || newStance == Stance.UNCONTACTED) {
+            valid = false;
         }
         stance.put(player.getId(), newStance);
+        return valid;
     }
 
     /**
