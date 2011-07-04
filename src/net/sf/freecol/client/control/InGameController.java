@@ -2746,8 +2746,7 @@ public final class InGameController implements NetworkConstants {
         if (europe == null || unit.isInEurope()) {
             cash = true; // No need to check for transport.
         } else {
-            int fee = getSpecification()
-                .getInteger("model.option.treasureTransportFee");
+            int fee = unit.getTransportFee();
             StringTemplate template = (fee == 0)
                 ? StringTemplate.template("cashInTreasureTrain.free")
                 : StringTemplate.template("cashInTreasureTrain.pay")
