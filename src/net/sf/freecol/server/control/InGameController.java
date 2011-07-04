@@ -1018,9 +1018,9 @@ public final class InGameController extends Controller {
                 .addAmount("%amount%", fullAmount)
                 .addStringTemplate("%nation%", serverPlayer.getNationName()));
 
-        // Dispose of the unit.
+        // Dispose of the unit, only visible to the owner.
         cs.add(See.only(serverPlayer), (FreeColGameObject) unit.getLocation());
-        cs.addDispose(serverPlayer, unit.getLocation(), unit);
+        cs.addDispose(See.only(serverPlayer), null, unit);
 
         // Others can see the cash in message.
         sendToOthers(serverPlayer, cs);
@@ -1125,7 +1125,7 @@ public final class InGameController extends Controller {
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
 
         // Now the REF is ready, we can dispose of the European connection.
-        cs.addDispose(serverPlayer, null, serverPlayer.getEurope());
+        cs.addDispose(See.only(serverPlayer), null, serverPlayer.getEurope());
         serverPlayer.setEurope(null);
         serverPlayer.setMonarch(null);
 
@@ -1711,10 +1711,11 @@ public final class InGameController extends Controller {
         unit.setMovesLeft(0);
         csSpeakToChief(serverPlayer, settlement, false, cs);
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
-        case HATEFUL: // Killed
+        case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject) unit.getLocation());
-            cs.addDispose(serverPlayer, unit.getLocation(), unit);
+            cs.addDispose(See.perhaps().always(serverPlayer),
+                unit.getLocation(), unit);
             break;
         case ANGRY: // Learn nothing, not even a pet update
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -1828,7 +1829,8 @@ public final class InGameController extends Controller {
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject) unit.getLocation());
-            cs.addDispose(serverPlayer, unit.getLocation(), unit);
+            cs.addDispose(See.perhaps().always(serverPlayer),
+                unit.getLocation(), unit);
             result = "die";
         } else {
             // Otherwise player gets to visit, and learn about the settlement.
@@ -1956,7 +1958,8 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject) unit.getLocation());
-        cs.addDispose(serverPlayer, unit.getLocation(), unit);
+        cs.addDispose(See.perhaps().always(serverPlayer),
+            unit.getLocation(), unit);
 
         // Others can see missionary disappear
         sendToOthers(serverPlayer, cs);
@@ -1977,20 +1980,9 @@ public final class InGameController extends Controller {
         csSpeakToChief(serverPlayer, settlement, false, cs);
 
         Unit missionary = settlement.getMissionary();
-        Tile tile = settlement.getTile();
-        ServerPlayer enemy = null;
         if (missionary != null) {
-            enemy = (ServerPlayer) missionary.getOwner();
-            settlement.changeMissionary(null);
-
-            // Inform the enemy of loss of mission
-            cs.add(See.only(enemy), settlement);
-            cs.addDispose(enemy, settlement.getTile(), missionary);
-            cs.addMessage(See.only(enemy),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 "indianSettlement.mission.denounced",
-                                 settlement)
-                    .addName("%settlement%", settlement.getNameFor(enemy)));
+            ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
+            enemy.csKillMissionary(settlement, cs);
         }
 
         // Result depends on tension wrt this settlement.
@@ -1998,8 +1990,9 @@ public final class InGameController extends Controller {
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject) unit.getLocation());
-            cs.addDispose(serverPlayer, unit.getLocation(), unit);
+                (FreeColGameObject) unit.getLocation());
+            cs.addDispose(See.perhaps().always(serverPlayer),
+                unit.getLocation(), unit);
             break;
         case HAPPY: case CONTENT: case DISPLEASED:
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
@@ -2016,6 +2009,7 @@ public final class InGameController extends Controller {
             }
             break;
         }
+        Tile tile = settlement.getTile();
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.perhaps().always(serverPlayer), tile);
         String messageId = "indianSettlement.mission."
@@ -2459,7 +2453,8 @@ public final class InGameController extends Controller {
         // Dispose of the unit.
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject) unit.getLocation());
-        cs.addDispose(serverPlayer, unit.getLocation(), unit);
+        cs.addDispose(See.perhaps().always(serverPlayer),
+            unit.getLocation(), unit);
 
         // Others can see the unit removal and the space it leaves.
         sendToOthers(serverPlayer, cs);
@@ -2611,7 +2606,8 @@ public final class InGameController extends Controller {
 
         // Now do the dispose.
         cs.add(See.perhaps().always(serverPlayer), settlement.getTile());
-        cs.addDispose(serverPlayer, settlement.getTile(), settlement);
+        cs.addDispose(See.perhaps().always(serverPlayer),
+            settlement.getTile(), settlement);
 
         // TODO: Player.settlements is still being fixed on the client side.
         sendToOthers(serverPlayer, cs);

@@ -516,6 +516,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Kills the missionary in a settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to kill the
+     *     missionary from.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csKillMissionary(IndianSettlement settlement, ChangeSet cs) {
+        Unit missionary = settlement.getMissionary();
+        settlement.changeMissionary(null);
+
+        // Inform the enemy of loss of mission
+        cs.add(See.only(this), settlement);
+        cs.addDispose(See.perhaps().always(this),
+            settlement.getTile(), missionary);
+        cs.addMessage(See.only(this),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                "indianSettlement.mission.denounced", settlement)
+            .addName("%settlement%", settlement.getNameFor(this)));
+    }
+
+    /**
      * Kill off a player and clear out its remains.
      *
      * @param cs A <code>ChangeSet</code> to update.
@@ -533,9 +554,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Unit unit = s.getMissionary();
                     if (unit != null
                         && ((ServerPlayer) unit.getOwner()) == this) {
-                        s.changeMissionary(null);
-                        cs.addDispose(this, s.getTile(), unit);
-                        cs.add(See.perhaps().always(this), s.getTile());
+                        csKillMissionary(s, cs);
                     }
                     s.removeAlarm(this);
                 }
@@ -548,7 +567,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Settlement> settlements = getSettlements();
         while (!settlements.isEmpty()) {
             Settlement settlement = settlements.remove(0);
-            cs.addDispose(this, settlement.getTile(), settlement);
+            cs.addDispose(See.perhaps().always(this),
+                settlement.getTile(), settlement);
         }
 
         // Clean up remaining tile ownerships
@@ -566,7 +586,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (unit.getLocation() instanceof Tile) {
                 cs.add(See.perhaps().always(this), unit.getTile());
             }
-            cs.addDispose(this, unit.getLocation(), unit);
+            cs.addDispose(See.perhaps().always(this),
+                unit.getLocation(), unit);
         }
     }
 
@@ -2150,7 +2171,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
             units.addAll(u.getUnitList());
-            cs.addDispose(colonyPlayer, u.getLocation(), u);
+            // Only the colony player should see units disappear
+            cs.addDispose(See.only(colonyPlayer), null, u);
         }
 
         // Inform former owner of loss of owned tiles, and process possible
@@ -2409,7 +2431,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Unit u;
         while ((u = ship.getFirstUnit()) != null) {
             u.setLocation(null);
-            cs.addDispose(player, ship, u);
+            cs.addDispose(See.only(player), null, u); // Only owner-visible
         }
 
         // Damage the ship and send it off for repair
@@ -2654,7 +2676,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Settlement goes away
-        cs.addDispose(owner, centerTile, settlement);
+        cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
         if (centerClaimant != null) {
             centerTile.changeOwnership(centerClaimant.getOwner(),
                                        centerClaimant);
@@ -3030,7 +3052,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
                             ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        cs.addDispose(shipPlayer, ship.getLocation(), ship);
+        cs.addDispose(See.perhaps().always(shipPlayer),
+            ship.getLocation(), ship);
         cs.addAttribute(See.only(attackerPlayer), "sound",
             "sound.event.shipSunk");
     }
@@ -3088,7 +3111,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Destroy unit.
-        cs.addDispose(loserPlayer, loser.getLocation(), loser);
+        cs.addDispose(See.perhaps().always(loserPlayer),
+            loser.getLocation(), loser);
     }
 
     /**

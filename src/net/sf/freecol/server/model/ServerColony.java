@@ -151,7 +151,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // nonsensical 0-unit colony.
         if (getUnitCount() <= 0) {
             logger.warning("Cleaning up 0-unit colony: " + getName());
-            cs.addDispose(owner, getTile(), this);
+            cs.addDispose(See.perhaps().always(owner), getTile(), this);
             return;
         }
 
@@ -239,7 +239,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     if (getUnitCount() > 1) {
                         Unit victim = Utils.getRandomMember(logger,
                             "Choose starver", getUnitList(), random);
-                        cs.addDispose(owner, this, victim);
+                        cs.addDispose(See.only(owner), null, victim);
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                              "model.colony.colonistStarved",
@@ -251,7 +251,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                                              "model.colony.colonyStarved",
                                              this)
                                 .addName("%colony%", getName()));
-                        cs.addDispose(owner, getTile(), this);
+                        cs.addDispose(See.perhaps().always(owner),
+                            getTile(), this);
                         return;
                     }
                 } else if (net < 0) {

@@ -205,7 +205,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                         "model.unit.attrition", this)
                     .addStringTemplate("%unit%", getLabel()));
-                cs.addDispose(owner, loc, this);
+                cs.addDispose(See.perhaps().always(owner), loc, this);
             }
         } else {
             setAttrition(0);
@@ -572,7 +572,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             csNativeBurialGround(cs);
             break;
         case EXPEDITION_VANISHES:
-            cs.addDispose(serverPlayer, tile, this);
+            cs.addDispose(See.perhaps().always(serverPlayer), tile, this);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.ExpeditionVanishes", serverPlayer));

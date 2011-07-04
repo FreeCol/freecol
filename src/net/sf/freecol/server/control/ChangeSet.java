@@ -1050,15 +1050,13 @@ public class ChangeSet {
     /**
      * Helper function to add a removal for a disposal list to a ChangeSet.
      *
-     * @param owner The <code>ServerPlayer</code> that owns this object.
+     * @param see The visibility of this change.
      * @param loc The <code>Location</code> where the object was.
      * @param obj The <code>FreeColGameObject</code> to remove.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addDispose(ServerPlayer owner, Location loc,
-                                FreeColGameObject obj) {
-        changes.add(new RemoveChange(See.perhaps().always(owner), loc,
-                                     obj.disposeList()));
+    public ChangeSet addDispose(See see, Location loc, FreeColGameObject obj) {
+        changes.add(new RemoveChange(see, loc, obj.disposeList()));
         return this;
     }
 
