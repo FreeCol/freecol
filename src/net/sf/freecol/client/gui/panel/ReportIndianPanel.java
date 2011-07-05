@@ -79,8 +79,6 @@ public final class ReportIndianPanel extends ReportPanel {
         JLabel headline = localizedLabel(opponent.getNationName());
         headline.setFont(smallHeaderFont);
         reportPanel.add(headline, "wrap 20");
-//        reportPanel.add(localizedLabel("report.indian.nameOfTribe"));
-//        reportPanel.add(localizedLabel(opponent.getNationName()), "wrap");
         reportPanel.add(localizedLabel("report.indian.chieftain"));
         reportPanel.add(new JLabel(Messages.message(opponent.getName())), "left, wrap");
         reportPanel.add(localizedLabel("report.indian.typeOfSettlements"));
@@ -89,8 +87,6 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "left, wrap");
         reportPanel.add(new JLabel(Messages.message("report.indian.tribeTension")));
         reportPanel.add(localizedLabel(opponent.getTension(player).toString()), "left, wrap 20");
-
-//        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
 
         int numberOfSettlements = opponent.getIndianSettlements().size();
         if (numberOfSettlements > 0) {
