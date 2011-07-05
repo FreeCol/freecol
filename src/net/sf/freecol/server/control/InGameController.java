@@ -1866,7 +1866,7 @@ public final class InGameController extends Controller {
 
             // Have now spoken to the chief.
             csSpeakToChief(serverPlayer, settlement, true, cs);
-            if (!"nothing".equals(result)) tileDirty = true;
+            tileDirty = true;
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
