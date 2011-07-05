@@ -476,10 +476,11 @@ public class ChangeSet {
         public List<Change> consequences(ServerPlayer serverPlayer) {
             if (seeOld(serverPlayer) && !seeNew(serverPlayer)) {
                 List<Change> changes = new ArrayList<Change>();
-                List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+                List<FreeColGameObject> objects
+                    = new ArrayList<FreeColGameObject>();
                 objects.add(unit);
                 changes.add(new RemoveChange(See.only(serverPlayer),
-                                             unit.getLocation(), objects));
+                        unit.getLocation(), objects));
                 return changes;
             }
             return Collections.emptyList();
@@ -845,38 +846,6 @@ public class ChangeSet {
                 || (war && serverPlayer.hasContacted(first)
                     && serverPlayer.hasContacted(second))
                 || serverPlayer.hasAbility("model.ability.betterForeignAffairsReport");
-        }
-
-        /**
-         * There are consequences to a stance change.  If it is
-         * visible to a player they should see a message about it,
-         * unless they initiated the change and already know.
-         *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
-         * @return A list of changes if there are messages to send.
-         */
-        @Override
-        public List<Change> consequences(ServerPlayer serverPlayer) {
-            List<Change> changes = new ArrayList<Change>();
-            String sta = stance.toString();
-            ModelMessage m = (stance == Stance.UNCONTACTED)
-                ? null
-                : ((ServerPlayer) first == serverPlayer)
-                ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + sta + ".declared", second)
-                    .addStringTemplate("%nation%", second.getNationName())
-                : ((ServerPlayer) second == serverPlayer)
-                ? new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + sta + ".declared", first)
-                    .addStringTemplate("%nation%", first.getNationName())
-                : new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + sta + ".others", first)
-                    .addStringTemplate("%attacker%", first.getNationName())
-                    .addStringTemplate("%defender%", second.getNationName());
-            if (m != null) {
-                changes.add(new OwnedChange(See.only(serverPlayer), m));
-            }
-            return changes;
         }
 
         /**

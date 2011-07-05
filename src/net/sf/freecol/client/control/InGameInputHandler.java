@@ -940,12 +940,11 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
         logger.info("Stance transition: " + old.toString()
-                    + " -> " + stance.toString());
+            + " -> " + stance.toString());
         if (player == first && old == Stance.UNCONTACTED) {
             freeColClient.playSound("sound.event.meet."
-                                    + second.getNationID());
+                + second.getNationID());
         }
-
         return null;
     }
 

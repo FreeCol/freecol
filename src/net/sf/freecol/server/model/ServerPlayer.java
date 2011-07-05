@@ -981,7 +981,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + otherPlayer.getName());
-            addStanceChange((ServerPlayer) otherPlayer);
+            this.addStanceChange((ServerPlayer) otherPlayer);
             change = true;
         }
         if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
@@ -993,8 +993,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
             logger.info("Stance modification " + otherPlayer.getName()
                 + " " + old.toString() + " -> " + stance.toString()
-                + " wrt " + getName() + " (symmetric)"
-                + ((change) ? "(suppressed)" : ""));
+                + " wrt " + getName() + " (symmetric)");
             ((ServerPlayer) otherPlayer).addStanceChange(this);
             change = true;
         }
@@ -1061,8 +1060,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Update stances
         while (!stanceDirty.isEmpty()) {
             ServerPlayer s = stanceDirty.remove(0);
-            cs.addStance(See.perhaps(), this, getStance(s), s,
-                getStance(s) == Stance.WAR || s.getStance(this) == Stance.WAR);
+            Stance sta = getStance(s);
+            boolean war = sta == Stance.WAR;
+            cs.addStance(See.perhaps(), this, sta, s, war);
+            if (sta == Stance.UNCONTACTED) continue;
+            cs.addMessage(See.only(s),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    "model.diplomacy." + sta + ".declared", this)
+                    .addStringTemplate("%nation%", getNationName()));
+            for (Player p : getGame().getLiveEuropeanPlayers()) {
+                if ((ServerPlayer) p == this || p == s) continue;
+                if (p.hasAbility("model.ability.betterForeignAffairsReport")
+                    || war) {
+                    cs.addMessage(See.only((ServerPlayer) p),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            "model.diplomacy." + sta + ".others", this)
+                        .addStringTemplate("%attacker%", getNationName())
+                        .addStringTemplate("%defender%", s.getNationName()));
+                }
+            }
         }
     }
 
