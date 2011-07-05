@@ -457,7 +457,6 @@ public final class ConnectController {
                             ResourceManager.setScenarioMapping(savegame.getResourceMapping());
                             login(username, "127.0.0.1", FreeCol.getDefaultPort());
                             canvas.closeStatusPanel();
-                            canvas.updateMapControls();
                         }
                     } );
                 } catch (NoRouteToServerException e) {

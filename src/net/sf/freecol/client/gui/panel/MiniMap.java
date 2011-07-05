@@ -126,8 +126,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
 
         // Add buttons:
-        miniMapZoomOutButton = new UnitButton(freeColClient.getActionManager().getFreeColAction(MiniMapZoomOutAction.id));
-        miniMapZoomInButton = new UnitButton(freeColClient.getActionManager().getFreeColAction(MiniMapZoomInAction.id));
+        miniMapZoomOutButton = new UnitButton(freeColClient.getActionManager(), MiniMapZoomOutAction.id);
+        miniMapZoomInButton = new UnitButton(freeColClient.getActionManager(), MiniMapZoomInAction.id);
 
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);

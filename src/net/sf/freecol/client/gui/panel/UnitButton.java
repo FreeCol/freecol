@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 
+import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
 
 /**
@@ -41,13 +42,29 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 */
 public final class UnitButton extends JButton {
 
+	private String actionId;
+	private ActionManager am;
+	
     /**
     * The basic constructor.
-    * @param a The action to be used with this button.
+    * @param am The action manager which holds all FreeColAction.
+    * @param actionId The key for the action to be used with this button
     */
-    public UnitButton(FreeColAction a) {
-        super(a);
+    public UnitButton(ActionManager am, String actionId) {
+        super(am.getFreeColAction(actionId));
+        this.actionId = actionId;
+        this.am = am;
     }
+    
+    /**
+     * Refreshes the the reference to the FreeColAction stored in the
+     * action manager.
+     */
+    public void refreshAction() {
+        setAction(null);
+        setAction(am.getFreeColAction(actionId));
+    }
+    
 
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);

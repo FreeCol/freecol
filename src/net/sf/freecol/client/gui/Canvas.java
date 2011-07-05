@@ -760,12 +760,6 @@ public final class Canvas extends JDesktopPane {
         return mapControls;
     }
 
-    public void updateMapControls() {
-        mapControls = ((MapControlsAction) freeColClient
-                       .getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
-    }
-
-
     @Override
     public Dimension getMinimumSize() {
         return new Dimension(640, 480);

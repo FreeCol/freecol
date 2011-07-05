@@ -62,9 +62,9 @@ public final class MapControls {
 
     private final FreeColClient freeColClient;
 
-    private final InfoPanel infoPanel;
-    private final MiniMap miniMap;
-    private final List<UnitButton> unitButtons = new ArrayList<UnitButton>();
+    private final InfoPanel        infoPanel;
+    private final MiniMap          miniMap;
+    private final UnitButton[]     unitButton;
     private final JLabel compassRose;
 
     private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
@@ -84,7 +84,23 @@ public final class MapControls {
         miniMap = new MiniMap(freeColClient);
         compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
 
-        updateUnitButtons();
+        final ActionManager am = freeColClient.getActionManager();
+
+        List<UnitButton> ubList = new ArrayList<UnitButton>();
+        ubList.add(new UnitButton(am, WaitAction.id));
+        ubList.add(new UnitButton(am, SkipUnitAction.id));
+        ubList.add(new UnitButton(am, SentryAction.id));
+        ubList.add(new UnitButton(am, FortifyAction.id));
+//        if ( freeColClient.getGame() != null )  // ** DOUBTFUL !! just for testing
+        for (TileImprovementType type : freeColClient.getGame().getSpecification()
+                 .getTileImprovementTypeList()) {
+            if (!type.isNatural()) {
+                ubList.add(new UnitButton(am, type.getShortId() + "Action"));
+            }
+        }
+        ubList.add(new UnitButton(am, BuildColonyAction.id));
+        ubList.add(new UnitButton(am, DisbandUnitAction.id));
+        unitButton = (ubList.toArray(new UnitButton[0]));
 
         //
         // Don't allow them to gain focus
@@ -92,6 +108,10 @@ public final class MapControls {
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
         compassRose.setFocusable(false);
+
+        for(int i=0; i<unitButton.length; i++) {
+            unitButton[i].setFocusable(false);
+        }
 
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
@@ -107,31 +127,6 @@ public final class MapControls {
                     freeColClient.getInGameController().moveActiveUnit(direction);
                 }
             });
-
-    }
-
-
-    private void updateUnitButtons() {
-
-        final ActionManager am = freeColClient.getActionManager();
-
-        unitButtons.clear();
-        unitButtons.add(new UnitButton(am.getFreeColAction(WaitAction.id)));
-        unitButtons.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
-        unitButtons.add(new UnitButton(am.getFreeColAction(SentryAction.id)));
-        unitButtons.add(new UnitButton(am.getFreeColAction(FortifyAction.id)));
-        for (TileImprovementType type : freeColClient.getGame().getSpecification()
-                 .getTileImprovementTypeList()) {
-            if (!type.isNatural()) {
-                unitButtons.add(new UnitButton(am.getFreeColAction(type.getShortId() + "Action")));
-            }
-        }
-        unitButtons.add(new UnitButton(am.getFreeColAction(BuildColonyAction.id)));
-        unitButtons.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.id)));
-
-        for (UnitButton button : unitButtons) {
-            button.setFocusable(false);
-        }
 
     }
 
@@ -164,17 +159,18 @@ public final class MapControls {
         miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
         compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
 
-        final int WIDTH = unitButtons.get(0).getWidth();
+        final int WIDTH = unitButton[0].getWidth();
         final int SPACE = 5;
-        int x = miniMap.getWidth() + 1 +
-            ((infoPanel.getX() - miniMap.getWidth() -
-              unitButtons.size() * WIDTH -
-              (unitButtons.size() - 1) * SPACE - WIDTH) / 2);
-        int y = component.getHeight() - 40;
 
-        for (UnitButton button : unitButtons) {
-            button.setLocation(x, y);
-            x += (WIDTH + SPACE);
+        for(int i=0; i<unitButton.length; i++) {
+            int x = miniMap.getWidth() + 1 +
+                    ((infoPanel.getX() - miniMap.getWidth() -
+                      unitButton.length * WIDTH -
+                      (unitButton.length-1) * SPACE - WIDTH) / 2) +
+                    i * (WIDTH + SPACE);
+            int y = component.getHeight() - 40;
+
+            unitButton[i].setLocation(x, y);
         }
 
         //
@@ -187,11 +183,9 @@ public final class MapControls {
         }
 
         if (!freeColClient.isMapEditor()) {
-            for (UnitButton button : unitButtons) {
-                component.add(button, CONTROLS_LAYER, false);
-                Action a = button.getAction();
-                button.setAction(null);
-                button.setAction(a);
+            for(int i=0; i<unitButton.length; i++) {
+                component.add(unitButton[i], CONTROLS_LAYER, false);
+                unitButton[i].refreshAction();
             }
         }
     }
@@ -225,8 +219,8 @@ public final class MapControls {
         canvas.remove(miniMap, false);
         canvas.remove(compassRose, false);
 
-        for (UnitButton button : unitButtons) {
-            canvas.remove(button, false);
+        for(int i=0; i<unitButton.length; i++) {
+            canvas.remove(unitButton[i], false);
         }
     }
 
