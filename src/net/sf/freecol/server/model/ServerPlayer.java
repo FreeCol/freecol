@@ -2169,16 +2169,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Hand over the colony
         colony.changeOwner(attackerPlayer);
 
-        // Dispose of the units
-        List<Unit> units = colony.getUnitList();
-        units.addAll(colony.getTile().getUnitList());
-        while (!units.isEmpty()) {
-            Unit u = units.remove(0);
-            units.addAll(u.getUnitList());
-            // Only the colony player should see units disappear
-            cs.addDispose(See.only(colonyPlayer), null, u);
-        }
-
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.
         for (Tile t : colony.getOwnedTiles()) {
