@@ -224,7 +224,7 @@ public final class ColonyPanel extends FreeColPanel
                                                   ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane buildingsScroll = new JScrollPane(buildingsPanel,
                                                       ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                                                      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         buildingsScroll.getVerticalScrollBar().setUnitIncrement( 16 );
 
         // Make the colony label
