@@ -299,7 +299,7 @@ public class SettlementType extends FreeColGameObjectType {
      * @return The warehouse capacity of this settlement.
      */
     public int getWarehouseCapacity() {
-        return 100 * getClaimableRadius();
+        return GoodsContainer.CARGO_SIZE * getClaimableRadius();
     }
 
 

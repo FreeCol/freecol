@@ -28,6 +28,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
@@ -63,7 +64,8 @@ public final class MarketLabel extends AbstractGoodsLabel {
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public MarketLabel(GoodsType type, Market market, Canvas parent, boolean isSmall) {
-        super(new AbstractGoods(type, 100), parent, isSmall);
+        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE),
+            parent, isSmall);
         if (market == null) {
             throw new NullPointerException();
         }

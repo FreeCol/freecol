@@ -105,31 +105,44 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Stores the alarm levels. <b>Only used by AI.</b>
-     * "Alarm" means: Tension-with-respect-to-a-player-from-an-IndianSettlement.
+     * "Alarm" means: Tension with respect to a player from an
+     *      IndianSettlement.
      * Alarm is overloaded with the concept of "contact".  If a settlement
      * has never been contacted by a player, alarm.get(player) will be null.
      * Acts causing contact initialize this variable.
      */
-    private java.util.Map<Player, Tension> alarm = new HashMap<Player, Tension>();
+    private java.util.Map<Player, Tension> alarm
+        = new HashMap<Player, Tension>();
 
-    // sort goods types descending by price
+    // Sort goods types descending by price.
     private final Comparator<GoodsType> wantedGoodsComparator
         = new Comparator<GoodsType>() {
             public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-                return getPriceToBuy(goodsType2, 100)
-                - getPriceToBuy(goodsType1, 100);
+                return getPriceToBuy(goodsType2, GoodsContainer.CARGO_SIZE)
+                - getPriceToBuy(goodsType1, GoodsContainer.CARGO_SIZE);
             }
         };
 
-    // sort goods descending by amount and price when amounts are equal
+    // Sort goods with new world goods first, then by price, and amount.
     private final Comparator<Goods> exportGoodsComparator
         = new Comparator<Goods>() {
             public int compare(Goods goods1, Goods goods2) {
-                if (goods2.getAmount() == goods1.getAmount()) {
-                    return getPriceToBuy(goods2) - getPriceToBuy(goods1);
-                } else {
-                    return goods2.getAmount() - goods1.getAmount();
+                int cmp;
+                GoodsType t1 = goods1.getType();
+                GoodsType t2 = goods2.getType();
+                cmp = (((t2.isNewWorldGoodsType()) ? 1 : 0)
+                    - ((t1.isNewWorldGoodsType()) ? 1 : 0));
+                if (cmp == 0) {
+                    int a1 = Math.min(goods2.getAmount(),
+                        GoodsContainer.CARGO_SIZE);
+                    int a2 = Math.min(goods1.getAmount(),
+                        GoodsContainer.CARGO_SIZE);
+                    cmp = getPriceToBuy(t2, a2) - getPriceToBuy(t1, a1);
+                    if (cmp == 0) {
+                        cmp = a2 - a1;
+                    }
                 }
+                return cmp;
             }
         };
 
@@ -755,7 +768,10 @@ public class IndianSettlement extends Settlement {
      * @return The price.
      */
     public int getPriceToBuy(GoodsType type, int amount) {
-        if (amount > 100) throw new IllegalArgumentException("Amount > 100");
+        if (amount > GoodsContainer.CARGO_SIZE) {
+            throw new IllegalArgumentException("Amount > "
+                + GoodsContainer.CARGO_SIZE);
+        }
 
         int price = 0;
         if (type.isMilitaryGoods()) {
@@ -913,8 +929,9 @@ public class IndianSettlement extends Settlement {
      * @return The price.
      */
     public int getPriceToSell(GoodsType type, int amount) {
-        if (amount > 100) {
-            throw new IllegalArgumentException("Too many goods");
+        if (amount > GoodsContainer.CARGO_SIZE) {
+            throw new IllegalArgumentException("Amount > "
+                + GoodsContainer.CARGO_SIZE);
         }
         final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
 
@@ -938,23 +955,15 @@ public class IndianSettlement extends Settlement {
      * @return A list of goods to sell.
      */
     public List<Goods> getSellGoods(int limit) {
+        List<Goods> result = new ArrayList<Goods>();
         List<Goods> settlementGoods = getCompactGoods();
-        for (Goods goods : settlementGoods) {
-            if (goods.getAmount() > 100) {
-                goods.setAmount(100);
-            }
-        }
         Collections.sort(settlementGoods, exportGoodsComparator);
 
-        List<Goods> result = new ArrayList<Goods>();
         int count = 0;
         for (Goods goods : settlementGoods) {
-            if (goods.getType().isNewWorldGoodsType()
-                && goods.getAmount() > 0) {
-                result.add(goods);
-                count++;
-                if (count >= limit) break;
-            }
+            result.add(goods);
+            count++;
+            if (count >= limit) break;
         }
         return result;
     }

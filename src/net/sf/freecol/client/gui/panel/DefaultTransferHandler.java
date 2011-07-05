@@ -56,6 +56,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
@@ -342,8 +343,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                         return false;
                     }
                     label.getGoods().setAmount(amount);
-                } else if (label.getGoods().getAmount() > 100) {
-                    label.getGoods().setAmount(100);
+                } else if (label.getGoods().getAmount() > GoodsContainer.CARGO_SIZE) {
+                    label.getGoods().setAmount(GoodsContainer.CARGO_SIZE);
                 }
 
                 /*

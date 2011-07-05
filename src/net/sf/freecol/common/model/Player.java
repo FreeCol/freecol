@@ -2993,10 +2993,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the most valuable goods available in one of the player's
-     * colonies for the purposes of choosing a threat-to-boycott.
-     * The goods must not currently be boycotted, the player must have traded in
-     * it, and the amount will not exceed 100.
+     * Returns the most valuable goods available in one of the
+     * player's colonies for the purposes of choosing a
+     * threat-to-boycott.  The goods must not currently be boycotted,
+     * the player must have traded in it, and the amount to be discarded
+     * will not exceed GoodsContainer.CARGO_SIZE.
      *
      * @return A goods object, or null.
      */
@@ -3011,11 +3012,10 @@ public class Player extends FreeColGameObject implements Nameable {
             for (Goods currentGoods : colonyGoods) {
                 if (getArrears(currentGoods) == 0
                     && hasTraded(currentGoods.getType())) {
-                    // never discard more than 100 units
-                    if (currentGoods.getAmount() > 100) {
-                        currentGoods.setAmount(100);
-                    }
-                    int goodsValue = market.getSalePrice(currentGoods);
+                    int amount = Math.min(currentGoods.getAmount(),
+                                          GoodsContainer.CARGO_SIZE);
+                    int goodsValue = market.getSalePrice(currentGoods.getType(),
+                                                         amount);
                     if (goodsValue > value) {
                         value = goodsValue;
                         goods = currentGoods;

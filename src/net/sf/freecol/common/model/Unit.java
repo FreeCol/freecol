@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -1858,10 +1859,11 @@ public class Unit extends FreeColGameObject
      */
     public int getLoadableAmount(GoodsType type) {
         if (canCarryGoods()) {
-            int result = getSpaceLeft() * 100;
-            int count = getGoodsContainer().getGoodsCount(type) % 100;
-            if (count > 0 && count < 100) {
-                result += (100 - count);
+            int result = getSpaceLeft() * GoodsContainer.CARGO_SIZE;
+            int count = getGoodsContainer().getGoodsCount(type)
+                % GoodsContainer.CARGO_SIZE;
+            if (count > 0 && count < GoodsContainer.CARGO_SIZE) {
+                result += GoodsContainer.CARGO_SIZE - count;
             }
             return result;
         } else {

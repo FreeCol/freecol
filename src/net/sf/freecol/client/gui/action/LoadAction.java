@@ -27,7 +27,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Unit;
+
 
 /**
  * An action for filling the holds of the currently selected unit.
@@ -75,8 +77,10 @@ public class LoadAction extends MapboardAction {
                 Iterator<Goods> goodsIterator = unit.getGoodsIterator();
                 while (goodsIterator.hasNext()) {
                     Goods goods = goodsIterator.next();
-                    if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
-                        int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
+                    if (goods.getAmount() < GoodsContainer.CARGO_SIZE
+                        && colony.getGoodsCount(goods.getType()) > 0) {
+                        int amount = Math.min(GoodsContainer.CARGO_SIZE - goods.getAmount(),
+                            colony.getGoodsCount(goods.getType()));
                         Goods newGoods = new Goods(goods.getGame(), colony, goods.getType(), amount);
                         getFreeColClient().getInGameController().loadCargo(newGoods, unit);
                     }

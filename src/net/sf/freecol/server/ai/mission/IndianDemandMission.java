@@ -197,7 +197,7 @@ public class IndianDemandMission extends Mission {
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
-            warehouse.getGoodsCount(food) >= 100) {
+            warehouse.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
             int amount = (warehouse.getGoodsCount(food) * dx) / 6;
             if (amount > 0) {
                 return new Goods(getGame(), target, food, capAmount(amount, dx));
@@ -279,7 +279,7 @@ public class IndianDemandMission extends Mission {
     private int capAmount(int amount, int difficulty) {
         int finalAmount = Math.max((amount * difficulty) / 6, 1);
         // natives can only carry one load of goods
-        finalAmount = Math.min(finalAmount, 100);
+        finalAmount = Math.min(finalAmount, GoodsContainer.CARGO_SIZE);
         return finalAmount;
     }
 

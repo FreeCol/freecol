@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -191,7 +192,7 @@ public class AIGoods extends AIObject implements Transportable {
     * @return The priority of the transport.
     */
     public int getTransportPriority() {
-        if (goods.getAmount() <= 100) {
+        if (goods.getAmount() <= GoodsContainer.CARGO_SIZE) {
             return goods.getAmount();
         } else {
             return transportPriority;

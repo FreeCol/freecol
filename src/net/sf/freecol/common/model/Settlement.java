@@ -386,7 +386,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /**
      * Gets an <code>Iterator</code> of every <code>Goods</code> in this
      * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
-     * amount of 100.
+     * amount of GoodsContainer.CARGO_SIZE.
      *
      * @return The <code>Iterator</code>.
      */

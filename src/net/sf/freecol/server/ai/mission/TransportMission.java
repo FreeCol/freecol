@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -867,7 +868,8 @@ public class TransportMission extends Mission {
                     }
                 } else if (w instanceof GoodsWish) {
                     GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());
+                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(),
+                        GoodsContainer.CARGO_SIZE, gw.getDestination());
                     if (ag != null) {
                         gw.setTransportable(ag);
                         addToTransportList(ag);

@@ -800,9 +800,10 @@ public final class InGameController extends Controller {
 
         Element reply = askElement(serverPlayer, cs);
         cs = new ChangeSet();
+        int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
         if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
             serverPlayer.csSetTax(tax, cs);
-        } else if (colony.getGoodsCount(goodsType) < goods.getAmount()) {
+        } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
             final int extraTax = 3;
@@ -815,7 +816,7 @@ public final class InGameController extends Controller {
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
-            colony.removeGoods(goods);
+            colony.removeGoods(goodsType, amount);
 
             Market market = serverPlayer.getMarket();
             market.setArrears(goodsType, market.getPaidForSale(goodsType)
@@ -857,8 +858,8 @@ public final class InGameController extends Controller {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  messageId, serverPlayer)
                     .addName("%colony%", colony.getName())
-                    .addName("%amount%", String.valueOf(goods.getAmount()))
-                    .add("%goods%", goods.getNameKey()));
+                    .addName("%amount%", Integer.toString(amount))
+                    .add("%goods%", goodsType.getNameKey()));
         }
         sendElement(serverPlayer, cs);
     }

@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -146,7 +147,7 @@ public final class DragListener extends MouseAdapter {
                     ((GoodsLabel) comp).setPartialChosen(false);
                 } else if (comp instanceof MarketLabel) {
                     ((MarketLabel) comp).setPartialChosen(false);
-                    ((MarketLabel) comp).setAmount(100);
+                    ((MarketLabel) comp).setAmount(GoodsContainer.CARGO_SIZE);
                 }
             }
 

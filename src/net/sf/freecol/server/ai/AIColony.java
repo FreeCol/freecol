@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ProductionInfo;
@@ -662,13 +663,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         if (oldGoods.getGoods().getLocation() != colony) {
                             continue;
                         }
-                        if (oldGoods.getGoods().getAmount() < 100 && oldGoods.getGoods().getAmount() < amountRemaining) {
-                            int goodsAmount = Math.min(100, amountRemaining);
+                        if (oldGoods.getGoods().getAmount() < GoodsContainer.CARGO_SIZE
+                            && oldGoods.getGoods().getAmount() < amountRemaining) {
+                            int goodsAmount = Math.min(GoodsContainer.CARGO_SIZE, amountRemaining);
                             oldGoods.getGoods().setAmount(goodsAmount);
                             if (amountRemaining >= colony.getWarehouseCapacity()
                                 && oldGoods.getTransportPriority() < AIGoods.IMPORTANT_DELIVERY) {
                                 oldGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
-                            } else if (goodsAmount == 100 && oldGoods.getTransportPriority() < AIGoods.FULL_DELIVERY) {
+                            } else if (goodsAmount == GoodsContainer.CARGO_SIZE
+                                && oldGoods.getTransportPriority() < AIGoods.FULL_DELIVERY) {
                                 oldGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
                             }
                             amountRemaining -= goodsAmount;
@@ -692,8 +695,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         }
                     }
                     while (amountRemaining > 0) {
-                        if (amountRemaining >= 100) {
-                            AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, 100, getColony().getOwner()
+                        if (amountRemaining >= GoodsContainer.CARGO_SIZE) {
+                            AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, GoodsContainer.CARGO_SIZE, getColony().getOwner()
                                                            .getEurope());
                             if (amountRemaining >= colony.getWarehouseCapacity()) {
                                 newGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
@@ -701,7 +704,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                 newGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
                             }
                             newAIGoods.add(newGoods);
-                            amountRemaining -= 100;
+                            amountRemaining -= GoodsContainer.CARGO_SIZE;
                         } else {
                             AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, amountRemaining, getColony()
                                                            .getOwner().getEurope());

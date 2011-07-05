@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 
@@ -83,7 +84,7 @@ public class GoodsWish extends Wish {
      *       completly.
      */
     public GoodsWish(AIMain aiMain, Location destination, int value, GoodsType goodsType) {
-        this(aiMain,destination,value,100,goodsType);
+        this(aiMain,destination,value, GoodsContainer.CARGO_SIZE, goodsType);
     }
 
     /**
@@ -184,31 +185,23 @@ public class GoodsWish extends Wish {
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
 
         goodsType = getAIMain().getGame().getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
-
-        final String amountStr = in.getAttributeValue(null, "amountRequested");
-        if (amountStr != null) {
-            amountRequested = Integer.parseInt(amountStr);
-        } else {
-            //backwards compatibility in case amount has not been saved
-            //can be removed if savegame versions <3 are no longer supported.
-            amountRequested = 100;
-        }
-
+        amountRequested = getAttribute(in, "amountRequested",
+                                       GoodsContainer.CARGO_SIZE);
         in.nextTag();
     }
 
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     * @return "GoodsWish"
-     */
-    public static String getXMLElementTagName() {
-        return "GoodsWish";
-    }
 
     public String toString() {
         return "GoodsWish: " + amountRequested + " " + goodsType
             + " (" + getValue() + ")";
     }
 
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "GoodsWish"
+     */
+    public static String getXMLElementTagName() {
+        return "GoodsWish";
+    }
 }
