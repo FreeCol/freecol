@@ -80,7 +80,7 @@ public class NewLandNameMessage extends DOMMessage {
             this.welcomerId = welcomer.getId();
             this.campCount = Integer.toString(camps);
         }
-        this.acceptString = null;
+        this.acceptString = Boolean.toString(accept);
     }
 
     /**
@@ -201,7 +201,8 @@ public class NewLandNameMessage extends DOMMessage {
             }
             boolean foundWelcomer = false;
             for (Tile t : tile.getSurroundingTiles(1)) {
-                if (t.getFirstUnit().getOwner() == welcomer) {
+                if (t.getFirstUnit() != null
+                    && t.getFirstUnit().getOwner() == welcomer) {
                     foundWelcomer = true;
                     break;
                 }
