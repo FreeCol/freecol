@@ -677,7 +677,9 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        return (unit.getMovesLeft() > 0) ? unit.getDestination() : null;
+        return (unit.getMovesLeft() > 0
+            && unit.getState() != UnitState.SKIPPED) ? unit.getDestination()
+            : null;
     }
 
     /**
@@ -985,7 +987,8 @@ public final class InGameController implements NetworkConstants {
         gui.setActiveUnit(unit);
 
         Location destination;
-        while (unit.getMovesLeft() > 0) {
+        while (unit.getMovesLeft() > 0
+            && unit.getState() != UnitState.SKIPPED) {
             // Look for valid destinations
             if (unit.getTradeRoute() == null) {
                 if ((destination = unit.getDestination()) == null) {
@@ -1037,7 +1040,9 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             checkCashInTreasureTrain(unit);
-            if (unit.getMovesLeft() > 0 && unit.getTile() != null
+            if (unit.getMovesLeft() > 0
+                && unit.getState() != UnitState.SKIPPED
+                && unit.getTile() != null
                 && freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.ALWAYS_CENTER)) {
                 freeColClient.getGUI().setSelectedTile(unit.getTile(), false);
@@ -1697,13 +1702,9 @@ public final class InGameController implements NetworkConstants {
             }
             return false;
         case MOVE_NO_MOVES:
-            if (!interactive) {
-                // The unit may have some moves left, but not enough
-                // to move to the next node.  Clear its remaining
-                // moves on the client side only, to avoid it being
-                // reselected.
-                unit.setMovesLeft(0);
-            }
+            // The unit may have some moves left, but not enough
+            // to move to the next node.
+            unit.setState(UnitState.SKIPPED);
             return false;
         default:
             if (interactive) {
@@ -3674,7 +3675,7 @@ public final class InGameController implements NetworkConstants {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
             moveToDestination(unit);
-            unit.setMovesLeft(0); // Fake change, client side only
+            //unit.setMovesLeft(0); // Fake change, client side only
             nextModelMessage();
         }
         return true;
