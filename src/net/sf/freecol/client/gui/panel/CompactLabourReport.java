@@ -479,7 +479,7 @@ public final class CompactLabourReport extends ReportPanel {
             JLabel buildingLabel = new JLabel(schoolhouse != null ?
                                               Messages.message(schoolhouse.getNameKey()) : "");
             buildingLabel.setBorder(CELLBORDER);
-            reportPanel.add(buildingLabel, "cell " + buildingStartRow + " " + BUILDING_COLUMN + " 1 " + (row - buildingStartRow));
+            reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
         }
 
         if (data.getUnitData().showProduction() && row > notProducingStartRow) {
