@@ -2816,7 +2816,10 @@ public final class GUI {
         List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getAdjacentTile(direction);
-            if (borderingTile != null && borderingTile.hasRoad()) {
+            TileImprovement r;
+            if (borderingTile != null
+                && (r = borderingTile.getRoad()) != null
+                && r.isComplete()) {
                 points.add(corners.get(direction));
             }
         }
