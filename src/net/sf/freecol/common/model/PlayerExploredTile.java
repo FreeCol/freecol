@@ -56,7 +56,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     private Settlement owningSettlement;
 
     // All known TileItems.
-    private List<TileItem> tileItems;
+    private final List<TileItem> tileItems = new ArrayList<TileItem>();
 
     // Colony data.
     private int colonyUnitCount = 0;
@@ -100,7 +100,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         owner = tile.getOwner();
         owningSettlement = tile.getOwningSettlement();
 
-        tileItems = new ArrayList<TileItem>();
+        tileItems.clear();
         TileItemContainer tic = tile.getTileItemContainer();
         if (tic != null) {
             tileItems.addAll(tic.getImprovements());
@@ -113,15 +113,19 @@ public class PlayerExploredTile extends FreeColGameObject {
         }
 
         Colony colony = tile.getColony();
-        if (colony != null) {
+        if (colony == null) {
+            colonyUnitCount = -1;
+            colonyStockadeKey = null;
+        } else {
             colonyUnitCount = colony.getUnitCount();
             colonyStockadeKey = colony.getTrueStockadeKey();
-            missionary = null;
         }
         IndianSettlement is = tile.getIndianSettlement();
-        if (is != null) {
-            colonyUnitCount = 0;
-            colonyStockadeKey = null;
+        if (is == null) {
+            missionary = null;
+            skill = null;
+            wantedGoods = new GoodsType[] { null, null, null };
+        } else {
             missionary = is.getMissionary();
             if (full) {
                 skill = is.getLearnableSkill();
@@ -188,15 +192,12 @@ public class PlayerExploredTile extends FreeColGameObject {
 
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
+     * This method writes an XML-representation of this object to the
+     * given stream.
      * 
-     * <br>
-     * <br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will be
-     * added to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is set
+     * to <code>false</code>.
      * 
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation
@@ -210,7 +211,8 @@ public class PlayerExploredTile extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    public void toXMLImpl(XMLStreamWriter out, Player player,
+                          boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
 
         // Start element:
@@ -220,7 +222,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         out.writeAttribute("player", player.getId());
         out.writeAttribute("tile", tile.getId());
 
-        if (tile.getOwner() != owner && owner != null) {
+        if (owner != null) {
             out.writeAttribute("owner", owner.getId());
         }
         if (owningSettlement != null) {
@@ -228,24 +230,30 @@ public class PlayerExploredTile extends FreeColGameObject {
         }
 
         Settlement settlement = tile.getSettlement();
-        if (settlement instanceof Colony) {
-            out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
-            if (colonyStockadeKey != null) {
-                out.writeAttribute("colonyStockadeKey", colonyStockadeKey);
-            }
-        } else if (settlement instanceof IndianSettlement) {
+        if (colonyUnitCount > 0) {
+            out.writeAttribute("colonyUnitCount",
+                Integer.toString(colonyUnitCount));
+        }
+        if (colonyStockadeKey != null) {
+            out.writeAttribute("colonyStockadeKey", colonyStockadeKey);
+        }
+        if (skill != null) {
             writeAttribute(out, "learnableSkill", skill);
+        }
+        if (wantedGoods[0] != null) {
             writeAttribute(out, "wantedGoods0", wantedGoods[0]);
+        }
+        if (wantedGoods[1] != null) {
             writeAttribute(out, "wantedGoods1", wantedGoods[1]);
+        }
+        if (wantedGoods[2] != null) {
             writeAttribute(out, "wantedGoods2", wantedGoods[2]);
-            // attributes end here
-            if (missionary != null) {
-                out.writeStartElement("missionary");
-                missionary.toXML(out, player, showAll, toSavedGame);
-                out.writeEndElement();
-            }
-        } else if (settlement != null) {
-            throw new IllegalStateException("Bogus settlement");
+        }
+        // Attributes end here
+        if (missionary != null) {
+            out.writeStartElement("missionary");
+            missionary.toXML(out, player, showAll, toSavedGame);
+            out.writeEndElement();
         }
         for (TileItem ti : tileItems) {
             ti.toXML(out, player, showAll, toSavedGame);
@@ -268,8 +276,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         
         player = getFreeColGameObject(in, "player", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        owner = getFreeColGameObject(in, "owner",
-                                     Player.class, tile.getOwner());
+        owner = getFreeColGameObject(in, "owner", Player.class, null);
         owningSettlement = getFreeColGameObject(in, "owningSettlement",
                                                 Settlement.class, null);
         colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
@@ -282,8 +289,8 @@ public class PlayerExploredTile extends FreeColGameObject {
         wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class,
                                       null);
 
+        tileItems.clear();
         missionary = null;
-        tileItems = new ArrayList<TileItem>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
                 in.nextTag(); // advance to the Unit tag

@@ -2244,7 +2244,8 @@ public class Colony extends Settlement implements Nameable {
             }
 
             for (WorkLocation workLocation : getWorkLocations()) {
-                ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
+                ((FreeColGameObject) workLocation).toXML(out, player,
+                    showAll, toSavedGame);
             }
             for (BuildableType item : buildQueue.getValues()) {
                 out.writeStartElement(BUILD_QUEUE_TAG);
@@ -2257,12 +2258,16 @@ public class Colony extends Settlement implements Nameable {
                 out.writeEndElement();
             }
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            out.writeAttribute("owner", pet.getOwner().getId());
-            out.writeAttribute("unitCount",
-                               Integer.toString(pet.getColonyUnitCount()));
+            if (pet.getOwner() != null) {
+                out.writeAttribute("owner", pet.getOwner().getId());
+            }
+            if (pet.getColonyUnitCount() > 0) {
+                out.writeAttribute("unitCount",
+                    Integer.toString(pet.getColonyUnitCount()));
+            }
             if (pet.getColonyStockadeKey() != null) {
                 out.writeAttribute("stockadeKey",
-                                   pet.getColonyStockadeKey());
+                    pet.getColonyStockadeKey());
             }
         }
         goodsContainer.toXML(out, player, showAll, toSavedGame);

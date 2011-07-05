@@ -1500,6 +1500,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             pet = new PlayerExploredTile(getGame(), player, this);
             playerExploredTiles.put(player, pet);
         }
+        if (settlement != null && "Havana".equals(settlement.getName())) try { throw new IllegalStateException("UPPET = " + pet.getId()); } catch (Exception e) { e.printStackTrace(); }
         pet.update(full);
     }
 
@@ -1834,12 +1835,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("connected", Boolean.toString(true));
         }
 
-        if (full) {
+        if (full || player.canSee(this)) {
             if (owner != null) {
                 out.writeAttribute("owner", owner.getId());
                 if (owningSettlement != null) {
                     out.writeAttribute("owningSettlement",
-                                       owningSettlement.getId());
+                        owningSettlement.getId());
                 }
             }
         } else if (pet != null) {
@@ -1847,50 +1848,48 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("owner", pet.getOwner().getId());
                 if (pet.getOwningSettlement() != null) {
                     out.writeAttribute("owningSettlement",
-                                       pet.getOwningSettlement().getId());
+                        pet.getOwningSettlement().getId());
                 }
             }
         }
         // End of attributes
 
-        if (settlement != null) {
-            if (full || player.canSee(this)) {
+        if (full || player.canSee(this)) {
+            if (settlement != null) {
                 settlement.toXML(out, player, showAll, toSavedGame);
-            } else if (pet != null) {
-                // Only display the settlement if we know it owns the tile
-                // and we have a useful level of information about it.
-                // This is a compromise, but something more precise is too
-                // complex for the present.
-                if (pet.getOwningSettlement() == settlement
-                    && pet.getOwner() == settlement.getOwner()
-                    && !(settlement instanceof Colony
-                         && pet.getColonyUnitCount() <= 0)) {
-                    settlement.toXML(out, player, showAll, toSavedGame);
+            }
+            // Show enemy units if there is no enemy settlement.
+            if ((full || settlement == null || settlement.getOwner() == player)
+                && !units.isEmpty()) {
+                out.writeStartElement(UNITS_TAG_NAME);
+                for (Unit unit : units) {
+                    unit.toXML(out, player, showAll, toSavedGame);
                 }
+                out.writeEndElement();
             }
-        }
-
-        // Check if the player can see the tile.
-        // Do not show enemy units on a tile out-of-sight, but do show
-        // enemy units if the tile is visible and there is no
-        // settlement there owned by another player.
-        if (!units.isEmpty()
-            && (full || (player.canSee(this)
-                         && (settlement == null
-                             || settlement.getOwner() == player)))) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
+        } else if (pet != null) {
+            // Only display the settlement if we know it owns the tile
+            // and we have a useful level of information about it.
+            // This is a compromise, but something more precise is too
+            // complex for the present.
+            if (settlement != null
+                && settlement == pet.getOwningSettlement()
+                && settlement.getOwner() == pet.getOwner()
+                && !(settlement instanceof Colony
+                    && pet.getColonyUnitCount() <= 0)) {
+                settlement.toXML(out, player, showAll, toSavedGame);
             }
-            out.writeEndElement();
         }
         if (tileItemContainer != null) {
             tileItemContainer.toXML(out, player, showAll, toSavedGame);
         }
 
+        // Save the pets.
         if (toSavedGame && playerExploredTiles != null) {
-            for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
-                entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
+            for (Entry<Player, PlayerExploredTile> entry
+                     : playerExploredTiles.entrySet()) {
+                entry.getValue().toXML(out, entry.getKey(),
+                    showAll, toSavedGame);
             }
         }
 
@@ -1967,7 +1966,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 } else {
                     tileItemContainer = new TileItemContainer(getGame(), this, in);
                 }
-            } else if (in.getLocalName().equals("playerExploredTile")) {
+            } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
                 // Only from a savegame:
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 PlayerExploredTile pet = getPlayerExploredTile(player);
@@ -1978,10 +1977,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     pet.readFromXML(in);
                 }
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " [" +
-                               in.getAttributeValue(null, "ID") + "] " +
-                               " loading tile with ID " +
-                               getId());
+                logger.warning("Unknown tag: " + in.getLocalName()
+                    + " [" + in.getAttributeValue(null, "ID") + "] "
+                    + " loading tile with ID " + getId());
                 in.nextTag();
             }
         }
@@ -2010,34 +2008,44 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (getColony() != null && getColony().isTileInUse(this)) {
             getColony().invalidateCache();
         }
+    }
 
-        // 0.9.x compatibility code
-        if (settlement != null && playerExploredTiles != null) {
-            for (Entry<Player, PlayerExploredTile> e
-                     : playerExploredTiles.entrySet()) {
-                PlayerExploredTile pet = e.getValue();
-                if (pet != null && (pet.getOwner() == null
-                                    || pet.getOwningSettlement() == null)) {
-                    logger.warning("0.9.x workaround reading settlement: "
-                                   + settlement.getName());
+    /**
+     * Fixes visible pets where there is a settlement present but the
+     * tile is not owned correctly as ownership was not implemented in
+     * 0.9.x.
+     * Need to do this after reading the game so that canSee() is valid.
+     * TODO: remove when 0.9.x is not supported.
+     */
+    public void fixup09x() {
+        if (playerExploredTiles == null) return;
+        for (Entry<Player, PlayerExploredTile> e
+                 : playerExploredTiles.entrySet()) {
+            Player p = e.getKey();
+            PlayerExploredTile pet = e.getValue();
+            if (settlement != null
+                && (pet.getOwner() == null
+                    || pet.getOwningSettlement() == null)) {
+                if (p.canSee(this)) {
+                    // Correct with an ordinary update
+                    pet.update(false);
+                } else if (settlement instanceof Colony) {
+                    if (pet.getColonyUnitCount() > 0) {
+                        // Have seen the colony, update the ownership
+                        // and the stockade level but not the unit count
+                        // as that is the one that was seen.
+                        pet.setOwner(settlement.getOwner());
+                        pet.setOwningSettlement(settlement);
+                        pet.setColonyStockadeKey(((Colony) settlement)
+                            .getStockadeKey());
+                    }
+                } else if (settlement instanceof IndianSettlement) {
+                    // Unclear what has been seen, update just the ownership
                     pet.setOwner(settlement.getOwner());
                     pet.setOwningSettlement(settlement);
-                    if (settlement instanceof IndianSettlement) {
-                        // work-around for bug #3065488
-                        Unit missionary = ((IndianSettlement) settlement)
-                            .getMissionary();
-                        if (missionary != null) {
-                            pet.setMissionary(missionary);
-                        }
-                    } else if (settlement instanceof Colony) {
-                        Colony colony = (Colony) settlement;
-                        pet.setColonyUnitCount(colony.getUnitCount());
-                        pet.setColonyStockadeKey(colony.getStockadeKey());
-                    }
                 }
             }
         }
-        // end of work-around
     }
 
     /**
@@ -2046,7 +2054,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return A String representation of this Tile.
      */
     public String toString() {
-        return "Tile("+x+","+y+"):"+((type==null)?"unknown":type.getId());
+        return "Tile(" + x + "," + y +"):"
+            + ((type == null) ? "unknown" : type.getId());
     }
 
     /**
