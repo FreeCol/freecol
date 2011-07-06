@@ -1500,7 +1500,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             pet = new PlayerExploredTile(getGame(), player, this);
             playerExploredTiles.put(player, pet);
         }
-        if (settlement != null && "Havana".equals(settlement.getName())) try { throw new IllegalStateException("UPPET = " + pet.getId()); } catch (Exception e) { e.printStackTrace(); }
         pet.update(full);
     }
 
@@ -1838,18 +1837,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (full || player.canSee(this)) {
             if (owner != null) {
                 out.writeAttribute("owner", owner.getId());
-                if (owningSettlement != null) {
-                    out.writeAttribute("owningSettlement",
-                        owningSettlement.getId());
-                }
+            }
+            if (owningSettlement != null) {
+                out.writeAttribute("owningSettlement",
+                    owningSettlement.getId());
             }
         } else if (pet != null) {
             if (pet.getOwner() != null) {
                 out.writeAttribute("owner", pet.getOwner().getId());
-                if (pet.getOwningSettlement() != null) {
-                    out.writeAttribute("owningSettlement",
-                        pet.getOwningSettlement().getId());
-                }
+            }
+            if (pet.getOwningSettlement() != null) {
+                out.writeAttribute("owningSettlement",
+                    pet.getOwningSettlement().getId());
             }
         }
         // End of attributes
@@ -2023,26 +2022,32 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                  : playerExploredTiles.entrySet()) {
             Player p = e.getKey();
             PlayerExploredTile pet = e.getValue();
-            if (settlement != null
-                && (pet.getOwner() == null
-                    || pet.getOwningSettlement() == null)) {
-                if (p.canSee(this)) {
-                    // Correct with an ordinary update
-                    pet.update(false);
-                } else if (settlement instanceof Colony) {
-                    if (pet.getColonyUnitCount() > 0) {
-                        // Have seen the colony, update the ownership
-                        // and the stockade level but not the unit count
-                        // as that is the one that was seen.
+            if (settlement != null) {
+                if (pet.getOwner() == null
+                    || pet.getOwningSettlement() == null) {
+                    if (p.canSee(this)) {
+                        // Correct with an ordinary update
+                        pet.update(false);
+                    } else if (settlement instanceof Colony) {
+                        if (pet.getColonyUnitCount() > 0) {
+                            // Have seen the colony, update the ownership
+                            // and the stockade level but not the unit count
+                            // as that is the one that was seen.
+                            pet.setOwner(settlement.getOwner());
+                            pet.setOwningSettlement(settlement);
+                            pet.setColonyStockadeKey(((Colony) settlement)
+                                .getStockadeKey());
+                        }
+                    } else if (settlement instanceof IndianSettlement) {
+                        // Unclear what has been seen, update just the ownership
                         pet.setOwner(settlement.getOwner());
                         pet.setOwningSettlement(settlement);
-                        pet.setColonyStockadeKey(((Colony) settlement)
-                            .getStockadeKey());
                     }
-                } else if (settlement instanceof IndianSettlement) {
-                    // Unclear what has been seen, update just the ownership
-                    pet.setOwner(settlement.getOwner());
-                    pet.setOwningSettlement(settlement);
+                }
+            } else {
+                if (pet.getOwningSettlement() != null
+                    && pet.getOwner() == null) {
+                    pet.setOwner(pet.getOwningSettlement().getOwner());
                 }
             }
         }
