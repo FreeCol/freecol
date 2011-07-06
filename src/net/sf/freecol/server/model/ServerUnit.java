@@ -825,30 +825,27 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     continue; // Invalid tile for contact
                 }
 
-                ServerPlayer other = null;
                 settlement = t.getSettlement();
-                if (settlement != null) {
-                    other = (ServerPlayer) t.getSettlement().getOwner();
-                    // Initialize alarm for native settlements.
-                    if (other.isIndian()) {
-                        IndianSettlement is = (IndianSettlement) settlement;
-                        if (!is.hasContactedSettlement(serverPlayer)) {
-                            is.makeContactSettlement(serverPlayer);
-                            cs.add(See.only(serverPlayer), is);
-                        }
-                    }
-                } else if (t.getFirstUnit() != null) {
-                    other = (ServerPlayer) t.getFirstUnit().getOwner();
-                }
-                if (other == null || other == serverPlayer) {
-                    continue; // No contact
-                }
-
-                csActivateSentries(t, cs);
+                ServerPlayer other = (settlement != null)
+                    ? (ServerPlayer) t.getSettlement().getOwner()
+                    : (t.getFirstUnit() != null)
+                    ? (ServerPlayer) t.getFirstUnit().getOwner()
+                    : null;
+                if (other == null
+                    || other == serverPlayer) continue; // No contact
 
                 if (serverPlayer.csContact(other, newTile, cs) != null) {
                     welcomer = other;
                 }
+                // Initialize alarm for native settlements.
+                if (settlement instanceof IndianSettlement) {
+                    IndianSettlement is = (IndianSettlement) settlement;
+                    if (!is.hasContactedSettlement(serverPlayer)) {
+                        is.makeContactSettlement(serverPlayer);
+                        cs.add(See.only(serverPlayer), is);
+                    }
+                }
+                csActivateSentries(t, cs);
             }
             if (newLand != null) {
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
