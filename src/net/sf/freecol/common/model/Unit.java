@@ -143,6 +143,7 @@ public class Unit extends FreeColGameObject
         MOVE_NO_ACCESS_BEACHED("Attempt to move onto foreign beached ship"),
         MOVE_NO_ACCESS_EMBARK("Attempt to embark onto absent or foreign carrier"),
         MOVE_NO_ACCESS_FULL("Attempt to embark onto full carrier"),
+        MOVE_NO_ACCESS_GOODS("Attempt to trade without goods"),
         MOVE_NO_ACCESS_CONTACT("Attempt to interact with natives before contact"),
         MOVE_NO_ACCESS_SETTLEMENT("Attempt to move into foreign settlement"),
         MOVE_NO_ACCESS_SKILL("Attempt to learn skill with incapable unit"),
@@ -551,13 +552,12 @@ public class Unit extends FreeColGameObject
 
     /**
      * Checks if this is a trading <code>Unit</code>, meaning that it
-     * can trade with settlements, and that it has something to trade.
+     * can trade with settlements.
      *
      * @return True if this is a trading unit.
      */
     public boolean isTradingUnit() {
-        return canCarryGoods() && goodsContainer.getGoodsCount() > 0
-            && owner.isEuropean();
+        return canCarryGoods() && owner.isEuropean();
     }
 
     /**
@@ -1510,9 +1510,11 @@ public class Unit extends FreeColGameObject
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_TRADE;
         } else if (settlement instanceof IndianSettlement) {
-            return (allowContact(settlement))
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (goodsContainer.getGoodsCount() > 0)
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
-                : MoveType.MOVE_NO_ACCESS_CONTACT;
+                : MoveType.MOVE_NO_ACCESS_GOODS;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen
         }

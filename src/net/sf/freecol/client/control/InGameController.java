@@ -1642,6 +1642,16 @@ public final class InGameController implements NetworkConstants {
                     .addStringTemplate("%nation%", nation));
             }
             return false;
+        case MOVE_NO_ACCESS_GOODS:
+            if (interactive) {
+                freeColClient.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                canvas.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessGoods")
+                    .addStringTemplate("%nation%", nation)
+                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+            }
+            return false;
         case MOVE_NO_ACCESS_LAND:
             if (!moveDisembark(unit, direction)) {
                 if (interactive) {
