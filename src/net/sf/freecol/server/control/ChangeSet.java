@@ -801,7 +801,6 @@ public class ChangeSet {
         private Player first;
         private Stance stance;
         private Player second;
-        private boolean war;
 
         /**
          * Build a new StanceChange.
@@ -812,13 +811,11 @@ public class ChangeSet {
          * @param second The <code>Player</code> wrt with to change.
          * @param war The war status.
          */
-        StanceChange(See see, Player first, Stance stance, Player second,
-                     boolean war) {
+        StanceChange(See see, Player first, Stance stance, Player second) {
             super(see);
             this.first = first;
             this.stance = stance;
             this.second = second;
-            this.war = war;
         }
 
         /**
@@ -828,24 +825,6 @@ public class ChangeSet {
          */
         public int sortPriority() {
             return ChangePriority.CHANGE_STANCE.getPriority();
-        }
-
-        /**
-         * Should a player perhaps be notified of this stance change?
-         * Yes, if they are the player that initiated the change, the
-         * player the stance change applies to, or it is a war, or
-         * they have enhaced diplomacy reporting.
-         *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
-         * @return True if the player should be notified.
-         */
-        @Override
-        public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return (ServerPlayer) first == serverPlayer
-                || (ServerPlayer) second == serverPlayer
-                || (war && serverPlayer.hasContacted(first)
-                    && serverPlayer.hasContacted(second))
-                || serverPlayer.hasAbility("model.ability.betterForeignAffairsReport");
         }
 
         /**
@@ -1191,12 +1170,11 @@ public class ChangeSet {
      * @param first The <code>Player</code> changing stance.
      * @param stance The <code>Stance</code> to change to.
      * @param second The <code>Player</code> wrt with to change.
-     * @param war Was this change to/from a war stance.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addStance(See see, Player first, Stance stance,
-                               Player second, boolean war) {
-        changes.add(new StanceChange(see, first, stance, second, war));
+                               Player second) {
+        changes.add(new StanceChange(see, first, stance, second));
         return this;
     }
 

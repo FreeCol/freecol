@@ -968,6 +968,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean csChangeStance(Stance stance, Player otherPlayer,
                                   boolean symmetric, ChangeSet cs) {
+        ServerPlayer other = (ServerPlayer) otherPlayer;
         boolean change = false;
         Stance old = getStance(otherPlayer);
 
@@ -975,13 +976,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int modifier = old.getTensionModifier(stance);
             setStance(otherPlayer, stance);
             if (modifier != 0) {
-                cs.add(See.only(null).perhaps((ServerPlayer) otherPlayer),
+                cs.add(See.only(null).perhaps(other),
                     modifyTension(otherPlayer, modifier));
             }
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + otherPlayer.getName());
-            this.addStanceChange((ServerPlayer) otherPlayer);
+            this.addStanceChange(other);
+            cs.addMessage(See.only(other),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    "model.diplomacy." + stance + ".declared", this)
+                .addStringTemplate("%nation%", getNationName()));
+            cs.addStance(See.only(this), this, stance, otherPlayer);
+            cs.addStance(See.only(other), this, stance, otherPlayer);
             change = true;
         }
         if (symmetric && (old = otherPlayer.getStance(this)) != stance) {
@@ -994,7 +1001,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
             logger.info("Stance modification " + otherPlayer.getName()
                 + " " + old.toString() + " -> " + stance.toString()
                 + " wrt " + getName() + " (symmetric)");
-            ((ServerPlayer) otherPlayer).addStanceChange(this);
+            other.addStanceChange(this);
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    "model.diplomacy." + stance + ".declared", otherPlayer)
+                .addStringTemplate("%nation%", otherPlayer.getNationName()));
+            cs.addStance(See.only(this), otherPlayer, stance, this);
+            cs.addStance(See.only(other), otherPlayer, stance, this);
             change = true;
         }
 
@@ -1062,17 +1075,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             ServerPlayer s = stanceDirty.remove(0);
             Stance sta = getStance(s);
             boolean war = sta == Stance.WAR;
-            cs.addStance(See.perhaps(), this, sta, s, war);
             if (sta == Stance.UNCONTACTED) continue;
-            cs.addMessage(See.only(s),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "model.diplomacy." + sta + ".declared", this)
-                    .addStringTemplate("%nation%", getNationName()));
             for (Player p : getGame().getLiveEuropeanPlayers()) {
-                if ((ServerPlayer) p == this || p == s) continue;
+                ServerPlayer sp = (ServerPlayer) p;
+                if (sp == this || p == s
+                    || !p.hasContacted(this) || !p.hasContacted(p)) continue;
                 if (p.hasAbility("model.ability.betterForeignAffairsReport")
                     || war) {
-                    cs.addMessage(See.only((ServerPlayer) p),
+                    cs.addStance(See.only(sp), this, sta, s);
+                    cs.addMessage(See.only(sp),
                         new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                             "model.diplomacy." + sta + ".others", this)
                         .addStringTemplate("%attacker%", getNationName())
