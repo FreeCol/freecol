@@ -873,7 +873,7 @@ public final class Canvas extends JDesktopPane {
      * Quits the application. This method uses {@link #showConfirmDialog} in
      * order to get a "Are you sure"-confirmation from the user.
      */
-    public void quit() {
+    public void askToQuit() {
         if (showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
             freeColClient.quit();
         }
@@ -987,12 +987,21 @@ public final class Canvas extends JDesktopPane {
         if (showConfirmDialog("retireDialog.areYouSure.text",
                               "ok", "cancel")) {
             freeColClient.setIsRetired(true);
-            if (freeColClient.retire()) {
+            if (freeColClient.askServer().retire()) {
                 // Panel exit calls quit.
-                showPanel(new ReportHighScoresPanel(this));
+                showHighScoresPanel(null);
             }
             freeColClient.quit();
         }
+    }
+
+    /**
+     * Displays the high scores panel.
+     *
+     * @param messageId An optional message to add to the high scores panel.
+     */
+    public void showHighScoresPanel(String messageId) {
+        showPanel(new ReportHighScoresPanel(this, messageId), false);
     }
 
     /**

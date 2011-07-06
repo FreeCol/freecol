@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -44,7 +45,9 @@ public final class VictoryPanel extends FreeColPanel {
 
     private static final String CONTINUE = "CONTINUE";
 
-    private JButton continueButton = new JButton(Messages.message("victory.continue"));
+    private JButton continueButton
+        = new JButton(Messages.message("victory.continue"));
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -59,7 +62,8 @@ public final class VictoryPanel extends FreeColPanel {
 
         setLayout(new MigLayout("wrap 1", "", ""));
 
-        add(getDefaultHeader(Messages.message("victory.text")), "align center, wrap 20");
+        add(getDefaultHeader(Messages.message("victory.text")),
+            "align center, wrap 20");
 
         Image tempImage = ResourceManager.getImage("VictoryImage");
         if (tempImage != null) {
@@ -77,26 +81,25 @@ public final class VictoryPanel extends FreeColPanel {
             add(okButton, "newline 20, tag ok");
         }
         setSize(getPreferredSize());
+
+        boolean high = getFreeColClient().askServer().checkHighScore();
+        getCanvas().showHighScoresPanel((high) ? "highscores.yes"
+            : "highscores.no");
     }
 
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
+     * This function analyses an event and calls the right methods to
+     * take care of the user's requests.
      * 
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        Canvas canvas = getCanvas();
         if (OK.equals(command)) {
-            boolean high = getFreeColClient().retire();
-            canvas.showPanel(new ReportHighScoresPanel(canvas), false);
-            canvas.showInformationMessage((high) ? "highscores.yes"
-                                          : "highscores.no");
             getFreeColClient().quit();
         } else {
             getFreeColClient().continuePlaying();
-            canvas.remove(this);
+            getCanvas().remove(this);
         }
     }
 }

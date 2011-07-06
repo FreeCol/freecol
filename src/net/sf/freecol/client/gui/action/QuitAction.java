@@ -47,6 +47,6 @@ public class QuitAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().quit();
+        getFreeColClient().getCanvas().askToQuit();
     }
 }

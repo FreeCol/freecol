@@ -553,6 +553,13 @@ public final class InGameInputHandler extends InputHandler
                 return new AssignTradeRouteMessage(getGame(), element)
                     .handle(freeColServer, connection);
             }});
+        register("checkHighScore",
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return freeColServer.getInGameController()
+                    .checkHighScore(freeColServer.getPlayer(connection));
+            }});
         register("continuePlaying",
                  new NetworkRequestHandler() {
             @Override

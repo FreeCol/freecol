@@ -43,8 +43,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
      * The constructor that will add the items to this panel.
      *
      * @param parent The parent of this panel.
+     * @param prefix An optional message to add at the top of the panel.
      */
-    public ReportHighScoresPanel(Canvas parent) {
+    public ReportHighScoresPanel(Canvas parent, String prefix) {
         super(parent, Messages.message("reportHighScoresAction.name"));
         // Display Panel
         reportPanel.removeAll();
@@ -52,6 +53,11 @@ public final class ReportHighScoresPanel extends ReportPanel {
         List<HighScore> highScores = getController().getHighScores();
 
         reportPanel.setLayout(new MigLayout("wrap 3, gapx 30", "[][][align right]", ""));
+
+        if (prefix != null) {
+            reportPanel.add(new JLabel(Messages.message(prefix)),
+                "span, wrap 10");
+        }
 
         for (HighScore highScore : highScores) {
             JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
@@ -73,8 +79,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.turn")), "skip");
             int retirementTurn = highScore.getRetirementTurn();
-            String retirementTurnStr = (retirementTurn > 0) ? Turn.toString(retirementTurn) :
-                Messages.message("N/A");
+            String retirementTurnStr = (retirementTurn <= 0)
+                ? Messages.message("N/A")
+                : Messages.message(Turn.getLabel(retirementTurn));
             reportPanel.add(new JLabel(retirementTurnStr));
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.score")), "skip");
@@ -85,9 +92,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.independence")), "skip");
             int independenceTurn = highScore.getIndependenceTurn();
-            String independence = independenceTurn > 0
-                ? Messages.message(Turn.getLabel(independenceTurn))
-                : Messages.message("no");
+            String independence = (independenceTurn <= 0)
+                ? Messages.message("no")
+                : Messages.message(Turn.getLabel(independenceTurn));
             reportPanel.add(new JLabel(independence));
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.nation")), "skip");

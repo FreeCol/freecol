@@ -895,12 +895,12 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Handle a player retiring.
+     * Check the high scores.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
-     * @return An element cleaning up the player.
+     * @return An element indicating the players high score state.
      */
-    public Element retire(ServerPlayer serverPlayer) {
+    public Element checkHighScore(ServerPlayer serverPlayer) {
         FreeColServer freeColServer = getFreeColServer();
         boolean highScore = freeColServer.newHighScore(serverPlayer);
         if (highScore) {
@@ -912,16 +912,24 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Clean up the player.
         ChangeSet cs = new ChangeSet();
-        serverPlayer.csWithdraw(cs);
-        cs.addAttribute(See.only(serverPlayer), "highScore",
-                        Boolean.toString(highScore));
-
-        sendToOthers(serverPlayer, cs);
+        cs.addAttribute(See.only(serverPlayer),
+            "highScore", Boolean.toString(highScore));
         return cs.build(serverPlayer);
     }
 
+    /**
+     * Handle a player retiring.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
+     * @return An element cleaning up the player.
+     */
+    public Element retire(ServerPlayer serverPlayer) {
+        ChangeSet cs = new ChangeSet();
+        serverPlayer.csWithdraw(cs); // Clean up the player.
+        sendToOthers(serverPlayer, cs);
+        return cs.build(serverPlayer);
+    }
 
     /**
      * Continue playing after winning.

@@ -751,19 +751,6 @@ public final class FreeColClient {
         System.exit(0);
     }
 
-    /**
-     * Retires the player from the game.
-     *
-     * @return True if the player achieved a new high score.
-     */
-    public boolean retire() {
-        Element retireElement = DOMMessage.createNewRootElement("retire");
-        Element reply = client.ask(retireElement);
-        boolean result = reply != null
-            && "true".equals(reply.getAttribute("highScore"));
-        return result;
-    }
-
 
     /**
      * Continue playing after winning the game.

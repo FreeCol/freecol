@@ -500,7 +500,7 @@ public final class InGameInputHandler extends InputHandler {
                 }
             } else {
                 if (!new ShowConfirmDialogSwingTask(null, StringTemplate.key("defeated.text"),
-                                                    "defeated.yes", "defeated.no").confirm()) {
+                        "defeated.yes", "defeated.no").confirm()) {
                     freeColClient.quit();
                 }
             }

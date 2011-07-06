@@ -137,8 +137,9 @@ public class HighScore extends FreeColObject {
     private int retirementTurn;
 
     public HighScore(Player player, Date theDate) {
+        Game game = player.getGame();
         date = theDate;
-        retirementTurn = player.getGame().getTurn().getNumber();
+        retirementTurn = game.getTurn().getNumber();
         score = player.getScore();
         for (Level someLevel : Level.values()) {
             if (score >= someLevel.getMinimumScore()) {
@@ -152,13 +153,13 @@ public class HighScore extends FreeColObject {
         colonies = player.getColonies().size();
         units = player.getUnits().size();
         if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
-            independenceTurn = player.getGame().getTurn().getNumber();
+            independenceTurn = game.getTurn().getNumber();
             nationName = player.getIndependentNationName();
         } else {
             independenceTurn = -1;
         }
         // TODO: how difficult is a custom difficulty?
-        difficulty = "model.difficulty.medium"; //player.getDifficulty().getId();
+        difficulty = game.getSpecification().getDifficultyLevel().getId();
         newLandName = player.getNewLandName();
     }
 

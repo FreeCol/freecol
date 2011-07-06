@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 
 
 /**
@@ -46,6 +45,6 @@ public class ReportHighScoresAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportHighScoresPanel(freeColClient.getCanvas()));
+        freeColClient.getCanvas().showHighScoresPanel(null);
     }
 }

@@ -485,6 +485,20 @@ public class ServerAPI {
     }
 
     /**
+     * Server query-response for checking the high score.
+     *
+     * @return True if the player has achieved a new high score.
+     */
+    public boolean checkHighScore() {
+        HashMap<String, String> results = loadMap("highScore");
+        return (askHandling(new TrivialMessage("checkHighScore"),
+                            null, results)
+            && results.get("highScore") != null)
+            ? Boolean.parseBoolean(results.get("highScore"))
+            : false;
+    }
+
+    /**
      * Server query-response for choosing a founding father.
      *
      * @param foundingFather The <code>FoundingFather</code> to choose.
@@ -1014,6 +1028,16 @@ public class ServerAPI {
      */
     public boolean rename(FreeColGameObject object, String name) {
         return askHandling(new RenameMessage(object, name),
+            null, null);
+    }
+
+    /**
+     * Retires the player from the game.
+     *
+     * @return True if the player achieved a new high score.
+     */
+    public boolean retire() {
+        return askHandling(new TrivialMessage("retire"),
             null, null);
     }
 
