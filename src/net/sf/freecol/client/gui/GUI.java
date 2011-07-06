@@ -2422,7 +2422,7 @@ public final class GUI {
                 int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
                 int xx = 40;
 
-                for (int i = 1; i < getMessageCount(); i++) {
+                for (int i = 0; i < getMessageCount(); i++) {
                     message = getMessage(i);
                     g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), font),
                                 xx, yy, null);
