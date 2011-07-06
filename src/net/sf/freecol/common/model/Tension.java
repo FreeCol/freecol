@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Locale;
+
 
 public class Tension {
 
@@ -137,6 +139,15 @@ public class Tension {
      */
     public void modify(int newTension) {
         setValue(value + newTension);
+    }
+
+    /**
+     * Gets a string suitable for use in a message id.
+     *
+     * @return A message id string.
+     */
+    public String getKey() {
+        return toString().toLowerCase(Locale.US);
     }
 
     /**

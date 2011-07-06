@@ -2019,7 +2019,7 @@ public final class InGameController extends Controller {
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.perhaps().always(serverPlayer), tile);
         String messageId = "indianSettlement.mission."
-            + settlement.getAlarm(serverPlayer).toString();
+            + settlement.getAlarm(serverPlayer).getKey();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer, unit)
