@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
  * The base class for all types defined by the specification. It can
  * be instantiated in order to provide a source for modifiers and
@@ -223,15 +224,36 @@ public class FreeColGameObjectType extends FreeColObject {
         this.abstractType = newAbstract;
     }
 
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // currently, FreeColGameObjectTypes are not serialized
     }
 
-    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @exception XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, String tag)
+        throws XMLStreamException {
         super.toXML(out, tag);
     }
 
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
         if (featureContainer != null) {
             for (Ability ability: featureContainer.getAbilities()) {
                 ability.toXMLImpl(out);
@@ -242,12 +264,31 @@ public class FreeColGameObjectType extends FreeColObject {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         setAbstractType(getAttribute(in, "abstract", false));
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
         }
@@ -256,7 +297,7 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * Reads a common child object, i.e. an Ability or Modifier.
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in The XML input stream.
      * @exception XMLStreamException if an error occurs
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
@@ -291,9 +332,10 @@ public class FreeColGameObjectType extends FreeColObject {
                 specification.addModifier(modifier);
             }
         } else {
-            logger.warning("Parsing of " + childName + " is not implemented yet");
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                   !in.getLocalName().equals(childName)) {
+            logger.warning("Parsing of " + childName
+                + " is not implemented yet");
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                   || !in.getLocalName().equals(childName)) {
                 in.nextTag();
             }
         }
@@ -303,6 +345,7 @@ public class FreeColGameObjectType extends FreeColObject {
      * Use only for debugging purposes! A human-readable and localized name is
      * returned by getName().
      */
+    @Override
     public String toString() {
         return getId();
     }

@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
@@ -1105,7 +1106,7 @@ public class ColonyPlan {
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute("ID", colony.getId());
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE, colony.getId());
 
         return element;
     }
@@ -1117,7 +1118,8 @@ public class ColonyPlan {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+        colony = (Colony) getAIMain()
+            .getFreeColGameObject(element.getAttribute(FreeColObject.ID_ATTRIBUTE));
         // TODO: serialize profile
         selectProfile();
     }

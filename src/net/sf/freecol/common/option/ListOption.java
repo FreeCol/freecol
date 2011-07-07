@@ -121,6 +121,7 @@ public class ListOption<T> extends AbstractOption<List<T>> {
         setValue(value);
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -130,26 +131,37 @@ public class ListOption<T> extends AbstractOption<List<T>> {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
         for (String id : getValueIds()) {
             out.writeStartElement(OPTION_VALUE_TAG);
             out.writeAttribute(ID_ATTRIBUTE_TAG, id);
             out.writeEndElement();
         }
-
-        out.writeEndElement();
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
 
         if (id == null && getId().equals(NO_ID)){
@@ -171,7 +183,6 @@ public class ListOption<T> extends AbstractOption<List<T>> {
 
     }
 
-
     /**
      * Debug print helper.
      *
@@ -188,6 +199,7 @@ public class ListOption<T> extends AbstractOption<List<T>> {
 
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "listOption".
      */
     public static String getXMLElementTagName() {

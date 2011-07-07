@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
@@ -51,22 +50,23 @@ import org.w3c.dom.Element;
 
 
 public class PrivateerMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
-	private static enum PrivateerMissionState {HUNTING,TRANSPORTING};
-	private PrivateerMissionState state = PrivateerMissionState.HUNTING;
-	private Location nearestPort = null;
-	private Tile target = null;
-	private boolean valid = true;
+    private static enum PrivateerMissionState {HUNTING,TRANSPORTING};
+    private PrivateerMissionState state = PrivateerMissionState.HUNTING;
+    private Location nearestPort = null;
+    private Tile target = null;
+    private boolean valid = true;
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
         Unit unit = aiUnit.getUnit();
@@ -102,12 +102,12 @@ public class PrivateerMission extends Mission {
 
 
     /**
-    * Performs the mission. This is done by searching for hostile units
-    * that are located within one tile and attacking them. If no such units
-    * are found, then wander in a random direction.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
+     * Performs the mission. This is done by searching for hostile units
+     * that are located within one tile and attacking them. If no such units
+     * are found, then wander in a random direction.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
     public void doMission(Connection connection) {
     	logger.finest("Entering doMission");
     	Unit unit = getUnit();
@@ -353,6 +353,50 @@ public class PrivateerMission extends Mission {
     }
 
     /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     */
+    public String getDebuggingInfo() {
+    	StringBuffer sb = new StringBuffer("State: " + state.name());
+    	if(state == PrivateerMissionState.HUNTING && target != null){
+    		Unit targetUnit = target.getDefendingUnit(getUnit());
+    		if(targetUnit != null){
+    			String coord = " (" + target.getX() + "," + target.getY() + ")";
+    			sb.append(" target=" + targetUnit + coord);
+    		}
+    	}
+        return sb.toString();
+    }
+
+    /**
+     * Calculates the modifier used when assessing the value of a
+     * target to a privateer.
+     * Note: it gives a modifier value, other parameters should be
+     * considered as well
+     * Note: we assume the unit given is a privateer, no test is made
+     *
+     * @param combatModel The <code>Combat Model</code> used.
+     * @param attacker The <code>Unit</code> attacking, should be a privateer.
+     * @param defender The <code>Unit</code> the attacker is considering as a target.
+     * @return The modifier value the defender is worth as a target to the privateer
+     */
+    public static int getModifierValueForTarget(CombatModel combatModel, Unit attacker, Unit defender){
+    	// pirates are greedy ;)
+    	int modifier = 100;
+    	modifier += defender.getGoodsCount() * 200;
+    	modifier += defender.getUnitCount() * 100;
+
+        // they are also coward
+        if(defender.isOffensiveUnit()){
+        	modifier -= combatModel.getDefencePower(attacker, defender) * 100;
+        }
+
+        return modifier;
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
@@ -372,59 +416,24 @@ public class PrivateerMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        state = PrivateerMissionState.valueOf(in.getAttributeValue(null, "state"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+        state = PrivateerMissionState.valueOf(in.getAttributeValue(null,
+                "state"));
         in.nextTag();
     }
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unitWanderHostileMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "privateerMission"
+     */
     public static String getXMLElementTagName() {
         return "privateerMission";
-    }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     */
-    public String getDebuggingInfo() {
-    	StringBuffer sb = new StringBuffer("State: " + state.name());
-    	if(state == PrivateerMissionState.HUNTING && target != null){
-    		Unit targetUnit = target.getDefendingUnit(getUnit());
-    		if(targetUnit != null){
-    			String coord = " (" + target.getX() + "," + target.getY() + ")";
-    			sb.append(" target=" + targetUnit + coord);
-    		}
-    	}
-        return sb.toString();
-    }
-
-    /**
-     * Calculates the modifier used when assessing the value of a target to a privateer
-     * Note: it gives a modifier value, other parameters should be considered as well
-     * Note: we assume the unit given is a privateer, no test is made
-     * @param combatModel The <code>Combat Model</code> used.
-     * @param attacker The <code>Unit</code> attacking, should be a privateer.
-     * @param defender The <code>Unit</code> the attacker is considering as a target.
-     * @return The modifier value the defender is worth as a target to the privateer
-     */
-    public static int getModifierValueForTarget(CombatModel combatModel, Unit attacker, Unit defender){
-    	// pirates are greedy ;)
-    	int modifier = 100;
-    	modifier += defender.getGoodsCount() * 200;
-    	modifier += defender.getUnitCount() * 100;
-
-        // they are also coward
-        if(defender.isOffensiveUnit()){
-        	modifier -= combatModel.getDefencePower(attacker, defender) * 100;
-        }
-
-        return modifier;
     }
 }

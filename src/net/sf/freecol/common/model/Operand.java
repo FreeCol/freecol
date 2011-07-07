@@ -310,7 +310,6 @@ public class Operand extends Scope {
         }
     }
 
-
     /**
      * Describe <code>count</code> method here.
      *
@@ -326,23 +325,38 @@ public class Operand extends Scope {
         return result;
     }
 
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Write the attributes of this object to a stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
-        writeAttributes(out);
-        out.writeEndElement();
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("operandType", operandType.toString());
+        out.writeAttribute("scopeLevel", scopeLevel.toString());
+        if (value != null) {
+            out.writeAttribute(VALUE_TAG, value.toString());
+        }
     }
 
-    public void readAttributes(XMLStreamReader in)
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         String attribute = in.getAttributeValue(null, "operandType");
         if (attribute != null) {
             operandType = Enum.valueOf(OperandType.class, attribute);
@@ -357,15 +371,7 @@ public class Operand extends Scope {
         }
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("operandType", operandType.toString());
-        out.writeAttribute("scopeLevel", scopeLevel.toString());
-        if (value != null) {
-            out.writeAttribute(VALUE_TAG, value.toString());
-        }
-    }
-
+    @Override
     public String toString() {
         if (value == null) {
             return scopeLevel + "'s number of " + operandType + "s";
@@ -373,7 +379,4 @@ public class Operand extends Scope {
             return Integer.toString(value);
         }
     }
-
-
 }
-

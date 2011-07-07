@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -40,11 +39,12 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for attacking any unit owned by a player we do not like that is within
-* a radius of 1 tile. If no such unit can be found; just wander
-* around.
-*/
+ * Mission for attacking any unit owned by a player we do not like that
+ * is within a radius of 1 tile. If no such unit can be found; just
+ * wander around.
+ */
 public class UnitWanderHostileMission extends Mission {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
 
@@ -125,6 +125,7 @@ public class UnitWanderHostileMission extends Mission {
         return super.isValid();
     }
 
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -144,17 +145,21 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain()
+            .getAIObject(in.getAttributeValue(null, "unit")));
         in.nextTag();
     }
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unitWanderHostileMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "unitWanderHostileMission".
+     */
     public static String getXMLElementTagName() {
         return "unitWanderHostileMission";
     }

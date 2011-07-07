@@ -42,9 +42,8 @@ import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 
 
 /**
- *
- * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this getPlayer().
+ * Objects of this class contains AI-information for a single {@link
+ * Player} and is used for controlling this getPlayer().
  *
  * @deprecated Currently unused, outdated copy of {@link AIPlayer}. Eventual
  * specialization of AI should extend AIPlayer, see {@link ColonialAIPlayer}.
@@ -382,6 +381,4 @@ public class IndianAIPlayer extends NewAIPlayer {
             }
         }
     }
-
-
 }

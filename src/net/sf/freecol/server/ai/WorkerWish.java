@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
@@ -81,7 +80,7 @@ public class WorkerWish extends Wish {
     *       of a <code>WorkerWish</code>.
     */
     public WorkerWish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -106,7 +105,7 @@ public class WorkerWish extends Wish {
      *      during parsing.
      */
     public WorkerWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -135,6 +134,7 @@ public class WorkerWish extends Wish {
         return unitType;
     }
 
+
     /**
      * Writes this object to an XML stream.
      *
@@ -150,7 +150,7 @@ public class WorkerWish extends Wish {
 
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("destination", destination.getId());
         if (transportable != null) {
             out.writeAttribute("transportable", transportable.getId());
@@ -165,12 +165,14 @@ public class WorkerWish extends Wish {
 
     /**
      * Reads information for this object from an XML stream.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
 
         final String transportableStr = in.getAttributeValue(null, "transportable");
@@ -189,17 +191,17 @@ public class WorkerWish extends Wish {
         in.nextTag();
     }
 
-
-    /**
-    * Returns the tag name of the root element representing this object.
-    * @return "workerWish"
-    */
-    public static String getXMLElementTagName() {
-        return "workerWish";
-    }
-
+    @Override
     public String toString() {
         return "WorkerWish: " + unitType.getNameKey()
             + " (" + getValue() + (expertNeeded ? ", expert)" : ")");
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     * @return "workerWish"
+     */
+    public static String getXMLElementTagName() {
+        return "workerWish";
     }
 }

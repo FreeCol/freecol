@@ -1180,9 +1180,10 @@ public class IndianSettlement extends Settlement {
      *      to the stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
+        boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet = (player == null) ? null
             : getTile().getPlayerExploredTile(player);
 
@@ -1274,13 +1275,16 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         owner.addSettlement(this);
         ownedUnits.clear();
 
@@ -1354,12 +1358,6 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-    public String toString() {
-        StringBuilder s = new StringBuilder(getName());
-        s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")");
-        return s.toString();
-    }
-
     /**
      * Partial writer, so that "remove" messages can be brief.
      *
@@ -1385,8 +1383,17 @@ public class IndianSettlement extends Settlement {
         readFromXMLPartialByClass(in, getClass());
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(getName());
+        s.append(" at (").append(tile.getX());
+        s.append(",").append(tile.getY()).append(")");
+        return s.toString();
+    }
+
     /**
      * Returns the tag name of the root element representing this object.
+     *
      * @return "indianSettlement".
      */
     public static String getXMLElementTagName() {

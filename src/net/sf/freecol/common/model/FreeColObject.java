@@ -57,6 +57,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
 public abstract class FreeColObject {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
@@ -66,7 +67,7 @@ public abstract class FreeColObject {
 
     public static final String NO_ID = "NO_ID";
 
-    protected static final String ID_ATTRIBUTE = "ID";
+    public static final String ID_ATTRIBUTE = "ID";
 
     /**
      * XML tag name for value attribute.
@@ -166,14 +167,12 @@ public abstract class FreeColObject {
             xsw.writeEndDocument();
             xsw.flush();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while writing object.", e);
+            logger.log(Level.WARNING, "Exception writing object.", e);
         } finally {
             try {
-                if (xsw != null) {
-                    xsw.close();
-                }
+                if (xsw != null) xsw.close();
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception while closing save stream.", e);
+                logger.log(Level.WARNING, "Exception closing save stream.", e);
             }
         }
     }
@@ -231,7 +230,8 @@ public abstract class FreeColObject {
      *      is only needed when saving a game is added.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+    public Element toXMLElement(Player player, Document document,
+                                boolean showAll, boolean toSavedGame) {
         return toXMLElement(player, document, showAll, toSavedGame, null);
     }
 
@@ -270,7 +270,9 @@ public abstract class FreeColObject {
      *               indicates this should be a partial write.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame, String[] fields) {
+    public Element toXMLElement(Player player, Document document,
+                                boolean showAll, boolean toSavedGame,
+                                String[] fields) {
         try {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
@@ -315,7 +317,76 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * <br><br>
+     * All attributes will be made visible.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out);
+    }
+
+    /**
+     * This method writes an XML-representation of this object with
+     * a specified tag to the given stream.
+     *
+     * Almost all FreeColObjects end up calling this, and implementing
+     * their own write{Attributes,Children} methods which begin by
+     * calling their superclass.  This allows a clean nesting of the
+     * serialization routines throughout the class hierarchy.
+     *
+     * All attributes will be made visible.
+     *
+     * @param out The target stream.
+     * @param tag The tag to use.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public void toXML(XMLStreamWriter out, String tag)
+        throws XMLStreamException {
+        out.writeStartElement(tag);
+        writeAttributes(out);
+        writeChildren(out);
+        out.writeEndElement();
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     * To be overridden by any object that uses
+     * the toXML(XMLStreamWriter, String) call.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        if (getId() == null) {
+            logger.warning("FreeColObject with null id: " + toString());
+        } else {
+            out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        }
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     * To be overridden by any object that has children and uses the
+     * toXML(XMLStreamWriter, String) call.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        // do nothing
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
      *
      * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
@@ -333,46 +404,43 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out, Player player,
+                      boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        // FreeColObjects are not to contain data that varies with
+        // the observer, so the extra arguments are moot here.
+        // However, this method is overridden in FreeColGameObject
+        // where they are meaningful, and we need a version here for
+        // toXMLElement() to call.
         toXMLImpl(out);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream. Only attributes visible to the given
-     * <code>Player</code> will be added to that representation.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation is
-     *               made for.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
-     */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
-        toXML(out, player, false, false);
     }
 
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * All attributes will be made visible.
-     *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, null, true, false);
-    }
+    abstract protected void toXMLImpl(XMLStreamWriter out)
+        throws XMLStreamException;
 
-    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+    /**
+     * This method writes a partial XML-representation of this object to
+     * the given stream using only the mandatory and specified fields.
+     * Ideally this would be abstract, but as not all FreeColObject-subtypes
+     * need partial updates we provide a non-operating stub here which is
+     * to be overridden where needed.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        throw new UnsupportedOperationException("Partial update of unsupported type.");
     }
 
     /**
@@ -608,29 +676,23 @@ public abstract class FreeColObject {
      * @param object a <code>FreeColObject</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public void writeAttribute(XMLStreamWriter out, String attributeName, FreeColObject object)
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+        FreeColObject object)
         throws XMLStreamException {
         if (object != null) {
             out.writeAttribute(attributeName, object.getId());
         }
     }
 
-    public void writeFreeColGameObject(FreeColGameObject object, XMLStreamWriter out, Player player,
-                                       boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        if (object != null) {
-            object.toXMLImpl(out, player, showAll, toSavedGame);
-        }
-    }
-
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param in The input stream with the XML.
+     * @param in The XML input stream.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         readAttributes(in);
         readChildren(in);
     }
@@ -638,22 +700,40 @@ public abstract class FreeColObject {
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param in The input stream with the XML.
-     * @param specification a <code>Specification</code> value
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in, Specification specification)
+    protected void readFromXMLImpl(XMLStreamReader in,
+                                   Specification specification)
         throws XMLStreamException {
         readAttributes(in, specification);
         readChildren(in, specification);
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         readAttributes(in, null);
     }
 
-    protected void readAttributes(XMLStreamReader in, Specification specification)
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected void readAttributes(XMLStreamReader in,
+                                  Specification specification)
         throws XMLStreamException {
         String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         // TODO: get rid of compatibility code
@@ -664,11 +744,27 @@ public abstract class FreeColObject {
         }
     }
 
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         readChildren(in, null);
     }
 
-    protected void readChildren(XMLStreamReader in, Specification specification)
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected void readChildren(XMLStreamReader in,
+                                Specification specification)
         throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             // do nothing
@@ -685,49 +781,10 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
         throw new UnsupportedOperationException("Partial update of unsupported type");
     }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
-
-    /**
-     * This method writes a partial XML-representation of this object to
-     * the given stream using only the mandatory and specified fields.
-     * Ideally this would be abstract, but as not all FreeColObject-subtypes
-     * need partial updates we provide a non-operating stub here which is
-     * to be overridden where needed.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        throw new UnsupportedOperationException("Partial update of unsupported type.");
-    }
-
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        if (getId() == null) {
-            logger.warning("FreeColObject with null id: " + toString());
-        } else {
-            out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        }
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        // do nothing
-    }
-
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
 

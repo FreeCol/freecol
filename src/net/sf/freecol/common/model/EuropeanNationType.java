@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -34,9 +33,10 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
- * Represents one of the European nations present in the game, i.e. both REFs
- * and possible human players.
+ * Represents one of the European nations present in the game,
+ * i.e. both REFs and possible human players.
  */
 public class EuropeanNationType extends NationType {
 
@@ -141,16 +141,95 @@ public class EuropeanNationType extends NationType {
     }
 
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    public void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("ref", Boolean.toString(ref));
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
+            // default map
+            for (Map.Entry<String, AbstractUnit> entry
+                     : startingUnitMap.get(null).entrySet()) {
+                writeUnit(out, entry.getKey(), entry.getValue(), false);
+            }
+            // expert map
+            for (Map.Entry<String, AbstractUnit> entry
+                     : startingUnitMap.get("true").entrySet()) {
+                writeUnit(out, entry.getKey(), entry.getValue(), true);
+            }
+        }
+    }
+
+    private void writeUnit(XMLStreamWriter out, String id,
+        AbstractUnit unit, boolean expert)
+        throws XMLStreamException {
+        out.writeStartElement("unit");
+        out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+        out.writeAttribute("type", unit.getId());
+        out.writeAttribute("role",
+            unit.getRole().toString().toLowerCase(Locale.US));
+        //out.writeAttribute("number", String.valueOf(unit.getNumber()));
+        if (expert) {
+            out.writeAttribute("expert-starting-units", "true");
+        }
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         String extendString = in.getAttributeValue(null, "extends");
         EuropeanNationType parent = (extendString == null) ? this :
             (EuropeanNationType) getSpecification().getNationType(extendString);
         ref = getAttribute(in, "ref", parent.ref);
 
         if (parent != this) {
-            for (Map.Entry<String,Map<String, AbstractUnit>> entry : parent.startingUnitMap.entrySet()) {
-                startingUnitMap.put(entry.getKey(), new HashMap<String, AbstractUnit>(entry.getValue()));
+            for (Map.Entry<String,Map<String, AbstractUnit>> entry
+                     : parent.startingUnitMap.entrySet()) {
+                startingUnitMap.put(entry.getKey(),
+                    new HashMap<String, AbstractUnit>(entry.getValue()));
             }
             getSettlementTypes().addAll(parent.getSettlementTypes());
             getFeatureContainer().add(parent.getFeatureContainer());
@@ -160,7 +239,14 @@ public class EuropeanNationType extends NationType {
         }
     }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if ("unit".equals(childName)) {
             String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
@@ -181,53 +267,11 @@ public class EuropeanNationType extends NationType {
     }
 
     /**
-     * Makes an XML-representation of this object.
+     * Returns the tag name of the root element representing this object.
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @return "european-nation-type".
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("ref", Boolean.toString(ref));
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-
-        if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
-            // default map
-            for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get(null).entrySet()) {
-                writeUnit(out, entry.getKey(), entry.getValue(), false);
-            }
-            // expert map
-            for (Map.Entry<String, AbstractUnit> entry : startingUnitMap.get("true").entrySet()) {
-                writeUnit(out, entry.getKey(), entry.getValue(), true);
-            }
-        }
-    }
-
-    protected void writeUnit(XMLStreamWriter out, String id, AbstractUnit unit, boolean expert)
-        throws XMLStreamException {
-        out.writeStartElement("unit");
-        out.writeAttribute(ID_ATTRIBUTE_TAG, id);
-        out.writeAttribute("type", unit.getId());
-        out.writeAttribute("role", unit.getRole().toString().toLowerCase(Locale.US));
-        //out.writeAttribute("number", String.valueOf(unit.getNumber()));
-        if (expert) {
-            out.writeAttribute("expert-starting-units", "true");
-        }
-        out.writeEndElement();
-    }
-
-
     public static String getXMLElementTagName() {
         return "european-nation-type";
     }
-
-
 }

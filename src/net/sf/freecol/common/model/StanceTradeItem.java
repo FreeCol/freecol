@@ -32,6 +32,7 @@ public class StanceTradeItem extends TradeItem {
      * The stance between source and destination.
      */
     private Stance stance;
+
         
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
@@ -41,7 +42,8 @@ public class StanceTradeItem extends TradeItem {
      * @param destination a <code>Player</code> value
      * @param stance an <code>Stance</code> value
      */
-    public StanceTradeItem(Game game, Player source, Player destination, Stance stance) {
+    public StanceTradeItem(Game game, Player source, Player destination,
+                           Stance stance) {
         super(game, "tradeItem.stance", source, destination);
         this.stance = stance;
     }
@@ -99,18 +101,6 @@ public class StanceTradeItem extends TradeItem {
 
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
-        this.stance = Enum.valueOf(Stance.class, in.getAttributeValue(null, "stance"));
-        in.nextTag();
-    }
-
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
@@ -118,20 +108,48 @@ public class StanceTradeItem extends TradeItem {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        super.toXMLImpl(out);
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     * To be overridden by any object that uses
+     * the toXML(XMLStreamWriter, String) call.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
         out.writeAttribute("stance", this.stance.toString());
-        out.writeEndElement();
     }
     
     /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readFromXMLImpl(in);
+        this.stance = Enum.valueOf(Stance.class,
+            in.getAttributeValue(null, "stance"));
+        in.nextTag();
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
-     * @return "goods".
+     *
+     * @return "stanceTradeItem".
      */
     public static String getXMLElementTagName() {
         return "stanceTradeItem";
     }
-
 }
-

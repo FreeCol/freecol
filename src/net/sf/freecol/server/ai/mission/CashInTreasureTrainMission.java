@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -50,7 +49,6 @@ public class CashInTreasureTrainMission extends Mission {
     // TODO: Require protection
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
-
 
 
     /**
@@ -181,6 +179,7 @@ public class CashInTreasureTrainMission extends Mission {
         return super.isValid();
     }
 
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -200,16 +199,20 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
         in.nextTag();
     }
 
     /**
      * Returns the tag name of the root element representing this object.
-     * @return The <code>String</code> "cashInTreasureTrainMission".
+     *
+     * @return "cashInTreasureTrainMission".
      */
     public static String getXMLElementTagName() {
         return "cashInTreasureTrainMission";

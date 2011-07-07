@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.model.ServerUnit;
@@ -269,7 +270,7 @@ public class GoodsTest extends FreeColTestCase {
         Document document = DOMMessage.createNewDocument();
         Element element = goods1.toXMLElement(null, document, true, true);
 
-        element.setAttribute("ID", "newID");
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE, "newID");
         Goods goods2 = new Goods(colony.getGame(), element);
 
         assertEquals(goods1.getGame(), goods2.getGame());

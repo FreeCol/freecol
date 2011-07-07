@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */
@@ -140,5 +141,4 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * @return a <code>boolean</code> value
      */
     public abstract boolean isTileTypeAllowed(TileType tileType);
-
 }

@@ -310,6 +310,29 @@ public class IndianDemandMission extends Mission {
                         .getLevel().compareTo(Tension.Level.HAPPY) <= 0));
     }
 
+
+    /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
+     *         "[ColonyName] Getting gift: (x, y)".
+     */
+    public String getDebuggingInfo() {
+        if (getUnit().getIndianSettlement() == null) {
+            return "invalid";
+        }
+        final String targetName = (target != null) ? target.getName() : "null";
+        if (!hasTribute()) {
+            return "[" + targetName + "] Getting tribute: "
+                + getUnit().getIndianSettlement().getTile().getPosition();
+        } else {
+            return "[" + targetName + "] "
+                + getUnit().getGoodsIterator().next().getNameKey();
+        }
+    }
+
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -351,30 +374,9 @@ public class IndianDemandMission extends Mission {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "indianDemandMission".
+     * @return "indianDemandMission".
      */
     public static String getXMLElementTagName() {
         return "indianDemandMission";
-    }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
-     *         "[ColonyName] Getting gift: (x, y)".
-     */
-    public String getDebuggingInfo() {
-        if (getUnit().getIndianSettlement() == null) {
-            return "invalid";
-        }
-        final String targetName = (target != null) ? target.getName() : "null";
-        if (!hasTribute()) {
-            return "[" + targetName + "] Getting tribute: "
-                + getUnit().getIndianSettlement().getTile().getPosition();
-        } else {
-            return "[" + targetName + "] "
-                + getUnit().getGoodsIterator().next().getNameKey();
-        }
     }
 }

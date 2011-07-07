@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
@@ -88,8 +89,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @return A <code>TradeRoute</code> on success, null on error.
      */
     public static TradeRoute tradeRouteFromElement(Game game, Element element) {
-        String id = element.getAttribute("ID");
-        element.setAttribute("ID", idPrefix + id);
+        String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE, idPrefix + id);
         try {
             return new TradeRoute(game, element);
         } catch (Exception e) {

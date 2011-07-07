@@ -26,8 +26,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 import org.w3c.dom.Element;
+
 
 /**
  * Represents a locatable goods of a specified type and quantity.
@@ -201,8 +201,6 @@ public class Resource extends TileItem {
     */
 
 
-    // ------------------------------------------------------------ API methods
-
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -227,13 +225,14 @@ public class Resource extends TileItem {
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", getTile().getId());
         out.writeAttribute("type", getType().getId());
         out.writeAttribute("quantity", Integer.toString(quantity));
@@ -249,8 +248,9 @@ public class Resource extends TileItem {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
         type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
@@ -261,10 +261,10 @@ public class Resource extends TileItem {
 
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "resource".
      */
     public static String getXMLElementTagName() {
         return "resource";
     }
-
 }

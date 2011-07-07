@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
@@ -640,54 +639,6 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-        if (tileImprovementPlan != null) {
-            out.writeAttribute("tileImprovementPlan", tileImprovementPlan.getId());
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-
-        final String tileImprovementPlanStr = in.getAttributeValue(null, "tileImprovementPlan");
-        if (tileImprovementPlanStr != null) {
-            tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementPlanStr);
-            if (tileImprovementPlan == null) {
-                tileImprovementPlan = new TileImprovementPlan(getAIMain(), tileImprovementPlanStr);
-            }
-        } else {
-            tileImprovementPlan = null;
-        }
-
-        in.nextTag();
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     * @return The <code>String</code> "wishRealizationMission".
-     */
-    public static String getXMLElementTagName() {
-        return "tileImprovementPlanMission";
-    }
-
-    /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
@@ -716,5 +667,60 @@ public class PioneeringMission extends Mission {
             logger.warning("Unknown state");
             return "";
         }
+    }
+
+
+    /**
+     * Writes all of the <code>AIObject</code>s and other AI-related
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+
+        out.writeAttribute("unit", getUnit().getId());
+        if (tileImprovementPlan != null) {
+            out.writeAttribute("tileImprovementPlan",
+                tileImprovementPlan.getId());
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     *
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+
+        final String tileImprovementPlanStr
+            = in.getAttributeValue(null, "tileImprovementPlan");
+        if (tileImprovementPlanStr != null) {
+            tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementPlanStr);
+            if (tileImprovementPlan == null) {
+                tileImprovementPlan = new TileImprovementPlan(getAIMain(), tileImprovementPlanStr);
+            }
+        } else {
+            tileImprovementPlan = null;
+        }
+
+        in.nextTag();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "wishRealizationMission".
+     */
+    public static String getXMLElementTagName() {
+        return "tileImprovementPlanMission";
     }
 }

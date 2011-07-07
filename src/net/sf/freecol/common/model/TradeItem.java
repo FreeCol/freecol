@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
@@ -29,7 +28,6 @@ import net.sf.freecol.common.model.Player.Stance;
 
 /**
  * One of the items a DiplomaticTrade consists of.
- *
  */
 public abstract class TradeItem extends FreeColObject {
 
@@ -197,33 +195,34 @@ public abstract class TradeItem extends FreeColObject {
 
 
     /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("source", this.source.getId());
+        out.writeAttribute("destination", this.destination.getId());
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         String sourceID = in.getAttributeValue(null, "source");
         this.source = (Player) game.getFreeColGameObject(sourceID);
         String destinationID = in.getAttributeValue(null, "destination");
         this.destination = (Player) game.getFreeColGameObject(destinationID);
     }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("ID", getId());
-        out.writeAttribute("source", this.source.getId());
-        out.writeAttribute("destination", this.destination.getId());
-    }
-    
-
 }
-

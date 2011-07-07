@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 import org.w3c.dom.Element;
 
 
@@ -221,9 +220,6 @@ public final class Ability extends Feature {
         }
     }
 
-    // -- Serialization --
-
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -234,32 +230,54 @@ public final class Ability extends Feature {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, "ability");
+        super.toXML(out, getXMLElementTagName());
     }
 
-    public void readAttributes(XMLStreamReader in, Specification specification)
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute(VALUE_TAG, String.valueOf(value));
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in,
+                                  Specification specification)
         throws XMLStreamException {
         super.readAttributes(in, specification);
+
         value = getAttribute(in, VALUE_TAG, true);
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute(VALUE_TAG, String.valueOf(value));
+    @Override
+    public String toString() {
+        return getId() + (getSource() == null ? " "
+            : " (" + getSource().getId() + ") ")
+            + " " + value;
     }
 
     /**
      * Returns the XML tag name for this element.
      *
-     * @return a <code>String</code> value
+     * @return "ability".
      */
     public static String getXMLElementTagName() {
         return "ability";
     }
-
-    public String toString() {
-        return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
-            " " + value;
-    }
-
 }

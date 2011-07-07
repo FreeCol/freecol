@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -44,10 +43,10 @@ import net.sf.freecol.server.ai.AIUnit;
 
 
 /**
-* A mission describes what a unit should do; attack, build colony, wander etc.
-* Every {@link AIUnit} should have a mission. By extending this class,
-* you create different missions.
-*/
+ * A mission describes what a unit should do; attack, build colony,
+ * wander etc.  Every {@link AIUnit} should have a mission. By
+ * extending this class, you create different missions.
+ */
 public abstract class Mission extends AIObject {
 
     private static final Logger logger = Logger.getLogger(Mission.class.getName());
@@ -62,22 +61,21 @@ public abstract class Mission extends AIObject {
 
 
     /**
-    * Creates a mission.
-    * @param aiMain The main AI-object.
-    */
+     * Creates a mission.
+     * @param aiMain The main AI-object.
+     */
     public Mission(AIMain aiMain) {
         this(aiMain, null);
     }
 
-
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    * @exception NullPointerException if <code>aiUnit == null</code>.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @exception NullPointerException if <code>aiUnit == null</code>.
+     */
     public Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
         this.aiUnit = aiUnit;

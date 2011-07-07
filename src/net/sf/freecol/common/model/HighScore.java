@@ -415,23 +415,30 @@ public class HighScore extends FreeColObject {
         this.date = newDate;
     }
 
-   /**
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
-     * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *  
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
 
         out.writeAttribute("date", dateFormat.format(date));
         out.writeAttribute("retirementTurn", Integer.toString(retirementTurn));
@@ -450,12 +457,11 @@ public class HighScore extends FreeColObject {
         out.writeAttribute("difficulty", difficulty);
         out.writeAttribute("units", Integer.toString(units));
         out.writeAttribute("colonies", Integer.toString(colonies));
-
-        out.writeEndElement();
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in)
@@ -489,10 +495,9 @@ public class HighScore extends FreeColObject {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "highScore".
      */
     public static String getXMLElementTagName() {
         return "highScore";
     }
-
 }

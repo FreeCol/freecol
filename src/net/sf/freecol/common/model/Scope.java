@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
@@ -328,17 +327,6 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
 
-    public void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        matchNegated = getAttribute(in, "matchNegated", false);
-        matchesNull = getAttribute(in, "matchesNull", true);
-        type = in.getAttributeValue(null, "type");
-        abilityID = in.getAttributeValue(null, "ability-id");
-        abilityValue = getAttribute(in, "ability-value", true);
-        methodName = in.getAttributeValue(null, "method-name");
-        methodValue = in.getAttributeValue(null, "method-value");
-    }
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -348,14 +336,21 @@ public class Scope extends FreeColObject implements Cloneable {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
         out.writeEndElement();
     }
 
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         out.writeAttribute("matchNegated", Boolean.toString(matchNegated));
         out.writeAttribute("matchesNull", Boolean.toString(matchesNull));
         if (type != null) {
@@ -374,9 +369,32 @@ public class Scope extends FreeColObject implements Cloneable {
         }
     }
     
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        matchNegated = getAttribute(in, "matchNegated", false);
+        matchesNull = getAttribute(in, "matchesNull", true);
+        type = in.getAttributeValue(null, "type");
+        abilityID = in.getAttributeValue(null, "ability-id");
+        abilityValue = getAttribute(in, "ability-value", true);
+        methodName = in.getAttributeValue(null, "method-name");
+        methodValue = in.getAttributeValue(null, "method-value");
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "scope".
+     */
     public static String getXMLElementTagName() {
         return "scope";
     }
-
-
 }

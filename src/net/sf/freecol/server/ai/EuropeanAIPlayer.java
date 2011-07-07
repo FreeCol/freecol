@@ -53,10 +53,11 @@ import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
+
 /**
  *
- * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
+ * Objects of this class contains AI-information for a single {@link
+ * Player} and is used for controlling this player.
  *
  * @deprecated Currently unused, outdated copy of {@link AIPlayer}. Eventual
  * specialization of AI should extend AIPlayer, see {@link ColonialAIPlayer}.
@@ -864,8 +865,4 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         Collections.sort(wishList);
         return wishList.iterator();
     }
-
-
-
-
 }

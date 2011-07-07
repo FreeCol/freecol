@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -231,23 +230,93 @@ public class IndianNationType extends NationType {
         return skills;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("number-of-settlements",
+            numberOfSettlements.toString().toLowerCase(Locale.US));
+        out.writeAttribute("aggression",
+            aggression.toString().toLowerCase(Locale.US));
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (RandomChoice<UnitType> choice : skills) {
+            out.writeStartElement("skill");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());
+            out.writeAttribute("probability",
+                Integer.toString(choice.getProbability()));
+            out.writeEndElement();
+        }
+
+        for (String region : regions) {
+            out.writeStartElement(Region.getXMLElementTagName());
+            out.writeAttribute(ID_ATTRIBUTE_TAG, region);
+            out.writeEndElement();
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         String extendString = in.getAttributeValue(null, "extends");
         IndianNationType parent = (extendString == null) ? this :
             getSpecification().getType(extendString, IndianNationType.class);
-        String valueString = in.getAttributeValue(null, "number-of-settlements");
+        String valueString = in.getAttributeValue(null,
+            "number-of-settlements");
         if (valueString == null) {
             numberOfSettlements = parent.numberOfSettlements;
         } else {
-            numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString.toUpperCase(Locale.US));
+            numberOfSettlements = Enum.valueOf(SettlementNumber.class,
+                valueString.toUpperCase(Locale.US));
         }
 
         valueString = in.getAttributeValue(null, "aggression");
         if (valueString == null) {
             aggression = parent.aggression;
         } else {
-            aggression = Enum.valueOf(AggressionLevel.class, valueString.toUpperCase(Locale.US));
+            aggression = Enum.valueOf(AggressionLevel.class,
+                valueString.toUpperCase(Locale.US));
         }
 
         if (parent != this) {
@@ -261,17 +330,34 @@ public class IndianNationType extends NationType {
 
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         super.readChildren(in);
+
         // sort skill according to probability
         Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
-                public int compare(RandomChoice<UnitType> choice1, RandomChoice<UnitType> choice2) {
+                public int compare(RandomChoice<UnitType> choice1,
+                                   RandomChoice<UnitType> choice2) {
                     return choice2.getProbability() - choice1.getProbability();
                 }
             });
     }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if ("skill".equals(childName)) {
             UnitType unitType = getSpecification().getUnitType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
@@ -287,43 +373,11 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Makes an XML-representation of this object.
+     * Returns the tag name of the root element representing this object.
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @return "indian-nation-type".
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("number-of-settlements", numberOfSettlements.toString().toLowerCase(Locale.US));
-        out.writeAttribute("aggression", aggression.toString().toLowerCase(Locale.US));
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-
-        for (RandomChoice<UnitType> choice : skills) {
-            out.writeStartElement("skill");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());
-            out.writeAttribute("probability", Integer.toString(choice.getProbability()));
-            out.writeEndElement();
-        }
-
-        for (String region : regions) {
-            out.writeStartElement(Region.getXMLElementTagName());
-            out.writeAttribute(ID_ATTRIBUTE_TAG, region);
-            out.writeEndElement();
-        }
-
-    }
-
     public static String getXMLElementTagName() {
         return "indian-nation-type";
     }
-
-
 }

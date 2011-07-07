@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+
 // TODO: implement entire Map interface
 public class TypeCountMap<T extends FreeColGameObjectType> {
 
@@ -84,6 +85,8 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
         values.putAll(other.values);
     }
 
+
+    @Override
     public String toString() {
         String result = "[" + getClass().getName();
         for (Map.Entry<T, Integer> entry : values.entrySet()) {

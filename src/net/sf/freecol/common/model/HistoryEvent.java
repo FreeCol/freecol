@@ -153,48 +153,49 @@ public class HistoryEvent extends StringTemplate {
      */
     public HistoryEvent addStringTemplate(String key, StringTemplate template) {
         super.addStringTemplate(key, template);
-	return this;
+        return this;
     }
 
-
-    public String toString() {
-        return eventType.toString() + " (" + turn.getYear() + ") ["
-            + super.toString() + "]";
-    }
 
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("turn", Integer.toString(turn.getNumber()));
         out.writeAttribute("eventType", eventType.toString());
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         turn = new Turn(Integer.parseInt(in.getAttributeValue(null, "turn")));
         String eventString = in.getAttributeValue(null, "eventType");
         // TODO: remove compatibility code
@@ -205,8 +206,17 @@ public class HistoryEvent extends StringTemplate {
             setId("model.history." + eventString);
         }
         // end compatibility code
-        eventType = Enum.valueOf(EventType.class, eventString);
         super.readChildren(in);
+        eventType = Enum.valueOf(EventType.class, eventString);
+    }
+
+    /**
+     * Builds a string representation of this object.
+     */
+    @Override
+    public String toString() {
+        return eventType.toString() + " (" + turn.getYear() + ") ["
+            + super.toString() + "]";
     }
 
     /**
@@ -217,5 +227,4 @@ public class HistoryEvent extends StringTemplate {
     public static String getXMLElementTagName() {
         return "historyEvent";
     }
-
 }

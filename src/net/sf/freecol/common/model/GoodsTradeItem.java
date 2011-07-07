@@ -38,6 +38,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     private Settlement settlement;
         
+
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
@@ -47,7 +48,8 @@ public class GoodsTradeItem extends TradeItem {
      * @param goods a <code>Goods</code> value
      * @param settlement a <code>Settlement</code> value
      */
-    public GoodsTradeItem(Game game, Player source, Player destination, Goods goods, Settlement settlement) {
+    public GoodsTradeItem(Game game, Player source, Player destination,
+                          Goods goods, Settlement settlement) {
         super(game, "tradeItem.goods", source, destination);
         this.goods = goods;
         this.settlement = settlement;
@@ -136,14 +138,58 @@ public class GoodsTradeItem extends TradeItem {
 
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("settlement", settlement.getId());
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        goods.toXML(out);
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readFromXMLImpl(in);
-        this.settlement = (Settlement) game.getFreeColGameObject(in.getAttributeValue(null, "settlement"));
+        this.settlement = (Settlement) game
+            .getFreeColGameObject(in.getAttributeValue(null, "settlement"));
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
                 this.goods = new Goods(game, in);
@@ -152,29 +198,11 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        super.toXMLImpl(out);
-        out.writeAttribute("settlement", settlement.getId());
-        this.goods.toXML(out);
-        out.writeEndElement();
-    }
-    
-    /**
      * Gets the tag name of the root element representing this object.
-     * @return "goods".
+     *
+     * @return "goodsTradeItem".
      */
     public static String getXMLElementTagName() {
         return "goodsTradeItem";
     }
-
 }
-
-

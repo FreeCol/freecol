@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
-
 public class Event extends FreeColGameObjectType {
 
     /**
@@ -107,12 +106,31 @@ public class Event extends FreeColGameObjectType {
         this.scoreValue = newScoreValue;
     }
 
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (value != null) {
             out.writeAttribute(VALUE_TAG, value);
         }
@@ -121,9 +139,18 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
-
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeChildren(out);
+
         if (limits != null) {
             for (Limit limit : limits.values()) {
                 limit.toXMLImpl(out);
@@ -131,14 +158,30 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         value = in.getAttributeValue(null, VALUE_TAG);
         scoreValue = getAttribute(in, "scoreValue", 0);
     }
 
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (Limit.getXMLElementTagName().equals(in.getLocalName())) {
             if (limits == null) {
                 limits = new HashMap<String, Limit>();
@@ -151,10 +194,12 @@ public class Event extends FreeColGameObjectType {
         }
     }
 
-
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "event".
+     */
     public static String getXMLElementTagName() {
         return "event";
     }
-
-
 }

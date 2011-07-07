@@ -108,7 +108,7 @@ public abstract class NewAIPlayer extends AIObject {
      * @param element The XML-element containing information.
      */
     public NewAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -120,7 +120,7 @@ public abstract class NewAIPlayer extends AIObject {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public NewAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -446,42 +446,6 @@ public abstract class NewAIPlayer extends AIObject {
         return true;
     }
 
-    /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
-     */
-    @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        player = (ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-        in.nextTag();
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * @return the tag name.
-     */
-    public static String getXMLElementTagName() {
-        return "aiPlayer";
-    }
-
 
     /**
      * Called after another <code>Player</code> sends a <code>trade</code> message
@@ -542,5 +506,43 @@ public abstract class NewAIPlayer extends AIObject {
                 }
             }
         }
+    }
+
+
+    /**
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads information for this object from an XML stream.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading from the
+     *             stream.
+     */
+    @Override
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        player = (ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+        in.nextTag();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "aiPlayer".
+     */
+    public static String getXMLElementTagName() {
+        return "aiPlayer";
     }
 }

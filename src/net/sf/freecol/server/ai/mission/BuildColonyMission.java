@@ -46,11 +46,9 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for building a <code>Colony</code>.
- *
- * <br />
- * <br />
  *
  * This mission can be used in two different ways:
  * <ul>
@@ -58,10 +56,10 @@ import org.w3c.dom.Element;
  * <li>Find a site for a colony and build it there.</li>
  * </ul>
  *
- * This mission will be aborted in the former case if the value gets below a
- * given threshold, while a colony will always get built (if there is sufficient
- * space on the map) in the latter case. Use the appropriate constructor to get
- * the desired behaviour.
+ * This mission will be aborted in the former case if the value gets
+ * below a given threshold, while a colony will always get built (if
+ * there is sufficient space on the map) in the latter case. Use the
+ * appropriate constructor to get the desired behaviour.
  *
  * @see net.sf.freecol.common.model.Colony Colony
  */
@@ -384,6 +382,24 @@ public class BuildColonyMission extends Mission {
                     && colonyValue <= getUnit().getOwner().getColonyValue(target)));
     }
 
+
+    /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
+     *         <code>x</code> and <code>y</code> is the coordinates of the
+     *         target tile for this mission, and <code>z</code> is the value
+     *         of building the colony. The exclamation mark is added if the unit
+     *         should continue searching for a colony site if the targeted site
+     *         is lost.
+     */
+    public String getDebuggingInfo() {
+        final String targetName = (target != null) ? target.getPosition().toString() : "unassigned";
+        return targetName + " " + colonyValue + (doNotGiveUp ? "!" : "");
+    }
+
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -411,7 +427,8 @@ public class BuildColonyMission extends Mission {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
 
         final String targetStr = in.getAttributeValue(null, "target");
@@ -421,7 +438,8 @@ public class BuildColonyMission extends Mission {
             target = null;
         }
 
-        final String doNotGiveUpStr = in.getAttributeValue(null, "doNotGiveUp");
+        final String doNotGiveUpStr = in.getAttributeValue(null,
+            "doNotGiveUp");
         if (doNotGiveUpStr != null) {
             doNotGiveUp = Boolean.valueOf(doNotGiveUpStr).booleanValue();
         } else {
@@ -434,25 +452,9 @@ public class BuildColonyMission extends Mission {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "buildColonyMission".
+     * @return "buildColonyMission".
      */
     public static String getXMLElementTagName() {
         return "buildColonyMission";
-    }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
-     *         <code>x</code> and <code>y</code> is the coordinates of the
-     *         target tile for this mission, and <code>z</code> is the value
-     *         of building the colony. The exclamation mark is added if the unit
-     *         should continue searching for a colony site if the targeted site
-     *         is lost.
-     */
-    public String getDebuggingInfo() {
-        final String targetName = (target != null) ? target.getPosition().toString() : "unassigned";
-        return targetName + " " + colonyValue + (doNotGiveUp ? "!" : "");
     }
 }

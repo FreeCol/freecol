@@ -17,11 +17,11 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 
 public class ValuedAIObject extends AIObject implements Comparable<ValuedAIObject> {
 
@@ -61,8 +61,8 @@ public class ValuedAIObject extends AIObject implements Comparable<ValuedAIObjec
         return other.value - this.value;
     }
 
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // do nothing
     }
-
 }

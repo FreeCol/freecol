@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.option;
 
 import java.util.logging.Logger;
@@ -26,9 +25,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
-* Represents an option where the valid choice is an integer.
-*/
+ * Represents an option where the valid choice is an integer.
+ */
 public class IntegerOption extends AbstractOption<Integer> {
 
     @SuppressWarnings("unused")
@@ -146,6 +146,7 @@ public class IntegerOption extends AbstractOption<Integer> {
         setValue(Integer.parseInt(value));
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -172,7 +173,8 @@ public class IntegerOption extends AbstractOption<Integer> {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, VALUE_TAG);
@@ -199,11 +201,11 @@ public class IntegerOption extends AbstractOption<Integer> {
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "integerOption".
-    */
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "integerOption".
+     */
     public static String getXMLElementTagName() {
         return "integerOption";
     }
-
 }

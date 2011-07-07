@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 
 /**
  * Represents one of the nations present in the game.
@@ -113,23 +113,41 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     public abstract boolean isREF();
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (SettlementType settlementType : settlementTypes) {
+            settlementType.toXML(out, "settlement");
+        }
+    }
+
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if ("settlement".equals(childName)) {
             String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            SettlementType settlementType = new SettlementType(id, getSpecification());
+            SettlementType settlementType
+                = new SettlementType(id, getSpecification());
             settlementType.readFromXML(in);
             settlementTypes.add(settlementType);
         } else {
             super.readChild(in);
         }
     }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-        for (SettlementType settlementType : settlementTypes) {
-            settlementType.toXML(out, "settlement");
-        }
-    }
-
 }

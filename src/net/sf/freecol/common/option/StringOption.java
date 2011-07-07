@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
@@ -33,6 +32,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
+
 
 /**
  * Represents an option that can be either <i>true</i>
@@ -223,10 +223,21 @@ public class StringOption extends AbstractOption<String> {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
         out.writeAttribute(VALUE_TAG, value);
         if (generateChoices != null) {
             out.writeAttribute("generate", generateChoices.toString());
@@ -234,6 +245,20 @@ public class StringOption extends AbstractOption<String> {
         if (addNone) {
             out.writeAttribute("addNone", Boolean.toString(addNone));
         }
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
         if (choices != null && !choices.isEmpty()) {
             for (String choice : choices) {
                 out.writeStartElement("choice");
@@ -241,17 +266,17 @@ public class StringOption extends AbstractOption<String> {
                 out.writeEndElement();
             }
         }
-
-        out.writeEndElement();
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, VALUE_TAG);
@@ -289,13 +314,12 @@ public class StringOption extends AbstractOption<String> {
         }
     }
 
-
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "StringOption".
      */
     public static String getXMLElementTagName() {
         return "stringOption";
     }
-
 }

@@ -42,8 +42,8 @@ import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
+
 /**
- *
  * Objects of this class contains AI-information for a single {@link
  * net.sf.freecol.common.model.Player} and is used for controlling
  * this Player.

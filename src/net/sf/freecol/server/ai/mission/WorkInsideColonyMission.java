@@ -32,26 +32,27 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for working inside a <code>Colony</code>.
  */
 public class WorkInsideColonyMission extends Mission{
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
-
 
     private AIColony aiColony;
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    * @param aiColony The <code>AIColony</code> the unit should be
-    *        working in.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @param aiColony The <code>AIColony</code> the unit should be
+     *        working in.
+     */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit, AIColony aiColony) {
         super(aiMain, aiUnit);
         this.aiColony = aiColony;
@@ -59,7 +60,6 @@ public class WorkInsideColonyMission extends Mission{
             throw new NullPointerException("aiColony == null");
         }
     }
-
 
     /**
      * Loads a mission from the given element.
@@ -104,8 +104,6 @@ public class WorkInsideColonyMission extends Mission{
         // Nothing to do yet.
     }
 
-
-
     /**
      * Checks if this mission is still valid to perform.
      *
@@ -117,6 +115,7 @@ public class WorkInsideColonyMission extends Mission{
             && aiColony.getColony() != null
             && !aiColony.getColony().isDisposed();
     }
+
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -138,22 +137,27 @@ public class WorkInsideColonyMission extends Mission{
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        aiColony = (AIColony) getAIMain().getAIObject(in.getAttributeValue(null, "colony"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+        aiColony = (AIColony) getAIMain()
+            .getAIObject(in.getAttributeValue(null, "colony"));
         if (aiColony == null) {
-            aiColony = new AIColony(getAIMain(), in.getAttributeValue(null, "colony"));
+            aiColony = new AIColony(getAIMain(),
+                in.getAttributeValue(null, "colony"));
         }
         in.nextTag();
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "workInsideColonyMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return The <code>String</code> "workInsideColonyMission".
+     */
     public static String getXMLElementTagName() {
         return "workInsideColonyMission";
     }

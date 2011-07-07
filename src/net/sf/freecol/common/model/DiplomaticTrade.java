@@ -283,12 +283,57 @@ public class DiplomaticTrade extends FreeColObject {
 
 
     /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("sender", sender.getId());
+        out.writeAttribute("recipient", recipient.getId());
+        out.writeAttribute("status", status.toString());
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (TradeItem item : items) item.toXML(out);
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         String senderString = in.getAttributeValue(null, "sender");
         sender = (Player) game.getFreeColGameObject(senderString);
 
@@ -319,23 +364,6 @@ public class DiplomaticTrade extends FreeColObject {
             items.add(item);
         }
 
-    }
-
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *         the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("sender", sender.getId());
-        out.writeAttribute("recipient", recipient.getId());
-        out.writeAttribute("status", status.toString());
-        for (TradeItem item : items) item.toXML(out);
-        out.writeEndElement();
     }
 
     /**

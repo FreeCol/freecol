@@ -44,12 +44,14 @@ import net.sf.freecol.common.model.Unit.UnitState;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Represents a single tile on the <code>Map</code>.
  *
  * @see Map
  */
-public final class Tile extends FreeColGameObject implements Location, Named, Ownable {
+public final class Tile extends FreeColGameObject
+    implements Location, Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
@@ -1802,7 +1804,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         if (!showAll) {
             if (toSavedGame) {
@@ -1812,8 +1815,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 logger.warning("player is null, but showAll is false");
             }
         }
-        boolean full = getGame().isClientTrusted() || showAll;
-        PlayerExploredTile pet = (showAll) ? null
+        PlayerExploredTile pet = (showAll || toSavedGame) ? null
             : getPlayerExploredTile(player);
 
         // Start element:
@@ -1834,7 +1836,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("connected", Boolean.toString(true));
         }
 
-        if (full || player.canSee(this)) {
+        if (showAll || toSavedGame || player.canSee(this)) {
             if (owner != null) {
                 out.writeAttribute("owner", owner.getId());
             }
@@ -1853,12 +1855,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         // End of attributes
 
-        if (full || player.canSee(this)) {
+        if (showAll || toSavedGame || player.canSee(this)) {
             if (settlement != null) {
                 settlement.toXML(out, player, showAll, toSavedGame);
             }
             // Show enemy units if there is no enemy settlement.
-            if ((full || settlement == null || settlement.getOwner() == player)
+            if ((showAll || toSavedGame || settlement == null
+                    || settlement.getOwner() == player)
                 && !units.isEmpty()) {
                 out.writeStartElement(UNITS_TAG_NAME);
                 for (Unit unit : units) {
@@ -1900,7 +1903,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         Settlement oldSettlement = settlement;
         Player oldSettlementOwner = (settlement == null) ? null
             : settlement.getOwner();
@@ -1977,7 +1981,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName()
-                    + " [" + in.getAttributeValue(null, "ID") + "] "
+                    + " [" + in.getAttributeValue(null, ID_ATTRIBUTE) + "] "
                     + " loading tile with ID " + getId());
                 in.nextTag();
             }
@@ -2058,6 +2062,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *
      * @return A String representation of this Tile.
      */
+    @Override
     public String toString() {
         return "Tile(" + x + "," + y +"):"
             + ((type == null) ? "unknown" : type.getId());

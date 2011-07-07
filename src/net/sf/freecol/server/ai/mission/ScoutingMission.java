@@ -46,6 +46,7 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for controlling a scout.
  *
@@ -341,8 +342,19 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related information
-     * to an XML-stream.
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     * @return The <code>String</code>.
+     */
+    public String getDebuggingInfo() {
+        return debugAction;
+    }
+
+
+    /**
+     * Writes all of the <code>AIObject</code>s and other AI-related
+     * information to an XML-stream.
      *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing to the
@@ -362,28 +374,19 @@ public class ScoutingMission extends Mission {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain()
+            .getAIObject(in.getAttributeValue(null, "unit")));
         in.nextTag();
     }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "scoutingMission".
+     * @return "scoutingMission".
      */
     public static String getXMLElementTagName() {
         return "scoutingMission";
     }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>.
-     */
-    public String getDebuggingInfo() {
-        return debugAction;
-    }
-
 }

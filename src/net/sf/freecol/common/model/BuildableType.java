@@ -145,6 +145,66 @@ public abstract class BuildableType extends FreeColGameObjectType {
         return requiredAbilities;
     }
 
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (populationRequired > 1) {
+            out.writeAttribute("required-population",
+                Integer.toString(populationRequired));
+        }
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        if (limits != null) {
+            for (Limit limit : limits) {
+                limit.toXMLImpl(out);
+            }
+        }
+        for (Map.Entry<String, Boolean> entry
+                 : getAbilitiesRequired().entrySet()) {
+            out.writeStartElement("required-ability");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
+            out.writeAttribute(VALUE_TAG, Boolean.toString(entry.getValue()));
+            out.writeEndElement();
+        }
+        if (getGoodsRequired() != null) {
+            for (AbstractGoods goods : getGoodsRequired()) {
+                out.writeStartElement("required-goods");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, goods.getType().getId());
+                out.writeAttribute(VALUE_TAG, Integer.toString(goods.getAmount()));
+                out.writeEndElement();
+            }
+        }
+    }
+
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if (Limit.getXMLElementTagName().equals(childName)) {
@@ -179,35 +239,4 @@ public abstract class BuildableType extends FreeColGameObjectType {
             super.readChild(in);
         }
     }
-
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        if (populationRequired > 1) {
-            out.writeAttribute("required-population", Integer.toString(populationRequired));
-        }
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-        if (limits != null) {
-            for (Limit limit : limits) {
-                limit.toXMLImpl(out);
-            }
-        }
-        for (Map.Entry<String, Boolean> entry : getAbilitiesRequired().entrySet()) {
-            out.writeStartElement("required-ability");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
-            out.writeAttribute(VALUE_TAG, Boolean.toString(entry.getValue()));
-            out.writeEndElement();
-        }
-        if (getGoodsRequired() != null) {
-            for (AbstractGoods goods : getGoodsRequired()) {
-                out.writeStartElement("required-goods");
-                out.writeAttribute(ID_ATTRIBUTE_TAG, goods.getType().getId());
-                out.writeAttribute(VALUE_TAG, Integer.toString(goods.getAmount()));
-                out.writeEndElement();
-            }
-        }
-    }
-
 }

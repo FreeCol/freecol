@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -225,67 +224,6 @@ public class FoundingFather extends FreeColGameObjectType {
         this.upgrades = newUpgrades;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        String typeString = in.getAttributeValue(null, "type").toUpperCase(Locale.US);
-        type = Enum.valueOf(FoundingFatherType.class, typeString);
-
-        weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
-        weight[2] = Integer.parseInt(in.getAttributeValue(null, "weight2"));
-        weight[3] = Integer.parseInt(in.getAttributeValue(null, "weight3"));
-
-    }
-
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
-    }
-
-    /**
-     * 0.9.x compatibility hack, called from the specification when it is
-     * finishing up.
-     */
-    public void fixup09x() {
-        try {
-            // Cortes has changed
-            if (!getModifierSet("model.modifier.nativeTreasureModifier").isEmpty()) {
-                addAbility(new Ability("model.ability.plunderNatives"));
-            }
-        } catch (Exception e) {
-            // we don't care
-        }
-    }
-
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if (Event.getXMLElementTagName().equals(childName)) {
-            Event event = new Event(null, getSpecification());
-            event.readFromXML(in);
-            events.add(event);
-        } else if ("scope".equals(childName)) {
-            scopes.add(new Scope(in));
-        } else if ("unit".equals(childName)) {
-            AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
-            if (units == null) {
-                units = new ArrayList<AbstractUnit>();
-            }
-            units.add(unit);
-        } else if ("upgrade".equals(childName)) {
-            UnitType fromType = getSpecification().getUnitType(in.getAttributeValue(null, "from-id"));
-            UnitType toType = getSpecification().getUnitType(in.getAttributeValue(null, "to-id"));
-            if (fromType != null && toType != null) {
-                if (upgrades == null) {
-                    upgrades = new HashMap<UnitType, UnitType>();
-                }
-                upgrades.put(fromType, toType);
-            }
-            in.nextTag();
-        } else {
-            super.readChild(in);
-        }
-    }
-
 
     /**
      * Makes an XML-representation of this object.
@@ -294,20 +232,41 @@ public class FoundingFather extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
         for (int index = 1; index <= 3; index++) {
-            out.writeAttribute("weight" + index, Integer.toString(weight[index]));
+            out.writeAttribute("weight" + index,
+                Integer.toString(weight[index]));
         }
     }
 
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeChildren(out);
+
         if (events != null) {
             for (Event event : events) {
                 event.toXMLImpl(out);
@@ -337,9 +296,102 @@ public class FoundingFather extends FreeColGameObjectType {
         }
     }
 
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        String typeString = in.getAttributeValue(null,
+            "type").toUpperCase(Locale.US);
+        type = Enum.valueOf(FoundingFatherType.class, typeString);
+
+        weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
+        weight[2] = Integer.parseInt(in.getAttributeValue(null, "weight2"));
+        weight[3] = Integer.parseInt(in.getAttributeValue(null, "weight3"));
+    }
+
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in)
+        throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+    }
+
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if (Event.getXMLElementTagName().equals(childName)) {
+            Event event = new Event(null, getSpecification());
+            event.readFromXML(in);
+            events.add(event);
+        } else if ("scope".equals(childName)) {
+            scopes.add(new Scope(in));
+        } else if ("unit".equals(childName)) {
+            // AbstractUnit closes element
+            AbstractUnit unit = new AbstractUnit(in);
+            if (units == null) {
+                units = new ArrayList<AbstractUnit>();
+            }
+            units.add(unit);
+        } else if ("upgrade".equals(childName)) {
+            UnitType fromType = getSpecification()
+                .getUnitType(in.getAttributeValue(null, "from-id"));
+            UnitType toType = getSpecification()
+                .getUnitType(in.getAttributeValue(null, "to-id"));
+            if (fromType != null && toType != null) {
+                if (upgrades == null) {
+                    upgrades = new HashMap<UnitType, UnitType>();
+                }
+                upgrades.put(fromType, toType);
+            }
+            in.nextTag();
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * 0.9.x compatibility hack, called from the specification when it is
+     * finishing up.
+     */
+    public void fixup09x() {
+        try {
+            // Cortes has changed
+            if (!getModifierSet("model.modifier.nativeTreasureModifier").isEmpty()) {
+                addAbility(new Ability("model.ability.plunderNatives"));
+            }
+        } catch (Exception e) {
+            // we don't care
+        }
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "founding-father".
+     */
     public static String getXMLElementTagName() {
         return "founding-father";
     }
-
-
 }

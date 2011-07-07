@@ -36,6 +36,7 @@ import net.sf.freecol.server.model.ServerGame;
 
 import org.w3c.dom.Element;
 
+
 /**
  * The superclass of all game objects in FreeCol.
  */
@@ -225,100 +226,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream for the purpose of storing this object
-     * as a part of a saved game.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
-     */
-    public void toSavedXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, null, true, true);
-    }
-
-    /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out, null, false, false);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll,
-                                      boolean toSavedGame) throws XMLStreamException;
-
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    @Override
-    public final void toXML(XMLStreamWriter out, Player player, boolean showAll,
-                            boolean toSavedGame) throws XMLStreamException {
-        if (toSavedGame && !showAll) {
-            throw new IllegalArgumentException("'showAll' should be true when saving a game.");
-        }
-        toXMLImpl(out, player, showAll, toSavedGame);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    @Override
-    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        uninitialized = false;
-        super.readFromXML(in);
-    }
-
-    /**
      * Gets the ID's integer part of this object. The age of two
      * FreeColGameObjects can be compared by comparing their integer
      * IDs.
@@ -330,16 +237,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         String stringPart = getRealXMLElementTagName() + ":";
         return new Integer(getId().substring(stringPart.length()));
     }
-
-    private String getRealXMLElementTagName() {
-        String tagName = "";
-        try {
-            Method m = getClass().getMethod("getXMLElementTagName", (Class[]) null);
-            tagName = (String) m.invoke((Object) null, (Object[]) null);
-        } catch (Exception e) {}
-        return tagName;
-    }
-    // end TODO
 
     /**
      * Sets the unique ID of this object. When setting a new ID to this object,
@@ -363,7 +260,6 @@ abstract public class FreeColGameObject extends FreeColObject {
             super.setId(newID);
         }
     }
-
 
     /**
      * Checks if this object has the specified ID.
@@ -406,16 +302,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         return getId().hashCode();
     }
 
-
-    /**
-     * Returns a string representation of the object.
-     * @return The <code>String</code>
-     */
-    @Override
-    public String toString() {
-        return getClass().getName() + ": " + getId() + " (super's hash code: " +
-            Integer.toHexString(super.hashCode()) + ")";
-    }
 
     public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
                                                                 Class<T> returnClass) {
@@ -467,6 +353,111 @@ abstract public class FreeColGameObject extends FreeColObject {
             return null;
         }
     }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * <br><br>
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code>
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    @Override
+    public final void toXML(XMLStreamWriter out, Player player,
+                            boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        if (toSavedGame && !showAll) {
+            throw new IllegalArgumentException("'showAll' should be true when saving a game.");
+        }
+        toXMLImpl(out, player, showAll, toSavedGame);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream for the purpose of storing this object
+     * as a part of a saved game.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     */
+    public void toSavedXML(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out, null, true, true);
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out, null, false, false);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * <br><br>
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code>
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    abstract protected void toXMLImpl(XMLStreamWriter out, Player player,
+                                      boolean showAll, boolean toSavedGame)
+        throws XMLStreamException;
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    @Override
+    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        uninitialized = false;
+        super.readFromXML(in);
+    }
+
+    private String getRealXMLElementTagName() {
+        String tagName = "";
+        try {
+            Method m = getClass().getMethod("getXMLElementTagName", (Class[]) null);
+            tagName = (String) m.invoke((Object) null, (Object[]) null);
+        } catch (Exception e) {}
+        return tagName;
+    }
+    // end TODO
 
     /**
      * Common routine for FreeColGameObject descendants to write an
@@ -552,6 +543,18 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
+     * Gets a string representation of the object.
+     *
+     * @return A string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return getClass().getName() + ": "
+            + getId() + " (super's hash code: "
+            + Integer.toHexString(super.hashCode()) + ")";
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      * This method should be overwritten by any sub-class, preferably
      * with the name of the class with the first letter in lower case.
@@ -561,5 +564,4 @@ abstract public class FreeColGameObject extends FreeColObject {
     public static String getXMLElementTagName() {
         return "unknown";
     }
-
 }

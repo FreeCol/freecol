@@ -47,10 +47,8 @@ import org.w3c.dom.Element;
 
 
 /**
- * Represents a player. The player can be either a human player or an AI-player.
- *
- * <br>
- * <br>
+ * Represents a player. The player can be either a human player or an
+ * AI-player.
  *
  * In addition to storing the name, nation e.t.c. of the player, it also stores
  * various defaults for the player. One example of this is the
@@ -3329,6 +3327,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream. <br>
@@ -3349,11 +3348,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("username", name);
         out.writeAttribute("nationID", nationID);
         if (nationType != null) {
@@ -3369,7 +3369,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // 0.9.x compatibility, no longer actually used
         out.writeAttribute("numberOfSettlements", Integer.toString(getNumberOfSettlements()));
 
-        if (getGame().isClientTrusted() || showAll || equals(player)) {
+        if (showAll || toSavedGame || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("liberty", Integer.toString(liberty));
@@ -3417,18 +3417,18 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         for (HistoryEvent event : history) {
-            event.toXML(out, this);
+            event.toXML(out);
         }
 
         for (TradeRoute route : tradeRoutes) {
-            route.toXML(out, this);
+            route.toXML(out, this, false, false);
         }
 
         if (market != null) {
             market.toXML(out, player, showAll, toSavedGame);
         }
 
-        if (getGame().isClientTrusted() || showAll || equals(player)) {
+        if (showAll || toSavedGame || equals(player)) {
             out.writeStartElement(FOUNDING_FATHER_TAG);
             out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
             int index = 0;
@@ -3473,8 +3473,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
         if (!isUnknownEnemy()) {
@@ -3638,5 +3639,4 @@ public class Player extends FreeColGameObject implements Nameable {
     public static String getXMLElementTagName() {
         return "player";
     }
-
 }

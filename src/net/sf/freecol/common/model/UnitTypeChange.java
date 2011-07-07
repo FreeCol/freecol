@@ -92,7 +92,8 @@ public class UnitTypeChange extends FreeColObject {
      * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public UnitTypeChange(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public UnitTypeChange(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         readAttributes(in, specification);
         readChildren(in, specification);
@@ -189,7 +190,42 @@ public class UnitTypeChange extends FreeColObject {
         this.newUnitType = newNewUnitType;
     }
 
-    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @exception XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        if (newUnitType != null) {
+            out.writeAttribute("unit", newUnitType.getId());
+        }
+        if (turnsToLearn != UNDEFINED) {
+            out.writeAttribute("turnsToLearn", Integer.toString(turnsToLearn));
+        }
+        for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
+            out.writeAttribute(tags.get(entry.getKey()),
+                entry.getValue().toString());
+        }
+        out.writeEndElement();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in,
+                                  Specification specification)
+        throws XMLStreamException {
         String newTypeId = in.getAttributeValue(null, "unit");
         if (newTypeId == null) {
             newUnitType = null;
@@ -208,7 +244,8 @@ public class UnitTypeChange extends FreeColObject {
                     } else if (value.equalsIgnoreCase("true")) {
                         changeTypes.put(type, 100);
                     } else {
-                        changeTypes.put(type, Math.max(0, Math.min(100, new Integer(value))));
+                        changeTypes.put(type, Math.max(0,
+                                Math.min(100, new Integer(value))));
                     }
                 }
                 // end compatibility code
@@ -216,7 +253,17 @@ public class UnitTypeChange extends FreeColObject {
         }
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("scope".equals(nodeName)) {
@@ -225,20 +272,11 @@ public class UnitTypeChange extends FreeColObject {
         }
     }
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        if (newUnitType != null) {
-            out.writeAttribute("unit", newUnitType.getId());
-        }
-        if (turnsToLearn != UNDEFINED) {
-            out.writeAttribute("turnsToLearn", Integer.toString(turnsToLearn));
-        }
-        for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
-            out.writeAttribute(tags.get(entry.getKey()), entry.getValue().toString());
-        }
-        out.writeEndElement();
-    }
-
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "upgrade".
+     */
     public static final String getXMLElementTagName() {
         return "upgrade";
     }

@@ -112,6 +112,4 @@ public class ServerRegion extends Region {
     public Position getCenter() {
         return new Position(bounds.x + bounds.width/2, bounds.y + bounds.height/2);
     }
-
-
 }

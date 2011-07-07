@@ -68,7 +68,7 @@ public abstract class Wish extends ValuedAIObject {
     *       of a <code>Wish</code>.
     */
     public Wish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -81,7 +81,7 @@ public abstract class Wish extends ValuedAIObject {
      *      during parsing.
      */
     public Wish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 

@@ -217,7 +217,7 @@ public final class UserConnectionHandler
                     out.writeAttribute("activeUnit",
                                        freeColServer.getActiveUnit().getId());
                 }
-                freeColServer.getGame().toXML(out, player);
+                freeColServer.getGame().toXML(out, player, false, false);
                 freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
                 out.writeEndElement();
             } catch (XMLStreamException e) {
@@ -281,7 +281,7 @@ public final class UserConnectionHandler
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
             out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-            freeColServer.getGame().toXML(out, newPlayer);
+            freeColServer.getGame().toXML(out, newPlayer, false, false);
             freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
             out.writeEndElement();
         }  catch (XMLStreamException e) {

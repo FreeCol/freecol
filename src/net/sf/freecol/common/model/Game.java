@@ -45,6 +45,7 @@ import net.sf.freecol.server.model.ServerModelObject;
 
 import net.sf.freecol.common.model.NationOptions.Advantages;
 
+
 /**
  * The main component of the game model.
  *
@@ -236,17 +237,6 @@ public class Game extends FreeColGameObject {
             }
         }
         return result;
-    }
-
-    /**
-     * Check if the clients are trusted or if the server should keep secrets in
-     * order to prevent cheating.
-     *
-     * @return true if clients are to be trusted.
-     */
-    public boolean isClientTrusted() {
-        // Trust the clients in order to prevent certain bugs, fix this later
-        return false;
     }
 
     /**
@@ -1015,7 +1005,8 @@ public class Game extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
@@ -1024,7 +1015,7 @@ public class Game extends FreeColGameObject {
             throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
         }
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("UUID", getUUID().toString());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
         out.writeAttribute("spanishSuccession", Boolean.toString(spanishSuccession));
@@ -1051,17 +1042,18 @@ public class Game extends FreeColGameObject {
             Player p = playerIterator.next();
             p.toXML(out, player, showAll, toSavedGame);
         }
-        writeFreeColGameObject(getUnknownEnemy(), out, player, showAll, toSavedGame);
+        Player enemy = getUnknownEnemy();
+        if (enemy != null) enemy.toXML(out, player, showAll, toSavedGame);
 
         // serialize map
-        writeFreeColGameObject(map, out, player, showAll, toSavedGame);
+        if (map != null) map.toXML(out, player, showAll, toSavedGame);
 
         /* Moved to within player.  Last used in 0.9.x.
         // serialize messages
         playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = playerIterator.next();
-            if (this.isClientTrusted() || showAll || p.equals(player)) {
+            if (showAll || p.equals(player)) {
                 for (ModelMessage message : p.getModelMessages()) {
                     message.toXML(out);
                 }
@@ -1078,8 +1070,9 @@ public class Game extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String hs = in.getAttributeValue(null, "UUID");
         if (hs != null) {
@@ -1120,7 +1113,7 @@ public class Game extends FreeColGameObject {
                 }
                 nationOptions.readFromXML(in);
             } else if (tagName.equals(Player.getXMLElementTagName())) {
-                Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (player == null) {
                     player = new Player(this, in);
                     if (player.isUnknownEnemy()) {
@@ -1132,7 +1125,7 @@ public class Game extends FreeColGameObject {
                     player.readFromXML(in);
                 }
             } else if (tagName.equals(Map.getXMLElementTagName())) {
-                String mapId = in.getAttributeValue(null, "ID");
+                String mapId = in.getAttributeValue(null, ID_ATTRIBUTE);
                 map = (Map) getFreeColGameObject(mapId);
                 if (map != null) {
                     map.readFromXML(in);
@@ -1221,7 +1214,6 @@ public class Game extends FreeColGameObject {
     }
     // end compatibility code
 
-
     /**
      * Partial writer, so that simple updates can be brief.
      *
@@ -1250,10 +1242,9 @@ public class Game extends FreeColGameObject {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "game".
      */
     public static String getXMLElementTagName() {
         return "game";
     }
-
 }

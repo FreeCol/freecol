@@ -36,14 +36,16 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
+
 /**
  * This {@link Goal} deals with all missionaries of one {@link AIPlayer}.
  * </p><p>
  * For each missionary unit that is being added, this goal will try to find
  * an {@link IndianSettlement} needing a visit.
- * Distance and reachability from the current position of the unit are taken into
- * account, with the implicit assumption that the current location of the unit
- * is sensible in that a nearby settlement is even worth visiting.
+ * Distance and reachability from the current position of the unit are
+ * taken into account, with the implicit assumption that the current
+ * location of the unit is sensible in that a nearby settlement is
+ * even worth visiting.
  * Since missionary units are either created in a player-owned colony,
  * or brought there from Europe, this assumption will most often be valid.
  * </p><p>
@@ -51,6 +53,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * will be created, and the unit be moved there.   
  */       
 public class ManageMissionariesGoal extends Goal {
+
     private static final Logger logger = Logger.getLogger(ManageMissionariesGoal.class.getName());
 
     //Since all our subgoals are the same, we're keeping them on a simple list
@@ -151,15 +154,6 @@ public class ManageMissionariesGoal extends Goal {
         return descr;
     }
     
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        //TODO
-    }
-    
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        //TODO
-    }
-
-
 /* INTERNAL *******************************************************************/
 
 
@@ -184,5 +178,15 @@ public class ManageMissionariesGoal extends Goal {
         }
         //TODO: We didn't find a settlement in range - what now?
         return null;
+    }
+
+
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        //TODO
+    }
+
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        //TODO
     }
 }

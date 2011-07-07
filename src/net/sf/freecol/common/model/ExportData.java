@@ -17,12 +17,12 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 
 /**
  * Objects of this class hold the export data for a particular type of
@@ -180,54 +180,59 @@ public class ExportData extends FreeColObject {
         this.exported = newExport;
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
      *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute("ID", getId());
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("exported", Boolean.toString(exported));
         out.writeAttribute("highLevel", Integer.toString(highLevel));
         out.writeAttribute("lowLevel", Integer.toString(lowLevel));
         out.writeAttribute("exportLevel", Integer.toString(exportLevel));
-
-        out.writeEndElement();
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
-        exported = Boolean.parseBoolean(in.getAttributeValue(null, "exported"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        exported = Boolean.parseBoolean(in.getAttributeValue(null,
+                "exported"));
         highLevel = Integer.parseInt(in.getAttributeValue(null, "highLevel"));
         lowLevel = Integer.parseInt(in.getAttributeValue(null, "lowLevel"));
-        exportLevel = Integer.parseInt(in.getAttributeValue(null, "exportLevel"));
-
+        exportLevel = Integer.parseInt(in.getAttributeValue(null,
+                "exportLevel"));
         in.nextTag();
     }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "exportData".
      */
     public static String getXMLElementTagName() {
         return "exportData";
     }
-
 }

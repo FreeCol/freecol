@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -52,19 +51,18 @@ public class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
-
     private Wish wish;
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    * @param wish The <code>Wish</code> which will be realized by
-    *        the unit and this mission.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @param wish The <code>Wish</code> which will be realized by
+     *        the unit and this mission.
+     */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
         this.wish = wish;
@@ -207,6 +205,22 @@ public class WishRealizationMission extends Mission {
     }
 
     /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     *
+     * @return The <code>String</code>.
+     */
+    public String getDebuggingInfo() {
+        if (wish == null) {
+            return "No wish";
+        } else {
+            return wish.getDestination().getTile().getPosition() + " " + wish.getValue();
+        }
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
@@ -228,11 +242,15 @@ public class WishRealizationMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        wish = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "wish"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+        wish = (Wish) getAIMain().getAIObject(in.getAttributeValue(null,
+                "wish"));
         if (wish == null) {
             final String wid = in.getAttributeValue(null, "wish");
             if (wid.startsWith(GoodsWish.getXMLElementTagName())) {
@@ -246,28 +264,12 @@ public class WishRealizationMission extends Mission {
         in.nextTag();
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "wishRealizationMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return The <code>String</code> "wishRealizationMission".
+     */
     public static String getXMLElementTagName() {
         return "wishRealizationMission";
     }
-
-    /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
-     *
-     * @return The <code>String</code>.
-     */
-    public String getDebuggingInfo() {
-        if (wish == null) {
-            return "No wish";
-        } else {
-            return wish.getDestination().getTile().getPosition() + " " + wish.getValue();
-        }
-    }
-
 }

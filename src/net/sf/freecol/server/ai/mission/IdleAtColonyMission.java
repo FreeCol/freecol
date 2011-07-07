@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -38,20 +37,20 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for wandering in random directions.
-*/
+ * Mission for idling in colony.
+ */
 public class IdleAtColonyMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(IdleAtColonyMission.class.getName());
 
 
-
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     */
     public IdleAtColonyMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
     }
@@ -124,6 +123,7 @@ public class IdleAtColonyMission extends Mission {
         return super.isValid();
     }
 
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -143,17 +143,21 @@ public class IdleAtColonyMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
         in.nextTag();
     }
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unitWanderMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "idleAtColonyMission".
+     */
     public static String getXMLElementTagName() {
         return "idleAtColonyMission";
     }

@@ -25,8 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 import org.w3c.dom.Element;
+
 
 /**
  * Represents locatable goods of a specified type and amount. Use
@@ -255,6 +255,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         return false;
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -281,11 +282,13 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         setType(game.getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
         setAmount(Integer.parseInt(in.getAttributeValue(null, "amount")));
 
@@ -297,11 +300,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         in.nextTag();
     }
 
-
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "goods".
-    */
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "goods".
+     */
     public static String getXMLElementTagName() {
         return "goods";
     }

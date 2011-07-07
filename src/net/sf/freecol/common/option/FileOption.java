@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
  * Represents an option for specifying a <code>File</code>.
  */
@@ -72,6 +73,7 @@ public class FileOption extends AbstractOption<File> {
         isDefined = true;
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -81,15 +83,24 @@ public class FileOption extends AbstractOption<File> {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
         if (value != null) {
             out.writeAttribute(VALUE_TAG, value.getAbsolutePath());
         }
-
-        out.writeEndElement();
     }
 
     /**
@@ -98,7 +109,8 @@ public class FileOption extends AbstractOption<File> {
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id == null && getId().equals(NO_ID)){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
@@ -116,7 +128,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "booleanOption".
+     * @return "fileOption".
      */
     public static String getXMLElementTagName() {
         return "fileOption";

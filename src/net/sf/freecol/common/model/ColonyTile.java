@@ -669,16 +669,18 @@ public class ColonyTile extends FreeColGameObject
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("colony", colony.getId());
         out.writeAttribute("workTile", workTile.getId());
 
-        writeFreeColGameObject(unit, out, player, showAll, toSavedGame);
+        if (unit != null) unit.toXML(out, player, showAll, toSavedGame);
 
         // End element:
         out.writeEndElement();
@@ -691,7 +693,7 @@ public class ColonyTile extends FreeColGameObject
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         colony = getFreeColGameObject(in, "colony", Colony.class);
         workTile = getFreeColGameObject(in, "workTile", Tile.class);

@@ -2209,16 +2209,17 @@ public class Colony extends Settlement implements Nameable {
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        boolean full = getGame().isClientTrusted() || showAll
-            || player == getOwner();
+        boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet;
 
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         // Add attributes:
         super.writeAttributes(out);
+
         out.writeAttribute("established", Integer.toString(established.getNumber()));
         if (full) {
             out.writeAttribute("owner", owner.getId());
@@ -2281,8 +2282,10 @@ public class Colony extends Settlement implements Nameable {
      * @param in The input stream with the XML.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         owner.addSettlement(this);
         established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
@@ -2315,7 +2318,7 @@ public class Colony extends Settlement implements Nameable {
                 Building building = updateFreeColGameObject(in, Building.class);
                 addBuilding(building);
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (gc == null) {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 } else {

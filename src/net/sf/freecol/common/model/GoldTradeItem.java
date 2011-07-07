@@ -30,6 +30,7 @@ public class GoldTradeItem extends TradeItem {
      * The amount of gold to change hands.
      */
     private int gold;
+
         
     /**
      * Creates a new <code>GoldTradeItem</code> instance.
@@ -97,18 +98,6 @@ public class GoldTradeItem extends TradeItem {
 
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
-        this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
-        in.nextTag();
-    }
-
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
@@ -116,19 +105,44 @@ public class GoldTradeItem extends TradeItem {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        super.toXMLImpl(out);
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
         out.writeAttribute("gold", Integer.toString(this.gold));
-        out.writeEndElement();
     }
     
     /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readFromXMLImpl(in);
+        this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
+        in.nextTag();
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
-     * @return "goods".
+     *
+     * @return "goldTradeItem".
      */
     public static String getXMLElementTagName() {
         return "goldTradeItem";
     }
-
 }

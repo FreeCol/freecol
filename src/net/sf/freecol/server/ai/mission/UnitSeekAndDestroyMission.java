@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -50,9 +49,10 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for attacking a specific target, be it a Unit or a Settlement.
-*/
+ * Mission for attacking a specific target, be it a Unit or a Settlement.
+ */
 public class UnitSeekAndDestroyMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
 
     /**
@@ -61,15 +61,16 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private Location target;
 
+
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    * @param target The object we are trying to destroy. This can be either a
-    *        <code>Settlement</code> or a <code>Unit</code>.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @param target The object we are trying to destroy. This can be either a
+     *        <code>Settlement</code> or a <code>Unit</code>.
+     */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
         this.target = target;
@@ -301,47 +302,6 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    @Override
-	protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-        if (getTarget() != null) {
-            out.writeAttribute("target", getTarget().getId());
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     * @param in The input stream with the XML.
-     */
-    @Override
-	protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        setTarget((Location) getGame().getFreeColGameObject(in.getAttributeValue(null, "target")));
-        in.nextTag();
-    }
-
-
-    /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unitSeekAndDestroyMission".
-    */
-    public static String getXMLElementTagName() {
-        return "unitSeekAndDestroyMission";
-    }
-
-    /**
      * Gets debugging information about this mission.
      * This string is a short representation of this
      * object's state.
@@ -349,7 +309,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return The <code>String</code>.
      */
     @Override
-	public String getDebuggingInfo() {
+    public String getDebuggingInfo() {
         if (target == null) {
             return "No target";
         } else {
@@ -363,5 +323,51 @@ public class UnitSeekAndDestroyMission extends Mission {
             }
             return target.getTile().getPosition() + " " + name;
         }
+    }
+
+
+    /**
+     * Writes all of the <code>AIObject</code>s and other AI-related
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+
+        out.writeAttribute("unit", getUnit().getId());
+        if (getTarget() != null) {
+            out.writeAttribute("target", getTarget().getId());
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     *
+     * @param in The input stream with the XML.
+     */
+    @Override
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+        setTarget((Location) getGame()
+            .getFreeColGameObject(in.getAttributeValue(null, "target")));
+        in.nextTag();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "unitSeekAndDestroyMission".
+     */
+    public static String getXMLElementTagName() {
+        return "unitSeekAndDestroyMission";
     }
 }

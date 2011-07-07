@@ -37,9 +37,11 @@ import org.w3c.dom.Element;
 
 
 /**
- * The super class of all settlements on the map (that is colonies and indian settlements).
+ * The super class of all settlements on the map (that is colonies and
+ * indian settlements).
  */
-abstract public class Settlement extends FreeColGameObject implements Location, Named, Ownable {
+abstract public class Settlement extends FreeColGameObject
+    implements Location, Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName());
 
@@ -616,8 +618,19 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return true;
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
@@ -638,6 +651,14 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         setType(settlementType);
     }
 
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         out.writeAttribute(ID_ATTRIBUTE, getId());

@@ -44,18 +44,16 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
+
 /**
- *
- * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
- *
- * <br />
- * <br />
+ * Objects of this class contains AI-information for a single {@link
+ * Player} and is used for controlling this player.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
 public abstract class AIPlayer extends AIObject {
+
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
     /**
@@ -422,6 +420,7 @@ public abstract class AIPlayer extends AIObject {
      */
     public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
 
+
     /**
      * Writes this object to an XML stream.
      *
@@ -430,7 +429,8 @@ public abstract class AIPlayer extends AIObject {
      *             stream.
      */
     @Override
-    protected abstract void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
+    protected abstract void toXMLImpl(XMLStreamWriter out)
+        throws XMLStreamException;
 
     /**
      * Reads information for this object from an XML stream.
@@ -440,15 +440,15 @@ public abstract class AIPlayer extends AIObject {
      *             stream.
      */
     @Override
-    protected abstract void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
+    protected abstract void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException;
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "aiPlayer".
      */
     public static String getXMLElementTagName() {
         return "aiPlayer";
     }
-
 }

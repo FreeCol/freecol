@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Represents Europe in the game. Each <code>Player</code> has it's
  * own <code>Europe</code>.
@@ -42,7 +43,8 @@ import org.w3c.dom.Element;
  * <p>In Europe, you can recruit, train and purchase new units. You
  * can also equip units, as well as sell and buy goods.
  */
-public class Europe extends FreeColGameObject implements Location, Ownable, Named {
+public class Europe extends FreeColGameObject
+    implements Location, Ownable, Named {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
@@ -462,23 +464,6 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         return getOwner().getEuropeNameKey();
     }
 
-    /**
-     * Returns a suitable name.
-     */
-    public String toString() {
-        return "Europe";
-    }
-
-    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        if (!units.isEmpty()) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-            out.writeEndElement();
-        }
-    }
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -503,7 +488,8 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
@@ -530,13 +516,26 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
         out.writeEndElement();
     }
 
+    private void unitsToXML(XMLStreamWriter out, Player player,
+                            boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        if (!units.isEmpty()) {
+            out.writeStartElement(UNITS_TAG_NAME);
+            for (Unit unit : units) {
+                unit.toXML(out, player, showAll, toSavedGame);
+            }
+            out.writeEndElement();
+        }
+    }
+
     /**
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         Specification spec = getSpecification();
@@ -604,6 +603,13 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     }
 
     /**
+     * Returns a suitable name.
+     */
+    public String toString() {
+        return "Europe";
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "europe".
@@ -611,5 +617,4 @@ public class Europe extends FreeColGameObject implements Location, Ownable, Name
     public static String getXMLElementTagName() {
         return "europe";
     }
-
 }

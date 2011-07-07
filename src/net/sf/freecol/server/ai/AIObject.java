@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.Random;
@@ -29,11 +28,12 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 
+
 /**
-* An <code>AIObject</code> contains AI-related information and methods.
-* Each <code>FreeColGameObject</code>, that is owned by an AI-controlled
-* player, can have a single <code>AIObject</code> attached to it.
-*/
+ * An <code>AIObject</code> contains AI-related information and methods.
+ * Each <code>FreeColGameObject</code>, that is owned by an AI-controlled
+ * player, can have a single <code>AIObject</code> attached to it.
+ */
 public abstract class AIObject extends FreeColObject {
 
     @SuppressWarnings("unused")
@@ -87,17 +87,6 @@ public abstract class AIObject extends FreeColObject {
     }
     
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXML(in);
-        uninitialized = false;
-    }
-    
-    /**
      * Gets the random number generator to use in the AI.
      *
      * @return The AI random number generator.
@@ -126,9 +115,23 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unknown".
-    */
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public final void readFromXML(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readFromXML(in);
+        uninitialized = false;
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "AIObject".
+     */
     public static String getXMLElementTagName() {
         return "AIObject";
     }

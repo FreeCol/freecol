@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
@@ -94,7 +93,7 @@ public class GoodsWish extends Wish {
      * @param element The root element for the XML-representation of a <code>GoodsWish</code>.
      */
     public GoodsWish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -117,7 +116,7 @@ public class GoodsWish extends Wish {
      *      during parsing.
      */
     public GoodsWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -140,6 +139,7 @@ public class GoodsWish extends Wish {
         return amountRequested;
     }
 
+
     /**
      * Writes this object to an XML stream.
      *
@@ -150,7 +150,7 @@ public class GoodsWish extends Wish {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
 
         out.writeAttribute("destination", destination.getId());
         if (transportable != null) {
@@ -165,12 +165,14 @@ public class GoodsWish extends Wish {
 
     /**
      * Reads information for this object from an XML stream.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
 
         final String transportableStr = in.getAttributeValue(null, "transportable");
@@ -190,7 +192,7 @@ public class GoodsWish extends Wish {
         in.nextTag();
     }
 
-
+    @Override
     public String toString() {
         return "GoodsWish: " + amountRequested + " " + goodsType
             + " (" + getValue() + ")";

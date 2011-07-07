@@ -429,8 +429,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
 
-    // ------------------------------------------------------------ API methods
-
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -455,13 +453,14 @@ public class TileImprovement extends TileItem implements Named {
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", getTile().getId());
         out.writeAttribute("type", getType().getId());
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
@@ -482,8 +481,9 @@ public class TileImprovement extends TileItem implements Named {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {
@@ -500,10 +500,10 @@ public class TileImprovement extends TileItem implements Named {
 
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "tileImprovement".
      */
     public static String getXMLElementTagName() {
         return "tileimprovement";
     }
-
 }

@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit.Role;
+
 
 /**
  * Contains the information necessary to create a new unit.
@@ -150,8 +150,32 @@ public class AbstractUnit extends FreeColObject {
     }
 
 
-    public String toString() {
-        return Integer.toString(number) + " " + getId() + " (" + role.toString() + ")";
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
+        out.writeAttribute("number", String.valueOf(number));
     }
 
     /**
@@ -161,33 +185,28 @@ public class AbstractUnit extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public final void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    @Override
+    protected final void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
-        role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
+
+        role = Enum.valueOf(Role.class, getAttribute(in, "role",
+                "default").toUpperCase(Locale.US));
         number = getAttribute(in, "number", 1);
     }
 
+    @Override
+    public String toString() {
+        return Integer.toString(number) + " " + getId()
+            + " (" + role.toString() + ")";
+    }
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Returns the tag name of the root element representing this object.
      *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @return "abstractUnit".
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
-        out.writeAttribute("number", String.valueOf(number));
-    }
-
     public static String getXMLElementTagName() {
         return "abstractUnit";
     }
-
 }
-

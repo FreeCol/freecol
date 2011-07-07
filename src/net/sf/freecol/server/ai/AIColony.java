@@ -63,6 +63,7 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Objects of this class contains AI-information for a single {@link Colony}.
  */
@@ -114,7 +115,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *            of this object.
      */
     public AIColony(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -126,7 +127,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public AIColony(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -1468,6 +1469,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         rearrangeWorkers = true;
     }
 
+    public ColonyPlan getColonyPlan() {
+        return colonyPlan;
+    }
+
 
     /**
      * Writes this object to an XML stream.
@@ -1479,7 +1484,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
 
         Iterator<AIGoods> aiGoodsIterator = aiGoods.iterator();
         while (aiGoodsIterator.hasNext()) {
@@ -1493,7 +1498,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 continue;
             }
             out.writeStartElement(AIGoods.getXMLElementTagName() + "ListElement");
-            out.writeAttribute("ID", ag.getId());
+            out.writeAttribute(ID_ATTRIBUTE, ag.getId());
             out.writeEndElement();
         }
 
@@ -1511,7 +1516,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 logger.warning("Unknown type of wish.");
                 continue;
             }
-            out.writeAttribute("ID", w.getId());
+            out.writeAttribute(ID_ATTRIBUTE, w.getId());
             out.writeEndElement();
         }
 
@@ -1519,7 +1524,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         while (TileImprovementPlanIterator.hasNext()) {
             TileImprovementPlan ti = TileImprovementPlanIterator.next();
             out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + "ListElement");
-            out.writeAttribute("ID", ti.getId());
+            out.writeAttribute(ID_ATTRIBUTE, ti.getId());
             out.writeEndElement();
         }
 
@@ -1533,10 +1538,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        colony = (Colony) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        colony = (Colony) getAIMain().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
         if (colony == null) {
-            throw new NullPointerException("Could not find Colony with ID: " + in.getAttributeValue(null, "ID"));
+            throw new NullPointerException("Could not find Colony with ID: " + in.getAttributeValue(null, ID_ATTRIBUTE));
         }
 
         aiGoods.clear();
@@ -1547,30 +1553,30 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + "ListElement")) {
-                AIGoods ag = (AIGoods) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                AIGoods ag = (AIGoods) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ag == null) {
-                    ag = new AIGoods(getAIMain(), in.getAttributeValue(null, "ID"));
+                    ag = new AIGoods(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 aiGoods.add(ag);
                 in.nextTag();
             } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
-                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
-                    w = new WorkerWish(getAIMain(), in.getAttributeValue(null, "ID"));
+                    w = new WorkerWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 wishes.add(w);
                 in.nextTag();
             } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + "WishListElement")) {
-                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
-                    w = new GoodsWish(getAIMain(), in.getAttributeValue(null, "ID"));
+                    w = new GoodsWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 wishes.add(w);
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + "ListElement")) {
-                TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ti == null) {
-                    ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, "ID"));
+                    ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 tileImprovementPlans.add(ti);
                 in.nextTag();
@@ -1582,10 +1588,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!in.getLocalName().equals(getXMLElementTagName())) {
             logger.warning("Expected end tag, received: " + in.getLocalName());
         }
-    }
-
-    public ColonyPlan getColonyPlan() {
-        return colonyPlan;
     }
 
     /**

@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -289,20 +288,43 @@ public abstract class Feature extends FreeColObject {
     }
 
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (getSource() != null) {
             out.writeAttribute("source", getSource().getId());
         }
         if (getFirstTurn() != null) {
-            out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
+            out.writeAttribute("firstTurn",
+                String.valueOf(getFirstTurn().getNumber()));
         }
         if (getLastTurn() != null) {
-            out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
+            out.writeAttribute("lastTurn",
+                String.valueOf(getLastTurn().getNumber()));
         }
     }
 
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
         if (getScopes() != null) {
             for (Scope scope : getScopes()) {
                 scope.toXMLImpl(out);
@@ -310,7 +332,17 @@ public abstract class Feature extends FreeColObject {
         }
     }
 
-    protected void readAttributes(XMLStreamReader in, Specification specification)
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in,
+                                  Specification specification)
         throws XMLStreamException {
         // TODO: remove this backward compatibility for < 0.10.x games
         if (in.getAttributeValue(null, ID_ATTRIBUTE_TAG) == null
@@ -342,7 +374,18 @@ public abstract class Feature extends FreeColObject {
         }
     }
 
-    protected void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in,
+                                Specification specification)
+        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if (Scope.getXMLElementTagName().equals(childName)) {
@@ -352,7 +395,8 @@ public abstract class Feature extends FreeColObject {
                 }
                 getScopes().add(scope);
             } else {
-                logger.finest("Parsing of " + childName + " is not implemented yet");
+                logger.finest("Parsing of " + childName
+                    + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
                        !in.getLocalName().equals(childName)) {
                     in.nextTag();
@@ -360,5 +404,4 @@ public abstract class Feature extends FreeColObject {
             }
         }
     }
-
 }

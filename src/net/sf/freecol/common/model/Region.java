@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 
 /**
  * A named region on the map.
@@ -452,6 +452,7 @@ public class Region extends FreeColGameObject implements Nameable {
             .addName("%region%", newName);
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -475,10 +476,11 @@ public class Region extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("nameKey", nameKey);
         out.writeAttribute("type", type.toString());
         if (name != null) {
@@ -522,7 +524,7 @@ public class Region extends FreeColGameObject implements Nameable {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         nameKey = in.getAttributeValue(null, "nameKey");
         name = in.getAttributeValue(null, "name");
         claimable = getAttribute(in, "claimable", false);
@@ -556,15 +558,17 @@ public class Region extends FreeColGameObject implements Nameable {
 
     }            
 
-    /**
-    * Gets the tag name of the root element representing this object.
-    * @return "region".
-    */
-    public static String getXMLElementTagName() {
-        return "region";
-    }
-
+    @Override
     public String toString() {
         return nameKey;
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "region".
+     */
+    public static String getXMLElementTagName() {
+        return "region";
     }
 }

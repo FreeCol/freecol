@@ -149,7 +149,7 @@ public final class PreGameController extends Controller {
                 try {
                     XMLStreamWriter out = conn.send();
                     out.writeStartElement("updateGame");
-                    game.toXML(out, player);
+                    game.toXML(out, player, false, false);
                     out.writeEndElement();
                     conn.endTransmission(null);
                 } catch (Exception e) {

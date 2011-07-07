@@ -379,6 +379,7 @@ public class MarketData extends FreeColGameObject {
         this.traded = traded;
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -399,19 +400,22 @@ public class MarketData extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("goods-type", goodsType.getId());
         out.writeAttribute("amount", Integer.toString(amountInMarket));
         out.writeAttribute("initialPrice", Integer.toString(initialPrice));
         out.writeAttribute("arrears", Integer.toString(arrears));
         out.writeAttribute("sales", Integer.toString(sales));
-        out.writeAttribute("incomeBeforeTaxes", Integer.toString(incomeBeforeTaxes));
-        out.writeAttribute("incomeAfterTaxes", Integer.toString(incomeAfterTaxes));
+        out.writeAttribute("incomeBeforeTaxes",
+            Integer.toString(incomeBeforeTaxes));
+        out.writeAttribute("incomeAfterTaxes",
+            Integer.toString(incomeAfterTaxes));
         out.writeAttribute("traded", Boolean.toString(traded));
         out.writeEndElement();
     }
@@ -426,10 +430,10 @@ public class MarketData extends FreeColGameObject {
         String goodsTypeStr = in.getAttributeValue(null, "goods-type");
         if (goodsTypeStr == null) {
             // TODO: backward compatibility, remove in 0.11.x
-            goodsTypeStr = in.getAttributeValue(null, "ID");
+            goodsTypeStr = in.getAttributeValue(null, ID_ATTRIBUTE);
             setDefaultId(getGame());
         } else {
-            setId(in.getAttributeValue(null, "ID"));
+            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         }
         if (goodsTypeStr == null) {
             throw new XMLStreamException("Missing goods-type");

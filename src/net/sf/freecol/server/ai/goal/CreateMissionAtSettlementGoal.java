@@ -35,18 +35,21 @@ import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
+
 /**
  * This {@link Goal} deals with one missionary unit.
  * </p><p>
  * On construction, an {@link AIUnit} and an {@link IndianSettlement}
  * are given to this.
  * The Goal will try to create a mission at that settlement,
- * eventually by bringing the missionary unit there first using a {@link GotoAdjacentGoal}.
+ * eventually by bringing the missionary unit there first using a
+ * {@link GotoAdjacentGoal}.
  * Should the target become invalid, the missionary will be given back
  * to the parent of this goal ({@link ManageMissionariesGoal}, in most cases).
  * Excess units will be given back to the parent, or the {@link AIPlayer} directly. 
  */
 public class CreateMissionAtSettlementGoal extends Goal {
+
     private static final Logger logger = Logger.getLogger(CreateMissionAtSettlementGoal.class.getName());
 
     //the settlement to build a mission at
@@ -178,6 +181,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
         }
         return descr;
     }
+
     
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         //TODO

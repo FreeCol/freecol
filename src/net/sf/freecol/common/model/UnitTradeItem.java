@@ -30,6 +30,7 @@ public class UnitTradeItem extends TradeItem {
      * The unit to change hands.
      */
     private Unit unit;
+
         
     /**
      * Creates a new <code>UnitTradeItem</code> instance.
@@ -96,18 +97,6 @@ public class UnitTradeItem extends TradeItem {
         this.unit = unit;
     }
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
-        String unitID = in.getAttributeValue(null, "unit");
-        this.unit = (Unit) game.getFreeColGameObject(unitID);
-        in.nextTag();
-    }
 
     /**
      * This method writes an XML-representation of this object to
@@ -117,19 +106,46 @@ public class UnitTradeItem extends TradeItem {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        super.toXMLImpl(out);
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
         out.writeAttribute("unit", this.unit.getId());
-        out.writeEndElement();
     }
     
     /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readFromXMLImpl(in);
+        String unitID = in.getAttributeValue(null, "unit");
+        this.unit = (Unit) game.getFreeColGameObject(unitID);
+        in.nextTag();
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
-     * @return "goods".
+     *
+     * @return "unitTradeItem".
      */
     public static String getXMLElementTagName() {
         return "unitTradeItem";
     }
-
 }

@@ -54,7 +54,8 @@ public class SerializationTest extends FreeColTestCase {
         return schema.newValidator();
     }
 
-    private Source buildSource(FreeColObject object, Player player, boolean showAll, boolean toSavedGame)
+    private Source buildSource(FreeColObject object, Player player,
+                               boolean showAll, boolean toSavedGame)
         throws Exception {
         StringWriter sw = new StringWriter();
         XMLOutputFactory xif = XMLOutputFactory.newInstance();

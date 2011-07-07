@@ -117,6 +117,7 @@ public class AbstractGoods extends FreeColObject {
         return type == other.type && amount == other.amount;
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -129,35 +130,48 @@ public class AbstractGoods extends FreeColObject {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("type", getId());
         out.writeAttribute("amount", Integer.toString(amount));
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        type = getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        type = getSpecification().getGoodsType(in.getAttributeValue(null,
+                "type"));
         amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
         in.nextTag();
     }
 
-
-    /**
-    * Gets the tag name of the root element representing this object.
-    * @return "abstractGoods".
-    */
-    public static String getXMLElementTagName() {
-        return "abstractGoods";
-    }
-
+    @Override
     public String toString() {
         return Integer.toString(amount) + " " + type.getId();
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "abstractGoods".
+     */
+    public static String getXMLElementTagName() {
+        return "abstractGoods";
+    }
 }

@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -211,7 +212,8 @@ public class SimpleMapGenerator implements MapGenerator {
                     serverObjects = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverObjects.add(xsr.getLocalName());
-                        serverObjects.add(xsr.getAttributeValue(null, "ID"));
+                        serverObjects.add(xsr.getAttributeValue(null,
+                                FreeColObject.ID_ATTRIBUTE));
                         xsr.nextTag();
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {

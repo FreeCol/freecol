@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* *********************************************
+/**********************************************
  * Please see "Howto" at the end of this file! *
  **********************************************/
 
@@ -41,9 +41,10 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import net.sf.freecol.server.ai.goal.GoalConstants;
 
+
 /**
- * A Goal is used to encapsulate a specific part of the decision-making process
- * of an AI.
+ * A Goal is used to encapsulate a specific part of the
+ * decision-making process of an AI.
  * </p><p>
  * Using a top-down approach, every {@link AIPlayer} has a set of Goals which,
  * in turn, may have further subgoals. In combination, this tree of goals
@@ -53,10 +54,12 @@ import net.sf.freecol.server.ai.goal.GoalConstants;
  * existing Goal objects.
  * TODO: Turn {@link AIUnit} into a simple wrapper for individual units.
  * </p><p>
- * Specific AI goals are created by extending this class; some of these could
- * also be used to assist the human player (i.e. GoTo, Scouting, Trade, Piracy).
+ * Specific AI goals are created by extending this class; some of
+ * these could also be used to assist the human player (i.e. GoTo,
+ * Scouting, Trade, Piracy).
  */
 public abstract class Goal extends AIObject implements GoalConstants {
+
     private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
     private float relativeWeight;

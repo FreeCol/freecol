@@ -34,8 +34,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 import org.w3c.dom.Element;
+
 
 /**
  * Contains goods and can be used by a {@link Location} to make certain
@@ -471,12 +471,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         if (showAll || toSavedGame || player == getOwner()) {
             writeStorage(out, STORED_GOODS_TAG, storedGoods);
             writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
@@ -503,7 +504,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         storedGoods.clear();
         oldStoredGoods.clear();
         Map<GoodsType, Integer> storage;

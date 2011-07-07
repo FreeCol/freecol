@@ -139,16 +139,6 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        type = getSpecification().getNationType(in.getAttributeValue(null, "nation-type"));
-        selectable = getAttribute(in, "selectable", false);
-        String refId = getAttribute(in, "ref", null);
-        if (refId != null) {
-            refNation = getSpecification().getNation(refId);
-        }
-        anthem = in.getAttributeValue(null, "anthem");
-   }
 
     /**
      * Makes an XML-representation of this object.
@@ -157,12 +147,22 @@ public class Nation extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("nation-type", type.getId());
         out.writeAttribute("selectable", Boolean.toString(selectable));
         if (anthem != null) {
@@ -173,9 +173,35 @@ public class Nation extends FreeColGameObjectType {
         }
     }
 
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        type = getSpecification().getNationType(in.getAttributeValue(null,
+                "nation-type"));
+        selectable = getAttribute(in, "selectable", false);
+        String refId = getAttribute(in, "ref", null);
+        if (refId != null) {
+            refNation = getSpecification().getNation(refId);
+        }
+        anthem = in.getAttributeValue(null, "anthem");
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "nation".
+     */
     public static String getXMLElementTagName() {
         return "nation";
     }
-
-
 }

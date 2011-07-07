@@ -34,7 +34,9 @@ import org.w3c.dom.Element;
 /**
  * A TradeRoute holds all information for a unit to follow along a trade route.
  */
-public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
+public class TradeRoute extends FreeColGameObject
+    implements Cloneable, Ownable {
+
     private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 
     private static final String CARGO_TAG = "cargo";
@@ -199,10 +201,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     public final void setOwner(final Player newOwner) {
         this.owner = newOwner;
-    }
-
-    public String toString() {
-        return getName();
     }
 
     public List<Unit> getAssignedUnits(){
@@ -372,12 +370,23 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
     }
 
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "tradeRouteStop".
+     */
+    public static String getStopXMLElementTagName() {
+        return "tradeRouteStop";
+    }
+
+
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", getOwner().getId());
         for (Stop stop : stops) {
@@ -419,7 +428,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         String ownerID = in.getAttributeValue(null, "owner");
         
@@ -452,7 +461,12 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             }
         }
     }
-    
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     /**
      * Returns the tag name of the root element representing this object.
      * 
@@ -460,14 +474,5 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     public static String getXMLElementTagName() {
         return "tradeRoute";
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     * 
-     * @return "tradeRouteStop".
-     */
-    public static String getStopXMLElementTagName() {
-        return "tradeRouteStop";
     }
 }

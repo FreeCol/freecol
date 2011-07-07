@@ -30,13 +30,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.DOMMessage;
 
+
 /**
- * The default handler for FreeCol's log records. It currently only logs to a
- * file in the format offered by TextFormatter.
+ * The default handler for FreeCol's log records. It currently only
+ * logs to a file in the format offered by TextFormatter.
  */
 public final class DefaultHandler extends Handler {
-
-
 
     private FileWriter fileWriter;
 

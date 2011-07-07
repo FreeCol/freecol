@@ -35,11 +35,13 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
  * Option for selecting an audio mixer.
  *
- * <p>Element <tt>MixerWrapper</tt> may return a <b>null</b> value in <tt>getMixerInfo()</tt>.
- * <br>Element <tt>MixerWrapper</tt> may be <b>null</b> in <tt>getValue()</tt> (unusual).
+ * <p>Element <tt>MixerWrapper</tt> may return a <b>null</b> value in
+ * <tt>getMixerInfo()</tt>.  <br>Element <tt>MixerWrapper</tt> may be
+ * <b>null</b> in <tt>getValue()</tt> (unusual).
  */
 public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapper> {
 
@@ -141,59 +143,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         }
     }
 
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute(VALUE_TAG, getValue().getKey());
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
-
-        findAudioMixers();
-
-        if (getId() == NO_ID) {
-            setId(id);
-        }
-
-        if (value != null) {
-            setValue(audioMixers.get(value));
-        } else if (defaultValue != null) {
-            setValue(audioMixers.get(defaultValue));
-        } else {
-            setValue(DEFAULT); // audioMixers.get(AUTO)); ** does it make a difference?
-        }
-        in.nextTag();
-    }
-
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     * @return "audioMixerOption".
-     */
-    public static String getXMLElementTagName() {
-        return "audioMixerOption";
-    }
-
     public static class MixerWrapper {
         private String name;
         private Mixer.Info mixerInfo;
@@ -232,4 +181,69 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         }
     }
 
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute(VALUE_TAG, getValue().getKey());
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
+
+        findAudioMixers();
+
+        if (getId() == NO_ID) {
+            setId(id);
+        }
+
+        if (value != null) {
+            setValue(audioMixers.get(value));
+        } else if (defaultValue != null) {
+            setValue(audioMixers.get(defaultValue));
+        } else {
+            setValue(DEFAULT); // audioMixers.get(AUTO)); ** does it make a difference?
+        }
+        in.nextTag();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "audioMixerOption".
+     */
+    public static String getXMLElementTagName() {
+        return "audioMixerOption";
+    }
 }

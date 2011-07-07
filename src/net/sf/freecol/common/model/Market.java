@@ -509,7 +509,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("owner", owner.getId());
         
         if (player == owner || showAll || toSavedGame) {
@@ -552,7 +552,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "market".
      */
     public static String getXMLElementTagName() {
         return "market";

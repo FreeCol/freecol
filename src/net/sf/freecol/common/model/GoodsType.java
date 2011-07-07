@@ -340,39 +340,6 @@ public final class GoodsType extends FreeColGameObjectType {
         this.price = newPrice;
     }
 
-    // ------------------------------------------------------------ API methods
-
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        isFarmed = getAttribute(in, "is-farmed", false);
-        isFood = getAttribute(in, "is-food", false);
-        ignoreLimit = getAttribute(in, "ignore-limit", false);
-        newWorldGoods = getAttribute(in, "new-world-goods", false);
-        tradeGoods = getAttribute(in, "trade-goods", false);
-        breedingNumber = getAttribute(in, "breeding-number", INFINITY);
-        price = getAttribute(in, "price", INFINITY);
-
-        madeFrom = getSpecification().getType(in, "made-from", GoodsType.class, null);
-        if (madeFrom != null) {
-            madeFrom.makes = this;
-        }
-
-        storable = getAttribute(in, "storable", true);
-        storedAs = getSpecification().getType(in, "stored-as", GoodsType.class, null);
-    }
-
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("market".equals(childName)) {
-            initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
-            initialPrice = getAttribute(in, "initial-price", 1);
-            priceDiff = getAttribute(in, "price-difference", 1);
-            in.nextTag(); // close this element
-        } else {
-            super.readChild(in);
-        }
-    }
-
 
     /**
      * Makes an XML-representation of this object.
@@ -381,12 +348,22 @@ public final class GoodsType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("is-farmed", Boolean.toString(isFarmed));
         out.writeAttribute("is-food", Boolean.toString(isFood));
         out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
@@ -407,20 +384,87 @@ public final class GoodsType extends FreeColGameObjectType {
         }
     }
 
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeChildren(out);
+
         if (initialAmount > 0) {
             out.writeStartElement("market");
-            out.writeAttribute("initial-amount", Integer.toString(initialAmount));
-            out.writeAttribute("initial-price", Integer.toString(initialPrice));
-            out.writeAttribute("price-difference", Integer.toString(priceDiff));
+            out.writeAttribute("initial-amount",
+                Integer.toString(initialAmount));
+            out.writeAttribute("initial-price",
+                Integer.toString(initialPrice));
+            out.writeAttribute("price-difference",
+                Integer.toString(priceDiff));
             out.writeEndElement();
         }
     }
 
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        isFarmed = getAttribute(in, "is-farmed", false);
+        isFood = getAttribute(in, "is-food", false);
+        ignoreLimit = getAttribute(in, "ignore-limit", false);
+        newWorldGoods = getAttribute(in, "new-world-goods", false);
+        tradeGoods = getAttribute(in, "trade-goods", false);
+        breedingNumber = getAttribute(in, "breeding-number", INFINITY);
+        price = getAttribute(in, "price", INFINITY);
+
+        madeFrom = getSpecification().getType(in, "made-from",
+            GoodsType.class, null);
+        if (madeFrom != null) {
+            madeFrom.makes = this;
+        }
+
+        storable = getAttribute(in, "storable", true);
+        storedAs = getSpecification().getType(in, "stored-as",
+            GoodsType.class, null);
+    }
+
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("market".equals(childName)) {
+            initialAmount = Integer.parseInt(in.getAttributeValue(null,
+                    "initial-amount"));
+            initialPrice = getAttribute(in, "initial-price", 1);
+            priceDiff = getAttribute(in, "price-difference", 1);
+            in.nextTag(); // close this element
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "goods-type".
+     */
     public static String getXMLElementTagName() {
         return "goods-type";
     }
-
-
 }

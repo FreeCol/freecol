@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
@@ -86,7 +85,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *       of a <code>Wish</code>.
      */
     public TileImprovementPlan(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
     
@@ -99,7 +98,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *      during parsing.
      */
     public TileImprovementPlan(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
     
@@ -183,10 +182,6 @@ public class TileImprovementPlan extends ValuedAIObject {
         return target;
     }
 
-    public String toString() {
-        return type.getNameKey() + " on " + target + " (" + getValue() + ")";
-    }
-
     
     /**
      * Writes this object to an XML stream.
@@ -198,7 +193,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());        
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("type", type.getId());
         out.writeAttribute("value", Integer.toString(getValue()));
         if (pioneer != null) {
@@ -211,12 +206,14 @@ public class TileImprovementPlan extends ValuedAIObject {
 
     /**
      * Reads information for this object from an XML stream.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         type = getAIMain().getGame().getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
         
@@ -233,10 +230,16 @@ public class TileImprovementPlan extends ValuedAIObject {
         in.nextTag();
     }
 
+    @Override
+    public String toString() {
+        return type.getNameKey() + " on " + target + " (" + getValue() + ")";
+    }
+
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return "TileImprovementPlan"
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "tileimprovementplan"
+     */
     public static String getXMLElementTagName() {
         return "tileimprovementplan";
     }    

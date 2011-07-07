@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
@@ -45,19 +44,21 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+
 /**
-* The main AI-class. Keeps references to all other AI-classes.
-*/
-public class AIMain extends FreeColObject implements FreeColGameObjectListener {
+ * The main AI-class. Keeps references to all other AI-classes.
+ */
+public class AIMain extends FreeColObject
+    implements FreeColGameObjectListener {
     private static final Logger logger = Logger.getLogger(AIMain.class.getName());
 
     private FreeColServer freeColServer;
     private int nextID = 1;
 
     /**
-    * Contains mappings between <code>FreeColGameObject</code>s
-    * and <code>AIObject</code>s.
-    */
+     * Contains mappings between <code>FreeColGameObject</code>s
+     * and <code>AIObject</code>s.
+     */
     private HashMap<String, AIObject> aiObjects = new HashMap<String, AIObject>();
 
     /**
@@ -366,6 +367,34 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     }
 
     /**
+     * Computes how many objects of each class have been created, to
+     * track memory leaks over time
+     */
+    public HashMap<String, String> getAIStatistics() {
+        HashMap<String, String> stats = new HashMap<String, String>();
+        HashMap<String, Long> objStats = new HashMap<String, Long>();
+        Iterator<AIObject> iter = aiObjects.values().iterator();
+        while (iter.hasNext()) {
+            AIObject obj = iter.next();
+            String className = obj.getClass().getSimpleName();
+            if (objStats.containsKey(className)) {
+                Long count = objStats.get(className);
+                count++;
+                objStats.put(className, count);
+            } else {
+                Long count = new Long(1);
+                objStats.put(className, count);
+            }
+        }
+        for (String k : objStats.keySet()) {
+            stats.put(k, Long.toString(objStats.get(k)));
+        }
+
+        return stats;
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related 
      * information to an XML-stream.
      *
@@ -374,9 +403,35 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
 
         out.writeAttribute("nextID", Integer.toString(nextID));
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
 
         Iterator<AIObject> i = aiObjects.values().iterator();
         while (i.hasNext()) {
@@ -390,7 +445,8 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
                 if (aio.getId() != null) {
                     aio.toXML(out);
                 } else {
-                    logger.warning("aio.getId() == null, for: " + aio.getClass().getName());
+                    logger.warning("aio.getId() == null, for: "
+                        + aio.getClass().getName());
                 }
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
@@ -398,17 +454,17 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
                 logger.warning(sw.toString());
             }
         }
-
-        out.writeEndElement();
     }
 
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if an error occured during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         aiObjects.clear();
         
         if (!in.getLocalName().equals(getXMLElementTagName())) {
@@ -423,7 +479,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
             try {         
-                final String oid = in.getAttributeValue(null, "ID");
+                final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
                 if (oid != null && aiObjects.containsKey(oid)) {
                     getAIObject(oid).readFromXML(in);
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
@@ -467,39 +523,12 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         findNewObjects(false);
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return "aiMain"
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "aiMain"
+     */
     public static String getXMLElementTagName() {
         return "aiMain";
-    }
-    
-    /**
-     * Computes how many objects of each class have been created, 
-     * to track memory leaks over time
-     */
-    public HashMap<String, String> getAIStatistics() {
-        HashMap<String, String> stats = new HashMap<String, String>();
-        HashMap<String, Long> objStats = new HashMap<String, Long>();
-        Iterator<AIObject> iter = aiObjects.values().iterator();
-        while (iter.hasNext()) {
-            AIObject obj = iter.next();
-            String className = obj.getClass().getSimpleName();
-            if (objStats.containsKey(className)) {
-                Long count = objStats.get(className);
-                count++;
-                objStats.put(className, count);
-            } else {
-                Long count = new Long(1);
-                objStats.put(className, count);
-            }
-        }
-        for (String k : objStats.keySet()) {
-            stats.put(k, Long.toString(objStats.get(k)));
-        }
-
-        return stats;
     }
 }

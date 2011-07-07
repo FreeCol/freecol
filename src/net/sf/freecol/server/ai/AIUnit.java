@@ -50,6 +50,7 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Objects of this class contains AI-information for a single {@link Unit}.
  *
@@ -64,6 +65,7 @@ import org.w3c.dom.Element;
  * @see Mission
  */
 public class AIUnit extends AIObject implements Transportable {
+
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
 
@@ -120,7 +122,7 @@ public class AIUnit extends AIObject implements Transportable {
      *            of this object.
      */
     public AIUnit(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -133,7 +135,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @see AIObject#readFromXML
      */
     public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -373,6 +375,7 @@ public class AIUnit extends AIObject implements Transportable {
         return getAIOwner().getConnection();
     }
 
+
     /**
      * Writes this object to an XML stream.
      *
@@ -383,7 +386,7 @@ public class AIUnit extends AIObject implements Transportable {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         if (transport != null) {
             if (transport.getUnit() == null) {
                 logger.warning("transport.getUnit() == null");
@@ -410,8 +413,9 @@ public class AIUnit extends AIObject implements Transportable {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String inID = in.getAttributeValue(null, "ID");
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        final String inID = in.getAttributeValue(null, ID_ATTRIBUTE);
         unit = (Unit) getAIMain().getFreeColGameObject(inID);
 
         if (unit == null) {

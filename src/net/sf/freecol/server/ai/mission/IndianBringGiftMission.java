@@ -42,6 +42,7 @@ import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for bringing a gift to a specified player.
  *
@@ -57,10 +58,8 @@ import org.w3c.dom.Element;
  * </ol>
  */
 public class IndianBringGiftMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
-
-
-
 
     /** The <code>Colony</code> receiving the gift. */
     private Colony target;
@@ -224,6 +223,24 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
+     *         "[ColonyName] Getting gift: (x, y)".
+     */
+    public String getDebuggingInfo() {
+        if (!hasGift()) {
+            return "[" + target.getName() + "] Getting gift: "
+                    + getUnit().getIndianSettlement().getTile().getPosition();
+        } else {
+            return "[" + target.getName() + "] "
+                + getUnit().getGoodsIterator().next().getNameKey();
+        }
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
@@ -267,26 +284,9 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "indianBringGiftMission".
+     * @return "indianBringGiftMission".
      */
     public static String getXMLElementTagName() {
         return "indianBringGiftMission";
-    }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
-     *         "[ColonyName] Getting gift: (x, y)".
-     */
-    public String getDebuggingInfo() {
-        if (!hasGift()) {
-            return "[" + target.getName() + "] Getting gift: "
-                    + getUnit().getIndianSettlement().getTile().getPosition();
-        } else {
-            return "[" + target.getName() + "] "
-                + getUnit().getGoodsIterator().next().getNameKey();
-        }
     }
 }

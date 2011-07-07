@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.PlayerExploredTile;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Contains <code>TileItem</code>s and can be used by a {@link Tile}
  * to make certain tasks easier.
@@ -579,7 +580,6 @@ public class TileItemContainer extends FreeColGameObject {
         return null;
     }
 
-    // ------------------------------------------------------------ API methods
 
     /**
      * This method writes an XML-representation of this object to
@@ -603,19 +603,19 @@ public class TileItemContainer extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        PlayerExploredTile pet = (showAll) ? null
+        PlayerExploredTile pet = (showAll || toSavedGame) ? null
             : tile.getPlayerExploredTile(player);
 
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", tile.getId());
 
-        if (getGame().isClientTrusted() || showAll || toSavedGame
-            || player.canSee(tile)) {
+        if (showAll || toSavedGame || player.canSee(tile)) {
             for (TileItem item : tileItems) {
                 item.toXML(out, player, showAll, toSavedGame);
             }
@@ -632,10 +632,12 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {
@@ -645,7 +647,7 @@ public class TileItemContainer extends FreeColGameObject {
         tileItems.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            TileItem item = (TileItem) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+            TileItem item = (TileItem) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
             if (item == null) {
                 if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
                     item = new Resource(getGame(), in);
@@ -664,20 +666,11 @@ public class TileItemContainer extends FreeColGameObject {
         Collections.sort(tileItems, tileItemComparator);
     }
 
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     * @return "tileitemcontainer".
-     */
-    public static String getXMLElementTagName() {
-        return "tileitemcontainer";
-    }
-
-
     /**
      * Creates a <code>String</code> representation of this
      * <code>TileItemContainer</code>.
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(60);
         sb.append("TileItemContainer with: ");
@@ -687,4 +680,12 @@ public class TileItemContainer extends FreeColGameObject {
         return sb.toString();
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "tileitemcontainer".
+     */
+    public static String getXMLElementTagName() {
+        return "tileitemcontainer";
+    }
 }

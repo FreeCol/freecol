@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,8 +31,6 @@ import org.w3c.dom.Element;
  * and GoodsType.
  */
 public final class LastSale extends FreeColObject {
-
-    private static String LAST_SALE_TAG = "lastSale";
 
     // When a sale was made.
     private Turn when;
@@ -114,6 +111,7 @@ public final class LastSale extends FreeColObject {
         return where.getId() + "-" + what.getId();
     }
 
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -121,22 +119,29 @@ public final class LastSale extends FreeColObject {
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems with the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeStartElement(LAST_SALE_TAG);
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("when", Integer.toString(when.getNumber()));
         out.writeAttribute("price", Integer.toString(price));
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems with the stream.
      */
@@ -162,6 +167,7 @@ public final class LastSale extends FreeColObject {
     /**
      * Debug helper.
      */
+    @Override
     public String toString() {
         return getXMLElementTagName() + "-" + getId() + "-"
             + when.toString() + "-" + Integer.toString(price);
@@ -173,6 +179,6 @@ public final class LastSale extends FreeColObject {
      * @return "lastSale"
      */
     public static String getXMLElementTagName() {
-        return LAST_SALE_TAG;
+        return "lastSale";
     }
 }

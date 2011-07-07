@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit.Role;
 
+
 public class EquipmentType extends BuildableType {
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
@@ -231,16 +232,92 @@ public class EquipmentType extends BuildableType {
         this.militaryEquipment = newMilitaryEquipment;
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("maximum-count", Integer.toString(maximumCount));
+        out.writeAttribute("combat-loss-priority",
+            Integer.toString(combatLossPriority));
+        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (String compatible : compatibleEquipment) {
+            out.writeStartElement("compatible-equipment");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, compatible);
+            out.writeEndElement();
+        }
+
+        if (captureEquipmentId != null) {
+            out.writeStartElement("capture-equipment");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, captureEquipmentId);
+            out.writeAttribute("by-indians",
+                Boolean.toString(captureEquipmentByIndians));
+            out.writeEndElement();
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", -1);
         String roleString = getAttribute(in, "role", "default");
         role = Enum.valueOf(Role.class, roleString.toUpperCase(Locale.US));
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         super.readChildren(in);
+
         for (Modifier modifier : getFeatureContainer().getModifiers()) {
             if (modifier.getId().equals(Modifier.OFFENCE) ||
                 modifier.getId().equals(Modifier.DEFENCE)) {
@@ -253,8 +330,14 @@ public class EquipmentType extends BuildableType {
         }
     }
 
-
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String nodeName = in.getLocalName();
         if ("required-location-ability".equals(nodeName)) {
             // TODO: remove 0.10.0 compatibility code
@@ -278,41 +361,11 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Makes an XML-representation of this object.
+     * Returns the tag name of the root element representing this object.
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @return "equipment-type".
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("maximum-count", Integer.toString(maximumCount));
-        out.writeAttribute("combat-loss-priority", Integer.toString(combatLossPriority));
-        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-        for (String compatible : compatibleEquipment) {
-            out.writeStartElement("compatible-equipment");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, compatible);
-            out.writeEndElement();
-        }
-
-        if (captureEquipmentId != null) {
-            out.writeStartElement("capture-equipment");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, captureEquipmentId);
-            out.writeAttribute("by-indians", Boolean.toString(captureEquipmentByIndians));
-            out.writeEndElement();
-        }
-    }
-
     public static String getXMLElementTagName() {
         return "equipment-type";
     }
-
 }

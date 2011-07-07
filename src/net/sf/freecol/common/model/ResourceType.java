@@ -65,18 +65,6 @@ public final class ResourceType extends FreeColGameObjectType {
         return bestType;
     }
 
-    // ------------------------------------------------------------ API methods
-
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        if (hasAttribute(in, "maximum-value")) {
-            maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
-            minValue = getAttribute(in, "minimum-value", 0);
-        } else {
-            maxValue = -1;
-            minValue = -1;
-        }
-    }
 
     /**
      * Makes an XML-representation of this object.
@@ -85,20 +73,56 @@ public final class ResourceType extends FreeColGameObjectType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (maxValue > -1) {
             out.writeAttribute("maximum-value", Integer.toString(maxValue));
             out.writeAttribute("minimum-value", Integer.toString(minValue));
         }
     }
 
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        if (hasAttribute(in, "maximum-value")) {
+            maxValue = Integer.parseInt(in.getAttributeValue(null,
+                    "maximum-value"));
+            minValue = getAttribute(in, "minimum-value", 0);
+        } else {
+            maxValue = -1;
+            minValue = -1;
+        }
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "resource-type".
+     */
     public static String getXMLElementTagName() {
         return "resource-type";
     }
-
 }

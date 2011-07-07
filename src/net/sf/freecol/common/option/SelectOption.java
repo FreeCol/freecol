@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
  * Represents an option where the valid choice is an integer and the choices are
  * represented by strings. In general, these strings are localized by looking up
@@ -93,7 +94,8 @@ public class SelectOption extends IntegerOption {
         toXMLImpl(out, getXMLElementTagName());
     }
 
-    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, String tag)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(tag);
 
@@ -117,14 +119,16 @@ public class SelectOption extends IntegerOption {
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         localizedLabels = getAttribute(in, "localizedLabels", true);
         final String value = in.getAttributeValue(null, VALUE_TAG);
 
         if (id == null && getId().equals(NO_ID)) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                + "> tag : no id attribute found.");
         }
         if (defaultValue == null && value == null) {
             throw new XMLStreamException("invalid <" + getXMLElementTagName()
@@ -147,8 +151,9 @@ public class SelectOption extends IntegerOption {
                 itemValues.put(Integer.parseInt(itemValue), label);
                 in.nextTag();
             } else {
-                throw new XMLStreamException("Unknown child \"" + in.getLocalName() + "\" in a \""
-                                             + getXMLElementTagName() + "\". ");
+                throw new XMLStreamException("Unknown child \""
+                    + in.getLocalName() + "\" in a \""
+                    + getXMLElementTagName() + "\". ");
             }
         }
     }
@@ -163,13 +168,12 @@ public class SelectOption extends IntegerOption {
     }
 
     /**
-     * Gets the tag name of the item element
-     * This method is not static to ensure proper overriding in <code>readFromXMLImpl</code>.
+     * Gets the tag name of the item element This method is not static
+     * to ensure proper overriding in <code>readFromXMLImpl</code>.
      *
      * @return "selectValue".
      */
     public String getXMLItemElementTagName() {
         return "selectValue";
     }
-
 }

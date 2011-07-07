@@ -41,6 +41,7 @@ public class ColonyTradeItem extends TradeItem {
      */
     private String colonyName;
 
+
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
@@ -49,7 +50,8 @@ public class ColonyTradeItem extends TradeItem {
      * @param destination a <code>Player</code> value
      * @param colony a <code>Colony</code> value
      */
-    public ColonyTradeItem(Game game, Player source, Player destination, Colony colony) {
+    public ColonyTradeItem(Game game, Player source, Player destination,
+                           Colony colony) {
         super(game, "tradeItem.colony", source, destination);
         this.colony = colony;
         colonyID = colony.getId();
@@ -121,12 +123,42 @@ public class ColonyTradeItem extends TradeItem {
 
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("colony", colonyID);
+        out.writeAttribute("colonyName", colonyName);
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readFromXMLImpl(in);
         colonyID = in.getAttributeValue(null, "colony");
         colonyName = in.getAttributeValue(null, "colonyName");
@@ -135,28 +167,11 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        super.toXMLImpl(out);
-        out.writeAttribute("colony", colonyID);
-        out.writeAttribute("colonyName", colonyName);
-        out.writeEndElement();
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
-     * @return "goods".
+     *
+     * @return "colonyTradeItem".
      */
     public static String getXMLElementTagName() {
         return "colonyTradeItem";
     }
-
 }
-

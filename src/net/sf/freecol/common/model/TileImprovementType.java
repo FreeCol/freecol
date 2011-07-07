@@ -294,30 +294,130 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return exposeResourcePercent;
     }
 
-    // ------------------------------------------------------------ API methods
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("natural", Boolean.toString(natural));
+        out.writeAttribute("add-work-turns", Integer.toString(addWorkTurns));
+        out.writeAttribute("movement-cost", Integer.toString(movementCost));
+        out.writeAttribute("magnitude", Integer.toString(magnitude));
+        out.writeAttribute("zIndex", Integer.toString(zIndex));
+        out.writeAttribute("exposeResourcePercent",
+                           Integer.toString(exposeResourcePercent));
+        if (requiredImprovementType != null) {
+            out.writeAttribute("required-improvement",
+                requiredImprovementType.getId());
+        }
+        if (expendedEquipmentType != null) {
+            out.writeAttribute("expended-equipment-type",
+                expendedEquipmentType.getId());
+            out.writeAttribute("expended-amount",
+                Integer.toString(expendedAmount));
+        }
+        if (deliverGoodsType != null) {
+            out.writeAttribute("deliver-goods-type",
+                deliverGoodsType.getId());
+            out.writeAttribute("deliver-amount",
+                Integer.toString(deliverAmount));
+        }
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        if (scopes != null) {
+            for (Scope scope : scopes) {
+                scope.toXMLImpl(out);
+            }
+        }
+        if (allowedWorkers != null) {
+            for (String id : allowedWorkers) {
+                out.writeStartElement("worker");
+                out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+                out.writeEndElement();
+            }
+        }
+        if (tileTypeChange != null) {
+            for (Map.Entry<TileType, TileType> entry
+                     : tileTypeChange.entrySet()) {
+                out.writeStartElement("change");
+                out.writeAttribute("from", entry.getKey().getId());
+                out.writeAttribute("to", entry.getValue().getId());
+                out.writeEndElement();
+            }
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = getAttribute(in, "movement-cost", 0);
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
-        requiredImprovementType = getSpecification().getType(in, "required-improvement",
-                                                             TileImprovementType.class, null);
+        requiredImprovementType = getSpecification().getType(in,
+            "required-improvement", TileImprovementType.class, null);
 
         zIndex = getAttribute(in, "zIndex", 0);
         exposeResourcePercent = getAttribute(in, "exposeResourcePercent", 0);
 
-        expendedEquipmentType = getSpecification().getType(in, "expended-equipment-type",
-                                                           EquipmentType.class, null);
+        expendedEquipmentType = getSpecification().getType(in,
+            "expended-equipment-type", EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);
-        deliverGoodsType = getSpecification().getType(in, "deliver-goods-type", GoodsType.class, null);
+        deliverGoodsType = getSpecification().getType(in,
+            "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
     }
 
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         String childName = in.getLocalName();
         if ("scope".equals(childName)) {
             scopes.add(new Scope(in));
@@ -333,67 +433,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
         }
     }
 
-
     /**
-     * Makes an XML-representation of this object.
+     * Returns the tag name of the root element representing this object.
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @return "tileimprovement-type".
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("natural", Boolean.toString(natural));
-        out.writeAttribute("add-work-turns", Integer.toString(addWorkTurns));
-        out.writeAttribute("movement-cost", Integer.toString(movementCost));
-        out.writeAttribute("magnitude", Integer.toString(magnitude));
-        out.writeAttribute("zIndex", Integer.toString(zIndex));
-        out.writeAttribute("exposeResourcePercent",
-                           Integer.toString(exposeResourcePercent));
-        if (requiredImprovementType != null) {
-            out.writeAttribute("required-improvement", requiredImprovementType.getId());
-        }
-        if (expendedEquipmentType != null) {
-            out.writeAttribute("expended-equipment-type", expendedEquipmentType.getId());
-            out.writeAttribute("expended-amount", Integer.toString(expendedAmount));
-        }
-        if (deliverGoodsType != null) {
-            out.writeAttribute("deliver-goods-type", deliverGoodsType.getId());
-            out.writeAttribute("deliver-amount", Integer.toString(deliverAmount));
-        }
-    }
-
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-        if (scopes != null) {
-            for (Scope scope : scopes) {
-                scope.toXMLImpl(out);
-            }
-        }
-        if (allowedWorkers != null) {
-            for (String id : allowedWorkers) {
-                out.writeStartElement("worker");
-                out.writeAttribute(ID_ATTRIBUTE_TAG, id);
-                out.writeEndElement();
-            }
-        }
-        if (tileTypeChange != null) {
-            for (Map.Entry<TileType, TileType> entry : tileTypeChange.entrySet()) {
-                out.writeStartElement("change");
-                out.writeAttribute("from", entry.getKey().getId());
-                out.writeAttribute("to", entry.getValue().getId());
-                out.writeEndElement();
-            }
-        }
-    }
-
     public static String getXMLElementTagName() {
         return "tileimprovement-type";
     }
-
-
 }

@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
@@ -411,25 +410,31 @@ public class ModelMessage extends StringTemplate {
         return value;
     }
 
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode() + ", ");
-        sb.append(((sourceId == null) ? "null" : sourceId) + ", ");
-        sb.append(((displayId == null) ? "null" : displayId) + ", ");
-        sb.append(super.toString());
-        sb.append(", " + messageType + " >");
-        return sb.toString();
-    }
-
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (ownerId != null) {
             out.writeAttribute("owner", ownerId);
         }
@@ -460,6 +465,20 @@ public class ModelMessage extends StringTemplate {
         displayId = in.getAttributeValue(null, "display");
 
         super.readChildren(in);
+    }
+
+    /**
+     * Debug helper.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode()
+            + ", ");
+        sb.append(((sourceId == null) ? "null" : sourceId) + ", ");
+        sb.append(((displayId == null) ? "null" : displayId) + ", ");
+        sb.append(super.toString());
+        sb.append(", " + messageType + " >");
+        return sb.toString();
     }
 
     /**

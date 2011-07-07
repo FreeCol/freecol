@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -43,9 +42,9 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for defending a <code>Settlement</code>.
-* @see net.sf.freecol.common.model.Settlement Settlement
-*/
+ * Mission for defending a <code>Settlement</code>.
+ * @see net.sf.freecol.common.model.Settlement Settlement
+ */
 public class DefendSettlementMission extends Mission {
     /*
      * TODO: This Mission should later use sub-missions for
@@ -61,14 +60,14 @@ public class DefendSettlementMission extends Mission {
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    * @param settlement The <code>Settlement</code> to defend.
-    * @exception NullPointerException if <code>aiUnit == null</code> or
-    *        <code>settlement == null</code>.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @param settlement The <code>Settlement</code> to defend.
+     * @exception NullPointerException if <code>aiUnit == null</code> or
+     *        <code>settlement == null</code>.
+     */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit, Settlement settlement) {
         super(aiMain, aiUnit);
 
@@ -88,7 +87,8 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Creates a new <code>DefendSettlementMission</code> and reads the given element.
+     * Creates a new <code>DefendSettlementMission</code> and reads
+     * the given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -228,6 +228,24 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     *
+     * @return The <code>String</code>:
+     *      "(x, y) ColonyName"
+     *      where <code>x</code> and <code>y</code> is the
+     *      coordinates of the settlement for this mission,
+     *      and <code>ColonyName</code> is the name
+     *      (if available).
+     */
+    public String getDebuggingInfo() {
+        String name = (settlement instanceof Colony) ? ((Colony) settlement).getName() : "";
+        return settlement.getTile().getPosition().toString() + " " + name;
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
@@ -249,37 +267,25 @@ public class DefendSettlementMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "settlement"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
+        settlement = (Settlement) getGame()
+            .getFreeColGameObject(in.getAttributeValue(null, "settlement"));
 
         in.nextTag();
     }
 
     /**
      * Returns the tag name of the root element representing this object.
-     * @return The <code>String</code> "defendSettlementMission".
+     *
+     * @return "defendSettlementMission".
      */
     public static String getXMLElementTagName() {
         return "defendSettlementMission";
-    }
-
-    /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
-     *
-     * @return The <code>String</code>:
-     *      "(x, y) ColonyName"
-     *      where <code>x</code> and <code>y</code> is the
-     *      coordinates of the settlement for this mission,
-     *      and <code>ColonyName</code> is the name
-     *      (if available).
-     */
-    public String getDebuggingInfo() {
-        String name = (settlement instanceof Colony) ? ((Colony) settlement).getName() : "";
-        return settlement.getTile().getPosition().toString() + " " + name;
     }
 }

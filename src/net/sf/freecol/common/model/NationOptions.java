@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 public class NationOptions extends FreeColObject {
 
     /**
@@ -149,16 +150,44 @@ public class NationOptions extends FreeColObject {
 
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        //out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("nationalAdvantages", nationalAdvantages.toString());
+        out.writeStartElement("Nations");
+        for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
+            out.writeStartElement("Nation");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
+            out.writeAttribute("state", entry.getValue().toString());
+            out.writeEndElement();
+        }
+        out.writeEndElement();
+
+        out.writeEndElement();
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public final void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         //setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
 
-        String advantages = getAttribute(in, "nationalAdvantages", "selectable").toUpperCase(Locale.US);
+        String advantages = getAttribute(in, "nationalAdvantages",
+            "selectable").toUpperCase(Locale.US);
         nationalAdvantages = Enum.valueOf(Advantages.class, advantages);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -178,35 +207,6 @@ public class NationOptions extends FreeColObject {
         }
     }
     
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        //out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("nationalAdvantages", nationalAdvantages.toString());
-        out.writeStartElement("Nations");
-        for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
-            out.writeStartElement("Nation");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
-            out.writeAttribute("state", entry.getValue().toString());
-            out.writeEndElement();
-        }
-        out.writeEndElement();
-
-        out.writeEndElement();
-    }
-
-    public static String getXMLElementTagName() {
-        return "nationOptions";
-    }
-
     // debugging only
     public String toString() {
         StringBuilder result = new StringBuilder(); 
@@ -216,5 +216,14 @@ public class NationOptions extends FreeColObject {
             result.append("   " + entry.getKey().getId() + " " + entry.getValue().toString() + "\n");
         }
         return result.toString();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "nationOptions".
+     */
+    public static String getXMLElementTagName() {
+        return "nationOptions";
     }
 }

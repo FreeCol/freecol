@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Represents a building in a colony.
  */
@@ -865,7 +866,6 @@ public class Building extends FreeColGameObject
         return buildingType.getModifierSet(id);
     }
 
-    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -891,13 +891,14 @@ public class Building extends FreeColGameObject
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("colony", colony.getId());
         out.writeAttribute("buildingType", buildingType.getId());
 
@@ -918,8 +919,9 @@ public class Building extends FreeColGameObject
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         colony = getFreeColGameObject(in, "colony", Colony.class);
         buildingType = getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
@@ -962,6 +964,7 @@ public class Building extends FreeColGameObject
      *
      * @return The name of the building.
      */
+    @Override
     public String toString() {
         return getType().getId() + " [" + colony.getName() + "]";
     }
@@ -969,7 +972,7 @@ public class Building extends FreeColGameObject
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "building".
      */
     public static String getXMLElementTagName() {
         return "building";

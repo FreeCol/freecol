@@ -284,6 +284,7 @@ public class LostCityRumour extends TileItem {
             "Choose rumour", random, choices);
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -308,13 +309,14 @@ public class LostCityRumour extends TileItem {
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", getTile().getId());
         if (type != null && (showAll || toSavedGame)) {
             out.writeAttribute("type", getType().toString());
@@ -334,8 +336,9 @@ public class LostCityRumour extends TileItem {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
         String typeString = getAttribute(in, "type", null);
@@ -347,8 +350,12 @@ public class LostCityRumour extends TileItem {
         in.nextTag();
     }
 
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "lostCityRumour".
+     */
     public static String getXMLElementTagName() {
         return "lostCityRumour";
     }
-
 }

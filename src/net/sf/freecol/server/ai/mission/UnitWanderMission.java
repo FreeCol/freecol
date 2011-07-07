@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
@@ -35,21 +34,21 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for wandering in random directions.
-*/
+ * Mission for wandering in random directions.
+ */
 public class UnitWanderMission extends Mission {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderMission.class.getName());
 
 
-
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     */
     public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
     }
@@ -68,7 +67,8 @@ public class UnitWanderMission extends Mission {
     }
 
     /**
-     * Creates a new <code>UnitWanderMission</code> and reads the given element.
+     * Creates a new <code>UnitWanderMission</code> and reads the
+     * given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -104,6 +104,7 @@ public class UnitWanderMission extends Mission {
         return super.isValid();
     }
 
+
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -123,17 +124,21 @@ public class UnitWanderMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
         in.nextTag();
     }
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "unitWanderMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "unitWanderMission".
+     */
     public static String getXMLElementTagName() {
         return "unitWanderMission";
     }

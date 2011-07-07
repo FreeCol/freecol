@@ -184,9 +184,18 @@ public class NationSummary extends FreeColObject {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out)
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("numberOfSettlements", numberOfSettlements);
         out.writeAttribute("numberOfUnits", numberOfUnits);
         out.writeAttribute("militaryStrength", militaryStrength);
@@ -204,8 +213,18 @@ public class NationSummary extends FreeColObject {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         numberOfSettlements = getAttribute(in, "numberOfSettlements", "");
         numberOfUnits = getAttribute(in, "numberOfUnits", "");
         militaryStrength = getAttribute(in, "militaryStrength", "");

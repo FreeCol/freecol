@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
@@ -242,13 +241,12 @@ public class WorkLocationPlan extends ValuedAIObject {
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute("ID", workLocation.getId());
+        element.setAttribute(ID_ATTRIBUTE, workLocation.getId());
         element.setAttribute("priority", Integer.toString(priority));
         element.setAttribute("goodsType", goodsType.getId());
 
         return element;
     }
-
 
     /**
      * Updates this object from an XML-representation of
@@ -257,16 +255,16 @@ public class WorkLocationPlan extends ValuedAIObject {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+        workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute(ID_ATTRIBUTE));
         priority = Integer.parseInt(element.getAttribute("priority"));
         goodsType = getAIMain().getGame().getSpecification().getGoodsType(element.getAttribute("goodsType"));
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return "workLocationPlan"
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "workLocationPlan"
+     */
     public static String getXMLElementTagName() {
         return "workLocationPlan";
     }

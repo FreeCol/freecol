@@ -33,7 +33,8 @@ import javax.xml.stream.XMLStreamWriter;
  * given building type can have. The levels contain the information about the
  * name of the building in a given level and what is needed to build it.
  */
-public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
+public final class BuildingType extends BuildableType
+    implements Comparable<BuildingType> {
 
     private int level = 1;
     private int workPlaces = 3;
@@ -149,8 +150,66 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     }
 
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (upgradesFrom != null) {
+            out.writeAttribute("upgradesFrom", upgradesFrom.getId());
+        }
+        out.writeAttribute("workplaces", Integer.toString(workPlaces));
+        out.writeAttribute("basicProduction", Integer.toString(basicProduction));
+        if (minSkill > UNDEFINED) {
+            out.writeAttribute("minSkill", Integer.toString(minSkill));
+        }
+        if (maxSkill < INFINITY) {
+            out.writeAttribute("maxSkill", Integer.toString(maxSkill));
+        }
+        if (upkeep > 0) {
+            out.writeAttribute("upkeep", Integer.toString(upkeep));
+        }
+        if (priority != Consumer.BUILDING_PRIORITY) {
+            out.writeAttribute("priority", Integer.toString(priority));
+        }
+        if (consumes != null) {
+            out.writeAttribute("consumes", consumes.getId());
+        }
+        if (produces != null) {
+            out.writeAttribute("produces", produces.getId());
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         String extendString = in.getAttributeValue(null, "extends");
         BuildingType parent = (extendString == null) ? this :
             getSpecification().getBuildingType(extendString);
@@ -189,47 +248,17 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
         }
     }
 
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
-        }
-    }
-
-    /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        if (upgradesFrom != null) {
-            out.writeAttribute("upgradesFrom", upgradesFrom.getId());
-        }
-        out.writeAttribute("workplaces", Integer.toString(workPlaces));
-        out.writeAttribute("basicProduction", Integer.toString(basicProduction));
-        if (minSkill > UNDEFINED) {
-            out.writeAttribute("minSkill", Integer.toString(minSkill));
-        }
-        if (maxSkill < INFINITY) {
-            out.writeAttribute("maxSkill", Integer.toString(maxSkill));
-        }
-        if (upkeep > 0) {
-            out.writeAttribute("upkeep", Integer.toString(upkeep));
-        }
-        if (priority != Consumer.BUILDING_PRIORITY) {
-            out.writeAttribute("priority", Integer.toString(priority));
-        }
-        if (consumes != null) {
-            out.writeAttribute("consumes", consumes.getId());
-        }
-        if (produces != null) {
-            out.writeAttribute("produces", produces.getId());
         }
     }
 

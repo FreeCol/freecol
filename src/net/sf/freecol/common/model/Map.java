@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 
+
 /**
  * An isometric map. The map is represented as a collection of tiles.
  */
@@ -1664,6 +1665,35 @@ public class Map extends FreeColGameObject {
         }
     }
 
+    /**
+     * Make the map usable as a parameter in the for-loop.
+     *
+     * Returns all Tiles based on the order of the WholeMapIterator.
+     *
+     * @return An Iterable that can be used to get an iterator for all tiles of the map.
+     */
+    public Iterable<Tile> getAllTiles() {
+        return new Iterable<Tile>(){
+            public Iterator<Tile> iterator(){
+                final WholeMapIterator m = getWholeMapIterator();
+
+                return new Iterator<Tile>(){
+                    public boolean hasNext() {
+                        return m.hasNext();
+                    }
+
+                    public Tile next() {
+                        return getTile(m.next());
+                    }
+
+                    public void remove() {
+                        m.remove();
+                    }
+                };
+            }
+        };
+    }
+
     private final class BorderAdjacentIterator extends MapIterator {
         // The starting tile position
         private Position basePosition;
@@ -1715,6 +1745,7 @@ public class Map extends FreeColGameObject {
         }
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -1744,11 +1775,12 @@ public class Map extends FreeColGameObject {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-            boolean showAll, boolean toSavedGame) throws XMLStreamException {
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
         out.writeAttribute("layer", layer.toString());
@@ -1758,7 +1790,7 @@ public class Map extends FreeColGameObject {
         }
 
         for (Tile tile: getAllTiles()) {
-            if (showAll || player.hasExplored(tile)) {
+            if (showAll || toSavedGame || player.hasExplored(tile)) {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
                 tile.toXMLMinimal(out);
@@ -1777,7 +1809,7 @@ public class Map extends FreeColGameObject {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
         if (tiles == null) {
@@ -1803,38 +1835,9 @@ public class Map extends FreeColGameObject {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "map".
      */
     public static String getXMLElementTagName() {
         return "map";
-    }
-
-    /**
-     * Make the map usable as a parameter in the for-loop.
-     *
-     * Returns all Tiles based on the order of the WholeMapIterator.
-     *
-     * @return An Iterable that can be used to get an iterator for all tiles of the map.
-     */
-    public Iterable<Tile> getAllTiles() {
-        return new Iterable<Tile>(){
-            public Iterator<Tile> iterator(){
-                final WholeMapIterator m = getWholeMapIterator();
-
-                return new Iterator<Tile>(){
-                    public boolean hasNext() {
-                        return m.hasNext();
-                    }
-
-                    public Tile next() {
-                        return getTile(m.next());
-                    }
-
-                    public void remove() {
-                        m.remove();
-                    }
-                };
-            }
-        };
     }
 }

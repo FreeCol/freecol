@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
  * Option for selecting a language. The possible choices are determined
  * using the available language files in "data/strings".
@@ -213,59 +214,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         }
     }
 
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute(VALUE_TAG, getValue().getKey());
-
-        out.writeEndElement();
-     }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        findLanguages();
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        } else if(getId() == NO_ID) {
-            setId(id);
-        }
-
-        Language newValue = languages.get(in.getAttributeValue(null, VALUE_TAG));
-        if (newValue == null) {
-            newValue = languages.get(AUTO);
-        }
-        setValue(newValue);
-        in.nextTag();
-    }
-
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     * @return "selectOption".
-     */
-    public static String getXMLElementTagName() {
-        return "languageOption";
-    }
-
-
     public class Language {
 
         /**
@@ -343,4 +291,65 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     }
 
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute(VALUE_TAG, getValue().getKey());
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        findLanguages();
+
+        if (id == null && getId().equals(NO_ID)){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        } else if(getId() == NO_ID) {
+            setId(id);
+        }
+
+        Language newValue = languages.get(in.getAttributeValue(null, VALUE_TAG));
+        if (newValue == null) {
+            newValue = languages.get(AUTO);
+        }
+        setValue(newValue);
+        in.nextTag();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "languageOption".
+     */
+    public static String getXMLElementTagName() {
+        return "languageOption";
+    }
 }

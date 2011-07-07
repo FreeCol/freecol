@@ -1,3 +1,22 @@
+/**
+ *  Copyright (C) 2002-2011  The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -6,6 +25,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 
 public class SettlementType extends FreeColGameObjectType {
 
@@ -303,27 +323,57 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
 
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXMLImpl(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("capital", Boolean.toString(capital));
         out.writeAttribute("minimumSize", Integer.toString(minimumSize));
         out.writeAttribute("maximumSize", Integer.toString(maximumSize));
         out.writeAttribute("visibleRadius", Integer.toString(visibleRadius));
-        out.writeAttribute("claimableRadius", Integer.toString(claimableRadius));
-        out.writeAttribute("extraClaimableRadius", Integer.toString(extraClaimableRadius));
-        out.writeAttribute("wanderingRadius", Integer.toString(wanderingRadius));
+        out.writeAttribute("claimableRadius",
+            Integer.toString(claimableRadius));
+        out.writeAttribute("extraClaimableRadius",
+            Integer.toString(extraClaimableRadius));
+        out.writeAttribute("wanderingRadius",
+            Integer.toString(wanderingRadius));
         out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
         out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
         out.writeAttribute("tradeBonus", Integer.toString(tradeBonus));
     }
 
-
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeChildren(out);
+
         for (RandomRange range : plunder) {
             range.toXML(out, "plunder");
         }
@@ -332,22 +382,39 @@ public class SettlementType extends FreeColGameObjectType {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
+
         capital = getAttribute(in, "capital", capital);
         minimumSize = getAttribute(in, "minimumSize", minimumSize);
         maximumSize = getAttribute(in, "maximumSize", maximumSize);
         visibleRadius = getAttribute(in, "visibleRadius", visibleRadius);
         claimableRadius = getAttribute(in, "claimableRadius", claimableRadius);
-        extraClaimableRadius = getAttribute(in, "extraClaimableRadius", extraClaimableRadius);
+        extraClaimableRadius = getAttribute(in, "extraClaimableRadius",
+            extraClaimableRadius);
         wanderingRadius = getAttribute(in, "wanderingRadius", wanderingRadius);
         minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
         maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
         tradeBonus = getAttribute(in, "tradeBonus", tradeBonus);
     }
 
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if ("plunder".equals(in.getLocalName())) {
             RandomRange range = new RandomRange();
             range.readFromXML(in);
@@ -361,9 +428,12 @@ public class SettlementType extends FreeColGameObjectType {
         }
     }
 
-
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "settlementType".
+     */
     public static String getXMLElementTagName() {
         return "settlementType";
     }
-
 }

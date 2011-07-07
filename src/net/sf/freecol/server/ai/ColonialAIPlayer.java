@@ -95,18 +95,16 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+
 /**
- *
- * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
- *
- * <br />
- * <br />
+ * Objects of this class contains AI-information for a single {@link
+ * Player} and is used for controlling this player.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
 public class ColonialAIPlayer extends AIPlayer {
+
     private static final Logger logger = Logger.getLogger(ColonialAIPlayer.class.getName());
 
     private static enum AIStrategy { NONE, TRADE, IMMIGRATION, COOPERATION, CONQUEST }
@@ -142,7 +140,7 @@ public class ColonialAIPlayer extends AIPlayer {
      * @param element The XML-element containing information.
      */
     public ColonialAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
         //TODO: setPlayer()?
     }
@@ -155,7 +153,7 @@ public class ColonialAIPlayer extends AIPlayer {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public ColonialAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
         //TODO: setPlayer()?
     }
@@ -551,7 +549,7 @@ public class ColonialAIPlayer extends AIPlayer {
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeEndElement();
     }
 
@@ -564,19 +562,9 @@ public class ColonialAIPlayer extends AIPlayer {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setPlayer((ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID")));
+        setPlayer((ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
         in.nextTag();
     }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * @return the tag name.
-     */
-    public static String getXMLElementTagName() {
-        return "colonialAIPlayer";
-    }
-
 
 /* Internal methods ***********************************************************/
 
@@ -1507,4 +1495,13 @@ public class ColonialAIPlayer extends AIPlayer {
         myAIUnits.clear();
     }
 
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "colonialAIPlayer".
+     */
+    public static String getXMLElementTagName() {
+        return "colonialAIPlayer";
+    }
 }

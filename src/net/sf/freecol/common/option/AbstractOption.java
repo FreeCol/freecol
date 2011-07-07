@@ -23,14 +23,17 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColObject;
 
+
 /**
- * The super class of all options. GUI components making use of this class can
- * refer to its name and shortDescription properties. The complete keys of these
- * properties consist of the id of the option group (if any), followed by a "."
- * unless the option group is null, followed by the id of the option object,
- * followed by a ".", followed by "name" or "shortDescription".
+ * The super class of all options. GUI components making use of this
+ * class can refer to its name and shortDescription properties. The
+ * complete keys of these properties consist of the id of the option
+ * group (if any), followed by a "."  unless the option group is null,
+ * followed by the id of the option object, followed by a ".",
+ * followed by "name" or "shortDescription".
  */
-abstract public class AbstractOption<T> extends FreeColObject implements Option {
+abstract public class AbstractOption<T> extends FreeColObject
+    implements Option {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
@@ -105,5 +108,4 @@ abstract public class AbstractOption<T> extends FreeColObject implements Option 
     public abstract T getValue();
 
     public abstract void setValue(T value);
-
 }

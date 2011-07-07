@@ -366,9 +366,6 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     }
 
 
-    // -- Serialization --
-
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -378,7 +375,65 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, "modifier");
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute(VALUE_TAG, String.valueOf(value));
+        out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
+        if (incrementType != null) {
+            out.writeAttribute("incrementType",
+                incrementType.toString().toLowerCase(Locale.US));
+            out.writeAttribute("increment", String.valueOf(increment));
+        }
+        if (index >= 0) {
+            out.writeAttribute("index", Integer.toString(index));
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @param specification A <code>Specification</code> to use.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in,
+                                  Specification specification)
+        throws XMLStreamException {
+        super.readAttributes(in, specification);
+
+        String typeString = in.getAttributeValue(null, "type");
+        setType(Enum.valueOf(Type.class, typeString.toUpperCase(Locale.US)));
+        value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
+        String incrementString = in.getAttributeValue(null, "incrementType");
+        if (incrementString != null) {
+            setIncrementType(Enum.valueOf(Type.class,
+                    incrementString.toUpperCase(Locale.US)));
+            increment = Float.parseFloat(in.getAttributeValue(null,
+                    "increment"));
+        }
+        index = getAttribute(in, "index", -1);
+    }
+
+    @Override
+    public String toString() {
+        return getId() + ((getSource() == null) ? " "
+            : " (" + getSource().getId() + ") ")
+            + type + " " + value;
     }
 
     /**
@@ -388,39 +443,5 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      */
     public static String getXMLElementTagName() {
         return "modifier";
-    }
-
-    public void readAttributes(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        super.readAttributes(in, specification);
-        String typeString = in.getAttributeValue(null, "type");
-        setType(Enum.valueOf(Type.class, typeString.toUpperCase(Locale.US)));
-        value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
-        String incrementString = in.getAttributeValue(null, "incrementType");
-        if (incrementString != null) {
-            setIncrementType(Enum.valueOf(Type.class,
-                    incrementString.toUpperCase(Locale.US)));
-            increment = Float.parseFloat(in.getAttributeValue(null, "increment"));
-        }
-        index = getAttribute(in, "index", -1);
-    }
-
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute(VALUE_TAG, String.valueOf(value));
-        out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
-        if (incrementType != null) {
-            out.writeAttribute("incrementType", incrementType.toString().toLowerCase(Locale.US));
-            out.writeAttribute("increment", String.valueOf(increment));
-        }
-        if (index >= 0) {
-            out.writeAttribute("index", Integer.toString(index));
-        }
-    }
-
-    public String toString() {
-        return getId() + ((getSource() == null) ? " "
-                          : " (" + getSource().getId() + ") ")
-            + type + " " + value;
     }
 }

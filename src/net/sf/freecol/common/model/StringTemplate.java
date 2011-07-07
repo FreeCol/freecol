@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 
 /**
  * The <code>StringTemplate</code> represents a non-localized string
@@ -436,27 +436,49 @@ public class StringTemplate extends FreeColObject {
         return result;
     }
 
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out);
-        writeChildren(out);
-        out.writeEndElement();
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
     }
 
-    public static String getXMLElementTagName() {
-        return "stringTemplate";
-    }
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("templateType", templateType.toString());
         if (defaultId != null) {
             out.writeAttribute("defaultId", defaultId);
         }
     }
 
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
 
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         if (keys != null) {
             for (String key : keys) {
                 out.writeStartElement("key");
@@ -471,7 +493,16 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         // TODO: remove compatibility code
         String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id == null) {
@@ -494,8 +525,15 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if ("key".equals(in.getLocalName())) {
                 keys.add(in.getAttributeValue(null, VALUE_TAG));
@@ -524,4 +562,12 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "stringTemplate".
+     */
+    public static String getXMLElementTagName() {
+        return "stringTemplate";
+    }
 }

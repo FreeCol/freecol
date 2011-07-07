@@ -637,12 +637,13 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("player", this.player.getId());
         out.writeAttribute("name", name);
         out.writeAttribute("supportSea", String.valueOf(supportSea));
@@ -668,7 +669,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
         if (player == null) {

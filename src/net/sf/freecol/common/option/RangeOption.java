@@ -27,17 +27,18 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
-
 /**
- * Represents an option where the valid choice is an integer and the choices are
- * represented by strings. In general, these strings are localized by looking up
- * the key of the choice, which consists of the id of the AbstractObject
- * followed by a "." followed by the value of the option string.
+ * Represents an option where the valid choice is an integer and the
+ * choices are represented by strings. In general, these strings are
+ * localized by looking up the key of the choice, which consists of
+ * the id of the AbstractObject followed by a "." followed by the
+ * value of the option string.
  *
- * RangeOption differs from SelectOption, as the value being selected represents
- * a numeric measurement, defined by a bounded range of comparable values.
- * As the graphical component rendering a range option only works with a
- * conventional index, this implies to manage a fixed rank for each possible values.
+ * RangeOption differs from SelectOption, as the value being selected
+ * represents a numeric measurement, defined by a bounded range of
+ * comparable values.  As the graphical component rendering a range
+ * option only works with a conventional index, this implies to manage
+ * a fixed rank for each possible values.
  */
 public class RangeOption extends SelectOption {
 
@@ -88,6 +89,7 @@ public class RangeOption extends SelectOption {
         setValue(curValue);
     }
 
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -117,5 +119,4 @@ public class RangeOption extends SelectOption {
     public String getXMLItemElementTagName() {
         return "rangeValue";
     }
-
 }

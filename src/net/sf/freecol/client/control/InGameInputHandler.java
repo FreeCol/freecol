@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -228,7 +229,7 @@ public final class InGameInputHandler extends InputHandler {
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            String id = element.getAttribute("ID");
+            String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
             FreeColGameObject fcgo = game.getFreeColGameObjectSafely(id);
             if (fcgo == null) {
                 logger.warning("Object in update not present in client: " + id);
@@ -254,7 +255,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            String idString = element.getAttribute("ID");
+            String idString = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
             FreeColGameObject fcgo
                 = (idString == null || idString.isEmpty()) ? null
                 : game.getFreeColGameObject(idString);
@@ -314,7 +315,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);
-            if (id.equals(e.getAttribute("ID"))) {
+            if (id.equals(e.getAttribute(FreeColObject.ID_ATTRIBUTE))) {
                 return new Unit(game, e);
             }
         }
@@ -964,11 +965,11 @@ public final class InGameInputHandler extends InputHandler {
     private Element addPlayer(Element element) {
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        if (getGame().getFreeColGameObject(playerElement.getAttribute("ID")) == null) {
+        if (getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)) == null) {
             Player newPlayer = new Player(getGame(), playerElement);
             getGame().addPlayer(newPlayer);
         } else {
-            getGame().getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
+            getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)).readFromXMLElement(playerElement);
         }
 
         return null;
@@ -991,7 +992,7 @@ public final class InGameInputHandler extends InputHandler {
             // server may have already done so and its view will only
             // mislead us here in the client.
             Element e = (Element) nodes.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(e.getAttribute("ID"));
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(e.getAttribute(FreeColObject.ID_ATTRIBUTE));
 
             if (fcgo instanceof Unit) {
                 ((Unit) fcgo).dispose();

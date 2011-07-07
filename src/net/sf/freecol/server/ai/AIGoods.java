@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
@@ -40,9 +39,10 @@ import org.w3c.dom.Element;
 
 
 /**
-* Objects of this class contains AI-information for a single {@link Goods}.
-*/
+ * Objects of this class contains AI-information for a single {@link Goods}.
+ */
 public class AIGoods extends AIObject implements Transportable {
+
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
 
@@ -109,7 +109,7 @@ public class AIGoods extends AIObject implements Transportable {
      *      XML-representation of this object.
      */    
     public AIGoods(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
     
@@ -122,7 +122,7 @@ public class AIGoods extends AIObject implements Transportable {
      *      during parsing.
      */    
     public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
     
@@ -311,7 +311,7 @@ public class AIGoods extends AIObject implements Transportable {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         if (destination != null) {
             out.writeAttribute("destination", destination.getId());
         }
@@ -334,12 +334,14 @@ public class AIGoods extends AIObject implements Transportable {
 
     /**
      * Reads information for this object from an XML stream.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         final String destinationStr = in.getAttributeValue(null, "destination");
         if (destinationStr != null) {
             destination = (Location) getAIMain().getFreeColGameObject(destinationStr);
@@ -371,20 +373,23 @@ public class AIGoods extends AIObject implements Transportable {
         in.nextTag();
     }
 
-    
     /**
      * Returns a <code>String</code>-representation of this object.
-     * @return A <code>String</code> representing this objecy for debugging purposes.
+     *
+     * @return A <code>String</code> representing this object for
+     *     debugging purposes.
      */
+    @Override
     public String toString() {
-        return "AIGoods@" + hashCode() + ": " + goods + " (" + transportPriority + ")";
+        return "AIGoods@" + hashCode() + ": " + goods
+            + " (" + transportPriority + ")";
     }
-    
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return "aiGoods"
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "aiGoods"
+     */
     public static String getXMLElementTagName() {
         return "aiGoods";
     }

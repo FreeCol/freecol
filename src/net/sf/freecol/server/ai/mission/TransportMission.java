@@ -65,6 +65,7 @@ import net.sf.freecol.server.ai.WorkerWish;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Mission for transporting units and goods on a carrier.
  *
@@ -1469,6 +1470,22 @@ public class TransportMission extends Mission {
     }
 
     /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     *
+     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
+     *         <code>x</code> and <code>y</code> is the coordinates of the
+     *         target tile for this mission, and <code>z</code> is the value
+     *         of building the colony. The exclamation mark is added if the unit
+     *         should continue searching for a colony site if the targeted site
+     *         is lost.
+     */
+    public String getDebuggingInfo() {
+        return this.toString();
+    }
+
+
+    /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
@@ -1485,7 +1502,7 @@ public class TransportMission extends Mission {
         while (tli.hasNext()) {
             Transportable t = tli.next();
             out.writeStartElement(ELEMENT_TRANSPORTABLE);
-            out.writeAttribute("ID", ((AIObject) t).getId());
+            out.writeAttribute(ID_ATTRIBUTE, ((AIObject) t).getId());
             out.writeEndElement();
         }
         out.writeEndElement();
@@ -1497,14 +1514,16 @@ public class TransportMission extends Mission {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
+                    "unit")));
 
         transportList.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ELEMENT_TRANSPORTABLE)) {
-                String tid = in.getAttributeValue(null, "ID");
+                String tid = in.getAttributeValue(null, ID_ATTRIBUTE);
                 AIObject ao = getAIMain().getAIObject(tid);
                 if (ao == null) {
                     if (tid.startsWith(Unit.getXMLElementTagName())) {
@@ -1514,7 +1533,8 @@ public class TransportMission extends Mission {
                     }
                 }
                 if (!(ao instanceof Transportable)) {
-                    logger.warning("AIObject not Transportable, ID: " + in.getAttributeValue(null, "ID"));
+                    logger.warning("AIObject not Transportable, ID: "
+                        + in.getAttributeValue(null, ID_ATTRIBUTE));
                 } else {
                     transportList.add((Transportable) ao);
                 }
@@ -1526,33 +1546,10 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * @return The <code>String</code> "transportMission".
+     * Creates a <code>String</code> representation of this mission to
+     * be used for debugging purposes.
      */
-    public static String getXMLElementTagName() {
-        return "transportMission";
-    }
-
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
-     *         <code>x</code> and <code>y</code> is the coordinates of the
-     *         target tile for this mission, and <code>z</code> is the value
-     *         of building the colony. The exclamation mark is added if the unit
-     *         should continue searching for a colony site if the targeted site
-     *         is lost.
-     */
-    public String getDebuggingInfo() {
-        return this.toString();
-    }
-
-    /**
-     * Creates a <code>String</code> representation of this mission to be used
-     * for debugging purposes.
-     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Transport list:\n");
         List<Transportable> ts = new LinkedList<Transportable>();
@@ -1580,5 +1577,14 @@ public class TransportMission extends Mission {
             ts.add(t);
         }
         return sb.toString();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "transportMission".
+     */
+    public static String getXMLElementTagName() {
+        return "transportMission";
     }
 }

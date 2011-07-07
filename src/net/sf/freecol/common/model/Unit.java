@@ -3185,7 +3185,8 @@ public class Unit extends FreeColGameObject
 
     // Serialization
 
-    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    private void unitsToXML(XMLStreamWriter out, Player player,
+                            boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         if (!units.isEmpty()) {
             out.writeStartElement(UNITS_TAG_NAME);
@@ -3219,8 +3220,11 @@ public class Unit extends FreeColGameObject
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
+        boolean full = showAll || toSavedGame || player == getOwner();
+
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -3232,9 +3236,7 @@ public class Unit extends FreeColGameObject
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", state.toString());
         out.writeAttribute("role", role.toString());
-        Player who = (getOwner().equals(player)
-                      || !hasAbility(Ability.PIRACY) || showAll)
-            ? owner
+        Player who = (full || !hasAbility(Ability.PIRACY)) ? owner
             : getGame().getUnknownEnemy();
         out.writeAttribute("owner", who.getId());
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
@@ -3247,7 +3249,7 @@ public class Unit extends FreeColGameObject
         writeAttribute(out, "student", student);
         writeAttribute(out, "teacher", teacher);
 
-        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+        if (full) {
             writeAttribute(out, "indianSettlement", indianSettlement);
             out.writeAttribute("workLeft", Integer.toString(workLeft));
         } else {
@@ -3259,8 +3261,8 @@ public class Unit extends FreeColGameObject
         }
 
         if (location != null) {
-            if (getGame().isClientTrusted() || showAll || player == getOwner()
-                || !(location instanceof Building || location instanceof ColonyTile)) {
+            if (full || !(location instanceof Building
+                    || location instanceof ColonyTile)) {
                 out.writeAttribute("location", location.getId());
             } else {
                 out.writeAttribute("location", getColony().getId());
@@ -3275,10 +3277,12 @@ public class Unit extends FreeColGameObject
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
 
-        writeFreeColGameObject(workImprovement, out, player, showAll, toSavedGame);
+        if (workImprovement != null) {
+            workImprovement.toXML(out, player, showAll, toSavedGame);
+        }
 
         // Do not show enemy units hidden in a carrier:
-        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)) {
+        if (full) {
             unitsToXML(out, player, showAll, toSavedGame);
             if (getType().canCarryGoods()) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);

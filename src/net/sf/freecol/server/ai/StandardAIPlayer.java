@@ -17,14 +17,14 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* "STANDARD" AIPLAYER *********************************************************
+/* "STANDARD" AIPLAYER ********************************************************
  *
  * This class is able to control _any_ Player type,
  * whether European (both Colonial and REF), or Indian.
  *
  * It is currently used as the standard AI for all non-player nations.
  *
- ******************************************************************************/
+ *****************************************************************************/
 
 package net.sf.freecol.server.ai;
 
@@ -99,18 +99,16 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+
 /**
- *
- * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
- *
- * <br />
- * <br />
+ * Objects of this class contains AI-information for a single {@link
+ * Player} and is used for controlling this player.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
 public class StandardAIPlayer extends AIPlayer {
+
     private static final Logger logger = Logger.getLogger(StandardAIPlayer.class.getName());
 
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
@@ -152,7 +150,7 @@ public class StandardAIPlayer extends AIPlayer {
      * @param element The XML-element containing information.
      */
     public StandardAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute("ID"));
+        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
 
@@ -164,7 +162,7 @@ public class StandardAIPlayer extends AIPlayer {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public StandardAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, "ID"));
+        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
@@ -607,46 +605,6 @@ public class StandardAIPlayer extends AIPlayer {
             throw new IllegalArgumentException("Unknown type of settlement.");
         }
     }
-
-    /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
-     */
-    @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setPlayer((ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID")));
-        in.nextTag();
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * ATTN: For compatibility, this has the same tag name as its super class,
-     * the previous implementation of all AIPlayers. Eventually change this at some point.
-     *
-     * @return the tag name.
-     */
-    public static String getXMLElementTagName() {
-        return "aiPlayer";
-    }
-
 
 /* Internal methods ***********************************************************/
 
@@ -2404,4 +2362,46 @@ public class StandardAIPlayer extends AIPlayer {
         return best;
     }
 
+
+    /**
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads information for this object from an XML stream.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading from the
+     *             stream.
+     */
+    @Override
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setPlayer((ServerPlayer) getAIMain()
+            .getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
+        in.nextTag();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * ATTN: For compatibility, this has the same tag name as its
+     * super class, the previous implementation of all
+     * AIPlayers. Eventually change this at some point.
+     *
+     * @return the tag name.
+     */
+    public static String getXMLElementTagName() {
+        return "aiPlayer";
+    }
 }

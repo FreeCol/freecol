@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -147,11 +148,11 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        if (game.getFreeColGameObject(playerElement.getAttribute("ID")) == null) {
+        if (game.getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)) == null) {
            Player newPlayer = new Player(game, playerElement);
            getFreeColClient().getGame().addPlayer(newPlayer);
         } else {
-           game.getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
+           game.getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)).readFromXMLElement(playerElement);
         }
         getFreeColClient().getCanvas().refreshPlayersTable();
 

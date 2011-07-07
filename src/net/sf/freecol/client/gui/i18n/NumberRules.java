@@ -93,7 +93,8 @@ public class NumberRules {
         }
     }
 
-    private static void readChild(XMLStreamReader in) throws XMLStreamException {
+    private static void readChild(XMLStreamReader in)
+        throws XMLStreamException {
 
         String[] locales = in.getAttributeValue(null, "locales").split(" ");
         if (locales != null) {

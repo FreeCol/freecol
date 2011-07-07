@@ -249,6 +249,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
 
+    @Override
     public String toString() {
         String result = "BuildQueue:";
         for (BuildableType item : buildQueue) {
@@ -256,7 +257,5 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         }
         result += " [" + colony.getName() + "]";
         return result;
-
     }
-
 }

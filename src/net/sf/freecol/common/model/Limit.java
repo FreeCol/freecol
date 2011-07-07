@@ -253,26 +253,6 @@ public final class Limit extends FreeColGameObjectType {
         }
     }
 
-    @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        operator = Enum.valueOf(Operator.class, in.getAttributeValue(null, "operator"));
-    }
-
-    @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("leftHandSide".equals(childName)) {
-            leftHandSide = new Operand();
-            leftHandSide.readFromXMLImpl(in);
-        } else if ("rightHandSide".equals(childName)) {
-            rightHandSide = new Operand();
-            rightHandSide.readFromXMLImpl(in);
-        } else {
-            logger.warning("Unsupported child element: " + childName);
-        }
-    }
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -286,24 +266,71 @@ public final class Limit extends FreeColGameObjectType {
         super.toXML(out, getXMLElementTagName());
     }
 
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("operator", operator.toString());
     }
 
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeChildren(out);
-        leftHandSide.toXMLImpl(out, "leftHandSide");
-        rightHandSide.toXMLImpl(out, "rightHandSide");
+
+        leftHandSide.toXML(out, "leftHandSide");
+        rightHandSide.toXML(out, "rightHandSide");
     }
 
     /**
-     * Returns the XML tag name for this element.
+     * Reads the attributes of this object from an XML stream.
      *
-     * @return a <code>String</code> limit
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    public static String getXMLElementTagName() {
-        return "limit";
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        operator = Enum.valueOf(Operator.class,
+            in.getAttributeValue(null, "operator"));
+    }
+
+    /**
+     * Reads a child object.
+     *
+     * @param in The XML stream to read.
+     * @exception XMLStreamException if an error occurs
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if ("leftHandSide".equals(childName)) {
+            leftHandSide = new Operand();
+            leftHandSide.readFromXMLImpl(in);
+        } else if ("rightHandSide".equals(childName)) {
+            rightHandSide = new Operand();
+            rightHandSide.readFromXMLImpl(in);
+        } else {
+            logger.warning("Unsupported child element: " + childName);
+        }
     }
 
     public String toString() {
@@ -311,5 +338,12 @@ public final class Limit extends FreeColGameObjectType {
             + rightHandSide.toString();
     }
 
-
+    /**
+     * Returns the XML tag name for this element.
+     *
+     * @return "limit".
+     */
+    public static String getXMLElementTagName() {
+        return "limit";
+    }
 }
