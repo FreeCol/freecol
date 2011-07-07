@@ -32,6 +32,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -73,6 +74,24 @@ public final class ReportIndianPanel extends ReportPanel {
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
 
+        // if we've spoken to any village chief, he has told us how many settlements comprise the nation
+        // FIXME: actually, the player is told this info when he tries to move a scout into the village, whether or not he speaks to the chief
+        List<IndianSettlement> nativeSettlements = opponent.getIndianSettlements();
+        String numSettlements = getController().getNationSummary(opponent).getNumberOfSettlements();
+        int totalNumberOfSettlements = numSettlements == null ? 0 : Integer.parseInt(numSettlements);
+        int numberOfSettlements = nativeSettlements.size();
+        boolean spokenToChief = false;
+        for (IndianSettlement settlement : nativeSettlements) {
+            if(settlement.hasSpokenToChief(player)) {
+                spokenToChief = true;
+                break;
+            }
+        }
+        if(spokenToChief)
+            numSettlements = "" + numberOfSettlements + " / " + totalNumberOfSettlements;
+        else numSettlements = "" + numberOfSettlements;
+        
+        
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
@@ -84,11 +103,10 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(localizedLabel("report.indian.typeOfSettlements"));
         reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"), "left, wrap");
         reportPanel.add(localizedLabel("report.indian.numberOfSettlements"));
-        reportPanel.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "left, wrap");
+        reportPanel.add(new JLabel(numSettlements), "left, wrap");
         reportPanel.add(new JLabel(Messages.message("report.indian.tribeTension")));
         reportPanel.add(localizedLabel("tension." + opponent.getTension(player).getKey()), "left, wrap 20");
 
-        int numberOfSettlements = opponent.getIndianSettlements().size();
         if (numberOfSettlements > 0) {
             reportPanel.add(localizedLabel("Settlement"), "newline 10");
             reportPanel.add(localizedLabel("mission"));
@@ -96,7 +114,7 @@ public final class ReportIndianPanel extends ReportPanel {
             reportPanel.add(localizedLabel("report.indian.skillTaught"));
             reportPanel.add(localizedLabel("report.indian.tradeInterests"));
             List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(numberOfSettlements);
-            for (IndianSettlement settlement : opponent.getIndianSettlements()) {
+            for (IndianSettlement settlement : nativeSettlements) {
                 if (settlement.isCapital()) {
                     settlements.add(0, settlement);
                 } else {
