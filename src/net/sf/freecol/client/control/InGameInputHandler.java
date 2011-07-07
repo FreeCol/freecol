@@ -849,18 +849,21 @@ public final class InGameInputHandler extends InputHandler {
         case RAISE_TAX:
             GoodsType goodsType = message.getGoodsType(game);
             String goods = Messages.message(goodsType.getLabel(true));
-            accept = new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
-                                                   .addAmount("%replace%", message.getAmount())
-                                                   .addStringTemplate("%goods%", goodsType.getLabel(true))).confirm();
+            accept = new ShowMonarchPanelSwingTask(action,
+                StringTemplate.template("")
+                .addAmount("%amount%", message.getAmount())
+                .addStringTemplate("%goods%", goodsType.getLabel(true)))
+                .confirm();
             element.setAttribute("accepted", String.valueOf(accept));
             new UpdateMenuBarSwingTask().invokeLater();
             return element;
 
         case LOWER_TAX:
             int newTax = message.getAmount();
-            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
-                                          .addAmount("%difference%", player.getTax() - newTax)
-                                          .addAmount("%newTax%", newTax)).confirm();
+            new ShowMonarchPanelSwingTask(action,
+                StringTemplate.template("")
+                .addAmount("%difference%", player.getTax() - newTax)
+                .addAmount("%newTax%", newTax)).confirm();
             new UpdateMenuBarSwingTask().invokeLater();
             break;
 
@@ -870,21 +873,25 @@ public final class InGameInputHandler extends InputHandler {
 
         case ADD_TO_REF: case SUPPORT_LAND: case SUPPORT_SEA:
             additions = unitListSummary(message.getAdditions());
-            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
-                                          .addName("%addition%", additions)).confirm();
+            new ShowMonarchPanelSwingTask(action,
+                StringTemplate.template("")
+                .addName("%addition%", additions)).confirm();
             break;
 
         case DECLARE_WAR:
             Player enemy = message.getEnemy(game);
-            new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
-                                          .addStringTemplate("%nation%", enemy.getNationName())).confirm();
+            new ShowMonarchPanelSwingTask(action,
+                StringTemplate.template("")
+                .addStringTemplate("%nation%", enemy.getNationName()))
+                .confirm();
             break;
 
         case OFFER_MERCENARIES:
             additions = unitListSummary(message.getAdditions());
-            accept = new ShowMonarchPanelSwingTask(action, StringTemplate.template("")
-                                                   .addAmount("%gold%", message.getAmount())
-                                                   .addName("%mercenaries%", additions))
+            accept = new ShowMonarchPanelSwingTask(action,
+                StringTemplate.template("")
+                .addAmount("%gold%", message.getAmount())
+                .addName("%mercenaries%", additions))
                 .confirm();
             element.setAttribute("accepted", String.valueOf(accept));
             if (accept) {
@@ -1972,10 +1979,16 @@ public final class InGameInputHandler extends InputHandler {
         private DiplomaticTrade proposal;
     }
 
+
     /**
      * This class shows the monarch panel.
      */
     class ShowMonarchPanelSwingTask extends SwingTask {
+
+        private MonarchAction action;
+
+        private StringTemplate replace;
+
 
         /**
          * Constructor.
@@ -1983,9 +1996,10 @@ public final class InGameInputHandler extends InputHandler {
          * @param action The action key.
          * @param replace The replacement values.
          */
-        public ShowMonarchPanelSwingTask(MonarchAction action, StringTemplate replace) {
-            _action = action;
-            _replace = replace;
+        public ShowMonarchPanelSwingTask(MonarchAction action,
+                                         StringTemplate replace) {
+            this.action = action;
+            this.replace = replace;
         }
 
         /**
@@ -2008,13 +2022,9 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = getFreeColClient().getCanvas();
-            boolean choice = canvas.showFreeColDialog(new MonarchPanel(canvas, _action, _replace));
+            boolean choice = canvas.showFreeColDialog(new MonarchPanel(canvas,
+                    action, replace));
             return Boolean.valueOf(choice);
         }
-
-
-        private MonarchAction _action;
-
-        private StringTemplate _replace;
     }
 }

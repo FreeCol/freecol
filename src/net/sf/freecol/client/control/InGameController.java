@@ -3441,7 +3441,7 @@ public final class InGameController implements NetworkConstants {
         int price = colony.getPriceForBuilding();
         if (!canvas.showConfirmDialog(null,
                 StringTemplate.template("payForBuilding.text")
-                .addAmount("%replace%", price),
+                .addAmount("%amount%", price),
                 "payForBuilding.yes", "payForBuilding.no")) {
             return;
         }
@@ -3484,7 +3484,7 @@ public final class InGameController implements NetworkConstants {
         }
         if (canvas.showConfirmDialog(null,
                 StringTemplate.template("model.europe.payArrears")
-                .addAmount("%replace%", arrears),
+                .addAmount("%amount%", arrears),
                 "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type)) {

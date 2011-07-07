@@ -810,9 +810,8 @@ public final class InGameController extends Controller {
             serverPlayer.csSetTax(tax + extraTax, cs);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
-                                 "model.monarch.forceTaxRaise",
-                                 serverPlayer)
-                    .addName("%replace%", String.valueOf(tax + extraTax)));
+                    "model.monarch.forceTaxRaise", serverPlayer)
+                .addName("%amount%", String.valueOf(tax + extraTax)));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
