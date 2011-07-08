@@ -242,6 +242,10 @@ public final class ColonyPanel extends FreeColPanel
                 }
             });
 
+        // the following actions are pre-defined
+        nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
+        nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "selectNext2");
+
         buildingsScroll.setAutoscrolls(true);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsPanel.setOpaque(false);
