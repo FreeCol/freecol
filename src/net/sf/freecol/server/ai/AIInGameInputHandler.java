@@ -289,8 +289,14 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         boolean accept = false;
         switch (action) {
         case RAISE_TAX:
-            int tax = Integer.parseInt(element.getAttribute("amount"));
-            accept = getAIPlayer().acceptTax(tax);
+            int tax;
+            try {
+                tax = Integer.parseInt(element.getAttribute("amount"));
+                accept = getAIPlayer().acceptTax(tax);
+            } catch (Exception e) {
+                tax = -1;
+                accept = false;
+            }
             element.setAttribute("accepted", String.valueOf(accept));
             logger.finest("AI player monarch action " + action
                           + " = " + accept);

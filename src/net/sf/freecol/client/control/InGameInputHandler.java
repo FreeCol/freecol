@@ -840,75 +840,15 @@ public final class InGameInputHandler extends InputHandler {
         Player player = freeColClient.getMyPlayer();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         final MonarchAction action = message.getAction();
-        boolean accept;
-        String additions;
+        final StringTemplate template = message.getTemplate();
 
-        switch (action) {
-        case NO_ACTION:
-            break;
+        boolean accept = new ShowMonarchPanelSwingTask(action, template)
+            .confirm();
+        element.setAttribute("accepted", String.valueOf(accept));
 
-        case RAISE_TAX:
-            GoodsType goodsType = message.getGoodsType(game);
-            String goods = Messages.message(goodsType.getLabel(true));
-            accept = new ShowMonarchPanelSwingTask(action,
-                StringTemplate.template("")
-                .addAmount("%amount%", message.getAmount())
-                .addStringTemplate("%goods%", goodsType.getLabel(true)))
-                .confirm();
-            element.setAttribute("accepted", String.valueOf(accept));
-            new UpdateMenuBarSwingTask().invokeLater();
-            return element;
+        new UpdateMenuBarSwingTask().invokeLater();
 
-        case LOWER_TAX:
-            int newTax = message.getAmount();
-            new ShowMonarchPanelSwingTask(action,
-                StringTemplate.template("")
-                .addAmount("%difference%", player.getTax() - newTax)
-                .addAmount("%newTax%", newTax)).confirm();
-            new UpdateMenuBarSwingTask().invokeLater();
-            break;
-
-        case WAIVE_TAX:
-            new ShowMonarchPanelSwingTask(action, null).confirm();
-            break;
-
-        case ADD_TO_REF: case SUPPORT_LAND: case SUPPORT_SEA:
-            additions = unitListSummary(message.getAdditions());
-            new ShowMonarchPanelSwingTask(action,
-                StringTemplate.template("")
-                .addName("%addition%", additions)).confirm();
-            break;
-
-        case DECLARE_WAR:
-            Player enemy = message.getEnemy(game);
-            new ShowMonarchPanelSwingTask(action,
-                StringTemplate.template("")
-                .addStringTemplate("%nation%", enemy.getNationName()))
-                .confirm();
-            break;
-
-        case OFFER_MERCENARIES:
-            additions = unitListSummary(message.getAdditions());
-            accept = new ShowMonarchPanelSwingTask(action,
-                StringTemplate.template("")
-                .addAmount("%gold%", message.getAmount())
-                .addName("%mercenaries%", additions))
-                .confirm();
-            element.setAttribute("accepted", String.valueOf(accept));
-            if (accept) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        freeColClient.getCanvas().updateGoldLabel();
-                    }
-                });
-            }
-            return element;
-
-        default:
-            logger.warning("Bogus action: " + action);
-            break;
-        }
-        return null;
+        return element;
     }
 
     /**

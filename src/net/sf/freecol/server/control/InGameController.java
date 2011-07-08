@@ -321,8 +321,10 @@ public final class InGameController extends Controller {
         Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
 
         // Instantiate the REF in Europe
-        List<Unit> landUnits = refPlayer.createUnits(monarch.getLandUnits());
-        List<Unit> navalUnits = refPlayer.createUnits(monarch.getNavalUnits());
+        List<Unit> landUnits
+            = refPlayer.createUnits(monarch.getREFLandUnits());
+        List<Unit> navalUnits
+            = refPlayer.createUnits(monarch.getREFNavalUnits());
         List<Unit> unitsList = new ArrayList<Unit>();
         unitsList.addAll(navalUnits);
         unitsList.addAll(landUnits);
@@ -614,14 +616,20 @@ public final class InGameController extends Controller {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
+                    logger.finest("Debug monarch action: " + action);
                 } else {
                     action = RandomChoice.getWeightedRandom(logger,
                             "Choose monarch action", random,
                             monarch.getActionChoices());
                 }
-                if (action != null && monarch.actionIsValid(action)) {
-                    logger.finest("Monarch action: " + action);
-                    csMonarchAction(player, action, cs);
+                if (action != null) {
+                    if (monarch.actionIsValid(action)) {
+                        logger.finest("Monarch action: " + action);
+                        csMonarchAction(player, action, cs);
+                    } else {
+                        logger.finest("Skipping invalid monarch action: "
+                            + action);
+                    }
                 }
             }
 
@@ -671,20 +679,19 @@ public final class InGameController extends Controller {
             if (!u.isNaval()) surrenderUnits.add(u);
         }
         if (surrenderUnits.size() > 0) {
-            StringTemplate surrender = StringTemplate.label(", ");
             for (Unit u : surrenderUnits) {
                 UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
                                                      independent);
                 if (downgrade != null) u.setType(downgrade);
                 u.setOwner(independent);
-                surrender.addStringTemplate(u.getLabel());
                 // Make sure the former owner is notified!
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                     "model.player.independence.unitsAcquired", independent)
-                .addStringTemplate("%units%", surrender));
+                .addStringTemplate("%units%",
+                    unitTemplate(", ", surrenderUnits)));
         }
 
         // Update player type.  Again, a pity to have to do a whole
@@ -696,6 +703,24 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", independent.getNationName())
                 .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
+    }
+
+    private StringTemplate unitTemplate(String base, List<Unit> units) {
+        StringTemplate template = StringTemplate.label(base);
+        for (Unit u : units) {
+            template.addStringTemplate(u.getLabel());
+        }
+        return template;
+    }
+
+    private StringTemplate abstractUnitTemplate(String base,
+                                                List<AbstractUnit> units) {
+        StringTemplate template = StringTemplate.label(base);
+        Specification spec = getGame().getSpecification();
+        for (AbstractUnit au : units) {
+            template.addStringTemplate(au.getLabel(spec));
+        }
+        return template;
     }
 
     /**
@@ -713,6 +738,7 @@ public final class InGameController extends Controller {
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
+        String messageId = "model.monarch.action." + action.toString();
 
         switch (action) {
         case NO_ACTION:
@@ -720,22 +746,31 @@ public final class InGameController extends Controller {
         case RAISE_TAX:
             final int taxRaise = monarch.raiseTax(random);
             final Goods goods = serverPlayer.getMostValuableGoods();
-            if (goods == null) break;
-            new Thread(FreeCol.SERVER_THREAD + action.toString()) {
+            if (goods == null) {
+                logger.finest("Ignoring tax raise, no goods to boycott.");
+                break;
+            }
+            new Thread(FreeCol.SERVER_THREAD + action.toString()
+                + " " + serverPlayer.getName()) {
                 public void run() {
                     monarchRaiseTax(serverPlayer, taxRaise, goods);
                 }
             }.start();
             break;
         case LOWER_TAX:
+            int oldTax = serverPlayer.getTax();
             int taxLower = monarch.lowerTax(random);
             serverPlayer.csSetTax(taxLower, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   new MonarchActionMessage(taxLower));
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)
+                    .addAmount("%difference%", oldTax - taxLower)
+                    .addAmount("%newTax%", taxLower)));
             break;
         case WAIVE_TAX:
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                   new MonarchActionMessage(action));
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)));
             break;
         case ADD_TO_REF:
             final List<AbstractUnit> refAdditions
@@ -744,16 +779,21 @@ public final class InGameController extends Controller {
             monarch.addToREF(refAdditions);
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                   new MonarchActionMessage(action, refAdditions));
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)
+                    .addStringTemplate("%addition%",
+                        abstractUnitTemplate(", ", refAdditions))));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
             if (enemies.isEmpty()) break;
             Player enemy = Utils.getRandomMember(logger, "Choose enemy",
-                                                 enemies, random);
+                enemies, random);
             serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   new MonarchActionMessage(enemy));
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)
+                    .addStringTemplate("%nation%", enemy.getNationName())));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
             boolean sea = action == MonarchAction.SUPPORT_SEA;
@@ -761,11 +801,11 @@ public final class InGameController extends Controller {
             if (support.isEmpty()) break;
             serverPlayer.createUnits(support);
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
-            if (sea) {
-                cs.addPartial(See.only(serverPlayer), monarch, "supportSea");
-            }
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                   new MonarchActionMessage(action, support));
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)
+                    .addStringTemplate("%addition%",
+                        abstractUnitTemplate(", ", support))));
             break;
         case OFFER_MERCENARIES:
             final List<AbstractUnit> mercenaries
@@ -777,7 +817,7 @@ public final class InGameController extends Controller {
                 }
             }.start();
             break;
-        default:
+        case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
             break;
         }
@@ -795,23 +835,31 @@ public final class InGameController extends Controller {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         ChangeSet cs = new ChangeSet();
+        MonarchActionMessage message
+            = new MonarchActionMessage(MonarchAction.RAISE_TAX,
+                StringTemplate.template("model.monarch.action.RAISE_TAX")
+                .addStringTemplate("%goods%", goods.getType().getLabel(true))
+                .addAmount("%amount%", tax));
+        message.setTax(tax);
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-               new MonarchActionMessage(tax, goodsType));
-
+            message);
         Element reply = askElement(serverPlayer, cs);
         cs = new ChangeSet();
         int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
-        if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
+        boolean accepted = (reply == null
+            || reply.getAttribute("accepted") == null) ? false
+            : Boolean.parseBoolean(reply.getAttribute("accepted"));
+        if (accepted) {
             serverPlayer.csSetTax(tax, cs);
         } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
             final int extraTax = 3;
             serverPlayer.csSetTax(tax + extraTax, cs);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.WARNING,
-                    "model.monarch.forceTaxRaise", serverPlayer)
-                .addName("%amount%", String.valueOf(tax + extraTax)));
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                new MonarchActionMessage(MonarchAction.FORCE_TAX,
+                    StringTemplate.template("model.monarch.action.FORCE_TAX")
+                    .addAmount("%amount%", tax + extraTax)));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
@@ -832,13 +880,13 @@ public final class InGameController extends Controller {
                 // TODO: remove this backward compatibility hack for
                 // the < 0.10.x format.
                 template = new Modifier("model.modifier.colonyGoodsParty",
-                                        Specification.COLONY_GOODS_PARTY_SOURCE,
-                                        50, Modifier.Type.PERCENTAGE);
+                    Specification.COLONY_GOODS_PARTY_SOURCE,
+                    50, Modifier.Type.PERCENTAGE);
                 template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
             }
             colony.getFeatureContainer()
                 .addModifier(Modifier.makeTimedModifier("model.goods.bells",
-                                                        template, turn));
+                        template, turn));
 
             // Have to update the colony to pick up the feature container.
             // Otherwise we could get away with just sending the goods
@@ -855,7 +903,7 @@ public final class InGameController extends Controller {
             }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 messageId, serverPlayer)
+                    messageId, serverPlayer)
                     .addName("%colony%", colony.getName())
                     .addName("%amount%", Integer.toString(amount))
                     .add("%goods%", goodsType.getNameKey()));
@@ -880,15 +928,26 @@ public final class InGameController extends Controller {
             price = serverPlayer.getGold();
         }
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-               new MonarchActionMessage(price, mercenaries));
+            new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
+                StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
+                .addAmount("%gold%", price)
+                .addStringTemplate("%mercenaries%",
+                    abstractUnitTemplate(", ", mercenaries))));
         Element reply = askElement(serverPlayer, cs);
         if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
             cs = new ChangeSet();
-            serverPlayer.createUnits(mercenaries);
-            cs.add(See.only(serverPlayer),
-                   serverPlayer.getEurope());
-            serverPlayer.modifyGold(-price);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            if (serverPlayer.checkGold(price)) {
+                serverPlayer.createUnits(mercenaries);
+                cs.add(See.only(serverPlayer),
+                    serverPlayer.getEurope());
+                serverPlayer.modifyGold(-price);
+                cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            } else {
+                serverPlayer.getMonarch().setDispleasure(true);
+                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                    new MonarchActionMessage(MonarchAction.DISPLEASURE,
+                        StringTemplate.template("model.monarch.action.DISPLEASURE")));
+            }
             sendElement(serverPlayer, cs);
         }
     }

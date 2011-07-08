@@ -116,6 +116,18 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
+     * Describe <code>getLabel</code> method here.
+     *
+     * @param spec A <code>Specification<code> to query.
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate getLabel(Specification spec) {
+        return StringTemplate.template("abstractUnit")
+            .addAmount("%number%", getNumber())
+            .add("%unit%", getUnitType(spec).getNameKey());
+    }
+
+    /**
      * Returns the Equipment necessary to create a Unit with the same
      * type and role as this AbstractUnit.
      *

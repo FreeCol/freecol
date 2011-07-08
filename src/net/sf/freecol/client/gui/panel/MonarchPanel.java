@@ -55,11 +55,20 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      *
      * @param parent The parent panel.
      * @param action The MonarchAction
-     * @param replace The StringTemplate to use
+     * @param template The StringTemplate to use
      */
-    public MonarchPanel(Canvas parent, MonarchAction action, StringTemplate replace) {
-
+    public MonarchPanel(Canvas parent, MonarchAction action,
+                        StringTemplate template) {
         super(parent);
+
+        String messageId = "model.monarch.action." + action.toString();
+        String yesId = messageId + ".yes";
+        String noId = messageId + ".no";
+
+        if (!Messages.containsKey(messageId)) {
+            logger.warning("Unrecognized monarch action: " + action);
+            return;
+        }
 
         setLayout(new MigLayout("wrap 2"));
 
@@ -69,60 +78,23 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
         Nation nation = getMyPlayer().getNation();
         add(new JLabel(getLibrary().getMonarchImageIcon(nation)));
+        add(getDefaultTextArea((template == null)
+                ? Messages.message(messageId)
+                : Messages.message(new StringTemplate(messageId, template))));
 
-        String messageID;
-        String okText = "ok";
-        String cancelText = null;
-        switch (action) {
-        case RAISE_TAX:
-            messageID = "model.monarch.raiseTax";
-            okText = "model.monarch.acceptTax";
-            cancelText = "model.monarch.rejectTax";
-            break;
-        case LOWER_TAX:
-            messageID = "model.monarch.lowerTax";
-            break;
-        case WAIVE_TAX:
-            messageID = "model.monarch.waiveTax";
-            break;
-        case ADD_TO_REF:
-            messageID = "model.monarch.addToREF";
-            break;
-        case DECLARE_WAR:
-            messageID = "model.monarch.declareWar";
-            break;
-        case SUPPORT_SEA:
-            messageID = "model.monarch.supportSea";
-            cancelText = "display";
-            break;
-        case SUPPORT_LAND:
-            messageID = "model.monarch.supportLand";
-            cancelText = "display";
-            break;
-        case OFFER_MERCENARIES:
-            messageID = "model.monarch.offerMercenaries";
-            okText = "model.monarch.acceptMercenaries";
-            cancelText = "model.monarch.rejectMercenaries";
-            break;
-        default:
-            messageID = "Unknown monarch action: " + action;
+        boolean haveOK = false;
+        if (Messages.containsKey(yesId)) {
+            okButton.setText(Messages.message(yesId));
+            haveOK = true;
         }
-
-        if (replace == null) {
-            add(getDefaultTextArea(Messages.message(messageID)));
-        } else {
-            add(getDefaultTextArea(Messages.message(new StringTemplate(messageID, replace))));
-        }
-
-        okButton.setText(Messages.message(okText));
-        if (cancelText == null) {
-            add(okButton, "newline 20, span, tag ok");
-        } else {
+        if (!Messages.containsKey(noId)) noId = "close";
+        cancelButton.setText(Messages.message(noId));
+        if (haveOK) {
             add(okButton, "newline 20, span, tag ok, split 2");
-            cancelButton.setText(Messages.message(cancelText));
             add(cancelButton, "tag cancel");
+        } else {
+            add(cancelButton, "newline 20, span, tag cancel");
         }
-
         setSize(getPreferredSize());
     }
 
@@ -143,5 +115,4 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             logger.warning("Invalid action command: " + command);
         }
     }
-
 }

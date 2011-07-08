@@ -71,6 +71,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** Whether a frigate has been provided. */
     private boolean supportSea = false;
 
+    /** Whether displeasure has been incurred. */
+    private boolean displeasure = false;
+
     // Internal variables that do not need serialization.
     /** The space required to transport all land units. */
     private int spaceRequired;
@@ -82,14 +85,14 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** Constants describing monarch actions. */
     public static enum MonarchAction {
         NO_ACTION,
-        RAISE_TAX,
+        RAISE_TAX, FORCE_TAX,
         LOWER_TAX,
         WAIVE_TAX,
         ADD_TO_REF,
         DECLARE_WAR,
         SUPPORT_LAND,
         SUPPORT_SEA,
-        OFFER_MERCENARIES
+        OFFER_MERCENARIES, DISPLEASURE,
     }
 
 
@@ -207,6 +210,24 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.supportSea = supportSea;
     }
 
+    /**
+     * Gets the displeasure status.
+     *
+     * @return Gets the displeasure status.
+     */
+    public boolean getDispleasure() {
+        return displeasure;
+    }
+
+    /**
+     * Sets the displeasure status.
+     *
+     * @param displeasure The new displeasure status.
+     */
+    public void setDispleasure(boolean displeasure) {
+        this.displeasure = displeasure;
+    }
+
 
     /**
      * Return the name key of this Monarch.
@@ -218,9 +239,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Returns a List of all REF units.
+     * Gets the REF units.
      *
-     * @return a List of all REF units.
+     * @return A list of all REF units.
      */
     public List<AbstractUnit> getREF() {
         List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
@@ -229,20 +250,20 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Returns only the naval units.
+     * Gets the REF naval units.
      *
-     * @return the naval units
+     * @return A list of the REF naval units.
      */
-    public List<AbstractUnit> getNavalUnits() {
+    public List<AbstractUnit> getREFNavalUnits() {
         return navalUnits;
     }
 
     /**
-     * Returns only the land units.
+     * Gets the REF land units.
      *
-     * @return the land units
+     * @return A list of the REF land units.
      */
-    public List<AbstractUnit> getLandUnits() {
+    public List<AbstractUnit> getREFLandUnits() {
         return landUnits;
     }
 
@@ -284,6 +305,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             return true;
         case RAISE_TAX:
             return player.getTax() < taxMaximum();
+        case FORCE_TAX:
+            return false;
         case LOWER_TAX:
             return player.getTax() > MINIMUM_TAX_RATE + 10;
         case WAIVE_TAX:
@@ -293,9 +316,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         case DECLARE_WAR:
             return !collectPotentialEnemies().isEmpty();
         case SUPPORT_SEA:
-            return player.getAttackedByPrivateers() && !getSupportSea();
+            return player.getAttackedByPrivateers() && !getSupportSea()
+                && !getDispleasure();
         case SUPPORT_LAND: case OFFER_MERCENARIES:
-            return player.isAtWar();
+            return player.isAtWar() && !getDispleasure();
+        case DISPLEASURE:
+            return false;
         default:
             throw new IllegalArgumentException("Bogus monarch action: "
                                                + action);
@@ -323,48 +349,49 @@ public final class Monarch extends FreeColGameObject implements Named {
             return choices;
         }
 
-        if (actionIsValid(MonarchAction.NO_ACTION)) {
+        MonarchAction a = MonarchAction.NO_ACTION;
+        if (actionIsValid(a)) {
             // The more time has passed, the less likely the monarch
             // will do nothing.
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.NO_ACTION,
-                                                        Math.max(200 - turn, 100)));
+            choices.add(new RandomChoice<MonarchAction>(a,
+                    Math.max(200 - turn, 100)));
         }
 
-        if (actionIsValid(MonarchAction.RAISE_TAX)) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.RAISE_TAX,
-                                                        10 + dx));
+        a = MonarchAction.RAISE_TAX;
+        if (actionIsValid(a)) {
+            choices.add(new RandomChoice<MonarchAction>(a, 10 + dx));
         }
 
-        if (actionIsValid(MonarchAction.LOWER_TAX)) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX,
-                                                        10 - dx));
+        a = MonarchAction.LOWER_TAX;
+        if (actionIsValid(a)) {
+            choices.add(new RandomChoice<MonarchAction>(a, 10 - dx));
         }
 
-        if (actionIsValid(MonarchAction.ADD_TO_REF)) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.ADD_TO_REF,
-                                                        10 + dx));
+        a = MonarchAction.ADD_TO_REF;
+        if (actionIsValid(a)) {
+            choices.add(new RandomChoice<MonarchAction>(a, 10 + dx));
         }
 
-        if (actionIsValid(MonarchAction.DECLARE_WAR)) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.DECLARE_WAR,
-                                                        5 + dx));
+        a = MonarchAction.DECLARE_WAR;
+        if (actionIsValid(a)) {
+            choices.add(new RandomChoice<MonarchAction>(a, 5 + dx));
         }
 
-        if (actionIsValid(MonarchAction.SUPPORT_LAND)) {
+        a = MonarchAction.SUPPORT_LAND;
+        if (actionIsValid(a)) {
             if (!player.checkGold(MINIMUM_PRICE)) {
                 if (dx < 3) {
-                    choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_LAND,
-                                                                3 - dx));
+                    choices.add(new RandomChoice<MonarchAction>(a, 3 - dx));
                 }
             } else {
-                choices.add(new RandomChoice<MonarchAction>(MonarchAction.OFFER_MERCENARIES,
-                                                            6 - dx));
+                a = MonarchAction.OFFER_MERCENARIES;
+                choices.add(new RandomChoice<MonarchAction>(a, 6 - dx));
             }
         }
 
-        if (actionIsValid(MonarchAction.SUPPORT_SEA)) {
-            choices.add(new RandomChoice<MonarchAction>(MonarchAction.SUPPORT_SEA,
-                                                        6 - dx));
+        a = MonarchAction.SUPPORT_SEA;
+        if (actionIsValid(a)) {
+            choices.add(new RandomChoice<MonarchAction>(a, 6 - dx));
         }
 
         return choices;
@@ -383,8 +410,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
-        adjust = Utils.randomInt(logger, "Tax rise", random, 5 + turn/adjust)
-            + 1;
+        adjust = 1 + Utils.randomInt(logger, "Tax rise", random,
+                                     5 + turn/adjust);
         return Math.min(oldTax + adjust, taxMaximum());
     }
 
@@ -399,7 +426,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             .getIntegerOption("model.option.taxAdjustment").getValue();
         int oldTax = player.getTax();
         int adjust = Math.max(1, 10 - taxAdjustment); // 5-10
-        adjust = Utils.randomInt(logger, "Tax reduction", random, adjust) + 1;
+        adjust = 1 + Utils.randomInt(logger, "Tax reduction", random, adjust);
         return Math.max(oldTax - adjust, Monarch.MINIMUM_TAX_RATE);
     }
 
@@ -420,14 +447,13 @@ public final class Monarch extends FreeColGameObject implements Named {
         // TODO: magic number 2.5 * Manowar-capacity = 15
         if (capacity < spaceRequired + 15) {
             AbstractUnit unit = Utils.getRandomMember(logger, "Choose naval",
-                                                      navalUnits, random);
+                navalUnits, random);
             result.add(new AbstractUnit(unit.getId(), unit.getRole(), 1));
         } else {
             AbstractUnit unit = Utils.getRandomMember(logger, "Choose land",
-                                                      landUnits, random);
+                    landUnits, random);
             result.add(new AbstractUnit(unit.getId(), unit.getRole(),
-                                        Utils.randomInt(logger, "Choose land#",
-                                                        random, 3) + 1));
+                    Utils.randomInt(logger, "Choose land#", random, 3) + 1));
         }
         return result;
     }
@@ -647,6 +673,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         out.writeAttribute("player", this.player.getId());
         out.writeAttribute("name", name);
         out.writeAttribute("supportSea", String.valueOf(supportSea));
+        out.writeAttribute("displeasure", String.valueOf(displeasure));
 
         out.writeStartElement("navalUnits");
         for (AbstractUnit unit : navalUnits) {
@@ -676,7 +703,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             player = new Player(getGame(), in.getAttributeValue(null, "player"));
         }
         name = getAttribute(in, "name", player.getNation().getRulerNameKey());
-        supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
+        supportSea = getAttribute(in, "supportSea", false);
+        displeasure = getAttribute(in, "displeasure", false);
 
         navalUnits.clear();
         landUnits.clear();

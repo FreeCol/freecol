@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Document;
@@ -42,17 +43,11 @@ public class MonarchActionMessage extends DOMMessage {
     // The monarch action.
     private MonarchAction action;
 
-    // The tax amount (optional).
-    private String amountString;
+    // A template describing the action.
+    private StringTemplate template;
 
-    // The id of the goods to use in a tea party.
-    private String goodsTypeId;
-
-    // The id of a player the monarch has declared war on.
-    private String enemyId;
-
-    // Units added.
-    private List<AbstractUnit> additions;
+    // The tax rate, if appropriate.
+    private String tax;
 
 
     /**
@@ -60,68 +55,10 @@ public class MonarchActionMessage extends DOMMessage {
      *
      * @param action The <code>MonarchAction</code> to do.
      */
-    public MonarchActionMessage(MonarchAction action) {
+    public MonarchActionMessage(MonarchAction action, StringTemplate template) {
         this.action = action;
-        this.amountString = null;
-        this.goodsTypeId = null;
-        this.enemyId = null;
-        this.additions = new ArrayList<AbstractUnit>();
-    }
-
-    /**
-     * Create a new <code>MonarchActionMessage</code> for a RAISE_TAX action.
-     *
-     * @param tax The new tax rate.
-     * @param goodsType The <code>GoodsType</code> to use in a tea party.
-     */
-    public MonarchActionMessage(int tax, GoodsType goodsType) {
-        this(MonarchAction.RAISE_TAX);
-        this.amountString = Integer.toString(tax);
-        this.goodsTypeId = goodsType.getId();
-    }
-
-    /**
-     * Create a new <code>MonarchActionMessage</code> for a LOWER_TAX action.
-     *
-     * @param tax The new tax rate.
-     */
-    public MonarchActionMessage(int tax) {
-        this(MonarchAction.LOWER_TAX);
-        this.amountString = Integer.toString(tax);
-    }
-
-    /**
-     * Create a new <code>MonarchActionMessage</code> for a DECLARE_WAR action.
-     *
-     * @param enemy The new enemy.
-     */
-    public MonarchActionMessage(Player enemy) {
-        this(MonarchAction.DECLARE_WAR);
-        this.enemyId = enemy.getId();
-    }
-
-    /**
-     * Create a new <code>MonarchActionMessage</code> for a the actions that
-     * may add units.
-     *
-     * @param additions The extra units.
-     */
-    public MonarchActionMessage(MonarchAction action,
-                                List<AbstractUnit> additions) {
-        this(action);
-        this.additions = additions;
-    }
-
-    /**
-     * Create a new <code>MonarchActionMessage</code> for an OFFER_MERCENARIES
-     * action.
-     *
-     * @param price The price to pay for the mercenaries.
-     * @param additions The extra units.
-     */
-    public MonarchActionMessage(int price, List<AbstractUnit> additions) {
-        this(MonarchAction.OFFER_MERCENARIES, additions);
-        this.amountString = Integer.toString(price);
+        this.template = template;
+        this.tax = null;
     }
 
     /**
@@ -134,16 +71,13 @@ public class MonarchActionMessage extends DOMMessage {
     public MonarchActionMessage(Game game, Element element) {
         this.action = Enum.valueOf(MonarchAction.class,
                                    element.getAttribute("action"));
-        this.amountString = element.getAttribute("amount");
-        this.goodsTypeId = element.getAttribute("goods");
-        this.enemyId = element.getAttribute("enemy");
-        this.additions = new ArrayList<AbstractUnit>();
         NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            AbstractUnit au = new AbstractUnit();
-            au.readFromXMLElement((Element) children.item(i));
-            additions.add(au);
+        if (children.getLength() != 1) {
+            throw new IllegalArgumentException("Child template expected");
         }
+        this.template = StringTemplate.label(" ");
+        this.template.readFromXMLElement((Element) children.item(0));
+        this.tax = element.getAttribute("tax");
     }
 
     /**
@@ -156,51 +90,34 @@ public class MonarchActionMessage extends DOMMessage {
     }
 
     /**
-     * Gets the tax/price for this message.
+     * Gets the template of this message.
      *
-     * @return The amount, or negative on error.
+     * @return The template.
      */
-    public int getAmount() {
-        int amount;
+    public StringTemplate getTemplate() {
+        return template;
+    }
+
+    /**
+     * Gets the tax amount attached to this message.
+     *
+     * @return The tax amount, or negative if none present.
+     */
+    public int getTax() {
         try {
-            amount = Integer.parseInt(amountString);
-        } catch (NumberFormatException e) {
-            amount = -1;
+            return Integer.parseInt(tax);
+        } catch (Exception e) {
+            return -1;
         }
-        return amount;
     }
 
     /**
-     * Gets the tea party goods type.
+     * Sets the tax amount attached to this message.
      *
-     * @param game The <code>Game</code> to find the goods type in.
-     * @return The tea party goods type.
+     * @param tax The tax amount.
      */
-    public GoodsType getGoodsType(Game game) {
-        return (goodsTypeId == null) ? null
-            : game.getSpecification().getGoodsType(goodsTypeId);
-    }
-
-    /**
-     * Gets the new enemy.
-     *
-     * @param game The <code>Game</code> to find the enemy in.
-     * @return The new enemy.
-     */
-    public Player getEnemy(Game game) {
-        return (enemyId == null) ? null
-            : (game.getFreeColGameObject(enemyId) instanceof Player)
-            ? (Player) game.getFreeColGameObject(enemyId)
-            : null;
-    }
-
-    /**
-     * Gets the additional units added.
-     *
-     * @return The additional units.
-     */
-    public List<AbstractUnit> getAdditions() {
-        return additions;
+    public void setTax(int tax) {
+        this.tax = Integer.toString(tax);
     }
 
     /**
@@ -228,12 +145,8 @@ public class MonarchActionMessage extends DOMMessage {
         Element result = createNewRootElement(getXMLElementTagName());
         Document doc = result.getOwnerDocument();
         result.setAttribute("action", action.toString());
-        if (amountString != null) result.setAttribute("amount", amountString);
-        if (goodsTypeId != null) result.setAttribute("goods", goodsTypeId);
-        if (enemyId != null) result.setAttribute("enemy", enemyId);
-        for (AbstractUnit au : additions) {
-            result.appendChild(au.toXMLElement(null, doc));
-        }
+        if (tax != null) result.setAttribute("tax", tax);
+        result.appendChild(template.toXMLElement(null, doc));
         return result;
     }
 
