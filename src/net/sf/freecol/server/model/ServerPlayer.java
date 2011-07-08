@@ -1255,6 +1255,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         Unit brave = settlement.getUnitList().get(0);
                         brave.clearEquipment();
                         brave.setOwner(other);
+                        brave.setNationality(other.getNationID());
                         brave.setType(Utils.getRandomMember(logger,
                                 "Choose brave", converts, random));
                         brave.setLocation(colony.getTile());
@@ -2241,6 +2242,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%unit%", convert.getLabel()));
 
         convert.setOwner(attacker.getOwner());
+        // do not change nationality: convert was forcibly captured and wants to run away
         convert.setType(type);
         convert.setLocation(attacker.getTile());
     }

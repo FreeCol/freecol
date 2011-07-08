@@ -128,7 +128,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
         unitType = (newType == null) ? type : newType;
         this.owner = owner;
-        owner.getNationID();
+        if(!hasAbility(Ability.NAVAL_UNIT) && !hasAbility("model.ability.bombard") && !hasAbility(Ability.CARRY_TREASURE)) {
+            // 0.10.0 and earlier games have no model.ability.person, so instead we check if the unit is not a ship, artillery or wagon
+            nationality = owner.getNationID();
+            ethnicity = nationality;    // TODO: units born in colonies should inherit the ethnicity of the people in that colony (which may not be owner.nationID)
+        }
         setLocation(location);
 
         workLeft = -1;

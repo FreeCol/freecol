@@ -598,6 +598,7 @@
   <unit-types>
     <!-- ATTENTION: skillTaught can NOT be inherited because it defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true" offence="0" defence="1" movement="3" lineOfSight="1">
+      <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -794,6 +795,7 @@
     <unit-type id="model.unit.indianConvert" offence="0"  defence="1"
                movement="3" lineOfSight="1" maximumAttrition="10"
                scoreValue="3" skill="0">
+      <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.convert" value="true"/>
       <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
@@ -816,6 +818,7 @@
       <consumes id="model.goods.bells" value="1" />
     </unit-type>
     <unit-type id="model.unit.brave" offence="1" defence="1" movement="3" lineOfSight="1" space="1">
+      <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.bornInIndianSettlement" value="true"/>
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>

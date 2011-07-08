@@ -211,6 +211,10 @@ public class Unit extends FreeColGameObject
 
     protected Player owner;
 
+    protected String nationality = null;
+
+    protected String ethnicity = null;
+
     protected List<Unit> units = Collections.emptyList();
 
     protected GoodsContainer goodsContainer;
@@ -2269,6 +2273,54 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Gets the nationality of this Unit.
+     * Nationality represents a Unit's personal allegiance to a nation.
+     * This may conflict with who currently issues orders to the Unit (the owner).
+     *
+     * @return The nationality of this Unit.
+     */
+    public String getNationality() {
+        return nationality;
+    }
+
+    /**
+     * Sets the nationality of this Unit.
+     * A unit will change nationality when it switchers owners willingly.
+     * Currently only Converts do this, but it opens the possibility of naturalisation.
+     *
+     * @param owner The new nationality of this Unit.
+     */
+    public void setNationality(String newNationality) {
+        // 0.10.0 and earlier games have no model.ability.person, so instead we check if the unit is not a ship, artillery or wagon
+        if(!hasAbility(Ability.NAVAL_UNIT) && !hasAbility("model.ability.bombard") && !hasAbility(Ability.CARRY_TREASURE)) {
+            nationality = newNationality;
+        } else {
+            throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
+        }
+    }
+
+    /**
+     * Gets the ethnicity of this Unit.
+     * Ethnicity is inherited from the inhabitants of the place where the Unit was born.
+     * Potentially allows former converts to become native-looking master workers.
+     *
+     * @return The ethnicity of this Unit.
+     */
+    public String getEthnicity() {
+        return ethnicity;
+    }
+
+    /**
+     * Sets the ethnicity of this Unit.
+     * Ethnicity is something units are born with. It cannot be changed later
+     *
+     * @param owner The new ethnicity of this Unit.
+     */
+    public void setEthnicity(String newEthnicity) {
+        throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
+    }
+
+    /**
      * Sets the type of the unit.
      *
      * @param newUnitType The new type of the unit.
@@ -3239,6 +3291,19 @@ public class Unit extends FreeColGameObject
         Player who = (full || !hasAbility(Ability.PIRACY)) ? owner
             : getGame().getUnknownEnemy();
         out.writeAttribute("owner", who.getId());
+        if (nationality != null) {
+            out.writeAttribute("nationality", nationality);
+        } else if(!hasAbility(Ability.NAVAL_UNIT) && !hasAbility("model.ability.bombard") && !hasAbility(Ability.CARRY_TREASURE)) {
+            // 0.10.0 and earlier games have no model.ability.person, so instead we check if the unit is not a ship, artillery or wagon
+            out.writeAttribute("nationality", owner.getNationID());
+        }
+        if (ethnicity != null) {
+            out.writeAttribute("ethnicity", ethnicity);
+        } else if(!hasAbility("model.ability.convert") && !hasAbility(Ability.NAVAL_UNIT) && !hasAbility("model.ability.bombard") && !hasAbility(Ability.CARRY_TREASURE)) {
+            // do not compute the etnicity of a convert, that information is unretrievable
+            // 0.10.0 and earlier games have no model.ability.person, so instead we check if the unit is not a ship, artillery or wagon
+            out.writeAttribute("ethnicity", owner.getNationID());
+        }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         if (workType != null) out.writeAttribute("workType", workType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
@@ -3327,6 +3392,9 @@ public class Unit extends FreeColGameObject
         String ownerId = in.getAttributeValue(null, "owner");
         owner = (Player) getGame().getFreeColGameObject(ownerId);
         if (owner == null) owner = new Player(getGame(), ownerId);
+
+        nationality = in.getAttributeValue(null, "nationality");
+        ethnicity = in.getAttributeValue(null, "ethnicity");
 
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
