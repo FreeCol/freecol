@@ -3,7 +3,7 @@
 	   elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-      
+
       Copyright (C) 2002-2011  The FreeCol Team
 
       This file is part of FreeCol.
@@ -54,7 +54,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  
+
 
   <xs:element name="missionary">
     <xs:annotation>
@@ -97,8 +97,10 @@
     <xs:attribute name="treasureAmount" type="xs:int" use="required"/>
     <xs:attribute name="hitpoints" type="xs:int" use="required"/>
     <xs:attribute name="attrition" type="xs:int" use="required"/>
-    <xs:attribute name="student" type="xs:string" use="optional"/>
-    <xs:attribute name="teacher" type="xs:string" use="optional"/>
+    <xs:attribute name="student" type="UnitId" use="optional"/>
+    <xs:attribute name="teacher" type="UnitId" use="optional"/>
+    <xs:attribute name="nationality" type="NationId" use="optional"/>
+    <xs:attribute name="ethnicity" type="NationId" use="optional"/>
 
     <xs:attribute name="indianSettlement" type="xs:string"
 		  use="optional"/>
