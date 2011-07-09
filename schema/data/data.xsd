@@ -3,7 +3,7 @@
 	   elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-      
+
       Copyright (C) 2002-2011  The FreeCol Team
 
       This file is part of FreeCol.
@@ -42,6 +42,8 @@
   <xs:include schemaLocation="data-playerExploredTile.xsd" />
   <xs:include schemaLocation="data-region.xsd" />
   <xs:include schemaLocation="data-resource.xsd" />
+  <xs:include schemaLocation="data-savedGame.xsd" />
+  <xs:include schemaLocation="data-specification.xsd" />
   <xs:include schemaLocation="data-template.xsd" />
   <xs:include schemaLocation="data-tile.xsd" />
   <xs:include schemaLocation="data-tileimprovement.xsd" />
