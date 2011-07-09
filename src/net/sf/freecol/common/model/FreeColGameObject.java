@@ -262,17 +262,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Checks if this object has the specified ID.
-     *
-     * @param id The ID to check against.
-     * @return <i>true</i> if the specified ID match the ID of this object and
-     *         <i>false</i> otherwise.
-     */
-    public boolean hasID(String id) {
-        return getId().equals(id);
-    }
-
-    /**
      * Checks if the given <code>FreeColGameObject</code> equals this object.
      *
      * @param o The <code>FreeColGameObject</code> to compare against this object.
@@ -384,20 +373,6 @@ abstract public class FreeColGameObject extends FreeColObject {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
         toXMLImpl(out, player, showAll, toSavedGame);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream for the purpose of storing this object
-     * as a part of a saved game.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
-     */
-    public void toSavedXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, null, true, true);
     }
 
     /**

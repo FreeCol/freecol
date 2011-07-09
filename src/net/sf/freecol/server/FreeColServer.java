@@ -623,7 +623,7 @@ public final class FreeColServer {
             }
             xsw.writeEndElement();
             // Add the game:
-            game.toSavedXML(xsw);
+            game.toXML(xsw, null, true, true);
             // Add the AIObjects:
             if (aiMain != null) {
                 aiMain.toXML(xsw);
