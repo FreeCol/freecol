@@ -610,11 +610,16 @@ public abstract class FreeColObject {
      */
     public int getAttribute(XMLStreamReader in, String attributeName, int defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
+        int result = defaultValue;
         if (attributeString != null) {
-            return Integer.parseInt(attributeString);
-        } else {
-            return defaultValue;
+            try {
+                result = Integer.parseInt(attributeString);
+            } catch(NumberFormatException e) {
+                logger.warning("Attribute '" + attributeName + "' should be an integer, not '"
+                               + attributeString + "'.");
+            }
         }
+        return result;
     }
 
     /**
@@ -627,11 +632,16 @@ public abstract class FreeColObject {
      */
     public float getAttribute(XMLStreamReader in, String attributeName, float defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
+        float result = defaultValue;
         if (attributeString != null) {
-            return Float.parseFloat(attributeString);
-        } else {
-            return defaultValue;
+            try {
+                result = Float.parseFloat(attributeString);
+            } catch(NumberFormatException e) {
+                logger.warning("Attribute '" + attributeName + "' should be a float, not '"
+                               + attributeString + "'.");
+            }
         }
+        return result;
     }
 
     /**
