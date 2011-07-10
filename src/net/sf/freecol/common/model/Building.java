@@ -21,12 +21,10 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -37,25 +35,15 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public class Building extends FreeColGameObject
-    implements WorkLocation, Ownable, Named, Comparable<Building>, Consumer {
+public class Building extends WorkLocation implements Named, Comparable<Building>, Consumer {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Building.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
-    /** The colony containing this building. */
-    protected Colony colony;
-
     /** The type of building. */
     protected BuildingType buildingType;
-
-    /**
-     * List of the units which have this <code>Building</code> as it's
-     * {@link Unit#getLocation() location}.
-     */
-    private final List<Unit> units = new ArrayList<Unit>();
 
 
     /**
@@ -113,35 +101,8 @@ public class Building extends FreeColGameObject
     }
 
     /**
-     * Gets the owner of this <code>Ownable</code>.
-     *
-     * @return The <code>Player</code> controlling this {@link Ownable}.
+     * {@inheritDoc}
      */
-    public Player getOwner() {
-        return colony.getOwner();
-    }
-
-    /**
-     * Sets the owner of this <code>Ownable</code>.
-     *
-     * @param p The <code>Player</code> that should take ownership of this
-     *            {@link Ownable}.
-     * @exception UnsupportedOperationException is always thrown by this method.
-     */
-    public void setOwner(final Player p) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Gets the <code>Tile</code> where this <code>Building</code> is
-     * located.
-     *
-     * @return The <code>Tile</code>.
-     */
-    public Tile getTile() {
-        return colony.getTile();
-    }
-
     public String getNameKey() {
         return buildingType.getNameKey();
     }
@@ -163,16 +124,6 @@ public class Building extends FreeColGameObject
     public StringTemplate getLocationName() {
         return StringTemplate.template("inLocation")
             .add("%location%", getNameKey());
-    }
-
-    /**
-     * Returns the name of this location for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return The name of this location.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return getLocationName();
     }
 
     /**
@@ -200,24 +151,6 @@ public class Building extends FreeColGameObject
         return getColony().canBuild(buildingType.getUpgradesTo());
     }
 
-
-    /**
-     * Gets a pointer to the settlement containing this building.
-     *
-     * @return This colony.
-     */
-    public Settlement getSettlement() {
-        return colony;
-    }
-
-    /**
-     * Gets a pointer to the colony containing this building.
-     *
-     * @return The <code>Colony</code>.
-     */
-    public Colony getColony() {
-        return colony;
-    }
 
     /**
      * Gets the type of this building.
@@ -253,7 +186,7 @@ public class Building extends FreeColGameObject
      */
     public boolean canBeDamaged() {
         return !buildingType.isAutomaticBuild()
-            && !colony.isAutomaticBuild(buildingType);
+            && !getColony().isAutomaticBuild(buildingType);
     }
 
     /**
@@ -294,16 +227,16 @@ public class Building extends FreeColGameObject
      */
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
-        colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
+        getColony().getFeatureContainer().remove(buildingType.getFeatureContainer());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
 
             // add new features and abilities from new type
-            colony.getFeatureContainer().add(buildingType.getFeatureContainer());
+            getColony().getFeatureContainer().add(buildingType.getFeatureContainer());
 
             // Colonists which can't work here must be put outside
-            for (Unit unit : units) {
+            for (Unit unit : getUnitList()) {
                 if (!canAdd(unit.getType())) {
                     unit.putOutsideColony();
                 }
@@ -311,29 +244,21 @@ public class Building extends FreeColGameObject
         }
 
         // Colonists exceding units limit must be put outside
-        if (units.size() > getMaxUnits()) {
-            for (Unit unit : new ArrayList<Unit>(units.subList(getMaxUnits(), units.size()))) {
+        if (getUnitCount() > getUnitCapacity()) {
+            for (Unit unit : new ArrayList<Unit>(getUnitList().subList(getUnitCapacity(), getUnitCount()))) {
                 unit.putOutsideColony();
             }
         }
     }
 
     /**
-     * Gets the maximum number of units allowed in this <code>Building</code>.
+     * Returns the maximum number of <code>Units</code> this
+     * <code>Building</code> can hold.
      *
-     * @return The number.
+     * @return an <code>int</code> value
      */
-    public int getMaxUnits() {
+    public int getUnitCapacity() {
         return buildingType.getWorkPlaces();
-    }
-
-    /**
-     * Gets the amount of units at this <code>WorkLocation</code>.
-     *
-     * @return The amount of units at this {@link WorkLocation}.
-     */
-    public int getUnitCount() {
-        return units.size();
     }
 
     /**
@@ -358,7 +283,7 @@ public class Building extends FreeColGameObject
             return true;
         }
 
-        if (getUnitCount() >= getMaxUnits()) {
+        if (getUnitCount() >= getUnitCapacity()) {
             return false;
         }
 
@@ -391,10 +316,10 @@ public class Building extends FreeColGameObject
             throw new IllegalStateException("Can not add " + locatable
                                             + " to " + toString());
         }
-        if (units.contains(locatable)) return;
+        if (getUnitList().contains(locatable)) return;
 
         final Unit unit = (Unit) locatable;
-        units.add(unit);
+        getUnitList().add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setWorkType(getGoodsOutputType());
         getColony().invalidateCache();
@@ -428,7 +353,7 @@ public class Building extends FreeColGameObject
         }
 
         final Unit unit = (Unit) locatable;
-        if (units.remove(unit)) {
+        if (getUnitList().remove(unit)) {
             unit.setMovesLeft(0);
             unit.setState(Unit.UnitState.ACTIVE);
             getColony().invalidateCache();
@@ -447,54 +372,6 @@ public class Building extends FreeColGameObject
                 }
             }
         }
-    }
-
-    /**
-     * Checks if this <code>Building</code> contains the specified
-     * <code>Locatable</code>.
-     *
-     * @param locatable The <code>Locatable</code> to test the presence of.
-     * @return
-     *            <ul>
-     *            <li><code>true</code>if the specified
-     *            <code>Locatable</code> is in this <code>Building</code>
-     *            and</li>
-     *            <li><code>false</code> otherwise.</li>
-     *            </ul>
-     */
-    public boolean contains(final Locatable locatable) {
-        return units.contains(locatable);
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Building</code>.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return units.iterator();
-    }
-
-    /**
-     * Returns a new <code>List</code> containing all the Units
-     * present in the Building.
-     *
-     * @return a new <code>List</code> containing all the Units
-     * present in the Building.
-     */
-    public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
-    }
-
-    /**
-     * Returns this <code>Building</code>'s
-     * <code>GoodsContainer</code>, which is always <code>null</code>.
-     *
-     * @return <code>null</code>.
-     */
-    public GoodsContainer getGoodsContainer() {
-        return null;
     }
 
     /**
@@ -526,7 +403,7 @@ public class Building extends FreeColGameObject
      * @return a <code>ProductionInfo</code> object
      */
     public ProductionInfo getProductionInfo() {
-        return colony.getProductionInfo(this);
+        return getColony().getProductionInfo(this);
     }
 
     /**
@@ -545,7 +422,7 @@ public class Building extends FreeColGameObject
             throw new IllegalArgumentException("Wrong output type: " + output.getType()
                                                + " should have been: " + outputType);
         }
-        int capacity = colony.getWarehouseCapacity();
+        int capacity = getColony().getWarehouseCapacity();
         if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)
             && output.getAmount() >= capacity) {
             // warehouse is already full: produce nothing
@@ -571,7 +448,7 @@ public class Building extends FreeColGameObject
         if (outputType != null) {
             int maximumInput = 0;
             if (inputType != null && canAutoProduce()) {
-                int available = colony.getGoodsCount(outputType);
+                int available = getColony().getGoodsCount(outputType);
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
                     int divisor = (int) getType().getFeatureContainer()
@@ -596,7 +473,7 @@ public class Building extends FreeColGameObject
                 && buildingType.hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 int minimumGoodsInput = 0;
-                for (Unit unit: units) {
+                for (Unit unit: getUnitList()) {
                     if (unit.getType() == getExpertUnitType()) {
                         // TODO: put magic number in specification
                         minimumGoodsInput += 4;
@@ -686,7 +563,7 @@ public class Building extends FreeColGameObject
      * decrease in the production of input goods into account that
      * might be caused by moving a unit to this Building from another
      * WorkLocation. To do this right, it would be necessary to
-     * re-calculate the production for the whole colony.
+     * re-calculate the production for the whole getColony().
      *
      * @return The production of this building the next turn.
      */
@@ -734,7 +611,7 @@ public class Building extends FreeColGameObject
         }
 
         int productivity = 0;
-        for (Unit unit : units) {
+        for (Unit unit : getUnitList()) {
             productivity += getUnitProductivity(unit);
         }
         for (Unit unit : additionalUnits) {
@@ -758,7 +635,7 @@ public class Building extends FreeColGameObject
 
         int productivity = buildingType.getBasicProduction();
         if (productivity > 0) {
-            productivity += colony.getProductionBonus();
+            productivity += getColony().getProductionBonus();
             return (int) prodUnit.getType().getFeatureContainer()
                 .applyModifier(Math.max(1, productivity),
                                getGoodsOutputType().getId());
@@ -782,7 +659,7 @@ public class Building extends FreeColGameObject
         List<Modifier> modifiers = new ArrayList<Modifier>();
         GoodsType goodsOutputType = getGoodsOutputType();
         if (goodsOutputType != null) {
-            modifiers.addAll(colony.getFeatureContainer().
+            modifiers.addAll(getColony().getFeatureContainer().
                              getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
             Collections.sort(modifiers);
         }
@@ -805,8 +682,8 @@ public class Building extends FreeColGameObject
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (!units.isEmpty()) {
-            objects.addAll(units.remove(0).disposeList());
+        while (!getUnitList().isEmpty()) {
+            objects.addAll(getUnitList().remove(0).disposeList());
         }
         objects.addAll(super.disposeList());
         return objects;
@@ -898,15 +775,11 @@ public class Building extends FreeColGameObject
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("colony", colony.getId());
+        super.writeAttributes(out);
         out.writeAttribute("buildingType", buildingType.getId());
 
         // Add child elements:
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            unitIterator.next().toXML(out, player, showAll, toSavedGame);
-        }
+        super.writeChildren(out);
 
         // End element:
         out.writeEndElement();
@@ -919,19 +792,12 @@ public class Building extends FreeColGameObject
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        colony = getFreeColGameObject(in, "colony", Colony.class);
         buildingType = getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
 
-        units.clear();
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            Unit unit = updateFreeColGameObject(in, Unit.class);
-            if (!units.contains(unit)) units.add(unit);
-        }
+        super.readChildren(in);
     }
 
     /**
@@ -966,7 +832,7 @@ public class Building extends FreeColGameObject
      */
     @Override
     public String toString() {
-        return getType().getId() + " [" + colony.getName() + "]";
+        return getType().getId() + " [" + getColony().getName() + "]";
     }
 
     /**

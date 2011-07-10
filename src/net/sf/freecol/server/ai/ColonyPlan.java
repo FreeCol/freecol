@@ -795,7 +795,7 @@ public class ColonyPlan {
                 && buildingReq != null
                 && buildingReqProducer != null
                 && buildingReqProducer.getProduction() * builders <= getProductionOf(buildingRawMat)
-                && buildingReqProducer.getMaxUnits() < builders) {
+                && buildingReqProducer.getUnitCapacity() < builders) {
                 WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), buildingReqProducer, buildingReq);
                 workLocationPlans.add(wlp);
                 colonistAdded = true;
@@ -1026,7 +1026,7 @@ public class ColonyPlan {
                 return;
             }
 
-            if(factory.getUnitCount() == factory.getMaxUnits()){
+            if(factory.getUnitCount() == factory.getUnitCapacity()){
                 return;
             }
             Unit u = iter.next();

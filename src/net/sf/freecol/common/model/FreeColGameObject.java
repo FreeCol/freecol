@@ -323,8 +323,13 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     public <T extends FreeColGameObject> T updateFreeColGameObject(XMLStreamReader in, Class<T> returnClass) {
-        final String idString = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if (idString == null) return null;
+        String idString = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if (idString == null) {
+            idString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        }
+        if (idString == null) {
+            return null;
+        }
         FreeColGameObject fcgo = getGame().getFreeColGameObject(idString);
         T returnValue = (fcgo == null) ? null : returnClass.cast(fcgo);
         try {

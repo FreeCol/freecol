@@ -58,11 +58,10 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      */
     public ServerColonyTile(Game game, Colony colony, Tile workTile) {
         super(game);
-
-        this.colony = colony;
+        setColony(colony);
         this.workTile = workTile;
-        colonyCenterTile = colony.getTile() == workTile;
-        unit = null;
+        colonyCenterTile = (getTile() == workTile);
+        getUnitList().clear();
     }
 
 

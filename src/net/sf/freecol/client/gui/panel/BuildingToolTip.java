@@ -55,7 +55,7 @@ public class BuildingToolTip extends JToolTip {
      */
     public BuildingToolTip(Building building, Canvas parent) {
 
-        int workplaces = building.getMaxUnits();
+        int workplaces = building.getUnitCapacity();
 
         String columns = "[align center]";
         for (int index = 0; index < workplaces; index++) {
@@ -115,7 +115,7 @@ public class BuildingToolTip extends JToolTip {
             }
         }
 
-        int diff = building.getMaxUnits() - building.getUnitList().size();
+        int diff = building.getUnitCapacity() - building.getUnitList().size();
         for (int index = 0; index < diff; index++) {
             add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
         }

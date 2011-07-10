@@ -460,7 +460,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     }
                 } else if (location instanceof Building) {
                     Building building = (Building) location;
-                    if (building.getUnitCount() < building.getMaxUnits()) {
+                    if (building.getUnitCount() < building.getUnitCapacity()) {
                         bestType = building.getExpertUnitType();
                         break;
                     }
@@ -1213,7 +1213,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || (workLocation instanceof ColonyTile && goodsType == null)
             || (workLocation instanceof Building
                 && ((Building) workLocation).getUnitCount()
-                >= ((Building) workLocation).getMaxUnits())) {
+                >= ((Building) workLocation).getUnitCapacity())) {
             return null;
         } else {
             Tile tile = null;

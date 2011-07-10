@@ -58,8 +58,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
      */
     public ServerBuilding(Game game, Colony colony, BuildingType type) {
         super(game);
-
-        this.colony = colony;
+        setColony(colony);
         this.buildingType = type;
     }
 
@@ -131,10 +130,10 @@ public class ServerBuilding extends Building implements ServerModelObject {
                         cs.addMessage(See.only(owner),
                                       new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                                        "model.unit.unitEducated",
-                                                       colony, this)
+                                                       getColony(), this)
                                       .addStringTemplate("%oldName%", oldName)
                                       .addStringTemplate("%unit%", newName)
-                                      .addName("%colony%", colony.getName()));
+                                      .addName("%colony%", getColony().getName()));
                     }
                     student.setTurnsOfTraining(0);
                     student.setMovesLeft(0);

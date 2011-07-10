@@ -19,11 +19,83 @@
 
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Element;
 
 /**
- * This interface marks the locations where a <code>Unit</code> can work.
+ * The <code>WorkLocation</code> is a place in a {@link Colony} where
+ * <code>Units</code> can work. The unit capacity of a WorkLocation is
+ * likely to be limited. ColonyTiles can only hold a single worker,
+ * and Buildings can hold no more than three workers, for example.
+ * WorkLocations do not store any Goods. They take any Goods they
+ * consume from the Colony, and put all Goods they produce there,
+ * too. Although the WorkLocation implements {@link Ownable}, its
+ * owner can not be changed directly, as it is always owned by the
+ * owner of the Colony.
  */
-public interface WorkLocation extends Location {
+public abstract class WorkLocation extends UnitLocation implements Ownable {
+
+    /**
+     * Describe colony here.
+     */
+    private Colony colony;
+
+
+    /**
+     * Constructor for ServerWorkLocation.
+     */
+    protected WorkLocation() {
+        // empty constructor
+    }
+
+    /**
+     * Constructor for ServerWorkLocation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     */
+    protected WorkLocation(Game game) {
+        super(game);
+    }
+
+    /**
+     * Initiates a new <code>WorkLocation</code> from an XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
+     */
+    public WorkLocation(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+    }
+
+    /**
+     * Initiates a new <code>WorkLocation</code> from an XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize this object.
+     */
+    public WorkLocation(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Initiates a new <code>WorkLocation</code> with the given ID. The object
+     * should later be initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public WorkLocation(Game game, String id) {
+        super(game, id);
+    }
+
 
     /**
      * Returns the production of the given type of goods.
@@ -31,7 +103,7 @@ public interface WorkLocation extends Location {
      * @param goodsType The type of goods to get the production of.
      * @return The production of the given type of goods.
      */
-    public int getProductionOf(GoodsType goodsType);
+    public abstract int getProductionOf(GoodsType goodsType);
 
     /**
      * Returns the <code>Colony</code> this <code>WorkLocation</code> is
@@ -45,5 +117,72 @@ public interface WorkLocation extends Location {
      *
      * @see Location#getColony
      */
-    public Colony getColony();
+    public final Colony getColony() {
+        return colony;
+    }
+
+    /**
+     * Set the <code>Colony</code> value.
+     *
+     * @param newColony The new Colony value.
+     */
+    public final void setColony(final Colony newColony) {
+        this.colony = newColony;
+    }
+
+    /**
+     * Gets the <code>Tile</code> where this <code>Building</code> is
+     * located.
+     *
+     * @return The <code>Tile</code>.
+     */
+    public Tile getTile() {
+        return colony.getTile();
+    }
+
+    /**
+     * Returns the settlement containing this building.
+     *
+     * @return This colony.
+     */
+    public Settlement getSettlement() {
+        return colony;
+    }
+
+    /**
+     * Gets the owner of this <code>Ownable</code>.
+     *
+     * @return The <code>Player</code> controlling this
+     *         {@link Ownable}.
+     */
+    public Player getOwner() {
+        return colony.getOwner();
+    }
+
+    /**
+     * Sets the owner of this <code>Ownable</code>. Do not call this
+     * method, ever. Since the owner of this WorkLocation is the owner
+     * of the Colony, you must set the owner of the Colony instead.
+     *
+     * @param p The <code>Player</code> that should take ownership
+     *      of this {@link Ownable}.
+     * @exception UnsupportedOperationException is always thrown by
+     *      this method.
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+        colony = getFreeColGameObject(in, "colony", Colony.class);
+    }
+
+
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("colony", colony.getId());
+    }
+
 }

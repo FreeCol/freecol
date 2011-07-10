@@ -46,22 +46,20 @@ import org.w3c.dom.Element;
  * produces two different of goods, one food type and one new world
  * raw material.
  */
-public class ColonyTile extends FreeColGameObject
-    implements WorkLocation, Ownable {
+public class ColonyTile extends WorkLocation implements Ownable {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
-    /** The colony this colony tile belongs to. */
-    protected Colony colony;
+    /**
+     * The maximum number of units a ColonyTile can hold.
+     */
+    public static final int UNIT_CAPACITY = 1;
 
     /** The tile to work. */
     protected Tile workTile;
-
-    /** The unit working the tile. */
-    protected Unit unit;
 
     /** Is this colony tile at the center of the colony. */
     protected boolean colonyCenterTile;
@@ -79,12 +77,12 @@ public class ColonyTile extends FreeColGameObject
      *
      * @param game The <code>Game</code> this object belongs to.
      */
-    public ColonyTile(Game game) {
+    protected ColonyTile(Game game) {
         super(game);
     }
 
     /**
-     * Initiates a new <code>Building</code> from an
+     * Initiates a new <code>ColonyTile</code> from an
      * XML representation.
      *
      * @param game The <code>Game</code> this object belongs to.
@@ -98,7 +96,7 @@ public class ColonyTile extends FreeColGameObject
     }
 
     /**
-     * Initiates a new <code>Building</code> from an
+     * Initiates a new <code>ColonyTile</code> from an
      * XML representation.
      *
      * @param game The <code>Game</code> this object belongs to.
@@ -140,16 +138,6 @@ public class ColonyTile extends FreeColGameObject
     }
 
     /**
-     * Returns the name of this ColonyTile for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return The name of this ColonyTile.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return getLocationName();
-    }
-
-    /**
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow).
      *
@@ -159,28 +147,6 @@ public class ColonyTile extends FreeColGameObject
         return workTile.getLabel();
     }
 
-
-    /**
-    * Gets the owner of this <code>Ownable</code>.
-    *
-    * @return The <code>Player</code> controlling this
-    *         {@link Ownable}.
-    */
-    public Player getOwner() {
-        return colony.getOwner();
-    }
-
-    /**
-     * Sets the owner of this <code>Ownable</code>.
-     *
-     * @param p The <code>Player</code> that should take ownership
-     *      of this {@link Ownable}.
-     * @exception UnsupportedOperationException is always thrown by
-     *      this method.
-     */
-    public void setOwner(Player p) {
-        throw new UnsupportedOperationException();
-    }
 
     /**
     * Checks if this is the tile where the <code>Colony</code> is located.
@@ -201,44 +167,13 @@ public class ColonyTile extends FreeColGameObject
     }
 
     /**
-     * Gets the tile where the colony is located.
-     * @return The <code>Tile</code>.
-     */
-    public Tile getTile() {
-        return colony.getTile();
-    }
-
-    public GoodsContainer getGoodsContainer() {
-        return null;
-    }
-
-
-    /**
-     * Gets a pointer to the settlement containing this tile.
-     *
-     * @return This settlement.
-     */
-    public Settlement getSettlement() {
-        return colony;
-    }
-
-    /**
-     * Gets a pointer to the colony containing this tile.
-     *
-     * @return The <code>Colony</code>.
-     */
-    public Colony getColony() {
-        return colony;
-    }
-
-    /**
      * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
      *
      * @return The <code>Unit</code> or <i>null</i> if no unit is present.
      * @see #setUnit
      */
     public Unit getUnit() {
-        return unit;
+        return getUnitList().isEmpty() ? null : getUnitList().get(0);
     }
 
     /**
@@ -248,15 +183,20 @@ public class ColonyTile extends FreeColGameObject
      * @see #getUnit
      */
     public void setUnit(Unit unit) {
-        this.unit = unit;
+        getUnitList().clear();
+        if (unit != null) {
+            getUnitList().add(unit);
+        }
     }
 
     /**
-     * Gets the amount of Units at this <code>ColonyTile</code>.
-     * @return The amount of Units at this <code>ColonyTile</code>.
+     * Returns the maximum number of <code>Units</code> this Location
+     * can hold.
+     *
+     * @return an <code>int</code> value
      */
-    public int getUnitCount() {
-        return (getUnit() != null) ? 1 : 0;
+    public int getUnitCapacity() {
+        return UNIT_CAPACITY;
     }
 
     /**
@@ -302,15 +242,15 @@ public class ColonyTile extends FreeColGameObject
 
         return (tile.getSettlement() != null) ? NoAddReason.SETTLEMENT
             : (tile.getOccupyingUnit() != null) ? NoAddReason.OCCUPIED
-            : (!colony.hasAbility("model.ability.produceInWater")
+            : (!getColony().hasAbility("model.ability.produceInWater")
                 && !tile.isLand()) ? NoAddReason.PRODUCE
-            : (tile.getOwningSettlement() != colony
+            : (tile.getOwningSettlement() != getColony()
                 && !player.canClaimForSettlement(tile)) ? NoAddReason.CLAIM
             : NoAddReason.NONE;
     }
 
     /**
-     * Check if this <code>WorkLocation</code> is available to the colony.
+     * Check if this <code>WorkLocation</code> is available to the getColony().
      * Used by canAdd() and the gui to decide whether to draw a border
      * on this tile in the colony panel.
      *
@@ -361,7 +301,6 @@ public class ColonyTile extends FreeColGameObject
             throw new IllegalStateException("Can not add to colony tile: "
                 + toString() + " reason: " + reason);
         }
-
         final Unit unit = (Unit) locatable;
         setUnit(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
@@ -409,32 +348,6 @@ public class ColonyTile extends FreeColGameObject
             teacher.setStudent(null);
             unit.setTeacher(null);
         }
-    }
-
-    /**
-     * Gets a list of units in this colony tile.
-     *
-     * @return A list of units in this colony tile.
-     */
-    public List<Unit> getUnitList() {
-        List<Unit> units = new ArrayList<Unit>();
-        if (getUnit() != null) units.add(getUnit());
-        return units;
-    }
-
-    public Iterator <Unit> getUnitIterator() {
-        return getUnitList().iterator();
-    }
-
-
-    /**
-     * Checks if this <code>ColonyTile</code> contains the given <code>Locatable</code>.
-     *
-     * @param locatable The <code>Locatable</code>.
-     * @return The result.
-     */
-    public boolean contains(Locatable locatable) {
-        return (locatable == unit) ? true:false;
     }
 
     /**
@@ -609,11 +522,11 @@ public class ColonyTile extends FreeColGameObject
     public int getProductionOf(Unit unit, GoodsType goodsType) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
-        } else if (workTile.isLand() || colony.hasAbility("model.ability.produceInWater")) {
+        } else if (workTile.isLand() || getColony().hasAbility("model.ability.produceInWater")) {
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType, unit.getType());
             if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), modifiers) > 0) {
                 modifiers.addAll(unit.getModifierSet(goodsType.getId()));
-                modifiers.add(colony.getProductionModifier(goodsType));
+                modifiers.add(getColony().getProductionModifier(goodsType));
                 modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
                 List<Modifier> modifierList = new ArrayList<Modifier>(modifiers);
                 Collections.sort(modifierList);
@@ -633,8 +546,8 @@ public class ColonyTile extends FreeColGameObject
      */
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (unit != null) {
-            objects.addAll(unit.disposeList());
+        if (getUnit() != null) {
+            objects.addAll(getUnit().disposeList());
         }
         objects.addAll(super.disposeList());
         return objects;
@@ -676,11 +589,10 @@ public class ColonyTile extends FreeColGameObject
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("colony", colony.getId());
+        super.writeAttributes(out);
         out.writeAttribute("workTile", workTile.getId());
 
-        if (unit != null) unit.toXML(out, player, showAll, toSavedGame);
+        super.writeChildren(out);
 
         // End element:
         out.writeEndElement();
@@ -693,19 +605,12 @@ public class ColonyTile extends FreeColGameObject
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        super.readAttributes(in);
 
-        colony = getFreeColGameObject(in, "colony", Colony.class);
         workTile = getFreeColGameObject(in, "workTile", Tile.class);
-        colonyCenterTile = (colony.getTile() == workTile);
+        colonyCenterTile = (getTile() == workTile);
 
-        unit = null;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                unit = updateFreeColGameObject(in, Unit.class);
-            }
-        }
-
+        super.readChildren(in);
     }
 
     /**
