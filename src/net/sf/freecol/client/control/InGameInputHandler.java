@@ -470,8 +470,7 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning("Bad turn in newTurn: " + turnString);
         }
         Turn currTurn = game.getTurn();
-        if (currTurn.getYear() == Turn.SEASON_YEAR
-            && Turn.getYear(currTurn.getNumber() - 1) == Turn.SEASON_YEAR - 1) {
+        if (currTurn.isFirstSeasonTurn()) {
             new ShowInformationMessageSwingTask(StringTemplate.key("twoTurnsPerYear")).invokeLater();
         }
         new UpdateMenuBarSwingTask().invokeLater();

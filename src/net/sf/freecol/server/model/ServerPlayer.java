@@ -353,9 +353,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // After the season cutover year, no presence in New World
         // means death
-        if (getGame().getTurn().getYear() >= Turn.SEASON_YEAR) {
+        int mandatory = getGame().getSpecification().getInteger("model.option.mandatoryColonyYear");
+        if (getGame().getTurn().getYear() >= mandatory) {
             logger.info(getName() + " no presence in new world after "
-                        + Turn.SEASON_YEAR);
+                        + mandatory);
             return true;
         }
 

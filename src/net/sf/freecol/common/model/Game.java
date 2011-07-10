@@ -139,6 +139,12 @@ public class Game extends FreeColGameObject {
     protected Game(Specification specification) {
         super(null);
         this.specification = specification;
+        try {
+            Turn.setStartingYear(specification.getInteger(GameOptions.STARTING_YEAR));
+            Turn.setSeasonYear(specification.getInteger(GameOptions.SEASON_YEAR));
+        } catch(Exception e) {
+            // ignore error and use default values
+        }
     }
 
     /**

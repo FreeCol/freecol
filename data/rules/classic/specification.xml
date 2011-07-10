@@ -1918,6 +1918,18 @@
         <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
         <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
       </optionGroup>
+      <optionGroup id="gameOptions.years">
+        <!-- The very first year of the game. -->
+        <integerOption id="model.option.startingYear" value="1492" minimumValue="1492" maximumValue="1900" />
+        <!-- The first year in which there are two turns. -->
+        <integerOption id="model.option.seasonYear" value="1600" minimumValue="1492" maximumValue="1900" />
+        <!-- The year in which owning a colony becomes mandatory. -->
+        <integerOption id="model.option.mandatoryColonyYear" value="1600" minimumValue="1492" maximumValue="1900" />
+        <!-- The very last year of the game. -->
+        <integerOption id="model.option.lastYear" value="1850" minimumValue="1492" maximumValue="1900" />
+        <!-- The last year of the game for a colonial player. -->
+        <integerOption id="model.option.lastColonialYear" value="1800" minimumValue="1492" maximumValue="1900" />
+      </optionGroup>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions">
       <optionGroup id="mapGeneratorOptions.import" >

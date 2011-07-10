@@ -76,17 +76,30 @@ public class GameTest extends FreeColTestCase {
 
     public void testTurn() {
         assertEquals(1492, Turn.getYear(1));
+        assertEquals(1, Turn.yearToTurn(1492, Turn.Season.YEAR));
         assertEquals(Turn.Season.YEAR, Turn.getSeason(1));
+        assertEquals(1, Turn.getAge(1492));
+
         assertEquals(1599, Turn.getYear(108));
+        assertEquals(108, Turn.yearToTurn(1599, Turn.Season.YEAR));
         assertEquals(Turn.Season.YEAR, Turn.getSeason(108));
+        assertEquals(1, Turn.getAge(1599));
+
         assertEquals(1600, Turn.getYear(109));
+        assertEquals(109, Turn.yearToTurn(1600, Turn.Season.SPRING));
         assertEquals(Turn.Season.SPRING, Turn.getSeason(109));
         assertEquals(1600, Turn.getYear(110));
+        assertEquals(110, Turn.yearToTurn(1600, Turn.Season.AUTUMN));
         assertEquals(Turn.Season.AUTUMN, Turn.getSeason(110));
+        assertEquals(2, Turn.getAge(1600));
+
         assertEquals(1700, Turn.getYear(309));
+        assertEquals(309, Turn.yearToTurn(1700, Turn.Season.SPRING));
         assertEquals(Turn.Season.SPRING, Turn.getSeason(309));
         assertEquals(1700, Turn.getYear(310));
+        assertEquals(310, Turn.yearToTurn(1700, Turn.Season.AUTUMN));
         assertEquals(Turn.Season.AUTUMN, Turn.getSeason(310));
+        assertEquals(3, Turn.getAge(1700));
     }
 
 }

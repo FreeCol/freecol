@@ -75,4 +75,35 @@ public class GameOptions {
     public static final String ALLOW_STUDENT_SELECTION =
         "model.option.allowStudentSelection";
 
+    /**
+     * The year in which the game starts. At the moment, changing this
+     * value only shortens the game. In future, it might cause the map
+     * generator to create foreign colonies.
+     */
+    public static final String STARTING_YEAR = "model.option.startingYear";
+
+    /**
+     * The first year in which there are two seasons. Changing this
+     * value influences the duration of the game.
+     */
+    public static final String SEASON_YEAR = "model.option.seasonYear";
+
+    /**
+     * The year in which owning at least one colony becomes mandatory.
+     */
+    public static final String MANDATORY_COLONY_YEAR = "model.option.mandatoryColonyYear";
+
+    /**
+     * The very last year of the game.
+     */
+    public static final String LAST_YEAR = "model.option.lastYear";
+
+    /**
+     * The last year of the game for colonial players. In other words,
+     * if a colonial player does not declare independence by the end
+     * of this year, the game is lost.
+     */
+    public static final String LAST_COLONIAL_YEAR = "model.option.lastColonialYear";
+
+
 }

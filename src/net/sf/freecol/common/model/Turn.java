@@ -27,21 +27,72 @@ public class Turn {
 
     public static enum Season { YEAR, SPRING, AUTUMN }
 
-    public static final int STARTING_YEAR = 1492;
-    public static final int SEASON_YEAR = 1600;
-    private static final int OFFSET = SEASON_YEAR - STARTING_YEAR - 1;
-
     /**
      * The numerical value of the Turn, never less than one.
      *
      */
-    private int turn;
+    private int turn = 1;
 
+    /**
+     * The year in which the game starts.
+     */
+    private static int startingYear = 1492;
+
+    /**
+     * The first year in which there are two seasons.
+     */
+    private static int seasonYear = 1600;
+
+    /**
+     * The first years of the "ages" of the game, which are only used
+     * for weighting {@link FoundingFather}s.
+     */
+    private static int[] ages = new int[] {
+        1492, 1600, 1700
+    };
+
+
+
+    /**
+     * Creates a new <code>Turn</code> instance.
+     *
+     * @param turn an <code>int</code> value
+     */
     public Turn(int turn) {
         this.turn = turn;
     }
 
-    
+    /**
+     * Describe <code>yearToTurn</code> method here.
+     *
+     * @param year an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public static int yearToTurn(int year) {
+        return yearToTurn(year, Season.YEAR);
+    }
+
+    /**
+     * Describe <code>yearToTurn</code> method here.
+     *
+     * @param year an <code>int</code> value
+     * @param season a <code>Season</code> value
+     * @return an <code>int</code> value
+     */
+    public static int yearToTurn(int year, Season season) {
+        int turn = 1;
+        if (year >= startingYear) {
+            turn += year - startingYear;
+            if (year >= seasonYear) {
+                turn += (year - seasonYear);
+                if (season == Season.AUTUMN) {
+                    turn++;
+                }
+            }
+        }
+        return turn;
+    }
+
     /**
      * Increases the turn number by one.
      */
@@ -58,24 +109,29 @@ public class Turn {
         return turn;
     }
 
-    
+
     /**
-     * Gets the age.
-     * 
-     * @return The age:
-     *       <br>
-     *       <br>1 - if before {@link #SEASON_YEAR}
-     *       <br>2 - if between 1600 and 1700.
-     *       <br>3 - if after 1700.
+     * Describe <code>getAge</code> method here.
+     *
+     * @return an <code>int</code> value
      */
     public int getAge() {
-        if (getYear() < SEASON_YEAR) {
-            return 1;
-        } else if (getYear() < 1700) {
-            return 2;
-        } else {
-            return 3;
+        return getAge(getYear());
+    }
+
+    /**
+     * Describe <code>getAge</code> method here.
+     *
+     * @param year an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public static int getAge(int year) {
+        for (int index = 0; index < ages.length; index++) {
+            if (year < ages[index]) {
+                return index;
+            }
         }
+        return ages.length;
     }
 
 
@@ -90,18 +146,23 @@ public class Turn {
         }
     }
 
-    
+
+    private static int getOffset(int turn) {
+        return turn - (seasonYear - startingYear - 1);
+    }
+
+
     /**
      * Gets the year the given turn is in.
      * @return The calculated year based on the turn
      *       number.
      */
     public static int getYear(int turn) {
-        int c = turn - OFFSET;
+        int c = getOffset(turn);
         if (c < 0) {
-            return STARTING_YEAR + turn - 1;
+            return startingYear + turn - 1;
         } else {
-            return SEASON_YEAR + c/2 - 1;
+            return seasonYear + c/2 - 1;
         }
     }
 
@@ -141,7 +202,7 @@ public class Turn {
      * @return a <code>Season</code> value
      */
     public static Season getSeason(int turn) {
-        int c = turn - OFFSET;
+        int c = getOffset(turn);
         if (c <= 1) {
             return Season.YEAR;
         } else if (c % 2 == 0) {
@@ -179,6 +240,69 @@ public class Turn {
     public static StringTemplate getLabel(int turn) {
         return StringTemplate.template("year." + getSeason(turn))
             .addAmount("%year%", getYear(turn));
+    }
+
+    /**
+     * Get the <code>StartingYear</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public static final int getStartingYear() {
+        return startingYear;
+    }
+
+    /**
+     * Set the <code>StartingYear</code> value.
+     *
+     * @param newStartingYear The new StartingYear value.
+     */
+    public static final void setStartingYear(final int newStartingYear) {
+        startingYear = newStartingYear;
+    }
+
+    /**
+     * Get the <code>SeasonYear</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public static final int getSeasonYear() {
+        return seasonYear;
+    }
+
+    /**
+     * Set the <code>SeasonYear</code> value.
+     *
+     * @param newSeasonYear The new SeasonYear value.
+     */
+    public static final void setSeasonYear(final int newSeasonYear) {
+        seasonYear = newSeasonYear;
+    }
+
+    /**
+     * Describe <code>isFirstSeasonTurn</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isFirstSeasonTurn() {
+        return turn == yearToTurn(seasonYear, Season.SPRING);
+    }
+
+    /**
+     * Get the <code>Ages</code> value.
+     *
+     * @return an <code>int[]</code> value
+     */
+    public static final int[] getAges() {
+        return ages;
+    }
+
+    /**
+     * Set the <code>Ages</code> value.
+     *
+     * @param newAges The new Ages value.
+     */
+    public static final void setAges(final int[] newAges) {
+        ages = newAges;
     }
 
 }
