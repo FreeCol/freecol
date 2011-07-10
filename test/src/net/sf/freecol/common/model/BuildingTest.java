@@ -128,7 +128,7 @@ public class BuildingTest extends FreeColTestCase {
             if (building.canTeach())
             	continue;
 
-            int maxUnits = building.getMaxUnits();
+            int maxUnits = building.getUnitCapacity();
 
             assertEquals(0, building.getUnitCount());
 
