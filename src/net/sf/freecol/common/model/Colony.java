@@ -242,7 +242,7 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Is a building type able to be automatically built at no cost.
-     * True when the playe has a modifier that collapses the cost to zero.
+     * True when the player has a modifier that collapses the cost to zero.
      *
      * @param buildingType a <code>BuildingType</code> value
      * @return True if the building is available at zero cost.

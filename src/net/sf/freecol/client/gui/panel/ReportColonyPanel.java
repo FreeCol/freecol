@@ -19,12 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.GridLayout;
+
 import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -48,7 +51,7 @@ public final class ReportColonyPanel extends ReportPanel {
 
     private static final int COLONISTS_PER_ROW = 16;
     private static final int UNITS_PER_ROW = 12;
-    private static final int GOODS_PER_ROW = 12;
+    private static final int GOODS_PER_ROW = 10;
     private static final int BUILDINGS_PER_ROW = 8;
 
     private List<Colony> colonies;
@@ -125,22 +128,23 @@ public final class ReportColonyPanel extends ReportPanel {
                 }
             }
 
+            // Buildings
+            JPanel buildingsPanel = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
             List<Building> buildingList = colony.getBuildings();
             Collections.sort(buildingList);
             for (int index = 0; index < buildingList.size(); index++) {
                 Building building = buildingList.get(index);
+                if(building.getType().isAutomaticBuild()) {
+                    continue;
+                }
+                
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
                                                                       + ".image", 0.66)));
                 buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
-                if (index % BUILDINGS_PER_ROW == 0) {
-                    reportPanel.add(buildingLabel, "newline, split " + BUILDINGS_PER_ROW);
-                } else {
-                    reportPanel.add(buildingLabel);
-                }
+                buildingsPanel.add(buildingLabel);
             }
 
-            // Buildings
             BuildableType currentType = colony.getCurrentlyBuilding();
             if (currentType != null) {
                 JLabel buildableLabel =
@@ -149,8 +153,9 @@ public final class ReportColonyPanel extends ReportPanel {
                 buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
                                                                .add("%buildable%", currentType.getNameKey())));
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
-                reportPanel.add(buildableLabel);
+                buildingsPanel.add(buildableLabel);
             }
+            reportPanel.add(buildingsPanel, "newline, growx");
         }
 
     }
