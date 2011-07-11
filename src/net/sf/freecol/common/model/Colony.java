@@ -1238,7 +1238,7 @@ public class Colony extends Settlement implements Nameable {
      * Return the number of sons of liberty
      */
     public int getMembers() {
-	float result = (sonsOfLiberty * getUnitCount()) / 100f;
+        float result = (sonsOfLiberty * getUnitCount()) / 100f;
         return Math.round(result);
     }
 
@@ -1783,26 +1783,26 @@ public class Colony extends Settlement implements Nameable {
      * remain the same, or deteriorate if the colony had the given
      * population.
      *
-     * @param units an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param unitCount The proposed population for the colony.
+     * @return 1, 0 or -1.
      */
-    public int governmentChange(int units) {
+    public int governmentChange(int unitCount) {
         final int veryBadGovernment = getSpecification()
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
 
-        int rebels = calculateMembership(units);
-        int loyalists = Math.round((rebels * units) / 100f);
-        int result = 0;
+        int rebelPercent = calculateMembership(unitCount);
+        int rebelCount = Math.round(0.01f * rebelPercent * unitCount);
+        int loyalistCount = unitCount - rebelCount;
 
-        if (rebels == 100) {
-            // there are no tories left
+        int result = 0;
+        if (rebelPercent >= 100) { // There are no tories left.
             if (sonsOfLiberty < 100) {
                 result = 1;
             }
-        } else if (rebels >= 50) {
-            if (sonsOfLiberty == 100) {
+        } else if (rebelPercent >= 50) {
+            if (sonsOfLiberty >= 100) {
                 result = -1;
             } else if (sonsOfLiberty < 50) {
                 result = 1;
@@ -1810,21 +1810,22 @@ public class Colony extends Settlement implements Nameable {
         } else {
             if (sonsOfLiberty >= 50) {
                 result = -1;
-            }
-
-            // Now that no bonus is applied, penalties may.
-            if (loyalists > veryBadGovernment) {
-                if (tories <= veryBadGovernment) {
-                    result = -1;
+            } else { // Now that no bonus is applied, penalties may.
+                if (loyalistCount > veryBadGovernment) {
+                    if (tories <= veryBadGovernment) {
+                        result = -1;
+                    }
+                } else if (loyalistCount > badGovernment) {
+                    if (tories <= badGovernment) {
+                        result = -1;
+                    } else if (tories > veryBadGovernment) {
+                        result = 1;
+                    }
+                } else {
+                    if (tories > badGovernment) {
+                        result = 1;
+                    }
                 }
-            } else if (loyalists > badGovernment) {
-                if (tories <= badGovernment) {
-                    result = -1;
-                } else if (tories > veryBadGovernment) {
-                    result = 1;
-                }
-            } else if (tories > badGovernment) {
-                result = 1;
             }
         }
         return result;
@@ -2184,6 +2185,145 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
+
+    /**
+     * Collects tiles that need exploring, plowing or road building
+     * which may depend on current use within the colony.
+     *
+     * @param exploreTiles A list of <code>Tile</code>s to update with tiles
+     *     to explore.
+     * @param clearTiles A list of <code>Tile</code>s to update with tiles
+     *     to clear.
+     * @param plowTiles A list of <code>Tile</code>s to update with tiles
+     *     to plow.
+     * @param roadTiles A list of <code>Tile</code>s to update with tiles
+     *     to build roads on.
+     */
+    public void getColonyTileTodo(List<Tile> exploreTiles,
+                                  List<Tile> clearTiles, List<Tile> plowTiles,
+                                  List<Tile> roadTiles) {
+        final Specification spec = getSpecification();
+        final TileImprovementType clearImprovement
+            = spec.getTileImprovementType("model.improvement.clearForest");
+        final TileImprovementType plowImprovement
+            = spec.getTileImprovementType("model.improvement.plow");
+        final TileImprovementType roadImprovement
+            = spec.getTileImprovementType("model.improvement.road");
+        Tile tile = getTile();
+
+        for (Tile t : getTile().getSurroundingTiles(1)) {
+            if (t.hasLostCityRumour()) exploreTiles.add(t);
+        }
+
+        for (ColonyTile ct : getColonyTiles()) {
+            Unit u = ct.getUnit();
+            Tile t = ct.getWorkTile();
+            if (t == null) continue; // Colony has not claimed the tile yet.
+
+            if ((t.getTileItemContainer() == null
+                    || t.getTileItemContainer()
+                    .getImprovement(plowImprovement) == null)
+                && plowImprovement.isTileTypeAllowed(t.getType())) {
+                if (ct.isColonyCenterTile()) {
+                    plowTiles.add(t);
+                } else if (u != null && u.getWorkType() != null
+                    && plowImprovement.getBonus(u.getWorkType()) > 0) {
+                    plowTiles.add(t);
+                }
+            }
+
+            // To assess whether other improvements are beneficial we
+            // really need a unit, doing work, so we can compare the output
+            // with and without the improvement.  This means we can skip
+            // further consideration of the colony center tile.
+            if (ct.isColonyCenterTile()
+                || u == null || u.getWorkType() == null) continue;
+
+            TileType oldType = t.getType();
+            TileType newType;
+            if ((t.getTileItemContainer() == null
+                    || t.getTileItemContainer()
+                    .getImprovement(clearImprovement) == null)
+                && clearImprovement.isTileTypeAllowed(t.getType())
+                && u != null
+                && (newType = clearImprovement.getChange(oldType)) != null
+                && (newType.getProductionOf(u.getWorkType(), u.getType())
+                    > oldType.getProductionOf(u.getWorkType(), u.getType()))) {
+                clearTiles.add(t);
+            }
+
+            if (t.getRoad() == null
+                && u != null
+                && roadImprovement.isTileTypeAllowed(t.getType())
+                && roadImprovement.getBonus(u.getWorkType()) > 0) {
+                roadTiles.add(t);
+            }
+        }
+    }
+
+    /**
+     * Finds another unit in this colony that would be better at doing the
+     * job of the specified unit.
+     *
+     * @param expert The <code>Unit</code> to consider.
+     * @return A better expert, or null if none available.
+     */
+    public Unit getBetterExpert(Unit expert) {
+        if (expert.getSkillLevel() <= 0) return null;
+
+        GoodsType production = expert.getWorkType();
+        GoodsType expertise = expert.getType().getExpertProduction();
+        if (production == null || expertise == null
+            || production == expertise) return null;
+
+        // We have an expert not doing the job of their expertise.
+        // Check if there is a non-expert doing the job instead.
+        for (Unit nonExpert : getUnitList()) {
+            if (nonExpert.getWorkType() != expertise
+                || nonExpert.getType() == expert.getType()) continue;
+
+            // We have found a unit of a different type doing the
+            // job of this expert's expertise now check if the
+            // production would be better if the units swapped
+            // positions.
+            int expertProductionNow = 0;
+            int nonExpertProductionNow = 0;
+            int expertProductionPotential = 0;
+            int nonExpertProductionPotential = 0;
+
+            // Get the current and potential productions for the
+            // work location of the expert.
+            if (expert.getWorkTile() != null) {
+                ColonyTile ct = expert.getWorkTile();
+                expertProductionNow = ct.getProductionOf(expert, expertise);
+                nonExpertProductionPotential = ct.getProductionOf(nonExpert, expertise);
+            } else if (expert.getWorkBuilding() != null) {
+                Building b = expert.getWorkBuilding();
+                expertProductionNow = b.getUnitProductivity(expert);
+                nonExpertProductionPotential = b.getUnitProductivity(nonExpert);
+            }
+
+            // Get the current and potential productions for the
+            // work location of the non-expert.
+            if (nonExpert.getWorkTile() != null) {
+                ColonyTile ct = nonExpert.getWorkTile();
+                nonExpertProductionNow = ct.getProductionOf(nonExpert, expertise);
+                expertProductionPotential = ct.getProductionOf(expert, expertise);
+            } else if (nonExpert.getWorkBuilding() != null) {
+                Building b = nonExpert.getWorkBuilding();
+                nonExpertProductionNow = b.getUnitProductivity(nonExpert);
+                expertProductionPotential = b.getUnitProductivity(expert);
+            }
+
+            // Let the player know if the two units would be more
+            // productive were they to swap roles.
+            if (expertProductionNow + nonExpertProductionNow
+                < expertProductionPotential + nonExpertProductionPotential) {
+                return nonExpert;
+            }
+        }
+        return null;
+    }
 
     // Serialization
 

@@ -20,8 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +50,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the Advanced Colony Report.
@@ -138,60 +137,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         // Check if all unit requirements are met.
         for (Unit expert : colony.getUnitList()) {
-            if (expert.getSkillLevel() <= 0) continue;
-
-            GoodsType production = expert.getWorkType();
-            GoodsType expertise = expert.getType().getExpertProduction();
-            if (production == null || expertise == null
-                || production == expertise) continue;
-
-            // We have an expert not doing the job of their expertise.
-            // Check if there is a non-expert doing the job instead.
-            for (Unit nonExpert : colony.getUnitList()) {
-                if (nonExpert.getWorkType() != expertise
-                    || nonExpert.getType() == expert.getType()) continue;
-
-                // We have found a unit of a different type doing the
-                // job of this expert's expertise now check if the
-                // production would be better if the units swapped
-                // positions.
-                int expertProductionNow = 0;
-                int nonExpertProductionNow = 0;
-                int expertProductionPotential = 0;
-                int nonExpertProductionPotential = 0;
-
-                // Get the current and potential productions for the
-                // work location of the expert.
-                if (expert.getWorkTile() != null) {
-                    ColonyTile ct = expert.getWorkTile();
-                    expertProductionNow = ct.getProductionOf(expert, expertise);
-                    nonExpertProductionPotential = ct.getProductionOf(nonExpert, expertise);
-                } else if (expert.getWorkBuilding() != null) {
-                    Building b = expert.getWorkBuilding();
-                    expertProductionNow = b.getUnitProductivity(expert);
-                    nonExpertProductionPotential = b.getUnitProductivity(nonExpert);
-                }
-
-                // Get the current and potential productions for the
-                // work location of the non-expert.
-                if (nonExpert.getWorkTile() != null) {
-                    ColonyTile ct = nonExpert.getWorkTile();
-                    nonExpertProductionNow = ct.getProductionOf(nonExpert, expertise);
-                    expertProductionPotential = ct.getProductionOf(expert, expertise);
-                } else if (nonExpert.getWorkBuilding() != null) {
-                    Building b = nonExpert.getWorkBuilding();
-                    nonExpertProductionNow = b.getUnitProductivity(nonExpert);
-                    expertProductionPotential = b.getUnitProductivity(expert);
-                }
-
-                // Let the player know if the two units would be more
-                // productive were they to swap roles.
-                if ((expertProductionNow + nonExpertProductionNow)
-                    < (expertProductionPotential + nonExpertProductionPotential)
-                    && !badAssignmentWarning.contains(expert)) {
-                    addBadAssignmentWarning(doc, colony, expert, nonExpert);
-                    badAssignmentWarning.add(expert.getType());
-                }
+            Unit better = colony.getBetterExpert(expert);
+            if (better != null && !badAssignmentWarning.contains(expert)) {
+                addBadAssignmentWarning(doc, colony, expert, better);
+                badAssignmentWarning.add(expert.getType());
             }
         }
 
@@ -233,7 +182,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         List<Tile> clearTiles = new ArrayList<Tile>();
         List<Tile> plowTiles = new ArrayList<Tile>();
         List<Tile> roadTiles = new ArrayList<Tile>();
-        getColonyTileTodo(colony, exploreTiles, clearTiles, plowTiles,
+        colony.getColonyTileTodo(exploreTiles, clearTiles, plowTiles,
             roadTiles);
         for (Tile t : exploreTiles) {
             addTileWarning(doc, colony, "report.requirements.exploreTile", t);
@@ -265,82 +214,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     doc.getStyle("regular"));
             } catch (Exception e) {
                 logger.warning(e.toString());
-            }
-        }
-    }
-
-    /**
-     * Collects tiles that need exploring, plowing or road building
-     * (may depend on current use within the colony).
-     *
-     * @param colony The <code>Colony</code> to examine.
-     * @param exploreTiles A list of <code>Tile</code>s to update with tiles
-     *     to explore.
-     * @param clearTiles A list of <code>Tile</code>s to update with tiles
-     *     to clear.
-     * @param plowTiles A list of <code>Tile</code>s to update with tiles
-     *     to plow.
-     * @param roadTiles A list of <code>Tile</code>s to update with tiles
-     *     to build roads on.
-     */
-    public void getColonyTileTodo(Colony colony, List<Tile> exploreTiles,
-                                  List<Tile> clearTiles, List<Tile> plowTiles,
-                                  List<Tile> roadTiles) {
-        final Specification spec = getSpecification();
-        final TileImprovementType clearImprovement
-            = spec.getTileImprovementType("model.improvement.clearForest");
-        final TileImprovementType plowImprovement
-            = spec.getTileImprovementType("model.improvement.plow");
-        final TileImprovementType roadImprovement
-            = spec.getTileImprovementType("model.improvement.road");
-        Tile tile = colony.getTile();
-
-        for (Tile t : colony.getTile().getSurroundingTiles(1)) {
-            if (t.hasLostCityRumour()) exploreTiles.add(t);
-        }
-
-        for (ColonyTile ct : colony.getColonyTiles()) {
-            Unit u = ct.getUnit();
-            Tile t = ct.getWorkTile();
-            if (t == null) continue; // Colony has not claimed the tile yet.
-
-            if ((t.getTileItemContainer() == null
-                    || t.getTileItemContainer()
-                    .getImprovement(plowImprovement) == null)
-                && plowImprovement.isTileTypeAllowed(t.getType())) {
-                if (ct.isColonyCenterTile()) {
-                    plowTiles.add(t);
-                } else if (u != null && u.getWorkType() != null
-                    && plowImprovement.getBonus(u.getWorkType()) > 0) {
-                    plowTiles.add(t);
-                }
-            }
-
-            // To assess whether other improvements are beneficial we
-            // really need a unit, doing work, so we can compare the output
-            // with and without the improvement.  This means we can skip
-            // further consideration of the colony center tile.
-            if (ct.isColonyCenterTile()
-                || u == null || u.getWorkType() == null) continue;
-
-            TileType oldType = t.getType();
-            TileType newType;
-            if ((t.getTileItemContainer() == null
-                    || t.getTileItemContainer()
-                    .getImprovement(clearImprovement) == null)
-                && clearImprovement.isTileTypeAllowed(t.getType())
-                && u != null
-                && (newType = clearImprovement.getChange(oldType)) != null
-                && (newType.getProductionOf(u.getWorkType(), u.getType())
-                    > oldType.getProductionOf(u.getWorkType(), u.getType()))) {
-                clearTiles.add(t);
-            }
-
-            if (t.getRoad() == null
-                && u != null
-                && roadImprovement.isTileTypeAllowed(t.getType())
-                && roadImprovement.getBonus(u.getWorkType()) > 0) {
-                roadTiles.add(t);
             }
         }
     }
@@ -525,6 +398,4 @@ public final class ReportRequirementsPanel extends ReportPanel {
         button.addActionListener(this);
         return button;
     }
-
-
 }
