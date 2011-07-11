@@ -2758,10 +2758,15 @@ public final class InGameController implements NetworkConstants {
             cash = true; // No need to check for transport.
         } else {
             int fee = unit.getTransportFee();
-            StringTemplate template = (fee == 0)
-                ? StringTemplate.template("cashInTreasureTrain.free")
-                : StringTemplate.template("cashInTreasureTrain.pay")
-                    .addName("%fee%", Integer.toString(fee));
+            StringTemplate template;
+            if (fee == 0) {
+                template = StringTemplate.template("cashInTreasureTrain.free");
+            } else {
+                int percent = getSpecification()
+                    .getInteger("model.option.treasureTransportFee");
+                template = StringTemplate.template("cashInTreasureTrain.pay")
+                    .addName("%fee%", Integer.toString(percent));
+            }
             cash = canvas.showConfirmDialog(unit.getTile(), template,
                 "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
         }
