@@ -2285,7 +2285,7 @@ public class Unit extends FreeColGameObject
 
     /**
      * Sets the nationality of this Unit.
-     * A unit will change nationality when it switchers owners willingly.
+     * A unit will change nationality when it switches owners willingly.
      * Currently only Converts do this, but it opens the possibility of naturalisation.
      *
      * @param owner The new nationality of this Unit.
@@ -2316,7 +2316,7 @@ public class Unit extends FreeColGameObject
 
     /**
      * Sets the ethnicity of this Unit.
-     * Ethnicity is something units are born with. It cannot be changed later
+     * Ethnicity is something units are born with. It cannot be subsequently changed.
      *
      * @param owner The new ethnicity of this Unit.
      */
@@ -3300,11 +3300,11 @@ public class Unit extends FreeColGameObject
         } else if(hasAbility("model.ability.bornInColony")
                   || hasAbility("model.ability.bornInIndianSettlement")
                   || hasAbility("model.ability.foundColony")) {
-            // foundColony is for backwards compat, as inheritance of
-            // model.ability.bornInColony is quite new 0.10.0 and
-            // earlier games have no model.ability.person, so instead
-            // we check several other abilities to exclude ships,
-            // artillery, wagons and treasure trains
+            // 0.10.0 and earlier games have no model.ability.person,
+            // so instead we check several other abilities to exclude
+            // ships, artillery, wagons and treasure trains.
+            // foundColony is for additional backwards compatibility,
+            // as inheritance of model.ability.bornInColony is quite new.
             out.writeAttribute("nationality", owner.getNationID());
         }
         if (ethnicity != null) {
@@ -3313,13 +3313,13 @@ public class Unit extends FreeColGameObject
                    || hasAbility("model.ability.bornInIndianSettlement")
                    || hasAbility("model.ability.foundColony"))
                   && !hasAbility("model.ability.convert")) {
-            // foundColony is for backwards compat, as inheritance of
-            // model.ability.bornInColony is quite new 0.10.0 and
-            // earlier games have no model.ability.person, so instead
-            // we check several other abilities to exclude ships,
-            // artillery, wagons and treasure trains do not compute
-            // the etnicity of a convert, that information is
-            // unretrievable
+            // 0.10.0 and earlier games have no model.ability.person,
+            // so instead we check several other abilities to exclude
+            // ships, artillery, wagons and treasure trains.
+            // foundColony is for additional backwards compatibility,
+            // as inheritance of model.ability.bornInColony is quite new.
+            // do not compute the ethnicity of a convert, that information
+            // is unretrievable. TODO: we can get it from indianSettlement
             out.writeAttribute("ethnicity", owner.getNationID());
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
