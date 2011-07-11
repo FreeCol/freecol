@@ -132,8 +132,7 @@ public final class ReportColonyPanel extends ReportPanel {
             JPanel buildingsPanel = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
             List<Building> buildingList = colony.getBuildings();
             Collections.sort(buildingList);
-            for (int index = 0; index < buildingList.size(); index++) {
-                Building building = buildingList.get(index);
+            for (Building building : buildingList) {
                 if(building.getType().isAutomaticBuild()) {
                     continue;
                 }
