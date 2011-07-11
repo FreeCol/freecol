@@ -2530,9 +2530,8 @@ public final class GUI {
                 centerImage(g, colonyImage);
                 if (withNumber) {
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                    Color theColor = ResourceManager
-                        .getColor("productionBonus." + ((Colony) settlement).getProductionBonus()
-                                  + ".color");
+                    int bonus = ((Colony)settlement).getProductionBonus();
+                    Color theColor = ResourceManager.getProductionColor(bonus);
                     Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
                     Image stringImage = createStringImage(g, populationString, theColor, font);
                     centerImage(g, stringImage);
