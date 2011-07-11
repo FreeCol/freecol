@@ -49,8 +49,8 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class ReportColonyPanel extends ReportPanel {
 
-    private static final int COLONISTS_PER_ROW = 16;
-    private static final int UNITS_PER_ROW = 12;
+    private static final int COLONISTS_PER_ROW = 20;
+    private static final int UNITS_PER_ROW = 14;
     private static final int GOODS_PER_ROW = 10;
     private static final int BUILDINGS_PER_ROW = 8;
 
@@ -79,27 +79,37 @@ public final class ReportColonyPanel extends ReportPanel {
             reportPanel.add(button, "newline 20, split 2");
             reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
+            // Currently building
+            BuildableType currentType = colony.getCurrentlyBuilding();
+            JLabel buildableLabel = null;
+            if (currentType != null) {
+                buildableLabel = new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
+                                                          + ".image", 0.66)));
+                buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
+                                                               .add("%buildable%", currentType.getNameKey())));
+                buildableLabel.setIcon(buildableLabel.getDisabledIcon());
+            }
+
             // Units
+            JPanel colonistsPanel = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
             List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
-            for (int index = 0; index < unitList.size(); index++) {
-                UnitLabel unitLabel = new UnitLabel(unitList.get(index), getCanvas(), true, true);
-                if (index % COLONISTS_PER_ROW == 0) {
-                    reportPanel.add(unitLabel, "newline, split " + COLONISTS_PER_ROW);
-                } else {
-                    reportPanel.add(unitLabel);
-                }
+            for (Unit unit : unitList) {
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
+                colonistsPanel.add(unitLabel);
             }
+            JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
-            for (int index = 0; index < unitList.size(); index++) {
-                UnitLabel unitLabel = new UnitLabel(unitList.get(index), getCanvas(), true, true);
-                if (index % UNITS_PER_ROW == 0) {
-                    reportPanel.add(unitLabel, "newline, split " + UNITS_PER_ROW);
-                } else {
-                    reportPanel.add(unitLabel);
-                }
+            for (Unit unit : unitList) {
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
+                unitsPanel.add(unitLabel);
             }
+            if(buildableLabel != null && currentType.getSpecification().getUnitTypeList().contains(currentType)) {
+                unitsPanel.add(buildableLabel);
+            }
+            reportPanel.add(colonistsPanel, "newline, growx");
+            reportPanel.add(unitsPanel, "newline, growx");
 
             // Production
             GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
@@ -143,15 +153,7 @@ public final class ReportColonyPanel extends ReportPanel {
                 buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
                 buildingsPanel.add(buildingLabel);
             }
-
-            BuildableType currentType = colony.getCurrentlyBuilding();
-            if (currentType != null) {
-                JLabel buildableLabel =
-                    new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
-                                                                      + ".image", 0.66)));
-                buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
-                                                               .add("%buildable%", currentType.getNameKey())));
-                buildableLabel.setIcon(buildableLabel.getDisabledIcon());
+            if(buildableLabel != null && currentType.getSpecification().getBuildingTypeList().contains(currentType)) {
                 buildingsPanel.add(buildableLabel);
             }
             reportPanel.add(buildingsPanel, "newline, growx");
