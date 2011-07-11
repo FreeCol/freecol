@@ -122,9 +122,13 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
 
-        reportPanel.setLayout(new MigLayout("wrap 6", "[]30[]30[]", ""));
+        reportPanel.setLayout(new MigLayout("wrap 9", "[]10[]10[]30[]10[]10[]30[]10[]10[]", ""));
         
         for (UnitType unitType : colonists) {
+            if(!unitType.isAvailableTo(getMyPlayer())) {
+                continue;
+            }
+            
             Role role = Role.DEFAULT;
             if (unitType.hasAbility("model.ability.expertPioneer")) {
                 role = Role.PIONEER;
@@ -134,15 +138,22 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             
             int unitTypeCount = unitCount.getCount(unitType);
             if (unitTypeCount == 0) {
-                reportPanel.add(createUnitTypeLabel(unitType, role, 0));
+                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, role, true, 0.8));
+                JLabel unitCount = new JLabel("0");
                 JLabel unitName = localizedLabel(unitType.getNameKey());
+                unitCount.setForeground(Color.GRAY);
                 unitName.setForeground(Color.GRAY);
+                reportPanel.add(unitIcon);
+                reportPanel.add(unitCount);
                 reportPanel.add(unitName);
             } else {
-                reportPanel.add(createUnitTypeLabel(unitType, role, unitTypeCount));
+                JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, role, false, 0.8));
+                JLabel unitCount = new JLabel("" + unitTypeCount);
                 JButton linkButton = getLinkButton(Messages.message(unitType.getNameKey()),
                                                    null, unitType.getId());
                 linkButton.addActionListener(this);
+                reportPanel.add(unitIcon);
+                reportPanel.add(unitCount);
                 reportPanel.add(linkButton);
             }
         }
