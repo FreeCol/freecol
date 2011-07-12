@@ -3309,18 +3309,23 @@ public class Unit extends FreeColGameObject
         }
         if (ethnicity != null) {
             out.writeAttribute("ethnicity", ethnicity);
-        } else if((hasAbility("model.ability.bornInColony")
-                   || hasAbility("model.ability.bornInIndianSettlement")
-                   || hasAbility("model.ability.foundColony"))
-                  && !hasAbility("model.ability.convert")) {
+        } else if(hasAbility("model.ability.bornInColony")
+                  || hasAbility("model.ability.bornInIndianSettlement")
+                  || hasAbility("model.ability.foundColony")) {
             // 0.10.0 and earlier games have no model.ability.person,
             // so instead we check several other abilities to exclude
             // ships, artillery, wagons and treasure trains.
             // foundColony is for additional backwards compatibility,
             // as inheritance of model.ability.bornInColony is quite new.
-            // do not compute the ethnicity of a convert, that information
-            // is unretrievable. TODO: we can get it from indianSettlement
-            out.writeAttribute("ethnicity", owner.getNationID());
+            if(!hasAbility("model.ability.convert")) {
+                out.writeAttribute("ethnicity", owner.getNationID());
+            } else if(indianSettlement != null
+                      && indianSettlement.getOwner() != null) {
+                out.writeAttribute("ethnicity",
+                                   indianSettlement.getOwner().getNationID());
+            }
+            // do not compute the etnicity of a convert with a null
+            // indianSettlement, that information is now unretrievable
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         if (workType != null) out.writeAttribute("workType", workType.getId());
