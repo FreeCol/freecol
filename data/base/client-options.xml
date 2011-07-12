@@ -165,6 +165,8 @@
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
       <!-- If enabled: Automatically ends the turn when no units can be made active. -->
       <booleanOption id="model.option.autoEndTurn" defaultValue="true"/>
+      <!-- Type of colony report. -->
+      <booleanOption id="model.option.compactColonyReport" defaultValue="false"/>
       <!-- Type of labour report. -->
       <selectOption id="model.option.labourReport" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.labourReport.classic" value="0"/>

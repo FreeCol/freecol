@@ -283,6 +283,11 @@ public class ClientOptions extends OptionGroup {
     public static final String AUTOLOAD_EMIGRANTS = "model.option.autoloadEmigrants";
 
     /**
+     * Option for selecting the compact colony report.
+     */
+    public static final String COMPACT_COLONY_REPORT = "model.option.compactColonyReport";
+
+    /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.
      */
     public static final String SMOOTH_MINIMAP_RENDERING = "model.option.smoothRendering";
