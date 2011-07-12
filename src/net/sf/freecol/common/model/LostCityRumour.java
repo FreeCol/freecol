@@ -246,7 +246,7 @@ public class LostCityRumour extends TileItem {
         events.put(RumourType.NOTHING, 100 * percentNeutral);
 
         // The BAD
-        // If the tile not is European-owned, allow burial grounds rumour.
+        // If the tile is native-owned, allow burial grounds rumour.
         if (tile.getOwner() != null && tile.getOwner().isIndian()) {
             events.put(RumourType.EXPEDITION_VANISHES, 75 * percentBad);
             events.put(RumourType.BURIAL_GROUND, 25 * percentBad);
