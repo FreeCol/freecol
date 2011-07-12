@@ -3324,7 +3324,7 @@ public class Unit extends FreeColGameObject
                 out.writeAttribute("ethnicity",
                                    indianSettlement.getOwner().getNationID());
             }
-            // do not compute the etnicity of a convert with a null
+            // do not compute the ethnicity of a convert with a null
             // indianSettlement, that information is now unretrievable
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
