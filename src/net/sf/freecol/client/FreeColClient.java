@@ -358,7 +358,7 @@ public final class FreeColClient {
                 // AudioSystem.getMixer(null).  Workaround this and other
                 // such failures by just disabling sound.
                 soundPlayer = null;
-                logger.log(Level.WARNING, "Unexpected sound failure", e);
+                logger.log(Level.WARNING, "Sound disabled", e);
             }
         } else {
             soundPlayer = null;

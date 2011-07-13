@@ -70,15 +70,17 @@ public class SoundPlayer {
      * @param volume The volume option to use when playing audio.
      */
     public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume) {
+        mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
+        if (mixer == null) {
+            throw new IllegalStateException("Mixer unavailable.");
+        }
         this.volume = volume;
-
         mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
                     mixer = AudioSystem.getMixer(((MixerWrapper) e.getNewValue())
                                                 .getMixerInfo());
                 }
             });
-        mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
         soundPlayerThread = new SoundPlayerThread();
         soundPlayerThread.start();
     }
