@@ -2935,6 +2935,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setTax(int amount) {
         tax = amount;
+        recalculateBellsBonus();
     }
 
     /**
@@ -2942,7 +2943,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return True if a bells bonus was set.
      */
-    public boolean recalculateBellsBonus() {
+    protected boolean recalculateBellsBonus() {
         Set<Modifier> libertyBonus
             = featureContainer.getModifierSet("model.goods.bells");
         boolean ret = false;

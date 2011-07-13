@@ -664,7 +664,6 @@ public final class InGameController extends Controller {
         Turn turn = game.getTurn();
         independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
         independent.setTax(0);
-        independent.recalculateBellsBonus();
         independent.reinitialiseMarket();
         cs.addGlobalHistory(game,
             new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE));
