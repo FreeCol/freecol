@@ -2935,7 +2935,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setTax(int amount) {
         tax = amount;
-        recalculateBellsBonus();
+        if (recalculateBellsBonus()) {
+            for (Colony colony : getColonies()) {
+                colony.invalidateCache();
+            }
+        }
     }
 
     /**

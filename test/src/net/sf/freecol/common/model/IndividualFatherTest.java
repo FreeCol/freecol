@@ -165,7 +165,6 @@ public class IndividualFatherTest extends FreeColTestCase {
         player.recalculateBellsBonus();
 
         expected = (int) (3 * 6 * 1.3f + 1);
-        colony.invalidateCache();
         assertEquals(expected, townHall.getProductionOf(bells));
     }
 
