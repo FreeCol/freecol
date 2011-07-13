@@ -2020,7 +2020,8 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>Modifier</code> value
      */
     public final Set<Modifier> getModifierSet(String id) {
-        Set<Modifier> result = getFeatureContainer().getModifierSet(id, null, getGame().getTurn());
+        Set<Modifier> result = new HashSet<Modifier>();
+        result.addAll(getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
         if (owner != null) { // Null owner happens during dispose.
             result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
         }

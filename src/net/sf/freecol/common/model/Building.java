@@ -661,6 +661,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (goodsOutputType != null) {
             modifiers.addAll(getColony().getFeatureContainer().
                              getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+            if (getOwner() != null) {
+                modifiers.addAll(getOwner().getFeatureContainer().
+                                 getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+            }
             Collections.sort(modifiers);
         }
         return modifiers;

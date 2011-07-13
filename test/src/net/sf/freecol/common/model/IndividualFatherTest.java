@@ -148,16 +148,24 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         FoundingFather paine = spec().getFoundingFather("model.foundingFather.thomasPaine");
         player.addFather(paine);
+        player.recalculateBellsBonus();
 
         assertTrue(player.hasAbility("model.ability.addTaxToBells"));
-        assertFalse(player.getFeatureContainer().getModifierSet("model.goods.bells").isEmpty());
+        Set<Modifier> modifierSet = player.getFeatureContainer().getModifierSet("model.goods.bells");
+        assertEquals(1, modifierSet.size());
+
+        Modifier paineModifier = modifierSet.iterator().next();
+        assertEquals(paine, paineModifier.getSource());
+        assertEquals(player.getTax(), (int) paineModifier.getValue());
+
+        int expected = (int) (3 * 6 * 1.2f + 1);
+        assertEquals(expected, townHall.getProductionOf(bells));
 
         player.setTax(30);
         player.recalculateBellsBonus();
-        // TODO: find out why the following changes anything
-        colony.getModifierSet("model.goods.bells");
 
-        int expected = (int) (3 * 6 * 1.3f + 1);
+        expected = (int) (3 * 6 * 1.3f + 1);
+        colony.invalidateCache();
         assertEquals(expected, townHall.getProductionOf(bells));
     }
 
