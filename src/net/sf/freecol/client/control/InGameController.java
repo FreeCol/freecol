@@ -978,9 +978,11 @@ public final class InGameController implements NetworkConstants {
      * Moves the given unit towards its destinations if possible.
      *
      * @param unit The <code>Unit</code> to move.
+     * @return True if the unit reached its destination and has more moves
+     *     to make.
      */
-    public void moveToDestination(Unit unit) {
-        if (!requireOurTurn()) return;
+    public boolean moveToDestination(Unit unit) {
+        if (!requireOurTurn()) return false;
         Player player = freeColClient.getMyPlayer();
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
         GUI gui = freeColClient.getGUI();
@@ -1039,13 +1041,16 @@ public final class InGameController implements NetworkConstants {
                     }
                 }
             }
-            checkCashInTreasureTrain(unit);
-            if (unit.getMovesLeft() > 0
-                && unit.getState() != UnitState.SKIPPED
+            // Check cashin, and if the unit is still on the map, has
+            // moves left and was not set to SKIPPED by moveDirection,
+            // then make sure it remains selected and warn that this
+            // unit could continue.
+            if (!checkCashInTreasureTrain(unit)
                 && unit.getTile() != null
-                && freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                freeColClient.getGUI().setSelectedTile(unit.getTile(), false);
+                && unit.getMovesLeft() > 0
+                && unit.getState() != UnitState.SKIPPED) {
+                freeColClient.getGUI().setActiveUnit(unit);
+                return true;
             }
         } else {
             if (freeColClient.getClientOptions()
@@ -1055,6 +1060,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -3666,7 +3672,8 @@ public final class InGameController implements NetworkConstants {
     /**
      * Actually do the goto orders operation.
      *
-     * @return True if all goto orders have been performed.
+     * @return True if all goto orders have been performed and no units
+     *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
         // Ensure the goto mode sticks.
@@ -3675,10 +3682,14 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Process all units.
+        boolean result = true;
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         GUI gui = freeColClient.getGUI();
         while (player.hasNextGoingToUnit()) {
+            Unit unit = player.getNextGoingToUnit();
+            gui.setActiveUnit(unit);
+
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
             if (canvas.isShowingSubPanel()) {
@@ -3687,13 +3698,10 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Move the unit as much as possible
-            Unit unit = player.getNextGoingToUnit();
-            gui.setActiveUnit(unit);
-            moveToDestination(unit);
-            //unit.setMovesLeft(0); // Fake change, client side only
+            if (moveToDestination(unit)) result = false;
             nextModelMessage();
         }
-        return true;
+        return result;
     }
 
     /**
@@ -3760,7 +3768,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         // No active units left.  Do the goto orders.
-        if (!doExecuteGotoOrders()) return;
+        if (!doExecuteGotoOrders()) {
+            return;
+        }
 
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
