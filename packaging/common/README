@@ -51,10 +51,10 @@ the directory where you executed the 'ant' command (in case you
 downloaded the source package).
 Make sure the file named 'FreeCol.jar' is in your current directory.
 
-Execute the command 'java -Xmx256M -jar FreeCol.jar'
+Execute the command 'java -Xmx512M -jar FreeCol.jar'
 
 Windows users may need to execute
-'java -Xmx256M -cp . -jar FreeCol.jar'
+'java -Xmx512M -cp . -jar FreeCol.jar'
 
 In case the command could not be found, check your Java installation
 and make sure that the java (*nix) or java.exe (Windows) file is in

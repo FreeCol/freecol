@@ -202,7 +202,8 @@ Linux, using Java 6 is recommended, as its font rendering is much
 better. If you are using FreeCol on a different platform, we would
 like to hear about it.
 
-FreeCol requires at least 256 MB memory and works best with a screen
+FreeCol requires at least 256 MB memory, although some systems slow
+down badly and require 512MB.  FreeCol works best with a screen
 resolution of at least 1024x768 pixels. It should also be possible to
 play the game with a screen resolution of 1024x600 pixels, although
 some panels will look a bit cramped. You can play the game with an
@@ -236,7 +237,7 @@ In order to compile FreeCol you will need Java and
 \href{http://ant.apache.org/}{the Ant build system}. When these are
 installed, go to the root directory of FreeCol and type \verb$ant$ to
 build a JAR file containing the game. The game is started using the
-command \verb$java -Xmx256M -jar FreeCol.jar$.
+command \verb$java -Xmx512M -jar FreeCol.jar$.
 
 If something goes wrong, please open a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
@@ -264,9 +265,9 @@ paragraphs.
 \hypertarget{Command line options}{\subsection{Command line options}}
 
 If you are in the directory in which FreeCol is installed, you can
-start the game with the command \verb$java -Xmx256M -jar FreeCol.jar$.
+start the game with the command \verb$java -Xmx512M -jar FreeCol.jar$.
 This will tell the Virtual Machine to load the game and to set the
-maximum heap size to 256 MB. Refer to the manual of your Java Virtual
+maximum heap size to 512 MB. Refer to the manual of your Java Virtual
 Machine for details.
 
 There are many other Java options, but you probably won't need to
