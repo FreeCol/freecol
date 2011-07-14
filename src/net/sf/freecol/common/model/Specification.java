@@ -1177,6 +1177,16 @@ public final class Specification {
                 ff.fixup09x();
             }
         }
+        // end TODO
+
+        // TODO: remove 0.10.x compatibility code
+        String id = "model.option.mandatoryColonyYear";
+        if (allOptions.get(id) == null) {
+            IntegerOption option = new IntegerOption(id);
+            option.setValue(1600);
+            allOptions.put(id, option);
+        }
+        // end TODO
 
         initialized = true;
     }
