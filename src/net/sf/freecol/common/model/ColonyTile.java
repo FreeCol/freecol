@@ -540,6 +540,35 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
+     * Gets the potential production of a given goods type from using
+     * a unit of a given type in this building.
+     *
+     * @param unitType The <code>UnitType</code> to check.
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The amount of goods potentially produced.
+     */
+    public int getPotentialProduction(UnitType unitType, GoodsType goodsType) {
+        int production = 0;
+        if (workTile.isLand()
+            || getColony().hasAbility("model.ability.produceInWater")) {
+            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
+                                                                  unitType);
+            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
+                    modifiers) > 0) {
+                modifiers.addAll(unitType.getModifierSet(goodsType.getId()));
+                modifiers.add(getColony().getProductionModifier(goodsType));
+                modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
+                List<Modifier> modifierList = new ArrayList<Modifier>(modifiers);
+                Collections.sort(modifierList);
+                production = Math.max((int) FeatureContainer.applyModifiers(0,
+                        getGame().getTurn(), modifierList), 1);
+            }
+        }
+        return production;
+    }
+
+
+    /**
      * Removes all references to this object.
      *
      * @return A list of disposed objects.

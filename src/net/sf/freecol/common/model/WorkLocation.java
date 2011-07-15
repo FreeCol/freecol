@@ -106,6 +106,17 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     public abstract int getProductionOf(GoodsType goodsType);
 
     /**
+     * Gets the potential production of a given goods type from using
+     * a unit of a given type in this work location.
+     *
+     * @param unitType The <code>UnitType</code> to produce the goods.
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return The amount of goods potentially produced.
+     */
+    public abstract int getPotentialProduction(UnitType unitType,
+                                               GoodsType goodsType);
+
+    /**
      * Returns the <code>Colony</code> this <code>WorkLocation</code> is
      * located in.
      *

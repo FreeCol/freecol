@@ -814,7 +814,7 @@ public class Unit extends FreeColGameObject
     public Set<Modifier> getModifierSet(String id) {
         Set<Modifier> result = new HashSet<Modifier>();
         // UnitType modifiers always apply
-        result.addAll(unitType.getFeatureContainer().getModifierSet(id));
+        result.addAll(unitType.getModifierSet(id));
         // the player's modifiers may not apply
         result.addAll(getOwner().getFeatureContainer()
                       .getModifierSet(id, unitType, getGame().getTurn()));

@@ -765,9 +765,7 @@ public class Colony extends Settlement implements Nameable {
     public List<Unit> getUnitList() {
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (WorkLocation wl : getWorkLocations()) {
-            for (Unit unit : wl.getUnitList()) {
-                units.add(unit);
-            }
+            units.addAll(wl.getUnitList());
         }
         return units;
     }
