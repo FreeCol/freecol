@@ -92,7 +92,8 @@
     <xs:attribute name="role" type="UnitRole" use="required"/>
     <xs:attribute name="owner" type="PlayerId" use="required"/>
     <xs:attribute name="turnsOfTraining" type="xs:int" use="required"/>
-    <xs:attribute name="workType" type="xs:string" use="required"/>
+    <xs:attribute name="workType" type="xs:string" use="optional"/>
+    <xs:attribute name="experienceType" type="xs:string" use="optional"/>
     <xs:attribute name="experience" type="xs:int" use="required"/>
     <xs:attribute name="treasureAmount" type="xs:int" use="required"/>
     <xs:attribute name="hitpoints" type="xs:int" use="required"/>
@@ -102,8 +103,7 @@
     <xs:attribute name="nationality" type="NationId" use="optional"/>
     <xs:attribute name="ethnicity" type="NationId" use="optional"/>
 
-    <xs:attribute name="indianSettlement" type="xs:string"
-		  use="optional"/>
+    <xs:attribute name="indianSettlement" type="xs:string" use="optional"/>
     <xs:attribute name="workLeft" type="xs:integer" use="required"/>
 
     <xs:attribute name="entryLocation" type="TileId" use="optional"/>

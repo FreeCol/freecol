@@ -230,7 +230,7 @@ public class Unit extends FreeColGameObject
     /** The trade route this unit has. */
     protected TradeRoute tradeRoute = null;
 
-    /** Whic stop in a trade route the unit is going to. */
+    /** Which stop in a trade route the unit is going to. */
     protected int currentStop = -1;
 
     /** To be used only for type == TREASURE_TRAIN */
@@ -244,6 +244,9 @@ public class Unit extends FreeColGameObject
 
     /** What type of goods this unit produces in its occupation. */
     protected GoodsType workType;
+
+    /** What type of goods this unit last earned experience producing. */
+    private GoodsType experienceType;
 
     protected int experience = 0;
 
@@ -707,10 +710,11 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Gets the experience of this <code>Unit</code> at its current workType.
+     * Gets the experience of this <code>Unit</code> at its current
+     * experienceType.
      *
      * @return The experience of this <code>Unit</code> at its current
-     *         workType.
+     *         experienceType.
      * @see #modifyExperience
      */
     public int getExperience() {
@@ -718,10 +722,11 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Sets the experience of this <code>Unit</code> at its current workType.
+     * Sets the experience of this <code>Unit</code> at its current
+     * experienceType.
      *
      * @param experience The new experience of this <code>Unit</code>
-     *         at its current workType.
+     *         at its current experienceType.
      * @see #modifyExperience
      */
     public void setExperience(int experience) {
@@ -730,7 +735,7 @@ public class Unit extends FreeColGameObject
 
     /**
      * Modifies the experience of this <code>Unit</code> at its current
-     * workType.
+     * experienceType.
      *
      * @param value The value by which to modify the experience of this
      *            <code>Unit</code>.
@@ -1004,7 +1009,7 @@ public class Unit extends FreeColGameObject
      * @return The type of goods this unit would produce.
      */
     public GoodsType getExperienceType() {
-        return workType;
+        return experienceType;
     }
 
     /**
@@ -1023,6 +1028,9 @@ public class Unit extends FreeColGameObject
      */
     public void setWorkType(GoodsType type) {
         workType = type;
+        if (type != null) {
+            experienceType = type;
+        }
     }
 
     /**
@@ -3329,6 +3337,8 @@ public class Unit extends FreeColGameObject
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         if (workType != null) out.writeAttribute("workType", workType.getId());
+        if (experienceType != null) out.writeAttribute("experienceType",
+                                                        experienceType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
@@ -3465,14 +3475,21 @@ public class Unit extends FreeColGameObject
         }
 
         workType = getSpecification().getType(in, "workType", GoodsType.class, null);
+        experienceType = getSpecification().getType(in, "experienceType", GoodsType.class, null);
+        if (experienceType == null && workType != null) {
+            experienceType = workType;
+        }
         // TODO: remove compatibility code once 0.10.0 has been released
         try {
             // this is likely to cause an exception, as the
             // specification might not define grain
             GoodsType grain = getSpecification().getGoodsType("model.goods.grain");
             GoodsType food = getSpecification().getPrimaryFoodType();
-            if (food.equals(workType)) {
+            if (workType.equals(food)) {
                 workType = grain;
+            }
+            if (experienceType.equals(food)) {
+                experienceType = grain;
             }
         } catch(Exception e) {
             logger.finest("Failed to update food to grain.");
