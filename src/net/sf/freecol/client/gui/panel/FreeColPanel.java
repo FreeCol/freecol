@@ -644,10 +644,12 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param runnable Some code to run on close.
      */
     public void addClosingCallback(final Runnable runnable) {
+        final FreeColPanel fcp = this;
         addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
                     if ("closing".equals(e.getPropertyName())) {
                         runnable.run();
+                        fcp.removePropertyChangeListener(this);
                     }
                 }
             });
