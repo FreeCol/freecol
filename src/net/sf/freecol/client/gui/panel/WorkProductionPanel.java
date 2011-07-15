@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -65,19 +66,21 @@ public class WorkProductionPanel extends FreeColPanel {
         Colony colony = unit.getColony();
         UnitType unitType = unit.getType();
 
+        List<Modifier> unitModifiers = new ArrayList<Modifier>();
         List<Modifier> modifiers = new ArrayList<Modifier>();
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
-            Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
-            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), basicModifiers) > 0) {
-                basicModifiers.addAll(unit.getModifierSet(goodsType.getId()));
+            Set<Modifier> tileModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
+            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), tileModifiers) > 0) {
+                tileModifiers.addAll(unit.getModifierSet(goodsType.getId()));
+                unitModifiers.addAll(tileModifiers);
                 if (colony.getProductionBonus() != 0) {
-                    basicModifiers.add(colony.getProductionModifier(goodsType));
+                    modifiers.add(colony.getProductionModifier(goodsType));
                 }
-                basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
-                modifiers.addAll(basicModifiers);
+                modifiers.addAll(colony.getModifierSet(goodsType.getId()));
             }
+            Collections.sort(unitModifiers);
             add(localizedLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
             TileType tileType = colonyTile.getWorkTile().getType();
@@ -90,18 +93,18 @@ public class WorkProductionPanel extends FreeColPanel {
                                               colonyTile.getWorkTile(), colony);
             add(new JLabel(new ImageIcon(image)));
 
-        } else {
+        } else if (unit.getLocation() instanceof Building) {
             Building building = (Building) unit.getLocation();
             GoodsType goodsType = building.getGoodsOutputType();
             if (building.getType().getProductionModifier() != null) {
-                modifiers.add(building.getType().getProductionModifier());
+                unitModifiers.add(building.getType().getProductionModifier());
             }
             if (colony.getProductionBonus() != 0) {
-                modifiers.add(colony.getProductionModifier(goodsType));
+                unitModifiers.add(colony.getProductionModifier(goodsType));
             }
 
             if (goodsType != null) {
-                modifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
+                unitModifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
             }
             modifiers.addAll(colony.getModifierSet(goodsType.getId()));
 
@@ -114,55 +117,19 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new UnitLabel(unit, canvas, false, false), "wrap");
 
         float result = 0;
-        for (Modifier modifier : modifiers) {
-            FreeColGameObjectType source = modifier.getSource();
-            String sourceName;
-            if (source == null) {
-                sourceName = "???";
-            } else {
-                sourceName = Messages.message(source.getNameKey());
-                if (unitType != null && modifier.hasScope()) {
-                    for (Scope scope : modifier.getScopes()) {
-                        if (scope.appliesTo(unitType)) {
-                            sourceName += " (" + Messages.message(unitType.getNameKey()) + ")";
-                        }
-                    }
-                }
-            }
-            String bonus = getModifierFormat().format(modifier.getValue());
-            boolean percentage = false;
-            switch(modifier.getType()) {
-            case ADDITIVE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                break;
-            case PERCENTAGE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                percentage = true;
-                break;
-            case MULTIPLICATIVE:
-                bonus = "\u00D7" + bonus;
-                break;
-            default:
-            }
-            result = modifier.applyTo(result);
-            add(new JLabel(sourceName), "newline");
-            add(new JLabel(bonus));
-            if (percentage) {
-                add(new JLabel("%"));
+        for (Modifier modifier : unitModifiers) {
+            result = addModifier(modifier, unitType, result);
+        }
+
+        if (!modifiers.isEmpty()) {
+            add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
+
+            for (Modifier modifier : modifiers) {
+                result = addModifier(modifier, unitType, result);
             }
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
-
-        /*
-        int result = (int) FeatureContainer.applyModifierSet(0, getGame().getTurn(), basicModifiers);
-        result = (int) FeatureContainer.applyModifierSet(result, getGame().getTurn(), colonyModifiers);
-        result += colony.getProductionBonus();
-        */
 
         JLabel finalLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalLabel.setFont(bigFont);
@@ -178,6 +145,52 @@ public class WorkProductionPanel extends FreeColPanel {
         setSize(getPreferredSize());
 
     }
+
+
+    private float addModifier(Modifier modifier, UnitType unitType, float result) {
+        FreeColGameObjectType source = modifier.getSource();
+        String sourceName;
+        if (source == null) {
+            sourceName = "???";
+        } else {
+            sourceName = Messages.message(source.getNameKey());
+            if (unitType != null && modifier.hasScope()) {
+                for (Scope scope : modifier.getScopes()) {
+                    if (scope.appliesTo(unitType)) {
+                        sourceName += " (" + Messages.message(unitType.getNameKey()) + ")";
+                    }
+                }
+            }
+        }
+        String bonus = getModifierFormat().format(modifier.getValue());
+        boolean percentage = false;
+        switch(modifier.getType()) {
+        case ADDITIVE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            break;
+        case PERCENTAGE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            percentage = true;
+            break;
+        case MULTIPLICATIVE:
+            bonus = "\u00D7" + bonus;
+            break;
+        default:
+        }
+
+        add(new JLabel(sourceName), "newline");
+        add(new JLabel(bonus));
+        add(new JLabel(percentage ? "%" : ""));
+
+        return modifier.applyTo(result);
+    }
+
+
+
 }
 
 
