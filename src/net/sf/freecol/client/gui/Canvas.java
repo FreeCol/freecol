@@ -701,7 +701,7 @@ public final class Canvas extends JDesktopPane {
         } else if (display instanceof Unit) {
             Unit unit = (Unit) display;
             try {
-                image = imageLibrary.getUnitImageIcon(unit.getType()).getImage();
+                image = imageLibrary.getUnitImageIcon(unit).getImage();
             } catch (Exception e) {
                 logger.warning("could not find image for unit " + unit.toString());
             }
