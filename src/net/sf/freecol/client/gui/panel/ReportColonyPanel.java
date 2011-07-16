@@ -274,7 +274,7 @@ public final class ReportColonyPanel extends ReportPanel
         // Define the layout, with a column for each goods type.
         String cols = "[l][c][c][c]";
         for (int i = 0; i < goodsTypes.size(); i++) cols += "[c]";
-        cols += "[l][l][c][l]";
+        cols += "[c][l][l][c][l]";
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
                 cols, ""));
 
@@ -378,9 +378,10 @@ public final class ReportColonyPanel extends ReportPanel
         int newFood = colony.getAdjustedNetProductionOf(foodType);
         boolean famine = newFood < 0
             && colony.getGoodsCount(foodType) / -newFood <= 3;
-        int newColonist = (newFood <= 0) ? -1
-            : (Settlement.FOOD_PER_COLONIST + 1
-                - colony.getGoodsCount(foodType)) / newFood;
+        int newColonist = (newFood == 0) ? 0
+            : (newFood < 0) ? colony.getGoodsCount(foodType) / newFood - 1
+            : (Settlement.FOOD_PER_COLONIST - colony.getGoodsCount(foodType))
+                / newFood + 1;
         int pop = colony.getUnitCount();
         int grow, bonus = colony.getProductionBonus();
         if (bonus < 0) {
@@ -508,10 +509,18 @@ public final class ReportColonyPanel extends ReportPanel
                     .add("%goods%", g.getNameKey())
                     .addAmount("%amount%", p)
                     .addAmount("%export%", exportData.getExportLevel());
-            } else if (g != foodType && amount > high) {
-                int turns = 1 + (colony.getWarehouseCapacity() - amount)
-                    / p;
+            } else if (g != foodType
+                && amount + p > colony.getWarehouseCapacity()) {
                 c = cAlarm;
+                int waste = amount + p - colony.getWarehouseCapacity();
+                tip = stpl("report.colony.production.waste.description")
+                    .addName("%colony%", colony.getName())
+                    .add("%goods%", g.getNameKey())
+                    .addAmount("%amount%", p)
+                    .addAmount("%waste%", waste);
+            } else if (g != foodType && amount > high) {
+                int turns = (colony.getWarehouseCapacity() - amount) / p;
+                c = cWarn;
                 tip = stpl("report.colony.production.high.description")
                     .addName("%colony%", colony.getName())
                     .add("%goods%", g.getNameKey())
@@ -610,29 +619,38 @@ public final class ReportColonyPanel extends ReportPanel
             if (w == null || w != t) couldWork.add(u.getType());
         }
 
+        // Field: New colonist arrival, or famine warning.
+        // Colour: cGood if arriving eventually, blank if not enough food
+        // to grow, cWarn if negative, cAlarm if famine soon.
+        if (newColonist > 0) {
+            b = colourButton(cac, Integer.toString(newColonist),
+                null, cGood,
+                stpl("report.colony.arriving.description")
+                    .addName("%colony%", colony.getName())
+                    .add("%unit%", colonistType.getNameKey())
+                    .addAmount("%turns%", newColonist));
+            reportPanel.add(b);
+        } else if (newColonist < 0) {
+            b = colourButton(cac, Integer.toString(-newColonist),
+                null, (newColonist >= -3) ? cAlarm : cWarn,
+                stpl("report.colony.starving.description")
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%turns%", -newColonist));
+            reportPanel.add(b);
+        } else {
+            reportPanel.add(new JLabel(""));
+        }
+
         // Field: What is currently being built (clickable if on the
         // buildqueue) and the turns until it completes, including
-        // units being taught and new colonists.
+        // units being taught.
         // Colour: cAlarm bold "Nothing" if nothing being built, cAlarm
         // with no turns if no production, cGood with turns if
         // completing, cAlarm with turns if will block, turns
         // indicates when blocking occurs.
         BuildableType build = colony.getCurrentlyBuilding();
-        int fields = 1 + teachers.size()
-            + ((newColonist < 0) ? 0 : 1);
+        int fields = 1 + teachers.size();
         String layout = (fields > 1) ? "split " + fields : null;
-        if (newColonist >= 0) {
-            newColonist++;
-            b = colourButton(cac, Integer.toString(newColonist),
-                lib.getUnitImageIcon(colonistType, Role.DEFAULT,
-                    true, 0.333), cGood,
-                stpl("report.colony.making.birth.description")
-                    .addName("%colony%", colony.getName())
-                    .add("%unit%", colonistType.getNameKey())
-                    .addAmount("%turns%", newColonist));
-            reportPanel.add(b, layout);
-            layout = null;
-        }
         String qac = BUILDQUEUE + colony.getId();
         if (build == null) {
             b = colourButton(qac, Messages.message("nothing"),
@@ -758,6 +776,13 @@ public final class ReportColonyPanel extends ReportPanel
             l.setEnabled(market == null || market.getArrears(g) <= 0);
             reportPanel.add(l);
         }
+        final UnitType colonistType
+            = getSpecification().getUnitType("model.unit.freeColonist");
+        ImageIcon colonistIcon
+            = getCanvas().getImageLibrary().getUnitImageIcon(colonistType,
+                Role.DEFAULT, true, 0.333);
+        reportPanel.add(newLabel(null, colonistIcon, null,
+                                 stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
                                  stpl("report.colony.making.description")));
         reportPanel.add(newLabel("report.colony.improve.header", null, null,
@@ -866,15 +891,15 @@ public final class ReportColonyPanel extends ReportPanel
                 }
             });
         for (UnitType type : types) {
-            boolean gray = false;
+            boolean present = false;
             if (have.contains(type)) {
                 have.remove(type);
-                gray = true;
+                present = true;
             }
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
             ImageIcon ii = lib.getUnitImageIcon(type, Role.DEFAULT,
-                gray, 0.333);
+                true, 0.333);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())
@@ -887,7 +912,8 @@ public final class ReportColonyPanel extends ReportPanel
                     .add("%unit%", type.getNameKey())
                     .add("%goods%", suggestion.goodsType.getNameKey())
                     .addAmount("%amount%", suggestion.amount);
-            JButton b = colourButton(action, label, ii, Color.BLACK, tip);
+            JButton b = colourButton(action, label, ii,
+                (present) ? cGood : cPlain, tip);
             reportPanel.add(b, layout);
             layout = null;
         }
