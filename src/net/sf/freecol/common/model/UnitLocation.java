@@ -319,6 +319,15 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
+     * @{inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+    }
+    
+    /**
      * {@inheritDoc}
      */
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
