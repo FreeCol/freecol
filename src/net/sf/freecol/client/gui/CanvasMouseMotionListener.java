@@ -55,13 +55,13 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
     // private static final int SCROLLSPACE = 3;
     private static final int DRAG_SCROLLSPACE = 100;
-	
+
 	private static final int AUTO_SCROLLSPACE = 1;
 
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      * @param m The Map that is currently being drawn on the Canvas (by the
@@ -76,11 +76,11 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
     /**
      * Invoked when the mouse has been moved.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-      
+
     	if (e.getComponent().isEnabled()
           && canvas.getFreeColClient().getClientOptions()
           .getBoolean(ClientOptions.AUTO_SCROLL)) {
@@ -94,7 +94,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             if (gui.getActiveUnit() == null) {
                 gui.stopGoto();
             }
-            
+
             Tile tile = gui.convertToMapTile(e.getX(), e.getY());
 
             if (tile != null) {
@@ -107,14 +107,14 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                     } else {
                         gui.setGotoPath(null);
                     }
-                } 
+                }
             }
         }
     }
-	
+
 	/**
      * Invoked when the mouse has been dragged.
-     * 
+     *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
@@ -129,13 +129,13 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         }
 
         Tile tile = gui.convertToMapTile(e.getX(), e.getY());
-        if (tile != null && 
+        if (tile != null &&
             (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
             // only perform the goto for the left mouse button
             if (gui.isGotoStarted()) {
                 if (gui.getActiveUnit() == null) {
                     gui.stopGoto();
-                } else { 
+                } else {
                     if (lastTile != tile) {
                         lastTile = tile;
                         if (gui.getActiveUnit().getTile() != tile) {
@@ -151,24 +151,24 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             }
         }
     }
-	
+
 	private void auto_scroll(int x, int y){
 		scroll(x, y, AUTO_SCROLLSPACE);
 	}
-	
+
 	private void drag_scroll(int x, int y){
 		scroll(x, y, DRAG_SCROLLSPACE);
 	}
 
 	private void scroll(int x, int y, int scrollspace) {
-		
+
 		/*
          * if (y < canvas.getMenuBarHeight()) { if (scrollThread != null) {
          * scrollThread.stopScrolling(); scrollThread = null; } return; } else
          * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
          * canvas.getMenuBarHeight(); }
          */
-		
+
 		Direction direction;
         if ((x < scrollspace) && (y < scrollspace)) {
             // Upper-Left
@@ -230,7 +230,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         /**
          * The constructor to use.
-         * 
+         *
          * @param m The Map that needs to be scrolled.
          * @param g The GUI that holds information such as screen resolution.
          */
@@ -243,7 +243,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         /**
          * Sets the direction in which this ScrollThread will scroll.
-         * 
+         *
          * @param d The direction in which this ScrollThread will scroll.
          */
         public void setDirection(Direction d) {
