@@ -223,7 +223,7 @@ public class Unit extends FreeColGameObject
 
     protected Location location;
 
-    protected IndianSettlement indianSettlement = null; // only used by BRAVE.
+    protected IndianSettlement indianSettlement = null; // only used by Brave and Convert
 
     protected Location destination = null;
 
@@ -2299,12 +2299,14 @@ public class Unit extends FreeColGameObject
      * @param owner The new nationality of this Unit.
      */
     public void setNationality(String newNationality) {
-        // 0.10.0 and earlier games have no model.ability.person, so
-        // instead we check if the unit is not a ship, artillery or
-        // wagon
-        if (!hasAbility(Ability.NAVAL_UNIT)
-            && !hasAbility("model.ability.bombard")
-            && !hasAbility(Ability.CARRY_TREASURE)) {
+        if (hasAbility("model.ability.bornInColony")
+			|| hasAbility("model.ability.bornInIndianSettlement")
+			|| hasAbility("model.ability.foundColony")) {
+            // 0.10.0 and earlier games have no model.ability.person,
+            // so instead we check several other abilities to exclude
+            // ships, artillery, wagons and treasure trains.
+            // foundColony is for additional backwards compatibility,
+            // as inheritance of model.ability.bornInColony is quite new.
             nationality = newNationality;
         } else {
             throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
@@ -2314,7 +2316,7 @@ public class Unit extends FreeColGameObject
     /**
      * Gets the ethnicity of this Unit.
      * Ethnicity is inherited from the inhabitants of the place where the Unit was born.
-     * Potentially allows former converts to become native-looking master workers.
+     * Allows former converts to become native-looking colonists.
      *
      * @return The ethnicity of this Unit.
      */
@@ -2330,6 +2332,22 @@ public class Unit extends FreeColGameObject
      */
     public void setEthnicity(String newEthnicity) {
         throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
+    }
+
+    /**
+     * Identifies whether this unit came from a native tribe.
+     *
+     * @return Whether this unit looks native or not.
+     */
+    public boolean hasNativeEthnicity() {
+    	try {
+    		// FIXME: getNation() could fail, but getNationType() doesn't work as expected
+            return getGame().getSpecification().getNation(ethnicity).getType().isIndian();
+//          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
+//          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
+		} catch (Exception e) {
+			return false;
+		}
     }
 
     /**

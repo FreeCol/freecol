@@ -128,10 +128,20 @@ public class ServerUnit extends Unit implements ServerModelObject {
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
         unitType = (newType == null) ? type : newType;
         this.owner = owner;
-        if(hasAbility("model.ability.bornInColony") || hasAbility("model.ability.bornInIndianSettlement") || hasAbility("model.ability.convert") || hasAbility("model.ability.foundColony")) { // foundColony is for backwards compat, as inheritance of model.ability.bornInColony is quite new
-            // 0.10.0 and earlier games have no model.ability.person, so instead we check several other abilities to exclude ships, artillery, wagons and treasure trains
+        if(hasAbility("model.ability.bornInColony")
+            || hasAbility("model.ability.bornInIndianSettlement")
+            || hasAbility("model.ability.convert")
+            || hasAbility("model.ability.foundColony")) {
+            // 0.10.0 and earlier games have no model.ability.person,
+            // so instead we check several other abilities to exclude
+            // ships, artillery, wagons and treasure trains.
+            // foundColony is for additional backwards compatibility,
+            // as inheritance of model.ability.bornInColony is quite new.
+            
+            // TODO: units born in colonies should inherit the ethnicity of
+            // the people in that colony (which may not be owner.nationID)
             nationality = owner.getNationID();
-            ethnicity = nationality;    // TODO: units born in colonies should inherit the ethnicity of the people in that colony (which may not be owner.nationID)
+            ethnicity = nationality;
         }
         setLocation(location);
 
