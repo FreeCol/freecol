@@ -147,11 +147,10 @@ public final class ReportColonyPanel extends ReportPanel
      */
     public ReportColonyPanel(Canvas parent) {
         super(parent, Messages.message("reportColonyAction.name"));
-        ClientOptions options = getFreeColClient().getClientOptions();
-        colonies = options.getSortedColonies(getMyPlayer());
+        colonies = getSortedColonies();
 
         try {
-            useCompact = options.getBoolean(ClientOptions.COMPACT_COLONY_REPORT);
+            useCompact = getClientOptions().getBoolean(ClientOptions.COMPACT_COLONY_REPORT);
         } catch (Exception e) {
             useCompact = false;
         }

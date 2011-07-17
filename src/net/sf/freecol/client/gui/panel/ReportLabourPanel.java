@@ -62,8 +62,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      */
     public ReportLabourPanel(Canvas parent) {
         super(parent, Messages.message("reportLabourAction.name"));
-        colonies = getFreeColClient().getClientOptions()
-              .getSortedColonies(getMyPlayer());
+        colonies = getSortedColonies();
         gatherData();
         displayData();
     }

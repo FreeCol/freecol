@@ -66,6 +66,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -202,6 +203,26 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     }
 
+
+    /**
+     * Return the client's <code>ClientOptions</code>.
+     *
+     * @return a <code>ClientOptions</code> value
+     */
+    protected ClientOptions getClientOptions() {
+        return getFreeColClient().getClientOptions();
+    }
+
+    /**
+     * Return the player's Colonies, sorted according to player's
+     * <code>ClientOptions</code>.
+     *
+     * @return a sorted List of Colonies
+     */
+    protected List<Colony> getSortedColonies() {
+        return getFreeColClient().getClientOptions()
+            .getSortedColonies(getMyPlayer());
+    }
 
     /**
      * Return an <code>int</code> associated with the name of the

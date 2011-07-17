@@ -74,7 +74,7 @@ public final class ReportTurnPanel extends ReportPanel {
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("reportTurnAction.name"));
 
-        ClientOptions options = getFreeColClient().getClientOptions();
+        ClientOptions options = getClientOptions();
         this._messages = messages;
 
         Comparator<ModelMessage> comparator

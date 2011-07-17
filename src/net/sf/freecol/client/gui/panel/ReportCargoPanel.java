@@ -126,8 +126,7 @@ public final class ReportCargoPanel extends ReportPanel {
     private void gatherData() {
         locations = new HashMap<String, ArrayList<Unit>>();
         Player player = getMyPlayer();
-        List<Colony> colonies = getFreeColClient().getClientOptions()
-            .getSortedColonies(player);
+        List<Colony> colonies = getSortedColonies();
         colonyNames = new ArrayList<String>();
         for (Colony colony : colonies) {
             colonyNames.add(colony.getName());

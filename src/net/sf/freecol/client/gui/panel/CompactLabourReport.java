@@ -248,11 +248,11 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(unitTotal, null, row);
 
-        for (Colony colony : getFreeColClient().getClientOptions()
-                 .getSortedColonies(getMyPlayer())) {
+        for (Colony colony : getSortedColonies()) {
             LabourData.LocationData colonyData = unitData.getDetails().get(colony);
             if (colonyData != null) {
-                reportPanel.add(createColonyButton(colony), "cell " + COLONY_COLUMN + " " + row + " 1 " + colonyData.getRowCount());
+                reportPanel.add(createColonyButton(colony), "cell " + COLONY_COLUMN + " "
+                                + row + " 1 " + colonyData.getRowCount());
                 row = addLocationData(colonyData, colony, row);
             }
         }

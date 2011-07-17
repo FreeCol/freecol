@@ -145,7 +145,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      */
     @Override
     public void initialize() {
-        
+
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
         sendButton.addActionListener(this);
         sendButton.setActionCommand(SEND);
@@ -198,7 +198,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         add(sendButton, "newline 20, span, split 3");
         add(acceptButton, "tag ok");
         add(cancelButton, "tag cancel");
-            
+
         updateDialog();
     }
 
@@ -249,19 +249,19 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             logger.warning("Failed to update summary: " + e.toString());
         }
     }
-    
+
     private void updateOfferItems(){
         // Update stance options
         stance.updateStanceBox();
-        
+
         // Update the gold amount that can be demanded
         goldOffer.setAvailableGold(player.getGold());
-        
+
         if(unit.isCarrier()){
             Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(player).iterator();
             List<Goods> goodsAvail = new ArrayList<Goods>();
             goodsAvail.addAll(unit.getGoodsContainer().getGoods());
-                
+
             //remove the ones already on the table
             while(goodsInAgreement.hasNext()){
                 Goods goods = goodsInAgreement.next();
@@ -275,7 +275,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                     }
                 }
             }
-                
+
             // Update the list of goods available to add to agreement
             goodsOffer.updateGoodsBox(goodsAvail);
         } else{
@@ -283,18 +283,18 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             colonyOffer.updateColonyBox();
         }
     }
-    
+
     private void updateDemandItems() {
         // Update the gold amount that can be demanded
         NationSummary ns = getController().getNationSummary(otherPlayer);
         int foreignGold = (ns == null) ? 0 : ns.getGold();
         goldDemand.setAvailableGold(foreignGold);
-        
+
         if(unit.isCarrier()){
             Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(otherPlayer).iterator();
             List<Goods> goodsAvail = new ArrayList<Goods>();
             goodsAvail.addAll(settlement.getGoodsContainer().getGoods());
-                
+
             //remove the ones already on the table
             while(goodsInAgreement.hasNext()){
                 Goods goods = goodsInAgreement.next();
@@ -308,7 +308,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                     }
                 }
             }
-                
+
             // Update the list of goods available to add to agreement
             goodsDemand.updateGoodsBox(goodsAvail);
         }
@@ -317,7 +317,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             colonyDemand.updateColonyBox();
         }
     }
-    
+
     public void updateDialog(){
         updateOfferItems();
         updateDemandItems();
@@ -469,7 +469,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     /**
      * Analyzes an event and calls the right external methods to take care of
      * the user's request.
-     * 
+     *
      * @param event The incoming action event
      */
     @Override
@@ -498,7 +498,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         private Player player;
         private NegotiationDialog negotiationDialog;
         private JLabel textLabel;
-        
+
         /**
          * Creates a new <code>ColonyTradeItemPanel</code> instance.
          *
@@ -521,9 +521,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             add(this.textLabel);
             add(colonyBox);
             add(addButton);
-            
+
         }
-        
+
         private void updateColonyBox() {
 
             if (!player.isEuropean()) {
@@ -537,11 +537,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 colonyBox.removeActionListener(al);
             }
             colonyBox.removeAllItems();
-                
+
             Iterator<Colony> coloniesInAgreement = agreement.getColoniesGivenBy(player).iterator();
-            List<Colony> coloniesAvail = getFreeColClient().getClientOptions()
-                .getSortedColonies(player);
-                
+            List<Colony> coloniesAvail = getClientOptions().getSortedColonies(player);
+
             //remove the ones already on the table
             while(coloniesInAgreement.hasNext()){
                 Colony colony = coloniesInAgreement.next();
@@ -554,7 +553,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                     }
                 }
             }
-            
+
             if (coloniesAvail.isEmpty()){
                 addButton.setEnabled(false);
                 colonyBox.setEnabled(false);
@@ -573,7 +572,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         /**
          * Analyzes an event and calls the right external methods to take care of
          * the user's request.
-         * 
+         *
          * @param event The incoming action event
          */
         public void actionPerformed(ActionEvent event) {
@@ -593,7 +592,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         private Player player;
         private NegotiationDialog negotiationDialog;
         private JLabel label;
-        
+
         /**
          * Creates a new <code>GoodsTradeItemPanel</code> instance.
          *
@@ -630,7 +629,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 goodsBox.removeActionListener(al);
             }
             goodsBox.removeAllItems();
-            
+
             if(allGoods != null && !allGoods.isEmpty()){
                 Iterator<Goods> goodsIterator = allGoods.iterator();
                 while (goodsIterator.hasNext()) {
@@ -642,7 +641,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 for(ActionListener al : listeners) {
                     goodsBox.addActionListener(al);
                 }
-                
+
                 this.label.setEnabled(true);
                 addButton.setEnabled(true);
                 goodsBox.setEnabled(true);
@@ -650,13 +649,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 this.label.setEnabled(false);
                 addButton.setEnabled(false);
                 goodsBox.setEnabled(false);
-            }            
+            }
         }
 
         /**
          * Analyzes an event and calls the right external methods to take care of
          * the user's request.
-         * 
+         *
          * @param event The incoming action event
          */
         public void actionPerformed(ActionEvent event) {
@@ -679,16 +678,16 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                   throw new NullPointerException();
                this.value = value;
             }
-            
+
             @Override
             public String toString() {
                 return Messages.getStanceAsString(value);
             }
-            
+
             Stance getValue() {
                 return value;
             }
-            
+
             @Override
             public boolean equals(Object other) {
                 if (other == null || !(other instanceof StanceItem)) {
@@ -703,13 +702,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                return value.hashCode();
             }
         }
-        
+
         private JComboBox stanceBox;
         private JButton addButton;
         private NegotiationDialog negotiationDialog;
         private Player source;
         private Player target;
-        
+
         /**
          * Creates a new <code>StanceTradeItemPanel</code> instance.
          *
@@ -721,12 +720,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             this.negotiationDialog = parent;
             this.source = source;
             this.target = target;
-            
+
             addButton = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
             addButton.setActionCommand("add");
             stanceBox = new JComboBox();
-            
+
             updateStanceBox();
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -740,7 +739,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         /**
          * Analyzes an event and calls the right external methods to take care of
          * the user's request.
-         * 
+         *
          * @param event The incoming action event
          */
         public void actionPerformed(ActionEvent event) {
@@ -752,7 +751,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             }
 
         }
-        
+
         public void updateStanceBox(){
             stanceBox.removeAllItems();
             Stance stance = source.getStance(target);
@@ -789,7 +788,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
             // adjust entry size
             ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setColumns(5);
-            
+
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -801,7 +800,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         /**
          * Analyzes an event and calls the right external methods to take care of
          * the user's request.
-         * 
+         *
          * @param event The incoming action event
          */
         public void actionPerformed(ActionEvent event) {
@@ -813,7 +812,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             }
 
         }
-        
+
         public void setAvailableGold(int gold) {
             SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
             model.setMaximum(new Integer(gold));

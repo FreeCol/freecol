@@ -129,7 +129,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) &&
-                !unitType.hasAbility(Ability.NAVAL_UNIT) && 
+                !unitType.hasAbility(Ability.NAVAL_UNIT) &&
                 (unitType.hasAbility("model.ability.expertSoldier") ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility("model.ability.canBeEquipped")) {
@@ -181,17 +181,16 @@ public final class ReportMilitaryPanel extends ReportPanel {
     public Dimension getMinimumSize() {
         return new Dimension(750, 600);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
-    
+
     private void gatherData() {
         Player player = getMyPlayer();
         locations = new HashMap<String, ArrayList<Unit>>();
-        List<Colony> colonies = getFreeColClient().getClientOptions()
-            .getSortedColonies(player);
+        List<Colony> colonies = getSortedColonies();
         colonyNames = new ArrayList<String>();
         for (Colony colony : colonies) {
             colonyNames.add(colony.getName());
@@ -230,7 +229,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             } else if (unit.getState() == UnitState.TO_EUROPE) {
                 locationName = Messages.message("goingToEurope");
             }
-            
+
             ArrayList<Unit> unitList = locations.get(locationName);
             if (unitList == null) {
                 unitList = new ArrayList<Unit>();

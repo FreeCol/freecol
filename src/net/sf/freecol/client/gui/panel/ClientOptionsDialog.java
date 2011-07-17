@@ -50,8 +50,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     public ClientOptionsDialog(Canvas parent) {
         super(parent, true);
         getButtons().clear();
-        initialize(getFreeColClient().getClientOptions(),
-            getFreeColClient().getClientOptions().getName(), null);
+        initialize(getClientOptions(), getClientOptions().getName(), null);
     }
 
     /**

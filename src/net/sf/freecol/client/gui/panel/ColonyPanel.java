@@ -230,9 +230,7 @@ public final class ColonyPanel extends FreeColPanel
         // Make the colony label
         nameBox = new JComboBox();
         nameBox.setFont(smallHeaderFont);
-        List<Colony> settlements = colony.getOwner().getColonies();
-        sortColonies(settlements);
-        for (Colony aColony : settlements) {
+        for (Colony aColony : getSortedColonies()) {
             nameBox.addItem(aColony);
         }
         nameBox.setSelectedItem(colony);
@@ -399,11 +397,6 @@ public final class ColonyPanel extends FreeColPanel
 
     private void sortBuildings(List<Building> buildings) {
         Collections.sort(buildings);
-    }
-
-    private void sortColonies(List<Colony> colonies) {
-        Collections.sort(colonies, getFreeColClient().getClientOptions()
-                         .getColonyComparator());
     }
 
     /**
@@ -1251,7 +1244,7 @@ public final class ColonyPanel extends FreeColPanel
          * Update this WarehousePanel.
          */
         private void update() {
-            final int threshold = getFreeColClient().getClientOptions()
+            final int threshold = getClientOptions()
                 .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
@@ -1631,7 +1624,7 @@ public final class ColonyPanel extends FreeColPanel
                     getController().changeWorkType(unit, workType);
                 }
 
-                if (getFreeColClient().getClientOptions()
+                if (getClientOptions()
                     .getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
                     ColonyTile best = colony.getVacantColonyTileFor(unit, false,
                                                                     workType);

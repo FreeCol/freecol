@@ -147,8 +147,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
 
             int[] totalProduction = new int[selectedTypes.size()];
-            for (Colony colony : getFreeColClient().getClientOptions()
-                     .getSortedColonies(player)) {
+            for (Colony colony : getSortedColonies()) {
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
                 colonyButton.setBorder(FreeColPanel.LEFTCELLBORDER);
