@@ -836,10 +836,8 @@ public class IndianSettlement extends Settlement {
             * (GOODS_CAPACITY - current) / GOODS_CAPACITY;
 
         // But farmed goods are always less interesting.
-        if (type.isFarmed()) unitPrice /= 2;
-
         // and small settlements are not interested in building.
-        if (type.isRawBuildingMaterial()) unitPrice /= 2;
+        if (type.isFarmed() || type.isRawBuildingMaterial()) unitPrice /= 2;
 
         // Only pay for the portion that is valued.
         int price = (unitPrice < 0) ? 0 : valued * unitPrice;
