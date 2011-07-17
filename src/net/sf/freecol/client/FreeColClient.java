@@ -576,7 +576,7 @@ public final class FreeColClient {
      *
      * @param savedGame An optional <code>File</code> to load options from.
      */
-    public void loadClientOptions(File savedGame) {
+    private void loadClientOptions(File savedGame) {
         clientOptions = new ClientOptions();
         logger.info("Loaded default client options.");
 
