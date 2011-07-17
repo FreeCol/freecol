@@ -1019,6 +1019,7 @@ public final class GUI {
      */
     public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
         displayBaseTile(g, tile, false);
+        displayTileOverlays(g, tile, false, false);
 
         Unit occupyingUnit = null;
         int price = 0;
@@ -1030,7 +1031,6 @@ public final class GUI {
                 g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
             }
         }
-        displayTileOverlays(g, tile, false, false);
 
         if (price > 0 && tile.getSettlement() == null) {
             // tile is owned by an IndianSettlement
