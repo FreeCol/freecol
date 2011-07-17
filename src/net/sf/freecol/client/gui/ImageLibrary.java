@@ -28,6 +28,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -598,11 +599,19 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), scalingFactor);
+        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, double scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), scale);
+        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), false, scale);
+    }
+
+    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), grayscale, scalingFactor);
+    }
+
+    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale, double scale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), grayscale, scale);
     }
 
     /**
@@ -612,80 +621,92 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, scalingFactor);
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
-        Image im = null;
-		try {
-			im = ResourceManager.getImage(unitType.getId() + ".image", scale);
-        } catch (NullPointerException e) {
-//			logger.dontKnow("Trying to get image from te resource manager for '" + unitType.getId() + ".image' threw an NPE.")
-		}
-		return (im == null) ? null : new ImageIcon(im);
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, false, scale);
     }
 
-    /**
-     * Returns the ImageIcon that will represent a unit of the given
-     * type and role.
-     *
-     * @param unitType an <code>UnitType</code> value
-     * @param role a <code>Role</code> value
-     * @return an <code>ImageIcon</code> value
-     */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
-        return getUnitImageIcon(unitType, role, scalingFactor);
+        return getUnitImageIcon(unitType, role, false, false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, double scale) {
-        final String roleStr = (role != Role.DEFAULT) ? "." + role.getId() : "";
-        final Image im = ResourceManager.getImage(unitType.getId() + roleStr + ".image", scale);
-        return (im != null) ? new ImageIcon(im) : null;
+        return getUnitImageIcon(unitType, role, false, false, scale);
     }
 
-    /**
-     * Returns the ImageIcon that will represent the given unit.
-     *
-     * @param unit an <code>Unit</code> value
-     * @param grayscale a <code>boolean</code> value
-     * @return an <code>ImageIcon</code> value
-     */
-    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), grayscale);
-    }
-
-    /**
-     * Returns the ImageIcon that will represent a unit of the given type.
-     *
-     * @param unitType an <code>UnitType</code> value
-     * @param grayscale a <code>boolean</code> value
-     * @return an <code>ImageIcon</code> value
-     */
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, grayscale);
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scalingFactor);
     }
 
-    /**
-     * Returns the ImageIcon that will represent a unit of the given
-     * type and role.
-     *
-     * @param unitType an <code>UnitType</code> value
-     * @param role a <code>Role</code> value
-     * @param grayscale a <code>boolean</code> value
-     * @return an <code>ImageIcon</code> value
-     */
+    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale, double scale) {
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scale);
+    }
+
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
-        return getUnitImageIcon(unitType, role, grayscale, scalingFactor);
+        return getUnitImageIcon(unitType, role, false, grayscale, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale, double scale) {
-        if (grayscale) {
-            String key = unitType.getId() + (role == Role.DEFAULT ? "" : "." + role.getId()) + ".image";
-            final Image im = ResourceManager.getGrayscaleImage(key, scale);
-            return (im != null) ? new ImageIcon(im) : null;
-        } else {
-            return getUnitImageIcon(unitType, role, scale);
+        return getUnitImageIcon(unitType, role, false, grayscale, scale);
+    }
+
+    /**
+     * Returns the ImageIcon that will represent a unit with the given specifics.
+     *
+     * @param unitType the type of unit to be represented
+     * @param role unit has equipment that affects its abilities/appearance
+     * @param nativeEthnicity draws the unit with native skin tones
+     * @param grayscale draws the icon in an inactive/disabled-looking state
+     * @return an <code>ImageIcon</code> value
+     */
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean nativeEthnicity, boolean grayscale, double scale) {
+        // units that can only be native don't need the .native key part
+        if (unitType.getId().equals("model.unit.indianConvert")
+            || unitType.getId().equals("model.unit.brave")) {
+            nativeEthnicity = false;
         }
+        else for (Entry<String, Boolean> entry : unitType.getAbilitiesRequired().entrySet()) {
+            if (entry.getKey().equals("model.ability.native") && entry.getValue() == true) {
+                nativeEthnicity = false;
+            }
+        }
+        
+        // try to get an image matching the key
+        final String key = unitType.getId()
+            + (role == Role.DEFAULT ? "" : "." + role.getId())
+            + (nativeEthnicity ? ".native" : "")
+            + ".image";
+        Image image = null;
+        if (grayscale) {
+            image = ResourceManager.getGrayscaleImage(key, scale);
+        } else {
+            image = ResourceManager.getImage(key, scale);
+        }
+        
+        if (image == null) {
+            // log and attempt fallback
+            logger.finest("No image found for image for " + key);
+            if (nativeEthnicity == true) {
+                // try non-native variant
+                return getUnitImageIcon(unitType, role, false, grayscale, scale);
+            
+            // FIXME: these require the game specification, which ImageLibrary doesn't yet have access to
+/*          } else if (role != Role.DEFAULT && !unitType.getId().equals("model.unit.freeColonist")) {
+                // try a free colonist with the same role
+                unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
+                return getUnitImageIcon(unitType, role, false, grayscale, scale);
+            } else {
+                // give up, draw a standard unit icon
+                unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
+                return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scale);
+*/          }
+            
+            logger.warning("Failed to retrieve image for " + key);
+            return null;
+        }
+        return new ImageIcon(image);
     }
 
 
