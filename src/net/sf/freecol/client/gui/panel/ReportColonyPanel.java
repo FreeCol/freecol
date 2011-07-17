@@ -190,6 +190,7 @@ public final class ReportColonyPanel extends ReportPanel
 
             // Units
             JPanel colonistsPanel = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
+            colonistsPanel.setOpaque(false);
             List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
@@ -197,6 +198,7 @@ public final class ReportColonyPanel extends ReportPanel
                 colonistsPanel.add(unitLabel);
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
+            unitsPanel.setOpaque(false);
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
@@ -238,13 +240,14 @@ public final class ReportColonyPanel extends ReportPanel
 
             // Buildings
             JPanel buildingsPanel = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
+            buildingsPanel.setOpaque(false);
             List<Building> buildingList = colony.getBuildings();
             Collections.sort(buildingList);
             for (Building building : buildingList) {
                 if(building.getType().isAutomaticBuild()) {
                     continue;
                 }
-                
+
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
                                                                       + ".image", 0.66)));
