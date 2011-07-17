@@ -391,10 +391,12 @@ public final class ConnectController {
             }
             xs.close();
 
-            // Reload the client options, including those specific to
-            // this game.
-            freeColClient.loadClientOptions(file);
-
+            // Reload the client options saved with this game.
+            try {
+                freeColClient.getClientOptions().updateOptions(fis.getInputStream(fis.CLIENT_OPTIONS));
+            } catch(FileNotFoundException e) {
+                // no client options, we don't care
+            }
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
