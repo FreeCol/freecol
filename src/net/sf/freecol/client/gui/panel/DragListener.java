@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -535,7 +536,8 @@ public final class DragListener extends MouseAdapter {
         if (horses != null && muskets != null && horses.isCompatibleWith(muskets)) {
             final EquipmentType horseType = horses;
             final EquipmentType musketType = muskets;
-            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"));
+            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"),
+                imageLibrary.getUnitImageIcon(tempUnit.getType(), Role.DRAGOON, 1.0/3));
             newItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         igc.equipUnit(tempUnit, horseType, 1);
