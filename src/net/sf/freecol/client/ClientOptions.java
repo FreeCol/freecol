@@ -608,7 +608,7 @@ public class ClientOptions extends OptionGroup {
             XMLStreamReader xsr = XMLInputFactory.newInstance()
                 .createXMLStreamReader(in, "UTF-8");
             xsr.nextTag();
-            updateFromXML(xsr);
+            readFromXML(xsr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {

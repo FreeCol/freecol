@@ -259,41 +259,44 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             setId(id);
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String optionType = in.getLocalName();
             String optionId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             Option option = getOption(optionId);
             if (option == null) {
-                if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new OptionGroup(in));
-                } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new IntegerOption(in));
-                } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new BooleanOption(in));
-                } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new RangeOption(in));
-                } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new SelectOption(in));
-                } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new LanguageOption(in));
-                } else if (FileOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new FileOption(in));
-                } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new PercentageOption(in));
-                } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new AudioMixerOption(in));
-                } else if (StringOption.getXMLElementTagName().equals(optionType)) {
-                    addNewOption(new StringOption(in));
-                } else {
-                    logger.finest("Parsing of " + optionType + " is not implemented yet");
-                    in.nextTag();
-                }
+                addNewOption(in);
             } else {
                 option.readFromXML(in);
             }
         }
     }
 
-    private void addNewOption(AbstractOption option) {
+    private void addNewOption(XMLStreamReader in) throws XMLStreamException {
+        String optionType = in.getLocalName();
+        AbstractOption option = null;
+        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
+            option = new OptionGroup(in);
+        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+            option = new IntegerOption(in);
+        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+            option = new BooleanOption(in);
+        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+            option = new RangeOption(in);
+        } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
+            option = new SelectOption(in);
+        } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
+            option = new LanguageOption(in);
+        } else if (FileOption.getXMLElementTagName().equals(optionType)) {
+            option = new FileOption(in);
+        } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
+            option = new PercentageOption(in);
+        } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
+            option = new AudioMixerOption(in);
+        } else if (StringOption.getXMLElementTagName().equals(optionType)) {
+            option = new StringOption(in);
+        } else {
+            logger.finest("Parsing of " + optionType + " is not implemented yet");
+            in.nextTag();
+            return;
+        }
         add(option);
         option.setGroup(this.getId());
     }
