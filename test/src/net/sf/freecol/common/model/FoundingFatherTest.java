@@ -102,6 +102,29 @@ public class FoundingFatherTest extends FreeColTestCase {
         }
     }
 
+    public void testBellsRequired() {
+
+        int[] expectedValues = new int[] {
+            40, 201, 442, 763, 1164, 1645 , 2206, 2847, 3568, 4369,
+            5250, 6211, 7252, 8373, 9574, 10855, 12216, 13657, 15178,
+            16779, 18460, 20221, 22062, 23983, 25984
+        };
+
+    	Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        //assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        assertEquals(40, spec().getInteger("model.option.foundingFatherFactor"));
+
+        for (int index = 0; index < expectedValues.length; index++) {
+            assertEquals(index, dutch.getFatherCount());
+            assertEquals(expectedValues[index], dutch.getTotalFoundingFatherCost());
+            FoundingFather father = new FoundingFather("father" + index, spec());
+            dutch.addFather(father);
+        }
+
+    }
+
     public void testAvailableTo() {
         // this feature is not used at the moment
     	Game game = getGame();
