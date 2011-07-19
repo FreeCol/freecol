@@ -501,7 +501,9 @@ public class ClientOptions extends OptionGroup {
                 mods.clear();
                 for (FreeColModFile f : Mods.getAllMods()) {
                     ModInfo modInfo = f.getModInfo();
-                    mods.put(modInfo.getId(), modInfo);
+                    if (modInfo != null && modInfo.getId() != null) {
+                        mods.put(modInfo.getId(), modInfo);
+                    }
                 }
             }
 

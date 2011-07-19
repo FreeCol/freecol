@@ -204,8 +204,9 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     }
 
     private List<ListOptionElement<T>> createElementList(List<T> list) {
-        final List<ListOptionElement<T>> elementList = new ArrayList<ListOptionElement<T>>(list.size());
+        final List<ListOptionElement<T>> elementList = new ArrayList<ListOptionElement<T>>();
         for (T o : list) {
+            if (o == null) continue;
             final ListOptionSelector<T> los = option.getListOptionSelector();
             final ListOptionElement<T> e = new ListOptionElement<T>(o, los.toString(o));
             elementList.add(e);
