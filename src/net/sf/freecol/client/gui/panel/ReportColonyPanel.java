@@ -150,7 +150,8 @@ public final class ReportColonyPanel extends ReportPanel
         colonies = getSortedColonies();
 
         try {
-            useCompact = getClientOptions().getBoolean(ClientOptions.COMPACT_COLONY_REPORT);
+            useCompact = getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)
+                == ClientOptions.COLONY_REPORT_COMPACT;
         } catch (Exception e) {
             useCompact = false;
         }

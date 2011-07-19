@@ -1071,7 +1071,7 @@
       <required-goods id="model.goods.tools" value="50"/>
     </building-type>
     <building-type id="model.building.university" extends="model.building.college"
-                   workplaces="3" maxSkill="3" upgradesFrom="model.building.college"
+                   workplaces="3" maxSkill="4" upgradesFrom="model.building.college"
                    required-population="10" upkeep="15">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>

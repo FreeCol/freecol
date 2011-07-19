@@ -283,11 +283,6 @@ public class ClientOptions extends OptionGroup {
     public static final String AUTOLOAD_EMIGRANTS = "model.option.autoloadEmigrants";
 
     /**
-     * Option for selecting the compact colony report.
-     */
-    public static final String COMPACT_COLONY_REPORT = "model.option.compactColonyReport";
-
-    /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.
      */
     public static final String SMOOTH_MINIMAP_RENDERING = "model.option.smoothRendering";
@@ -341,6 +336,13 @@ public class ClientOptions extends OptionGroup {
     public static final String LABOUR_REPORT = "model.option.labourReport";
     public static final int LABOUR_REPORT_CLASSIC = 0;
     public static final int LABOUR_REPORT_COMPACT = 1;
+
+    /**
+     * Option for selecting the compact colony report.
+     */
+    public static final String COLONY_REPORT = "model.option.colonyReport";
+    public static final int COLONY_REPORT_CLASSIC = 0;
+    public static final int COLONY_REPORT_COMPACT = 1;
 
     /**
      * The Indian demand action.
