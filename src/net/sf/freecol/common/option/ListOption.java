@@ -108,7 +108,7 @@ public class ListOption<T> extends AbstractOption<List<T>> {
     private List<String> getValueIds() {
         final List<String> ids = new ArrayList<String>(value.size());
         for (T t : value) {
-            ids.add(selector.getId(t));
+            if (t != null) ids.add(selector.getId(t));
         }
         return ids;
     }
