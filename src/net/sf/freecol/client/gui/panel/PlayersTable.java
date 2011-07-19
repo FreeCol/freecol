@@ -93,7 +93,7 @@ public final class PlayersTable extends JTable {
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param canvas a <code>Canvas</code> value
      * @param nationOptions a <code>NationOptions</code> value
      * @param myPlayer a <code>Player</code> value
@@ -139,7 +139,7 @@ public final class PlayersTable extends JTable {
         TableColumn availableColumn = getColumnModel().getColumn(AVAILABILITY_COLUMN);
         availableColumn.setCellRenderer(new AvailableCellRenderer());
         availableColumn.setCellEditor(new AvailableCellEditor());
-        
+
         TableColumn advantagesColumn = getColumnModel().getColumn(ADVANTAGE_COLUMN);
         if (nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
             advantagesColumn.setCellEditor(new AdvantageCellEditor(canvas.getSpecification().getEuropeanNationTypes()));
@@ -153,7 +153,7 @@ public final class PlayersTable extends JTable {
         TableColumn playerColumn = getColumnModel().getColumn(PLAYER_COLUMN);
         playerColumn.setCellEditor(new PlayerCellEditor());
         playerColumn.setCellRenderer(new PlayerCellRenderer());
-        
+
     }
 
     public void update() {
@@ -233,7 +233,13 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    class AvailableCellRenderer extends JLabel implements TableCellRenderer {
+    class AvailableCellRenderer implements TableCellRenderer {
+
+        private JComboBox box = new JComboBox(allStates);
+
+        public AvailableCellRenderer() {
+            box.setRenderer(new NationStateRenderer());
+        }
 
         /**
          * Returns the component used to render the cell's value.
@@ -246,8 +252,8 @@ public final class PlayersTable extends JTable {
          */
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
-            setText(Messages.message("nationState." + ((NationState) value).toString()));
-            return this;
+            box.setSelectedItem(value);
+            return box;
         }
     }
 
@@ -379,7 +385,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * A standard constructor.
-         * 
+         *
          * @param pgc The PreGameController to use when updates need to be notified
          *            across the network.
          * @param nationOptions a <code>NationOptions</code> value
@@ -413,7 +419,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns the Class of the objects in the given column.
-         * 
+         *
          * @param column The column to return the Class of.
          * @return The Class of the objects in the given column.
          */
@@ -435,7 +441,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns the amount of columns in this statesTable.
-         * 
+         *
          * @return The amount of columns in this statesTable.
          */
         public int getColumnCount() {
@@ -444,7 +450,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns the name of the specified column.
-         * 
+         *
          * @return The name of the specified column.
          */
         public String getColumnName(int column) {
@@ -453,7 +459,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns the amount of rows in this statesTable.
-         * 
+         *
          * @return The amount of rows in this statesTable.
          */
         public int getRowCount() {
@@ -462,7 +468,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns the value at the requested location.
-         * 
+         *
          * @param row The requested row.
          * @param column The requested column.
          * @return The value at the requested location.
@@ -492,7 +498,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Returns 'true' if the specified cell is editable, 'false' otherwise.
-         * 
+         *
          * @param row The specified row.
          * @param column The specified column.
          * @return 'true' if the specified cell is editable, 'false' otherwise.
@@ -516,7 +522,7 @@ public final class PlayersTable extends JTable {
 
         /**
          * Sets the value at the specified location.
-         * 
+         *
          * @param value The new value.
          * @param row The specified row.
          * @param column The specified column.
