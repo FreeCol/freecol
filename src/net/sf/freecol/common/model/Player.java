@@ -1741,11 +1741,7 @@ public class Player extends FreeColGameObject implements Nameable {
         int base = getSpecification()
             .getIntegerOption("model.option.foundingFatherFactor").getValue();
         int count = getFatherCount();
-        int previous = 1;
-        for (int index = 0; index < count; index++) {
-            previous += 2 * (index + 2);
-        }
-        return previous * base + count;
+        return ((count + 1) * (count + 2) - 1) * base + count;
     }
 
     /**
