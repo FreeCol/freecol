@@ -96,11 +96,11 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
 
         JPanel panel = new JPanel();
         add(panel);
-        button1 = new JButton( "Test" );
+        button1 = new JButton(Messages.message("Test"));
         panel.add(button1);
         button1.addActionListener(aHandler);
 
-        button2 = new JButton( "Music" );
+        button2 = new JButton(Messages.message("Music"));
         panel.add(button2);
         button2.addActionListener(aHandler);
 
@@ -129,7 +129,7 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
                 text = "-- NO ADAPTER --";
         else
                 text = mixer.getMixerInfo().getName();
-        currentMixerLabel.setText("Current:  ".concat(text));
+        currentMixerLabel.setText(Messages.message("Current") + ":  " + text);
     }
 
     /**
