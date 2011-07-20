@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -72,6 +73,8 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     public static final Integer NO_MNEMONIC = null;
 
     protected final FreeColClient freeColClient;
+
+    private int orderButtonImageCount = 0;
 
 
     /**
@@ -128,15 +131,38 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         return freeColClient;
     }
 
+    /**
+     * Are all the order button images present?
+     *
+     * @return True if all the order button images are present.
+     */
+    public boolean hasOrderButtons() {
+        return orderButtonImageCount == 4;
+    }
+
+    /**
+     * Adds icons for the order buttons.
+     *
+     * @param key The id of the action.
+     */
     protected void addImageIcons(String key) {
-        putValue(BUTTON_IMAGE,
-                 new ImageIcon(ResourceManager.getImage("orderButton.normal." + key)));
-        putValue(BUTTON_ROLLOVER_IMAGE,
-                 new ImageIcon(ResourceManager.getImage("orderButton.highlighted." + key)));
-        putValue(BUTTON_PRESSED_IMAGE,
-                 new ImageIcon(ResourceManager.getImage("orderButton.pressed." + key)));
-        putValue(BUTTON_DISABLED_IMAGE,
-                 new ImageIcon(ResourceManager.getImage("orderButton.disabled." + key)));
+        Image normal = ResourceManager.getImage("orderButton.normal." + key);
+        Image highlighted = ResourceManager.getImage("orderButton.highlighted." + key);
+        Image pressed = ResourceManager.getImage("orderButton.pressed." + key);
+        Image disabled = ResourceManager.getImage("orderButton.disabled." + key);
+        orderButtonImageCount = ((normal == null) ? 0 : 1)
+            + ((highlighted == null) ? 0 : 1)
+            + ((pressed == null) ? 0 : 1)
+            + ((disabled == null) ? 0 : 1);
+        if (hasOrderButtons()) {
+            putValue(BUTTON_IMAGE, new ImageIcon(normal));
+            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(highlighted));
+            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(pressed));
+            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(disabled));
+        } else {
+            logger.warning("Missing " + (4-orderButtonImageCount)
+                + " orderButton images for " + getId());
+        }
     }
 
     /**

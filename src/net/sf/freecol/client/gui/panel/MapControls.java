@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
+import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
@@ -94,7 +95,10 @@ public final class MapControls {
 //        if ( freeColClient.getGame() != null )  // ** DOUBTFUL !! just for testing
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
-            if (!type.isNatural()) {
+            FreeColAction action = am.getFreeColAction(type.getShortId()
+                                                       + "Action");
+            if (!type.isNatural() && action != null
+                && action.hasOrderButtons()) {
                 ubList.add(new UnitButton(am, type.getShortId() + "Action"));
             }
         }
