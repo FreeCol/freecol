@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -307,4 +308,22 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(5, townHall.getProduction());
 
     }
+
+    public void lasCasas() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(true));
+
+        FoundingFather lasCasas = spec().getFoundingFather("model.foundingFather.bartolomeDeLasCasas");
+        Map<UnitType, UnitType> upgrades = lasCasas.getUpgrades();
+
+        assertFalse(upgrades.isEmpty());
+
+        for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
+            assertEquals(entry.getKey(), spec().getUnitType(entry.getKey().getId()));
+            assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
+        }
+
+    }
+
+
 }
