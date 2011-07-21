@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -257,7 +258,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 }
                 if (u.hasAbility("model.ability.expertSoldier")) {
                     recruits.add(u);
-                } else if (u.hasAbility("model.ability.canBeEquipped")) {
+                } else if (u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     others.add(u);
                 }
             }

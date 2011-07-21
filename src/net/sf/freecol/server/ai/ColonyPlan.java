@@ -213,7 +213,7 @@ public class ColonyPlan {
             if (type.hasAbility("model.ability.produceInWater")) {
                 docks.add(type);
             }
-            if (type.hasAbility("model.ability.export")) {
+            if (type.hasAbility(Ability.EXPORT)) {
                 customs.add(type);
             }
             if (type.hasAbility(Ability.CAN_TEACH)) {
@@ -330,7 +330,7 @@ public class ColonyPlan {
         // build custom house as soon as possible, in order to free
         // transports for other duties (and avoid pirates, and
         // possibly boycotts)
-        if (!colony.hasAbility("model.ability.export")) {
+        if (!colony.hasAbility(Ability.EXPORT)) {
             for (BuildingType buildingType : customs) {
                 if (colony.canBuild(buildingType)) {
                     buildables.add(new Buildable(buildingType, CUSTOMS_HOUSE_PRIORITY));

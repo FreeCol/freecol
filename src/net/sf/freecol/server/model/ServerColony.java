@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildQueue;
 import net.sf.freecol.common.model.BuildableType;
@@ -197,7 +198,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     ; // It was invalid, ignore.
                 } else if (buildable instanceof UnitType) {
                     Unit newUnit = csBuildUnit(queue, random, cs);
-                    if (newUnit.hasAbility("model.ability.bornInColony")) {
+                    if (newUnit.hasAbility(Ability.BORN_IN_COLONY)) {
                         newUnitBorn = true;
                     }
                     built.add(queue);
@@ -302,7 +303,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Export goods if custom house is built.
         // Do not flush price changes yet, as any price change may change
         // yet again in csYearlyGoodsAdjust.
-        if (hasAbility("model.ability.export")) {
+        if (hasAbility(Ability.EXPORT)) {
             boolean gold = false;
             for (Goods goods : container.getCompactGoods()) {
                 GoodsType type = goods.getType();
@@ -379,7 +380,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
             // No problem this turn, but what about the next?
             if (!(exportData.isExported()
-                  && hasAbility("model.ability.export")
+                  && hasAbility(Ability.EXPORT)
                   && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
                 && amount <= limit) {
                 int loss = amount + getNetProductionOf(type) - limit;
@@ -482,7 +483,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
                                    (UnitType) buildQueue.getCurrentlyBuilding(),
                                    UnitState.ACTIVE);
-        if (unit.hasAbility("model.ability.bornInColony")) {
+        if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                            "model.colony.newColonist",

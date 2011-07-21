@@ -123,7 +123,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (!(unitType.getGoodsRequired().isEmpty()
-                  || unitType.hasAbility("model.ability.bornInColony"))) {
+                  || unitType.hasAbility(Ability.BORN_IN_COLONY))) {
                 // can be built
                 buildableUnits.add(unitType);
             }
@@ -257,10 +257,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
 
             if (!(colony.getFeatureContainer()
-                  .hasAbility("model.ability.build", unitType, getGame().getTurn())
-                  || featureContainer.hasAbility("model.ability.build", unitType))) {
+                  .hasAbility(Ability.BUILD, unitType, getGame().getTurn())
+                  || featureContainer.hasAbility(Ability.BUILD, unitType))) {
                 boolean builderFound = false;
-                for (Ability ability : getSpecification().getAbilities("model.ability.build")) {
+                for (Ability ability : getSpecification().getAbilities(Ability.BUILD)) {
                     if (ability.appliesTo(unitType)
                         && ability.getValue()
                         && ability.getSource() != null
@@ -450,7 +450,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             } else {
                 for (int index = 0; index < buildQueue.getSize(); index++) {
                     if (((BuildableType) buildQueue.getElementAt(index))
-                        .hasAbility("model.ability.build", buildableType)) {
+                        .hasAbility(Ability.BUILD, buildableType)) {
                         return index + 1;
                     }
                 }
@@ -499,7 +499,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                     continue;
                 }
 
-                if (toBuild.hasAbility("model.ability.build", buildableType)) {
+                if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
                     return buildQueueLastPos;
                 }
             }
@@ -544,7 +544,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 }
 
                 // Don't go past a unit this building can build.
-                if (buildableType.hasAbility("model.ability.build", toBuild)) {
+                if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
                     return index;
                 }
             }

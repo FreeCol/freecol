@@ -53,6 +53,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
@@ -360,7 +361,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 if (comp instanceof UnitLabel) {
                     UnitLabel unitLabel = ((UnitLabel) comp);
                     Unit unit = unitLabel.getUnit();
-                    if (unit.hasAbility("model.ability.canBeEquipped")) {
+                    if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                         Goods goods = label.getGoods();
                         for (EquipmentType equipment : canvas.getSpecification()
                                  .getEquipmentTypeList()) {
@@ -427,7 +428,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 if (comp instanceof UnitLabel) {
                     UnitLabel unitLabel = (UnitLabel) comp;
                     Unit unit = unitLabel.getUnit();
-                    if (unit.hasAbility("model.ability.canBeEquipped")) {
+                    if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                         for (EquipmentType equipment : canvas.getSpecification()
                                  .getEquipmentTypeList()) {
                             if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {

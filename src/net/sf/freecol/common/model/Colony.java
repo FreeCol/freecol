@@ -1595,8 +1595,8 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility("model.ability.bornInColony")
-                && !hasAbility("model.ability.build", buildableType)) {
+            if (!buildableType.hasAbility(Ability.BORN_IN_COLONY)
+                && !hasAbility(Ability.BUILD, buildableType)) {
                 return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
@@ -2495,7 +2495,7 @@ public class Colony extends Settlement implements Nameable {
         }
         // TODO: remove 0.9.x compatibility code
         if (populationQueue.isEmpty()) {
-            for (UnitType unitType : getSpecification().getUnitTypesWithAbility("model.ability.bornInColony")) {
+            for (UnitType unitType : getSpecification().getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
                 GoodsType food = getSpecification().getGoodsType("model.goods.food");
                 List<AbstractGoods> required = unitType.getGoodsRequired();
                 boolean found = false;

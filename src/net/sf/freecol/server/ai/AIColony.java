@@ -550,7 +550,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void createAIGoods() {
         int capacity = colony.getWarehouseCapacity();
-        if (colony.hasAbility("model.ability.export")) {
+        if (colony.hasAbility(Ability.EXPORT)) {
             for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isTradeGoods()) {
                     // can only be produced in Europe
@@ -1139,7 +1139,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // FIXME: should be executed just once, when the custom house is built
-        /*if (colony.hasAbility("model.ability.export")) {
+        /*if (colony.hasAbility(Ability.EXPORT)) {
           colony.setExports(Goods.SILVER, true);
           colony.setExports(Goods.RUM, true);
           colony.setExports(Goods.CIGARS, true);

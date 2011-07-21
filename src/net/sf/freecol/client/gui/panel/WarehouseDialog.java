@@ -33,6 +33,7 @@ import javax.swing.SpinnerNumberModel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
@@ -160,7 +161,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"), exportData.isExported());
             export.setToolTipText(Messages.message("warehouseDialog.export.shortDescription"));
-            if (!colony.hasAbility("model.ability.export")) {
+            if (!colony.hasAbility(Ability.EXPORT)) {
                 export.setEnabled(false);
             }
             add(export);

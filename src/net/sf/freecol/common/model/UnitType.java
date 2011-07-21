@@ -443,7 +443,7 @@ public final class UnitType extends BuildableType
     }
 
     public EquipmentType[] getDefaultEquipment() {
-        if (hasAbility("model.ability.canBeEquipped") && defaultEquipment != null) {
+        if (hasAbility(Ability.CAN_BE_EQUIPPED) && defaultEquipment != null) {
             int count = defaultEquipment.getMaximumCount();
             EquipmentType[] result = new EquipmentType[count];
             for (int index = 0; index < count; index++) {

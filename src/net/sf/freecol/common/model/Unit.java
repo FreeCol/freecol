@@ -2299,8 +2299,8 @@ public class Unit extends FreeColGameObject
      * @param owner The new nationality of this Unit.
      */
     public void setNationality(String newNationality) {
-        if (hasAbility("model.ability.bornInColony")
-			|| hasAbility("model.ability.bornInIndianSettlement")
+        if (hasAbility(Ability.BORN_IN_COLONY)
+			|| hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
 			|| hasAbility("model.ability.foundColony")) {
             // 0.10.0 and earlier games have no model.ability.person,
             // so instead we check several other abilities to exclude
@@ -3323,8 +3323,8 @@ public class Unit extends FreeColGameObject
         out.writeAttribute("owner", who.getId());
         if (nationality != null) {
             out.writeAttribute("nationality", nationality);
-        } else if(hasAbility("model.ability.bornInColony")
-                  || hasAbility("model.ability.bornInIndianSettlement")
+        } else if(hasAbility(Ability.BORN_IN_COLONY)
+                  || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                   || hasAbility("model.ability.foundColony")) {
             // 0.10.0 and earlier games have no model.ability.person,
             // so instead we check several other abilities to exclude
@@ -3335,8 +3335,8 @@ public class Unit extends FreeColGameObject
         }
         if (ethnicity != null) {
             out.writeAttribute("ethnicity", ethnicity);
-        } else if(hasAbility("model.ability.bornInColony")
-                  || hasAbility("model.ability.bornInIndianSettlement")
+        } else if(hasAbility(Ability.BORN_IN_COLONY)
+                  || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                   || hasAbility("model.ability.foundColony")) {
             // 0.10.0 and earlier games have no model.ability.person,
             // so instead we check several other abilities to exclude

@@ -33,22 +33,11 @@ import org.w3c.dom.Element;
  */
 public final class Ability extends Feature {
 
+    /**
+     * The ability to add the current tax as a bonus to the production
+     * of bells. Provided by the {@link FoundingFather} Thomas Paine.
+     */
     public static final String ADD_TAX_TO_BELLS = "model.ability.addTaxToBells";
-
-    /**
-     * The ability of some buildings (e.g. the schoolhouse) to teach
-     * skills.
-     */
-    public static final String CAN_TEACH = "model.ability.teach";
-
-    /**
-     * The somewhat controversial ability of expert units in factory
-     * level buildings to produce a certain amount of goods even when
-     * no raw materials are available. Allegedly, this is a feature of
-     * the original game.
-     */
-    public static final String EXPERTS_USE_CONNECTIONS =
-        "model.ability.expertsUseConnections";
 
     /**
      * The ability of certain buildings (e.g. the stables) to produce
@@ -66,16 +55,53 @@ public final class Ability extends Feature {
         "model.ability.avoidExcessProduction";
 
     /**
-     * The ability of certain consumers (e.g. BuildQueues) to consume
-     * a large amount of goods at once instead of turn by turn.
+     * The ability to be born in a Colony. Only Units with this
+     * ability can be produced by a Colony.
      */
-    public static final String CONSUME_ALL_OR_NOTHING =
-        "model.ability.consumeAllOrNothing";
+    public static final String BORN_IN_COLONY = "model.ability.bornInColony";
 
     /**
-     * The ability of ships to move across water tiles.
+     * The ability to be born in an IndianSettlement. Only Units with
+     * this ability can be produced by an IndianSettlement.
      */
-    public static final String NAVAL_UNIT = "model.ability.navalUnit";
+    public static final String BORN_IN_INDIAN_SETTLEMENT =
+        "model.ability.bornInIndianSettlement";
+
+    /**
+     * The ability to build {@link BuildableType}s, such as units. The
+     * shipyard provides the ability to build ships, for example.
+     */
+    public static final String BUILD = "model.ability.build";
+
+    /**
+     * The ability of certain unarmed units to be captured by another
+     * player's units. Units lacking this ability (e.g. braves) will
+     * be destroyed instead.
+     */
+    public static final String CAN_BE_CAPTURED = "model.ability.canBeCaptured";
+
+    /**
+     * The ability of certain units to be equipped with tools, muskets, etc.
+     */
+    public static final String CAN_BE_EQUIPPED = "model.ability.canBeEquipped";
+
+    /**
+     * The ability of some buildings (e.g. the schoolhouse) to teach
+     * skills.
+     */
+    public static final String CAN_TEACH = "model.ability.teach";
+
+    /**
+     * The ability of certain units (e.g. privateers) to capture goods
+     * carried by another player's units.
+     */
+    public static final String CAPTURE_GOODS = "model.ability.captureGoods";
+
+    /**
+     * The ability of certain armed units to capture another player's
+     * units.
+     */
+    public static final String CAPTURE_UNITS = "model.ability.captureUnits";
 
     /**
      * The ability of certain units (e.g. wagon trains) to carry goods.
@@ -94,23 +120,31 @@ public final class Ability extends Feature {
     public static final String CARRY_TREASURE = "model.ability.carryTreasure";
 
     /**
-     * The ability of certain units (e.g. privateers) to capture goods
-     * carried by another player's units.
+     * The ability of certain consumers (e.g. BuildQueues) to consume
+     * a large amount of goods at once instead of turn by turn.
      */
-    public static final String CAPTURE_GOODS = "model.ability.captureGoods";
+    public static final String CONSUME_ALL_OR_NOTHING =
+        "model.ability.consumeAllOrNothing";
 
     /**
-     * The ability of certain armed units to capture another player's
-     * units.
+     * The somewhat controversial ability of expert units in factory
+     * level buildings to produce a certain amount of goods even when
+     * no raw materials are available. Allegedly, this is a feature of
+     * the original game.
      */
-    public static final String CAPTURE_UNITS = "model.ability.captureUnits";
+    public static final String EXPERTS_USE_CONNECTIONS =
+        "model.ability.expertsUseConnections";
 
     /**
-     * The ability of certain unarmed units to be captured by another
-     * player's units. Units lacking this ability (e.g. braves) will
-     * be destroyed instead.
+     * The ability to export goods to Europe directly.
      */
-    public static final String CAN_BE_CAPTURED = "model.ability.canBeCaptured";
+    public static final String EXPORT = "model.ability.export";
+
+
+    /**
+     * The ability of ships to move across water tiles.
+     */
+    public static final String NAVAL_UNIT = "model.ability.navalUnit";
 
     /**
      * The ability of certain units (e.g. privateers) to plunder

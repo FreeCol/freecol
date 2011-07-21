@@ -1298,7 +1298,7 @@ public class StandardAIPlayer extends AIPlayer {
                 }
                 if (u.hasAbility("model.ability.expertSoldier")) {
                     recruits.add(u);
-                } else if (u.hasAbility("model.ability.canBeEquipped")) {
+                } else if (u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     others.add(u);
                 }
             }

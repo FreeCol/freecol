@@ -123,7 +123,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                } else if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     landUnits.add(new AbstractUnit(unitType, Role.SOLDIER, number));
                     landUnits.add(new AbstractUnit(unitType, Role.DRAGOON, number));
                 } else {
@@ -511,7 +511,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                     navalTypes.add(unitType);
                 } else if (unitType.hasAbility("model.ability.bombard")) {
                     bombardTypes.add(unitType);
-                } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                } else if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     mountedTypes.add(unitType);
                 }
             }
@@ -598,7 +598,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         for (int count = 0; count < limit; count++) {
             unitType = Utils.getRandomMember(logger, "Choose unit", unitTypes,
                                              random);
-            if (unitType.hasAbility("model.ability.canBeEquipped")) {
+            if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                 for (int number = 3; number > 0; number--) {
                     au = new AbstractUnit(unitType, Role.DRAGOON, number);
                     int newPrice = player.getPrice(au) * mercPrice / 100;
@@ -633,7 +633,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         /* Try to always return something, even if it is not affordable */
         if (mercs.isEmpty() && unitType != null) {
-            Role role = (unitType.hasAbility("model.ability.canBeEquipped"))
+            Role role = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
                 ? Role.SOLDIER
                 : Role.DEFAULT;
             mercs.add(new AbstractUnit(unitType, role, 1));

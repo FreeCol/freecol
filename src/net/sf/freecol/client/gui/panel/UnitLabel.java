@@ -38,6 +38,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
@@ -390,7 +391,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     }
 
     public boolean canUnitBeEquipedWith(JLabel data){
-        if(!getUnit().hasAbility("model.ability.canBeEquipped")){
+        if(!getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)){
             return false;
         }
 

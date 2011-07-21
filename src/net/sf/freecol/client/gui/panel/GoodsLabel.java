@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -74,7 +75,7 @@ public final class GoodsLabel extends AbstractGoodsLabel {
             || player.canTrade(goods)
             || (location instanceof Colony
                 && player.getGame().getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
-                && ((Colony) location).hasAbility("model.ability.export"))) {
+                && ((Colony) location).hasAbility(Ability.EXPORT))) {
             setToolTipText(Messages.message(goods.getNameKey()));
         } else {
             setToolTipText(Messages.message(goods.getLabel(false)));

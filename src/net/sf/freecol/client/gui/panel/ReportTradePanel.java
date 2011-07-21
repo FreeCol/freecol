@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -227,7 +228,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         JButton button = new JButton();
         String name = colony.getName();
-        if (colonies.get(index).hasAbility("model.ability.export")) {
+        if (colonies.get(index).hasAbility(Ability.EXPORT)) {
             name += "*";
         }
         button.setText(name);
