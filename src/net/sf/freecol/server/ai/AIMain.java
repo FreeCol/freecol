@@ -478,8 +478,8 @@ public class AIMain extends FreeColObject
         String lastTag = "";
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
+            final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
             try {         
-                final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
                 if (oid != null && aiObjects.containsKey(oid)) {
                     getAIObject(oid).readFromXML(in);
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
@@ -499,13 +499,14 @@ public class AIMain extends FreeColObject
                 } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())) {
                     new TileImprovementPlan(this, in);                
                 } else {
-                    logger.warning("Unkown AI-object read: " + tagName + "(" + lastTag + ")");
+                    logger.warning("Unknown AI-object read: " + tagName + "(" + lastTag + ")");
                 }
                 lastTag = in.getLocalName();
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
-                logger.warning("Exception while reading an AIObject: " + sw.toString());
+                logger.warning("Exception while reading an AIObject(" + tagName
+                    + ", " + oid + "): " + sw.toString());
                 while (!in.getLocalName().equals(tagName) && !in.getLocalName().equals(getXMLElementTagName())) {
                     in.nextTag();                    
                 }
