@@ -1837,9 +1837,9 @@ public class InGameControllerTest extends FreeColTestCase {
 
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
-        java.util.Map<String, String> upgrades = new HashMap<String, String>();
-        upgrades.put(indenturedServantType.getId(), colonistType.getId());
-        upgrades.put(colonistType.getId(), statesmanType.getId());
+        java.util.Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
+        upgrades.put(indenturedServantType, colonistType);
+        upgrades.put(colonistType, statesmanType);
         father.setUpgrades(upgrades);
         igc.addFoundingFather((ServerPlayer) colony.getOwner(), father);
 

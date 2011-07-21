@@ -62,7 +62,7 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * Holds the upgrades of Units caused by this FoundingFather.
      */
-    private Map<String, String> upgrades;
+    private Map<UnitType, UnitType> upgrades;
 
     public static enum FoundingFatherType {
         TRADE,
@@ -212,15 +212,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return a <code>Map<UnitType, UnitType></code> value
      */
     public final Map<UnitType, UnitType> getUpgrades() {
-        Map<UnitType, UnitType> result = new HashMap<UnitType, UnitType>();
-        if (upgrades != null) {
-            for (Map.Entry<String, String> entry : upgrades.entrySet()) {
-                UnitType from = getSpecification().getUnitType(entry.getKey());
-                UnitType to = getSpecification().getUnitType(entry.getValue());
-                result.put(from, to);
-            }
-        }
-        return result;
+        return upgrades;
     }
 
     /**
@@ -228,7 +220,7 @@ public class FoundingFather extends FreeColGameObjectType {
      *
      * @param newUpgrades The new Upgrades value.
      */
-    public final void setUpgrades(final Map<String, String> newUpgrades) {
+    public final void setUpgrades(final Map<UnitType, UnitType> newUpgrades) {
         this.upgrades = newUpgrades;
     }
 
@@ -295,10 +287,10 @@ public class FoundingFather extends FreeColGameObjectType {
             }
         }
         if (upgrades != null) {
-            for (Map.Entry<String, String> entry : upgrades.entrySet()) {
+            for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
                 out.writeStartElement("upgrade");
-                out.writeAttribute("from-id", entry.getKey());
-                out.writeAttribute("to-id", entry.getValue());
+                out.writeAttribute("from-id", entry.getKey().getId());
+                out.writeAttribute("to-id", entry.getValue().getId());
                 out.writeEndElement();
             }
         }
@@ -363,11 +355,13 @@ public class FoundingFather extends FreeColGameObjectType {
             }
             units.add(unit);
         } else if ("upgrade".equals(childName)) {
-            String fromType = in.getAttributeValue(null, "from-id");
-            String toType = in.getAttributeValue(null, "to-id");
+            UnitType fromType = getSpecification()
+                .getUnitType(in.getAttributeValue(null, "from-id"));
+            UnitType toType = getSpecification()
+                .getUnitType(in.getAttributeValue(null, "to-id"));
             if (fromType != null && toType != null) {
                 if (upgrades == null) {
-                    upgrades = new HashMap<String, String>();
+                    upgrades = new HashMap<UnitType, UnitType>();
                 }
                 upgrades.put(fromType, toType);
             }
