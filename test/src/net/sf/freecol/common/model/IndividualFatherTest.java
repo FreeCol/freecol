@@ -323,6 +323,16 @@ public class IndividualFatherTest extends FreeColTestCase {
             assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
         }
 
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        Unit unit = colony.getUnitList().get(0);
+
+        Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
+        unit.setType(entry.getKey());
+
+        player.addFather(lasCasas);
+        assertEquals(unit.getType(), entry.getValue());
+
     }
 
 
