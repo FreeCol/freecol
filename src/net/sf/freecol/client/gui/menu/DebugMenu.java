@@ -300,8 +300,7 @@ public class DebugMenu extends JMenu {
         this.add(addFather);
         addFather.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    addFatherAction(game, server.getInGameController(),
-                        serverPlayer, fatherTitle);
+                    addFatherAction(game, server, serverPlayer, fatherTitle);
                 }
             });
         addFather.setEnabled(server != null);
@@ -561,13 +560,14 @@ public class DebugMenu extends JMenu {
         this.addSeparator();
     }
 
-    private void addFatherAction(final Game game, final InGameController igc,
-                                 final Player player, String fatherTitle) {
+    private void addFatherAction(final Game game, final FreeColServer server,
+                                 final Player serverPlayer,
+                                 String fatherTitle) {
         List<ChoiceItem<FoundingFather>> fathers
             = new ArrayList<ChoiceItem<FoundingFather>>();
         for (FoundingFather father : game.getSpecification()
                  .getFoundingFathers()) {
-            if (!player.hasFather(father)) {
+            if (!serverPlayer.hasFather(father)) {
                 ChoiceItem<FoundingFather> choice
                     = new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
                                                      father);
@@ -579,7 +579,10 @@ public class DebugMenu extends JMenu {
                 fathers);
         FoundingFather father = canvas.showFreeColDialog(choiceDialog, null);
         if (father != null) {
-            igc.addFoundingFather((ServerPlayer) player, father);
+            server.getInGameController()
+                .addFoundingFather((ServerPlayer) serverPlayer,
+                    server.getGame().getSpecification()
+                        .getFoundingFather(father.getId()));
         }
     }
 
