@@ -896,6 +896,13 @@ public final class UnitType extends BuildableType
     }
 
     /**
+     * Debug print helper.
+     */
+    public String toString() {
+        return getId();
+    }
+
+    /**
      * Returns the tag name of the root element representing this object.
      *
      * @return "unit-type".
