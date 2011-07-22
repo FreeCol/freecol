@@ -3654,6 +3654,14 @@ public final class InGameController implements NetworkConstants {
         GUI gui = freeColClient.getGUI();
         gui.setActiveUnit(null);
 
+        // Unskip all skipped, some may have been faked in-client.
+        // Server-side skipped units are set active in csNewTurn.
+        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+            if (unit.getState() == UnitState.SKIPPED) {
+                unit.setState(UnitState.ACTIVE);
+            }
+        }
+
         // Inform the server of end of turn
         askServer().endTurn();
 
