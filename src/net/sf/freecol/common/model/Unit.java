@@ -3060,28 +3060,6 @@ public class Unit extends FreeColGameObject
         disposeList();
     }
 
-    private Location newLocation(Game game, String locationString) {
-        String XMLElementTag = locationString.substring(0, locationString.indexOf(':'));
-        if (XMLElementTag.equals(Tile.getXMLElementTagName())) {
-            return new Tile(game, locationString);
-        } else if (XMLElementTag.equals(ColonyTile.getXMLElementTagName())) {
-            return new ColonyTile(game, locationString);
-        } else if (XMLElementTag.equals(Colony.getXMLElementTagName())) {
-            return new Colony(game, locationString);
-        } else if (XMLElementTag.equals(IndianSettlement.getXMLElementTagName())) {
-            return new IndianSettlement(game, locationString);
-        } else if (XMLElementTag.equals(Europe.getXMLElementTagName())) {
-            return new Europe(game, locationString);
-        } else if (XMLElementTag.equals(Building.getXMLElementTagName())) {
-            return new Building(game, locationString);
-        } else if (XMLElementTag.equals(Unit.getXMLElementTagName())) {
-            return new Unit(game, locationString);
-        } else {
-            logger.warning("Unknown type of Location: " + locationString);
-            return new Tile(game, locationString);
-        }
-    }
-
     /**
      * Return how many turns left to be repaired
      *
@@ -3471,15 +3449,7 @@ public class Unit extends FreeColGameObject
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
-        final String destinationStr = in.getAttributeValue(null, "destination");
-        if (destinationStr != null) {
-            destination = (Location) getGame().getFreeColGameObject(destinationStr);
-            if (destination == null) {
-                destination = newLocation(getGame(), destinationStr);
-            }
-        } else {
-            destination = null;
-        }
+        destination = newLocation(in.getAttributeValue(null, "destination"));
 
         currentStop = -1;
         tradeRoute = null;
@@ -3516,30 +3486,20 @@ public class Unit extends FreeColGameObject
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
-        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
-        if (entryLocationStr != null) {
-            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
-            if (entryLocation == null) {
-                entryLocation = newLocation(getGame(), entryLocationStr);
-            }
-        }
+        entryLocation = newLocation(in.getAttributeValue(null, "entryLocation"));
 
-        final String locationStr = in.getAttributeValue(null, "location");
-        if (locationStr != null) {
-            location = (Location) getGame().getFreeColGameObject(locationStr);
-            if (location == null) {
-                location = newLocation(getGame(), locationStr);
-            }
-            //TODO: added to fix bug in pre-rev.4883 savegames. Might eventually
-            //be removed later.
-            //Savegame sanitation: A WorkLocation is always inside a colony, so
-            //a unit located there should always have state "IN_COLONY".
-            //If not, parts of the code may consider the unit to be outside
-            //the colony, leading to errors.
-            if ((location instanceof WorkLocation) && state!=UnitState.IN_COLONY) {
-                logger.warning("Found "+getId()+" with state=="+state+" on WorkLocation in "+location.getColony().getName()+". Fixing: ");
-                state=UnitState.IN_COLONY;
-            }
+        location = newLocation(in.getAttributeValue(null, "location"));
+        //TODO: added to fix bug in pre-rev.4883 savegames. Might eventually
+        //be removed later.
+        //Savegame sanitation: A WorkLocation is always inside a colony, so
+        //a unit located there should always have state "IN_COLONY".
+        //If not, parts of the code may consider the unit to be outside
+        //the colony, leading to errors.
+        if ((location instanceof WorkLocation) && state != UnitState.IN_COLONY) {
+            logger.warning("Found " + getId() + " with state==" + state
+                           + " on WorkLocation in "+ location.getColony().getName()
+                           + ". Fixing: ");
+            state = UnitState.IN_COLONY;
         }
 
         units.clear();

@@ -348,6 +348,35 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
     }
 
+    protected Location newLocation(String locationString) {
+        Location destination = null;
+        if (locationString != null) {
+            destination = (Location) game.getFreeColGameObject(locationString);
+            if (destination == null) {
+                String XMLElementTag = locationString.substring(0, locationString.indexOf(':'));
+                if (XMLElementTag.equals(Tile.getXMLElementTagName())) {
+                    return new Tile(game, locationString);
+                } else if (XMLElementTag.equals(ColonyTile.getXMLElementTagName())) {
+                    return new ColonyTile(game, locationString);
+                } else if (XMLElementTag.equals(Colony.getXMLElementTagName())) {
+                    return new Colony(game, locationString);
+                } else if (XMLElementTag.equals(IndianSettlement.getXMLElementTagName())) {
+                    return new IndianSettlement(game, locationString);
+                } else if (XMLElementTag.equals(Europe.getXMLElementTagName())) {
+                    return new Europe(game, locationString);
+                } else if (XMLElementTag.equals(Building.getXMLElementTagName())) {
+                    return new Building(game, locationString);
+                } else if (XMLElementTag.equals(Unit.getXMLElementTagName())) {
+                    return new Unit(game, locationString);
+                } else {
+                    logger.warning("Unknown type of Location: " + locationString);
+                    return new Tile(game, locationString);
+                }
+            }
+        }
+        return destination;
+    }
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
