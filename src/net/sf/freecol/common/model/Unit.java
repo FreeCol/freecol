@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
  * {@link Location}.
  */
 public class Unit extends FreeColGameObject
-    implements Consumer, Locatable, Location, Nameable, Ownable {
+    implements Consumer, Locatable, Location, Movable, Nameable, Ownable {
 
     private static Comparator<Unit> skillLevelComp =
         new Comparator<Unit>() {
