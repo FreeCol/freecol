@@ -959,7 +959,8 @@ public class IndianSettlement extends Settlement {
 
         int count = 0;
         for (Goods goods : settlementGoods) {
-            result.add(goods);
+            result.add(new Goods(getGame(), this, goods.getType(),
+                    Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE)));
             count++;
             if (count >= limit) break;
         }
