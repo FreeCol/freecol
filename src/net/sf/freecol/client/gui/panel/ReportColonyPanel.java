@@ -480,7 +480,7 @@ public final class ReportColonyPanel extends ReportPanel
             StringTemplate tip;
             if (p < 0) {
                 if (amount < low) {
-                    int turns = amount / p + 1;
+                    int turns = -amount / p + 1;
                     c = cAlarm;
                     tip = stpl("report.colony.production.low.description")
                         .addName("%colony%", colony.getName())
