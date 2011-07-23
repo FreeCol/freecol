@@ -352,14 +352,19 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         units.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
-                Unit unit = updateFreeColGameObject(in, Unit.class);
-                if (!units.contains(unit)) {
-                    units.add(unit);
-                }
-            } else {
-                logger.warning("Found unknown child element '" + in.getLocalName() + "'.");
+            readChild(in);
+        }
+    }
+
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
+            Unit unit = updateFreeColGameObject(in, Unit.class);
+            if (!units.contains(unit)) {
+                units.add(unit);
             }
+        } else {
+            logger.warning("Found unknown child element '" + in.getLocalName() + "'.");
         }
     }
 
