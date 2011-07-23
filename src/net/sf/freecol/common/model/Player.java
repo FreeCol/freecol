@@ -357,6 +357,12 @@ public class Player extends FreeColGameObject implements Nameable {
         = new UnitIterator(this, new GoingToPredicate(this));
 
     /**
+     * The HighSeas is a Location that enables Units to travel between
+     * the New World and one or several European Ports.
+     */
+    protected HighSeas highSeas;
+
+    /**
      * A cache of settlement names, a capital for natives, and a fallback
      * settlement name prefix.
      * Does not need to be serialized.
@@ -1806,6 +1812,15 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setMonarch(Monarch monarch) {
         this.monarch = monarch;
+    }
+
+    /**
+     * Get the <code>HighSeas</code> value.
+     *
+     * @return a <code>HighSeas</code> value
+     */
+    public final HighSeas getHighSeas() {
+        return highSeas;
     }
 
     /**
@@ -3354,6 +3369,18 @@ public class Player extends FreeColGameObject implements Nameable {
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
+
+        writeAttributes(out, player, showAll, toSavedGame);
+        writeChildren(out, player, showAll, toSavedGame);
+
+        out.writeEndElement();
+    }
+
+
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("username", name);
         out.writeAttribute("nationID", nationID);
@@ -3401,7 +3428,11 @@ public class Player extends FreeColGameObject implements Nameable {
             int index = getNameIndex(key);
             if (index > 0) out.writeAttribute(key, Integer.toString(index));
         }
-        // attributes end here
+    }
+
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
 
         for (Entry<Player, Tension> entry : tension.entrySet()) {
             out.writeStartElement(TENSION_TAG);
@@ -3466,7 +3497,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        out.writeEndElement();
+        if (highSeas != null && !highSeas.isEmpty()) {
+            highSeas.toXMLImpl(out, player, showAll, toSavedGame);
+        }
+
     }
 
     /**
@@ -3583,6 +3617,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 LastSale lastSale = new LastSale();
                 lastSale.readFromXMLImpl(in);
                 saveSale(lastSale);
+            } else if (HighSeas.getXMLElementTagName().equals(in.getLocalName())) {
+                highSeas.readFromXMLImpl(in);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();

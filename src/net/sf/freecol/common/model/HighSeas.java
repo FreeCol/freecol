@@ -43,7 +43,7 @@ public class HighSeas extends UnitLocation {
 
 
 
-    public HighSeas(Game game, Player owner) {
+    public HighSeas(Game game) {
         super(game);
     }
 
@@ -82,7 +82,7 @@ public class HighSeas extends UnitLocation {
     }
 
     /**
-     * Remove a single destination to this HighSeas instance.
+     * Remove a single destination from this HighSeas instance.
      *
      * @param destination a <code>Location</code> value
      */

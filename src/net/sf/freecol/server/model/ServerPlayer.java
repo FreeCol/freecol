@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -162,6 +163,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.playerType = (nationType.isREF()) ? PlayerType.ROYAL
                     : PlayerType.COLONIAL;
                 europe = new ServerEurope(game, this);
+                highSeas = new HighSeas(game);
                 if (this.playerType == PlayerType.COLONIAL) {
                     monarch = new Monarch(game, this, nation.getRulerNameKey());
                 }

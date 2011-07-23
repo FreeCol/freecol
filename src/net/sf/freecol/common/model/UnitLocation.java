@@ -249,13 +249,23 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     */
 
     /**
-     * Returns the amount of Units at this Location.
+     * Returns the number of Units at this Location.
      *
-     * @return The amount of Units at this Location.
+     * @return The number of Units at this Location.
      */
     public int getUnitCount() {
         return units.size();
     }
+
+    /**
+     * Returns true if there are no Units present in this Location.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isEmpty() {
+        return units.isEmpty();
+    }
+
 
     /**
      * Returns a list containing all the Units present at this Location.
