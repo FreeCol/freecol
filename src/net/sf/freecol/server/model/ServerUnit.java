@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -247,15 +248,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     setWorkLeft(turns);
                 }
                 break;
-            case TO_AMERICA:
-                if (getOwner().isREF()) { // Swift travel to America for the REF
-                    setWorkLeft(0);
-                    break;
-                }
-                // Fall through
             default:
                 setWorkLeft(getWorkLeft() - 1);
                 break;
+            }
+
+            if (loc instanceof HighSeas && getOwner().isREF()) {
+                // Swift travel to America for the REF
+                setWorkLeft(0);
             }
         }
 
@@ -285,39 +285,46 @@ public class ServerUnit extends Unit implements ServerModelObject {
     private boolean csCompleteWork(Random random, ChangeSet cs) {
         setWorkLeft(-1);
 
-        switch (getState()) {
-        case TO_EUROPE:
-            logger.info(toString() + " arrives in Europe");
-            if (getTradeRoute() != null) {
-                setMovesLeft(0);
-                setState(UnitState.ACTIVE);
-                return false;
-            }
-            ServerPlayer owner = (ServerPlayer) getOwner();
+        if (getLocation() instanceof HighSeas) {
             Europe europe = owner.getEurope();
-            if (getDestination() == europe) setDestination(null);
-            cs.addMessage(See.only(owner),
-                new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                    "model.unit.arriveInEurope",
-                    europe, this)
-                .add("%europe%", europe.getNameKey()));
-            setState(UnitState.ACTIVE);
-            break;
-        case TO_AMERICA:
-            logger.info(toString() + " arrives in America");
-            csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
-                random, cs);
-            break;
-        case FORTIFYING:
-            setState(UnitState.FORTIFIED);
-            break;
-        case IMPROVING:
-            csImproveTile(random, cs);
-            return true;
-        default:
-            logger.warning("Unknown work completed, state=" + getState());
-            setState(UnitState.ACTIVE);
-            break;
+            if (getDestination() == europe) {
+                setLocation(europe);
+                logger.info(toString() + " arrives in Europe");
+                if (getTradeRoute() != null) {
+                    setMovesLeft(0);
+                    setState(UnitState.ACTIVE);
+                    return false;
+                }
+                ServerPlayer owner = (ServerPlayer) getOwner();
+                setDestination(null);
+                cs.addMessage(See.only(owner),
+                              new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                               "model.unit.arriveInEurope",
+                                               europe, this)
+                              .add("%europe%", europe.getNameKey()));
+                setState(UnitState.ACTIVE);
+                cs.add(See.only(owner), europe, owner.getHighSeas());
+            } else if (getDestination() == getGame().getNewWorld()) {
+                logger.info(toString() + " arrives in America");
+                csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
+                       random, cs);
+            } else {
+                logger.warning(toString() + " has unsupported destination "
+                               + getDestination());
+            }
+        } else {
+            switch (getState()) {
+            case FORTIFYING:
+                setState(UnitState.FORTIFIED);
+                break;
+            case IMPROVING:
+                csImproveTile(random, cs);
+                return true;
+            default:
+                logger.warning("Unknown work completed, state=" + getState());
+                setState(UnitState.ACTIVE);
+                break;
+            }
         }
         return false;
     }
@@ -357,7 +364,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     }
                     // Add residue to first adjacent settlement.
                     adjacent.get(0).addGoods(deliver,
-                        amount % adjacent.size());
+                                             amount % adjacent.size());
                 }
             }
         }
@@ -379,13 +386,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (Utils.randomInt(logger, "Expose resource", random, 100)
                 < exposeResource) {
                 ResourceType resType = RandomChoice.getWeightedRandom(logger,
-                    "Resource type", random,
-                    tile.getType().getWeightedResources());
+                                                                      "Resource type", random,
+                                                                      tile.getType().getWeightedResources());
                 int minValue = resType.getMinValue();
                 int maxValue = resType.getMaxValue();
                 int value = minValue + ((minValue == maxValue) ? 0
-                    : Utils.randomInt(logger, "Resource quantity",
-                        random, maxValue - minValue + 1));
+                                        : Utils.randomInt(logger, "Resource quantity",
+                                                          random, maxValue - minValue + 1));
                 tile.addResource(new Resource(getGame(), tile, resType, value));
             }
         }
@@ -771,7 +778,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         Location oldLocation = getLocation();
         setState(UnitState.ACTIVE);
         setStateToAllChildren(UnitState.SENTRY);
-        if (oldLocation instanceof Europe) {
+        if (oldLocation instanceof HighSeas) {
             ; // Do not try to calculate move cost from Europe!
         } else if (oldLocation instanceof Unit) {
             setMovesLeft(0); // Disembark always consumes all moves.

@@ -57,7 +57,10 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighSeas;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.NewWorld;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
@@ -81,9 +84,9 @@ public final class EuropePanel extends FreeColPanel {
         SAIL
     }
 
-    private final ToAmericaPanel toAmericaPanel;
+    private final DestinationPanel toAmericaPanel;
 
-    private final ToEuropePanel toEuropePanel;
+    private final DestinationPanel toEuropePanel;
 
     private final InPortPanel inPortPanel;
 
@@ -132,8 +135,8 @@ public final class EuropePanel extends FreeColPanel {
         EuropeButton sailButton = new EuropeButton(Messages.message("sail"),
                                                    KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
 
-        toAmericaPanel = new ToAmericaPanel(this);
-        toEuropePanel = new ToEuropePanel(this);
+        toAmericaPanel = new DestinationPanel();
+        toEuropePanel = new DestinationPanel();
         inPortPanel = new InPortPanel();
         cargoPanel = new EuropeCargoPanel(parent);
         cargoPanel.setParentPanel(this);
@@ -340,8 +343,8 @@ public final class EuropePanel extends FreeColPanel {
         header.setText(Messages.message(europe.getNameKey()));
 
         // Initialize the subpanels.
-        toAmericaPanel.initialize();
-        toEuropePanel.initialize();
+        toAmericaPanel.initialize(getGame().getNewWorld());
+        toEuropePanel.initialize(getMyPlayer().getEurope());
         // Initialize cargoPanel before inPortPanel calls setSelectedUnit().
         cargoPanel.initialize();
         inPortPanel.initialize();
@@ -461,56 +464,51 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitsLabels that represent Units that are going to
      * America.
      */
-    public final class ToAmericaPanel extends JPanel {
+    public final class DestinationPanel extends JPanel {
 
-        private final EuropePanel europePanel;
-
-        /**
-         * Creates this ToAmericaPanel.
-         *
-         * @param europePanel The panel that holds this ToAmericaPanel.
-         */
-        public ToAmericaPanel(EuropePanel europePanel) {
-            this.europePanel = europePanel;
-        }
+        private Location destination;
 
         /**
-         * Initialize this ToAmericaPanel.
+         * Initialize this DestinationPanel.
          */
-        public void initialize() {
+        public void initialize(Location destination) {
+            this.destination = destination;
             update();
         }
 
         /**
-         * Cleans up this ToAmericaPanel.
+         * Cleans up this DestinationPanel.
          */
         public void cleanup() {}
 
         /**
-         * Update this ToAmericaPanel.
+         * Update this DestinationPanel.
          */
         public void update() {
             removeAll();
 
-            for (Unit unit : europe.getUnitList()) {
-                if (unit.isNaval()
-                    && unit.getState() == UnitState.TO_AMERICA) {
-                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                    add(unitLabel);
+            System.out.println("updating destination panel for " + destination);
+            HighSeas highSeas = getMyPlayer().getHighSeas();
+            if (highSeas != null) {
+                for (Unit unit : highSeas.getUnitList()) {
+                    System.out.println(unit);
+                    if (unit.getDestination() == destination) {
+                        UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                        add(unitLabel);
+                    }
                 }
             }
 
-            String newLandName = Messages.getNewLandName(getMyPlayer());
             StringTemplate t = StringTemplate.template("sailingTo")
-                .addName("%location%", newLandName);
+                .addStringTemplate("%location%", destination.getLocationNameFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
             revalidate();
         }
 
         /**
-         * Adds a component to this ToAmericaPanel and makes sure that
+         * Adds a component to this DestinationPanel and makes sure that
          * the unit that the component represents gets modified so
          * that it will sail to America.
          *
@@ -524,7 +522,7 @@ public final class EuropePanel extends FreeColPanel {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
-                    logger.warning("Invalid component dropped on this ToAmericaPanel.");
+                    logger.warning("Invalid component dropped on this DestinationPanel.");
                     return null;
                 }
                 final Unit unit = ((UnitLabel) comp).getUnit();
@@ -536,7 +534,7 @@ public final class EuropePanel extends FreeColPanel {
                     boolean leave = getCanvas()
                         .showConfirmDialog(null,
                                            StringTemplate.template("europe.leaveColonists")
-                                           .addName("%newWorld%", Messages.getNewLandName(unit.getOwner())),
+                                           .addName("%newWorld%", destination.getLocationNameFor(unit.getOwner())),
                                            "yes", "no");
                     if (!leave) { // Colonists remain in Europe.
                         return null;
@@ -544,95 +542,23 @@ public final class EuropePanel extends FreeColPanel {
                 }
                 comp.getParent().remove(comp);
 
-                getController().moveToAmerica(unit);
-
+                // TODO: make this more generic
+                if (destination instanceof NewWorld) {
+                    getController().moveToAmerica(unit);
+                } else if (destination instanceof Europe) {
+                    getController().moveToEurope(unit);
+                }
                 inPortPanel.update();
                 docksPanel.update();
             }
 
             Component c = add(comp);
-            toAmericaPanel.revalidate();
-            europePanel.refresh();
-            return c;
-        }
-    }
-
-    /**
-     * A panel that holds UnitsLabels that represent Units that are
-     * going to Europe.
-     */
-    public final class ToEuropePanel extends JPanel {
-
-        private final EuropePanel europePanel;
-
-        /**
-         * Creates this ToEuropePanel.
-         *
-         * @param europePanel The panel that holds this ToEuropePanel.
-         */
-        public ToEuropePanel(EuropePanel europePanel) {
-            this.europePanel = europePanel;
-        }
-
-        /**
-         * Initialize this ToEuropePanel.
-         */
-        public void initialize() {
-            update();
-        }
-
-        /**
-         * Cleans up this ToEuropePanel.
-         */
-        public void cleanup() {}
-
-        /**
-         * Update this ToEuropePanel.
-         */
-        public void update() {
-            removeAll();
-
-            for (Unit unit : europe.getUnitList()) {
-                if (unit.isNaval()
-                    && unit.getState() == UnitState.TO_EUROPE) {
-                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                    add(unitLabel);
-                }
-            }
             revalidate();
-        }
-
-        /**
-         * Adds a component to this ToEuropePanel and makes sure that
-         * the unit that the component represents gets modified so
-         * that it will sail to Europe.
-         *
-         * @param comp The component to add.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit) should be changed so that the
-         *            underlying unit is now sailing to Europe.
-         * @return The component argument.
-         */
-        public Component add(Component comp, boolean editState) {
-            if (editState) {
-                if (!(comp instanceof UnitLabel)) {
-                    logger.warning("Invalid component dropped on this ToEuropePanel.");
-                    return null;
-                }
-                comp.getParent().remove(comp);
-                Unit unit = ((UnitLabel) comp).getUnit();
-
-                getController().moveToEurope(unit);
-            }
-
-            Component c = add(comp);
-            europePanel.refresh();
+            EuropePanel.this.refresh();
             return c;
         }
     }
+
 
     /**
      * A panel that holds UnitLabels that represent naval units that are

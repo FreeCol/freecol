@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -243,22 +244,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
 
-                if ((unit.getState() == UnitState.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
-                    return false;
+                if (unit.getLocation() instanceof HighSeas
+                    && !(comp instanceof EuropePanel.DestinationPanel)) {
+                        return false;
                 }
 
-                if ((unit.getState() == UnitState.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
-                    return false;
-                }
-
-                if ((unit.getState() != UnitState.TO_AMERICA) && ((comp instanceof EuropePanel.ToEuropePanel))) {
-                    return false;
-                }
-
-                if (!unit.isNaval() && (comp instanceof EuropePanel.InPortPanel
+                if (!unit.isNaval()
+                    && (comp instanceof EuropePanel.InPortPanel
                         || comp instanceof ColonyPanel.InPortPanel
-                        || comp instanceof EuropePanel.ToEuropePanel
-                        || comp instanceof EuropePanel.ToAmericaPanel)) {
+                        || comp instanceof EuropePanel.DestinationPanel)) {
                     return false;
                 }
 
@@ -281,10 +275,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     // Do this in the 'add'-methods instead:
                     //data.getParent().remove(data);
 
-                    if (comp instanceof EuropePanel.ToEuropePanel) {
-                        ((EuropePanel.ToEuropePanel)comp).add(data, true);
-                    } else if (comp instanceof EuropePanel.ToAmericaPanel) {
-                        ((EuropePanel.ToAmericaPanel)comp).add(data, true);
+                    if (comp instanceof EuropePanel.DestinationPanel) {
+                        ((EuropePanel.DestinationPanel)comp).add(data, true);
                     } else if (comp instanceof EuropePanel.DocksPanel) {
                         ((EuropePanel.DocksPanel)comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {

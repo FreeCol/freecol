@@ -86,8 +86,10 @@ public class Unit extends FreeColGameObject
         SENTRY,
         IN_COLONY,
         IMPROVING,
+        // TODO: remove 0.10.0 compatibilty code
         TO_EUROPE,
         TO_AMERICA,
+        // end TODO
         FORTIFYING,
         SKIPPED
     }
@@ -2190,9 +2192,7 @@ public class Unit extends FreeColGameObject
         if (location instanceof Unit) {
             return ((Unit) location).isBetweenEuropeAndNewWorld();
         } else {
-            return getLocation() instanceof Europe
-                && (getState() == UnitState.TO_EUROPE
-                    || getState() == UnitState.TO_AMERICA);
+            return location instanceof HighSeas;
         }
     }
 
@@ -2618,13 +2618,6 @@ public class Unit extends FreeColGameObject
         case FORTIFYING:
         case SKIPPED:
             return (getMovesLeft() > 0);
-        case TO_EUROPE:
-            return isNaval()
-                && ((location instanceof Europe)
-                    && (getState() == UnitState.TO_AMERICA))
-                || (getEntryLocation() == getLocation());
-        case TO_AMERICA:
-            return (location instanceof Europe && isNaval() && !isUnderRepair());
         default:
             logger.warning("Invalid unit state: " + s);
             return false;
@@ -2643,6 +2636,30 @@ public class Unit extends FreeColGameObject
                            .getValue(),
                            "model.modifier.sailHighSeas",
                            unitType, getGame().getTurn());
+    }
+
+
+    public void setSailFor(Location destination) {
+        if (!owner.getHighSeas().getDestinations().contains(destination)) {
+            throw new IllegalStateException("High Seas do not connect to " + destination);
+        }
+        // remove unit from list of movable units
+        setMovesLeft(0);
+        if (location == owner.getHighSeas()) {
+            if (destination != this.destination) {
+                // we are changing directions
+                setWorkLeft(getSailTurns() - getWorkLeft() + 1);
+            } else {
+                // nothing to do
+            }
+        } else {
+            if (getTile() != null) {
+                setEntryLocation(getTile());
+            }
+            setLocation(owner.getHighSeas());
+            setDestination(destination);
+            setWorkLeft(getSailTurns());
+        }
     }
 
     /**
@@ -2708,15 +2725,6 @@ public class Unit extends FreeColGameObject
                 setWorkLeft(-1);
             } else {
                 setWorkLeft(workImprovement.getTurnsToComplete());
-            }
-            movesLeft = 0;
-            break;
-        case TO_EUROPE: case TO_AMERICA:
-            if ((s == UnitState.TO_EUROPE && state == UnitState.TO_AMERICA)
-                || (s == UnitState.TO_AMERICA && state == UnitState.TO_EUROPE)) {
-                setWorkLeft(getSailTurns() - getWorkLeft() + 1);
-            } else {
-                setWorkLeft(getSailTurns());
             }
             movesLeft = 0;
             break;
@@ -3546,6 +3554,20 @@ public class Unit extends FreeColGameObject
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);
         }
+
+        // TODO: remove 0.10.0 compatibility code
+        if (location instanceof Europe) {
+            if (state == UnitState.TO_EUROPE) {
+                setLocationNoUpdate(owner.getHighSeas());
+                setDestination(owner.getEurope());
+                setState(UnitState.ACTIVE);
+            } else if (state == UnitState.TO_AMERICA) {
+                setLocationNoUpdate(owner.getHighSeas());
+                setDestination(getGame().getNewWorld());
+                setState(UnitState.ACTIVE);
+            }
+        }
+        // end TODO
 
         setRole();
         getOwner().setUnit(this);

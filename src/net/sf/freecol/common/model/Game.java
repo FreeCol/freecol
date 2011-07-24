@@ -128,6 +128,12 @@ public class Game extends FreeColGameObject {
      */
     private Specification specification;
 
+    /**
+     * An "abstract" Location that represents the whole of the game
+     * map. Used as a destination for ships returning from Europe.
+     */
+    private NewWorld newWorld = new NewWorld(this);
+
 
 
     /**
@@ -321,6 +327,15 @@ public class Game extends FreeColGameObject {
      */
     public final OptionGroup getDifficultyLevel() {
         return specification.getDifficultyLevel();
+    }
+
+    /**
+     * Get the <code>NewWorld</code> value.
+     *
+     * @return a <code>NewWorld</code> value
+     */
+    public final NewWorld getNewWorld() {
+        return newWorld;
     }
 
     /**
@@ -1041,6 +1056,7 @@ public class Game extends FreeColGameObject {
             out.writeEndElement();
         }
         nationOptions.toXML(out);
+        newWorld.toXML(out);
 
         // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
@@ -1169,6 +1185,8 @@ public class Game extends FreeColGameObject {
                     specification = spec;
                     specification.clean();
                 }
+            } else if (NewWorld.getXMLElementTagName().equals(tagName)) {
+                newWorld.readFromXMLImpl(in);
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();

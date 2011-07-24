@@ -146,14 +146,9 @@ public final class ReportNavalPanel extends ReportPanel {
         for (Unit unit : player.getUnits()) {
             if (unit.isNaval()) {
                 navalUnits.incrementCount(unit.getType(), 1);
-            
-                String locationName = Messages.message(unit.getLocation().getLocationNameFor(player));
-                if (unit.getState() == UnitState.TO_AMERICA) {
-                    locationName = Messages.message("goingToAmerica");
-                } else if (unit.getState() == UnitState.TO_EUROPE) {
-                    locationName = Messages.message("goingToEurope");
-                }
-            
+
+                String locationName = getLocationNameFor(unit);
+
                 ArrayList<Unit> unitList = locations.get(locationName);
                 if (unitList == null) {
                     unitList = new ArrayList<Unit>();
@@ -169,12 +164,12 @@ public final class ReportNavalPanel extends ReportPanel {
 
     private void handleLocation(String location, boolean makeButton) {
         List<Unit> unitList = locations.get(location);
-        
+
         // Do not show locations without units
         if (unitList == null) {
         	return;
         }
-        
+
         JComponent component;
         if (makeButton) {
             JButton button = FreeColPanel.getLinkButton(location, null, location);
@@ -214,7 +209,7 @@ public final class ReportNavalPanel extends ReportPanel {
     public Dimension getMinimumSize() {
         return new Dimension(750, 600);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();

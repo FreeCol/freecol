@@ -49,12 +49,14 @@ import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NewWorld;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -655,11 +657,11 @@ public class DebugMenu extends JMenu {
             sb.append("==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
-                if (u.getState() == UnitState.TO_AMERICA) {
+                if (u.getDestination() instanceof NewWorld) {
                     toAmerica.add(u);
                     continue;
                 }
-                if (u.getState() == UnitState.TO_EUROPE) {
+                if (u.getDestination() instanceof Europe) {
                     toEurope.add(u);
                     continue;
                 }

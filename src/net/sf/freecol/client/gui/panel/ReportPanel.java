@@ -148,6 +148,17 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         return unitLabel;
     }
 
+    public String getLocationNameFor(Unit unit) {
+        if (unit.getDestination() == unit.getGame().getNewWorld()) {
+            return Messages.message("goingToAmerica");
+        } else if (unit.getDestination() instanceof Europe) {
+            return Messages.message("goingToEurope");
+        } else {
+            return Messages.message(unit.getLocation().getLocationNameFor(unit.getOwner()));
+        }
+    }
+
+
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.

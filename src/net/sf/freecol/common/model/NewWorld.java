@@ -23,6 +23,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Element;
 
 /**
  * A representation of the "New World" intended to be used as a
@@ -30,7 +36,28 @@ import java.util.List;
  *
  * @see Locatable
  */
-public class NewWorld implements Location {
+public class NewWorld extends FreeColGameObject implements Location {
+
+
+    public NewWorld(Game game) {
+        super(game);
+    }
+
+    public NewWorld(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXML(in);
+    }
+
+    public NewWorld(Game game, Element e) {
+        super(game, e);
+        readFromXMLElement(e);
+    }
+
+    public NewWorld(Game game, String id) {
+        super(game, id);
+    }
+
+
 
 
     /**
@@ -58,7 +85,12 @@ public class NewWorld implements Location {
      * @return The name of this location.
      */
     public StringTemplate getLocationNameFor(Player player) {
-        return StringTemplate.name(player.getNewLandName());
+        String name = player.getNewLandName();
+        if (name == null) {
+            return getLocationName();
+        } else {
+            return StringTemplate.name(name);
+        }
     }
 
     /**
@@ -154,16 +186,6 @@ public class NewWorld implements Location {
     }
 
     /**
-     * Returns <code>NO_ID</code>.
-     *
-     * @return The ID.
-     * @see FreeColGameObject#getId
-     */
-    public String getId() {
-        return FreeColObject.NO_ID;
-    }
-
-    /**
      * Gets the <code>GoodsContainer</code> this <code>Location</code> use
      * for storing it's goods.
      *
@@ -190,6 +212,19 @@ public class NewWorld implements Location {
      */
     public Colony getColony() {
         return null;
+    }
+
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeEndElement();
+    }
+
+
+    public static final String getXMLElementTagName() {
+        return "newWorld";
     }
 
 }

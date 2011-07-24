@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -347,7 +348,10 @@ public final class InGameController extends Controller {
             }
         }
         // Send the navy on its way
-        for (Unit u : navalUnits) u.setState(UnitState.TO_AMERICA);
+        for (Unit u : navalUnits) {
+            u.setLocation(u.getOwner().getHighSeas());
+            u.setDestination(getGame().getNewWorld());
+        }
 
         return refPlayer;
     }
@@ -1580,8 +1584,9 @@ public final class InGameController extends Controller {
      */
     public Element moveToAmerica(ServerPlayer serverPlayer, Unit unit) {
         ChangeSet cs = new ChangeSet();
-        unit.setState(UnitState.TO_AMERICA);
-        cs.add(See.only(serverPlayer), serverPlayer.getEurope());
+        unit.setSailFor(getGame().getNewWorld());
+        cs.add(See.only(serverPlayer), serverPlayer.getEurope(),
+               serverPlayer.getHighSeas());
 
         // Only the player can see this.
         return cs.build(serverPlayer);
@@ -1595,24 +1600,19 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element moveToEurope(ServerPlayer serverPlayer, Unit unit) {
-        Europe europe = serverPlayer.getEurope();
-        if (unit.getLocation() == europe) {
-            // Unit already in Europe, nothing to see for the others.
-            unit.setState(UnitState.TO_EUROPE);
-            return new ChangeSet().add(See.only(serverPlayer), unit, europe)
+        HighSeas highSeas = serverPlayer.getHighSeas();
+        if (unit.getLocation() == highSeas) {
+            // Unit already sailing, nothing to see for the others.
+            return new ChangeSet().add(See.only(serverPlayer), unit, highSeas)
                 .build(serverPlayer);
         }
 
         ChangeSet cs = new ChangeSet();
 
-        // Set entry location before setState (satisfy its check), then
-        // set location.
         Tile tile = unit.getTile();
-        unit.setEntryLocation(tile);
-        unit.setState(UnitState.TO_EUROPE);
-        unit.setLocation(europe);
+        unit.setSailFor(serverPlayer.getEurope());
         cs.addDisappear(serverPlayer, tile, unit);
-        cs.add(See.only(serverPlayer), tile, europe);
+        cs.add(See.only(serverPlayer), tile, highSeas);
 
         // Others see a disappearance, player sees tile and europe update
         // as europe now contains the unit.

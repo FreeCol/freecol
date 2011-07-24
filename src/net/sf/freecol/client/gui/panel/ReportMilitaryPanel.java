@@ -223,12 +223,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             }
 
 
-            String locationName = Messages.message(unit.getLocation().getLocationNameFor(player));
-            if (unit.getState() == UnitState.TO_AMERICA) {
-                locationName = Messages.message("goingToAmerica");
-            } else if (unit.getState() == UnitState.TO_EUROPE) {
-                locationName = Messages.message("goingToEurope");
-            }
+            String locationName = getLocationNameFor(unit);
 
             ArrayList<Unit> unitList = locations.get(locationName);
             if (unitList == null) {

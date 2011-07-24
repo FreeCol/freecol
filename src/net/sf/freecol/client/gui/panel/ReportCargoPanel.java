@@ -141,13 +141,8 @@ public final class ReportCargoPanel extends ReportPanel {
                 carriers.incrementCount(unit.getType(), 1);
                 capacity += unit.getType().getSpace();
 
-                String locationName = Messages.message(unit.getLocation().getLocationNameFor(player));
-                if (unit.getState() == UnitState.TO_AMERICA) {
-                    locationName = Messages.message("goingToAmerica");
-                } else if (unit.getState() == UnitState.TO_EUROPE) {
-                    locationName = Messages.message("goingToEurope");
-                }
-            
+                String locationName = getLocationNameFor(unit);
+
                 ArrayList<Unit> unitList = locations.get(locationName);
                 if (unitList == null) {
                     unitList = new ArrayList<Unit>();
@@ -206,10 +201,10 @@ public final class ReportCargoPanel extends ReportPanel {
     public Dimension getMinimumSize() {
         return new Dimension(750, 600);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
-    
+
 }

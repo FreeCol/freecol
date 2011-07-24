@@ -164,6 +164,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     : PlayerType.COLONIAL;
                 europe = new ServerEurope(game, this);
                 highSeas = new HighSeas(game);
+                highSeas.addDestination(europe);
+                highSeas.addDestination(game.getNewWorld());
                 if (this.playerType == PlayerType.COLONIAL) {
                     monarch = new Monarch(game, this, nation.getRulerNameKey());
                 }
@@ -413,7 +415,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
          * We already checked that it has (or can buy) a carrier to
          * transport them to New World
          */
-        for (Unit eu : getEurope().getUnitList()) {
+        List<Unit> units = new ArrayList<Unit>();
+        units.addAll(getEurope().getUnitList());
+        units.addAll(getHighSeas().getUnitList());
+        for (Unit eu : units) {
             if (eu.isCarrier()) {
                 /*
                  * The carrier has colonist units on board

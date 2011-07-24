@@ -46,6 +46,7 @@
 	<xs:element ref="modelMessage" />
         <xs:element ref="cibola" />
         <xs:element ref="freecol-specification" />
+        <xs:element name="newWorld" />
       </xs:choice>
 
       <xs:attribute name="ID" type="GameId" use="required" />

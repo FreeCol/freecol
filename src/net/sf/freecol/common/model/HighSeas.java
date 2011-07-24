@@ -62,6 +62,16 @@ public class HighSeas extends UnitLocation {
     }
 
     /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    @Override
+    public StringTemplate getLocationName() {
+        return StringTemplate.key("model.tile.highSeas.name");
+    }
+
+    /**
      * Get the <code>Destinations</code> value.
      *
      * @return a <code>List<Location></code> value
@@ -131,7 +141,7 @@ public class HighSeas extends UnitLocation {
         super.writeChildren(out, player, showAll, toSavedGame);
         for (Location destination : destinations) {
             out.writeStartElement("destination");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, destination.getId());
+            out.writeAttribute(ID_ATTRIBUTE, destination.getId());
             out.writeEndElement();
         }
     }
@@ -142,7 +152,8 @@ public class HighSeas extends UnitLocation {
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if ("destination".equals(in.getLocalName())) {
-                destinations.add(newLocation(in.getAttributeValue(null, ID_ATTRIBUTE_TAG)));
+                destinations.add(newLocation(in.getAttributeValue(null, ID_ATTRIBUTE)));
+                in.nextTag();
             } else {
                 super.readChild(in);
             }

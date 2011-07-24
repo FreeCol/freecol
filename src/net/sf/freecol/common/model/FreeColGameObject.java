@@ -368,6 +368,8 @@ abstract public class FreeColGameObject extends FreeColObject {
                     return new Building(game, locationString);
                 } else if (XMLElementTag.equals(Unit.getXMLElementTagName())) {
                     return new Unit(game, locationString);
+                } else if (XMLElementTag.equals(HighSeas.getXMLElementTagName())) {
+                    return new HighSeas(game, locationString);
                 } else {
                     logger.warning("Unknown type of Location: " + locationString);
                     return new Tile(game, locationString);

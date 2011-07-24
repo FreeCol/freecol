@@ -3618,7 +3618,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 lastSale.readFromXMLImpl(in);
                 saveSale(lastSale);
             } else if (HighSeas.getXMLElementTagName().equals(in.getLocalName())) {
-                highSeas.readFromXMLImpl(in);
+                highSeas = updateFreeColGameObject(in, HighSeas.class);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();
