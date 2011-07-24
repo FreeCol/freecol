@@ -2651,6 +2651,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Tile> owned = settlement.getOwnedTiles();
         Tile centerTile = settlement.getTile();
         Settlement centerClaimant = null;
+
         while (!owned.isEmpty()) {
             Tile tile = owned.remove(0);
             votes.clear();
@@ -2663,6 +2664,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 Settlement s = t.getOwningSettlement();
                 if (s == null) {
                     ;
+                } else if (s.isDisposed() || s.getOwner() == null) {
+                    // BR#3375773 found a case where tiles were still
+                    // owned by a settlement that had been previously
+                    // destroyed.  Keep things simple and just clear
+                    // the ownership on these.  The bug occurred
+                    // because settlement.getOwnedTiles() was missing
+                    // some tiles, which should be fixed, but we can
+                    // be defensive here.
+                    t.setOwningSettlement(null);
                 } else if (s == settlement) {
                     // Add this to the tiles to process if its not
                     // there already.

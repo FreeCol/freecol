@@ -409,16 +409,27 @@ abstract public class Settlement extends FreeColGameObject
 
     /**
      * Get the tiles this settlement owns.
+     * Exploits the fact that the map generator only grows connected tiles.
      *
      * @return A list of tiles.
      */
     public List<Tile> getOwnedTiles() {
         Tile settlementTile = getTile();
-        ArrayList<Tile> tiles = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<Tile>();
+        tiles.add(settlementTile);
         for (Tile t : settlementTile.getSurroundingTiles(getRadius())) {
             if (t.getOwningSettlement() == this) tiles.add(t);
         }
-        tiles.add(settlementTile);
+        List<Tile> todo = new ArrayList<Tile>(tiles);
+        while (!todo.isEmpty()) {
+            Tile t = todo.remove(0);
+            for (Tile s : t.getSurroundingTiles(1)) {
+                if (s.getOwningSettlement() == this && !tiles.contains(s)) {
+                    tiles.add(s);
+                    todo.add(s);
+                }
+            }
+        }
         return tiles;
     }
 
