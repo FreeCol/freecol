@@ -2268,10 +2268,11 @@ public class Colony extends Settlement implements Nameable {
      * @return A better expert, or null if none available.
      */
     public Unit getBetterExpert(Unit expert) {
-        if (expert.getSkillLevel() <= 0) return null;
-
         GoodsType production = expert.getWorkType();
         GoodsType expertise = expert.getType().getExpertProduction();
+        Unit bestExpert = null;
+        int bestImprovement = 0;
+
         if (production == null || expertise == null
             || production == expertise) return null;
 
@@ -2292,36 +2293,31 @@ public class Colony extends Settlement implements Nameable {
 
             // Get the current and potential productions for the
             // work location of the expert.
-            if (expert.getWorkTile() != null) {
-                ColonyTile ct = expert.getWorkTile();
-                expertProductionNow = ct.getProductionOf(expert, expertise);
-                nonExpertProductionPotential = ct.getProductionOf(nonExpert, expertise);
-            } else if (expert.getWorkBuilding() != null) {
-                Building b = expert.getWorkBuilding();
-                expertProductionNow = b.getUnitProductivity(expert);
-                nonExpertProductionPotential = b.getUnitProductivity(nonExpert);
+            WorkLocation ewl = expert.getWorkLocation();
+            if (ewl != null) {
+                expertProductionNow = ewl.getProductionOf(expert, expertise);
+                nonExpertProductionPotential = ewl.getProductionOf(nonExpert, expertise);
             }
 
             // Get the current and potential productions for the
             // work location of the non-expert.
-            if (nonExpert.getWorkTile() != null) {
-                ColonyTile ct = nonExpert.getWorkTile();
-                nonExpertProductionNow = ct.getProductionOf(nonExpert, expertise);
-                expertProductionPotential = ct.getProductionOf(expert, expertise);
-            } else if (nonExpert.getWorkBuilding() != null) {
-                Building b = nonExpert.getWorkBuilding();
-                nonExpertProductionNow = b.getUnitProductivity(nonExpert);
-                expertProductionPotential = b.getUnitProductivity(expert);
+            WorkLocation nwl = nonExpert.getWorkTile();
+            if (nwl != null) {
+                nonExpertProductionNow = nwl.getProductionOf(nonExpert, expertise);
+                expertProductionPotential = nwl.getProductionOf(expert, expertise);
             }
 
-            // Let the player know if the two units would be more
-            // productive were they to swap roles.
-            if (expertProductionNow + nonExpertProductionNow
-                < expertProductionPotential + nonExpertProductionPotential) {
-                return nonExpert;
+            // Find the unit that achieves the best improvement.
+            int improvement = expertProductionPotential
+                + nonExpertProductionPotential
+                - expertProductionNow
+                - nonExpertProductionNow;
+            if (improvement > bestImprovement) {
+                bestImprovement = improvement;
+                bestExpert = nonExpert;
             }
         }
-        return null;
+        return bestExpert;
     }
 
     // Serialization

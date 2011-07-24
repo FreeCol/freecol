@@ -581,23 +581,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the production of the given type of goods.
-     *
-     * @param goodsType The type of goods to get the production for.
-     * @return the production og the given goods this turn. This method will
-     *         return the same as {@link #getProduction} if the given type of
-     *         goods is the same as {@link #getGoodsOutputType} and
-     *         <code>0</code> otherwise.
-     */
-    public int getProductionOf(GoodsType goodsType) {
-        if (goodsType == getGoodsOutputType()) {
-            return getProduction();
-        }
-
-        return 0;
-    }
-
-    /**
      * Returns the maximum productivity of worker/s currently working
      * in this building.
      *
@@ -642,6 +625,37 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Returns the production of the given type of goods.
+     *
+     * @param goodsType The type of goods to get the production for.
+     * @return the production og the given goods this turn. This method will
+     *         return the same as {@link #getProduction} if the given type of
+     *         goods is the same as {@link #getGoodsOutputType} and
+     *         <code>0</code> otherwise.
+     */
+    public int getProductionOf(GoodsType goodsType) {
+        if (goodsType == getGoodsOutputType()) {
+            return getProduction();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Gets the production of the given type of goods produced by a unit.
+     *
+     * @param unit The unit to do the work.
+     * @param goodsType The type of goods to get the production of.
+     * @return The production of the given type of goods.
+     */
+    public int getProductionOf(Unit unit, GoodsType goodsType) {
+        return (unit == null || !contains(unit)
+            || getGoodsOutputType() != goodsType
+            || getGoodsOutputType() == null) ? 0
+            : getUnitProductivity(unit);
     }
 
     /**

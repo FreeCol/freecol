@@ -98,12 +98,21 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
 
     /**
-     * Returns the production of the given type of goods.
+     * Gets the production of the given type of goods.
      *
      * @param goodsType The type of goods to get the production of.
      * @return The production of the given type of goods.
      */
     public abstract int getProductionOf(GoodsType goodsType);
+
+    /**
+     * Gets the production of the given type of goods produced by a unit.
+     *
+     * @param unit The unit to do the work.
+     * @param goodsType The type of goods to get the production of.
+     * @return The production of the given type of goods.
+     */
+    public abstract int getProductionOf(Unit unit, GoodsType goodsType);
 
     /**
      * Gets the potential production of a given goods type from using

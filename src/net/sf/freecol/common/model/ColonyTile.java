@@ -455,6 +455,33 @@ public class ColonyTile extends WorkLocation implements Ownable {
         return result;
     }
 
+    /**
+     * Gets the production modifiers for the given type of goods and unit.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>unitType</code> to produce them.
+     * @return A set of the applicable modifiers.
+     */
+    public Set<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
+        if (goodsType == null) {
+            throw new IllegalArgumentException("GoodsType must not be 'null'.");
+        } else {
+            Set<Modifier> result = new HashSet<Modifier>();
+            if (getUnit() == null) {
+                if (isColonyCenterTile() &&
+                    (workTile.getType().isPrimaryGoodsType(goodsType)
+                     || workTile.getType().isSecondaryGoodsType(goodsType))) {
+                    result.addAll(workTile.getProductionBonus(goodsType, null));
+                    result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+                }
+            } else if (goodsType.equals(getUnit().getWorkType())) {
+                result.addAll(workTile.getProductionBonus(goodsType, unitType));
+                result.addAll(getUnit().getModifierSet(goodsType.getId()));
+            }
+            return result;
+        }
+    }
+
 
     /**
      * Returns the production of the given type of goods.
@@ -481,33 +508,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
             return getProductionOf(getUnit(), goodsType);
         } else {
             return 0;
-        }
-    }
-
-    /**
-     * Returns the production of the given type of goods.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param unitType a <code>unitType</code> value
-     * @return an <code>int</code> value
-     */
-    public Set<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
-        if (goodsType == null) {
-            throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        } else {
-            Set<Modifier> result = new HashSet<Modifier>();
-            if (getUnit() == null) {
-                if (isColonyCenterTile() &&
-                    (workTile.getType().isPrimaryGoodsType(goodsType)
-                     || workTile.getType().isSecondaryGoodsType(goodsType))) {
-                    result.addAll(workTile.getProductionBonus(goodsType, null));
-                    result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
-                }
-            } else if (goodsType.equals(getUnit().getWorkType())) {
-                result.addAll(workTile.getProductionBonus(goodsType, unitType));
-                result.addAll(getUnit().getModifierSet(goodsType.getId()));
-            }
-            return result;
         }
     }
 

@@ -136,6 +136,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         // Check if all unit requirements are met.
         for (Unit expert : colony.getUnitList()) {
+            if (expert.getSkillLevel() <= 0) continue;
             Unit better = colony.getBetterExpert(expert);
             if (better != null && !badAssignmentWarning.contains(expert)) {
                 addBadAssignmentWarning(doc, colony, expert, better);
