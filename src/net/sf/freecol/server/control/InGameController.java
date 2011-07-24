@@ -88,6 +88,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
@@ -2960,9 +2961,12 @@ public final class InGameController extends Controller {
         }
 
         // Check for upgrade.
-        UnitType type = unit.getType().getTargetType(ChangeType.ENTER_COLONY,
-                                                     unit.getOwner());
-        if (type != null) unit.setType(type);
+        UnitType oldType = unit.getType();
+        UnitTypeChange change = oldType
+            .getUnitTypeChange(ChangeType.ENTER_COLONY, unit.getOwner());
+        if (change != null) {
+            unit.setType(change.getNewUnitType());
+        }
 
         // Change the location.
         // We could avoid updating the whole tile if we knew that this
