@@ -568,11 +568,10 @@ public final class ReportColonyPanel extends ReportPanel
             // TODO: fix non-OO
             if (wl instanceof ColonyTile) {
                 if (!((ColonyTile) wl).canBeWorked()) continue;
-            } else if (wl instanceof Building) {
-                if (((Building) wl).canTeach()) {
-                    teachers.addAll(wl.getUnitList());
-                    continue;
-                }
+            }
+            if (wl.canTeach()) {
+                teachers.addAll(wl.getUnitList());
+                continue;
             }
 
             UnitType expert;

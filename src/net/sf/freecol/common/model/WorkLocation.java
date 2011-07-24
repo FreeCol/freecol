@@ -151,7 +151,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Gets the <code>Tile</code> where this <code>Building</code> is
+     * Gets the <code>Tile</code> where this work location is
      * located.
      *
      * @return The <code>Tile</code>.
@@ -193,13 +193,86 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns <code>true</code> if this work location has the Ability to
+     * teach skills.
+     *
+     * @see Ability#CAN_TEACH
+     */
+    public boolean canTeach() {
+        return hasAbility(Ability.CAN_TEACH);
+    }
 
+    /**
+     * Adds the specified locatable to this building.
+     *
+     * @param locatable The <code>Locatable</code> to add.
+     */
+    public void add(final Locatable locatable) {
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalStateException("Not a unit: " + locatable);
+        }
+
+        Unit unit = (Unit) locatable;
+        super.add(unit);
+
+        if (canTeach()) {
+            Unit student = unit.getStudent();
+            if (student == null
+                && (student = getColony().findStudent(unit)) != null) {
+                unit.setStudent(student);
+                student.setTeacher(unit);
+            }
+            unit.setWorkType(null);
+        } else {
+            Unit teacher = unit.getTeacher();
+            if (teacher == null
+                && (teacher = getColony().findTeacher(unit)) != null) {
+                unit.setTeacher(teacher);
+                teacher.setStudent(unit);
+            }
+        }
+    }
+
+    /**
+     * Removes the specified locatable from this building.
+     *
+     * @param locatable The <code>Locatable</code> to remove.
+     */
+    public void remove(final Locatable locatable) {
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalStateException("Not a unit: " + locatable);
+        }
+
+        Unit unit = (Unit) locatable;
+        super.remove(unit);
+
+        if (canTeach()) {
+            Unit student = unit.getStudent();
+            if (student != null) {
+                student.setTeacher(null);
+                unit.setStudent(null);
+            }
+        } else {
+            Unit teacher = unit.getTeacher();
+            if (teacher != null) {
+                teacher.setStudent(null);
+                unit.setTeacher(null);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         colony = getFreeColGameObject(in, "colony", Colony.class);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("colony", colony.getId());

@@ -169,16 +169,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns <code>true</code> if this Building has the Ability to
-     * teach skills.
-     *
-     * @see Ability#CAN_TEACH
-     */
-    public boolean canTeach() {
-        return hasAbility(Ability.CAN_TEACH);
-    }
-
-    /**
      * Returns whether this building can be damaged
      *
      * @return <code>true</code> if can be damaged
@@ -305,7 +295,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return buildingType.canAdd(unitType);
     }
 
-
     /**
      * Adds the specified locatable to this building.
      *
@@ -316,30 +305,15 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             throw new IllegalStateException("Can not add " + locatable
                                             + " to " + toString());
         }
-        if (getUnitList().contains(locatable)) return;
+        Unit unit = (Unit) locatable;
+        if (contains(unit)) return;
 
-        final Unit unit = (Unit) locatable;
         super.add(unit);
+
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setWorkType(getGoodsOutputType());
-        getColony().invalidateCache();
 
-        if (canTeach()) {
-            Unit student = unit.getStudent();
-            if (student == null
-                && (student = getColony().findStudent(unit)) != null) {
-                unit.setStudent(student);
-                student.setTeacher(unit);
-            }
-            unit.setWorkType(null);
-        } else {
-            Unit teacher = unit.getTeacher();
-            if (teacher == null
-                && (teacher = getColony().findTeacher(unit)) != null) {
-                unit.setTeacher(teacher);
-                teacher.setStudent(unit);
-            }
-        }
+        getColony().invalidateCache();
     }
 
     /**
@@ -349,29 +323,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public void remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Can only remove units from building.");
+            throw new IllegalStateException("Not a unit: " + locatable);
         }
-        if (!getUnitList().contains(locatable)) return;
+        Unit unit = (Unit) locatable;
+        if (!contains(unit)) return;
 
-        final Unit unit = (Unit) locatable;
         super.remove(unit);
+
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
-        getColony().invalidateCache();
 
-        if (canTeach()) {
-            Unit student = unit.getStudent();
-            if (student != null) {
-                student.setTeacher(null);
-                unit.setStudent(null);
-            }
-        } else {
-            Unit teacher = unit.getTeacher();
-            if (teacher != null) {
-                teacher.setStudent(null);
-                unit.setTeacher(null);
-            }
-        }
+        getColony().invalidateCache();
     }
 
     /**

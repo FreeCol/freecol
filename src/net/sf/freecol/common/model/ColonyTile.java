@@ -255,10 +255,12 @@ public class ColonyTile extends WorkLocation implements Ownable {
             throw new IllegalStateException("Can not add to colony tile: "
                 + toString() + " reason: " + reason);
         }
-        final Unit unit = (Unit) locatable;
+        Unit unit = (Unit) locatable;
+        if (contains(unit)) return;
+
         super.add(unit);
+
         unit.setState(Unit.UnitState.IN_COLONY);
-        getColony().invalidateCache();
 
         // Choose a sensible work type only if none already specified.
         if (unit.getWorkType() == null) {
@@ -273,12 +275,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
             if (goods != null) unit.setWorkType(goods.getType());
         }
 
-        Unit teacher = unit.getTeacher();
-        if (teacher == null
-            && (teacher = getColony().findTeacher(unit)) != null) {
-            unit.setTeacher(teacher);
-            teacher.setStudent(unit);
-        }
+        getColony().invalidateCache();
     }
 
     /**
@@ -287,21 +284,18 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @param locatable The <code>Locatable</code> to be removed.
      */
     public void remove(final Locatable locatable) {
-        if (getUnit() == null || !getUnit().equals(locatable)) {
-            return;
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalStateException("Not a unit: " + locatable);
         }
+        Unit unit = (Unit) locatable;
+        if (!contains(unit)) return;
 
-        final Unit unit = getUnit();
         super.remove(unit);
+
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
-        getColony().invalidateCache();
 
-        Unit teacher = unit.getTeacher();
-        if (teacher != null) {
-            teacher.setStudent(null);
-            unit.setTeacher(null);
-        }
+        getColony().invalidateCache();
     }
 
     /**
