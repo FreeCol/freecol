@@ -167,26 +167,15 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.
+     * Gets the <code>Unit</code> currently working on this
+     * <code>ColonyTile</code>.
      *
      * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-     * @see #setUnit
+     * TODO: deprecate this in favour of using the unit list, as we are
+     * unnecessarily encoding the assumption that there can only be one unit.
      */
     public Unit getUnit() {
-        return getUnitList().isEmpty() ? null : getUnitList().get(0);
-    }
-
-    /**
-     * Sets a <code>Unit</code> to this <code>ColonyTile</code>.
-     *
-     * @param unit The <code>Unit</code>.
-     * @see #getUnit
-     */
-    public void setUnit(Unit unit) {
-        getUnitList().clear();
-        if (unit != null) {
-            getUnitList().add(unit);
-        }
+        return (getUnitCount() == 0) ? null : getUnitList().get(0);
     }
 
     /**
@@ -205,10 +194,10 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * within the {@link Colony}.
      */
     public void relocateWorkers() {
-        if (getUnit() != null) {
+        for (Unit unit : getUnitList()) {
             for (WorkLocation wl : getColony().getWorkLocations()) {
-                if (wl != this && wl.canAdd(getUnit())) {
-                    getUnit().setLocation(wl);
+                if (wl != this && wl.canAdd(unit)) {
+                    unit.setLocation(wl);
                     break;
                 }
             }
@@ -216,78 +205,43 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-       Reasons why a colony tile can not be worked or added to.
-    */
-    public static enum NoAddReason {
-        NONE,            // Actually, tile can be worked
-        SETTLEMENT,      // Settlement centre tile
-        OCCUPIED,        // Occupying unit fortified
-        PRODUCE,         // Does not have produceInWater ability
-        CLAIM,           // Does not own the tile, see NoClaimReason
-        FULL,            // Workable tile is full
-        NOTUNIT,         // Adding non-unit
-        NOSKILL,         // Adding unit with no skill
-    };
-
-    /**
      * Checks if this colony tile is available to the colony to be worked.
-     * Checks ownership last because this can trigger a tile claim,
-     * which we should be conservative about.
      *
      * @return The reason why/not the tile can be worked.
      */
-    public NoAddReason canBeWorkedReason() {
-        Player player = getOwner();
+    public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
 
-        return (tile.getSettlement() != null) ? NoAddReason.SETTLEMENT
-            : (tile.getOccupyingUnit() != null) ? NoAddReason.OCCUPIED
+        return (isColonyCenterTile())
+            ? NoAddReason.COLONY_CENTER
+            : (tile.getOccupyingUnit() != null)
+            ? NoAddReason.OCCUPIED_BY_ENEMY
             : (!getColony().hasAbility("model.ability.produceInWater")
-                && !tile.isLand()) ? NoAddReason.PRODUCE
-            : (tile.getOwningSettlement() != getColony()
-                && !player.canClaimForSettlement(tile)) ? NoAddReason.CLAIM
+                && !tile.isLand())
+            ? NoAddReason.MISSING_ABILITY
+            : (tile.getOwningSettlement() != getColony())
+            ? ((getOwner().canClaimForSettlement(tile))
+                ? NoAddReason.CLAIM_REQUIRED : NoAddReason.OWNED_BY_ENEMY)
             : NoAddReason.NONE;
     }
 
     /**
-     * Check if this <code>WorkLocation</code> is available to the getColony().
-     * Used by canAdd() and the gui to decide whether to draw a border
-     * on this tile in the colony panel.
+     * Checks if this colony tile can be worked.
      *
-     * @return True if the location can be worked.
+     * @return True if the colony tile can be worked.
      */
     public boolean canBeWorked() {
-        return canBeWorkedReason() == NoAddReason.NONE;
+        return getNoWorkReason() == NoAddReason.NONE;
     }
 
     /**
-     * Checks if this tile can have a specified locatable added to it.
-     *
-     * @param locatable The <code>Locatable</code> to add.
-     * @return The reason why/not the tile can be added to.
+     * @inheritDoc
      */
-    public NoAddReason canAddReason(Locatable locatable) {
-        NoAddReason reason;
-        Unit unit;
-
-        return (!(locatable instanceof Unit)) ? NoAddReason.NOTUNIT
-            : (!(unit = (Unit) locatable).getType()
-                .hasSkill()) ? NoAddReason.NOSKILL
-            : (getUnit() != null && getUnit() != unit) ? NoAddReason.FULL
-            : ((reason = canBeWorkedReason()) != NoAddReason.NONE) ? reason
-            : NoAddReason.NONE;
-    }
-
-    /**
-     * Checks if the specified <code>Locatable</code> may be added to
-     * this <code>WorkLocation</code>.
-     *
-     * @param locatable the <code>Locatable</code>.
-     * @return <code>true</code> if the <code>Unit</code> may be added
-     *         and <code>false</code> otherwise.
-     */
-    public boolean canAdd(Locatable locatable) {
-        return canAddReason(locatable) == NoAddReason.NONE;
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        NoAddReason reason = getNoWorkReason();
+        return (reason != NoAddReason.NONE) ? reason
+            : super.getNoAddReason(locatable);
     }
 
     /**
@@ -296,13 +250,13 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @param locatable The <code>Locatable</code> to add.
      */
     public void add(final Locatable locatable) {
-        NoAddReason reason = canAddReason(locatable);
+        NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add to colony tile: "
                 + toString() + " reason: " + reason);
         }
         final Unit unit = (Unit) locatable;
-        setUnit(unit);
+        super.add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
         getColony().invalidateCache();
 
@@ -338,7 +292,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         }
 
         final Unit unit = getUnit();
-        setUnit(null);
+        super.remove(unit);
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
         getColony().invalidateCache();
@@ -448,9 +402,12 @@ public class ColonyTile extends WorkLocation implements Ownable {
             if (secondaryProduction != null) {
                 result.add(secondaryProduction);
             }
-        } else if (getUnit() != null) {
-            GoodsType goodsType = getUnit().getWorkType();
-            result.add(new AbstractGoods(goodsType, getProductionOf(getUnit(), goodsType)));
+        } else {
+            for (Unit unit : getUnitList()) {
+                GoodsType goodsType = unit.getWorkType();
+                result.add(new AbstractGoods(goodsType, getProductionOf(unit,
+                            goodsType)));
+            }
         }
         return result;
     }
@@ -465,23 +422,21 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public Set<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        } else {
-            Set<Modifier> result = new HashSet<Modifier>();
-            if (getUnit() == null) {
-                if (isColonyCenterTile() &&
-                    (workTile.getType().isPrimaryGoodsType(goodsType)
-                     || workTile.getType().isSecondaryGoodsType(goodsType))) {
-                    result.addAll(workTile.getProductionBonus(goodsType, null));
-                    result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
-                }
-            } else if (goodsType.equals(getUnit().getWorkType())) {
-                result.addAll(workTile.getProductionBonus(goodsType, unitType));
-                result.addAll(getUnit().getModifierSet(goodsType.getId()));
-            }
-            return result;
         }
+        Set<Modifier> result = new HashSet<Modifier>();
+        for (Unit unit : getUnitList()) {
+            if (isColonyCenterTile()
+                && (workTile.getType().isPrimaryGoodsType(goodsType)
+                    || workTile.getType().isSecondaryGoodsType(goodsType))) {
+                result.addAll(workTile.getProductionBonus(goodsType, null));
+                result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+            } else if (goodsType.equals(unit.getWorkType())) {
+                result.addAll(workTile.getProductionBonus(goodsType, unitType));
+                result.addAll(unit.getModifierSet(goodsType.getId()));
+            }
+        }
+        return result;
     }
-
 
     /**
      * Returns the production of the given type of goods.
@@ -490,25 +445,26 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @return an <code>int</code> value
      */
     public int getProductionOf(GoodsType goodsType) {
-        if (isColonyCenterTile()) {
-            if (workTile.getType().getPrimaryGoods() != null
-                && workTile.getType().getPrimaryGoods().getType() == goodsType) {
-                return getPrimaryProduction().getAmount();
-            } else if (workTile.getType().getSecondaryGoods() != null
-                       && workTile.getType().getSecondaryGoods().getType() == goodsType) {
-                return getSecondaryProduction().getAmount();
-            } else {
-                return 0;
-            }
-        } else if (goodsType == null) {
+        if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        } else if (getUnit() == null) {
-            return 0;
-        } else if (goodsType.equals(getUnit().getWorkType())) {
-            return getProductionOf(getUnit(), goodsType);
-        } else {
-            return 0;
         }
+        if (isColonyCenterTile()) {
+            TileType type = workTile.getType();
+            return (type.getPrimaryGoods() != null
+                && type.getPrimaryGoods().getType() == goodsType)
+                ? getPrimaryProduction().getAmount()
+                : (type.getSecondaryGoods() != null
+                    && type.getSecondaryGoods().getType() == goodsType)
+                ? getSecondaryProduction().getAmount()
+                : 0;
+        }
+        int production = 0;
+        for (Unit unit : getUnitList()) {
+            if (goodsType.equals(unit.getWorkType())) {
+                production += getProductionOf(unit, goodsType);
+            }
+        }
+        return production;
     }
 
     /**
@@ -565,28 +521,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
             }
         }
         return production;
-    }
-
-
-    /**
-     * Removes all references to this object.
-     *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (getUnit() != null) {
-            objects.addAll(getUnit().disposeList());
-        }
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Dispose of this ColonyTile.
-     */
-    public void dispose() {
-        disposeList();
     }
 
     /**

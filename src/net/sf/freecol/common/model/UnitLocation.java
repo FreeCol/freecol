@@ -67,7 +67,25 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
          * Locatable can not be added because the Location belongs
          * to another player and does not admit foreign objects.
          */
-        OWNED_BY_ENEMY
+        OWNED_BY_ENEMY,
+        // Enums can not be extended, so ColonyTile-specific failure reasons
+        // have to be here.
+        /**
+         * Can not add to colony center tile.
+         */
+        COLONY_CENTER,
+        /**
+         * Missing ability to work colony tile, for example, produceInWater.
+         */
+        MISSING_ABILITY,
+        /**
+         * Missing skill to work colony tile.
+         */
+        MISSING_SKILL,
+        /**
+         * Not claimed yet, but claim would succeed.
+         */
+        CLAIM_REQUIRED,
     }
 
     /**
@@ -151,6 +169,38 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean canAdd(Locatable locatable) {
+        return getNoAddReason(locatable) == NoAddReason.NONE;
+    }
+
+    /**
+     * Returns the reason why a given <code>Locatable</code> can not
+     * be added to this Location.
+     *
+     * @param locatable a <code>Locatable</code> value
+     * @return a <code>NoAddReason</code> value
+     */
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            if (units == null || units.size() >= getUnitCapacity()) {
+                return NoAddReason.CAPACITY_EXCEEDED;
+            } else {
+                Unit unit = (Unit) locatable;
+                if (!units.isEmpty()
+                    && units.get(0).getOwner() != unit.getOwner()) {
+                    return NoAddReason.OCCUPIED_BY_ENEMY;
+                } else {
+                    return NoAddReason.NONE;
+                }
+            }
+        } else {
+            return NoAddReason.WRONG_TYPE;
+        }
+    }
+
+    /**
      * Adds a <code>Locatable</code> to this Location.
      *
      * @param locatable
@@ -167,13 +217,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         } else if (locatable instanceof Goods) {
             locatable.setLocation(null);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean canAdd(Locatable locatable) {
-        return getNoAddReason(locatable) == NoAddReason.NONE;
     }
 
     /**
@@ -204,32 +247,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     public boolean contains(Locatable locatable) {
         return units != null && units.contains(locatable);
     }
-
-    /**
-     * Returns the reason why a given <code>Locatable</code> can not
-     * be added to this Location.
-     *
-     * @param locatable a <code>Locatable</code> value
-     * @return a <code>NoAddReason</code> value
-     */
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (units == null || units.size() >= getUnitCapacity()) {
-                return NoAddReason.CAPACITY_EXCEEDED;
-            } else {
-                Unit unit = (Unit) locatable;
-                if (!units.isEmpty()
-                    && units.get(0).getOwner() != unit.getOwner()) {
-                    return NoAddReason.OCCUPIED_BY_ENEMY;
-                } else {
-                    return NoAddReason.NONE;
-                }
-            }
-        } else {
-            return NoAddReason.WRONG_TYPE;
-        }
-    }
-
 
     /**
      * Returns <code>true</code> if this Location admits the given
@@ -268,12 +285,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     /**
-     * Returns a list containing all the Units present at this Location.
+     * Gets the Units present at this Location.
      *
-     * @return a list containing the Units present at this location.
+     * @return A copy of the list containing the Units present at this location.
      */
     public List<Unit> getUnitList() {
-        return units;
+        return new ArrayList<Unit>(units);
     }
 
     /**
@@ -327,6 +344,29 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     public GoodsContainer getGoodsContainer() {
         return null;
     }
+
+
+    /**
+     * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
+     */
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (!units.isEmpty()) {
+            objects.addAll(units.remove(0).disposeList());
+        }
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Dispose of this UnitLocation.
+     */
+    public void dispose() {
+        disposeList();
+    }
+
 
     /**
      * @{inheritDoc}

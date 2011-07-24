@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
+
 public class TileTest extends FreeColTestCase {
 
     private static final BuildingType townHallType

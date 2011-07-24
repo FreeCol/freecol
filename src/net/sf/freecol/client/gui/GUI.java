@@ -87,6 +87,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -1027,7 +1028,10 @@ public final class GUI {
             ColonyTile colonyTile = colony.getColonyTile(tile);
             occupyingUnit = colonyTile.getOccupyingUnit();
             price = colony.getOwner().getLandPrice(tile);
-            if (!colonyTile.canBeWorked() && !colonyTile.isColonyCenterTile()) {
+            switch (colonyTile.getNoWorkReason()) {
+            case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
+                break;
+            default:
                 g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
             }
         }

@@ -245,7 +245,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         // Colonists exceding units limit must be put outside
         if (getUnitCount() > getUnitCapacity()) {
-            for (Unit unit : new ArrayList<Unit>(getUnitList().subList(getUnitCapacity(), getUnitCount()))) {
+            for (Unit unit : getUnitList().subList(getUnitCapacity(), getUnitCount())) {
                 unit.putOutsideColony();
             }
         }
@@ -319,7 +319,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (getUnitList().contains(locatable)) return;
 
         final Unit unit = (Unit) locatable;
-        getUnitList().add(unit);
+        super.add(unit);
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setWorkType(getGoodsOutputType());
         getColony().invalidateCache();
@@ -351,25 +351,25 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Can only remove units from building.");
         }
+        if (!getUnitList().contains(locatable)) return;
 
         final Unit unit = (Unit) locatable;
-        if (getUnitList().remove(unit)) {
-            unit.setMovesLeft(0);
-            unit.setState(Unit.UnitState.ACTIVE);
-            getColony().invalidateCache();
+        super.remove(unit);
+        unit.setMovesLeft(0);
+        unit.setState(Unit.UnitState.ACTIVE);
+        getColony().invalidateCache();
 
-            if (canTeach()) {
-                Unit student = unit.getStudent();
-                if (student != null) {
-                    student.setTeacher(null);
-                    unit.setStudent(null);
-                }
-            } else {
-                Unit teacher = unit.getTeacher();
-                if (teacher != null) {
-                    teacher.setStudent(null);
-                    unit.setTeacher(null);
-                }
+        if (canTeach()) {
+            Unit student = unit.getStudent();
+            if (student != null) {
+                student.setTeacher(null);
+                unit.setStudent(null);
+            }
+        } else {
+            Unit teacher = unit.getTeacher();
+            if (teacher != null) {
+                teacher.setStudent(null);
+                unit.setTeacher(null);
             }
         }
     }
@@ -714,31 +714,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public int compareTo(Building other) {
         return getType().compareTo(other.getType());
-    }
-
-
-    /**
-     * Dispose of this building.
-     *
-     * @return A list of disposed objects.
-     */
-    @Override
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (!getUnitList().isEmpty()) {
-            objects.addAll(getUnitList().remove(0).disposeList());
-        }
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Disposes this building. All units that currently has this
-     * <code>Building as it's location will be disposed</code>.
-     */
-    @Override
-    public void dispose() {
-        disposeList();
     }
 
 

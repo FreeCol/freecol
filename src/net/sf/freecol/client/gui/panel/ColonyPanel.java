@@ -73,7 +73,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.ColonyTile.NoAddReason;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -90,6 +89,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 
 
 /**
@@ -1560,8 +1560,8 @@ public final class ColonyPanel extends FreeColPanel
                 Player player = unit.getOwner();
                 Canvas canvas = getCanvas();
 
-                NoAddReason reason = colonyTile.canAddReason(unit);
-                if (reason == NoAddReason.CLAIM) {
+                NoAddReason reason = colonyTile.getNoAddReason(unit);
+                if (reason == NoAddReason.CLAIM_REQUIRED) {
                     // Need to acquire the tile before working it.
                     NoClaimReason claim
                         = player.canClaimForSettlementReason(tile);
@@ -1588,8 +1588,8 @@ public final class ColonyPanel extends FreeColPanel
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
-                    reason = colonyTile.canAddReason(unit);
-                    if (reason == NoAddReason.CLAIM) {
+                    reason = colonyTile.getNoAddReason(unit);
+                    if (reason == NoAddReason.CLAIM_REQUIRED) {
                         throw new IllegalStateException("Claim failed");
                     }
                 }

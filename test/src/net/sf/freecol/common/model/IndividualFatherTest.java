@@ -27,8 +27,10 @@ import java.util.Set;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 /**
  * Test cases for individual Founding Fathers. TODO: add a test case
@@ -36,54 +38,66 @@ import net.sf.freecol.util.test.FreeColTestCase;
  */
 public class IndividualFatherTest extends FreeColTestCase {
 
-    private static GoodsType musketsType
+    private static final BuildableType customHouseType
+        = spec().getBuildingType("model.building.customHouse");
+    private static final BuildingType townHallType
+        = spec().getBuildingType("model.building.townHall");
+
+    private static final EquipmentType bibleType
+        = spec().getEquipmentType("model.equipment.missionary");
+
+    private static final GoodsType bellsType
+        = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
 
-    private static UnitType servantType
+    private static final UnitType servantType
         = spec().getUnitType("model.unit.indenturedServant");
-    private static UnitType colonistType
+    private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
-    private static UnitType statesmanType
+    private static final UnitType statesmanType
         = spec().getUnitType("model.unit.elderStatesman");
 
 
     public void testPeterStuyvesant() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
 
         // The custom house is not buildable initially
-        BuildableType customHouse = spec().getBuildingType("model.building.customHouse");
-        assertFalse(colony.canBuild(customHouse));
+        assertFalse(colony.canBuild(customHouseType));
 
-        // But it should become available after Peter Stuyvesant has joined continental congress
-        FoundingFather father = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
+        // But it should become available after Peter Stuyvesant has
+        // joined continental congress
+        FoundingFather father
+            = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
         player.addFather(father);
-        assertTrue(colony.canBuild(customHouse));
+        assertTrue(colony.canBuild(customHouseType));
     }
 
     public void testHernanCortes() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
         NationType inca = spec().getNationType("model.nationType.inca");
-        SettlementType incaCity = inca.getSettlementType("model.settlement.inca");
+        SettlementType incaCity
+            = inca.getSettlementType("model.settlement.inca");
 
         RandomRange range = incaCity.getPlunderRange(unit);
         assertEquals(2100, range.getFactor());
 
-        FoundingFather father = spec().getFoundingFather("model.foundingFather.hernanCortes");
+        FoundingFather father
+            = spec().getFoundingFather("model.foundingFather.hernanCortes");
         player.addFather(father);
 
         range = incaCity.getPlunderRange(unit);
         assertEquals(3100, range.getFactor());
-
     }
 
     public void testMinuit() {
@@ -99,8 +113,10 @@ public class IndividualFatherTest extends FreeColTestCase {
         Tile settlementTile = disputedTile.getNeighbourOrNull(Direction.N);
         assertNull(settlementTile.getOwner());
 
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(getGame());
-        IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile)
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(getGame());
+        IndianSettlement indianSettlement
+            = builder.player(iroquois).settlementTile(settlementTile)
             .skillToTeach(null).build();
 
         disputedTile.setOwner(iroquois);
@@ -114,45 +130,49 @@ public class IndividualFatherTest extends FreeColTestCase {
             = spec().getFoundingFather("model.foundingFather.peterMinuit");
         player.addFather(minuit);
 
-        assertEquals(0, player.getLandPrice(disputedTile));
-        assertTrue(colony.getColonyTile(disputedTile).canAdd(unit));
+        assertEquals("Tile should be zero cost",
+            0, player.getLandPrice(disputedTile));
+        assertEquals("Should still have to claim the tile",
+            colony.getColonyTile(disputedTile).getNoAddReason(unit),
+            NoAddReason.CLAIM_REQUIRED);
     }
 
     public void testPaine() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
-        GoodsType bells = spec().getGoodsType("model.goods.bells");
-        Building townHall = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
         List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
+        Building townHall = colony.getBuilding(townHallType);
 
         Unit statesman1 = colony.getUnitList().get(0);
         Unit statesman2 = colony.getUnitList().get(1);
         Unit statesman3 = colony.getUnitList().get(2);
 
-        statesman1.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman1.setType(statesmanType);
         statesman1.setLocation(townHall);
-        assertEquals(6 + 1, townHall.getProductionOf(bells));
+        assertEquals(6 + 1, townHall.getProductionOf(bellsType));
 
-        statesman2.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman2.setType(statesmanType);
         statesman2.setLocation(townHall);
-        assertEquals(2 * 6 + 1, townHall.getProductionOf(bells));
+        assertEquals(2 * 6 + 1, townHall.getProductionOf(bellsType));
 
-        statesman3.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman3.setType(statesmanType);
         statesman3.setLocation(townHall);
-        assertEquals(3 * 6 + 1, townHall.getProductionOf(bells));
+        assertEquals(3 * 6 + 1, townHall.getProductionOf(bellsType));
 
         player.setTax(20);
-        assertEquals(3 * 6 + 1, townHall.getProductionOf(bells));
+        assertEquals(3 * 6 + 1, townHall.getProductionOf(bellsType));
 
-        FoundingFather paine = spec().getFoundingFather("model.foundingFather.thomasPaine");
+        FoundingFather paine
+            = spec().getFoundingFather("model.foundingFather.thomasPaine");
         player.addFather(paine);
         player.recalculateBellsBonus();
 
         assertTrue(player.hasAbility("model.ability.addTaxToBells"));
-        Set<Modifier> modifierSet = player.getFeatureContainer().getModifierSet("model.goods.bells");
+        Set<Modifier> modifierSet
+            = player.getFeatureContainer().getModifierSet("model.goods.bells");
         assertEquals(1, modifierSet.size());
 
         Modifier paineModifier = modifierSet.iterator().next();
@@ -160,13 +180,13 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(player.getTax(), (int) paineModifier.getValue());
 
         int expected = (int) (3 * 6 * 1.2f + 1);
-        assertEquals(expected, townHall.getProductionOf(bells));
+        assertEquals(expected, townHall.getProductionOf(bellsType));
 
         player.setTax(30);
         player.recalculateBellsBonus();
 
         expected = (int) (3 * 6 * 1.3f + 1);
-        assertEquals(expected, townHall.getProductionOf(bells));
+        assertEquals(expected, townHall.getProductionOf(bellsType));
     }
 
     public void testRevere() {
@@ -177,20 +197,21 @@ public class IndividualFatherTest extends FreeColTestCase {
         Player player = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);
 
-        String errMsg = "Unit should not be able to automatically arm, Revere not in congress yet";
-        assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
+        assertNull("Unit should not be able to automatically arm, Revere not in congress yet",
+            colonist.getAutomaticEquipment());
 
         // adding Revere to congress
-        FoundingFather father = spec().getFoundingFather("model.foundingFather.paulRevere");
+        FoundingFather father
+            = spec().getFoundingFather("model.foundingFather.paulRevere");
         player.addFather(father);
 
-        errMsg = "Unit should not be able to automatically arm, no muskets available";
-        assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
+        assertNull("Unit should not be able to automatically arm, no muskets available",
+            colonist.getAutomaticEquipment());
 
         colony.addGoods(musketsType, 100);
 
-        errMsg = "Unit be able to automatically arm, has muskets and Paul Revere";
-        assertFalse(errMsg, colonist.getAutomaticEquipment() == null);
+        assertNotNull("Unit be able to automatically arm, has muskets and Paul Revere",
+            colonist.getAutomaticEquipment());
     }
 
     public void testDeWitt() {
@@ -202,7 +223,8 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
         assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
-        FoundingFather father = spec().getFoundingFather("model.foundingFather.janDeWitt");
+        FoundingFather father
+            = spec().getFoundingFather("model.foundingFather.janDeWitt");
         dutch.addFather(father);
 
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
@@ -220,27 +242,25 @@ public class IndividualFatherTest extends FreeColTestCase {
     }
 
     public void testBrebeuf() {
-
-    	Game game = getGame();
+        Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        FoundingFather brebeuf = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-
-        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
+        FoundingFather brebeuf
+            = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
         String ability = "model.ability.expertMissionary";
 
         assertTrue(brebeuf.hasAbility(ability));
         assertFalse(dutch.hasAbility(ability));
 
         game.setMap(getTestMap());
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
-        EquipmentType bible = spec().getEquipmentType("model.equipment.missionary");
 
-        Unit missionary = new ServerUnit(game, null, dutch, colonist,
-                                   UnitState.ACTIVE, bible);
+        Unit missionary = new ServerUnit(game, null, dutch, colonistType,
+                                   UnitState.ACTIVE, bibleType);
         camp.setMissionary(missionary);
 
-        assertTrue(bible.hasAbility("model.ability.missionary"));
+        assertTrue(bibleType.hasAbility("model.ability.missionary"));
         assertTrue(missionary.hasAbility("model.ability.missionary"));
 
         dutch.addFather(brebeuf);
@@ -250,8 +270,7 @@ public class IndividualFatherTest extends FreeColTestCase {
     }
 
     public void testBrewster() {
-
-    	Game game = getGame();
+        Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
         String ability = "model.ability.canRecruitUnit";
@@ -260,7 +279,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         for (UnitType unitType : spec().getUnitTypeList()) {
             if (unitType.isRecruitable()) {
                 assertTrue("Unable to recruit " + unitType.toString(),
-                           dutch.getFeatureContainer().hasAbility(ability, unitType));
+                    dutch.getFeatureContainer().hasAbility(ability, unitType));
             }
         }
 
@@ -272,24 +291,25 @@ public class IndividualFatherTest extends FreeColTestCase {
             if (unitType.isRecruitable()) {
                 if (unitType.getSkill() < 0) {
                     assertFalse("Able to recruit " + unitType.toString(),
-                                dutch.getFeatureContainer().hasAbility(ability, unitType));
+                        dutch.getFeatureContainer().hasAbility(ability,
+                            unitType));
                 } else {
                     assertTrue("Unable to recruit " + unitType.toString(),
-                               dutch.getFeatureContainer().hasAbility(ability, unitType));
+                        dutch.getFeatureContainer().hasAbility(ability,
+                            unitType));
                 }
             }
         }
-
     }
 
     public void testJefferson() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
-        FoundingFather jefferson = spec().getFoundingFather("model.foundingFather.thomasJefferson");
+        FoundingFather jefferson
+            = spec().getFoundingFather("model.foundingFather.thomasJefferson");
         assertEquals(1, jefferson.getModifierSet("model.goods.bells").size());
         Modifier modifier = jefferson.getModifierSet("model.goods.bells").iterator().next();
-        BuildingType townHallType = spec().getBuildingType("model.building.townHall");
         assertTrue(modifier.appliesTo(townHallType));
 
         Colony colony = getStandardColony(4);
@@ -306,7 +326,6 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(2, colony.getModifierSet("model.goods.bells").size());
         assertEquals(2, townHall.getProductionModifiers().size());
         assertEquals(5, townHall.getProduction());
-
     }
 
     public void lasCasas() {
