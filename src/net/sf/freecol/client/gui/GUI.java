@@ -44,6 +44,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumMap;
@@ -336,6 +337,8 @@ public final class GUI {
     // roads
     private EnumMap<Direction, Point2D.Float> corners =
         new EnumMap<Direction, Point2D.Float>(Direction.class);
+    private EnumMap<Direction, List<Direction>> prohibitedRoads =
+        new EnumMap<Direction, List<Direction>>(Direction.class);
     private Stroke roadStroke = new BasicStroke(2);
     // borders
     private EnumMap<Direction, Point2D.Float> borderPoints =
@@ -1019,9 +1022,7 @@ public final class GUI {
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
     public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
-        displayBaseTile(g, tile, false);
-        displayTileOverlays(g, tile, false, false);
-
+        boolean tileCannotBeWorked = false;
         Unit occupyingUnit = null;
         int price = 0;
         if (colony != null) {
@@ -1032,8 +1033,14 @@ public final class GUI {
             case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
                 break;
             default:
-                g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
+                tileCannotBeWorked = true;
             }
+        }
+
+        displayBaseTile(g, tile, false);
+        displayTileOverlays(g, tile, false, false);
+        if (tileCannotBeWorked) {
+            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
         }
 
         if (price > 0 && tile.getSettlement() == null) {
@@ -1917,8 +1924,8 @@ public final class GUI {
             circle.append(new Ellipse2D.Double(padding-1, padding-1, size+1, size+1), false);
             inset = 4.0;
             bar = (size - inset - inset) / 3.0;
-			// more nasty -1, +1 kludges
-			kludge = 1.0;
+            // more nasty -1, +1 kludges
+            kludge = 1.0;
         }
         offset -= 1.0;
         cross.moveTo(offset, padding + inset - kludge);
@@ -2817,6 +2824,7 @@ public final class GUI {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GeneralPath path = new GeneralPath();
         List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
+        List<Direction> directions = new ArrayList<Direction>(8);
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getAdjacentTile(direction);
             TileImprovement r;
@@ -2824,6 +2832,7 @@ public final class GUI {
                 && (r = borderingTile.getRoad()) != null
                 && r.isComplete()) {
                 points.add(corners.get(direction));
+                directions.add(direction);
             }
         }
 
@@ -2843,13 +2852,21 @@ public final class GUI {
             path.quadTo(halfWidth, halfHeight, points.get(1).getX(), points.get(1).getY());
             break;
         case 3:
-        case 4:
-            Point2D p0 = points.get(points.size() - 1);
-            path.moveTo(p0.getX(), p0.getY());
-            for (Point2D p : points) {
-                path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
+        case 4: {
+            Direction pen = directions.get(directions.size() - 1);
+            Point2D p = corners.get(pen);
+            path.moveTo(p.getX(), p.getY());
+            for (Direction d : directions) {
+                p = corners.get(d);
+                if(prohibitedRoads.get(pen).contains(d)) {
+                    path.moveTo(p.getX(), p.getY());
+                } else {
+                    path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
+                }
+                pen = d;
             }
             break;
+        }
         default:
             for (Point2D p : points) {
                 path.moveTo(halfWidth, halfHeight);
@@ -3404,13 +3421,13 @@ public final class GUI {
         int ddy = dy + dy/2;
 
         // corners
-        corners.put(Direction.N, new Point2D.Float(halfWidth, 0));
+        corners.put(Direction.N,  new Point2D.Float(halfWidth, 0));
         corners.put(Direction.NE, new Point2D.Float(0.75f * tileWidth, 0.25f * tileHeight));
-        corners.put(Direction.E, new Point2D.Float(tileWidth, halfHeight));
+        corners.put(Direction.E,  new Point2D.Float(tileWidth, halfHeight));
         corners.put(Direction.SE, new Point2D.Float(0.75f * tileWidth, 0.75f * tileHeight));
-        corners.put(Direction.S, new Point2D.Float(halfWidth, tileHeight));
+        corners.put(Direction.S,  new Point2D.Float(halfWidth, tileHeight));
         corners.put(Direction.SW, new Point2D.Float(0.25f * tileWidth, 0.75f * tileHeight));
-        corners.put(Direction.W, new Point2D.Float(0, halfHeight));
+        corners.put(Direction.W,  new Point2D.Float(0, halfHeight));
         corners.put(Direction.NW, new Point2D.Float(0.25f * tileWidth, 0.25f * tileHeight));
 
         // small corners
@@ -3425,14 +3442,27 @@ public final class GUI {
         controlPoints.put(Direction.NW, new Point2D.Float(halfWidth, 0));
         // small corners
         borderPoints.put(Direction.NW, new Point2D.Float(dx + ddx, halfHeight - ddy));
-        borderPoints.put(Direction.N, new Point2D.Float(halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.N,  new Point2D.Float(halfWidth - ddx, dy + ddy));
         borderPoints.put(Direction.NE, new Point2D.Float(halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E, new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
+        borderPoints.put(Direction.E,  new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
         borderPoints.put(Direction.SE, new Point2D.Float(tileWidth - dx - ddx, halfHeight + ddy));
-        borderPoints.put(Direction.S, new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.S,  new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
         borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.W, new Point2D.Float(dx + ddx, halfHeight + ddy));
+        borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
+        
+        // road pairs to skip drawing when doing 3 or 4 exit point tiles
+        //  don't put more than two directions in each list,
+        //  otherwise a 3-point tile may not draw any roads at all!
+        prohibitedRoads.put(Direction.N,  Arrays.asList(Direction.NW, Direction.NE));
+        prohibitedRoads.put(Direction.NE, Arrays.asList(Direction.N, Direction.E));
+        prohibitedRoads.put(Direction.E,  Arrays.asList(Direction.NE, Direction.SE));
+        prohibitedRoads.put(Direction.SE, Arrays.asList(Direction.E, Direction.S));
+        prohibitedRoads.put(Direction.S,  Arrays.asList(Direction.SE, Direction.SW));
+        prohibitedRoads.put(Direction.SW, Arrays.asList(Direction.S, Direction.W));
+        prohibitedRoads.put(Direction.W,  Arrays.asList(Direction.SW, Direction.NW));
+        prohibitedRoads.put(Direction.NW, Arrays.asList(Direction.W, Direction.N));
 
+        
         borderStroke = new BasicStroke(dy);
         roadStroke = new BasicStroke(dy/2);
         gridStroke = new BasicStroke(lib.getScalingFactor());
