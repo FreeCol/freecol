@@ -279,8 +279,10 @@ public final class DragListener extends MouseAdapter {
 
         // Work at Building - show both max potential and realistic projection
         for (Building building : colony.getBuildings()) {
-            if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
-                if (building.canAdd(tempUnit)) {
+            if (tempUnit.getWorkLocation() != building) {
+                // Skip if currently working at this location
+                switch (building.getNoAddReason(tempUnit)) {
+                case NONE: case ALREADY_PRESENT:
                     GoodsType goodsType = building.getGoodsOutputType();
                     String locName = Messages.message(building.getNameKey());
                     JMenuItem menuItem = new JMenuItem(locName);
@@ -297,6 +299,9 @@ public final class DragListener extends MouseAdapter {
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
                     separatorNeeded = true;
+                    break;
+                default:
+                    break;
                 }
             }
         }

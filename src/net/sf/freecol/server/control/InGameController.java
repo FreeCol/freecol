@@ -88,6 +88,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -2488,9 +2489,14 @@ public final class InGameController extends Controller {
         // clearing of the speciality.  For example, teachers cannot
         // not be cleared of their speciality.
         Location oldLocation = unit.getLocation();
-        if (oldLocation instanceof Building
-            && !((Building) oldLocation).canAdd(newType)) {
-            return DOMMessage.clientError("Cannot clear speciality, building does not allow new unit type");
+        if (oldLocation instanceof UnitLocation) {
+            switch (((UnitLocation) oldLocation).getNoAddReason(unit)) {
+            case NONE: case ALREADY_PRESENT:
+                break;
+            default:
+                return DOMMessage.clientError("Cannot clear speciality,"
+                    + " location does not allow new unit type");
+            }
         }
 
         // Valid, change type.

@@ -230,8 +230,9 @@ public class ColonyTest extends FreeColTestCase {
                                        UnitState.ACTIVE);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
-        assertEquals(townHallType, colony.getBuildingFor(colonist).getType());
-        assertEquals(townHallType, ((Building) colonist.getLocation()).getType());
+        Building townHall = colony.getBuilding(townHallType);
+        assertEquals(townHall, colonist.getLocation());
+        assertEquals(townHall, colony.getBuildingFor(colonist));
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
         colonist.putOutsideColony();

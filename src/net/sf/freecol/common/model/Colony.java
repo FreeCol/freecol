@@ -529,7 +529,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public boolean isTileInUse(Tile tile) {
         ColonyTile colonyTile = getColonyTile(tile);
-        return colonyTile != null && colonyTile.getUnit() != null;
+        return colonyTile != null && !colonyTile.isEmpty();
     }
 
     /**
@@ -1377,7 +1377,8 @@ public class Colony extends Settlement implements Nameable {
                 GoodsType bestWork = null;
                 int bestAmount = 0;
                 for (ColonyTile tile : colonyTiles) {
-                    if (tile.canAdd(unit)) {
+                    switch (tile.getNoAddReason(unit)) {
+                    case NONE: case ALREADY_PRESENT:
                         for (GoodsType type : rawTypes) {
                             int amount = tile.getProductionOf(unit, type);
                             if (amount > bestAmount) {
@@ -1386,6 +1387,9 @@ public class Colony extends Settlement implements Nameable {
                                 bestTile = tile;
                             }
                         }
+                        break;
+                    default:
+                        break;
                     }
                 }
                 if (bestAmount > 0) {
@@ -1393,8 +1397,13 @@ public class Colony extends Settlement implements Nameable {
                 } else {
                     for (GoodsType type : rawTypes) {
                         Building building = getBuildingForProducing(type);
-                        if (building != null && building.canAdd(unit)) {
-                            return new Occupation(building, type);
+                        if (building != null) {
+                            switch (building.getNoAddReason(unit)) {
+                            case NONE: case ALREADY_PRESENT:
+                                return new Occupation(building, type);
+                            default:
+                                break;
+                            }
                         }
                     }
                 }
@@ -1462,10 +1471,15 @@ public class Colony extends Settlement implements Nameable {
         }
         buildings.addAll(getBuildings());
         for (Building building : buildings) {
-            if (building.canAdd(unit)
-                && (building.getGoodsInputType() == null
-                    || getGoodsCount(building.getGoodsInputType()) > 0)) {
-                return building;
+            switch (building.getNoAddReason(unit)) {
+            case NONE: case ALREADY_PRESENT:
+                if (building.getGoodsInputType() == null
+                    || getGoodsCount(building.getGoodsInputType()) > 0) {
+                    return building;
+                }
+                break;
+            default:
+                break;
             }
         }
         return null;
@@ -1485,27 +1499,28 @@ public class Colony extends Settlement implements Nameable {
      *         there is no available <code>ColonyTile</code> for producing
      *         that goods.
      */
-    public ColonyTile getVacantColonyTileFor(Unit unit, boolean allowClaim, GoodsType... goodsTypes) {
+    public ColonyTile getVacantColonyTileFor(Unit unit, boolean allowClaim,
+                                             GoodsType... goodsTypes) {
         ColonyTile bestPick = null;
         int highestProduction = 0;
         for (ColonyTile colonyTile : colonyTiles) {
-            if (colonyTile.canAdd(unit)) {
+            switch (colonyTile.getNoAddReason(unit)) {
+            case NONE: case ALREADY_PRESENT:
                 Tile workTile = colonyTile.getWorkTile();
                 if (workTile.getOwningSettlement() == this
                     || (allowClaim && owner.getLandPrice(workTile) == 0)) {
                     for (GoodsType goodsType : goodsTypes) {
-                        /*
-                         * canAdd ensures workTile it's empty or unit it's working in it
-                         * so unit can work in it if it's owned by none, by europeans or
-                         * unit's owner has the founding father Peter Minuit
-                         */
-                        int potential = colonyTile.getProductionOf(unit, goodsType);
+                        int potential = colonyTile.getProductionOf(unit,
+                                                                   goodsType);
                         if (potential > highestProduction) {
                             highestProduction = potential;
                             bestPick = colonyTile;
                         }
                     }
                 }
+                break;
+            default:
+                break;
             }
         }
         return bestPick;
@@ -2215,7 +2230,6 @@ public class Colony extends Settlement implements Nameable {
         }
 
         for (ColonyTile ct : getColonyTiles()) {
-            Unit u = ct.getUnit();
             Tile t = ct.getWorkTile();
             if (t == null) continue; // Colony has not claimed the tile yet.
 
@@ -2225,9 +2239,14 @@ public class Colony extends Settlement implements Nameable {
                 && plowImprovement.isTileTypeAllowed(t.getType())) {
                 if (ct.isColonyCenterTile()) {
                     plowTiles.add(t);
-                } else if (u != null && u.getWorkType() != null
-                    && plowImprovement.getBonus(u.getWorkType()) > 0) {
-                    plowTiles.add(t);
+                } else {
+                    for (Unit u : ct.getUnitList()) {
+                        if (u != null && u.getWorkType() != null
+                            && plowImprovement.getBonus(u.getWorkType()) > 0) {
+                            plowTiles.add(t);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -2235,8 +2254,7 @@ public class Colony extends Settlement implements Nameable {
             // really need a unit, doing work, so we can compare the output
             // with and without the improvement.  This means we can skip
             // further consideration of the colony center tile.
-            if (ct.isColonyCenterTile()
-                || u == null || u.getWorkType() == null) continue;
+            if (ct.isColonyCenterTile() || ct.isEmpty()) continue;
 
             TileType oldType = t.getType();
             TileType newType;
@@ -2244,18 +2262,24 @@ public class Colony extends Settlement implements Nameable {
                     || t.getTileItemContainer()
                     .getImprovement(clearImprovement) == null)
                 && clearImprovement.isTileTypeAllowed(t.getType())
-                && u != null
-                && (newType = clearImprovement.getChange(oldType)) != null
-                && (newType.getProductionOf(u.getWorkType(), u.getType())
-                    > oldType.getProductionOf(u.getWorkType(), u.getType()))) {
-                clearTiles.add(t);
+                && (newType = clearImprovement.getChange(oldType)) != null) {
+                for (Unit u : ct.getUnitList()) {
+                    if (newType.getProductionOf(u.getWorkType(), u.getType())
+                        > oldType.getProductionOf(u.getWorkType(), u.getType())) {
+                        clearTiles.add(t);
+                        break;
+                    }
+                }
             }
 
             if (t.getRoad() == null
-                && u != null
-                && roadImprovement.isTileTypeAllowed(t.getType())
-                && roadImprovement.getBonus(u.getWorkType()) > 0) {
-                roadTiles.add(t);
+                && roadImprovement.isTileTypeAllowed(t.getType())) {
+                for (Unit u : ct.getUnitList()) {
+                    if (roadImprovement.getBonus(u.getWorkType()) > 0) {
+                        roadTiles.add(t);
+                        break;
+                    }
+                }
             }
         }
     }

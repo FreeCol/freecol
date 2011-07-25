@@ -126,6 +126,22 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                                                GoodsType goodsType);
 
     /**
+     * Checks if this work location is available to the colony to be worked.
+     *
+     * @return The reason why/not the work location can be worked.
+     */
+    public abstract NoAddReason getNoWorkReason();
+
+    /**
+     * Checks if this colony tile can be worked.
+     *
+     * @return True if the colony tile can be worked.
+     */
+    public boolean canBeWorked() {
+        return getNoWorkReason() == NoAddReason.NONE;
+    }
+
+    /**
      * Returns the <code>Colony</code> this <code>WorkLocation</code> is
      * located in.
      *

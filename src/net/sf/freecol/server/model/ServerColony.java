@@ -165,7 +165,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         for (WorkLocation workLocation : getWorkLocations()) {
             ProductionInfo productionInfo = getProductionInfo(workLocation);
             ((ServerModelObject) workLocation).csNewTurn(random, cs);
-            if (workLocation.getUnitCount() > 0) {
+            if (!workLocation.isEmpty()) {
                 for (AbstractGoods goods : productionInfo.getProduction()) {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
                     int experience = goods.getAmount() / workLocation.getUnitCount();
@@ -442,7 +442,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      ChangeSet cs) {
         // Can not happen if the building needs no input or no one is
         // working there.
-        if (building.canAutoProduce() || building.getUnitCount() <= 0) return;
+        if (building.canAutoProduce() || building.isEmpty()) return;
 
         // Check all goods types produced by this building.  If the
         // output for a type is zero and the maximum production is
@@ -616,22 +616,22 @@ public class ServerColony extends Colony implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
         Tile tile = enemyUnit.getTile();
         ServerColonyTile ct = (ServerColonyTile) getColonyTile(tile);
-        Unit unit;
-        if (ct == null || (unit = ct.getUnit()) == null) return;
+        if (ct == null || ct.isEmpty()) return;
         Tile centerTile = getTile();
 
-        unit.setState(UnitState.ACTIVE);
-        unit.setLocation(centerTile);
+        for (Unit unit : ct.getUnitList()) {
+            unit.setState(UnitState.ACTIVE);
+            unit.setLocation(centerTile);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.WARNING,
+                    "model.colony.workerEvicted", this, this)
+                    .addName("%colony%", getName())
+                    .addStringTemplate("%unit%", unit.getLabel())
+                    .addStringTemplate("%location%", tile.getLocationName())
+                    .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
+        }
         cs.add(See.only(serverPlayer), ct);
         cs.add(See.perhaps(), centerTile);
-        cs.addMessage(See.only(serverPlayer),
-                      new ModelMessage(ModelMessage.MessageType.WARNING,
-                                       "model.colony.workerEvicted",
-                                       this, this)
-                      .addName("%colony%", getName())
-                      .addStringTemplate("%unit%", unit.getLabel())
-                      .addStringTemplate("%location%", tile.getLocationName())
-                      .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
     }
 
 

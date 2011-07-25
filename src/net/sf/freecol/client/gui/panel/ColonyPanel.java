@@ -1482,15 +1482,13 @@ public final class ColonyPanel extends FreeColPanel
 
                 removeAll();
                 UnitLabel unitLabel = null;
-                if (colonyTile.getUnit() != null) {
-                    Unit unit = colonyTile.getUnit();
+                for (Unit unit : colonyTile.getUnitList()) {
                     unitLabel = new UnitLabel(unit, getCanvas());
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
                     super.add(unitLabel);
-
                 }
                 updateDescriptionLabel(unitLabel, true);
 

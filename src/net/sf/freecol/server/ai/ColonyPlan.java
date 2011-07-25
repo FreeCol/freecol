@@ -1026,9 +1026,7 @@ public class ColonyPlan {
                 return;
             }
 
-            if(factory.getUnitCount() == factory.getUnitCapacity()){
-                return;
-            }
+            if (factory.isFull()) return;
             Unit u = iter.next();
             // this particular unit cannot be added to this building
             if(!factory.canAdd(u.getType())){

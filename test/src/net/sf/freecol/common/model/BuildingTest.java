@@ -35,8 +35,50 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
 
-    BuildingType printingPressType = spec().getBuildingType("model.building.printingPress");
-    BuildingType newspaperType = spec().getBuildingType("model.building.newspaper");
+    private static final BuildingType chapelType
+        = spec().getBuildingType("model.building.chapel");
+    private static final BuildingType countryType
+        = spec().getBuildingType("model.building.country");
+    private static final BuildingType depotType
+        = spec().getBuildingType("model.building.depot");
+    private static final BuildingType fortType
+        = spec().getBuildingType("model.building.fort");
+    private static final BuildingType fortressType
+        = spec().getBuildingType("model.building.fortress");
+    private static final BuildingType newspaperType
+        = spec().getBuildingType("model.building.newspaper");
+    private static final BuildingType printingPressType
+        = spec().getBuildingType("model.building.printingPress");
+    private static final BuildingType schoolType
+        = spec().getBuildingType("model.building.schoolhouse");
+    private static final BuildingType stockadeType
+        = spec().getBuildingType("model.building.stockade");
+    private static final BuildingType townHallType
+        = spec().getBuildingType("model.building.townHall");
+    private static final BuildingType universityType
+        = spec().getBuildingType("model.building.university");
+    private static final BuildingType warehouseType
+        = spec().getBuildingType("model.building.warehouse");
+    private static final BuildingType weaverHouseType
+        = spec().getBuildingType("model.building.weaverHouse");
+
+    private static final UnitType elderStatesmanType
+        = spec().getUnitType("model.unit.elderStatesman");
+    private static final UnitType expertFarmerType
+        = spec().getUnitType("model.unit.expertFarmer");
+    private static final UnitType freeColonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType indenturedServantType
+        = spec().getUnitType("model.unit.indenturedServant");
+    private static final UnitType indianConvertType
+        = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType masterCarpenterType
+        = spec().getUnitType("model.unit.masterCarpenter");
+    private static final UnitType masterDistillerType
+        = spec().getUnitType("model.unit.masterDistiller");
+    private static final UnitType pettyCriminalType
+        = spec().getUnitType("model.unit.pettyCriminal");
+
 
     public void testCanBuildNext() {
         Game game = getGame();
@@ -46,8 +88,7 @@ public class BuildingTest extends FreeColTestCase {
 
         // First check with a building that can be fully built with a
         // normal colony
-        BuildingType warehouseType = spec().getBuildingType("model.building.depot");
-        Building warehouse = new ServerBuilding(getGame(), colony, warehouseType);
+        Building warehouse = new ServerBuilding(getGame(), colony, depotType);
         colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
@@ -70,12 +111,11 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testInitialColony() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
 
-        BuildingType warehouseType = spec().getBuildingType("model.building.warehouse");
         Building warehouse = colony.getBuilding(warehouseType);
 
         // Is build as depot...
@@ -90,19 +130,18 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testChurch() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
         EquipmentType missionary = spec().getEquipmentType("model.equipment.missionary");
 
-        BuildingType churchType = spec().getBuildingType("model.building.chapel");
-        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+        assertFalse(chapelType.hasAbility("model.ability.dressMissionary"));
         assertFalse(unit.hasAbility("model.ability.dressMissionary"));
         assertFalse(unit.canBeEquippedWith(missionary));
 
-        Building church = colony.getBuilding(churchType);
+        Building church = colony.getBuilding(chapelType);
         assertTrue(church != null);
         assertFalse(colony.hasAbility("model.ability.dressMissionary"));
         assertFalse(unit.hasAbility("model.ability.dressMissionary"));
@@ -116,8 +155,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testCanAddToBuilding() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
@@ -125,21 +164,21 @@ public class BuildingTest extends FreeColTestCase {
         for (Building building : colony.getBuildings()) {
 
             // schoolhouse is special, see testCanAddToSchool
-            if (building.canTeach())
-            	continue;
+            if (building.canTeach()) continue;
 
             int maxUnits = building.getUnitCapacity();
 
             assertEquals(0, building.getUnitCount());
 
             for (int index = 0; index < maxUnits; index++) {
-                assertTrue("unable to add unit " + index + " to building type " +
-                           building.getType(), building.canAdd(units.get(index)));
+                assertTrue("unable to add unit " + index
+                    + " to building type " + building.getType(),
+                    building.canAdd(units.get(index)));
                 building.add(units.get(index));
             }
-            assertFalse("able to add unit " + maxUnits + " to building type " +
-                        building.getType(),
-                        building.canAdd(units.get(maxUnits)));
+            assertFalse("able to add unit " + maxUnits
+                + " to building type " + building.getType(),
+                building.canAdd(units.get(maxUnits)));
             for (int index = 0; index < maxUnits; index++) {
                 building.remove(building.getUnitList().get(0));
             }
@@ -155,17 +194,8 @@ public class BuildingTest extends FreeColTestCase {
      * TODO: make this more generic.
      */
     public void testCanAddToSchool(){
-        UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
-        UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
-        UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
-        UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
-        UnitType masterCarpenterType = spec().getUnitType("model.unit.masterCarpenter");
-        UnitType masterDistillerType = spec().getUnitType("model.unit.masterDistiller");
-        UnitType elderStatesmanType = spec().getUnitType("model.unit.elderStatesman");
-        UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
-
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(10);
 
@@ -196,7 +226,6 @@ public class BuildingTest extends FreeColTestCase {
         carpenter.setType(masterCarpenterType);
 
         // Check school
-        BuildingType schoolType = spec().getBuildingType("model.building.schoolhouse");
         Building school = colony.getBuilding(schoolType);
         assertTrue(school == null);
 
@@ -252,7 +281,8 @@ public class BuildingTest extends FreeColTestCase {
 
         school.upgrade();
 
-        assertEquals(school.getType().toString(), school.getType(), spec().getBuildingType("model.building.university"));
+        assertEquals(school.getType().toString(), school.getType(),
+            universityType);
 
         // these can never teach
         assertFalse("able to add free colonist to University",
@@ -311,33 +341,28 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(50f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
 
-        BuildingType stockade = spec()
-            .getBuildingType("model.building.stockade");
-        modifierSet = stockade.getModifierSet("model.modifier.defence");
+        modifierSet = stockadeType.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockade.getFeatureContainer()
+        assertEquals(0f, stockadeType.getFeatureContainer()
                      .applyModifier(0, "model.modifier.minimumColonySize"));
 
-        BuildingType fort = spec().getBuildingType("model.building.fort");
-        modifierSet = fort.getModifierSet("model.modifier.defence");
+        modifierSet = fortType.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockade.getFeatureContainer()
+        assertEquals(0f, stockadeType.getFeatureContainer()
                      .applyModifier(0, "model.modifier.minimumColonySize"));
 
-        BuildingType fortress = spec()
-            .getBuildingType("model.building.fortress");
-        modifierSet = fortress.getModifierSet("model.modifier.defence");
+        modifierSet = fortressType.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockade.getFeatureContainer()
+        assertEquals(0f, stockadeType.getFeatureContainer()
                      .applyModifier(0, "model.modifier.minimumColonySize"));
     }
 
@@ -354,7 +379,7 @@ public class BuildingTest extends FreeColTestCase {
         GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
         GoodsType clothType = spec().getGoodsType("model.goods.cloth");
 
-        Building weaver = colony.getBuilding(spec().getBuildingType("model.building.weaverHouse"));
+        Building weaver = colony.getBuilding(weaverHouseType);
         assertEquals(cottonType, weaver.getGoodsInputType());
         assertEquals(clothType, weaver.getGoodsOutputType());
 
@@ -390,8 +415,7 @@ public class BuildingTest extends FreeColTestCase {
         GoodsType grainType = spec().getGoodsType("model.goods.grain");
         GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
-        BuildingType country = spec().getBuildingType("model.building.country");
-        Building pasture = colony.getBuilding(country);
+        Building pasture = colony.getBuilding(countryType);
         assertEquals(grainType, pasture.getGoodsInputType());
         assertEquals(horsesType, pasture.getGoodsOutputType());
 
@@ -443,17 +467,16 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testTownhallProduction() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
         Player owner = colony.getOwner();
         Unit colonist = colony.getUnitList().get(0);
         Unit statesman = colony.getUnitList().get(1);
-        statesman.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman.setType(elderStatesmanType);
 
-        BuildingType townHall = spec().getBuildingType("model.building.townHall");
-        Building building = colony.getBuilding(townHall);
+        Building building = colony.getBuilding(townHallType);
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
@@ -467,7 +490,7 @@ public class BuildingTest extends FreeColTestCase {
 
         building.add(colonist);
         // 3 from the colonist
-        assertEquals(3, colonist.getProductionOf(bellsType, townHall.getBasicProduction()));
+        assertEquals(3, colonist.getProductionOf(bellsType, townHallType.getBasicProduction()));
         assertEquals(3, building.getUnitProductivity(colonist));
         // 3 from the colonist + 1
         assertEquals("Wrong bell production", 4, building.getProduction());
@@ -515,7 +538,7 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
-        Building building = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
+        Building building = colony.getBuilding(townHallType);
 
         int bellProduction = building.getProduction();
         int expectBellProd = 1;
@@ -540,7 +563,7 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
-        Building building = colony.getBuilding(spec().getBuildingType("model.building.townHall"));
+        Building building = colony.getBuilding(townHallType);
 
         int bellProduction = building.getProduction();
         int expectBellProd = 1;
@@ -567,10 +590,6 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(4);
         Unit unit = colony.getUnitList().get(0);
 
-        UnitType servant = spec().getUnitType("model.unit.indenturedServant");
-        UnitType convert = spec().getUnitType("model.unit.indianConvert");
-        UnitType criminal = spec().getUnitType("model.unit.pettyCriminal");
-
         for (Building building : colony.getBuildings()) {
             GoodsType outputType = building.getGoodsOutputType();
             if (outputType != null) {
@@ -582,11 +601,11 @@ public class BuildingTest extends FreeColTestCase {
                         int expected = building.getType().getBasicProduction();
                         if (type == building.getExpertUnitType()) {
                             expected = 6;
-                        } else if (type == servant) {
+                        } else if (type == indenturedServantType) {
                             expected = 2;
-                        } else if (type == convert) {
+                        } else if (type == indianConvertType) {
                             expected = 1;
-                        } else if (type == criminal) {
+                        } else if (type == pettyCriminalType) {
                             expected = 1;
                         }
                         if (expected != building.getType().getBasicProduction()) {

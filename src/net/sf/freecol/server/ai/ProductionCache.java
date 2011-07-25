@@ -119,7 +119,7 @@ public class ProductionCache {
         // this assumes all colonists can be added to any tile
         Unit someUnit = colony.getUnitList().get(0);
         for (ColonyTile colonyTile : colony.getColonyTiles()) {
-            if (colonyTile.getUnit() != null || colonyTile.canAdd(someUnit)) {
+            if (colonyTile.canAdd(someUnit)) {
                 colonyTiles.add(colonyTile);
             }
         }

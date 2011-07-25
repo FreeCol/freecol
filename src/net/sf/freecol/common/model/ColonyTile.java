@@ -76,9 +76,16 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * Constructor for ServerColonyTile.
      *
      * @param game The <code>Game</code> this object belongs to.
+     * @param colony The <code>Colony</code> this object belongs to.
+     * @param workTile The tile in which this <code>ColonyTile</code>
+     *                 represents a <code>WorkLocation</code> for.
      */
-    protected ColonyTile(Game game) {
+    protected ColonyTile(Game game, Colony colony, Tile workTile) {
         super(game);
+
+        setColony(colony);
+        this.workTile = workTile;
+        colonyCenterTile = (getTile() == workTile);
     }
 
     /**
@@ -149,9 +156,10 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
 
     /**
-    * Checks if this is the tile where the <code>Colony</code> is located.
-    * @return The result.
-    */
+     * Checks if this is the tile where the <code>Colony</code> is located.
+     *
+     * @return True if this is the colony center tile.
+     */
     public boolean isColonyCenterTile() {
         return colonyCenterTile;
     }
@@ -175,39 +183,19 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * unnecessarily encoding the assumption that there can only be one unit.
      */
     public Unit getUnit() {
-        return (getUnitCount() == 0) ? null : getUnitList().get(0);
+        return (isEmpty()) ? null : getUnitList().get(0);
     }
 
     /**
-     * Returns the maximum number of <code>Units</code> this Location
-     * can hold.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
+    @Override
     public int getUnitCapacity() {
         return UNIT_CAPACITY;
     }
 
     /**
-     * Relocates any worker on this <code>ColonyTile</code>.
-     * The workers are added to another {@link WorkLocation}
-     * within the {@link Colony}.
-     */
-    public void relocateWorkers() {
-        for (Unit unit : getUnitList()) {
-            for (WorkLocation wl : getColony().getWorkLocations()) {
-                if (wl != this && wl.canAdd(unit)) {
-                    unit.setLocation(wl);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if this colony tile is available to the colony to be worked.
-     *
-     * @return The reason why/not the tile can be worked.
+     * {@inheritDoc}
      */
     public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
@@ -226,16 +214,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Checks if this colony tile can be worked.
-     *
-     * @return True if the colony tile can be worked.
-     */
-    public boolean canBeWorked() {
-        return getNoWorkReason() == NoAddReason.NONE;
-    }
-
-    /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
@@ -252,8 +231,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public void add(final Locatable locatable) {
         NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
-            throw new IllegalStateException("Can not add to colony tile: "
-                + toString() + " reason: " + reason);
+            throw new IllegalStateException("Can not add " + locatable
+                + " to " + toString()
+                + " because " + reason);
         }
         Unit unit = (Unit) locatable;
         if (contains(unit)) return;
@@ -296,6 +276,22 @@ public class ColonyTile extends WorkLocation implements Ownable {
         unit.setState(Unit.UnitState.ACTIVE);
 
         getColony().invalidateCache();
+    }
+
+    /**
+     * Relocates any worker on this <code>ColonyTile</code>.
+     * The workers are added to another {@link WorkLocation}
+     * within the {@link Colony}.
+     */
+    public void relocateWorkers() {
+        for (Unit unit : getUnitList()) {
+            for (WorkLocation wl : getColony().getWorkLocations()) {
+                if (wl != this && wl.canAdd(unit)) {
+                    unit.setLocation(wl);
+                    break;
+                }
+            }
+        }
     }
 
     /**

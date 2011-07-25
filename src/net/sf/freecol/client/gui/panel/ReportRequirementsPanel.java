@@ -145,14 +145,14 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
 
         for (ColonyTile colonyTile : colony.getColonyTiles()) {
-            Unit unit = colonyTile.getUnit();
-            if (unit == null) continue;
-            GoodsType workType = unit.getWorkType();
-            UnitType expert = spec.getExpertForProducing(workType);
-            if (unitCount.get(colony).getCount(expert) == 0
-                && !missingExpertWarning.contains(expert)) {
-                addExpertWarning(doc, colony, workType, expert);
-                missingExpertWarning.add(expert);
+            for (Unit unit : colonyTile.getUnitList()) {
+                GoodsType workType = unit.getWorkType();
+                UnitType expert = spec.getExpertForProducing(workType);
+                if (unitCount.get(colony).getCount(expert) == 0
+                    && !missingExpertWarning.contains(expert)) {
+                    addExpertWarning(doc, colony, workType, expert);
+                    missingExpertWarning.add(expert);
+                }
             }
         }
 

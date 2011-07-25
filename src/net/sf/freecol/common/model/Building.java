@@ -235,18 +235,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         // Colonists exceding units limit must be put outside
         if (getUnitCount() > getUnitCapacity()) {
-            for (Unit unit : getUnitList().subList(getUnitCapacity(), getUnitCount())) {
+            for (Unit unit : getUnitList().subList(getUnitCapacity(),
+                                                   getUnitCount())) {
                 unit.putOutsideColony();
             }
         }
     }
 
     /**
-     * Returns the maximum number of <code>Units</code> this
-     * <code>Building</code> can hold.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
+    @Override
     public int getUnitCapacity() {
         return buildingType.getWorkPlaces();
     }
@@ -261,26 +260,28 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Checks if the specified <code>Locatable</code> may be added to this
-     * <code>WorkLocation</code>.
-     *
-     * @param locatable the <code>Locatable</code>.
-     * @return <i>true</i> if the <i>Unit</i> may be added and <i>false</i>
-     *         otherwise.
+     * {@inheritDoc}
      */
-    public boolean canAdd(final Locatable locatable) {
-        if (locatable.getLocation() == this) {
-            return true;
-        }
+    public NoAddReason getNoWorkReason() {
+        BuildingType type = getType();
 
-        if (getUnitCount() >= getUnitCapacity()) {
-            return false;
-        }
+        return (type.getWorkPlaces() <= 0) ? NoAddReason.CAPACITY_EXCEEDED
+            : NoAddReason.NONE;
+    }
 
-        if (!(locatable instanceof Unit)) {
-            return false;
-        }
-        return canAdd(((Unit) locatable).getType());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        if (!(locatable instanceof Unit)) return NoAddReason.WRONG_TYPE;
+        NoAddReason reason = getNoWorkReason();
+        Unit unit = (Unit) locatable;
+        BuildingType type = getType();
+
+        return (reason != NoAddReason.NONE) ? reason
+            : !type.canAdd(unit.getType()) ? NoAddReason.MISSING_SKILL
+            : super.getNoAddReason(locatable);
     }
 
     /**
@@ -292,7 +293,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      *         otherwise.
      */
     public boolean canAdd(final UnitType unitType) {
-        return buildingType.canAdd(unitType);
+        return canBeWorked() && buildingType.canAdd(unitType);
     }
 
     /**
@@ -301,9 +302,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @param locatable The <code>Locatable</code> to add.
      */
     public void add(final Locatable locatable) {
-        if (!canAdd(locatable)) {
+        NoAddReason reason = getNoAddReason(locatable);
+        if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add " + locatable
-                                            + " to " + toString());
+                                            + " to " + toString()
+                                            + " because " + reason);
         }
         Unit unit = (Unit) locatable;
         if (contains(unit)) return;

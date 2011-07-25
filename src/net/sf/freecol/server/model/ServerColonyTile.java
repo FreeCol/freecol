@@ -57,11 +57,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      *                 represents a <code>WorkLocation</code> for.
      */
     public ServerColonyTile(Game game, Colony colony, Tile workTile) {
-        super(game);
-        setColony(colony);
-        this.workTile = workTile;
-        colonyCenterTile = (getTile() == workTile);
-        getUnitList().clear();
+        super(game, colony, workTile);
     }
 
 
@@ -77,7 +73,6 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         ServerPlayer owner = (ServerPlayer) colony.getOwner();
 
         Tile workTile = getWorkTile();
-        Unit unit = getUnit();
         if (isColonyCenterTile()) {
             /*
             GoodsType goodsType;
@@ -88,7 +83,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
                 colony.addGoods(getSecondaryProduction());
             }
             */
-        } else if (unit != null) {
+        } else if (!isEmpty() && canBeWorked()) {
             /*
             int amount = getProductionOf(unit.getWorkType());
             if (amount > 0) {
@@ -97,17 +92,19 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
                 cs.addPartial(See.only(owner), unit, "experience");
             }
             */
-            Resource resource
-                = workTile.expendResource(unit.getWorkType(),
-                                          unit.getType(), colony);
-            if (resource != null) {
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.WARNING,
-                                     "model.tile.resourceExhausted",
-                                     colony)
-                              .add("%resource%", resource.getNameKey())
-                              .addName("%colony%", colony.getName()));
-                cs.add(See.perhaps(), workTile);
+            for (Unit unit : getUnitList()) {
+                Resource resource
+                    = workTile.expendResource(unit.getWorkType(),
+                        unit.getType(), colony);
+                if (resource != null) {
+                    cs.addMessage(See.only(owner),
+                        new ModelMessage(ModelMessage.MessageType.WARNING,
+                            "model.tile.resourceExhausted", colony)
+                            .add("%resource%", resource.getNameKey())
+                            .addName("%colony%", colony.getName()));
+                    cs.add(See.perhaps(), workTile);
+                    break;
+                }
             }
         }
     }

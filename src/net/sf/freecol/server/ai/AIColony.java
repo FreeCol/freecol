@@ -242,7 +242,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     plan = wlp.createTileImprovementPlan();
                     if (plan != null) {
                         int value = plan.getValue();
-                        if (colonyTile.getUnit() != null) value *= 2;
+                        if (!colonyTile.isEmpty()) value *= 2;
                         value -= colony.getOwner().getLandPrice(target);
                         plan.setValue(value);
                         tileImprovementPlans.add(plan);
@@ -451,16 +451,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 WorkLocation location = plan.getWorkLocation();
                 if (location instanceof ColonyTile) {
                     ColonyTile colonyTile = (ColonyTile) location;
-                    if (colonyTile.getUnit() == null
-                        && (colonyTile.getWorkTile().isLand()
-                            || colony.hasAbility("model.ability.produceInWater"))) {
+                    if (colonyTile.canBeWorked()) {
                         bestType = colony.getSpecification()
                             .getExpertForProducing(plan.getGoodsType());
                         break;
                     }
                 } else if (location instanceof Building) {
                     Building building = (Building) location;
-                    if (building.getUnitCount() < building.getUnitCapacity()) {
+                    if (building.canBeWorked()) {
                         bestType = building.getExpertUnitType();
                         break;
                     }
@@ -931,26 +929,28 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 if (wl.getUnitCount() > 0) {
                     if (wl instanceof ColonyTile) {
                         ColonyTile ct = (ColonyTile) wl;
-                        Unit u = ct.getUnit();
-                        if (ct.getUnit().getWorkType() != foodType) {
-                            int uProduction = ct.getProductionOf(u, foodType);
-                            if (uProduction > 1) {
-                                if (bestPick == null || bestPick instanceof Building) {
-                                    bestPick = wl;
+                        for (Unit u : ct.getUnitList()) {
+                            if (u.getWorkType() != foodType) {
+                                int uProduction = ct.getProductionOf(u, foodType);
+                                if (uProduction > 1) {
+                                    if (bestPick == null || bestPick instanceof Building) {
+                                        bestPick = wl;
+                                    } else {
+                                        ColonyTile bpct = (ColonyTile) bestPick;
+                                        int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), foodType);
+                                        if (uProduction > bestPickProduction
+                                            || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
+                                                .getSkillLevel())) {
+                                            bestPick = wl;
+                                        }
+                                    }
                                 } else {
-                                    ColonyTile bpct = (ColonyTile) bestPick;
-                                    int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), foodType);
-                                    if (uProduction > bestPickProduction
-                                        || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
-                                            .getSkillLevel())) {
+                                    if (bestPick == null) {
                                         bestPick = wl;
                                     }
+                                    // else - TODO: This might be the
+                                    // best pick sometimes:
                                 }
-                            } else {
-                                if (bestPick == null) {
-                                    bestPick = wl;
-                                } // else - TODO: This might be the best pick
-                                // sometimes:
                             }
                         }
                     } else { // wl instanceof Building
@@ -1210,10 +1210,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                GoodsType goodsType) {
 
         if (units == null || units.isEmpty() || workLocation == null
-            || (workLocation instanceof ColonyTile && goodsType == null)
-            || (workLocation instanceof Building
-                && ((Building) workLocation).getUnitCount()
-                >= ((Building) workLocation).getUnitCapacity())) {
+            || workLocation.isFull()
+            || (workLocation instanceof ColonyTile && goodsType == null)) {
             return null;
         } else {
             Tile tile = null;

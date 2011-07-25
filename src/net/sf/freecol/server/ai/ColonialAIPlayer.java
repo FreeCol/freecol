@@ -743,7 +743,7 @@ public class ColonialAIPlayer extends AIPlayer {
             AIColony c = ci.next();
             ArrayList<Tile> oldWorkTiles = new ArrayList<Tile>();
             for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
-                if (colonyTile.getUnit() != null) {
+                if (!colonyTile.isEmpty()) {
                     oldWorkTiles.add(colonyTile.getWorkTile());
                 }
             }

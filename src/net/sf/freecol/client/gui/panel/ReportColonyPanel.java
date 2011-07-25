@@ -576,7 +576,7 @@ public final class ReportColonyPanel extends ReportPanel
 
             UnitType expert;
             GoodsType work;
-            boolean needsWorker = wl.getUnitCount() < wl.getUnitCapacity();
+            boolean needsWorker = !wl.isFull();
             int delta;
 
             // Check first if the workers are working, and then if

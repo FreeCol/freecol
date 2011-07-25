@@ -48,6 +48,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
          */
         NONE,
         /**
+         * Unit is already in the location.
+         */
+        ALREADY_PRESENT,
+        /**
          * Locatable can not be added because it has the wrong
          * type. E.g. a {@link Building} can not be added to a
          * {@link Unit}.
@@ -140,10 +144,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Returns the maximum number of <code>Units</code> this Location
-     * can hold.
+     * Gets the maximum number of <code>Units</code> this Location
+     * can hold.  To be overridden by subclasses.
      *
-     * @return Integer.MAX_VALUE
+     * @return Integer.MAX_VALUE, denoting no effective limit.
      */
     public int getUnitCapacity() {
         return Integer.MAX_VALUE;
@@ -176,28 +180,27 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Returns the reason why a given <code>Locatable</code> can not
-     * be added to this Location.
+     * Gets the reason why a given <code>Locatable</code> can not be
+     * added to this Location.
      *
-     * @param locatable a <code>Locatable</code> value
-     * @return a <code>NoAddReason</code> value
+     * @param locatable The <code>Locatable</code> to test.
+     * @return The reason why adding would fail.
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (units == null || units.size() >= getUnitCapacity()) {
-                return NoAddReason.CAPACITY_EXCEEDED;
-            } else {
-                Unit unit = (Unit) locatable;
-                if (!units.isEmpty()
-                    && units.get(0).getOwner() != unit.getOwner()) {
-                    return NoAddReason.OCCUPIED_BY_ENEMY;
-                } else {
-                    return NoAddReason.NONE;
-                }
-            }
-        } else {
-            return NoAddReason.WRONG_TYPE;
-        }
+        Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
+        return (units == null || isFull())
+            ? NoAddReason.CAPACITY_EXCEEDED
+            : (unit == null)
+            ? NoAddReason.WRONG_TYPE
+            : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
+            ? NoAddReason.OCCUPIED_BY_ENEMY
+            // Always test this last before success (NoAddReason.NONE),
+            // so that we can treat ALREADY_PRESENT as success in some
+            // cases (e.g. if the unit changes type --- does it still
+            // have a required skill?)
+            : contains(unit)
+            ? NoAddReason.ALREADY_PRESENT
+            : NoAddReason.NONE;
     }
 
     /**
@@ -283,6 +286,14 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return units.isEmpty();
     }
 
+    /**
+     * Is this unit location full?
+     *
+     * @return True if this location is full.
+     */
+    public boolean isFull() {
+        return getUnitCount() >= getUnitCapacity();
+    }
 
     /**
      * Gets the Units present at this Location.
@@ -389,7 +400,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        if (!getUnitList().isEmpty()) {
+        if (!isEmpty()) {
             for (Unit unit : getUnitList()) {
                 unit.toXML(out, player, showAll, toSavedGame);
             }
