@@ -944,24 +944,35 @@ public final class ColonyPanel extends FreeColPanel
              * @return The component argument.
              */
             public Component add(Component comp, boolean editState) {
-
+                Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
-                        Unit unit = ((UnitLabel) comp).getUnit();
-
-                        if (getBuilding().canAdd(unit)) {
-                            //oldParent.remove(comp);
-                            getController().work(unit, getBuilding());
+                        if (tryWork(((UnitLabel) comp).getUnit())) {
+                            oldParent.remove(comp);
                         } else {
                             return null;
                         }
                     } else {
-                        logger.warning("An invalid component got dropped on this BuildingsPanel.");
+                        logger.warning("An invalid component was dropped"
+                            + " on this ASingleBuildingPanel.");
                         return null;
                     }
                 }
                 initialize();
                 return null;
+            }
+
+            private boolean tryWork(Unit unit) {
+                Building building = getBuilding();
+                NoAddReason reason = building.getNoAddReason(unit);
+                if (reason != NoAddReason.NONE) {
+                    getCanvas().errorMessage("noAddReason."
+                        + reason.toString().toLowerCase(Locale.US));
+                    return false;
+                }
+
+                getController().work(unit, building);
+                return true;
             }
         }
     }
@@ -1522,7 +1533,7 @@ public final class ColonyPanel extends FreeColPanel
                 Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
-                        if (tryWorkTile(((UnitLabel) comp).getUnit())) {
+                        if (tryWork(((UnitLabel) comp).getUnit())) {
                             oldParent.remove(comp);
                             ((UnitLabel) comp).setSmall(false);
                         } else {
@@ -1552,7 +1563,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param unit The <code>Unit</code> to work the tile.
              * @return True if the unit succeeds.
              */
-            private boolean tryWorkTile(Unit unit) {
+            private boolean tryWork(Unit unit) {
                 Tile tile = colonyTile.getWorkTile();
                 Colony colony = getColony();
                 Player player = unit.getOwner();
@@ -1564,10 +1575,7 @@ public final class ColonyPanel extends FreeColPanel
                     NoClaimReason claim
                         = player.canClaimForSettlementReason(tile);
                     switch (claim) {
-                    case NONE:
-                        throw new IllegalStateException("NoAddReason=CLAIM"
-                            + "yet NoClaimReason=NONE");
-                    case NATIVES:
+                    case NONE: case NATIVES:
                         if (getController().claimLand(tile, colony, 0)
                             && tile.getOwningSettlement() == colony) {
                             logger.info("Colony " + colony.getName()
@@ -1581,7 +1589,7 @@ public final class ColonyPanel extends FreeColPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        canvas.errorMessage("badTileUse."
+                        canvas.errorMessage("noClaimReason."
                             + claim.toString().toLowerCase(Locale.US));
                         return false;
                     }
@@ -1594,7 +1602,7 @@ public final class ColonyPanel extends FreeColPanel
 
                 // Claim sorted, but complain about other failure.
                 if (reason != NoAddReason.NONE) {
-                    canvas.errorMessage("badTileUse."
+                    canvas.errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
