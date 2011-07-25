@@ -306,6 +306,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.add(See.only(owner), europe, owner.getHighSeas());
             } else if (getDestination() == getGame().getNewWorld()) {
                 logger.info(toString() + " arrives in America");
+                setDestination(null);
                 csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
                        random, cs);
             } else {
