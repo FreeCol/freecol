@@ -1835,7 +1835,7 @@ public final class InGameController implements NetworkConstants {
     public void moveToAmerica(Unit unit) {
         if (!requireOurTurn()) return;
 
-        if (!(unit.getLocation() instanceof Europe)) {
+        if (unit.getLocation() instanceof Tile) {
             freeColClient.playSound("sound.event.illegalMove");
             return;
         }

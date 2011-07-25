@@ -78,9 +78,11 @@ public class MoveToAmericaMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (!(unit.getLocation() instanceof Europe)) {
-            return DOMMessage.clientError("Unit must be in Europe to move to America: "
-                + unitId);
+        if (unit.isInEurope() || unit.isBetweenEuropeAndNewWorld()) {
+            ; // OK
+        } else {
+            return DOMMessage.clientError("Unit must be in Europe"
+                + " or on high seas to move to America: " + unitId);
         }
 
         // Proceed to move.
