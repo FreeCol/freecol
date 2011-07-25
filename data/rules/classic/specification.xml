@@ -838,7 +838,7 @@
       <consumes id="model.goods.cloth" value="1" />
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
-               skillTaught="model.unit.veteranSoldier" skill="4">
+               skillTaught="model.unit.veteranSoldier" skill="3">
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
