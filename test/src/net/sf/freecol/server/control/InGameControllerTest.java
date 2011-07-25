@@ -1821,8 +1821,10 @@ public class InGameControllerTest extends FreeColTestCase {
         igc.addFoundingFather(dutch, father);
 
         assertEquals(2, dutch.getUnits().size());
-        assertEquals(colonistType, dutch.getUnits().get(0).getType());
-        assertEquals(statesmanType, dutch.getUnits().get(1).getType());
+        UnitType[] types = { dutch.getUnits().get(0).getType(),
+                             dutch.getUnits().get(1).getType() };
+        assertTrue((colonistType == types[0] && statesmanType == types[1])
+            || (colonistType == types[1] && statesmanType == types[0]));
     }
 
     public void testAddFatherUpgrades() {
