@@ -800,17 +800,17 @@ public class ServerUnit extends Unit implements ServerModelObject {
             csExploreLostCityRumour(random, cs);
         }
 
-        // Unless moving in from Europe, update the old location and
+        // Unless moving in from off-map, update the old location and
         // make sure the move is always visible even if the unit
-        // dies, including the animation.  However dead units
+        // dies (including the animation).  However, dead units
         // make no discoveries.  Always update the new tile.
-        if (oldLocation instanceof Europe) {
-            cs.add(See.only(serverPlayer), (Europe) oldLocation);
-        } else {
+        if (oldLocation instanceof Tile) {
             cs.addMove(See.perhaps().always(serverPlayer), this,
                 oldLocation, newTile);
             cs.add(See.perhaps().always(serverPlayer),
                 (FreeColGameObject) oldLocation);
+        } else {
+            cs.add(See.only(serverPlayer), (FreeColGameObject) oldLocation);
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
         if (isDisposed()) return;
