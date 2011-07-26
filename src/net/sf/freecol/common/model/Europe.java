@@ -52,8 +52,6 @@ public class Europe extends FreeColGameObject
 
     private static final int LOWER_CAP_INITIAL = 80;
 
-    public static final String UNITS_TAG_NAME = "units";
-
     public static final String UNIT_CHANGE = "unitChange";
 
     /**

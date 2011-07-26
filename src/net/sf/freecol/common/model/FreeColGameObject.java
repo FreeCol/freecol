@@ -44,6 +44,8 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
+    public static final String UNITS_TAG_NAME = "units";
+
     private Game game;
     private boolean disposed = false;
     private boolean uninitialized;

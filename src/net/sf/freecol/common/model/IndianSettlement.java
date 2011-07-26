@@ -49,7 +49,6 @@ public class IndianSettlement extends Settlement {
 
     public static final int TALES_RADIUS = 6;
 
-    public static final String UNITS_TAG_NAME = "units";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
     public static final String IS_VISITED_TAG_NAME = "isVisited";
     public static final String ALARM_TAG_NAME = "alarm";

@@ -72,8 +72,6 @@ public class Unit extends FreeColGameObject
      */
     private static final String EQUIPMENT_TAG = "equipment";
 
-    private static final String UNITS_TAG_NAME = "units";
-
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
 

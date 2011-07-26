@@ -55,8 +55,6 @@ public final class Tile extends FreeColGameObject
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
-    private static final String UNITS_TAG_NAME = "units";
-
     // This must be distinct from ColonyTile/Building.UNIT_CHANGE or
     // the colony panel can get confused.
     public static final String UNIT_CHANGE = "TILE_UNIT_CHANGE";
