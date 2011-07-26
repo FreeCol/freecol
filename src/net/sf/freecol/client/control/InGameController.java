@@ -1819,6 +1819,7 @@ public final class InGameController implements NetworkConstants {
                 StringTemplate.template("highseas.text")
                 .addAmount("%number%", unit.getSailTurns()),
                 "highseas.yes", "highseas.no")) {
+            unit.setDestination(unit.getOwner().getEurope());
             moveToEurope(unit);
             nextActiveUnit();
             return false;

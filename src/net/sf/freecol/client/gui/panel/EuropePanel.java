@@ -487,11 +487,9 @@ public final class EuropePanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            System.out.println("updating destination panel for " + destination);
             HighSeas highSeas = getMyPlayer().getHighSeas();
             if (highSeas != null) {
                 for (Unit unit : highSeas.getUnitList()) {
-                    System.out.println(unit);
                     if (unit.getDestination() == destination) {
                         UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                         unitLabel.setTransferHandler(defaultTransferHandler);

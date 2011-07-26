@@ -150,13 +150,11 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if ("destination".equals(in.getLocalName())) {
-                destinations.add(newLocation(in.getAttributeValue(null, ID_ATTRIBUTE)));
-                in.nextTag();
-            } else {
-                super.readChild(in);
-            }
+        if ("destination".equals(in.getLocalName())) {
+            destinations.add(newLocation(in.getAttributeValue(null, ID_ATTRIBUTE)));
+            in.nextTag();
+        } else {
+            super.readChild(in);
         }
     }
 

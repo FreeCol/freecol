@@ -3460,6 +3460,10 @@ public class Player extends FreeColGameObject implements Nameable {
             market.toXML(out, player, showAll, toSavedGame);
         }
 
+        if (highSeas != null) {
+            highSeas.toXMLImpl(out, player, showAll, toSavedGame);
+        }
+
         if (showAll || toSavedGame || equals(player)) {
             out.writeStartElement(FOUNDING_FATHER_TAG);
             out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
@@ -3495,10 +3499,6 @@ public class Player extends FreeColGameObject implements Nameable {
                     sale.toXMLImpl(out);
                 }
             }
-        }
-
-        if (highSeas != null && !highSeas.isEmpty()) {
-            highSeas.toXMLImpl(out, player, showAll, toSavedGame);
         }
 
     }
@@ -3619,6 +3619,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 saveSale(lastSale);
             } else if (HighSeas.getXMLElementTagName().equals(in.getLocalName())) {
                 highSeas = updateFreeColGameObject(in, HighSeas.class);
+                System.out.println("high seas is " + highSeas);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();
