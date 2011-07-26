@@ -87,6 +87,7 @@
         <xs:element ref="historyEvent" />
         <xs:element ref="tradeRoute"/>
         <xs:element ref="market" />
+        <xs:element ref="highSeas" />
       </xs:choice>
 
       <xs:attribute name="ID" type="PlayerId" use="required"/>
@@ -151,4 +152,20 @@
       <xs:enumeration value="ALLIANCE" />
     </xs:restriction>
   </xs:simpleType>
+
+  <xs:element name="highSeas">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="unit" />
+        <xs:element name="destination">
+          <xs:complexType>
+            <xs:attribute name="ID" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="ID" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+
 </xs:schema>
