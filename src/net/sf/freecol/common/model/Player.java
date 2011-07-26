@@ -3570,6 +3570,7 @@ public class Player extends FreeColGameObject implements Nameable {
         tradeRoutes.clear();
         modelMessages.clear();
         lastSales = null;
+        highSeas = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));

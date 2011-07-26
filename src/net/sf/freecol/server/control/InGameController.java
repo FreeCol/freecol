@@ -1194,7 +1194,8 @@ public final class InGameController extends Controller {
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
 
         // Now the REF is ready, we can dispose of the European connection.
-        cs.addDispose(See.only(serverPlayer), null, serverPlayer.getEurope());
+        serverPlayer.getHighSeas().removeDestination(europe);
+        cs.addDispose(See.only(serverPlayer), null, europe);
         serverPlayer.setEurope(null);
         serverPlayer.setMonarch(null);
 
