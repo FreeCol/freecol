@@ -163,9 +163,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.playerType = (nationType.isREF()) ? PlayerType.ROYAL
                     : PlayerType.COLONIAL;
                 europe = new ServerEurope(game, this);
-                highSeas = new HighSeas(game);
-                highSeas.addDestination(europe);
-                highSeas.addDestination(game.getNewWorld());
+                initializeHighSeas();
                 if (this.playerType == PlayerType.COLONIAL) {
                     monarch = new Monarch(game, this, nation.getRulerNameKey());
                 }

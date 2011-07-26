@@ -1824,6 +1824,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Initialize the highSeas.
+     * Needs to be public until the backward compatibility code in
+     * FreeColServer is gone.
+     */
+    public void initializeHighSeas() {
+        Game game = getGame();
+        highSeas = new HighSeas(game);
+        if (europe != null) highSeas.addDestination(europe);
+        highSeas.addDestination(game.getNewWorld());
+    }
+
+    /**
      * Returns the amount of gold that this player has.
      *
      * @return The amount of gold that this player has.  May return

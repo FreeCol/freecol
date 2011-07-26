@@ -129,7 +129,7 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      */
-    public static final int SAVEGAME_VERSION = 11;
+    public static final int SAVEGAME_VERSION = 12;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -779,6 +779,16 @@ public final class FreeColServer {
                     throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                 }
             }
+
+            if (savegameVersion < 12) {
+                // Moved to 12 when HighSeas introduced (post-0.10.1).
+                // Remove when 0.10.x save format/version==11 is no longer
+                // supported.
+                for (Player p : game.getPlayers()) {
+                    p.initializeHighSeas();
+                }
+            }
+
             // TODO: remove compatibility code
             for (Tile tile : game.getMap().getAllTiles()) {
                 TerrainGenerator.encodeStyle(tile);
