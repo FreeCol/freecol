@@ -48,6 +48,8 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -65,11 +67,13 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -106,6 +110,7 @@ public class DebugMenu extends JMenu {
         this.setMnemonic(KeyEvent.VK_D);
         add(this);
 
+        /*
         final JMenu debugFixMenu = new JMenu("Fixes");
         debugFixMenu.setOpaque(false);
         debugFixMenu.setMnemonic(KeyEvent.VK_F);
@@ -113,6 +118,8 @@ public class DebugMenu extends JMenu {
 
         // TODO: remove this one day unless someone remembers what this
         // bug was and whether it is still relevant.
+        // 201107. Commenting out.
+
         final JMenuItem crossBug
             = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
         crossBug.setOpaque(false);
@@ -130,6 +137,7 @@ public class DebugMenu extends JMenu {
         crossBug.setEnabled(server != null);
 
         this.addSeparator();
+        */
 
         final JCheckBoxMenuItem sc
             = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"),
@@ -145,37 +153,6 @@ public class DebugMenu extends JMenu {
                 }
             });
         sc.setEnabled(true);
-
-        final JCheckBoxMenuItem dam
-            = new JCheckBoxMenuItem("Display AI-missions",
-                gui.debugShowMission);
-        final JCheckBoxMenuItem dami
-            = new JCheckBoxMenuItem("Additional AI-mission info",
-                gui.debugShowMissionInfo);
-        dam.setOpaque(false);
-        dam.setMnemonic(KeyEvent.VK_M);
-        this.add(dam);
-        dam.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    gui.debugShowMission
-                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                    dami.setEnabled(gui.debugShowMission);
-                    canvas.refresh();
-                }
-            });
-        dam.setEnabled(true);
-
-        dami.setOpaque(false);
-        dami.setMnemonic(KeyEvent.VK_I);
-        this.add(dami);
-        dami.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    gui.debugShowMissionInfo
-                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                    canvas.refresh();
-                }
-            });
-        dami.setEnabled(gui.debugShowMission);
 
         final JMenuItem reveal
             = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
@@ -218,7 +195,7 @@ public class DebugMenu extends JMenu {
                 gui.displayColonyValue
                 && gui.displayColonyValuePlayer == null);
         cv3.setOpaque(false);
-        cv3.setMnemonic(KeyEvent.VK_C);
+        //cv3.setMnemonic(KeyEvent.VK_C);
         cvpMenu.add(cv3);
         bg.add(cv3);
         cv3.addActionListener(new ActionListener() {
@@ -241,7 +218,7 @@ public class DebugMenu extends JMenu {
                         gui.displayColonyValue
                         && gui.displayColonyValuePlayer == p);
                 cv2.setOpaque(false);
-                cv2.setMnemonic(KeyEvent.VK_C);
+                //cv2.setMnemonic(KeyEvent.VK_C);
                 cvpMenu.add(cv2);
                 bg.add(cv2);
                 cv2.addActionListener(new ActionListener() {
@@ -259,7 +236,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem skipTurns
             = new JMenuItem(Messages.message("menuBar.debug.skipTurns"));
         skipTurns.setOpaque(false);
-        skipTurns.setMnemonic(KeyEvent.VK_S);
+        skipTurns.setMnemonic(KeyEvent.VK_T);
         this.add(skipTurns);
         skipTurns.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -294,6 +271,20 @@ public class DebugMenu extends JMenu {
             });
         skipTurns.setEnabled(server != null);
 
+        final String buildingTitle
+            = Messages.message("menuBar.debug.addBuilding");
+        final JMenuItem addBuilding = new JMenuItem(buildingTitle);
+        addBuilding.setOpaque(false);
+        addBuilding.setMnemonic(KeyEvent.VK_B);
+        this.add(addBuilding);
+        addBuilding.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    addBuildingAction(game, server, serverPlayer,
+                        buildingTitle);
+                }
+            });
+        addBuilding.setEnabled(server != null);
+
         final String fatherTitle
             = Messages.message("menuBar.debug.addFoundingFather");
         final JMenuItem addFather = new JMenuItem(fatherTitle);
@@ -311,7 +302,7 @@ public class DebugMenu extends JMenu {
             = Messages.message("menuBar.debug.runMonarch");
         final JMenuItem runMonarch = new JMenuItem(monarchTitle);
         runMonarch.setOpaque(false);
-        runMonarch.setMnemonic(KeyEvent.VK_F);
+        runMonarch.setMnemonic(KeyEvent.VK_M);
         this.add(runMonarch);
         runMonarch.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -334,6 +325,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem addGold
             = new JMenuItem(Messages.message("menuBar.debug.addGold"));
         addGold.setOpaque(false);
+        addGold.setMnemonic(KeyEvent.VK_G);
         this.add(addGold);
         addGold.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -356,7 +348,7 @@ public class DebugMenu extends JMenu {
             = Messages.message("menuBar.debug.addImmigration");
         final JMenuItem addCrosses = new JMenuItem(immigrationTitle);
         addCrosses.setOpaque(false);
-        // addCrosses.setMnemonic(KeyEvent.VK_????);
+        addCrosses.setMnemonic(KeyEvent.VK_I);
         this.add(addCrosses);
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -378,7 +370,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem giveBells
             = new JMenuItem(Messages.message("menuBar.debug.addLiberty"));
         giveBells.setOpaque(false);
-        giveBells.setMnemonic(KeyEvent.VK_B);
+        giveBells.setMnemonic(KeyEvent.VK_L);
         this.add(giveBells);
         giveBells.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -469,6 +461,25 @@ public class DebugMenu extends JMenu {
             });
         europeStatus.setEnabled(server != null);
 
+        final JCheckBoxMenuItem dam
+            = new JCheckBoxMenuItem("Display AI-missions",
+                gui.debugShowMission);
+        final JCheckBoxMenuItem dami
+            = new JCheckBoxMenuItem("Additional AI-mission info",
+                gui.debugShowMissionInfo);
+        dam.setOpaque(false);
+        dam.setMnemonic(KeyEvent.VK_A);
+        this.add(dam);
+        dam.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.debugShowMission
+                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    dami.setEnabled(gui.debugShowMission);
+                    canvas.refresh();
+                }
+            });
+        dam.setEnabled(true);
+
         final JMenuItem useAI
             = new JMenuItem(Messages.message("menuBar.debug.useAI"));
         useAI.setOpaque(false);
@@ -488,12 +499,24 @@ public class DebugMenu extends JMenu {
             });
         useAI.setEnabled(server != null);
 
+        dami.setOpaque(false);
+        dami.setMnemonic(KeyEvent.VK_I);
+        this.add(dami);
+        dami.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.debugShowMissionInfo
+                        = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    canvas.refresh();
+                }
+            });
+        dami.setEnabled(gui.debugShowMission);
+
         this.addSeparator();
 
         final JMenuItem compareMaps
             = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
         compareMaps.setOpaque(false);
-        compareMaps.setMnemonic(KeyEvent.VK_C);
+        //compareMaps.setMnemonic(KeyEvent.VK_C);
         compareMaps.setAccelerator(KeyStroke.getKeyStroke('C',
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
                 | InputEvent.ALT_MASK));
@@ -508,6 +531,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem showResourceKeys
             = new JMenuItem(Messages.message("menuBar.debug.showResourceKeys"));
         showResourceKeys.setOpaque(false);
+        //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
         showResourceKeys.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -537,7 +561,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem statistics
             = new JMenuItem(Messages.message("menuBar.debug.statistics"));
         statistics.setOpaque(false);
-        statistics.setMnemonic(KeyEvent.VK_I);
+        //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -550,7 +574,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem gc
             = new JMenuItem(Messages.message("menuBar.debug.memoryManager.gc"));
         gc.setOpaque(false);
-        gc.setMnemonic(KeyEvent.VK_G);
+        //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
         gc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -560,6 +584,42 @@ public class DebugMenu extends JMenu {
         gc.setEnabled(true);
 
         this.addSeparator();
+    }
+
+    private void addBuildingAction(final Game game, final FreeColServer server,
+                                   final Player serverPlayer,
+                                   String buildingTitle) {
+        List<ChoiceItem<BuildingType>> buildings
+            = new ArrayList<ChoiceItem<BuildingType>>();
+        for (BuildingType b : game.getSpecification().getBuildingTypeList()) {
+            buildings.add(new ChoiceItem<BuildingType>(Messages.message(b.toString() + ".name"),
+                    b));
+        }
+        BuildingType buildingType
+            = canvas.showChoiceDialog(null, buildingTitle, "Cancel",
+                buildings);
+        if (buildingType == null) return;
+        Game sGame = server.getGame();
+        BuildingType sBuildingType = server.getSpecification()
+            .getBuildingType(buildingType.getId());
+        List<String> results = new ArrayList<String>();
+        int fails = 0;
+        for (Colony sColony : serverPlayer.getColonies()) {
+            Colony.NoBuildReason reason = sColony.getNoBuildReason(sBuildingType);
+            results.add(sColony.getName() + ": " + reason.toString());
+            if (reason == Colony.NoBuildReason.NONE) {
+                Building sBuilding = new ServerBuilding(sGame, sColony,
+                    sBuildingType);
+                sColony.addBuilding(sBuilding);
+            } else {
+                fails++;
+            }
+        }
+        canvas.showInformationMessage(Utils.join(", ", results));
+        if (fails < serverPlayer.getNumberOfSettlements()) {
+            // Brutally resynchronize
+            freeColClient.getConnectController().reconnect();
+        }
     }
 
     private void addFatherAction(final Game game, final FreeColServer server,
