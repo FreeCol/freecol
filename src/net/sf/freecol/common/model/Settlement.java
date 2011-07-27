@@ -40,8 +40,8 @@ import org.w3c.dom.Element;
  * The super class of all settlements on the map (that is colonies and
  * indian settlements).
  */
-abstract public class Settlement extends FreeColGameObject
-    implements Location, Named, Ownable {
+abstract public class Settlement extends GoodsLocation
+    implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName());
 
@@ -55,8 +55,6 @@ abstract public class Settlement extends FreeColGameObject
 
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
-
-    protected GoodsContainer goodsContainer;
 
     /**
      * Contains the abilities and modifiers of this Colony.
@@ -290,6 +288,15 @@ abstract public class Settlement extends FreeColGameObject
     }
 
     /**
+     * Returns this Settlement.
+     *
+     * @return this Settlement
+     */
+    public Settlement getSettlement() {
+        return this;
+    }
+
+    /**
      * Put a prepared settlement onto the map.
      */
     public void placeSettlement() {
@@ -368,46 +375,6 @@ abstract public class Settlement extends FreeColGameObject
     }
 
     /**
-     * Gets the goods container for this settlement.
-     *
-     * @return The settlements goods container.
-     */
-    public GoodsContainer getGoodsContainer() {
-        return goodsContainer;
-    }
-
-    /**
-     * Sets the goods container for this settlement.
-     *
-     * @param goodsContainer The new <code>GoodsContainer</code> to use.
-     */
-    public void setGoodsContainer(GoodsContainer goodsContainer) {
-        this.goodsContainer = goodsContainer;
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-     * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
-     * amount of GoodsContainer.CARGO_SIZE.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Goods> getGoodsIterator() {
-        return goodsContainer.getGoodsIterator();
-    }
-
-    /**
-     * Gets an <code>List</code> with every <code>Goods</code> in this
-     * <code>Colony</code>. There is only one <code>Goods</code> for each
-     * type of goods.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public List<Goods> getCompactGoods() {
-        return goodsContainer.getCompactGoods();
-    }
-
-    /**
      * Get the tiles this settlement owns.
      * Exploits the fact that the map generator only grows connected tiles.
      *
@@ -440,12 +407,8 @@ abstract public class Settlement extends FreeColGameObject
      */
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (owner != null && goodsContainer != null) {
-            objects.addAll(goodsContainer.disposeList());
-            goodsContainer = null;
-        }
-
-        if (owner != null && getTile() != null
+        if (owner != null
+            && getTile() != null
             && getTile().getSettlement() != null) {
             // Defensive tests to handle transition from calling dispose()
             // on both sides to when it is only called on server-side.
@@ -467,13 +430,6 @@ abstract public class Settlement extends FreeColGameObject
 
         objects.addAll(super.disposeList());
         return objects;
-    }
-
-    /**
-     * Dispose of this <code>Settlement</code>.
-     */
-    public void dispose() {
-        disposeList();
     }
 
     /**
@@ -502,65 +458,6 @@ abstract public class Settlement extends FreeColGameObject
      *     of this change.
      */
     public abstract boolean propagateAlarm(Player player, int addToAlarm);
-
-    /**
-     * Gets the storage capacity of this settlement.
-     *
-     * @return The storage capacity of this settlement.
-     */
-    public abstract int getWarehouseCapacity();
-
-    /**
-     * Removes a specified amount of a type of Goods from this Settlement.
-     *
-     * @param type The type of Goods to remove from this settlement.
-     * @param amount The amount of Goods to remove from this settlement.
-     */
-    public void removeGoods(GoodsType type, int amount) {
-        goodsContainer.removeGoods(type, amount);
-    }
-
-    /**
-     * Removes the given Goods from the Settlement.
-     *
-     * @param goods a <code>Goods</code> value
-     */
-    public void removeGoods(AbstractGoods goods) {
-        goodsContainer.removeGoods(goods);
-    }
-
-    /**
-     * Removes all Goods of the given type from the Settlement.
-     *
-     * @param type a <code>GoodsType</code> value
-     */
-    public void removeGoods(GoodsType type) {
-        goodsContainer.removeGoods(type);
-    }
-
-    /**
-     * Describe <code>addGoods</code> method here.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @param amount an <code>int</code> value
-     */
-    public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type, amount);
-    }
-
-    public void addGoods(AbstractGoods goods) {
-        addGoods(goods.getType(), goods.getAmount());
-    }
-
-    /**
-     * Gets the amount of one type of Goods at this Settlement.
-     *
-     * @param type The type of goods to look for.
-     * @return The amount of this type of Goods at this Location.
-     */
-    public int getGoodsCount(GoodsType type) {
-        return goodsContainer.getGoodsCount(type);
-    }
 
     /**
      * Returns the production of the given type of goods.
@@ -672,8 +569,9 @@ abstract public class Settlement extends FreeColGameObject
     @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        super.writeAttributes(out);
         out.writeAttribute("name", getName());
+        out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("settlementType", getType().getId());
         // Not owner, it is subject to PlayerExploredTile handling.

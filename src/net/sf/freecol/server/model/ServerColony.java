@@ -85,7 +85,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         super(game, owner, name, tile);
         Specification spec = getSpecification();
 
-        goodsContainer = new GoodsContainer(game, this);
+        setGoodsContainer(new GoodsContainer(game, this));
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         established = game.getTurn();
@@ -226,11 +226,9 @@ public class ServerColony extends Colony implements ServerModelObject {
             int net = productionMap.getCount(goodsType);
             int stored = getGoodsCount(goodsType);
             if (net + stored <= 0) {
-                goodsContainer.removeGoods(goodsType, stored);
-                modifySpecialGoods(goodsType, -stored);
+                removeGoods(goodsType, stored);
             } else {
-                goodsContainer.addGoods(goodsType, net);
-                modifySpecialGoods(goodsType, net);
+                addGoods(goodsType, net);
             }
 
             // Handle the food situation

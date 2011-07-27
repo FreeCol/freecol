@@ -648,10 +648,11 @@ public class Colony extends Settlement implements Nameable {
      * @param type The type of Goods to remove from this settlement.
      * @param amount The amount of Goods to remove from this settlement.
      */
-    public void removeGoods(GoodsType type, int amount) {
-        Goods removed = goodsContainer.removeGoods(type, amount);
+    public Goods removeGoods(GoodsType type, int amount) {
+        Goods removed = super.removeGoods(type, amount);
         productionCache.invalidate(type);
         modifySpecialGoods(type, -removed.getAmount());
+        return removed;
     }
 
     /**
@@ -659,8 +660,8 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param goods a <code>Goods</code> value
      */
-    public void removeGoods(AbstractGoods goods) {
-        removeGoods(goods.getType(), goods.getAmount());
+    public Goods removeGoods(AbstractGoods goods) {
+        return removeGoods(goods.getType(), goods.getAmount());
     }
 
     /**
@@ -668,10 +669,11 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param type a <code>GoodsType</code> value
      */
-    public void removeGoods(GoodsType type) {
-        Goods removed = goodsContainer.removeGoods(type);
+    public Goods removeGoods(GoodsType type) {
+        Goods removed = super.removeGoods(type);
         productionCache.invalidate(type);
         modifySpecialGoods(type, -removed.getAmount());
+        return removed;
     }
 
     /**
@@ -690,7 +692,7 @@ public class Colony extends Settlement implements Nameable {
      * @param amount an <code>int</code> value
      */
     public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type, amount);
+        super.addGoods(type, amount);
         productionCache.invalidate(type);
         modifySpecialGoods(type, amount);
     }
@@ -1943,7 +1945,7 @@ public class Colony extends Settlement implements Nameable {
      *
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
-    public int getWarehouseCapacity() {
+    public int getGoodsCapacity() {
         /* This will return 0 unless additive modifiers are present.
            This is intentional.
         */
@@ -1959,15 +1961,6 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns just this Colony itself.
-     *
-     * @return This colony.
-     */
-    public Settlement getSettlement() {
-        return this;
     }
 
     /**
@@ -2381,7 +2374,6 @@ public class Colony extends Settlement implements Nameable {
 
         out.writeAttribute("established", Integer.toString(established.getNumber()));
         if (full) {
-            out.writeAttribute("owner", owner.getId());
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
@@ -2418,9 +2410,6 @@ public class Colony extends Settlement implements Nameable {
                 out.writeEndElement();
             }
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            if (pet.getOwner() != null) {
-                out.writeAttribute("owner", pet.getOwner().getId());
-            }
             if (pet.getColonyUnitCount() > 0) {
                 out.writeAttribute("unitCount",
                     Integer.toString(pet.getColonyUnitCount()));
@@ -2430,7 +2419,7 @@ public class Colony extends Settlement implements Nameable {
                     pet.getColonyStockadeKey());
             }
         }
-        goodsContainer.toXML(out, player, showAll, toSavedGame);
+        super.writeChildren(out);
         // End element:
         out.writeEndElement();
     }
@@ -2476,13 +2465,6 @@ public class Colony extends Settlement implements Nameable {
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building building = updateFreeColGameObject(in, Building.class);
                 addBuilding(building);
-            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (gc == null) {
-                    goodsContainer = new GoodsContainer(getGame(), this, in);
-                } else {
-                    goodsContainer.readFromXML(in);
-                }
             } else if (in.getLocalName().equals(ExportData.getXMLElementTagName())) {
                 ExportData data = new ExportData();
                 data.readFromXML(in);
@@ -2509,8 +2491,7 @@ public class Colony extends Settlement implements Nameable {
                 populationQueue.add(getSpecification().getType(id, UnitType.class));
                 in.nextTag();
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + getName());
-                in.nextTag();
+                super.readChild(in);
             }
         }
         // TODO: remove 0.9.x compatibility code

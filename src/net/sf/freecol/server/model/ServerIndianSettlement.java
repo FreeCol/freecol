@@ -77,7 +77,7 @@ public class ServerIndianSettlement extends IndianSettlement
                                   Set<Player> spokenTo, Unit missionary) {
         super(game, owner, name, tile);
 
-        goodsContainer = new GoodsContainer(game, this);
+        setGoodsContainer(new GoodsContainer(game, this));
         this.learnableSkill = learnableSkill;
         setCapital(isCapital);
         this.spokenTo = spokenTo;

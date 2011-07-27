@@ -87,9 +87,6 @@ public class IndianSettlement extends Settlement {
      */
     protected Set<Player> spokenTo = new HashSet<Player>();
 
-    /** Units present at this settlement. */
-    protected List<Unit> units = Collections.emptyList();
-
     /** Units that belong to this settlement. */
     protected ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
 
@@ -617,83 +614,16 @@ public class IndianSettlement extends Settlement {
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (!units.contains(locatable)) {
-                Unit indian = (Unit)locatable;
-                if (units.equals(Collections.emptyList())) {
-                    units = new ArrayList<Unit>();
-                }
-                units.add(indian);
-                if (indian.getIndianSettlement() == null) {
-                    // Adopt homeless Indians
-                    indian.setIndianSettlement(this);
-                }
+        super.add(locatable);
+        if (locatable instanceof Unit && contains(locatable)) {
+            Unit indian = (Unit)locatable;
+            if (indian.getIndianSettlement() == null) {
+                // Adopt homeless Indians
+                indian.setIndianSettlement(this);
             }
-        } else if (locatable instanceof Goods) {
-            addGoods((Goods)locatable);
-        } else {
-            logger.warning("Tried to add an unrecognized 'Locatable' to a IndianSettlement.");
         }
     }
 
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this Location.
-     */
-    public void remove(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (!units.remove(locatable)) {
-                logger.warning("Failed to remove unit " + ((Unit)locatable).getId() + " from IndianSettlement");
-            }
-        } else if (locatable instanceof Goods) {
-            removeGoods((Goods)locatable);
-        } else {
-            logger.warning("Tried to remove an unrecognized 'Locatable' from a IndianSettlement.");
-        }
-    }
-
-
-    /**
-     * Returns this settlement.
-     *
-     * @return This settlement.
-     */
-    public Settlement getSettlement() {
-        return this;
-    }
-
-    /**
-     * An Indian settlement is not a colony.
-     *
-     * @return Null.
-     */
-    public Colony getColony() {
-        return null;
-    }
-
-    /**
-     * Returns the amount of Units at this Location.
-     *
-     * @return The amount of Units at this Location.
-     */
-    public int getUnitCount() {
-        return units.size();
-    }
-
-    /**
-     * Gets a list of units in this settlement.
-     *
-     * @return A list of units in this settlement.
-     */
-    public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
-    }
-
-    public Iterator<Unit> getUnitIterator() {
-        return units.iterator();
-    }
 
     /**
      * Gets the <code>Unit</code> that is currently defending this
@@ -708,7 +638,7 @@ public class IndianSettlement extends Settlement {
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
         float defencePower = -1.0f;
-        for (Unit nextUnit : units) {
+        for (Unit nextUnit : getUnitList()) {
             float tmpPower = attacker.getGame().getCombatModel().getDefencePower(attacker, nextUnit);
             if (tmpPower > defencePower) {
                 defender = nextUnit;
@@ -730,7 +660,7 @@ public class IndianSettlement extends Settlement {
      *
      * @return The storage capacity of this settlement.
      */
-    public int getWarehouseCapacity() {
+    public int getGoodsCapacity() {
         return getType().getWarehouseCapacity();
     }
 
@@ -1040,19 +970,6 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-    public boolean contains(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            return units.contains(locatable);
-        } else {
-            return false;
-        }
-    }
-
-
-    public boolean canAdd(Locatable locatable) {
-        return true;
-    }
-
     /**
      * Gets the production of a specified goods type for this settlement.
      *
@@ -1074,8 +991,8 @@ public class IndianSettlement extends Settlement {
         // When a native settlement has more tiles than units, pretend
         // that they produce from their entire area at reduced
         // efficiency.
-        if (tiles > units.size()) {
-            potential *= (float) units.size() / tiles;
+        if (tiles > getUnitCount()) {
+            potential *= (float) getUnitCount() / tiles;
         }
 
         // Always add full potential for center tile.
@@ -1127,21 +1044,7 @@ public class IndianSettlement extends Settlement {
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
-
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (units.size() > 0) {
-            objects.addAll(units.remove(0).disposeList());
-        }
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Dispose of this native settlement.
-     */
-    @Override
-    public void dispose() {
-        disposeList();
+        return super.disposeList();
     }
 
     /**
@@ -1151,7 +1054,7 @@ public class IndianSettlement extends Settlement {
      * Only for compatibility when loading savegames with pre-0.0.3 protocols.
      */
     public void createGoodsContainer() {
-        goodsContainer = new GoodsContainer(getGame(), this);
+        setGoodsContainer(new GoodsContainer(getGame(), this));
     }
 
 
@@ -1193,7 +1096,6 @@ public class IndianSettlement extends Settlement {
         out.writeStartElement(getXMLElementTagName());
         super.writeAttributes(out);
 
-        out.writeAttribute("owner", owner.getId());
         if (full) {
             out.writeAttribute("lastTribute", Integer.toString(lastTribute));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
@@ -1215,11 +1117,23 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        // attributes end here
+        writeChildren(out, player, showAll, toSavedGame);
 
-        goodsContainer.toXML(out, player, showAll, toSavedGame);
+        out.writeEndElement();
 
-        if (full) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        super.writeChildren(out, player, showAll, toSavedGame);
+
+        PlayerExploredTile pet = (player == null) ? null
+            : getTile().getPlayerExploredTile(player);
+
+        if (showAll || toSavedGame || player == getOwner()) {
             Iterator<Player> playerIterator = spokenTo.iterator();
             while (playerIterator.hasNext()) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
@@ -1235,13 +1149,6 @@ public class IndianSettlement extends Settlement {
             if (missionary != null) {
                 out.writeStartElement(MISSIONARY_TAG_NAME);
                 missionary.toXML(out, player, showAll, toSavedGame);
-                out.writeEndElement();
-            }
-            if (!units.isEmpty()) {
-                out.writeStartElement(UNITS_TAG_NAME);
-                for (Unit unit : units) {
-                    unit.toXML(out, player, showAll, toSavedGame);
-                }
                 out.writeEndElement();
             }
             for (Unit unit : ownedUnits) {
@@ -1267,8 +1174,6 @@ public class IndianSettlement extends Settlement {
                 out.writeEndElement();
             }
         }
-
-        out.writeEndElement();
     }
 
     /**
@@ -1279,8 +1184,7 @@ public class IndianSettlement extends Settlement {
      *      during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         owner.addSettlement(this);
@@ -1297,62 +1201,61 @@ public class IndianSettlement extends Settlement {
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = getSpecification().getType(in, "learnableSkill", UnitType.class, null);
+    }
 
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         spokenTo.clear();
         alarm = new HashMap<Player, Tension>();
         missionary = null;
-        units.clear();
         ownedUnits.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
-                Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                spokenTo.add(player);
-                in.nextTag(); // close tag is always generated.
-            } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-                in.nextTag(); // close element
-            } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
-                String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME, in, new String[0]);
-                for (int i = 0; i < wantedGoodsID.length; i++) {
-                    if (i == 3)
-                        break;
-                    wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsID[i]);
-                }
-            } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
-                in.nextTag();
-                missionary = updateFreeColGameObject(in, Unit.class);
-                in.nextTag();
-            } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
-                units = new ArrayList<Unit>();
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = updateFreeColGameObject(in, Unit.class);
-                        if (unit.getLocation() != this) {
-                            logger.warning("fixing unit location");
-                            unit.setLocation(this);
-                        }
-                        units.add(unit);
+        super.readChildren(in);
+    }
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
+            Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            spokenTo.add(player);
+            in.nextTag(); // close tag is always generated.
+        } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
+            Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
+            in.nextTag(); // close element
+        } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
+            String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME, in, new String[0]);
+            for (int i = 0; i < wantedGoodsID.length; i++) {
+                if (i == 3)
+                    break;
+                wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsID[i]);
+            }
+        } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
+            in.nextTag();
+            missionary = updateFreeColGameObject(in, Unit.class);
+            in.nextTag();
+        } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
+            // TODO: remove 0.10.1 compatibility code
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                    Unit unit = updateFreeColGameObject(in, Unit.class);
+                    if (unit.getLocation() != this) {
+                        logger.warning("fixing unit location");
+                        unit.setLocation(this);
                     }
-                }
-            } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
-                Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
-                if (unit.getOwner() != null && unit.getOwner() != owner) {
-                    logger.warning("Error in savegame: unit " + unit.getId()
-                                   + " does not belong to settlement " + getId());
-                } else {
-                    ownedUnits.add(unit);
-                    owner.setUnit(unit);
-                }
-                in.nextTag();
-            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (goodsContainer != null) {
-                    goodsContainer.readFromXML(in);
-                } else {
-                    goodsContainer = new GoodsContainer(getGame(), this, in);
+                    add(unit);
                 }
             }
+            // end TODO
+        } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
+            Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
+            if (unit.getOwner() != null && unit.getOwner() != owner) {
+                logger.warning("Error in savegame: unit " + unit.getId()
+                               + " does not belong to settlement " + getId());
+            } else {
+                ownedUnits.add(unit);
+                owner.setUnit(unit);
+            }
+            in.nextTag();
+        } else {
+            super.readChild(in);
         }
     }
 

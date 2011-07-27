@@ -1294,7 +1294,8 @@ public class Unit extends FreeColGameObject
     public MoveType getMoveType(Direction direction) {
         Tile tile = getTile();
         if (tile == null) {
-            throw new IllegalStateException("getTile() == null");
+            throw new IllegalStateException("getTile() == null, location is "
+                                            + location);
         }
 
         Tile target = tile.getNeighbourOrNull(direction);

@@ -22,20 +22,17 @@ package net.sf.freecol.common.model;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
-public class EuropeTest extends FreeColTestCase {
+public class HighSeasTest extends FreeColTestCase {
 
-    public void testMissionary() {
+    public void test() {
 
         Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        Europe amsterdam = dutch.getEurope();
+        HighSeas highSeas = dutch.getHighSeas();
+        UnitType caravel = spec().getUnitType("model.unit.caravel");
+        Unit unit = new ServerUnit(game, highSeas, dutch, caravel, Unit.UnitState.ACTIVE);
 
-        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        Unit colonist = new ServerUnit(game, amsterdam, dutch, colonistType,
-                                       Unit.UnitState.ACTIVE);
-
-        assertTrue(amsterdam.hasAbility("model.ability.dressMissionary"));
-        assertTrue(colonist.hasAbility("model.ability.dressMissionary"));
+        dutch.dumpObject();
 
     }
 

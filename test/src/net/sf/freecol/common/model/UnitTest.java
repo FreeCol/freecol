@@ -159,7 +159,8 @@ public class UnitTest extends FreeColTestCase {
         Colony colony = this.getStandardColony();
         int foodInColony = 300;
         colony.addGoods(foodType, foodInColony);
-        assertEquals("Setup error, colony does not have expected goods quantities",foodInColony,colony.getGoodsCount(foodType));
+        assertEquals("Setup error, colony does not have expected goods quantities",
+                     foodInColony, colony.getGoodsCount(foodType));
 
         Player dutch = game.getPlayer("model.nation.dutch");
         Unit wagonTrain = new ServerUnit(game, colony.getTile(), dutch, spec().getUnitType("model.unit.wagonTrain"),
@@ -168,7 +169,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Setup error, unit has wrong initial moves", initialMoves, wagonTrain.getMovesLeft());
         assertTrue("Setup error, unit should not carry anything", wagonTrain.getGoodsCount() == 0);
 
-        Goods tooManyGoods = colony.goodsContainer.getGoods(foodType);
+        Goods tooManyGoods = colony.getGoodsContainer().getGoods(foodType);
         try{
             wagonTrain.add(tooManyGoods);
             fail("Should have thrown an IllegalStateException");
@@ -321,8 +322,13 @@ public class UnitTest extends FreeColTestCase {
 
         Player indianPlayer = game.getPlayer("model.nation.sioux");
 
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game)
+            .player(indianPlayer);
+
         IndianSettlement camp = builder.build();
+
+        assertEquals(indianPlayer, camp.getOwner());
 
         UnitType indianBraveType = spec().getUnitType("model.unit.brave");
         Unit brave = new ServerUnit(game, camp, indianPlayer, indianBraveType,
