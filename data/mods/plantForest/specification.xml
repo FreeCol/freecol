@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2011  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="plantForest">
+  <tileimprovement-types>
+    <tileimprovement-type id="model.improvement.plantForest" add-work-turns="9"
+                          expended-equipment-type="model.equipment.tools"
+                          expended-amount="4"
+                          magnitude="2">
+      <scope method-name="isForested"      method-value="false" />
+      <scope method-name="isWater"         method-value="false" />
+      <scope type="model.tile.arctic"      matchNegated="true" />
+      <scope type="model.tile.hills"       matchNegated="true" />
+      <scope type="model.tile.mountains"   matchNegated="true" />
+      <change from="model.tile.plains"     to="model.tile.mixedForest"/>
+      <change from="model.tile.grassland"  to="model.tile.coniferForest"/>
+      <change from="model.tile.prairie"    to="model.tile.broadleafForest"/>
+      <change from="model.tile.savannah"   to="model.tile.tropicalForest"/>
+      <change from="model.tile.marsh"      to="model.tile.wetlandForest"/>
+      <change from="model.tile.swamp"      to="model.tile.rainForest"/>
+      <change from="model.tile.desert"     to="model.tile.scrubForest"/>
+      <change from="model.tile.tundra"     to="model.tile.borealForest"/>
+    </tileimprovement-type>
+  </tileimprovement-types>
+</freecol-specification>
