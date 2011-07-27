@@ -2105,7 +2105,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the disembark "succeeds" (which deliberately includes
      *         declined disembarks).
      */
-    private boolean moveDisembark(Unit unit, Direction direction) {
+    private boolean moveDisembark(Unit unit, final Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (tile.getFirstUnit() != null
             && tile.getFirstUnit().getOwner() != unit.getOwner()) {
@@ -2113,7 +2113,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Disembark selected units able to move.
-        List<Unit> disembarkable = new ArrayList<Unit>();
+        final List<Unit> disembarkable = new ArrayList<Unit>();
         unit.setStateToAllChildren(UnitState.ACTIVE);
         for (Unit u : unit.getUnitList()) {
             if (u.getMoveType(tile).isProgress()) {
@@ -2141,21 +2141,31 @@ public final class InGameController implements NetworkConstants {
             if (disembarkable.size() > 1) {
                 choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
             }
+
+            // Use moveDirection() to disembark units as while the
+            // destination tile is known to be clear of other player
+            // units or settlements, it may have a rumour or need
+            // other special handling.
             Unit u = canvas.showChoiceDialog(unit.getTile(),
                 Messages.message("disembark.text"),
                 Messages.message("disembark.cancel"),
                 choices);
-            if (u == null) break; // Done
-            // Call move() as while the destination tile is known to
-            // be clear of settlements or other player units, it *may*
-            // have a rumour.
-            if (u == unit) {
-                for (Unit dUnit : disembarkable) move(dUnit, direction);
-                disembarkable.clear();
-            } else {
-                move(u, direction);
-                disembarkable.remove(u);
+            if (u == null) { // Cancelled, done.
+                break;
+            } else if (u == unit) { // Disembark all.
+                for (Unit dUnit : disembarkable) {
+                    // Guard against loss of control when asking the
+                    // server to move the unit.
+                    try {
+                        moveDirection(dUnit, direction, false);
+                    } finally {
+                        continue;
+                    }
+                }
+                return true;
             }
+            moveDirection(u, direction, false);
+            disembarkable.remove(u);
         }
         return true;
     }

@@ -1003,43 +1003,12 @@ public final class InGameInputHandler extends InputHandler {
         NewLandNameMessage message = new NewLandNameMessage(game, element);
         Unit unit = message.getUnit(game);
         String defaultName = message.getNewLandName();
-        final Tile tile = unit.getTile();
-        if (unit == null || defaultName == null || tile == null) return null;
+        if (unit == null || defaultName == null
+            || unit.getTile() == null) return null;
 
-        // Player names the land.
-        String name = new ShowInputDialogSwingTask(tile,
-            StringTemplate.template("newLand.text"), defaultName,
-            "newLand.yes", null, true).show();
-
-        // Check if there is a welcoming native offering land.
-        Player welcomer = message.getWelcomer(game);
-        boolean accept = false;
-        if (welcomer != null) {
-            String messageId = (tile.getOwner() == welcomer)
-                ? "welcomeOffer.text" : "welcomeSimple.text";
-            String type = ((IndianNationType) welcomer
-                .getNationType()).getSettlementTypeKey(true);
-            accept = new ShowConfirmDialogSwingTask(tile,
-                StringTemplate.template(messageId)
-                    .addStringTemplate("%nation%", welcomer.getNationName())
-                    .addName("%camps%", message.getCamps())
-                    .add("%settlementType%", type),
-                "welcome.yes", "welcome.no").confirm();
-        }
-
-        // Respond to the server.
-        getFreeColClient().askServer()
-            .newLandName(unit, name, welcomer, accept);
-
-        // Add tutorial message.
-        String key = FreeColActionUI.getHumanKeyStrokeText(getFreeColClient()
-            .getActionManager().getFreeColAction("buildColonyAction")
-            .getAccelerator());
-        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                "tutorial.buildColony", player)
-            .addName("%build_colony_key%", key)
-            .add("%build_colony_menu_item%", "buildColonyAction.name")
-            .add("%orders_menu_item%", "menuBar.orders"));
+        // Offer to name the land.
+        new NewLandNameSwingTask(unit, defaultName, message.getWelcomer(game),
+            message.getCamps()).invokeLater();
         return null;
     }
 
@@ -1056,13 +1025,10 @@ public final class InGameInputHandler extends InputHandler {
         Region region = message.getRegion(game);
         Unit unit = message.getUnit(game);
         if (name == null || region == null) return null;
-        name = new ShowInputDialogSwingTask((unit == null) ? null
-            : unit.getTile(),
-            StringTemplate.template("nameRegion.text")
-                .addName("%type%", Messages.message(region.getLabel())),
-            name, "ok", null, false).show();
-        if (name == null || "".equals(name)) name = message.getNewRegionName();
-        getFreeColClient().askServer().newRegionName(region, unit, name);
+
+        // Offer to name the region.
+        new NewRegionNameSwingTask(unit, region, message.getNewRegionName())
+            .invokeLater();
         return null;
     }
 
@@ -1451,6 +1417,102 @@ public final class InGameInputHandler extends InputHandler {
             if (!goods.isEmpty()) {
                 getFreeColClient().askServer().loot(unit, defenderId, goods);
             }
+        }
+    }
+
+    class NewLandNameSwingTask extends NoResultCanvasSwingTask {
+
+        private Unit unit;
+        private String defaultName;
+        private Player welcomer;
+        private String camps;
+
+
+        /**
+         * Constructor.
+         *
+         * @param unit The <code>Unit</code> that has come ashore.
+         * @param defaultName The default new land name.
+         * @param welcomer An optional <code>Player</code> that is welcoming
+         *     this player to the new world.
+         * @param camps The number of camps of the welcomer.
+         */
+        public NewLandNameSwingTask(Unit unit, String defaultName,
+            Player welcomer, String camps) {
+            this.unit = unit;
+            this.defaultName = defaultName;
+            this.welcomer = welcomer;
+            this.camps = camps;
+        }
+
+        protected void doWork(Canvas canvas) {
+            // Player names the land.
+            Tile tile = unit.getTile();
+            String name = canvas.showInputDialog(tile,
+                StringTemplate.template("newLand.text"), defaultName,
+                "newLand.yes", null, true);
+
+            // Check if there is a welcoming native offering land.
+            boolean accept = false;
+            if (welcomer != null) {
+                String messageId = (tile.getOwner() == welcomer)
+                    ? "welcomeOffer.text" : "welcomeSimple.text";
+                String type = ((IndianNationType) welcomer
+                    .getNationType()).getSettlementTypeKey(true);
+                accept = canvas.showConfirmDialog(tile,
+                    StringTemplate.template(messageId)
+                        .addStringTemplate("%nation%", welcomer.getNationName())
+                        .addName("%camps%", camps)
+                        .add("%settlementType%", type),
+                    "welcome.yes", "welcome.no");
+            }
+
+            // Respond to the server.
+            FreeColClient fcc = getFreeColClient();
+            fcc.askServer().newLandName(unit, name, welcomer, accept);
+
+            // Add tutorial message.
+            Player player = unit.getOwner();
+            String key = FreeColActionUI.getHumanKeyStrokeText(fcc
+                .getActionManager().getFreeColAction("buildColonyAction")
+                .getAccelerator());
+            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                    "tutorial.buildColony", player)
+                .addName("%build_colony_key%", key)
+                .add("%build_colony_menu_item%", "buildColonyAction.name")
+                .add("%orders_menu_item%", "menuBar.orders"));
+        }
+    }
+
+    class NewRegionNameSwingTask extends NoResultCanvasSwingTask {
+
+        private Unit unit;
+        private Region region;
+        private String defaultName;
+
+
+        /**
+         * Constructor.
+         *
+         * @param unit The <code>Unit</code> that discovers the region.
+         * @param region The <code>Region</code> that is discovered.
+         * @param defaultName The default name of the new region.
+         */
+        public NewRegionNameSwingTask(Unit unit, Region region,
+                                      String defaultName) {
+            this.unit = unit;
+            this.region = region;
+            this.defaultName = defaultName;
+        }
+
+        protected void doWork(Canvas canvas) {
+            String name = canvas.showInputDialog((unit == null) ? null
+                : unit.getTile(),
+                StringTemplate.template("nameRegion.text")
+                    .addName("%type%", Messages.message(region.getLabel())),
+                defaultName, "ok", null, false);
+            if (name == null || "".equals(name)) name = defaultName;
+            getFreeColClient().askServer().newRegionName(region, unit, name);
         }
     }
 

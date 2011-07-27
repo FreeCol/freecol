@@ -838,6 +838,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.DEFAULT,
                         "EventPanel.FIRST_LANDING", serverPlayer));
+                // Set the default value now to prevent multiple attempts.
+                // The user setNewLandName can override.
+                serverPlayer.setNewLandName(newLand);
             }
 
             // Check for new contacts.
@@ -906,11 +909,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         "EventPanel.DISCOVER_PACIFIC", serverPlayer));
                 cs.addRegion(serverPlayer, region,
                     Messages.message("model.region.pacific"));
-            } else {
+            } else if (region.getName() == null) {
+                // Really newly discovered.
                 String defaultName = Messages.getDefaultRegionName(serverPlayer,
                     region.getType());
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                     new NewRegionNameMessage(region, this, defaultName));
+                // Set the default name to prevent multiple attempts.
+                region.setName(defaultName);
             }
         }
     }

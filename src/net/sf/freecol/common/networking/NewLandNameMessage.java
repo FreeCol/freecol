@@ -184,9 +184,7 @@ public class NewLandNameMessage extends DOMMessage {
         if (newLandName == null || newLandName.length() == 0) {
             return DOMMessage.clientError("Empty new land name");
         }
-        if (serverPlayer.isNewLandNamed()) {
-            return DOMMessage.clientError("Player has named the new land already.");
-        }
+
         ServerPlayer welcomer = null;
         int camps = 0;
         if (welcomerId != null) {
