@@ -23,6 +23,7 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,6 +46,7 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -153,6 +155,8 @@ public final class ConnectController {
                 return;
             }
         }
+
+        loadModFragments(specification);
 
         try {
             FreeColServer freeColServer = new FreeColServer(specification, false, true, port, null, advantages);
@@ -671,6 +675,33 @@ public final class ConnectController {
                 logger.warning("Could not close connection to meta-server.");
                 return null;
             }
+        }
+    }
+
+    private void loadModFragments(Specification specification) {
+        boolean loadedMod = false;
+        for (FreeColModFile f : freeColClient.getClientOptions()
+                 .getActiveMods()) {
+            InputStream sis = null;
+            try {
+                sis = f.getSpecificationInputStream();
+            } catch (IOException ioe) {
+                logger.warning("IO error in mod fragment " + f.getId()
+                    + ": " + ioe.getMessage());
+            }
+            if (sis != null) {
+                try {
+                    specification.loadFragment(sis);
+                    loadedMod = true;
+                    logger.info("Loaded mod fragment " + f.getId());
+                } catch (RuntimeException rte) {
+                    logger.warning("Parse error in mod fragment " + f.getId()
+                        + ": " + rte.getMessage());
+                }
+            }
+        }
+        if (loadedMod) { // Update actions in case new ones loaded.
+            freeColClient.getActionManager().update();
         }
     }
 }
