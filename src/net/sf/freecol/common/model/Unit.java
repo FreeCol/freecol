@@ -3554,20 +3554,6 @@ public class Unit extends FreeColGameObject
             goodsContainer = new GoodsContainer(getGame(), this);
         }
 
-        // TODO: remove 0.10.0 compatibility code
-        if (location instanceof Europe) {
-            if (state == UnitState.TO_EUROPE) {
-                setLocationNoUpdate(owner.getHighSeas());
-                setDestination(owner.getEurope());
-                setState(UnitState.ACTIVE);
-            } else if (state == UnitState.TO_AMERICA) {
-                setLocationNoUpdate(owner.getHighSeas());
-                setDestination(getGame().getNewWorld());
-                setState(UnitState.ACTIVE);
-            }
-        }
-        // end TODO
-
         setRole();
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();

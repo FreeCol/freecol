@@ -3608,6 +3608,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 String playerId = in.getAttributeValue(null, "player");
                 stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, VALUE_TAG)));
                 in.nextTag(); // close element
+            } else if (in.getLocalName().equals(HighSeas.getXMLElementTagName())) {
+                highSeas = updateFreeColGameObject(in, HighSeas.class);
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = updateFreeColGameObject(in, Europe.class);
             } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
@@ -3630,8 +3632,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 LastSale lastSale = new LastSale();
                 lastSale.readFromXMLImpl(in);
                 saveSale(lastSale);
-            } else if (HighSeas.getXMLElementTagName().equals(in.getLocalName())) {
-                highSeas = updateFreeColGameObject(in, HighSeas.class);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();

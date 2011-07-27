@@ -31,6 +31,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Unit;
+
 import org.w3c.dom.Element;
 
 
@@ -561,9 +563,18 @@ public class Europe extends FreeColGameObject
         unitPrices.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+                Unit unit;
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        units.add(updateFreeColGameObject(in, Unit.class));
+                        unit = updateFreeColGameObject(in, Unit.class);
+                        // TODO: remove 0.10.0 compatibility code
+                        if (unit.getLocation() == null) {
+                            // sometimes units in a Europe element have a missing
+                            //  location. it should always be this Europe instance.
+                            unit.setLocationNoUpdate(this);
+                        }
+                        // end TODO
+                        units.add(unit);
                     }
                 }
             } else if (in.getLocalName().equals("unitPrice")) {

@@ -785,7 +785,25 @@ public final class FreeColServer {
                 // Remove when 0.10.x save format/version==11 is no longer
                 // supported.
                 for (Player p : game.getPlayers()) {
-                    p.initializeHighSeas();
+                    if(!p.isIndian() && p.getEurope() != null) {
+                        p.initializeHighSeas();
+                        
+                        for (Unit u : p.getEurope().getUnitList()) {
+                            // move units to high seas
+                            //  use setLocation() so that units are removed from Europe,
+                            //  and appear in correct panes in the EuropePanel
+                            //  do not set the UnitState, as this clears workLeft
+                            if (u.getState() == UnitState.TO_EUROPE) {
+                                logger.info("Found unit on way to europe: "+u.toString());
+                                u.setLocation(p.getHighSeas());
+                                u.setDestination(p.getEurope());
+                            } else if (u.getState() == UnitState.TO_AMERICA) {
+                                logger.info("Found unit on way to new world: "+u.toString());
+                                u.setLocation(p.getHighSeas());
+                                u.setDestination(getGame().getNewWorld());
+                            }
+                        }
+                    }
                 }
             }
 
