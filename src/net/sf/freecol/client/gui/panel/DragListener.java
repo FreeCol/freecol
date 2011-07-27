@@ -538,6 +538,7 @@ public final class DragListener extends MouseAdapter {
                 }
             }
         }
+        
         // convenience menu for equipping dragoons
         if (horses != null && muskets != null && horses.isCompatibleWith(muskets)) {
             final EquipmentType horseType = horses;
@@ -563,7 +564,8 @@ public final class DragListener extends MouseAdapter {
 
         UnitType newUnitType = tempUnit.getType().getTargetType(ChangeType.CLEAR_SKILL, tempUnit.getOwner());
         if (newUnitType != null) {
-            JMenuItem menuItem = new JMenuItem(Messages.message("clearSpeciality"));
+            JMenuItem menuItem = new JMenuItem(Messages.message("clearSpeciality"),
+                imageLibrary.getUnitImageIcon(newUnitType, 1.0/3));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             menu.add(menuItem);
