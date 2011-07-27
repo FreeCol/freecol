@@ -3632,7 +3632,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 saveSale(lastSale);
             } else if (HighSeas.getXMLElementTagName().equals(in.getLocalName())) {
                 highSeas = updateFreeColGameObject(in, HighSeas.class);
-                System.out.println("high seas is " + highSeas);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();
