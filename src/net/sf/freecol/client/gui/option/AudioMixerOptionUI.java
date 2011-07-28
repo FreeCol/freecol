@@ -58,32 +58,33 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
     private JButton button1, button2;
     private JLabel currentMixerLabel;
 
-    ActionListener aHandler = new ActionListener () {
+    private ActionListener aHandler = new ActionListener () {
         public void actionPerformed(ActionEvent e) {
-                if ( e.getSource() == button1 )
-                        client.playSound("sound.event.buildingComplete");
-                else if ( e.getSource() == button2 )
-                        client.playSound("sound.intro.general");
-                else if ( e.getSource() == cbox ) {
-//              if (option.isPreviewEnabled()) {
+            if (e.getSource() == button1) {
+                client.playSound("sound.event.buildingComplete");
+            } else if (e.getSource() == button2) {
+                client.playSound("sound.intro.general");
+            } else if (e.getSource() == cbox) {
                 MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
                 if (option.getValue() != value) {
                     option.setValue(value);
                     updateMixerLabel();
                 }
-//              }
             }
         }
     };
 
     /**
-    * Creates a new <code>AudioMixerOptionUI</code> for the given <code>AudioMixerOption</code>.
+     * Creates a new <code>AudioMixerOptionUI</code> for the given
+     * <code>AudioMixerOption</code>.
      *
-    *  @param option The <code>AudioMixerOption</code> to make a user interface for.
+     * @param option The <code>AudioMixerOption</code> to make a user
+     *      interface for.
      * @param editable boolean whether user can modify the setting
-    */
+     */
     public AudioMixerOptionUI(final AudioMixerOption option, boolean editable) {
-        super( new BorderLayout() );
+        super(new BorderLayout());
+
         ((BorderLayout)this.getLayout()).setHgap(15);
         this.option = option;
         originalValue = option.getValue();
@@ -114,21 +115,20 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
         reset();
 
         cbox.setEnabled(editable);
-        cbox.addActionListener( aHandler );
+        cbox.addActionListener(aHandler);
 
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
-    private void updateMixerLabel ()
-    {
-        String text;
+    private void updateMixerLabel() {
         SoundPlayer soundPlayer = FreeColClient.get().getSoundPlayer();
-        Mixer mixer = soundPlayer.getCurrentMixer();
-        if ( mixer == null )
-                text = "-- NO ADAPTER --";
-        else
-                text = mixer.getMixerInfo().getName();
+        Mixer mixer;
+        String text = (soundPlayer == null)
+            ? Messages.message("nothing")
+            : ((mixer = soundPlayer.getMixer()) == null)
+            ? Messages.message("none")
+            : mixer.getMixerInfo().getName();
         currentMixerLabel.setText(Messages.message("Current") + ":  " + text);
     }
 
@@ -154,8 +154,8 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
      * Rollback to the original value.
      *
      * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialog has been cancelled.
+     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()}
+     * is rolled back when an option dialog has been cancelled.
      */
     public void rollback() {
         option.setValue(originalValue);
@@ -183,7 +183,8 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * Updates the value of the {@link
+     * net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         option.setValue((MixerWrapper) cbox.getSelectedItem());

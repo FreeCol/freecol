@@ -41,7 +41,6 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
-//import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -56,11 +55,9 @@ public class SoundPlayer {
 
     private static Logger logger = Logger.getLogger(SoundPlayer.class.getName());
 
-    private SoundPlayerThread soundPlayerThread;
-
     private Mixer mixer;
-
-    private PercentageOption volume;
+    private int volume;
+    private SoundPlayerThread soundPlayerThread;
 
 
     /**
@@ -69,24 +66,56 @@ public class SoundPlayer {
      * @param mixerOption The option for setting the mixer to use.
      * @param volume The volume option to use when playing audio.
      */
-    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume) {
-        mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
+    public SoundPlayer(AudioMixerOption mixerOption,
+                       PercentageOption volumeOption) {
+        setMixer(mixerOption.getValue());
         if (mixer == null) {
             throw new IllegalStateException("Mixer unavailable.");
         }
-        this.volume = volume;
         mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
-                    mixer = AudioSystem.getMixer(((MixerWrapper) e.getNewValue())
-                                                .getMixerInfo());
+                    setMixer((MixerWrapper) e.getNewValue());
+                }
+            });
+        setVolume(volumeOption.getValue());
+        volumeOption.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    setVolume((Integer) e.getNewValue());
                 }
             });
         soundPlayerThread = new SoundPlayerThread();
         soundPlayerThread.start();
     }
 
-    public Mixer getCurrentMixer () {
+    /**
+     * Gets the mixer.
+     *
+     * @return The current mixer.
+     */
+    public Mixer getMixer () {
         return mixer;
+    }
+
+    private void setMixer(MixerWrapper mw) {
+        try {
+            mixer = AudioSystem.getMixer(mw.getMixerInfo());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not set mixer", e);
+            mixer = null;
+        }
+    }
+
+    /**
+     * Gets the volume.
+     *
+     * @return The current volume.
+     */
+    public int getVolume() {
+        return volume;
+    }
+
+    private void setVolume(int volume) {
+        this.volume = volume;
     }
 
     /**
@@ -95,6 +124,7 @@ public class SoundPlayer {
      * @param file The <code>File</code> to be played.
      */
     public void playOnce(File file) {
+        if (getMixer() == null) return; // Fail faster.
         soundPlayerThread.add(file);
         soundPlayerThread.awaken();
     }
@@ -169,12 +199,18 @@ public class SoundPlayer {
                     .getControl(FloatControl.Type.MASTER_GAIN);
                 if (control != null) {
                     // The gain (dB) and volume (percent) are log related.
-                    //   100% volume = 0dB attenuation
                     //   50% volume  = -6dB
                     //   10% volume  = -20dB
                     //   1% volume   = -40dB
-                    float gain = 20 * (float)Math.log10(vol / 100);
+                    // Use max/min for 100,0%.
+                    float gain = (vol <= 0) ? control.getMinimum()
+                        : (vol >= 100) ? control.getMaximum()
+                        : 20.0f * (float) Math.log10(0.01f * vol);
                     control.setValue(gain);
+                    logger.finest("Using volume " + vol + "%, gain = " + gain);
+                } else {
+                    logger.warning("No master gain control,"
+                        + " unable to change the volume.");
                 }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not set volume", e);
@@ -189,6 +225,7 @@ public class SoundPlayer {
                 line = (SourceDataLine) mixer.getLine(info);
                 line.open(audioFormat);
                 line.start();
+                setVolume(line, volume);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Can not open SourceDataLine", e);
             }
