@@ -248,24 +248,6 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(3, colonist.getLineOfSight()); // should get +1 bonus
     }
 
-    public void testDisposingUnits() {
-        Game game = getStandardGame();
-        Map map = getTestMap(plains, true);
-        game.setMap(map);
-        Player player = game.getPlayer("model.nation.dutch");
-        Tile tile = map.getTile(6, 9);
-
-        UnitType frigateType = spec().getUnitType("model.unit.frigate");
-        Unit frigate = new ServerUnit(game, tile, player, frigateType, UnitState.ACTIVE);
-        Unit colonist = new ServerUnit(game, frigate, player, colonistType, UnitState.ACTIVE);
-
-        tile.disposeAllUnits();
-        assertTrue(frigate.isDisposed());
-        assertTrue(colonist.isDisposed());
-        assertEquals(0, frigate.getUnitCount());
-        assertEquals(0, tile.getUnitCount());
-    }
-
     public void testUnitCanBuildColony() {
 
         Game game = getStandardGame();
