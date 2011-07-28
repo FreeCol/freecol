@@ -2087,6 +2087,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         UnitType gardenerType = new UnitType("gardener", spec());
         gardenerType.setSkill(0);
+        gardenerType.addAbility(new Ability("model.ability.person"));
 
         ChangeType enterColony = ChangeType.ENTER_COLONY;
         UnitTypeChange change = new UnitTypeChange();

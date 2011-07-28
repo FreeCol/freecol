@@ -75,11 +75,16 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         // Enums can not be extended, so ColonyTile-specific failure reasons
         // have to be here.
         /**
-         * Can not add to colony center tile.
+         * Claimed and in use by another of our colonies.
+         */
+        ANOTHER_COLONY,
+        /**
+         * Can not add to settlement center tile.
          */
         COLONY_CENTER,
         /**
-         * Missing ability to work colony tile, for example, produceInWater.
+         * Missing ability to work colony tile.
+         * Currently only produceInWater, which is assumed by the error message
          */
         MISSING_ABILITY,
         /**
@@ -87,7 +92,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
          */
         MISSING_SKILL,
         /**
-         * Not claimed yet, but claim would succeed.
+         * Either unclaimed or claimed but could be acquired.
          */
         CLAIM_REQUIRED,
     }
@@ -154,6 +159,17 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
+     * Gets the current space taken by the units in this location.
+     *
+     * @return The sum of the space taken by the units in this location.
+     */
+    public int getSpaceTaken() {
+        int space = 0;
+        for (Unit u : units) space += u.getSpaceTaken();
+        return space;
+    }
+
+    /**
      * Returns the name of this location.
      *
      * @return The name of this location.
@@ -188,7 +204,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
         Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
-        return (units == null || isFull())
+        return (units == null
+            || unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
             ? NoAddReason.CAPACITY_EXCEEDED
             : (unit == null)
             ? NoAddReason.WRONG_TYPE

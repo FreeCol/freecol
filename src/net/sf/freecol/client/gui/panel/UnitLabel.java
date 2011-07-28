@@ -328,7 +328,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
         case WORK_BUILDING:
             BuildingType buildingType = parent.getSpecification().getBuildingType(arg);
             Building building = unit.getColony().getBuilding(buildingType);
-            inGameController.work(unit, building);
+            if (building != unit.getLocation()) {
+                inGameController.work(unit, building);
+            }
             break;
         case ACTIVATE_UNIT:
             inGameController.changeState(unit, UnitState.ACTIVE);

@@ -1569,8 +1569,7 @@ public final class ColonyPanel extends FreeColPanel
                 Player player = unit.getOwner();
                 Canvas canvas = getCanvas();
 
-                NoAddReason reason = colonyTile.getNoAddReason(unit);
-                if (reason == NoAddReason.CLAIM_REQUIRED) {
+                if (tile.getOwningSettlement() != colony) {
                     // Need to acquire the tile before working it.
                     NoClaimReason claim
                         = player.canClaimForSettlementReason(tile);
@@ -1594,13 +1593,13 @@ public final class ColonyPanel extends FreeColPanel
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
-                    reason = colonyTile.getNoAddReason(unit);
-                    if (reason == NoAddReason.CLAIM_REQUIRED) {
+                    if (tile.getOwningSettlement() != colony) {
                         throw new IllegalStateException("Claim failed");
                     }
                 }
 
                 // Claim sorted, but complain about other failure.
+                NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
                     canvas.errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));

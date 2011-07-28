@@ -199,6 +199,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
+        NoClaimReason claim;
 
         return (isColonyCenterTile())
             ? NoAddReason.COLONY_CENTER
@@ -207,10 +208,26 @@ public class ColonyTile extends WorkLocation implements Ownable {
             : (!getColony().hasAbility("model.ability.produceInWater")
                 && !tile.isLand())
             ? NoAddReason.MISSING_ABILITY
-            : (tile.getOwningSettlement() != getColony())
-            ? ((getOwner().canClaimForSettlement(tile))
-                ? NoAddReason.CLAIM_REQUIRED : NoAddReason.OWNED_BY_ENEMY)
-            : NoAddReason.NONE;
+            : (tile.getOwningSettlement() == getColony())
+            ? NoAddReason.NONE
+            : ((claim = getOwner().canClaimForSettlementReason(tile))
+                == NoClaimReason.NONE)
+            ? NoAddReason.CLAIM_REQUIRED
+            : (claim == NoClaimReason.TERRAIN
+                || claim == NoClaimReason.RUMOUR
+                || claim == NoClaimReason.WATER)
+            ? NoAddReason.MISSING_ABILITY
+            : (claim == NoClaimReason.SETTLEMENT)
+            ? ((tile.getSettlement().getOwner() == getOwner())
+                ? NoAddReason.ANOTHER_COLONY
+                : NoAddReason.OWNED_BY_ENEMY)
+            : (claim == NoClaimReason.WORKED)
+            ? NoAddReason.ANOTHER_COLONY
+            : (claim == NoClaimReason.EUROPEANS)
+            ? NoAddReason.OWNED_BY_ENEMY
+            : (claim == NoClaimReason.NATIVES)
+            ? NoAddReason.CLAIM_REQUIRED
+            : NoAddReason.WRONG_TYPE;
     }
 
     /**

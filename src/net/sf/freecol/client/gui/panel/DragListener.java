@@ -259,11 +259,23 @@ public final class DragListener extends MouseAdapter {
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         Colony colony = tempUnit.getLocation().getColony();
         boolean separatorNeeded = false;
+        ColonyTile also = (tempUnit.getWorkLocation2() instanceof ColonyTile)
+            ? (ColonyTile) tempUnit.getWorkLocation2()
+            : null;
 
         List<GoodsType> farmedGoods = canvas.getSpecification().getFarmedGoodsTypeList();
         // Work in Field - automatically find the best location
         for (GoodsType goodsType : farmedGoods) {
             ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, false, goodsType);
+            if (also != null) {
+                int alsoProd = also.getProductionOf(tempUnit, goodsType);
+                if (bestTile == null) {
+                    if (alsoProd > 0) bestTile = also;
+                } else {
+                    if (alsoProd > bestTile.getProductionOf(tempUnit, goodsType))
+                        bestTile = also;
+                }
+            }
             if (bestTile != null) {
                 int maxpotential = bestTile.getProductionOf(tempUnit, goodsType);
                 String text = Messages.message(StringTemplate.template(goodsType.getId() + ".workAs")
@@ -279,30 +291,27 @@ public final class DragListener extends MouseAdapter {
 
         // Work at Building - show both max potential and realistic projection
         for (Building building : colony.getBuildings()) {
-            if (tempUnit.getWorkLocation() != building) {
-                // Skip if currently working at this location
-                switch (building.getNoAddReason(tempUnit)) {
-                case NONE: case ALREADY_PRESENT:
-                    GoodsType goodsType = building.getGoodsOutputType();
-                    String locName = Messages.message(building.getNameKey());
-                    JMenuItem menuItem = new JMenuItem(locName);
-                    if (goodsType != null) {
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                        StringTemplate t = StringTemplate.template("model.goods.goodsAmount")
-                            .addAmount("%amount%", building.getAdditionalProductionNextTurn(tempUnit))
-                            .addName("%goods%", goodsType);
-                        locName += " (" + Messages.message(t) +")";
-                        menuItem.setText(locName);
-                    }
-                    menuItem.setActionCommand(UnitAction.WORK_BUILDING.toString() + ":" +
-                                              building.getType().getId());
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    separatorNeeded = true;
-                    break;
-                default:
-                    break;
+            switch (building.getNoAddReason(tempUnit)) {
+            case NONE: case ALREADY_PRESENT:
+                GoodsType goodsType = building.getGoodsOutputType();
+                String locName = Messages.message(building.getNameKey());
+                JMenuItem menuItem = new JMenuItem(locName);
+                if (goodsType != null) {
+                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
+                    StringTemplate t = StringTemplate.template("model.goods.goodsAmount")
+                        .addAmount("%amount%", building.getAdditionalProductionNextTurn(tempUnit))
+                        .addName("%goods%", goodsType);
+                    locName += " (" + Messages.message(t) +")";
+                    menuItem.setText(locName);
                 }
+                menuItem.setActionCommand(UnitAction.WORK_BUILDING.toString() + ":" +
+                    building.getType().getId());
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                separatorNeeded = true;
+                break;
+            default:
+                break;
             }
         }
 

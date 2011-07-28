@@ -1652,7 +1652,9 @@ public class Unit extends FreeColGameObject
      * @return The space this <code>Unit</code> takes.
      */
     public int getSpaceTaken() {
-        return unitType.getSpaceTaken();
+        int space = unitType.getSpaceTaken() + getGoodsCount();
+        for (Unit u : units) space += u.getSpaceTaken();
+        return space;
     }
 
     /**

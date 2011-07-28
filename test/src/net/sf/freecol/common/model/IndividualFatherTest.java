@@ -119,6 +119,11 @@ public class IndividualFatherTest extends FreeColTestCase {
             = builder.player(iroquois).settlementTile(settlementTile)
             .skillToTeach(null).build();
 
+        // Set up disputed tile
+        ColonyTile colonyTile = colony.getColonyTile(disputedTile);
+        for (Unit u : colonyTile.getUnitList()) {
+            u.putOutsideColony();
+        }
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
 
@@ -133,8 +138,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals("Tile should be zero cost",
             0, player.getLandPrice(disputedTile));
         assertEquals("Should still have to claim the tile",
-            colony.getColonyTile(disputedTile).getNoAddReason(unit),
-            NoAddReason.CLAIM_REQUIRED);
+            NoAddReason.CLAIM_REQUIRED, colonyTile.getNoAddReason(unit));
     }
 
     public void testPaine() {
