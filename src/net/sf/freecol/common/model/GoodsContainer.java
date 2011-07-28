@@ -165,8 +165,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Adds a <code>Goods</code> to this containter.
      * @param g The Goods to add to this container.
      */
-    public void addGoods(AbstractGoods g) {
-        addGoods(g.getType(), g.getAmount());
+    public boolean addGoods(AbstractGoods g) {
+        return addGoods(g.getType(), g.getAmount());
     }
 
     /**
@@ -174,7 +174,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param type The type of goods to add.
      * @param amount The type of amount to add.
      */
-    public void addGoods(GoodsType type, int amount) {
+    public boolean addGoods(GoodsType type, int amount) {
         int oldAmount = getGoodsCount(type);
         int newAmount = oldAmount + amount;
 
@@ -186,6 +186,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         } else {
             storedGoods.put(type, newAmount);
         }
+        return true;
     }
 
     /**

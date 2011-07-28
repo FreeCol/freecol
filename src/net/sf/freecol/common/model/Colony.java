@@ -617,7 +617,7 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit newUnit = (Unit) locatable;
             if (newUnit.isColonist()) {
@@ -636,11 +636,13 @@ public class Colony extends Settlement implements Nameable {
             } else {
                 newUnit.putOutsideColony();
             }
+            return true;
         } else if (locatable instanceof Goods) {
-            addGoods((Goods) locatable);
+            return addGoods((Goods) locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a 'Colony'.");
         }
+        return false;
     }
     /**
      * Removes a specified amount of a type of Goods from this Settlement.
@@ -681,8 +683,8 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param goods an <code>AbstractGoods</code> value
      */
-    public void addGoods(AbstractGoods goods) {
-        addGoods(goods.getType(), goods.getAmount());
+    public boolean addGoods(AbstractGoods goods) {
+        return addGoods(goods.getType(), goods.getAmount());
     }
 
     /**
@@ -691,10 +693,11 @@ public class Colony extends Settlement implements Nameable {
      * @param type a <code>GoodsType</code> value
      * @param amount an <code>int</code> value
      */
-    public void addGoods(GoodsType type, int amount) {
+    public boolean addGoods(GoodsType type, int amount) {
         super.addGoods(type, amount);
         productionCache.invalidate(type);
         modifySpecialGoods(type, amount);
+        return true;
     }
 
     protected void modifySpecialGoods(GoodsType goodsType, int amount) {
@@ -726,20 +729,21 @@ public class Colony extends Settlement implements Nameable {
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             for (WorkLocation w : getWorkLocations()) {
                 if (w.contains(locatable)) {
                     w.remove(locatable);
                     updatePopulation(-1);
-                    return;
+                    return true;
                 }
             }
         } else if (locatable instanceof Goods) {
-            removeGoods((Goods) locatable);
+            return removeGoods((Goods) locatable) != null;
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a 'Colony'.");
         }
+        return false;
     }
 
     /**

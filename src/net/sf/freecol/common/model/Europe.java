@@ -45,8 +45,7 @@ import org.w3c.dom.Element;
  * <p>In Europe, you can recruit, train and purchase new units. You
  * can also equip units, as well as sell and buy goods.
  */
-public class Europe extends FreeColGameObject
-    implements Location, Ownable, Named {
+public class Europe extends UnitLocation implements Ownable, Named {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
@@ -78,11 +77,6 @@ public class Europe extends FreeColGameObject
     private int recruitPrice;
 
     private int recruitLowerCap;
-
-    /**
-     * Contains the units on this location.
-     */
-    private final List<Unit> units = new ArrayList<Unit>();
 
     private Player owner;
 
@@ -239,81 +233,16 @@ public class Europe extends FreeColGameObject
     }
 
     /**
-     * Returns <i>null</i>.
-     *
-     * @return <i>null</i>.
-     */
-    public Tile getTile() {
-        return null;
-    }
-
-
-    /**
-     * Europe does not belong to a settlement.
-     *
-     * @return Null.
-     */
-    public Settlement getSettlement() {
-        return null;
-    }
-
-    /**
-     * Europe does not belong to a colony.
-     *
-     * @return Null.
-     */
-    public Colony getColony() {
-        return null;
-    }
-
-    /**
      * Adds a <code>Locatable</code> to this Location.
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalArgumentException("Only units can be added to Europe.");
-        } else if (!units.contains(locatable)) {
-            Unit newUnit = (Unit) locatable;
-            units.add(newUnit);
-            if (!newUnit.isBetweenEuropeAndNewWorld()) {
-                newUnit.setState(Unit.UnitState.SENTRY);
-            }
+    public boolean add(Locatable locatable) {
+        boolean result = super.add(locatable);
+        if (result && locatable instanceof Unit) {
+            ((Unit) locatable).setState(Unit.UnitState.SENTRY);
         }
-    }
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this
-     *            Location.
-     */
-    public void remove(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            units.remove(locatable);
-        } else {
-            logger.warning("Tried to remove an unrecognized 'Locatable' from a europe.");
-        }
-    }
-
-    /**
-     * Checks if the specified <code>Locatable</code> is at this
-     * <code>Location</code>.
-     *
-     * @param locatable The <code>Locatable</code> to test the presence of.
-     * @return The result.
-     */
-    public boolean contains(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            return units.contains(locatable);
-        }
-
-        return false;
-    }
-
-    public GoodsContainer getGoodsContainer() {
-        return null;
+        return result;
     }
 
     /**
@@ -324,59 +253,11 @@ public class Europe extends FreeColGameObject
      * @return <i>true</i>.
      */
     public boolean canAdd(Locatable locatable) {
-        return true;
-    }
-
-    /**
-     * Gets the amount of Units at this Location.
-     *
-     * @return The amount of Units at this Location.
-     */
-    public int getUnitCount() {
-        return units.size();
-    }
-
-    /**
-     * Gets a <code>List</code> of every <code>Unit</code> directly located
-     * in this <code>Europe</code>. This does not include <code>Unit</code>s
-     * on ships.
-     *
-     * @return The <code>List</code>.
-     */
-    public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
-    }
-
-    /**
-     * Dispose of this <code>Europe</code>.
-     *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (units.size() > 0) {
-            objects.addAll(units.remove(0).disposeList());
+        if (locatable instanceof Goods) {
+            return true;
+        } else {
+            return super.canAdd(locatable);
         }
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Removes all references to this object.
-     */
-    public void dispose() {
-        disposeList();
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Unit</code> directly
-     * located in this <code>Europe</code>. This does not include
-     * <code>Unit</code>s on ships.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
     }
 
     /**
@@ -446,16 +327,6 @@ public class Europe extends FreeColGameObject
     }
 
     /**
-     * Returns the name of this location for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return The name of this location.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return getLocationName();
-    }
-
-    /**
      * Returns the name of the owner's home port.
      *
      * @return The name of this location.
@@ -511,21 +382,9 @@ public class Europe extends FreeColGameObject
             out.writeEndElement();
         }
 
-        unitsToXML(out, player, showAll, toSavedGame);
+        super.writeChildren(out);
 
         out.writeEndElement();
-    }
-
-    private void unitsToXML(XMLStreamWriter out, Player player,
-                            boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        if (!units.isEmpty()) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-            out.writeEndElement();
-        }
     }
 
     /**
@@ -559,30 +418,33 @@ public class Europe extends FreeColGameObject
         recruitPrice = getAttribute(in, "recruitPrice", RECRUIT_PRICE_INITIAL);
         recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
 
-        units.clear();
         unitPrices.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                Unit unit;
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        unit = updateFreeColGameObject(in, Unit.class);
-                        // TODO: remove 0.10.0 compatibility code
-                        if (unit.getLocation() == null) {
-                            // sometimes units in a Europe element have a missing
-                            //  location. it should always be this Europe instance.
-                            unit.setLocationNoUpdate(this);
-                        }
-                        // end TODO
-                        units.add(unit);
+        readChildren(in);
+    }
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+            // TODO: remove 0.10.1 compatibility code
+            Unit unit;
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                    unit = updateFreeColGameObject(in, Unit.class);
+                    if (unit.getLocation() == null) {
+                        // sometimes units in a Europe element have a missing
+                        //  location. it should always be this Europe instance.
+                        unit.setLocationNoUpdate(this);
                     }
+                    add(unit);
                 }
-            } else if (in.getLocalName().equals("unitPrice")) {
-                String unitTypeId = in.getAttributeValue(null, "unitType");
-                Integer price = new Integer(in.getAttributeValue(null, "price"));
-                unitPrices.put(spec.getUnitType(unitTypeId), price);
-                in.nextTag(); // close "unitPrice" tag
             }
+            // end TODO
+        } else if (in.getLocalName().equals("unitPrice")) {
+            String unitTypeId = in.getAttributeValue(null, "unitType");
+            Integer price = new Integer(in.getAttributeValue(null, "price"));
+            unitPrices.put(getSpecification().getUnitType(unitTypeId), price);
+            in.nextTag(); // close "unitPrice" tag
+        } else {
+            super.readChild(in);
         }
     }
 

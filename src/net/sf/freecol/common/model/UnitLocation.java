@@ -209,17 +209,25 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param locatable
      *            The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit unit = (Unit) locatable;
             if (contains(unit)) {
-                return;
+                return true;
             } else if (canAdd(unit)) {
-                units.add(unit);
+                return units.add(unit);
             }
         } else if (locatable instanceof Goods) {
+            // dumping goods is a valid action
             locatable.setLocation(null);
+            logger.finest("Dumped " + locatable + " in UnitLocation with ID "
+                          + getId());
+            return true;
+        } else {
+            logger.warning("Tried to add Locatable " + locatable
+                           + " to UnitLocation with ID " + getId() + ".");
         }
+        return false;
     }
 
     /**
@@ -228,9 +236,13 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param locatable
      *            The <code>Locatable</code> to remove from this Location.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            units.remove((Unit) locatable);
+            return units.remove((Unit) locatable);
+        } else {
+            logger.warning("Tried to remove Locatable " + locatable
+                           + " from UnitLocation with ID " + getId() + ".");
+            return false;
         }
     }
 

@@ -224,13 +224,13 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      *
      * @param locatable The <code>Locatable</code> to add.
      */
-    public void add(final Locatable locatable) {
+    public boolean add(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Not a unit: " + locatable);
         }
 
         Unit unit = (Unit) locatable;
-        super.add(unit);
+        boolean result = super.add(unit);
 
         if (canTeach()) {
             Unit student = unit.getStudent();
@@ -248,6 +248,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                 teacher.setStudent(unit);
             }
         }
+        return result;
     }
 
     /**
@@ -255,13 +256,13 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      *
      * @param locatable The <code>Locatable</code> to remove.
      */
-    public void remove(final Locatable locatable) {
+    public boolean remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Not a unit: " + locatable);
         }
 
         Unit unit = (Unit) locatable;
-        super.remove(unit);
+        boolean result = super.remove(unit);
 
         if (canTeach()) {
             Unit student = unit.getStudent();
@@ -276,6 +277,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                 unit.setTeacher(null);
             }
         }
+        return result;
     }
 
     /**

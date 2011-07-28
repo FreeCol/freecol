@@ -151,11 +151,11 @@ public abstract class GoodsLocation extends UnitLocation {
      *            The <code>Locatable</code> to add to this Location.
      */
     @Override
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Goods) {
-            addGoods((Goods) locatable);
+            return addGoods((Goods) locatable);
         } else {
-            super.add(locatable);
+            return super.add(locatable);
         }
     }
 
@@ -165,11 +165,11 @@ public abstract class GoodsLocation extends UnitLocation {
      * @param locatable
      *            The <code>Locatable</code> to remove from this Location.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         if (locatable instanceof Goods) {
-            removeGoods((Goods) locatable);
+            return removeGoods((Goods) locatable) != null;
         } else {
-            super.remove(locatable);
+            return super.remove(locatable);
         }
     }
 
@@ -258,8 +258,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @param type a <code>GoodsType</code> value
      * @param amount an <code>int</code> value
      */
-    public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type, amount);
+    public boolean addGoods(GoodsType type, int amount) {
+        return goodsContainer.addGoods(type, amount);
     }
 
     /**
@@ -267,8 +267,8 @@ public abstract class GoodsLocation extends UnitLocation {
      *
      * @param goods an <code>AbstractGoods</code> value
      */
-    public void addGoods(AbstractGoods goods) {
-        addGoods(goods.getType(), goods.getAmount());
+    public boolean addGoods(AbstractGoods goods) {
+        return addGoods(goods.getType(), goods.getAmount());
     }
 
     /**

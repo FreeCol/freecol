@@ -1091,20 +1091,22 @@ public final class Tile extends FreeColGameObject
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (!units.contains(locatable)) {
                 if (units.equals(Collections.emptyList())) {
                     units = new ArrayList<Unit>();
                 }
-                units.add((Unit) locatable);
                 ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
+                return units.add((Unit) locatable);
             }
         } else if (locatable instanceof TileItem) {
             addTileItem((TileItem) locatable);
+            return true;
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
         }
+        return false;
     }
 
     /**
@@ -1113,15 +1115,17 @@ public final class Tile extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         Player old = getOwner();
         if (locatable instanceof Unit) {
-            units.remove(locatable);
+            return units.remove(locatable);
         } else if (locatable instanceof TileItem) {
             tileItemContainer.addTileItem((TileItem) locatable);
             updatePlayerExploredTiles(old);
+            return true;
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
+            return false;
         }
     }
 

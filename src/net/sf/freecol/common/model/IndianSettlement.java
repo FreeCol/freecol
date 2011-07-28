@@ -613,15 +613,16 @@ public class IndianSettlement extends Settlement {
      *
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
-        super.add(locatable);
-        if (locatable instanceof Unit && contains(locatable)) {
+    public boolean add(Locatable locatable) {
+        boolean result = super.add(locatable);
+        if (result && locatable instanceof Unit) {
             Unit indian = (Unit)locatable;
             if (indian.getIndianSettlement() == null) {
                 // Adopt homeless Indians
                 indian.setIndianSettlement(this);
             }
         }
+        return result;
     }
 
 

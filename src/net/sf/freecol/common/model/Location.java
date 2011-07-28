@@ -60,7 +60,7 @@ public interface Location {
      * @param locatable
      *            The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable);
+    public boolean add(Locatable locatable);
 
     /**
      * Removes a <code>Locatable</code> from this Location.
@@ -68,7 +68,7 @@ public interface Location {
      * @param locatable
      *            The <code>Locatable</code> to remove from this Location.
      */
-    public void remove(Locatable locatable);
+    public boolean remove(Locatable locatable);
 
     /**
      * Checks if this <code>Location</code> contains the specified

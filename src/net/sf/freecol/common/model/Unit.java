@@ -1761,7 +1761,7 @@ public class Unit extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to add to this
      *            <code>Unit</code>.
      */
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (!canCarryUnits()) {
                 throw new IllegalStateException("Can not carry units: "
@@ -1775,15 +1775,15 @@ public class Unit extends FreeColGameObject
             }
             if (units.contains(locatable)) {
                 logger.warning("Already on carrier: " + unit.toString());
-                return;
+                return true;
             }
 
             if (units.equals(Collections.emptyList())) {
                 units = new ArrayList<Unit>();
             }
-            units.add(unit);
-            unit.setState(UnitState.SENTRY);
             spendAllMoves();
+            unit.setState(UnitState.SENTRY);
+            return units.add(unit);
         } else if (locatable instanceof Goods) {
             if (!canCarryGoods()) {
                 throw new IllegalStateException("Can not carry goods: "
@@ -1795,8 +1795,8 @@ public class Unit extends FreeColGameObject
                                                 + goods.toString()
                                                 + " on " + this.toString());
             }
-            goodsContainer.addGoods(goods);
             spendAllMoves();
+            return goodsContainer.addGoods(goods);
         } else {
             throw new IllegalStateException("Can not be added to unit: "
                 + ((FreeColGameObject) locatable).toString());
@@ -1809,18 +1809,19 @@ public class Unit extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to remove from this
      *            <code>Unit</code>.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            units.remove(locatable);
             spendAllMoves();
+            return units.remove(locatable);
         } else if (locatable instanceof Goods && canCarryGoods()) {
-            goodsContainer.removeGoods((Goods) locatable);
             spendAllMoves();
+            return goodsContainer.removeGoods((Goods) locatable) != null;
         } else {
             logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
         }
+        return false;
     }
 
     /**

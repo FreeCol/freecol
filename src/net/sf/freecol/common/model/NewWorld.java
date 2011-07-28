@@ -101,11 +101,13 @@ public class NewWorld extends FreeColGameObject implements Location {
      * @param locatable
      *            The <code>Locatable</code> to add to this Location.
      */
-    public void add(Locatable locatable) {
+    public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit unit = (Unit) locatable;
             unit.setLocation(unit.getEntryLocation());
+            return true;
         }
+        return false;
     }
 
     /**
@@ -114,13 +116,14 @@ public class NewWorld extends FreeColGameObject implements Location {
      * @param locatable
      *            The <code>Locatable</code> to remove from this Location.
      */
-    public void remove(Locatable locatable) {
+    public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             Tile tile = ((Unit) locatable).getTile();
             if (tile != null) {
-                tile.remove(locatable);
+                return tile.remove(locatable);
             }
         }
+        return false;
     }
 
     /**

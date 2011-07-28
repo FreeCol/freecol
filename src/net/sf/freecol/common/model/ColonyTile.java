@@ -228,7 +228,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      *
      * @param locatable The <code>Locatable</code> to add.
      */
-    public void add(final Locatable locatable) {
+    public boolean add(final Locatable locatable) {
         NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add " + locatable
@@ -236,9 +236,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
                 + " because " + reason);
         }
         Unit unit = (Unit) locatable;
-        if (contains(unit)) return;
+        if (contains(unit)) return true;
 
-        super.add(unit);
+        boolean result = super.add(unit);
 
         unit.setState(Unit.UnitState.IN_COLONY);
 
@@ -256,6 +256,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         }
 
         getColony().invalidateCache();
+        return result;
     }
 
     /**
@@ -263,19 +264,20 @@ public class ColonyTile extends WorkLocation implements Ownable {
      *
      * @param locatable The <code>Locatable</code> to be removed.
      */
-    public void remove(final Locatable locatable) {
+    public boolean remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException("Not a unit: " + locatable);
         }
         Unit unit = (Unit) locatable;
-        if (!contains(unit)) return;
+        if (!contains(unit)) return true;
 
-        super.remove(unit);
+        boolean result = super.remove(unit);
 
         unit.setMovesLeft(0);
         unit.setState(Unit.UnitState.ACTIVE);
 
         getColony().invalidateCache();
+        return result;
     }
 
     /**
