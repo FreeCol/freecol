@@ -580,7 +580,7 @@ public class TransportMission extends Mission {
         if(carrier.getMovesLeft() == 0){
         	return;
         }
-        if (carrier.isBetweenEuropeAndNewWorld()) {
+        if (carrier.isAtSea()) {
             return; // Going to/from Europe, do nothing
         } else if (carrier.isInEurope()) {
             inEurope(connection); // Actually in Europe
@@ -1185,7 +1185,7 @@ public class TransportMission extends Mission {
         boolean transportListChanged = false;
 
         // Sanitation
-        if (carrier.isBetweenEuropeAndNewWorld()) return false;
+        if (carrier.isAtSea()) return false;
 
         // Make a copy for iteration, the main list may change inside the loop
         for (Transportable t : new ArrayList<Transportable>(transportList)) {
@@ -1319,7 +1319,7 @@ public class TransportMission extends Mission {
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile() && !carrier.isBetweenEuropeAndNewWorld()) {
+                if (u.getTile() == carrier.getTile() && !carrier.isAtSea()) {
                     if (AIMessage.askEmbark(getAIUnit(), u)) {
                         tli.remove();
                         transportListChanged = true;
@@ -1327,7 +1327,7 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile() && !carrier.isBetweenEuropeAndNewWorld()) {
+                if (ag.getGoods().getTile() == carrier.getTile() && !carrier.isAtSea()) {
                     if (carrier.getLocation() instanceof Europe) {
                         GoodsType goodsType = ag.getGoods().getType();
                         int goodsAmount = ag.getGoods().getAmount();

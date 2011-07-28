@@ -296,7 +296,7 @@ public class BuildColonyMission extends Mission {
         if (unit.isOnCarrier()) {
             carrier = (Unit) unit.getLocation();
             startTile = carrier.getTile();
-        } else if (unit.isInEurope() || unit.isBetweenEuropeAndNewWorld()) {
+        } else if (unit.isInEurope() || unit.isAtSea()) {
             startTile = unit.getFullEntryLocation();
         } else {
             startTile = unit.getTile();

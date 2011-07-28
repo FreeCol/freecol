@@ -86,7 +86,7 @@ public class MoveToEuropeMessage extends DOMMessage {
             return DOMMessage.clientError("Unit can not move to Europe: "
                 + unitId);
         }
-        if (unit.isBetweenEuropeAndNewWorld() || unit.getTile() != null) {
+        if (unit.isAtSea() || unit.getTile() != null) {
             ; // OK
         } else {
             return DOMMessage.clientError("Unit must be in the new world"

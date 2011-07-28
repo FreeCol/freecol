@@ -996,7 +996,7 @@ public final class InGameController implements NetworkConstants {
                 if ((destination = unit.getDestination()) == null) {
                     break; // No destination
                 } else if (destination instanceof Europe
-                           && (unit.isInEurope() || unit.isBetweenEuropeAndNewWorld())) {
+                           && (unit.isInEurope() || unit.isAtSea())) {
                     break; // Arrived in Europe
                 } else if (destination.getTile() == null) {
                     break; // Not on the map

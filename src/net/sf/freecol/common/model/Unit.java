@@ -1208,7 +1208,7 @@ public class Unit extends FreeColGameObject
             return (p == null) ? INFINITY
                 : p.getTotalTurns() + carrier.getSailTurns();
         }
-        if (isBetweenEuropeAndNewWorld()) {
+        if (isAtSea()) {
             if (isNaval()) {
                 p = map.findPath(this, getFullEntryLocation(),
                                  destination.getTile());
@@ -2180,19 +2180,19 @@ public class Unit extends FreeColGameObject
         if (location instanceof Unit) {
             return ((Unit) location).isInEurope();
         } else {
-            return getLocation() instanceof Europe
-                && !isBetweenEuropeAndNewWorld();
+            return getLocation() instanceof Europe;
         }
     }
 
     /**
-     * Checks if this <code>Unit</code> is either a carrier or on one, bound to/from Europe
+     * Checks whether this <code>Unit</code> is at sea off the map, or
+     * on board of a carrier that is.
      *
      * @return The result.
      */
-    public boolean isBetweenEuropeAndNewWorld() {
+    public boolean isAtSea() {
         if (location instanceof Unit) {
-            return ((Unit) location).isBetweenEuropeAndNewWorld();
+            return ((Unit) location).isAtSea();
         } else {
             return location instanceof HighSeas;
         }

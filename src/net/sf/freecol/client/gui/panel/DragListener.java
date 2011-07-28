@@ -156,7 +156,7 @@ public final class DragListener extends MouseAdapter {
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
                 Unit u = ((UnitLabel) comp).getUnit();
                 if (parentPanel instanceof EuropePanel) {
-                    if (!u.isBetweenEuropeAndNewWorld()) {
+                    if (!u.isAtSea()) {
                         ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     }
                 } else if (parentPanel instanceof ColonyPanel) {
@@ -401,13 +401,13 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
-        final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
+        final boolean isUnitAtSea = tempUnit.isAtSea();
 
         JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
-                                && !isUnitBetweenEuropeAndNewWorld);
+                                && !isUnitAtSea);
         menu.add(menuItem);
 
         if (!(tempUnit.getLocation() instanceof Europe)) {
@@ -425,7 +425,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled(unitState != UnitState.SENTRY
-                                && !isUnitBetweenEuropeAndNewWorld);
+                                && !isUnitAtSea);
         menu.add(menuItem);
 
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
@@ -433,7 +433,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-                                && !isUnitBetweenEuropeAndNewWorld);
+                            && !isUnitAtSea);
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
