@@ -50,14 +50,21 @@ import org.w3c.dom.Element;
  *
  * @see Map
  */
-public final class Tile extends FreeColGameObject
-    implements Location, Named, Ownable {
+public final class Tile extends UnitLocation implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     // This must be distinct from ColonyTile/Building.UNIT_CHANGE or
     // the colony panel can get confused.
     public static final String UNIT_CHANGE = "TILE_UNIT_CHANGE";
+
+    /**
+     * The maximum distance that will still be considered "near" when
+     * determining the location name.
+     *
+     * @see getLocationName
+     */
+    public static final int NEAR_RADIUS = 8;
 
     private TileType type;
 
@@ -76,12 +83,6 @@ public final class Tile extends FreeColGameObject
      * Stores all Improvements and Resources (if any)
      */
     private TileItemContainer tileItemContainer;
-
-    /**
-     * Stores all Units (if any).
-     */
-    private List<Unit> units = Collections.emptyList();
-
 
     /**
      * Indicates which colony or Indian settlement that owns this tile ('null'
@@ -114,7 +115,7 @@ public final class Tile extends FreeColGameObject
     private Boolean moveToEurope;
 
     /**
-     * Describe style here.
+     * The style of this Tile, as determined by adjacent tiles.
      */
     private int style;
 
@@ -279,8 +280,7 @@ public final class Tile extends FreeColGameObject
     public StringTemplate getLocationName() {
         if (settlement == null) {
             Settlement nearSettlement = null;
-            int radius = 8; // more than 8 tiles away is no longer "near"
-            for (Tile tile: getSurroundingTiles(radius)) {
+            for (Tile tile: getSurroundingTiles(NEAR_RADIUS)) {
                 nearSettlement = tile.getSettlement();
                 if (nearSettlement != null) {
                     return StringTemplate.template("nameLocation")
@@ -339,15 +339,6 @@ public final class Tile extends FreeColGameObject
      */
     public int getDistanceTo(Tile tile) {
         return getPosition().getDistance(tile.getPosition());
-    }
-
-    /**
-     * Returns null.
-     *
-     * @return null
-     */
-    public GoodsContainer getGoodsContainer() {
-        return null;
     }
 
     /**
@@ -438,7 +429,7 @@ public final class Tile extends FreeColGameObject
         float power;
 
         // Check the units on the tile...
-        for (Unit u : units) {
+        for (Unit u : getUnitList()) {
             if (isLand() != u.isNaval()) {
                 // On land, ships are normally docked in port and
                 // cannot defend.  Except if beached (see below).
@@ -485,17 +476,6 @@ public final class Tile extends FreeColGameObject
     }
 
 
-    /**
-     * Disposes all units on this <code>Tile</code>.
-     */
-    public void disposeAllUnits() {
-        // Copy the list first, as the Unit will try to remove itself
-        // from its location.
-        for (Unit unit : new ArrayList<Unit>(units)) {
-            unit.dispose();
-        }
-    }
-
     public void dispose() {
         if (settlement != null) {
             settlement.dispose();
@@ -513,11 +493,7 @@ public final class Tile extends FreeColGameObject
      * @return The first <code>Unit</code> on this tile.
      */
     public Unit getFirstUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(0);
-        }
+        return isEmpty() ? null : getUnitList().get(0);
     }
 
     /**
@@ -526,11 +502,7 @@ public final class Tile extends FreeColGameObject
      * @return The last <code>Unit</code> on this tile.
      */
     public Unit getLastUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(units.size() - 1);
-        }
+        return isEmpty() ? null : getUnitList().get(getUnitCount() - 1);
     }
 
     /**
@@ -541,7 +513,7 @@ public final class Tile extends FreeColGameObject
      */
     public int getTotalUnitCount() {
         int result = 0;
-        for (Unit unit : units) {
+        for (Unit unit : getUnitList()) {
             result++;
             result += unit.getUnitCount();
         }
@@ -561,15 +533,11 @@ public final class Tile extends FreeColGameObject
      *            </ul>
      */
     public boolean contains(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            return units.contains(locatable);
-        } else if (locatable instanceof TileItem) {
+        if (locatable instanceof TileItem) {
             return tileItemContainer != null && tileItemContainer.contains((TileItem) locatable);
+        } else {
+            return super.contains(locatable);
         }
-
-        logger.warning("Tile.contains(" + locatable + ") Not implemented yet!");
-
-        return false;
     }
 
     /**
@@ -1092,21 +1060,16 @@ public final class Tile extends FreeColGameObject
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (!units.contains(locatable)) {
-                if (units.equals(Collections.emptyList())) {
-                    units = new ArrayList<Unit>();
-                }
-                ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
-                return units.add((Unit) locatable);
-            }
-        } else if (locatable instanceof TileItem) {
+        if (locatable instanceof TileItem) {
             addTileItem((TileItem) locatable);
             return true;
         } else {
-            logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
+            boolean result = super.add(locatable);
+            if (result && locatable instanceof Unit) {
+                ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
+            }
+            return result;
         }
-        return false;
     }
 
     /**
@@ -1116,71 +1079,14 @@ public final class Tile extends FreeColGameObject
      *            Location.
      */
     public boolean remove(Locatable locatable) {
-        Player old = getOwner();
-        if (locatable instanceof Unit) {
-            return units.remove(locatable);
-        } else if (locatable instanceof TileItem) {
+        if (locatable instanceof TileItem) {
+            Player old = getOwner();
             tileItemContainer.addTileItem((TileItem) locatable);
             updatePlayerExploredTiles(old);
             return true;
         } else {
-            logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
-            return false;
+            return super.remove(locatable);
         }
-    }
-
-    /**
-     * Removes the unit from the tile.
-     *
-     * @param unit The unit to be removed
-     */
-    public void removeUnitNoUpdate(Unit unit) {
-        units.remove(unit);
-    }
-
-    /**
-     * Adds the unit to the tile.
-     *
-     * @param unit The unit to be added
-     */
-    public void addUnitNoUpdate(Unit unit) {
-        if (units.equals(Collections.emptyList())) {
-            units = new ArrayList<Unit>();
-        }
-        units.add(unit);
-    }
-
-    /**
-     * Returns the amount of units at this <code>Location</code>.
-     *
-     * @return The amount of units at this <code>Location</code>.
-     */
-    public int getUnitCount() {
-        return units.size();
-    }
-
-    /**
-     * Gets a
-     * <code>List/code> of every <code>Unit</code> directly located on this
-     * <code>Tile</code>. This does not include <code>Unit</code>s located in a
-     * <code>Settlement</code> or on another <code>Unit</code> on this <code>Tile</code>.
-     *
-     * @return The <code>List</code>.
-     */
-    public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Tile</code>. This does not include
-     * <code>Unit</code>s located in a <code>Settlement</code> or on
-     * another <code>Unit</code> on this <code>Tile</code>.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return units.iterator();
     }
 
     /**
@@ -1192,8 +1098,12 @@ public final class Tile extends FreeColGameObject
      */
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Unit) {
-            // TODO: check for land/naval units?
-            return true;
+            Unit unit = (Unit) locatable;
+            if (unit.isNaval()) {
+                return isLand() ? getSettlement() != null : true;
+            } else {
+                return isLand();
+            }
         } else if (locatable instanceof TileImprovement) {
             return ((TileImprovement) locatable).getType().isTileTypeAllowed(getType());
         } else {
@@ -1863,13 +1773,9 @@ public final class Tile extends FreeColGameObject
             }
             // Show enemy units if there is no enemy settlement.
             if ((showAll || toSavedGame || settlement == null
-                    || settlement.getOwner() == player)
-                && !units.isEmpty()) {
-                out.writeStartElement(UNITS_TAG_NAME);
-                for (Unit unit : units) {
-                    unit.toXML(out, player, showAll, toSavedGame);
-                }
-                out.writeEndElement();
+                 || settlement.getOwner() == player)
+                && !isEmpty()) {
+                super.writeChildren(out);
             }
         } else if (pet != null) {
             // Only display the settlement if we know it owns the tile
@@ -1949,45 +1855,8 @@ public final class Tile extends FreeColGameObject
         }
 
         settlement = null;
-        units.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
-                settlement = updateFreeColGameObject(in, Colony.class);
-            } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
-                settlement = updateFreeColGameObject(in, IndianSettlement.class);
-            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        if (units.equals(Collections.emptyList())) {
-                            units = new ArrayList<Unit>();
-                        }
-                        units.add(updateFreeColGameObject(in, Unit.class));
-                    }
-                }
-            } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
-                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (tileItemContainer != null) {
-                    tileItemContainer.readFromXML(in);
-                } else {
-                    tileItemContainer = new TileItemContainer(getGame(), this, in);
-                }
-            } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
-                // Only from a savegame:
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                PlayerExploredTile pet = getPlayerExploredTile(player);
-                if (pet == null) {
-                    pet = new PlayerExploredTile(getGame(), in);
-                    playerExploredTiles.put(player, pet);
-                } else {
-                    pet.readFromXML(in);
-                }
-            } else {
-                logger.warning("Unknown tag: " + in.getLocalName()
-                    + " [" + in.getAttributeValue(null, ID_ATTRIBUTE) + "] "
-                    + " loading tile with ID " + getId());
-                in.nextTag();
-            }
-        }
+        readChildren(in);
+
 
         // Player settlement list is not passed in player updates
         // so do it here.  TODO: something better.
@@ -2012,6 +1881,42 @@ public final class Tile extends FreeColGameObject
 
         if (getColony() != null && getColony().isTileInUse(this)) {
             getColony().invalidateCache();
+        }
+    }
+
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
+            settlement = updateFreeColGameObject(in, Colony.class);
+        } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
+            settlement = updateFreeColGameObject(in, IndianSettlement.class);
+        } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+            // TODO: remove 0.10.1 compatibility code
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                    add(updateFreeColGameObject(in, Unit.class));
+                }
+            }
+            // end TODO
+        } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
+            tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+            if (tileItemContainer != null) {
+                tileItemContainer.readFromXML(in);
+            } else {
+                tileItemContainer = new TileItemContainer(getGame(), this, in);
+            }
+        } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
+            // Only from a savegame:
+            Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            PlayerExploredTile pet = getPlayerExploredTile(player);
+            if (pet == null) {
+                pet = new PlayerExploredTile(getGame(), in);
+                playerExploredTiles.put(player, pet);
+            } else {
+                pet.readFromXML(in);
+            }
+        } else {
+            super.readChild(in);
         }
     }
 

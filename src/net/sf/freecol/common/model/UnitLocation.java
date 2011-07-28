@@ -455,6 +455,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             }
         } else {
             logger.warning("Found unknown child element '" + in.getLocalName() + "'.");
+            in.nextTag();
         }
     }
 

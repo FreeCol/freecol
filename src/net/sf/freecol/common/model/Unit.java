@@ -2695,7 +2695,9 @@ public class Unit extends FreeColGameObject
         switch (state) {
         case IMPROVING:
             if (getWorkLeft() > 0) {
-                if (!workImprovement.isComplete()) {
+                if (!workImprovement.isComplete()
+                    && workImprovement.getTile() != null
+                    && workImprovement.getTile().getTileItemContainer() != null) {
                     workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
                 }
                 workImprovement = null;
