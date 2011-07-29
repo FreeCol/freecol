@@ -1073,6 +1073,21 @@ public class Colony extends Settlement implements Nameable {
      *     some goods are not being built, UNDEFINED if none is.
      */
     public int getTurnsToComplete(BuildableType buildable) {
+        return getTurnsToComplete(buildable, null);
+    }
+
+    /**
+     * Returns how many turns it would take to build the given
+     * <code>BuildableType</code>.
+     *
+     * @param buildable The <code>BuildableType</code> to build.
+     * @param needed The <code>AbstractGoods</code> needed to continue
+     *     the build.
+     * @return The number of turns to build the buildable, negative if
+     *     some goods are not being built, UNDEFINED if none is.
+     */
+    public int getTurnsToComplete(BuildableType buildable,
+                                  AbstractGoods needed) {
         int result = 0;
         boolean goodsMissing = false;
         boolean goodsBeingProduced = false;
@@ -1098,6 +1113,10 @@ public class Colony extends Settlement implements Nameable {
             }
             if (amountProduced <= 0) {
                 productionMissing = true;
+                if (needed != null) {
+                    needed.setType(requiredGoods.getType());
+                    needed.setAmount(requiredGoods.getAmount());
+                }
                 continue;
             }
             goodsBeingProduced = true;

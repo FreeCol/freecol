@@ -565,11 +565,9 @@ public final class ReportColonyPanel extends ReportPanel
         }
 
         for (WorkLocation wl : colony.getWorkLocations()) {
-            // TODO: fix non-OO
-            if (wl instanceof ColonyTile) {
-                if (!((ColonyTile) wl).canBeWorked()) continue;
-            }
-            if (wl.canTeach()) {
+            if (!wl.canBeWorked()) {
+                continue;
+            } else if (wl.canTeach()) {
                 teachers.addAll(wl.getUnitList());
                 continue;
             }
@@ -579,8 +577,9 @@ public final class ReportColonyPanel extends ReportPanel
             boolean needsWorker = !wl.isFull();
             int delta;
 
-            // Check first if the workers are working, and then if
-            // there is a better type of unit for the work being done.
+            // Check first if the units are working, and then add a
+            // suggestion if there is a better type of unit for the
+            // work being done.
             for (Unit u : wl.getUnitList()) {
                 if (u.getTeacher() != null) {
                     continue; // Ignore students, they are temporary
@@ -613,15 +612,14 @@ public final class ReportColonyPanel extends ReportPanel
         List<UnitType> couldWork = new ArrayList<UnitType>();
         for (Unit u : notWorking) {
             GoodsType t = u.getWorkType();
-            WorkLocation wl = (u.getLocation() instanceof Building
-                || u.getLocation() instanceof ColonyTile)
+            WorkLocation wl = (u.getLocation() instanceof WorkLocation)
                 ? (WorkLocation) u.getLocation()
                 : null;
             GoodsType w = bestProduction(wl, colonistType);
             if (w == null || w != t) couldWork.add(u.getType());
         }
 
-        // Field: New colonist arrival, or famine warning.
+        // Field: New colonist arrival or famine warning.
         // Colour: cGood if arriving eventually, blank if not enough food
         // to grow, cWarn if negative, cAlarm if famine soon.
         if (newColonist > 0) {
@@ -661,7 +659,8 @@ public final class ReportColonyPanel extends ReportPanel
                     .addName("%colony%", colony.getName()));
             b.setFont(b.getFont().deriveFont(Font.BOLD));
         } else {
-            int turns = colony.getTurnsToComplete(build);
+            AbstractGoods needed = new AbstractGoods();
+            int turns = colony.getTurnsToComplete(build, needed);
             String name = Messages.message(build.getNameKey());
             if (turns == FreeColObject.UNDEFINED) {
                 b = colourButton(qac, name, null, cAlarm,
@@ -679,8 +678,10 @@ public final class ReportColonyPanel extends ReportPanel
                 turns = -turns;
                 name += " " + Integer.toString(turns);
                 b = colourButton(qac, name, null, cAlarm,
-                    stpl("report.colony.making.block.description")
+                    stpl("report.colony.making.blocking.description")
                         .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", needed.getAmount())
+                        .add("%goods%", needed.getType().getNameKey())
                         .add("%buildable%", build.getNameKey())
                         .addAmount("%turns%", turns));
             }
