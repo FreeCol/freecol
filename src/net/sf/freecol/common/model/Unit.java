@@ -2700,7 +2700,7 @@ public class Unit extends FreeColGameObject
                     && workImprovement.getTile().getTileItemContainer() != null) {
                     workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
                 }
-                workImprovement = null;
+                setWorkImprovement(null);
             }
             break;
         default:
@@ -3518,7 +3518,7 @@ public class Unit extends FreeColGameObject
         units.clear();
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
-        workImprovement = null;
+        setWorkImprovement(null);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();
@@ -3550,7 +3550,7 @@ public class Unit extends FreeColGameObject
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                workImprovement = updateFreeColGameObject(in, TileImprovement.class);
+                setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
             }
         }
 
