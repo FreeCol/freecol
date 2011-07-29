@@ -800,7 +800,7 @@ public final class FreeColServer {
                             } else if (u.getState() == UnitState.TO_AMERICA) {
                                 logger.info("Found unit on way to new world: "+u.toString());
                                 u.setLocation(p.getHighSeas());
-                                u.setDestination(getGame().getNewWorld());
+                                u.setDestination(getGame().getMap());
                             }
                         }
                     }

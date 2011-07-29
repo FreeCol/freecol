@@ -351,7 +351,7 @@ public final class InGameController extends Controller {
         // Send the navy on its way
         for (Unit u : navalUnits) {
             u.setLocation(u.getOwner().getHighSeas());
-            u.setDestination(getGame().getNewWorld());
+            u.setDestination(getGame().getMap());
         }
 
         return refPlayer;
@@ -1586,7 +1586,7 @@ public final class InGameController extends Controller {
      */
     public Element moveToAmerica(ServerPlayer serverPlayer, Unit unit) {
         ChangeSet cs = new ChangeSet();
-        unit.setSailFor(getGame().getNewWorld());
+        unit.setSailFor(getGame().getMap());
         cs.add(See.only(serverPlayer), serverPlayer.getEurope(),
                serverPlayer.getHighSeas());
 

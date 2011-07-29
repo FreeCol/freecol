@@ -59,8 +59,8 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.NewWorld;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
@@ -343,7 +343,7 @@ public final class EuropePanel extends FreeColPanel {
         header.setText(Messages.message(europe.getNameKey()));
 
         // Initialize the subpanels.
-        toAmericaPanel.initialize(getGame().getNewWorld());
+        toAmericaPanel.initialize(getGame().getMap());
         toEuropePanel.initialize(getMyPlayer().getEurope());
         // Initialize cargoPanel before inPortPanel calls setSelectedUnit().
         cargoPanel.initialize();
@@ -541,7 +541,7 @@ public final class EuropePanel extends FreeColPanel {
                 comp.getParent().remove(comp);
 
                 // TODO: make this more generic
-                if (destination instanceof NewWorld) {
+                if (destination instanceof Map) {
                     getController().moveToAmerica(unit);
                 } else if (destination instanceof Europe) {
                     getController().moveToEurope(unit);

@@ -129,14 +129,6 @@ public class Game extends FreeColGameObject {
     private Specification specification;
 
     /**
-     * An "abstract" Location that represents the whole of the game
-     * map. Used as a destination for ships returning from Europe.
-     */
-    private NewWorld newWorld = new NewWorld(this);
-
-
-
-    /**
      * This constructor is used by the Server to create a new Game
      * with the given Specification.
      *
@@ -330,15 +322,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>NewWorld</code> value.
-     *
-     * @return a <code>NewWorld</code> value
-     */
-    public final NewWorld getNewWorld() {
-        return newWorld;
-    }
-
-    /**
      * Adds the specified player to the game.
      *
      * @param player The <code>Player</code> that shall be added to this
@@ -493,6 +476,11 @@ public class Game extends FreeColGameObject {
      */
     public void setMap(Map map) {
         this.map = map;
+        for (Player player : getPlayers()) {
+            if (player.getHighSeas() != null) {
+                player.getHighSeas().addDestination(map);
+            }
+        }
     }
 
     /**
@@ -1056,7 +1044,6 @@ public class Game extends FreeColGameObject {
             out.writeEndElement();
         }
         nationOptions.toXML(out);
-        newWorld.toXML(out);
 
         // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
@@ -1185,8 +1172,6 @@ public class Game extends FreeColGameObject {
                     specification = spec;
                     specification.clean();
                 }
-            } else if (NewWorld.getXMLElementTagName().equals(tagName)) {
-                newWorld.readFromXMLImpl(in);
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();

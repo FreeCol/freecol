@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -149,7 +150,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     public String getLocationNameFor(Unit unit) {
-        if (unit.getDestination() == unit.getGame().getNewWorld()) {
+        if (unit.getDestination() instanceof Map) {
             return Messages.message("goingToAmerica");
         } else if (unit.getDestination() instanceof Europe) {
             return Messages.message("goingToEurope");

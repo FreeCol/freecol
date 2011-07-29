@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.NewWorld;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -717,7 +716,7 @@ public class DebugMenu extends JMenu {
             sb.append("==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
-                if (u.getDestination() instanceof NewWorld) {
+                if (u.getDestination() instanceof Map) {
                     toAmerica.add(u);
                     continue;
                 }

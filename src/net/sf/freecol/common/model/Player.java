@@ -1832,7 +1832,7 @@ public class Player extends FreeColGameObject implements Nameable {
         Game game = getGame();
         highSeas = new HighSeas(game);
         if (europe != null) highSeas.addDestination(europe);
-        highSeas.addDestination(game.getNewWorld());
+        if (game.getMap() != null ) highSeas.addDestination(game.getMap());
     }
 
     /**

@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 /**
  * An isometric map. The map is represented as a collection of tiles.
  */
-public class Map extends FreeColGameObject {
+public class Map extends FreeColGameObject implements Location {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
@@ -1743,6 +1744,165 @@ public class Map extends FreeColGameObject {
             }
             throw new NoSuchElementException("Iterator exhausted");
         }
+    }
+
+    // Location interface
+
+    /**
+     * Returns <code>null</code>.
+     *
+     * @return <code>null</code>
+     */
+    public Tile getTile() {
+        return null;
+    }
+
+    /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationName() {
+        return StringTemplate.key("NewWorld");
+    }
+
+    /**
+     * Returns the name of this location for a particular player.
+     *
+     * @param player The <code>Player</code> to return the name for.
+     * @return The name of this location.
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        String name = player.getNewLandName();
+        if (name == null) {
+            return getLocationName();
+        } else {
+            return StringTemplate.name(name);
+        }
+    }
+
+    /**
+     * Adds a <code>Locatable</code> to this Location. It the given
+     * Locatable is a Unit, its location is set to its entry location,
+     * otherwise nothing happens.
+     *
+     * @param locatable
+     *            The <code>Locatable</code> to add to this Location.
+     */
+    public boolean add(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            Unit unit = (Unit) locatable;
+            unit.setLocation(unit.getEntryLocation());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes a <code>Locatable</code> from this Location.
+     *
+     * @param locatable
+     *            The <code>Locatable</code> to remove from this Location.
+     */
+    public boolean remove(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            Tile tile = ((Unit) locatable).getTile();
+            if (tile != null) {
+                return tile.remove(locatable);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if this <code>Location</code> contains the specified
+     * <code>Locatable</code>.
+     *
+     * @param locatable
+     *            The <code>Locatable</code> to test the presence of.
+     * @return
+     *            <ul>
+     *            <li><i>true</i> if the specified <code>Locatable</code> is
+     *            on this <code>Location</code> and
+     *            <li><i>false</i> otherwise.
+     *            </ul>
+     */
+    public boolean contains(Locatable locatable) {
+        if (locatable.getLocation() == null) {
+            return false;
+        } else if (locatable.getLocation().getTile() == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Checks whether or not the specified locatable may be added to this
+     * <code>Location</code>.
+     *
+     * @param locatable
+     *            The <code>Locatable</code> to add.
+     * @return The result.
+     */
+    public boolean canAdd(Locatable locatable) {
+        return (locatable instanceof Unit);
+    }
+
+    /**
+     * Returns <code>-1</code>
+     *
+     * @return <code>-1</code>
+     */
+    public int getUnitCount() {
+        return -1;
+    }
+
+    /**
+     * Returns an empty list.
+     *
+     * @return an empty list
+     */
+    public List<Unit> getUnitList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Returns an <code>Iterator</code> for an empty list.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<Unit> getUnitIterator() {
+        return getUnitList().iterator();
+    }
+
+    /**
+     * Gets the <code>GoodsContainer</code> this <code>Location</code> use
+     * for storing it's goods.
+     *
+     * @return The <code>GoodsContainer</code> or <code>null</code> if the
+     *         <code>Location</code> cannot store any goods.
+     */
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
+
+    /**
+     * Returns <code>null</code>.
+     *
+     * @return <code>null</code>
+     */
+    public Settlement getSettlement() {
+        return null;
+    }
+
+    /**
+     * Returns <code>null</code>.
+     *
+     * @return <code>null</code>
+     */
+    public Colony getColony() {
+        return null;
     }
 
 
