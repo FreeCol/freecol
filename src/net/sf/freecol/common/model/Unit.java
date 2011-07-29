@@ -3479,20 +3479,21 @@ public class Unit extends FreeColGameObject
         if (experienceType == null && workType != null) {
             experienceType = workType;
         }
-        // TODO: remove compatibility code once 0.10.0 has been released
+
+        // TODO: remove compatibility code once 0.9.x is obsolete
         try {
             // this is likely to cause an exception, as the
             // specification might not define grain
             GoodsType grain = getSpecification().getGoodsType("model.goods.grain");
             GoodsType food = getSpecification().getPrimaryFoodType();
-            if (workType.equals(food)) {
+            if (food.equals(workType)) {
                 workType = grain;
             }
-            if (experienceType.equals(food)) {
+            if (food.equals(experienceType)) {
                 experienceType = grain;
             }
-        } catch(Exception e) {
-            logger.finest("Failed to update food to grain.");
+        } catch (Exception e) {
+            logger.log(Level.FINEST, "Failed to update food to grain.", e);
         }
         // end TODO
         experience = getAttribute(in, "experience", 0);
