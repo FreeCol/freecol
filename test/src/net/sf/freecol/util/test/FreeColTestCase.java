@@ -368,6 +368,7 @@ public class FreeColTestCase extends TestCase {
             }
             this.width = width;
             this.height = heigth;
+            this.tiles = new TileType[width][height];
             return this;
         }
 
