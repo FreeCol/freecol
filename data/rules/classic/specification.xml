@@ -1900,6 +1900,9 @@
              chief and thus consume the scouting bonus -->
         <booleanOption id="model.option.settlementActionsContactChief"
                        defaultValue="false"/>
+        <!-- Missionaries grant visibility and enhance trade and training -->
+        <booleanOption id="model.option.enhancedMissionaries"
+                       defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

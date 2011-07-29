@@ -473,6 +473,7 @@ public abstract class NewAIPlayer extends AIObject {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
+        Player buyer = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
@@ -480,7 +481,15 @@ public abstract class NewAIPlayer extends AIObject {
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
             int price = ((IndianSettlement) settlement).getPriceToSell(goods)
-                + player.getTension(unit.getOwner()).getValue();
+                + player.getTension(buyer).getValue();
+            Unit missionary = ((IndianSettlement) settlement).getMissionary(buyer);
+            if (missionary != null && getSpecification()
+                .getBoolean("model.option.enhancedMissionaries")) {
+                // 10% bonus for missionary, 20% if expert
+                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 8
+                    : 9;
+                price = (price * bonus) / 10;
+            }
             sessionRegister.put(goldKey, new Integer(price));
             return price;
         } else {

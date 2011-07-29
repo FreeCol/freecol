@@ -85,6 +85,9 @@
         <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Whether amphibious moves are allowed. -->
         <booleanOption id="model.option.amphibiousMoves" defaultValue="true"/>
+        <!-- Missionaries grant visibility and enhance trade and training -->
+        <booleanOption id="model.option.enhancedMissionaries"
+                       defaultValue="true"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

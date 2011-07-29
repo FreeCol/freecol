@@ -1603,6 +1603,22 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             }
+            if (isEuropean() && getSpecification()
+                .getBoolean("model.option.enhancedMissionaries")) {
+                for (Player other : getGame().getPlayers()) {
+                    if (this.equals(other) || !other.isIndian()) continue;
+                    for (Settlement settlement : other.getSettlements()) {
+                        IndianSettlement is = (IndianSettlement) settlement;
+                        if (is.getMissionary(this) != null) {
+                            for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
+                                if (t != null) {
+                                    cST[t.getX()][t.getY()] = hasExplored(t);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return cST;
     }

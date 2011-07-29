@@ -1790,7 +1790,10 @@ public final class InGameController extends Controller {
             // Teach the unit, and expend the skill if necessary.
             // Do a full information update as the unit is in the settlement.
             unit.setType(skill);
-            if (!settlement.isCapital()) {
+            if (!settlement.isCapital()
+                && !(settlement.getMissionary(serverPlayer) != null
+                    && getGame().getSpecification()
+                    .getBoolean("model.option.enhancedMissionaries"))) {
                 settlement.setLearnableSkill(null);
             }
             break;

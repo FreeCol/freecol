@@ -878,6 +878,10 @@ public final class FreeColServer {
                 // Introduced: SAVEGAME_VERSION == 11
                 addBooleanOption("model.option.settlementActionsContactChief", false);
             }
+            if (!specification.hasOption("model.option.enhancedMissionaries")) {
+                // Introduced: SAVEGAME_VERSION == 12
+                addBooleanOption("model.option.enhancedMissionaries", false);
+            }
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null

@@ -502,6 +502,7 @@ public class StandardAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
+        Player buyer = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
@@ -509,7 +510,15 @@ public class StandardAIPlayer extends AIPlayer {
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
             int price = ((IndianSettlement) settlement).getPriceToSell(goods)
-                + getPlayer().getTension(unit.getOwner()).getValue();
+                + getPlayer().getTension(buyer).getValue();
+            Unit missionary = ((IndianSettlement) settlement).getMissionary(buyer);
+            if (missionary != null && getSpecification()
+                .getBoolean("model.option.enhancedMissionaries")) {
+                // 10% bonus for missionary, 20% if expert
+                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 8
+                    : 9;
+                price = (price * bonus) / 10;
+            }
             sessionRegister.put(goldKey, new Integer(price));
             return price;
         } else {
@@ -550,6 +559,7 @@ public class StandardAIPlayer extends AIPlayer {
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
+        Player seller = unit.getOwner();
         if (settlement instanceof IndianSettlement) {
             String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
             String hagglingKey = "tradeHaggling#" + unit.getId();
@@ -560,7 +570,15 @@ public class StandardAIPlayer extends AIPlayer {
                     return price;
                 }
             } else {
-                price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(unit.getOwner()).getValue();
+                price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(seller).getValue();
+                Unit missionary = ((IndianSettlement) settlement).getMissionary(seller);
+                if (missionary != null && getSpecification()
+                    .getBoolean("model.option.enhancedMissionaries")) {
+                    // 10% bonus for missionary, 20% if expert
+                    int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 12
+                        : 11;
+                    price = (price * bonus) / 10;
+                }
                 if (price <= 0) return 0;
                 sessionRegister.put(goldKey, new Integer(price));
             }
