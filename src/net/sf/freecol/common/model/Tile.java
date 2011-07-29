@@ -1064,11 +1064,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             addTileItem((TileItem) locatable);
             return true;
         } else {
-            boolean result = super.add(locatable);
-            if (result && locatable instanceof Unit) {
-                ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
-            }
-            return result;
+            return super.add(locatable);
         }
     }
 
