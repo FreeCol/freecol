@@ -62,27 +62,27 @@ public class MapTest extends FreeColTestCase {
         // Land Stripe
         builder.setTile(1,11,plainsType);
         builder.setTile(2,10,plainsType);
-        builder.setTile(2,9,plainsType); 
+        builder.setTile(2,9,plainsType);
         builder.setTile(3,8,plainsType);
         builder.setTile(3,7,plainsType);
-       
+
         return builder.build();
     }
-    
+
     // (1,5)*
-    //          *            
+    //          *
     //      *        *     * F(3,7)
     //                  * C(3,8)
     //      *        *
-    //            
+    //
     //      *   *
-    //      
+    //
     //      *S(1,11)
     //
     private Map getShortLongPathMap(Game game){
         TileType oceanType = spec().getTileType("model.tile.ocean");
         TileType plainsType = spec().getTileType("model.tile.plains");
-        
+
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
         //Start
@@ -100,14 +100,14 @@ public class MapTest extends FreeColTestCase {
         builder.setTile(3,8,plainsType);
         // Finish
         builder.setTile(3,7,plainsType);
-       
+
         return builder.build();
     }
 
     public void testMapGameInt() throws FreeColException {
         int expectedWidth = 20;
         int expectedHeigth = 15;
-        
+
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
         Map map = builder.setDimensions(expectedWidth, expectedHeigth).build();
@@ -183,7 +183,7 @@ public class MapTest extends FreeColTestCase {
 
         Set<Position> positions = new HashSet<Position>();
         Set<Tile> allTiles = new HashSet<Tile>();
-        
+
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 6; y++) {
                 Tile tile = new Tile(game, plainsType, x, y);
@@ -290,7 +290,7 @@ public class MapTest extends FreeColTestCase {
         Direction[] dirs = Direction.getRandomDirectionArray(new Random(1));
         assertNotNull(dirs);
     }
-    
+
     /**
      * Tests path discoverability in a map with only one path available
      * That path is obstructed by a settlement, so is invalid
@@ -299,7 +299,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
         game.setMap(map);
-        
+
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2,10);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -312,11 +312,11 @@ public class MapTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
-        
+
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNull("No path should be available",path);
     }
-    
+
     /**
      * Tests path discoverability in a map with only one path available
      * That path is obstructed by a settlement, so is invalid
@@ -325,7 +325,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
         game.setMap(map);
-        
+
         // set obstructing french colony
         Player frenchPlayer = game.getPlayer("model.nation.french");
         Tile settlementTile = map.getTile(2,10);
@@ -340,22 +340,22 @@ public class MapTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
-        
+
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNull("No path should be available",path);
     }
-    
+
     public void testMoveThroughTileWithEnemyUnit() {
         Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
-        
+
         //Setup
         Tile enemyUnitTile = map.getTile(2,1);
         Player frenchPlayer = game.getPlayer("model.nation.french");
         new ServerUnit(game, enemyUnitTile, frenchPlayer, pioneerType,
                        UnitState.ACTIVE);
-        
+
         Tile unitTile = map.getTile(1, 1);
         Tile otherTile = map.getTile(1, 2);
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
@@ -364,7 +364,7 @@ public class MapTest extends FreeColTestCase {
         // unit is going somewhere else
         Tile unitDestination = map.getTile(3, 1);
         unit.setDestination(unitDestination);
-        
+
         // Execute
         CostDecider decider = CostDeciders.avoidSettlementsAndBlockingUnits();
         assertTrue("No blocking unit, should be legal",
@@ -383,13 +383,13 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
         game.setMap(map);
-        
+
         // set obstructing unit
         Tile unitObstructionTile = map.getTile(2,10);
         Player frenchPlayer = game.getPlayer("model.nation.french");
         new ServerUnit(game, unitObstructionTile, frenchPlayer, colonistType,
                        UnitState.ACTIVE);
-        
+
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
@@ -397,12 +397,12 @@ public class MapTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
-        
+
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, null, CostDeciders.avoidSettlementsAndBlockingUnits());
         assertNull("No path should be available",path);
     }
-    
-    public void testShortestPathObstructed() {        
+
+    public void testShortestPathObstructed() {
         Game game = getStandardGame();
         Map map = getShortLongPathMap(getGame());
         game.setMap(map);
@@ -419,7 +419,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType, UnitState.ACTIVE);
         Tile destinationTile = map.getTile(3,7);
         colonist.setDestination(destinationTile);
-        
+
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNotNull("A path should be available",path);
     }
@@ -499,4 +499,40 @@ public class MapTest extends FreeColTestCase {
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);
     }
+
+    public void testLatitude() {
+        Game game = getStandardGame();
+
+        MapBuilder builder = new MapBuilder(game);
+        Map map = builder.setDimensions(1, 181).build();
+
+        assertEquals(181, map.getHeight());
+        assertEquals(1f, map.getLatitudePerRow());
+        assertEquals(-90, map.getLatitude(0));
+        assertEquals(0, map.getLatitude(90));
+        assertEquals(90, map.getLatitude(180));
+
+        builder = new MapBuilder(game);
+        map = builder.setDimensions(1, 91).build();
+
+        assertEquals(91, map.getHeight());
+        assertEquals(2f, map.getLatitudePerRow());
+        assertEquals(-90, map.getLatitude(0));
+        assertEquals(0, map.getLatitude(45));
+        assertEquals(90, map.getLatitude(90));
+
+
+        builder = new MapBuilder(game);
+        map = builder.setDimensions(1, 91).build();
+        map.setMinimumLatitude(0);
+
+        assertEquals(91, map.getHeight());
+        assertEquals(1f, map.getLatitudePerRow());
+        assertEquals(0, map.getLatitude(0));
+        assertEquals(45, map.getLatitude(45));
+        assertEquals(90, map.getLatitude(90));
+
+
+    }
+
 }

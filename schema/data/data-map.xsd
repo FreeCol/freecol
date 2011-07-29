@@ -3,7 +3,7 @@
 	   elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-      
+
       Copyright (C) 2002-2011  The FreeCol Team
 
       This file is part of FreeCol.
@@ -43,6 +43,8 @@
       <xs:attribute name="width" type="xs:int" use="required" />
       <xs:attribute name="height" type="xs:int" use="required" />
       <xs:attribute name="layer" type="MapLayerType" />
+      <xs:attribute name="minimumLatitude" type="xs:int" use="optional" />
+      <xs:attribute name="maximumLatitude" type="xs:int" use="optional" />
      </xs:complexType>
   </xs:element>
 

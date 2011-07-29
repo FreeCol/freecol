@@ -42,7 +42,14 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 
 
 /**
- * An isometric map. The map is represented as a collection of tiles.
+ * A rectangular isometric map. The map is represented as a
+ * two-dimensional array of tiles. Off-map destinations, such as
+ * {@link Europe}, can be reached via the {@link HighSeas}.
+ *
+ * <br/><br/>
+ *
+ * In theory, a {@link Game} might contain several Map instances
+ * connected by the HighSeas.
  */
 public class Map extends FreeColGameObject implements Location {
 
@@ -166,6 +173,25 @@ public class Map extends FreeColGameObject implements Location {
      */
     private Layer layer;
 
+    /**
+     * The latitude of the northern edge of the map. A negative value
+     * indicates northern latitude, a positive value southern
+     * latitude. Thus, -30 equals 30°N, and 40 equals 40°S.
+     */
+    private int minimumLatitude = -90;
+
+    /**
+     * The latitude of the southern edge of the map. A negative value
+     * indicates northern latitude, a positive value southern
+     * latitude. Thus, -30 equals 30°N, and 40 equals 40°S.
+     */
+    private int maximumLatitude = 90;
+
+    /**
+     * Variable used to convert rows to latitude.
+     */
+    private float latitudePerRow;
+
     private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
 
     /**
@@ -181,6 +207,7 @@ public class Map extends FreeColGameObject implements Location {
         super(game);
         this.tiles = tiles;
         setLayer(Layer.RESOURCES);
+        setLatitudePerRow();
     }
 
     /**
@@ -214,6 +241,11 @@ public class Map extends FreeColGameObject implements Location {
         super(game, id);
     }
 
+    /**
+     * Returns a Collection containing all map regions.
+     *
+     * @return a Collection containing all map regions
+     */
     public Collection<Region> getRegions() {
         return regions.values();
     }
@@ -234,6 +266,73 @@ public class Map extends FreeColGameObject implements Location {
      */
     public final void setLayer(final Layer newLayer) {
         this.layer = newLayer;
+    }
+
+    /**
+     * Get the <code>MinimumLatitude</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getMinimumLatitude() {
+        return minimumLatitude;
+    }
+
+    /**
+     * Set the <code>MinimumLatitude</code> value.
+     *
+     * @param newMinimumLatitude The new MinimumLatitude value.
+     */
+    public final void setMinimumLatitude(final int newMinimumLatitude) {
+        this.minimumLatitude = newMinimumLatitude;
+        setLatitudePerRow();
+    }
+
+    /**
+     * Get the <code>MaximumLatitude</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getMaximumLatitude() {
+        return maximumLatitude;
+    }
+
+    /**
+     * Set the <code>MaximumLatitude</code> value.
+     *
+     * @param newMaximumLatitude The new MaximumLatitude value.
+     */
+    public final void setMaximumLatitude(final int newMaximumLatitude) {
+        this.maximumLatitude = newMaximumLatitude;
+        setLatitudePerRow();
+    }
+
+    /**
+     * Get the <code>LatitudePerRow</code> value.
+     *
+     * @return a <code>float</code> value
+     */
+    public final float getLatitudePerRow() {
+        return latitudePerRow;
+    }
+
+    /**
+     * Set the <code>LatitudePerRow</code> value.
+     *
+     * @param newLatitudePerRow The new LatitudePerRow value.
+     */
+    private final void setLatitudePerRow() {
+        this.latitudePerRow = 1f * (maximumLatitude - minimumLatitude) /
+            (getHeight() - 1);
+    }
+
+    /**
+     * Get the latitude of the given map row.
+     *
+     * @param row an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public int getLatitude(int row) {
+        return minimumLatitude + (int) (row * latitudePerRow);
     }
 
     /**
@@ -1937,14 +2036,27 @@ public class Map extends FreeColGameObject implements Location {
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
+        writeAttributes(out, player, showAll, toSavedGame);
+        writeChildren(out, player, showAll, toSavedGame);
+        out.writeEndElement();
+    }
 
+
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
         out.writeAttribute("layer", layer.toString());
+        out.writeAttribute("minimumLatitude", Integer.toString(minimumLatitude));
+        out.writeAttribute("maximumLatitude", Integer.toString(maximumLatitude));
+    }
 
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         for (Region region : regions.values()) {
             region.toXML(out);
         }
@@ -1957,7 +2069,6 @@ public class Map extends FreeColGameObject implements Location {
             }
         }
 
-        out.writeEndElement();
     }
 
     /**
@@ -1978,6 +2089,10 @@ public class Map extends FreeColGameObject implements Location {
 
             tiles = new Tile[width][height];
         }
+
+        minimumLatitude = getAttribute(in, "minimumLatitude", -90);
+        maximumLatitude = getAttribute(in, "maximumLatitude", 90);
+        setLatitudePerRow();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Tile.getXMLElementTagName())) {
