@@ -1261,6 +1261,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         Unit brave = settlement.getUnitList().get(0);
                         brave.clearEquipment();
                         brave.setOwner(other);
+                        brave.setIndianSettlement(null);
                         brave.setNationality(other.getNationID());
                         brave.setType(Utils.getRandomMember(logger,
                                 "Choose brave", converts, random));
