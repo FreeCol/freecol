@@ -42,12 +42,6 @@ public class Nation extends FreeColGameObjectType {
     private boolean selectable;
 
     /**
-     * TODO: create audio resource and move all audio resources into
-     * ResourceManager.
-     */
-    private String anthem;
-
-    /**
      * Describe refNation here.
      */
     private Nation refNation;
@@ -57,24 +51,6 @@ public class Nation extends FreeColGameObjectType {
         super(id, specification);
     }
 
-
-    /**
-     * Get the <code>Anthem</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getAnthem() {
-        return anthem;
-    }
-
-    /**
-     * Set the <code>Anthem</code> value.
-     *
-     * @param newAnthem The new Anthem value.
-     */
-    public final void setAnthem(final String newAnthem) {
-        this.anthem = newAnthem;
-    }
 
     /**
      * Get the <code>Type</code> value.
@@ -165,9 +141,6 @@ public class Nation extends FreeColGameObjectType {
 
         out.writeAttribute("nation-type", type.getId());
         out.writeAttribute("selectable", Boolean.toString(selectable));
-        if (anthem != null) {
-            out.writeAttribute("anthem", anthem);
-        }
         if (refNation != null) {
             out.writeAttribute("ref", refNation.getId());
         }
@@ -193,7 +166,6 @@ public class Nation extends FreeColGameObjectType {
         if (refId != null) {
             refNation = getSpecification().getNation(refId);
         }
-        anthem = in.getAttributeValue(null, "anthem");
     }
 
     /**

@@ -561,7 +561,6 @@
             <xs:attribute name="id" use="required" type="xs:ID"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
-            <xs:attribute name="anthem" type="xs:string"/>
             <xs:attribute name="ref" type="xs:string"/>
           </xs:complexType>
         </xs:element>

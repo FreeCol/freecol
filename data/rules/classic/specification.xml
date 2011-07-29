@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.59 -->
+<!-- specification version 0.63 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1603,16 +1603,16 @@
   </indian-nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" anthem="anthem_dutch"
+    <nation id="model.nation.dutch"
             nation-type="model.nationType.trade" selectable="true"
             ref="model.nation.dutchREF"/>
-    <nation id="model.nation.french" anthem="anthem_french"
+    <nation id="model.nation.french"
             nation-type="model.nationType.cooperation" selectable="true"
             ref="model.nation.frenchREF"/>
-    <nation id="model.nation.english" anthem="anthem_english"
+    <nation id="model.nation.english"
             nation-type="model.nationType.immigration" selectable="true"
             ref="model.nation.englishREF"/>
-    <nation id="model.nation.spanish" anthem="anthem_spanish"
+    <nation id="model.nation.spanish"
             nation-type="model.nationType.conquest" selectable="true"
             ref="model.nation.spanishREF"/>
     <nation id="model.nation.inca"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.62
+<!-- XSD for specification version 0.63
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -38,6 +38,7 @@
      0.60: add offeredFathers to player
      0.61: add moveToEurope to tile
      0.62: add settlementType to indianSettlement
+     0.63: remove anthem from nation
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -593,7 +594,6 @@
             <xs:attribute name="id" use="required" type="xs:ID"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
-            <xs:attribute name="anthem" type="xs:string"/>
             <xs:attribute name="ref" type="xs:string"/>
           </xs:complexType>
         </xs:element>
