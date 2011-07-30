@@ -840,6 +840,10 @@ public final class FreeColServer {
 
             fixGameOptions();
 
+            if (savegameVersion < 11) {
+                for (Tile t : game.getMap().getAllTiles()) t.fixup09x();
+            }
+
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
                           : (Unit) game.getFreeColGameObjectSafely(active));

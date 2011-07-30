@@ -1190,9 +1190,6 @@ public class Game extends FreeColGameObject {
         if (mapGeneratorOptions != null) {
             addOldOptions(mapGeneratorOptions);
         }
-        if (map != null) {
-            for (Tile t : map.getAllTiles()) t.fixup09x();
-        }
         // end compatibility code
 
     }
