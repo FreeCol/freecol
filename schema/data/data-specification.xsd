@@ -561,6 +561,8 @@
             <xs:attribute name="id" use="required" type="xs:ID"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
+            <xs:attribute name="preferredLatitude" type="xs:int"/>
+            <xs:attribute name="startsOnEastCoast" type="xs:boolean"/>
             <xs:attribute name="ref" type="xs:string"/>
           </xs:complexType>
         </xs:element>

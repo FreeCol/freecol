@@ -46,6 +46,16 @@ public class Nation extends FreeColGameObjectType {
      */
     private Nation refNation;
 
+    /**
+     * Describe preferredLatitude here.
+     */
+    private int preferredLatitude = 0;
+
+    /**
+     * Describe startsOnEastCoast here.
+     */
+    private boolean startsOnEastCoast = true;
+
 
     public Nation(String id, Specification specification) {
         super(id, specification);
@@ -115,6 +125,41 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
+    /**
+     * Get the <code>PreferredLatitude</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getPreferredLatitude() {
+        return preferredLatitude;
+    }
+
+    /**
+     * Set the <code>PreferredLatitude</code> value.
+     *
+     * @param newPreferredLatitude The new PreferredLatitude value.
+     */
+    public final void setPreferredLatitude(final int newPreferredLatitude) {
+        this.preferredLatitude = newPreferredLatitude;
+    }
+
+    /**
+     * Get the <code>StartsOnEastCoast</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean startsOnEastCoast() {
+        return startsOnEastCoast;
+    }
+
+    /**
+     * Set the <code>StartsOnEastCoast</code> value.
+     *
+     * @param newStartsOnEastCoast The new StartsOnEastCoast value.
+     */
+    public final void setStartsOnEastCoast(final boolean newStartsOnEastCoast) {
+        this.startsOnEastCoast = newStartsOnEastCoast;
+    }
 
     /**
      * Makes an XML-representation of this object.
@@ -141,6 +186,8 @@ public class Nation extends FreeColGameObjectType {
 
         out.writeAttribute("nation-type", type.getId());
         out.writeAttribute("selectable", Boolean.toString(selectable));
+        out.writeAttribute("preferredLatitude", Integer.toString(preferredLatitude));
+        out.writeAttribute("startsOnEastCoast", Boolean.toString(startsOnEastCoast));
         if (refNation != null) {
             out.writeAttribute("ref", refNation.getId());
         }
@@ -162,6 +209,8 @@ public class Nation extends FreeColGameObjectType {
         type = getSpecification().getNationType(in.getAttributeValue(null,
                 "nation-type"));
         selectable = getAttribute(in, "selectable", false);
+        preferredLatitude = getAttribute(in, "preferredLatitude", 0);
+        startsOnEastCoast = getAttribute(in, "startsOnEastCoast", true);
         String refId = getAttribute(in, "ref", null);
         if (refId != null) {
             refNation = getSpecification().getNation(refId);

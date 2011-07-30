@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.63 -->
+<!-- specification version 0.64 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1605,16 +1605,16 @@
   <nations>
     <nation id="model.nation.dutch"
             nation-type="model.nationType.trade" selectable="true"
-            ref="model.nation.dutchREF"/>
+            preferredLatitude="-40" ref="model.nation.dutchREF"/>
     <nation id="model.nation.french"
             nation-type="model.nationType.cooperation" selectable="true"
-            ref="model.nation.frenchREF"/>
+            preferredLatitude="-53" ref="model.nation.frenchREF"/>
     <nation id="model.nation.english"
             nation-type="model.nationType.immigration" selectable="true"
-            ref="model.nation.englishREF"/>
+            preferredLatitude="-37" ref="model.nation.englishREF"/>
     <nation id="model.nation.spanish"
             nation-type="model.nationType.conquest" selectable="true"
-            ref="model.nation.spanishREF"/>
+            preferredLatitude="-19" ref="model.nation.spanishREF"/>
     <nation id="model.nation.inca"
             nation-type="model.nationType.inca"/>
     <nation id="model.nation.aztec"
@@ -1907,6 +1907,11 @@
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"
                        defaultValue="false"/>
+        <selectOption id="model.option.startingPositions" defaultValue="0" localizedLabels="true">
+          <selectValue label="model.option.startingPositions.classic" value="0"/>
+          <selectValue label="model.option.startingPositions.random" value="1"/>
+          <selectValue label="model.option.startingPositions.historical" value="2"/>
+        </selectOption>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

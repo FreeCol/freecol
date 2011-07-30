@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.51 -->
+<!-- specification version 0.64 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification id="freecol" extends="classic">
@@ -57,13 +57,18 @@
 
   <nations>
     <nation id="model.nation.portuguese"
-            nation-type="model.nationType.naval" selectable="true" ref="model.nation.portugueseREF"/>
+            nation-type="model.nationType.naval" selectable="true"
+            preferredLatitude="-16" ref="model.nation.portugueseREF"/>
     <nation id="model.nation.swedish"
-            nation-type="model.nationType.building" selectable="true" ref="model.nation.swedishREF"/>
+            nation-type="model.nationType.building" selectable="true"
+            preferredLatitude="-39" ref="model.nation.swedishREF"/>
     <nation id="model.nation.danish"
-            nation-type="model.nationType.agriculture" selectable="true" ref="model.nation.danishREF"/>
+            nation-type="model.nationType.agriculture" selectable="true"
+            preferredLatitude="-64" ref="model.nation.danishREF"/>
     <nation id="model.nation.russian"
-            nation-type="model.nationType.furTrapping" selectable="true" ref="model.nation.russianREF"/>
+            nation-type="model.nationType.furTrapping" selectable="true"
+            preferredLatitude="-55" startsOnEastCoast="false"
+            ref="model.nation.russianREF"/>
     <nation id="model.nation.portugueseREF"
             nation-type="model.nationType.ref"/>
     <nation id="model.nation.swedishREF"
