@@ -29,6 +29,11 @@ New features should in general not be added before we reach
 FreeCol 1.0.0, unless they are implemented as optional features
 using the class "GameOptions".
 
+(Note that if you add a game option, add a default value setting in
+FreeColServer.fixGameOptions so that use of the option does not break
+old games.  The same applies to client-options,
+in ClientOptions.fixClientOptions.)
+
 The big exception to this rule is the our client-server model that
 will allow players from all over the world to compete in a game
 of FreeCol.

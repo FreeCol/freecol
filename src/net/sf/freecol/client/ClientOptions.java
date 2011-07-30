@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
 import net.sf.freecol.common.option.Option;
@@ -733,6 +734,41 @@ public class ClientOptions extends OptionGroup {
     public BooleanOption getBooleanOption(ModelMessage message) {
         return (BooleanOption) getOption(message.getMessageType().getOptionName());
     }
+
+    /**
+     * Perform backward compatibility fixups on new client options as
+     * they are introduced.  Annotate with introduction version so we
+     * can clean these up as they become standard.
+     */
+    public void fixClientOptions() {
+        // Introduced: 0.10.0, remove when 0.9.x is obsolete
+        addBooleanOption("model.option.guiShowDemands",
+            "clientOptions.messages", true);
+        // Introduced: 0.10.0, remove when 0.9.x is obsolete
+        addBooleanOption("model.option.guiShowGifts",
+            "clientOptions.messages", true);
+        // Introduced: 0.10.0, remove when 0.9.x is obsolete
+        addBooleanOption("model.option.guiShowGoodsMovement",
+            "clientOptions.messages", true);
+        // Introduced: 0.10.1, remove when 0.9.x is obsolete
+        addIntegerOption(COLONY_REPORT,
+            "clientOptions.messages", 0);
+    }
+
+    private void addBooleanOption(String id, String gr, boolean val) {
+        BooleanOption op = new BooleanOption(id);
+        op.setGroup(gr);
+        op.setValue(val);
+        add(op);
+    }
+
+    private void addIntegerOption(String id, String gr, int val) {
+        IntegerOption op = new IntegerOption(id);
+        op.setGroup(gr);
+        op.setValue(val);
+        add(op);
+    }
+
 
     protected boolean isCorrectTagName(String tagName) {
         return getXMLElementTagName().equals(tagName);

@@ -656,9 +656,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if a new father should be chosen.
      */
     public boolean canRecruitFoundingFather() {
-        return getPlayerType() == PlayerType.COLONIAL
-            && canHaveFoundingFathers()
-            && currentFather == null
+        switch (getPlayerType()) {
+        case COLONIAL:
+            break;
+        case REBEL: case INDEPENDENT:
+            if (!getSpecification()
+                .getBoolean("model.option.continueFoundingFatherRecruitment"))
+                return false;
+            break;
+        default:
+            return false;
+        }
+        return canHaveFoundingFathers() && currentFather == null
             && !getSettlements().isEmpty();
     }
 

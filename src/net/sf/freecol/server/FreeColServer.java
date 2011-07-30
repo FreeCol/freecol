@@ -241,6 +241,7 @@ public final class FreeColServer {
 
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification, advantages));
+        fixGameOptions();
         mapGenerator = new SimpleMapGenerator(random, specification);
 
         try {
@@ -822,12 +823,12 @@ public final class FreeColServer {
             while (playerIterator.hasNext()) {
                 ServerPlayer player = (ServerPlayer) playerIterator.next();
                 if (player.isAI()) {
-                    DummyConnection theConnection = new DummyConnection(
-                                                                        "Server-Server-" + player.getName(),
-                                                                        getInGameInputHandler());
-                    DummyConnection aiConnection = new DummyConnection(
-                                                                       "Server-AI-" + player.getName(),
-                                                                       new AIInGameInputHandler(this, player, aiMain));
+                    DummyConnection theConnection
+                        = new DummyConnection("Server-Server-" + player.getName(),
+                            getInGameInputHandler());
+                    DummyConnection aiConnection
+                        = new DummyConnection("Server-AI-" + player.getName(),
+                            new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
                     getServer().addDummyConnection(theConnection);
@@ -837,51 +838,7 @@ public final class FreeColServer {
             }
             xs.close();
 
-            // Add a default value for options new to each version
-            // that are not part of the difficulty settings.
-            // Annotate with save format version where introduced
-            // so we can remove this backward compatibility code in future.
-            if (specification == null) {
-                specification = getSpecification();
-            }
-            if (!specification.hasOption("model.option.monarchSupport")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addIntegerOption("model.option.monarchSupport", 2);
-            }
-            if (!specification.hasOption("model.option.buildOnNativeLand")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addStringOption("model.option.buildOnNativeLand",
-                                "model.option.buildOnNativeLand.never");
-            }
-            if (!specification.hasOption("model.option.guiShowDemands")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.guiShowDemands", true);
-            }
-            if (!specification.hasOption("model.option.guiShowGifts")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.guiShowGifts", true);
-            }
-            if (!specification.hasOption("model.option.guiShowGoodsMovement")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.guiShowGoodsMovement", false);
-            }
-            if (!specification.hasOption("model.option.amphibiousMoves")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.amphibiousMoves", false);
-                game.getSpecification()
-                    .addModifier(new Modifier("model.modifier.amphibiousAttack",
-                                              Specification.AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
-                                              -75.0f,
-                                              Modifier.Type.PERCENTAGE));
-            }
-            if (!specification.hasOption("model.option.settlementActionsContactChief")) {
-                // Introduced: SAVEGAME_VERSION == 11
-                addBooleanOption("model.option.settlementActionsContactChief", false);
-            }
-            if (!specification.hasOption("model.option.enhancedMissionaries")) {
-                // Introduced: SAVEGAME_VERSION == 12
-                addBooleanOption("model.option.enhancedMissionaries", false);
-            }
+            fixGameOptions();
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
@@ -909,28 +866,65 @@ public final class FreeColServer {
         }
     }
 
-    private void addBooleanOption(String id, boolean defaultValue) {
+    private void fixGameOptions() {
+        // Add a default value for options new to each version
+        // that are not part of the difficulty settings.
+        // Annotate with save format version where introduced
+        // so we can remove this backward compatibility code in future.
+        Specification spec = game.getSpecification();
+
+        // Introduced: SAVEGAME_VERSION == 11
+        addIntegerOption("model.option.monarchSupport", "", 2);
+        // Introduced: SAVEGAME_VERSION == 11
+        addStringOption("model.option.buildOnNativeLand", "",
+            "model.option.buildOnNativeLand.never");
+        // Introduced: SAVEGAME_VERSION == 11
+        if (!spec.hasOption("model.option.amphibiousMoves")) {
+            addBooleanOption("model.option.amphibiousMoves",
+                "gameOptions.map", false);
+            spec.addModifier(new Modifier("model.modifier.amphibiousAttack",
+                    Specification.AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
+                    -75.0f,
+                    Modifier.Type.PERCENTAGE));
+        }
+        // Introduced: SAVEGAME_VERSION == 11
+        addBooleanOption("model.option.settlementActionsContactChief",
+            "gameOptions.map", false);
+        // Introduced: SAVEGAME_VERSION == 12
+        addBooleanOption("model.option.enhancedMissionaries",
+            "gameOptions.map", false);
+        // Introduced: SAVEGAME_VERSION == 12
+        addBooleanOption("model.option.continueFoundingFatherRecruitment",
+            "gameOptions.map", false);
+    }
+
+    private void addBooleanOption(String id, String gr, boolean defaultValue) {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(id)) {
             BooleanOption op = new BooleanOption(id);
+            op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
+            spec.getOptionGroup(gr).add(op);
         }
     }
 
-    private void addIntegerOption(String id, int defaultValue) {
+    private void addIntegerOption(String id, String gr, int defaultValue) {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(id)) {
             IntegerOption op = new IntegerOption(id);
+            op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
+            spec.getOptionGroup(gr).add(op);
         }
     }
 
-    private void addStringOption(String id, String defaultValue) {
+    private void addStringOption(String id, String gr, String defaultValue) {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(id)) {
             StringOption op = new StringOption(id);
+            op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
         }
