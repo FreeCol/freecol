@@ -788,7 +788,7 @@ public class IndianSettlement extends Settlement {
      * @param type The <code>GoodsType</code>.
      * @return The amount of goods wanted.
      */
-    private int getWantedGoodsAmount(GoodsType type) {
+    protected int getWantedGoodsAmount(GoodsType type) {
         final Specification spec = getSpecification();
 
         if (type.isMilitaryGoods()) {
@@ -1030,7 +1030,11 @@ public class IndianSettlement extends Settlement {
             potential *= (float) getUnitCount() / tiles;
         }
 
-        // Always add full potential for center tile.
+        // And because we are allowing them to simultaneously produce
+        // all goods types available from a tile, derate further.
+        potential /= 2;
+
+        // But always add full potential of the center tile.
         potential += getTile().potential(type, null);
 
         return potential;

@@ -105,39 +105,30 @@ public class ServerIndianSettlement extends IndianSettlement
             addGoods(g.getStoredAs(), getProductionOf(g));
         }
 
-        // Use tools (if available) to produce manufactured goods.
-        // TODO: what on Earth is this supposed to simulate?
-        GoodsType tools = spec.getGoodsType("model.goods.tools");
-        if (getGoodsCount(tools) > 0) {
-            GoodsType typeWithSmallestAmount = null;
-            for (GoodsType g : goodsList) {
-                if (g.isFoodType() || g.isBuildingMaterial()
-                    || g.isRawBuildingMaterial()) {
-                    continue;
-                }
-                if (g.isRawMaterial() && getGoodsCount(g) > KEEP_RAW_MATERIAL) {
-                    if (typeWithSmallestAmount == null
-                        || getGoodsCount(g.getProducedMaterial()) < getGoodsCount(typeWithSmallestAmount)) {
-                        typeWithSmallestAmount = g.getProducedMaterial();
-                    }
-                }
-            }
-            if (typeWithSmallestAmount != null) {
-                int production = Math.min(getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
-                                          Math.min(10, getGoodsCount(tools)));
-                removeGoods(tools, production);
-                removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
-                addGoods(typeWithSmallestAmount, production * 5);
-            }
-        }
-
         // Consume goods
         // TODO: do we need this at all? At the moment, most Indian Settlements
         // consume more than they produce.
         for (GoodsType g : goodsList) {
             consumeGoods(g, getConsumptionOf(g));
         }
-        getGoodsContainer().removeAbove(getWarehouseCapacity());
+
+        // Do a little ad hoc manufacturing.
+        for (GoodsType g : goodsList) {
+            GoodsType produced;
+            if (g.isRawMaterial()
+                && (produced = g.getProducedMaterial()) != null
+                && produced.isStorable()
+                && getGoodsCount(g) > getWantedGoodsAmount(g)
+                && getGoodsCount(produced) < getWantedGoodsAmount(produced)) {
+                // Say, 1/3 of the units present make quantity 1 of the item.
+                // Leaving efficiency at 1:1 ATM.
+                int production = getUnitCount() / 3;
+                if (production > 0) {
+                    removeGoods(g, production);
+                    addGoods(produced, production);
+                }
+            }
+        }
 
         // Check for new resident.
         // Alcohol also contributes to create children.
@@ -178,6 +169,7 @@ public class ServerIndianSettlement extends IndianSettlement
             logger.finest("Settlement " + getName() + " bred " + nHorses);
         }
 
+        getGoodsContainer().removeAbove(getWarehouseCapacity());
         updateWantedGoods();
     }
 
