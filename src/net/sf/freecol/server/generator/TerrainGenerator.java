@@ -141,8 +141,19 @@ public class TerrainGenerator {
 
         boolean mapHasLand = false;
         Tile[][] tiles = new Tile[width][height];
+        Map map = new Map(game, tiles);
+        int minimumLatitude = getMapGeneratorOptions()
+            .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
+        int maximumLatitude = getMapGeneratorOptions()
+            .getInteger(MapGeneratorOptions.MAXIMUM_LATITUDE);
+        // make sure the values are in range
+        minimumLatitude = Math.max(-90, Math.min(90, minimumLatitude));
+        maximumLatitude = Math.max(-90, Math.min(90, maximumLatitude));
+        map.setMinimumLatitude(Math.min(minimumLatitude, maximumLatitude));
+        map.setMaximumLatitude(Math.max(minimumLatitude, maximumLatitude));
+
         for (int y = 0; y < height; y++) {
-            int latitude = (Math.min(y, (height-1) - y) * 200) / height; // lat=0 for poles; lat=100 for equator
+            int latitude = map.getLatitude(y);
             for (int x = 0; x < width; x++) {
                 if (landMap[x][y]) {
                     mapHasLand = true;
@@ -173,7 +184,6 @@ public class TerrainGenerator {
             }
         }
 
-        Map map = new Map(game, tiles);
         game.setMap(map);
 
         if (!importTerrain) {
@@ -336,11 +346,11 @@ public class TerrainGenerator {
      * Gets a random land tile type based on the given percentage.
      *
      * @param game the Game
-     * @param latitudePercent The location of the tile relative to the north/south poles and equator,
-     *        100% is the mid-section of the map (equator)
-     *        0% is on the top/bottom of the map (poles).
+     * @param latitude The location of the tile relative to the north/south poles and equator,
+     *        0 is the mid-section of the map (equator)
+     *        90 is on the top/bottom of the map (poles).
      */
-    private TileType getRandomLandTileType(Game game, int latitudePercent) {
+    private TileType getRandomLandTileType(Game game, int latitude) {
         // decode options
         final int forestChance = getMapGeneratorOptions().getInteger("model.option.forestNumber");
         final int temperaturePreference = getMapGeneratorOptions().getInteger("model.option.temperature");
@@ -380,7 +390,7 @@ public class TerrainGenerator {
             equatorTemperature = 40;
         }
         int temperatureRange = equatorTemperature-poleTemperature;
-        int localeTemperature = poleTemperature + latitudePercent*temperatureRange/100;
+        int localeTemperature = poleTemperature + (90 - latitude) * temperatureRange/90;
         int temperatureDeviation = 7; // +/- 7 degrees randomization
         localeTemperature += random.nextInt(temperatureDeviation*2)-temperatureDeviation;
         if (localeTemperature>40)

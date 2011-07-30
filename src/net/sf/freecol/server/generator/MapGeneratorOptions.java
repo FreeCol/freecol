@@ -117,6 +117,16 @@ public class MapGeneratorOptions {
                             LAND_GEN_ISLANDS     = 3;
 
     /**
+     * The minimum latitude of the map.
+     */
+    public static final String MINIMUM_LATITUDE = "model.option.minimumLatitude";
+
+    /**
+     * The maximum latitude of the map.
+     */
+    public static final String MAXIMUM_LATITUDE = "model.option.maximumLatitude";
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "mapGeneratorOptions".

@@ -1972,6 +1972,10 @@
                        minimumValue="3" maximumValue="10"/>
       </optionGroup>
       <optionGroup id="mapGeneratorOptions.terrainGenerator" >
+        <integerOption id="model.option.minimumLatitude" defaultValue="-90"
+                       minimumValue="-90" maximumValue="90" />
+        <integerOption id="model.option.maximumLatitude" defaultValue="90"
+                       minimumValue="-90" maximumValue="90" />
         <!-- Option for setting the number of rivers on the map
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
