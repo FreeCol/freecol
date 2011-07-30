@@ -2412,6 +2412,15 @@ public final class InGameController extends Controller {
             unit.setMovesLeft(0);
             moved = true;
         }
+        Unit oldUnit = null;
+        if (oldLocation instanceof Unit) {
+            oldUnit = (Unit) oldLocation;
+            if (oldUnit.getInitialMovesLeft() != oldUnit.getMovesLeft()) {
+                oldUnit.setMovesLeft(0);
+            } else {
+                oldUnit = null;
+            }
+        }
 
         // Update the goodsContainers only if within a settlement,
         // otherwise update the shared location so that others can
@@ -2419,7 +2428,12 @@ public final class InGameController extends Controller {
         if (unit.getSettlement() != null) {
             cs.add(See.only(serverPlayer), oldLocation.getGoodsContainer());
             cs.add(See.only(serverPlayer), unit.getGoodsContainer());
-            if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            if (moved) {
+                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            }
+            if (oldUnit != null) {
+                cs.addPartial(See.only(serverPlayer), oldUnit, "movesLeft");
+            }
         } else {
             cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
         }
