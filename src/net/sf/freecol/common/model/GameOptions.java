@@ -105,5 +105,12 @@ public class GameOptions {
      */
     public static final String LAST_COLONIAL_YEAR = "model.option.lastColonialYear";
 
+    /**
+     * How to determine the starting positions of European players.
+     */
+    public static final String STARTING_POSITIONS = "model.option.startingPositions";
+    public static final int STARTING_POSITIONS_CLASSIC = 0;
+    public static final int STARTING_POSITIONS_RANDOM = 1;
+    public static final int STARTING_POSITIONS_HISTORICAL = 2;
 
 }

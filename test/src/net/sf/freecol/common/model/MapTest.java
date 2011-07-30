@@ -509,8 +509,11 @@ public class MapTest extends FreeColTestCase {
         assertEquals(181, map.getHeight());
         assertEquals(1f, map.getLatitudePerRow());
         assertEquals(-90, map.getLatitude(0));
+        assertEquals(0, map.getRow(-90));
         assertEquals(0, map.getLatitude(90));
+        assertEquals(90, map.getRow(0));
         assertEquals(90, map.getLatitude(180));
+        assertEquals(180, map.getRow(90));
 
         builder = new MapBuilder(game);
         map = builder.setDimensions(1, 91).build();
@@ -518,9 +521,11 @@ public class MapTest extends FreeColTestCase {
         assertEquals(91, map.getHeight());
         assertEquals(2f, map.getLatitudePerRow());
         assertEquals(-90, map.getLatitude(0));
+        assertEquals(0, map.getRow(-90));
         assertEquals(0, map.getLatitude(45));
+        assertEquals(45, map.getRow(0));
         assertEquals(90, map.getLatitude(90));
-
+        assertEquals(90, map.getRow(90));
 
         builder = new MapBuilder(game);
         map = builder.setDimensions(1, 91).build();
@@ -529,9 +534,11 @@ public class MapTest extends FreeColTestCase {
         assertEquals(91, map.getHeight());
         assertEquals(1f, map.getLatitudePerRow());
         assertEquals(0, map.getLatitude(0));
+        assertEquals(0, map.getRow(0));
         assertEquals(45, map.getLatitude(45));
+        assertEquals(45, map.getRow(45));
         assertEquals(90, map.getLatitude(90));
-
+        assertEquals(90, map.getRow(90));
 
     }
 

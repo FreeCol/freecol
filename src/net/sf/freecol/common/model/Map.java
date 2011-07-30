@@ -336,6 +336,16 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Get the map row with the given latitude.
+     *
+     * @param latitude an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public int getRow(int latitude) {
+        return (int) ((latitude - minimumLatitude) / latitudePerRow);
+    }
+
+    /**
      * Returns the <code>Region</code> with the given ID.
      *
      * @param id a <code>String</code> value
