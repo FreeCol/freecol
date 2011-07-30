@@ -1294,7 +1294,6 @@ public final class ColonyPanel extends FreeColPanel
                     return null;
                 }
                 comp.getParent().remove(comp);
-                ((GoodsLabel) comp).setSmall(false);
                 return comp;
             }
 

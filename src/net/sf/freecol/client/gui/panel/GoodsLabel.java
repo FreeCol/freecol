@@ -19,12 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
+import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
@@ -44,18 +47,7 @@ public final class GoodsLabel extends AbstractGoodsLabel {
      * @param parent The parent that knows more than we do.
      */
     public GoodsLabel(Goods goods, Canvas parent) {
-        this(goods, parent, false);
-    }
-
-    /**
-     * Initializes this JLabel with the given goods data.
-     *
-     * @param goods The Goods that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
-     * @param isSmall A smaller picture will be used if <code>true</code>.
-     */
-    public GoodsLabel(Goods goods, Canvas parent, boolean isSmall) {
-        super(goods, parent, isSmall);
+        super(goods, parent);
         initializeDisplay();
     }
 
@@ -66,6 +58,10 @@ public final class GoodsLabel extends AbstractGoodsLabel {
         Player player = null;
         Goods goods = getGoods();
         Location location = goods.getLocation();
+
+        if (getAmount() < GoodsContainer.CARGO_SIZE) {
+            setPartialChosen(true);
+        }
 
         if (location instanceof Ownable) {
             player = ((Ownable) location).getOwner();
@@ -99,6 +95,19 @@ public final class GoodsLabel extends AbstractGoodsLabel {
         }
 
         super.setText(String.valueOf(goods.getAmount()));
+    }
+
+    /**
+     * Set whether only a partial amount is to be selected.
+     *
+     * @param partialChosen a <code>boolean</code> value
+     */
+    @Override
+    public void setPartialChosen(boolean partialChosen) {
+        super.setPartialChosen(partialChosen);
+        Image image = getCanvas().getImageLibrary()
+            .getGoodsImage(getType(), partialChosen ? 0.75f : 1f);
+        setIcon(new ImageIcon(image));
     }
 
     /**

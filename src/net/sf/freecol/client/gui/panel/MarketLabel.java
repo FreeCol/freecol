@@ -51,21 +51,7 @@ public final class MarketLabel extends AbstractGoodsLabel {
      * @param parent The parent that knows more than we do.
      */
     public MarketLabel(GoodsType type, Market market, Canvas parent) {
-        this(type, market, parent, false);
-    }
-
-
-    /**
-     * Initializes this JLabel with the given goods type.
-     * @param type The Goods type that this JLabel will visually represent.
-     * @param market The <code>Market</code> being used to buy
-     *       and sell <code>Goods</code>.
-     * @param parent The parent that knows more than we do.
-     * @param isSmall The image will be smaller if set to <code>true</code>.
-     */
-    public MarketLabel(GoodsType type, Market market, Canvas parent, boolean isSmall) {
-        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE),
-            parent, isSmall);
+        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), parent);
         if (market == null) {
             throw new NullPointerException();
         }

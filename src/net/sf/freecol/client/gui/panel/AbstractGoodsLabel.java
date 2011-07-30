@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -50,22 +48,10 @@ public class AbstractGoodsLabel extends JLabel {
      * @param parent The parent that knows more than we do.
      */
     public AbstractGoodsLabel(AbstractGoods goods, Canvas parent) {
-        this(goods, parent, false);
-    }
-
-    /**
-     * Initializes this JLabel with the given goods data.
-     *
-     * @param goods The AbstractGoods that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
-     * @param isSmall A smaller picture will be used if <code>true</code>.
-     */
-    public AbstractGoodsLabel(AbstractGoods goods, Canvas parent, boolean isSmall) {
         super(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
         setToolTipText(Messages.message(goods.getNameKey()));
         this.parent = parent;
-        setSmall(isSmall);
     }
 
 
@@ -140,18 +126,4 @@ public class AbstractGoodsLabel extends JLabel {
         return goods.getAmount();
     }
 
-    /**
-     * Sets that this <code>GoodsLabel</code> should be small.
-     *
-     * @param isSmall A smaller picture will be used if <code>true</code>.
-     */
-    public void setSmall(boolean isSmall) {
-        if (isSmall) {
-            ImageIcon imageIcon = parent.getImageLibrary().getGoodsImageIcon(goods.getType());
-            setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2,
-                    imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
-        } else {
-            setIcon(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
-        }
-    }
 }
