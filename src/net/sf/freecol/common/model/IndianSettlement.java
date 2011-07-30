@@ -56,7 +56,6 @@ public class IndianSettlement extends Settlement {
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
 
     public static final int GOODS_BASE_PRICE = 12;
-    public static final int GOODS_CAPACITY = 200;
 
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
@@ -748,8 +747,8 @@ public class IndianSettlement extends Settlement {
                 : (rawProduction < 20) ?  2 * rawProduction + 55
                 : 100;
             // Decrease bonus in proportion to current stock, up to capacity.
-            add = (GOODS_CAPACITY - Math.min(GOODS_CAPACITY, current)) * add
-                / GOODS_CAPACITY;
+            add = (getGoodsCapacity() - Math.min(getGoodsCapacity(), current))
+                * add / getGoodsCapacity();
         }
         current += add;
 
@@ -758,12 +757,14 @@ public class IndianSettlement extends Settlement {
 
         // Only interested in the amount of goods that keeps the
         // total under the threshold.
-        int valued = Math.max(0, Math.min(amount, GOODS_CAPACITY - current));
+        int retain = Math.min(getWantedGoodsAmount(type), getGoodsCapacity());
+        int valued = (retain <= current) ? 0
+            : Math.min(amount, retain - current);
 
         // Unit price then is maximum price plus the bonus for the
         // settlement type, reduced by the proportion of goods present.
         int unitPrice = (GOODS_BASE_PRICE + getType().getTradeBonus())
-            * (GOODS_CAPACITY - current) / GOODS_CAPACITY;
+            * (getGoodsCapacity() - current) / getGoodsCapacity();
 
         // But farmed goods are always less interesting.
         // and small settlements are not interested in building.
@@ -781,27 +782,43 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Calculates how much of the given military goods type this settlement
-     * needs to fully arm.  Takes no account of current stock.
+     * Calculates how much of the given goods type this settlement
+     * wants and should retain.
      *
-     * @param type The military <code>GoodsType</code>.
-     * @return The amount of goods required for a complete arming.
+     * @param type The <code>GoodsType</code>.
+     * @return The amount of goods wanted.
      */
-    private int getRequiredMilitaryGoodsAmount(GoodsType type) {
+    private int getWantedGoodsAmount(GoodsType type) {
         final Specification spec = getSpecification();
-        int need = 0;
-        int toArm = 0;
 
-        if (type == spec.getGoodsType("model.goods.muskets")) {
-            for (Unit u : ownedUnits) if (!u.isArmed()) need++;
-            toArm = spec.getEquipmentType("model.equipment.indian.muskets")
-                .getAmountRequiredOf(type);
-        } else if (type == spec.getGoodsType("model.goods.horses")) {
-            for (Unit u : ownedUnits) if (!u.isMounted()) need++;
-            toArm = spec.getEquipmentType("model.equipment.indian.horses")
-                .getAmountRequiredOf(type);
+        if (type.isMilitaryGoods()) {
+            // Retain enough goods to fully arm.
+            int need = 0;
+            int toArm = 0;
+            if (type == spec.getGoodsType("model.goods.muskets")) {
+                for (Unit u : ownedUnits) if (!u.isArmed()) need++;
+                toArm = spec.getEquipmentType("model.equipment.indian.muskets")
+                    .getAmountRequiredOf(type);
+            } else if (type == spec.getGoodsType("model.goods.horses")) {
+                for (Unit u : ownedUnits) if (!u.isMounted()) need++;
+                toArm = spec.getEquipmentType("model.equipment.indian.horses")
+                    .getAmountRequiredOf(type);
+            }
+            return need * toArm;
         }
-        return need * toArm;
+
+        int consumption = getConsumptionOf(type);
+        if (type == spec.getPrimaryFoodType()) {
+            // Food is perishable, do not try to retain that much
+            return Math.max(40, consumption * 3);
+        }
+        if (type.isTradeGoods() || type.isNewWorldLuxuryType()
+            || type.isRefined()) {
+            // Aim for 10 years supply, resupply is doubtful
+            return Math.max(80, consumption * 20);
+        }
+        // Just keep some around
+        return 2 * getUnitCount();
     }
 
     /**
@@ -813,7 +830,7 @@ public class IndianSettlement extends Settlement {
      */
     private int getMilitaryGoodsPriceToBuy(GoodsType type, int amount) {
         final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
-        int required = getRequiredMilitaryGoodsAmount(type);
+        int required = getWantedGoodsAmount(type);
         if (required == 0) return 0; // Do not pay military price
 
         // If the settlement can use more than half of the goods on offer,
@@ -864,16 +881,26 @@ public class IndianSettlement extends Settlement {
         final int full = GOODS_BASE_PRICE + getType().getTradeBonus();
 
         // Base price is purchase price plus delta.
-        // Treat useful military goods at double value, and trade goods
-        // at maximum.
-        int price = amount + Math.max(0, getPriceToBuy(type, amount));
-        if (type.isMilitaryGoods()
-            && getRequiredMilitaryGoodsAmount(type) > 0) {
+        // - military goods at double value
+        // - trade goods at +50%
+        int price = amount + Math.max(0, 11 * getPriceToBuy(type, amount) / 10);
+        if (type.isMilitaryGoods()) {
             price = Math.max(price, amount * full * 2);
         } else if (type.isTradeGoods()) {
             price = Math.max(price, 150 * amount * full / 100);
         }
         return price;
+    }
+
+    /**
+     * Will this settlement sell a type of goods.
+     * Placeholder until we have a spec-configured blacklist.
+     *
+     * @param type The <code>GoodsType</code> to consider.
+     * @return True if the settlement would sell the goods.
+     */
+    public boolean willSell(GoodsType type) {
+        return !type.isTradeGoods();
     }
 
     /**
@@ -889,8 +916,15 @@ public class IndianSettlement extends Settlement {
 
         int count = 0;
         for (Goods goods : settlementGoods) {
-            result.add(new Goods(getGame(), this, goods.getType(),
-                    Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE)));
+            if (!willSell(goods.getType())) continue;
+            int amount = goods.getAmount();
+            int retain = getWantedGoodsAmount(goods.getType());
+            if (retain >= amount) continue;
+            amount -= retain;
+            if (amount > GoodsContainer.CARGO_SIZE) {
+                amount = GoodsContainer.CARGO_SIZE;
+            }
+            result.add(new Goods(getGame(), this, goods.getType(), amount));
             count++;
             if (count >= limit) break;
         }

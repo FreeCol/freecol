@@ -207,8 +207,8 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
                    + ") cheaper than coats ("
                    + camp.getPriceToBuy(coatsType, 50) + ")",
             camp.getPriceToBuy(clothType, 50) < camp.getPriceToBuy(coatsType, 50));
-        camp.addGoods(clothType, 100);
-        camp.addGoods(coatsType, 100);
+        camp.addGoods(clothType, 20);
+        camp.addGoods(coatsType, 20);
         assertTrue("Cloth still ("
                    + camp.getPriceToBuy(clothType, 50)
                    + ") cheaper than coats ("
@@ -225,21 +225,21 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, horsesType);
-        int p3 = camp.getPriceToBuy(toolsType, 100);
+        int p3 = camp.getPriceToBuy(toolsType, 50);
         camp.setWantedGoods(2, toolsType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, horsesType);
-        int p2 = camp.getPriceToBuy(toolsType, 100);
+        int p2 = camp.getPriceToBuy(toolsType, 50);
         assertTrue("Wanted 2: (" + p2 + " > " + p3 + ")",  p2 > p3);
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, toolsType);
         camp.setWantedGoods(0, horsesType);
-        int p1 = camp.getPriceToBuy(toolsType, 100);
+        int p1 = camp.getPriceToBuy(toolsType, 50);
         assertTrue("Wanted 1: (" + p1 + " > " + p2 + ")",  p1 > p2);
         camp.setWantedGoods(2, horsesType);
         camp.setWantedGoods(1, horsesType);
         camp.setWantedGoods(0, toolsType);
-        int p0 = camp.getPriceToBuy(toolsType, 100);
+        int p0 = camp.getPriceToBuy(toolsType, 50);
         assertTrue("Wanted 0: (" + p0 + " > " + p1 + ")",  p0 > p1);
     }
 }
