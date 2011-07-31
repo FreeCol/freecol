@@ -80,11 +80,6 @@ import net.miginfocom.swing.MigLayout;
 public final class ReportColonyPanel extends ReportPanel
     implements ActionListener {
 
-    private static final int COLONISTS_PER_ROW = 20;
-    private static final int UNITS_PER_ROW = 14;
-    private static final int GOODS_PER_ROW = 10;
-    private static final int BUILDINGS_PER_ROW = 8;
-
     private static final Comparator<GoodsType> goodsComparator
         = new Comparator<GoodsType>() {
             private int rank(GoodsType g) {
@@ -159,13 +154,17 @@ public final class ReportColonyPanel extends ReportPanel
             initializeCompactColonyPanel();
             updateCompactColonyPanel();
         } else {
-            prettyColonyPanel(colonies);
+            classicColonyPanel(colonies);
         }
     }
 
     // Standard pretty version
+    private void classicColonyPanel(List<Colony> colonies) {
+        final int COLONISTS_PER_ROW = 20;
+        final int UNITS_PER_ROW = 14;
+        final int GOODS_PER_ROW = 10;
+        final int BUILDINGS_PER_ROW = 8;
 
-    private void prettyColonyPanel(List<Colony> colonies) {
         // Display Panel
         reportPanel.setLayout(new MigLayout("fill"));
 

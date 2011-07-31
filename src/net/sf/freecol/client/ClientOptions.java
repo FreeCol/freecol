@@ -756,17 +756,21 @@ public class ClientOptions extends OptionGroup {
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {
-        BooleanOption op = new BooleanOption(id);
-        op.setGroup(gr);
-        op.setValue(val);
-        add(op);
+        if (getOption(id) == null) {
+            BooleanOption op = new BooleanOption(id);
+            op.setGroup(gr);
+            op.setValue(val);
+            add(op);
+        }
     }
 
     private void addIntegerOption(String id, String gr, int val) {
-        IntegerOption op = new IntegerOption(id);
-        op.setGroup(gr);
-        op.setValue(val);
-        add(op);
+        if (getOption(id) == null) {
+            IntegerOption op = new IntegerOption(id);
+            op.setGroup(gr);
+            op.setValue(val);
+            add(op);
+        }
     }
 
 
