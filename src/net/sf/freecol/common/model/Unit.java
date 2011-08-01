@@ -2617,8 +2617,10 @@ public class Unit extends FreeColGameObject
                 return getMovesLeft() > 0;
             }
             return false;
-        case FORTIFYING:
         case SKIPPED:
+            if (getState() == UnitState.ACTIVE) return true;
+            // Fall through
+        case FORTIFYING:
             return (getMovesLeft() > 0);
         default:
             logger.warning("Invalid unit state: " + s);
