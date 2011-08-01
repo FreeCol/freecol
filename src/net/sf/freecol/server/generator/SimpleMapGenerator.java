@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
@@ -57,6 +58,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -813,10 +815,13 @@ public class SimpleMapGenerator implements MapGenerator {
                 logger.finest("found European player " + player);
             }
         }
-        int startingPositions = europeanPlayers.size();
-        List<Integer> startingYPositions = new ArrayList<Integer>();
 
-        for (Player player : europeanPlayers) {
+        List<Position> positions = generateStartingPositions(map, europeanPlayers);
+        List<Tile> startingTiles = new ArrayList<Tile>();
+
+        for (int index = 0; index < europeanPlayers.size(); index++) {
+            Player player = europeanPlayers.get(index);
+            Position position = positions.get(index);
             logger.fine("generating units for player " + player);
 
             List<Unit> carriers = new ArrayList<Unit>();
@@ -843,23 +848,27 @@ public class SimpleMapGenerator implements MapGenerator {
                 startAtSea = false;
             }
 
-            // find an appropriate starting latitude
-            int x = width - 1;  // eastern edge of map
-            int y;
-            do {
-                 y = random.nextInt(height - poleDistance*2) + poleDistance;
-            } while (map.getTile(x, y).isLand() == startAtSea ||
-                     isStartingPositionTooClose(map, y, startingPositions, startingYPositions));
-            startingYPositions.add(new Integer(y));
-
-            if (startAtSea) {
-                // move westward to find the limit between high seas and coastal waters
-                while (map.getTile(x - 1, y).canMoveToEurope()) {
-                    x--;
+            Tile startTile = null;
+            int x = position.getX();
+            int y = position.getY();
+            for (int i = 0; i < 2 * map.getHeight(); i++) {
+                int offset = (i % 2 == 0) ? i / 2 : -(1 + i / 2);
+                startTile = findTileFor(map, y + offset, x, startAtSea);
+                if (startTile != null) {
+                    if (startingTiles.contains(startTile)) {
+                        startTile = null;
+                    } else {
+                        startingTiles.add(startTile);
+                        break;
+                    }
                 }
             }
 
-            Tile startTile = map.getTile(x,y);
+            if (startTile == null) {
+                throw new RuntimeException("Failed to find start tile for player "
+                                           + player);
+            }
+
             startTile.setExploredBy(player, true);
             player.setEntryLocation(startTile);
 
@@ -1062,26 +1071,77 @@ public class SimpleMapGenerator implements MapGenerator {
         // END DEBUG
     }
 
-    /**
-     * Determine whether a proposed ship starting Y position is "too close"
-     * to those already used.
-     * @param map a <code>Map</code> value
-     * @param proposedY Proposed ship starting Y position
-     * @param startingPositions The number of starting positions
-     * @return True if the proposed position is too close
-     */
-    private boolean isStartingPositionTooClose(Map map, int proposedY, int startingPositions,
-                                                 List<Integer> usedYPositions) {
-        final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*map.getHeight()/2);
-        final int spawnableRange = map.getHeight() - poleDistance*2;
-        final int minimumDistance = spawnableRange / (startingPositions * 2);
-        for (Integer yPosition : usedYPositions) {
-            if (Math.abs(yPosition.intValue() - proposedY) < minimumDistance) {
-                return true;
+    private List<Position> generateStartingPositions(Map map, List<Player> players) {
+        int number = players.size();
+        List<Position> positions = new ArrayList<Position>(number);
+        if (number > 0) {
+            int west = 0;
+            int east = map.getWidth() - 1;
+            switch(map.getSpecification().getInteger(GameOptions.STARTING_POSITIONS)) {
+            case GameOptions.STARTING_POSITIONS_CLASSIC:
+                int distance = map.getHeight() / number;
+                int row = distance/2;
+                for (int index = 0; index < number; index++) {
+                    positions.add(new Position(east, row));
+                    row += distance;
+                }
+                Collections.shuffle(positions);
+                break;
+            case GameOptions.STARTING_POSITIONS_RANDOM:
+                distance = 2 * map.getHeight() / number;
+                row = distance/2;
+                for (int index = 0; index < number; index++) {
+                    if (index % 2 == 0) {
+                        positions.add(new Position(east, row));
+                    } else {
+                        positions.add(new Position(west, row));
+                        row += distance;
+                    }
+                }
+                Collections.shuffle(positions);
+                break;
+            case GameOptions.STARTING_POSITIONS_HISTORICAL:
+                for (Player player : players) {
+                    Nation nation = player.getNation();
+                    positions.add(new Position(nation.startsOnEastCoast() ? east : west,
+                                               map.getRow(nation.getPreferredLatitude())));
+                }
+                break;
             }
         }
-        return false;
+        return positions;
     }
+
+    private Tile findTileFor(Map map, int row, int start, boolean startAtSea) {
+        Tile tile = null;
+        if (0 <= row && row < map.getHeight()) {
+            Tile firstLand = null;
+            int offset = (start == 0) ? 1 : -1;
+            for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
+                tile = map.getTile(x, row);
+                if (tile.isLand()) {
+                    if (startAtSea) {
+                        firstLand = tile;
+                        start = x - offset;
+                        break;
+                    } else {
+                        return tile;
+                    }
+                }
+            }
+            if (firstLand != null) {
+                offset = -offset;
+                for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
+                    tile = map.getTile(x, row);
+                    if (tile.canMoveToEurope()) {
+                        return tile;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     private class Territory {
         public ServerRegion region;
