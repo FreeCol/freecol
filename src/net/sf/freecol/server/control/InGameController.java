@@ -1651,11 +1651,11 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), (FreeColGameObject) oldLocation);
         if (carrier.getLocation() != oldLocation) {
             cs.add(See.only(serverPlayer), carrier);
-            cs.addMove(See.only(serverPlayer), unit, oldLocation,
-                       carrier.getTile());
-            if (oldLocation.getTile() != null) {
-                cs.addDisappear(serverPlayer, oldLocation.getTile(), unit);
-            }
+        }
+        if (oldLocation instanceof Tile) {
+            cs.addMove(See.only(serverPlayer), unit, (Tile) oldLocation,
+                carrier.getTile());
+            cs.addDisappear(serverPlayer, (Tile) oldLocation, unit);
         }
 
         // Others might see the unit disappear, or the carrier capacity.

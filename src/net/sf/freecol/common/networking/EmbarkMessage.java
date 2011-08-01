@@ -111,16 +111,20 @@ public class EmbarkMessage extends DOMMessage {
         Tile destinationTile = null;
         Direction direction;
         if (directionString == null) {
-            // Can not just check location as that fails between a colony
-            // work location and the colony tile, can not just check tile
-            // as that can be null for both off-map and Europe.
-            if (sourceLocation != carrier.getLocation()
-            		&& (sourceLocation.getTile() == null
-                    || sourceLocation.getTile() != carrier.getTile())) {
+            // Locations must be the same, or the source is also a
+            // carrier in the same location as the carrier, or they
+            // must be on the same tile.
+            if (sourceLocation == carrier.getLocation()
+                || ((sourceLocation instanceof Unit)
+                    && ((Unit) sourceLocation).getLocation()
+                    == carrier.getLocation())
+                || (sourceLocation.getTile() != null
+                    && sourceLocation.getTile() == carrier.getTile())) {
+                direction = null;
+            } else {
                 return DOMMessage.clientError("Unit: " + unitId
                     + " and carrier: " + carrierId + " are not co-located.");
             }
-            direction = null;
         } else {
             // Units have to be on the map and have moves left if a
             // move is involved.
