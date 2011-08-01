@@ -269,8 +269,10 @@ public class SimpleCombatModel extends CombatModel {
                             result.add(modifier);
                         }
                     }
-                    // Artillery in the open penalty
+                    // Artillery in the open penalty, must be on a
+                    // tile and not in a settlement.
                     if (attackerUnit.hasAbility("model.ability.bombard")
+                        && attackerUnit.getLocation() instanceof Tile
                         && attackerUnit.getSettlement() == null) {
                         result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                     }
