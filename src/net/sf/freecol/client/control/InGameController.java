@@ -3902,18 +3902,19 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (messages.size() > 0) {
-            Runnable uiTask = new Runnable() {
-                    public void run() {
-                        Canvas canvas = freeColClient.getCanvas();
-                        final ModelMessage[] a
-                            = messages.toArray(new ModelMessage[0]);
-                        if (endOfTurn) {
+            final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
+            final Canvas canvas = freeColClient.getCanvas();
+            Runnable uiTask = (endOfTurn)
+                ? new Runnable() {
+                        public void run() {
                             canvas.showReportTurnPanel(a);
-                        } else {
-                            canvas.showModelMessages(a);
                         }
                     }
-                };
+                : new Runnable() {
+                        public void run() {
+                            canvas.showModelMessages(a);
+                        }
+                    };
             freeColClient.getActionManager().update();
             if (SwingUtilities.isEventDispatchThread()) {
                 uiTask.run();
