@@ -1784,6 +1784,7 @@ public class StandardAIPlayer extends AIPlayer {
                     while (it2.hasNext()) {
                         chosenOne = getAIUnit(it2.next());
                         if (chosenOne.getUnit().getLocation() instanceof Tile
+                            && chosenOne.getUnit().canCarryGoods()
                             && (chosenOne.getMission() == null
                                 || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
                             // Check that the colony can be reached:
