@@ -233,7 +233,7 @@ public class CargoPanel extends FreeColPanel
                     Container oldParent = comp.getParent();
                     if (getController().boardShip(unit, carrier)) {
                         ((UnitLabel) comp).setSmall(false);
-                        oldParent.remove(comp);
+                        if (oldParent != null) oldParent.remove(comp);
                         update();
                         return comp;
                     }
