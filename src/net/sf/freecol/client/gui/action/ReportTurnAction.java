@@ -47,6 +47,6 @@ public class ReportTurnAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getInGameController().displayModelMessages(true);
+        freeColClient.getInGameController().displayModelMessages(true, true);
     }
 }
