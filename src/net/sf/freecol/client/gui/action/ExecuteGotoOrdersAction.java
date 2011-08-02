@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
+
 
 /**
  * An action for executing goto orders immediately.
@@ -46,6 +48,9 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().executeGotoOrders();
+        FreeColClient fcc = getFreeColClient();
+        Unit active = fcc.getGUI().getActiveUnit();
+        fcc.getInGameController().executeGotoOrders();
+        fcc.getGUI().setActiveUnit(active);
     }
 }
