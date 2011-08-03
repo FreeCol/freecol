@@ -1071,10 +1071,8 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        if (!requireOurTurn()) return;
-
         Unit unit = freeColClient.getGUI().getActiveUnit();
-        if (unit != null) {
+        if (unit != null && requireOurTurn()) {
             clearGotoOrders(unit);
             move(unit, direction);
         } // else: nothing: There is no active unit that can be moved.
