@@ -163,27 +163,44 @@ public class MarketData extends FreeColGameObject {
      */
     public void price() {
         if (!goodsType.isStorable()) return;
-        int newSalePrice = Math.round(goodsType.getInitialAmount()
-                                      * initialPrice
-                                      / (float) amountInMarket);
-        int newPrice = newSalePrice + goodsType.getPriceDifference();
+        int diff = goodsType.getPriceDifference();
+        float amountPrice = initialPrice * (goodsType.getInitialAmount()
+            / (float) amountInMarket);
+        int newSalePrice = Math.round(amountPrice);
+        int newPrice = newSalePrice + diff;
 
-        // dirty work-around to limit prices of new world goods
-        // and related manufactured goods
+        // Work-around to limit prices of new world goods
+        // and related manufactured goods.
         if ((goodsType.isNewWorldGoodsType()
              || (goodsType.getRawMaterial() != null
                  && goodsType.getRawMaterial().isNewWorldGoodsType()))
             && newSalePrice > initialPrice + 2) {
             newSalePrice = initialPrice + 2;
-            newPrice = newSalePrice + goodsType.getPriceDifference();
+            newPrice = newSalePrice + diff;
         }
 
+        // Another hack to prevent price changing too fast in one hit.
+        // Push the amount in market back as well to keep this stable.
+        if (newPrice > costToBuy + diff) {
+            amountPrice -= newPrice - (costToBuy + diff);
+            amountInMarket = Math.round(goodsType.getInitialAmount()
+                * (initialPrice / amountPrice));
+            newPrice = costToBuy + diff;
+        } else if (newPrice < costToBuy - diff) {
+            amountPrice += (costToBuy - diff) - newPrice;
+            amountInMarket = Math.round(goodsType.getInitialAmount()
+                * (initialPrice / amountPrice));
+            newPrice = costToBuy - diff;
+        }
+        newSalePrice = newPrice - diff;
+
+        // Clamp extremes.
         if (newPrice > MAXIMUM_PRICE) {
             newPrice = MAXIMUM_PRICE;
-            newSalePrice = newPrice - goodsType.getPriceDifference();
+            newSalePrice = newPrice - diff;
         } else if (newSalePrice < MINIMUM_PRICE) {
             newSalePrice = MINIMUM_PRICE;
-            newPrice = newSalePrice + goodsType.getPriceDifference();
+            newPrice = newSalePrice + diff;
         }
 
         costToBuy = newPrice;
