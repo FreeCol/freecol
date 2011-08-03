@@ -298,10 +298,19 @@ abstract public class Settlement extends GoodsLocation
 
     /**
      * Put a prepared settlement onto the map.
+     *
+     * @param maximal If true, also claim all the tiles possible.
      */
-    public void placeSettlement() {
-        List<Tile> tiles = getGame().getMap().getClaimableTiles(owner, tile,
-                                                                getRadius());
+    public void placeSettlement(boolean maximal) {
+        List<Tile> tiles;
+        if (maximal) {
+            tiles = getGame().getMap()
+                .getClaimableTiles(owner, tile, getRadius());
+        } else {
+            tiles = new ArrayList<Tile>();
+            tiles.add(tile);
+        }
+
         tile.setSettlement(this);
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);

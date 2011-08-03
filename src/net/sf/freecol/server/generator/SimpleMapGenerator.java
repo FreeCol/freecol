@@ -733,7 +733,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 unit.setLocation(settlement);
             }
         }
-        settlement.placeSettlement();
+        settlement.placeSettlement(true);
 
         // START DEBUG:
         if (FreeCol.isInDebugMode()) {
@@ -958,7 +958,7 @@ public class SimpleMapGenerator implements MapGenerator {
         String colonyName = Messages.message(player.getNationName())
             + " Colony";
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
-        colony.placeSettlement();
+        colony.placeSettlement(true);
         for (Tile tile : colonyTile.getSurroundingTiles(1)) {
             if (tile.getSettlement() == null
                 && (tile.getOwner() == null

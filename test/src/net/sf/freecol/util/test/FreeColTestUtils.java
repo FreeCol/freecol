@@ -139,7 +139,7 @@ public class FreeColTestUtils {
             */
 
             Colony colony = new ServerColony(game, player, name, colonyTile);
-            colony.placeSettlement();
+            colony.placeSettlement(true);
 
 
             // Add colonists

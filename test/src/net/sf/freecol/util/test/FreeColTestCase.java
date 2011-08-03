@@ -576,7 +576,7 @@ public class FreeColTestCase extends TestCase {
                                             indianBraveType.getDefaultEquipment());
                 camp.addOwnedUnit(brave);
             }
-            camp.placeSettlement();
+            camp.placeSettlement(true);
             return camp;
         }
 
@@ -610,7 +610,7 @@ public class FreeColTestCase extends TestCase {
      * Build/place a colony with a unit, without requiring the server.
      */
     public void nonServerBuildColony(Unit builder, Colony colony) {
-        colony.placeSettlement();
+        colony.placeSettlement(true);
         nonServerJoinColony(builder, colony);
     }
 
