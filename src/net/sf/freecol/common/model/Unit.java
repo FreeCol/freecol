@@ -1712,10 +1712,12 @@ public class Unit extends FreeColGameObject
     public boolean couldMove() {
         Europe europe = getOwner().getEurope();
         boolean carrierInEurope = false;
-        for (Unit u : europe.getUnitList()) {
-            if (u.isCarrier()) {
-                carrierInEurope = true;
-                break;
+        if (europe != null) {
+            for (Unit u : europe.getUnitList()) {
+                if (u.isCarrier()) {
+                    carrierInEurope = true;
+                    break;
+                }
             }
         }
 
