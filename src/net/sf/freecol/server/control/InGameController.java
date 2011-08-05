@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
@@ -1578,47 +1579,101 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Move a unit to America.
+     * Move a unit across the high seas.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to move to America.
+     * @param unit The <code>Unit</code> to move.
+     * @param destination The <code>Location</code> to move to.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element moveToAmerica(ServerPlayer serverPlayer, Unit unit) {
+    public Element moveTo(ServerPlayer serverPlayer, Unit unit,
+                          Location destination) {
         ChangeSet cs = new ChangeSet();
-        unit.setSailFor(getGame().getMap());
-        cs.add(See.only(serverPlayer), serverPlayer.getEurope(),
-               serverPlayer.getHighSeas());
-
-        // Only the player can see this.
-        return cs.build(serverPlayer);
-    }
-
-    /**
-     * Move a unit to Europe.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to move to Europe.
-     * @return An <code>Element</code> encapsulating this action.
-     */
-    public Element moveToEurope(ServerPlayer serverPlayer, Unit unit) {
         HighSeas highSeas = serverPlayer.getHighSeas();
-        if (unit.getLocation() == highSeas) {
-            // Unit already sailing, nothing to see for the others.
-            return new ChangeSet().add(See.only(serverPlayer), unit, highSeas)
-                .build(serverPlayer);
+        Location current = unit.getDestination();
+        boolean others = false; // Notify others?
+        boolean invalid = false; // Not a highSeas move?
+
+        if (destination instanceof Europe) {
+            if (!highSeas.getDestinations().contains(destination)) {
+                return DOMMessage.clientError("HighSeas does not connect to: "
+                    + ((FreeColGameObject) destination).getId());
+            } else if (unit.getLocation() == highSeas) {
+                if (!(current instanceof Europe)) {
+                    // Changed direction
+                    unit.setWorkLeft(unit.getSailTurns()
+                        - unit.getWorkLeft() + 1);
+                }
+                unit.setDestination(destination);
+                cs.add(See.only(serverPlayer), unit, highSeas);
+            } else if (unit.getTile() != null) {
+                Tile tile = unit.getTile();
+                unit.setEntryLocation(tile);
+                unit.setWorkLeft(unit.getSailTurns());
+                unit.setDestination(destination);
+                unit.setMovesLeft(0);
+                unit.setLocation(highSeas);
+                cs.addDisappear(serverPlayer, tile, unit);
+                cs.add(See.only(serverPlayer), tile, highSeas);
+                others = true;
+            } else {
+                invalid = true;
+            }
+        } else if (destination instanceof Map) {
+            if (!highSeas.getDestinations().contains(destination)) {
+                return DOMMessage.clientError("HighSeas does not connect to: "
+                    + ((FreeColGameObject) destination).getId());
+            } else if (unit.getLocation() == highSeas) {
+                if (current != destination && (current == null
+                        || current.getTile() == null
+                        || current.getTile().getMap() != destination)) {
+                    // Changed direction
+                    unit.setWorkLeft(unit.getSailTurns()
+                        - unit.getWorkLeft() + 1);
+                }
+                unit.setDestination(destination);
+                cs.add(See.only(serverPlayer), unit, highSeas);
+            } else if (unit.getLocation() instanceof Europe) {
+                Europe europe = (Europe) unit.getLocation();
+                unit.setWorkLeft(unit.getSailTurns());
+                unit.setDestination(destination);
+                unit.setMovesLeft(0);
+                unit.setLocation(highSeas);
+                cs.add(See.only(serverPlayer), unit, europe, highSeas);
+            } else {
+                invalid = true;
+            }
+        } else if (destination instanceof Settlement) {
+            Tile tile = destination.getTile();
+            if (!highSeas.getDestinations().contains(tile.getMap())) {
+                return DOMMessage.clientError("HighSeas does not connect to: "
+                    + ((FreeColGameObject) destination).getId());
+            } else if (unit.getLocation() == highSeas) {
+                // Direction is somewhat moot, so just reset.
+                unit.setWorkLeft(unit.getSailTurns());
+                unit.setDestination(destination);
+                cs.add(See.only(serverPlayer), unit, highSeas);
+            } else if (unit.getLocation() instanceof Europe) {
+                Europe europe = (Europe) unit.getLocation();
+                unit.setWorkLeft(unit.getSailTurns());
+                unit.setDestination(destination);
+                unit.setMovesLeft(0);
+                unit.setLocation(highSeas);
+                cs.add(See.only(serverPlayer), unit, europe, highSeas);
+            } else {
+                invalid = true;
+            }
+        } else {
+            return DOMMessage.clientError("Bogus moveTo destination: "
+                + ((FreeColGameObject) destination).getId());
+        }
+        if (invalid) {
+            return DOMMessage.clientError("Invalid moveTo: unit=" + unit.getId()
+                + " from=" + ((FreeColGameObject) unit.getLocation()).getId()
+                + " to=" + ((FreeColGameObject) destination).getId());
         }
 
-        ChangeSet cs = new ChangeSet();
-
-        Tile tile = unit.getTile();
-        unit.setSailFor(serverPlayer.getEurope());
-        cs.addDisappear(serverPlayer, tile, unit);
-        cs.add(See.only(serverPlayer), tile, highSeas);
-
-        // Others see a disappearance, player sees tile and europe update
-        // as europe now contains the unit.
-        sendToOthers(serverPlayer, cs);
+        if (others) sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 

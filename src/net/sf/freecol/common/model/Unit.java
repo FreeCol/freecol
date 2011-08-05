@@ -2652,29 +2652,6 @@ public class Unit extends FreeColGameObject
     }
 
 
-    public void setSailFor(Location destination) {
-        if (!owner.getHighSeas().getDestinations().contains(destination)) {
-            throw new IllegalStateException("High Seas do not connect to " + destination);
-        }
-        // remove unit from list of movable units
-        setMovesLeft(0);
-        if (location == owner.getHighSeas()) {
-            if (destination != this.destination) {
-                // we are changing directions
-                setWorkLeft(getSailTurns() - getWorkLeft() + 1);
-            } else {
-                // nothing to do
-            }
-        } else {
-            if (getTile() != null) {
-                setEntryLocation(getTile());
-            }
-            setLocation(owner.getHighSeas());
-            setDestination(destination);
-            setWorkLeft(getSailTurns());
-        }
-    }
-
     /**
      * Sets a new state for this unit and initializes the amount of work the
      * unit has left.

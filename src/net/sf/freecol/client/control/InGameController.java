@@ -68,6 +68,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
@@ -1092,11 +1093,19 @@ public final class InGameController implements NetworkConstants {
         if (setDestination(unit, destination)
             && freeColClient.getGame().getCurrentPlayer()
                 == freeColClient.getMyPlayer()) {
-            if (destination instanceof Europe && unit.getTile() != null
-                && unit.getTile().canMoveToEurope()) {
-                moveToEurope(unit);
+            if (destination instanceof Europe) {
+                if (unit.getTile() != null
+                    && unit.getTile().canMoveToEurope()) {
+                    moveTo(unit, destination);
+                } else {
+                    moveToDestination(unit);
+                }
             } else {
-                moveToDestination(unit);
+                if (unit.isInEurope()) {
+                    moveTo(unit, destination);
+                } else {
+                    moveToDestination(unit);
+                }
             }
         }
     }
@@ -1532,7 +1541,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.getDestination() instanceof Europe
                 && unit.getTile() != null
                 && unit.getTile().canMoveToEurope()) {
-                moveToEurope(unit);
+                moveTo(unit, unit.getDestination());
                 return false;
             }
 
@@ -1597,7 +1606,7 @@ public final class InGameController implements NetworkConstants {
             if (destination == null) {
                 return moveHighSeas(unit, direction);
             } else if (destination instanceof Europe) {
-                moveToEurope(unit);
+                moveTo(unit, destination);
                 return false;
             }
             // Fall through
@@ -1817,8 +1826,7 @@ public final class InGameController implements NetworkConstants {
                 StringTemplate.template("highseas.text")
                 .addAmount("%number%", unit.getSailTurns()),
                 "highseas.yes", "highseas.no")) {
-            unit.setDestination(unit.getOwner().getEurope());
-            moveToEurope(unit);
+            moveTo(unit, unit.getOwner().getEurope());
             nextActiveUnit();
             return false;
         }
@@ -1827,32 +1835,53 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Moves the specified unit to America.
+     * Moves the specified unit somewhere that requires crossing the high seas.
      *
-     * @param unit The <code>Unit</code> to be moved to America.
+     * @param unit The <code>Unit</code> to be moved.
+     * @param destination The <code>Location</code> to be moved to.
+     * @throws IllegalArgumentException if destination or unit are null.
      */
-    public void moveToAmerica(Unit unit) {
+    public void moveTo(Unit unit, Location destination) {
         if (!requireOurTurn()) return;
 
-        if (unit.getLocation() instanceof Tile) {
-            freeColClient.playSound("sound.event.illegalMove");
-            return;
+        // Sanity check current state.
+        if (unit == null || destination == null) {
+            throw new IllegalArgumentException("moveTo null argument");
+        } else if (destination instanceof Europe) {
+            if (unit.isInEurope()) {
+                freeColClient.playSound("sound.event.illegalMove");
+                return;
+            }
+        } else if (destination instanceof Map) {
+            if (unit.getTile() != null
+                && unit.getTile().getMap() == destination) {
+                freeColClient.playSound("sound.event.illegalMove");
+                return;
+            }
+        } else if (destination instanceof Settlement) {
+            if (unit.getTile() != null) {
+                freeColClient.playSound("sound.event.illegalMove");
+                return;
+            }
         }
 
-        // Ask for autoload emigrants
+        // Autoload emigrants?
         if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
+            .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
+            && unit.isInEurope()) {
             int spaceLeft = unit.getSpaceLeft();
-            for (Unit u : unit.getLocation().getUnitList()) {
-                if (!u.isNaval()) {
-                    if (u.getType().getSpaceTaken() > spaceLeft) break;
+            for (Unit u : unit.getOwner().getEurope().getUnitList()) {
+                if (spaceLeft <= 0) break;
+                if (!u.isNaval()
+                    && u.getState() == UnitState.SENTRY
+                    && u.getType().getSpaceTaken() <= spaceLeft) {
                     boardShip(u, unit);
                     spaceLeft -= u.getType().getSpaceTaken();
                 }
             }
         }
 
-        if (askServer().moveToAmerica(unit)) {
+        if (askServer().moveTo(unit, destination)) {
             nextActiveUnit();
         }
     }
@@ -1870,7 +1899,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (askServer().moveToEurope(unit)) {
+        if (askServer().moveTo(unit, unit.getOwner().getEurope())) {
             nextActiveUnit();
         }
     }

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -62,8 +63,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
-import net.sf.freecol.common.networking.MoveToAmericaMessage;
-import net.sf.freecol.common.networking.MoveToEuropeMessage;
+import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
@@ -491,26 +491,15 @@ public class AIMessage {
 
 
     /**
-     * Moves an AIUnit to America.
+     * Moves an AIUnit across the high seas.
      *
      * @param aiUnit The <code>AIUnit</code> to move.
+     * @param destination The <code>Location</code> to move to.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askMoveToAmerica(AIUnit aiUnit) {
+    public static boolean askMoveTo(AIUnit aiUnit, Location destination) {
         return sendMessage(aiUnit.getConnection(),
-                           new MoveToAmericaMessage(aiUnit.getUnit()));
-    }
-
-
-    /**
-     * Moves an AIUnit to Europe.
-     *
-     * @param aiUnit The <code>AIUnit</code> to move.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askMoveToEurope(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getConnection(),
-                           new MoveToEuropeMessage(aiUnit.getUnit()));
+                           new MoveToMessage(aiUnit.getUnit(), destination));
     }
 
 

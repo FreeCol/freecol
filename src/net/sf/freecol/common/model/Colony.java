@@ -372,23 +372,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns whether this colony is connected by water to Europe.
-     *
-     * @return <code>true</code> if this <code>Colony</code> is connected
-     *         to Europe.
-     */
-    public boolean isConnected() {
-        Tile tile = getTile();
-        for (Direction direction : Direction.values()) {
-            Tile t = tile.getNeighbourOrNull(direction);
-            if (t != null && t.getType().isWater() && t.isConnected()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Returns whether this colony has undead units.
      *
      * @return whether this colony has undead units.

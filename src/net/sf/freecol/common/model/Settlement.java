@@ -452,6 +452,20 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
+     * Returns whether this settlement is connected by water to Europe.
+     *
+     * @return <code>true</code> if this <code>Settlement</code> is connected
+     *         to Europe.
+     */
+    public boolean isConnected() {
+        for (Tile t : getTile().getSurroundingTiles(1)) {
+            if (t.isExplored() && t.getType().isWater()
+                && t.isConnected()) return true;
+        }
+        return false;
+    }
+
+    /**
      * Gets the current Sons of Liberty in this settlement.
      */
     public abstract int getSoL();

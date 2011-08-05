@@ -66,6 +66,30 @@ public final class CostDeciders {
 
 
     /**
+     * A <code>CostDecider</code> that uses server-side knowledge of where
+     * a player has explored to searches.
+     */
+    private static class ServerBaseCostDecider extends BaseCostDecider {
+        @Override
+        public int getCost(Unit unit, Tile oldTile, Tile newTile,
+                           int movesLeft) {
+            int cost = super.getCost(unit, oldTile, newTile, movesLeft);
+            if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
+                if (!newTile.isExploredBy(unit.getOwner())) return ILLEGAL_MOVE;
+            }
+            return cost;
+        }
+    };
+
+
+    /**
+     * A server-side <code>CostDecider</code> that costs unit moves normally.
+     */
+    private static final CostDecider
+        serverAvoidIllegalCostDecider = new ServerBaseCostDecider();
+
+
+    /**
      * A <code>CostDecider</code> that costs unit moves normally while
      * avoiding other player settlements.
      */
@@ -165,6 +189,18 @@ public final class CostDeciders {
      */
     public static CostDecider avoidIllegal() {
         return avoidIllegalCostDecider;
+    }
+
+    /**
+     * A <code>CostDecider</code> that returns the cost of moving
+     * across the terrain, excluding only illegal moves, and works correctly
+     * on the server side by refusing to consider tiles unexplored by the
+     * player.
+     *
+     * @return The <code>CostDecider</code>.
+     */
+    public static CostDecider serverAvoidIllegal() {
+        return serverAvoidIllegalCostDecider;
     }
 
     /**

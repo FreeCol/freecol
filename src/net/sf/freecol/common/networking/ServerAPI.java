@@ -100,8 +100,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
-import net.sf.freecol.common.networking.MoveToAmericaMessage;
-import net.sf.freecol.common.networking.MoveToEuropeMessage;
+import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -907,24 +906,14 @@ public class ServerAPI {
     }
 
     /**
-     * Server query-response for moving to America.
+     * Server query-response for moving to across the high seas.
      *
      * @param unit The <code>Unit</code> to move.
+     * @param destination The <code>Location</code> to move to.
      * @return True if the server interaction succeeded.
      */
-    public boolean moveToAmerica(Unit unit) {
-        return askHandling(new MoveToAmericaMessage(unit),
-            null, null);
-    }
-
-    /**
-     * Server query-response for moving to Europe.
-     *
-     * @param unit The <code>Unit</code> to move.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean moveToEurope(Unit unit) {
-        return askHandling(new MoveToEuropeMessage(unit),
+    public boolean moveTo(Unit unit, Location destination) {
+        return askHandling(new MoveToMessage(unit, destination),
             null, null);
     }
 

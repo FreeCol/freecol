@@ -156,11 +156,13 @@ public abstract class Mission extends AIObject {
 
 
     protected void moveUnitToAmerica() {
-        AIMessage.askMoveToAmerica(aiUnit);
+        AIMessage.askMoveTo(aiUnit,
+            aiUnit.getUnit().getOwner().getGame().getMap());
     }
 
     protected void moveUnitToEurope() {
-        AIMessage.askMoveToEurope(aiUnit);
+        AIMessage.askMoveTo(aiUnit,
+            aiUnit.getUnit().getOwner().getEurope());
     }
 
 

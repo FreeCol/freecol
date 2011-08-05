@@ -60,8 +60,7 @@ import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
-import net.sf.freecol.common.networking.MoveToAmericaMessage;
-import net.sf.freecol.common.networking.MoveToEuropeMessage;
+import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -408,20 +407,12 @@ public final class InGameInputHandler extends InputHandler
                 return new MoveMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(MoveToAmericaMessage.getXMLElementTagName(),
+        register(MoveToMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new MoveToAmericaMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(MoveToEuropeMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new MoveToEuropeMessage(getGame(), element)
+                return new MoveToMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(NewLandNameMessage.getXMLElementTagName(),

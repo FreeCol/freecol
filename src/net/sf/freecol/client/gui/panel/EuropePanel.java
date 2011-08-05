@@ -54,6 +54,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -462,7 +463,7 @@ public final class EuropePanel extends FreeColPanel {
 
     /**
      * A panel that holds UnitsLabels that represent Units that are going to
-     * America.
+     * America or Europe.
      */
     public final class DestinationPanel extends JPanel {
 
@@ -490,7 +491,19 @@ public final class EuropePanel extends FreeColPanel {
             HighSeas highSeas = getMyPlayer().getHighSeas();
             if (highSeas != null) {
                 for (Unit unit : highSeas.getUnitList()) {
-                    if (unit.getDestination() == destination) {
+                    boolean belongs;
+                    if (destination instanceof Europe) {
+                        belongs = unit.getDestination() == destination;
+                    } else if (destination instanceof Map) {
+                        belongs = unit.getDestination() == destination
+                            || (unit.getTile() != null
+                                && unit.getTile().getMap() == destination);
+                    } else {
+                        logger.warning("Bogus DestinationPanel location: "
+                            + ((FreeColGameObject) destination));
+                        belongs = false;
+                    }
+                    if (belongs) {
                         UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
@@ -523,29 +536,31 @@ public final class EuropePanel extends FreeColPanel {
                     logger.warning("Invalid component dropped on this DestinationPanel.");
                     return null;
                 }
+                final Canvas canvas = getCanvas();
                 final Unit unit = ((UnitLabel) comp).getUnit();
+
+                Location dest = destination;
+                if (unit.isInEurope()) {
+                    dest = canvas.showSelectDestinationDialog(unit);
+                    if (dest == null) return null; // user aborted
+                }
+
                 final ClientOptions co = getClientOptions();
                 boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
                 if (!autoload
+                    && unit.isInEurope()
+                    && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
                     && unit.getSpaceLeft() > 0) {
-                    boolean leave = getCanvas()
-                        .showConfirmDialog(null,
-                                           StringTemplate.template("europe.leaveColonists")
-                                           .addName("%newWorld%", destination.getLocationNameFor(unit.getOwner())),
-                                           "yes", "no");
-                    if (!leave) { // Colonists remain in Europe.
-                        return null;
-                    }
+                    boolean leave = canvas.showConfirmDialog(null,
+                        StringTemplate.template("europe.leaveColonists")
+                            .addStringTemplate("%newWorld%", destination.getLocationNameFor(unit.getOwner())),
+                        "yes", "no");
+                    if (!leave) return null; // Colonists remain in Europe.
                 }
-                comp.getParent().remove(comp);
 
-                // TODO: make this more generic
-                if (destination instanceof Map) {
-                    getController().moveToAmerica(unit);
-                } else if (destination instanceof Europe) {
-                    getController().moveToEurope(unit);
-                }
+                comp.getParent().remove(comp);
+                getController().moveTo(unit, dest);
                 inPortPanel.update();
                 docksPanel.update();
             }

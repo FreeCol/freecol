@@ -45,8 +45,10 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
@@ -66,6 +68,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.RandomChoice;
@@ -287,6 +291,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         if (getLocation() instanceof HighSeas) {
             Europe europe = owner.getEurope();
+            Map map = getGame().getMap();
             if (getDestination() == europe) {
                 setLocation(europe);
                 logger.info(toString() + " arrives in Europe");
@@ -304,11 +309,20 @@ public class ServerUnit extends Unit implements ServerModelObject {
                               .add("%europe%", europe.getNameKey()));
                 setState(UnitState.ACTIVE);
                 cs.add(See.only(owner), europe, owner.getHighSeas());
-            } else if (getDestination() == getGame().getMap()) {
+            } else if (getDestination() == map) {
                 logger.info(toString() + " arrives in America");
                 setDestination(null);
                 csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
                        random, cs);
+            } else if (getDestination() instanceof Settlement) {
+                Settlement settlement = (Settlement) getDestination();
+                setDestination(null);
+                PathNode path = map.findPathToEurope(this,
+                    settlement.getTile(), CostDeciders.serverAvoidIllegal());
+                csMove(path.getLastNode().getTile(), random, cs);
+                logger.info(toString() + " arrives in America"
+                    + ", sailing for" + settlement.getName()
+                    + " from " + path.getLastNode().getTile());
             } else {
                 logger.warning(toString() + " has unsupported destination "
                                + getDestination());

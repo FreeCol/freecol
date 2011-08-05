@@ -19,8 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
@@ -30,9 +31,9 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when moving a unit to America.
+ * The message sent when moving a unit across the high seas.
  */
-public class MoveToAmericaMessage extends DOMMessage {
+public class MoveToMessage extends DOMMessage {
 
     /**
      * The id of the object to be moved.
@@ -40,27 +41,36 @@ public class MoveToAmericaMessage extends DOMMessage {
     private String unitId;
 
     /**
-     * Create a new <code>MoveToAmericaMessage</code> for the supplied unit.
+     * The id of the destination to be moved to.
+     */
+    private String destinationId;
+
+    /**
+     * Create a new <code>MoveToMessage</code> for the supplied unit
+     * and destination.
      *
      * @param unit The <code>Unit</code> to move.
+     * @param destination The <code>Location</code> to move to.
      */
-    public MoveToAmericaMessage(Unit unit) {
+    public MoveToMessage(Unit unit, Location destination) {
         this.unitId = unit.getId();
+        this.destinationId = destination.getId();
     }
 
     /**
-     * Create a new <code>MoveToAmericaMessage</code> from a
+     * Create a new <code>MoveToMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public MoveToAmericaMessage(Game game, Element element) {
+    public MoveToMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
+        this.destinationId = element.getAttribute("destination");
     }
 
     /**
-     * Handle a "moveToAmerica"-message.
+     * Handle a "moveTo"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
@@ -72,41 +82,44 @@ public class MoveToAmericaMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = player.getGame();
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.isInEurope() || unit.isAtSea()) {
-            ; // OK
+        FreeColGameObject obj = game.getFreeColGameObjectSafely(destinationId);
+        Location destination;
+        if (obj instanceof Location) {
+            destination = (Location) obj;
         } else {
-            return DOMMessage.clientError("Unit must be in Europe"
-                + " or on high seas to move to America: " + unitId);
+            return DOMMessage.clientError("Not a location: " + destinationId);
         }
 
         // Proceed to move.
         return server.getInGameController()
-            .moveToAmerica(serverPlayer, unit);
+            .moveTo(serverPlayer, unit, destination);
     }
 
     /**
-     * Convert this MoveToAmericaMessage to XML.
+     * Convert this MoveToMessage to XML.
      *
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", this.unitId);
+        result.setAttribute("unit", unitId);
+        result.setAttribute("destination", destinationId);
         return result;
     }
 
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "moveToAmerica".
+     * @return "moveTo".
      */
     public static String getXMLElementTagName() {
-        return "moveToAmerica";
+        return "moveTo";
     }
 }
