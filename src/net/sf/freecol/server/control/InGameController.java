@@ -351,8 +351,9 @@ public final class InGameController extends Controller {
         }
         // Send the navy on its way
         for (Unit u : navalUnits) {
-            u.setLocation(u.getOwner().getHighSeas());
+            u.setWorkLeft(1);
             u.setDestination(getGame().getMap());
+            u.setLocation(u.getOwner().getHighSeas());
         }
 
         return refPlayer;
