@@ -1803,17 +1803,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        Settlement oldSettlement = settlement;
-        Player oldSettlementOwner = (settlement == null) ? null
-            : settlement.getOwner();
-
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        super.readAttributes(in);
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
@@ -1823,10 +1817,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (typeString != null) {
             type = getSpecification().getTileType(typeString);
         }
-
-        // compatibility mode
-        boolean needsRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
-
         connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
@@ -1834,7 +1824,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             ? null
             : getAttribute(in, "moveToEurope", false);
 
-        final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
+        final String owningSettlementStr
+            = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {
             owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
             if (owningSettlement == null) {
@@ -1849,10 +1840,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         } else {
             owningSettlement = null;
         }
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        Settlement oldSettlement = settlement;
+        Player oldSettlementOwner = (settlement == null) ? null
+            : settlement.getOwner();
         settlement = null;
-        readChildren(in);
 
+        super.readChildren(in);
 
         // Player settlement list is not passed in player updates
         // so do it here.  TODO: something better.
@@ -1880,7 +1879,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
             settlement = updateFreeColGameObject(in, Colony.class);
