@@ -1402,6 +1402,7 @@ public final class ColonyPanel extends FreeColPanel
                     }
                 }
             }
+            repaint();
         }
 
         public void cleanup() {
@@ -1510,9 +1511,6 @@ public final class ColonyPanel extends FreeColPanel
                     setTransferHandler(defaultTransferHandler);
                     addMouseListener(releaseListener);
                 }
-
-                revalidate();
-                repaint();
             }
 
             /**
