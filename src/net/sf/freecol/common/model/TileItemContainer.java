@@ -357,18 +357,21 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the movement cost to this <code>Tile</code> from another <code>Tile</code>.
+     * Determine the movement cost to this <code>Tile</code> from
+     * another <code>Tile</code>.
      * Does not consider special unit abilities.
      *
-     * @param basicMoveCost an <code>int</code> value
-     * @param fromTile a <code>Tile</code> value
-     * @return The movement cost
+     * @param basicMoveCost The basic cost.
+     * @param fromTile The <code>Tile</code> to move from.
+     * @return The movement cost.
      */
     public int getMoveCost(int basicMoveCost, Tile fromTile) {
         int moveCost = basicMoveCost;
         for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement) {
-                moveCost = ((TileImprovement) item).getMovementCost(moveCost, fromTile);
+            if (item instanceof TileImprovement
+                && ((TileImprovement) item).isComplete()) {
+                moveCost = ((TileImprovement) item).getMovementCost(moveCost,
+                                                                    fromTile);
             }
         }
         return moveCost;
