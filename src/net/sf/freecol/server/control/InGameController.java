@@ -2252,8 +2252,12 @@ public final class InGameController extends Controller {
         int next = current;
         for (;;) {
             if (++next >= stops.size()) next = 0;
-            if (next == current) break;
-            if (((ServerUnit) unit).hasWorkAtStop(stops.get(next))) break;
+            if (next == current) return null; // No work at any stop, stay put.
+            Stop nextStop = stops.get(next);
+            if (((ServerUnit) unit).hasWorkAtStop(nextStop)) break;
+            logger.finest("Unit " + unit
+                + " in trade route " + unit.getTradeRoute().getName()
+                + " found no work at stop: " + (FreeColGameObject) nextStop.getLocation());
         }
 
         // Next is the updated stop.
