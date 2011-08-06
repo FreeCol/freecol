@@ -424,4 +424,42 @@ public class CombatTest extends FreeColTestCase {
 
     }
 
+    public void testAttackShipWithLandUnit() {
+
+        Game game = getStandardGame();
+        Player spanish = game.getPlayer("model.nation.spanish");
+        Player tupi = game.getPlayer("model.nation.tupi");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel();
+
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+
+        tile1.setType(hills);
+        assertEquals(hills, tile1.getType());
+        tile2.setType(ocean);
+        assertEquals(ocean, tile2.getType());
+
+        spanish.setStance(tupi, Player.Stance.WAR);
+        tupi.setStance(spanish, Player.Stance.WAR);
+
+        Unit galleon = new ServerUnit(game, tile2, spanish, galleonType,
+                                      UnitState.ACTIVE);
+        Unit brave = new ServerUnit(game, tile1, tupi, braveType,
+                                    UnitState.ACTIVE);
+
+        assertEquals(tile1, brave.getLocation());
+        assertEquals(tile2, galleon.getLocation());
+
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_LAND,
+                     galleon.getMoveType(tile2, tile1, 3));
+
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_EMBARK,
+                     brave.getMoveType(tile1, tile2, 3));
+
+    }
+
+
 }
