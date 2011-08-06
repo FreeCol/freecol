@@ -243,6 +243,10 @@ public final class ColonyPanel extends FreeColPanel
         // the following actions are pre-defined
         nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
         nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"), "selectNext2");
+        InputMap nameInputMap = new ComponentInputMap(nameBox);
+        nameInputMap.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
+        nameInputMap.put(KeyStroke.getKeyStroke("RIGHT"), "selectNext2");
+        SwingUtilities.replaceUIInputMap(nameBox, JComponent.WHEN_IN_FOCUSED_WINDOW, nameInputMap);
 
         buildingsScroll.setAutoscrolls(true);
         buildingsScroll.getViewport().setOpaque(false);
