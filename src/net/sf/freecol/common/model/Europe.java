@@ -155,7 +155,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Describe <code>getFeatureContainer</code> method here.
+     * Returns the FeatureContainer.
      *
      * @return a <code>FeatureContainer</code> value
      */
@@ -163,8 +163,28 @@ public class Europe extends UnitLocation implements Ownable, Named {
         return featureContainer;
     }
 
+    /**
+     * Sets the FeatureContainer.
+     *
+     * @param container a <code>FeatureContainer</code> value
+     */
     protected void setFeatureContainer(FeatureContainer container) {
         featureContainer = container;
+    }
+
+    /**
+     * Returns true if a carrier unit is docked in Europe.
+     *
+     * @return a <code>boolean</code> value
+     * @see Unit#isCarrier
+     */
+    public boolean hasCarrier() {
+        for (Unit u : getUnitList()) {
+            if (u.isCarrier()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

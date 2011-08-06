@@ -1710,23 +1710,13 @@ public class Unit extends FreeColGameObject
      * @return a <code>boolean</code> value
      */
     public boolean couldMove() {
-        Europe europe = getOwner().getEurope();
-        boolean carrierInEurope = false;
-        if (europe != null) {
-            for (Unit u : europe.getUnitList()) {
-                if (u.isCarrier()) {
-                    carrierInEurope = true;
-                    break;
-                }
-            }
-        }
-
         return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
             && destination == null
             && tradeRoute == null
-            && (location instanceof Tile
-                || (location instanceof Europe && carrierInEurope))
-            && getMovesLeft() > 0;
+            && ((location instanceof Tile
+                 && getMovesLeft() > 0)
+                || (location instanceof Europe
+                    && ((Europe) location).hasCarrier()));
     }
 
 
