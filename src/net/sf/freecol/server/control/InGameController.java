@@ -1063,18 +1063,23 @@ public final class InGameController extends Controller {
     public Element cashInTreasureTrain(ServerPlayer serverPlayer, Unit unit) {
         ChangeSet cs = new ChangeSet();
 
-        // Work out the cash in amount.
+        // Work out the cash in amount and the message to send.
         int fullAmount = unit.getTreasureAmount();
-        int cashInAmount = (fullAmount - unit.getTransportFee())
-            * (100 - serverPlayer.getTax()) / 100;
+        int cashInAmount;
+        String messageId;
+        if (serverPlayer.getPlayerType() == PlayerType.COLONIAL) {
+            // Charge transport fee and apply tax
+            cashInAmount = (fullAmount - unit.getTransportFee())
+                * (100 - serverPlayer.getTax()) / 100;
+            messageId = "model.unit.cashInTreasureTrain.colonial";
+        } else {
+            // No fee possible, no tax applies.
+            cashInAmount = fullAmount;
+            messageId = "model.unit.cashInTreasureTrain.independent";
+        }
+            
         serverPlayer.modifyGold(cashInAmount);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
-
-        // Generate a suitable message.
-        String messageId = (serverPlayer.getPlayerType() == PlayerType.REBEL
-                            || serverPlayer.getPlayerType() == PlayerType.INDEPENDENT)
-            ? "model.unit.cashInTreasureTrain.independent"
-            : "model.unit.cashInTreasureTrain.colonial";
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(messageId, serverPlayer, unit)
                 .addAmount("%amount%", fullAmount)
