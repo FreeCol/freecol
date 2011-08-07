@@ -1751,7 +1751,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && isEuropean() && defenderPlayer.isEuropean();
                 if (ok) {
                     csCaptureColony(attackerUnit, colony, random, cs);
-                    attackerTileDirty = defenderTileDirty = true;
+                    attackerTileDirty = defenderTileDirty = false;
                     moveAttacker = true;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
                 }
@@ -2225,6 +2225,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 attackerPlayer.setExplored(t);
                 cs.add(See.only(attackerPlayer), t);
             }
+        }
+
+        // Inform the former owner of loss of units.  Only the potentially
+        // active units on the tile need be considered.  Carried and colony
+        // workers will just become inaccessible.
+        for (Unit u : tile.getUnitList()) {
+            cs.addDispose(See.only(colonyPlayer), tile, u);
         }
 
         cs.addAttribute(See.only(attackerPlayer), "sound",
