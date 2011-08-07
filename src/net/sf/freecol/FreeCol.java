@@ -107,8 +107,6 @@ public final class FreeCol {
     private static int debugRunTurns = -1;
     private static String debugRunSave = null;
 
-    private static boolean usesExperimentalAI = false;
-
     private static String fontName = null;
 
     private static int serverPort = DEFAULT_PORT;
@@ -618,10 +616,6 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("check-savegame")
                           .withDescription(Messages.message("cli.check-savegame"))
                           .create());
-        // TODO: remove option when AI is no longer experimental
-        options.addOption(OptionBuilder.withLongOpt("experimentalAI")
-                          .withDescription(Messages.message("cli.experimentalAI"))
-                          .create());
         options.addOption(OptionBuilder.withLongOpt("font")
                           .withDescription(Messages.message("cli.font"))
                           .withArgName(Messages.message("cli.arg.font"))
@@ -781,9 +775,6 @@ public final class FreeCol {
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
             }
-            if (line.hasOption("experimentalAI")) {
-                usesExperimentalAI = true;
-            }
             if (line.hasOption("font")) {
                 fontName = line.getOptionValue("font");
             }
@@ -890,15 +881,6 @@ public final class FreeCol {
      */
     public static String getDebugRunSaveName() {
         return debugRunSave;
-    }
-
-    /**
-     * Checks if the program is in "Experimental AI mode".
-     * @return <code>true</code> if the program is in Experimental AI
-     *       mode and <code>false</code> otherwise.
-     */
-    public static boolean usesExperimentalAI() {
-        return usesExperimentalAI;
     }
 
     /**

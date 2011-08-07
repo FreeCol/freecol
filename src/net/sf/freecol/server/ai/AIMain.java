@@ -73,13 +73,13 @@ public class AIMain extends FreeColObject
         this.freeColServer = freeColServer;
         findNewObjects();
     }
-    
+
     /**
     * Creates a new <code>AIMain</code> and reads the given element.
-    * 
+    *
     * @param freeColServer The main controller object for the
     *       server.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
+    * @param element The <code>Element</code> (in a DOM-parsed XML-tree)
     *       that describes this object.
     * @see #readFromXMLElement
     */
@@ -90,7 +90,7 @@ public class AIMain extends FreeColObject
 
     /**
      * Creates a new <code>AIMain</code> and reads the given element.
-     * 
+     *
      * @param freeColServer The main controller object for the
      *       server.
      * @param in The input stream containing the XML.
@@ -102,7 +102,7 @@ public class AIMain extends FreeColObject
          this(freeColServer);
          readFromXML(in);
      }
-     
+
 
     /**
      * Gets the main controller object for the server.
@@ -126,9 +126,9 @@ public class AIMain extends FreeColObject
      * Checks the integrity of this <code>AIMain</code>
      * by checking if there are any
      * {@link AIObject#isUninitialized() uninitialized objects}.
-     * 
+     *
      * Detected problems gets written to the log.
-     * 
+     *
      * @return <code>true</code> if the <code>Game</code> has
      *      been loaded properly.
      */
@@ -229,7 +229,7 @@ public class AIMain extends FreeColObject
      * @see #getAIObject(FreeColGameObject)
      * @return The <code>AIObject</code>.
      */
-    public AIObject getAIObject(String id) {        
+    public AIObject getAIObject(String id) {
         return aiObjects.get(id);
     }
 
@@ -337,17 +337,7 @@ public class AIMain extends FreeColObject
         if (freeColGameObject instanceof Unit) {
             new AIUnit(this, (Unit) freeColGameObject);
         } else if (freeColGameObject instanceof ServerPlayer) {
-            if (FreeCol.usesExperimentalAI()) {
-                ServerPlayer p = (ServerPlayer) freeColGameObject;
-                if (!p.isREF() && !p.isIndian() && p.isEuropean()) {
-                    logger.info("Using experimental ColonialAIPlayer for "+p.getName());
-                    new ColonialAIPlayer(this, p);
-                } else {
-                    new StandardAIPlayer(this, p);
-                }
-            } else {
-                new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
-            }
+            new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
         } else if (freeColGameObject instanceof Colony) {
             new AIColony(this, (Colony) freeColGameObject);
         }
@@ -395,7 +385,7 @@ public class AIMain extends FreeColObject
 
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
      *
      * @param out The target stream.
@@ -436,7 +426,7 @@ public class AIMain extends FreeColObject
         Iterator<AIObject> i = aiObjects.values().iterator();
         while (i.hasNext()) {
             AIObject aio = i.next();
-            
+
             if ((aio instanceof Wish) && !((Wish) aio).shouldBeStored()) {
                 continue;
             }
@@ -466,7 +456,7 @@ public class AIMain extends FreeColObject
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         aiObjects.clear();
-        
+
         if (!in.getLocalName().equals(getXMLElementTagName())) {
             logger.warning("Expected element name, got: " + in.getLocalName());
         }
@@ -474,20 +464,22 @@ public class AIMain extends FreeColObject
         if (nextIDStr != null) {
             nextID = Integer.parseInt(nextIDStr);
         }
-        
+
         String lastTag = "";
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
-            try {         
+            try {
                 if (oid != null && aiObjects.containsKey(oid)) {
                     getAIObject(oid).readFromXML(in);
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
                 } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
                     new StandardAIPlayer(this, in);
+                    /*
                 } else if (tagName.equals(ColonialAIPlayer.getXMLElementTagName())) {
                     new ColonialAIPlayer(this, in);
+                    */
                 } else if (tagName.equals(AIColony.getXMLElementTagName())) {
                     new AIColony(this, in);
                 } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
@@ -497,7 +489,7 @@ public class AIMain extends FreeColObject
                 } else if (tagName.equals(GoodsWish.getXMLElementTagName())) {
                     new GoodsWish(this, in);
                 } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())) {
-                    new TileImprovementPlan(this, in);                
+                    new TileImprovementPlan(this, in);
                 } else {
                     logger.warning("Unknown AI-object read: " + tagName + "(" + lastTag + ")");
                 }
@@ -508,18 +500,18 @@ public class AIMain extends FreeColObject
                 logger.warning("Exception while reading an AIObject(" + tagName
                     + ", " + oid + "): " + sw.toString());
                 while (!in.getLocalName().equals(tagName) && !in.getLocalName().equals(getXMLElementTagName())) {
-                    in.nextTag();                    
+                    in.nextTag();
                 }
                 if (!in.getLocalName().equals(getXMLElementTagName())) {
                     in.nextTag();
                 }
             }
         }
-        
+
         if (!in.getLocalName().equals(getXMLElementTagName())) {
             logger.warning("Expected element name (2), got: " + in.getLocalName());
         }
-        
+
         // This should not be necessary - but just in case:
         findNewObjects(false);
     }
