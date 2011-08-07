@@ -56,6 +56,14 @@ public abstract class AIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
+    public static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
+
+    public static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
+
+    public static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
+
+    public static final int MAX_NUMBER_OF_DEMANDS = 1;
+
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -313,30 +321,6 @@ public abstract class AIPlayer extends AIObject {
     public abstract void startWorking();
 
     /**
-     * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovement</code>s needed by all of this player's colonies.
-     *
-     * @return The <code>Iterator</code>.
-     * @see net.sf.freecol.common.model.TileImprovement
-     */
-    public abstract Iterator<TileImprovementPlan> getTileImprovementPlanIterator();
-
-    /**
-     * Remove a <code>TileImprovementPlan</code> from the list
-     */
-    public abstract void removeTileImprovementPlan(TileImprovementPlan plan);
-
-    /**
-     * This is a temporary method which are used for forcing the computer
-     * players into building more colonies. The method will be removed after the
-     * proper code for deciding whether a colony should be built or not has been
-     * implemented.
-     *
-     * @return <code>true</code> if the AI should build more colonies.
-     */
-    public abstract boolean hasFewColonies();
-
-    /**
      * Returns an <code>Iterator</code> for all the wishes. The items are
      * sorted by the {@link Wish#getValue value}, with the item having the
      * highest value appearing first in the <code>Iterator</code>.
@@ -345,42 +329,6 @@ public abstract class AIPlayer extends AIObject {
      * @see Wish
      */
     public abstract Iterator<Wish> getWishIterator();
-
-    /**
-     * Selects the most useful founding father offered.
-     *
-     * @param foundingFathers The founding fathers on offer.
-     * @return The founding father selected.
-     */
-    public abstract FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers);
-
-    /**
-     * Decides whether to accept the monarch's tax raise or not.
-     *
-     * @param tax The new tax rate to be considered.
-     * @return <code>true</code> if the tax raise should be accepted.
-     */
-    public abstract boolean acceptTax(int tax);
-
-    /**
-     * Decides whether to accept an Indian demand, or not.
-     *
-     * @param unit The unit making demands.
-     * @param colony The colony where demands are being made.
-     * @param goods The goods demanded.
-     * @param gold The amount of gold demanded.
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         indian demand and <code>false</code> otherwise.
-     */
-    public abstract boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold);
-
-    /**
-     * Decides whether to accept a mercenary offer, or not.
-     *
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         offer and <code>false</code> otherwise.
-     */
-    public abstract boolean acceptMercenaryOffer();
 
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
 
@@ -429,8 +377,11 @@ public abstract class AIPlayer extends AIObject {
      *             stream.
      */
     @Override
-    protected abstract void toXMLImpl(XMLStreamWriter out)
-        throws XMLStreamException;
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeEndElement();
+    }
 
     /**
      * Reads information for this object from an XML stream.
@@ -440,13 +391,17 @@ public abstract class AIPlayer extends AIObject {
      *             stream.
      */
     @Override
-    protected abstract void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException;
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        setPlayer((ServerPlayer) getAIMain()
+            .getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
+        in.nextTag();
+    }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return "aiPlayer".
+     * @return the tag name.
      */
     public static String getXMLElementTagName() {
         return "aiPlayer";

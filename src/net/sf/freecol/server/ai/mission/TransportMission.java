@@ -58,6 +58,7 @@ import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Transportable;
 import net.sf.freecol.server.ai.Wish;
@@ -772,7 +773,7 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     private void buyCargo(Connection connection) {
-        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
 
         if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");

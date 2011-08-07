@@ -75,16 +75,16 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
 
     /**
-     * 
+     *
      * The constructor to use.
-     * 
+     *
      * @param freeColServer The main server.
-     * 
+     *
      * @param me The AI player that is being managed by this
      *            AIInGameInputHandler.
-     * 
+     *
      * @param aiMain The main AI-object.
-     * 
+     *
      */
     public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me, AIMain aiMain) {
         this.freeColServer = freeColServer;
@@ -104,7 +104,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
     /**
      * Deals with incoming messages that have just been received.
-     * 
+     *
      * @param connection The <code>Connection</code> the message was received
      *            on.
      * @param element The root element of the message.
@@ -191,7 +191,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
     /**
      * Handles the main element of an XML message.
-     * 
+     *
      * @param connection The connection the message came from.
      * @param in The stream containing the message.
      * @param out The output stream for the reply.
@@ -201,9 +201,9 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     }
 
     /**
-     * 
+     *
      * Checks if the message handler support the given message.
-     * 
+     *
      * @param tagName The tag name of the message to check.
      * @return The result (currently always false).
      */
@@ -213,7 +213,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
     /**
      * Handles a "setCurrentPlayer"-message.
-     * 
+     *
      * @param connection The connection the message was received on.
      * @param setCurrentPlayerElement The element (root element in a DOM-parsed
      *            XML tree) that holds all the information.
@@ -240,17 +240,17 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     }
 
     /**
-     * 
+     *
      * Handles a "chooseFoundingFather"-message.
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * @param connection The connectio the message was received on.
-     * 
+     *
      * @param element The element (root element in a DOM-parsed XML tree) that
-     * 
+     *
      * holds all the information.
-     * 
+     *
      */
     private Element chooseFoundingFather(DummyConnection connection, Element element) {
         final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
@@ -268,7 +268,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             }
         }
 
-        FoundingFather foundingFather = getAIPlayer()
+        FoundingFather foundingFather = ((EuropeanAIPlayer) getAIPlayer())
             .selectFoundingFather(possibleFoundingFathers);
         if (foundingFather != null) {
             AIMessage.askChooseFoundingFather(connection, foundingFather);
@@ -278,11 +278,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
     /**
      * Handles a "monarchAction"-message.
-     * 
+     *
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * 
+     *
      */
     private Element monarchAction(DummyConnection connection, Element element) {
         MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
@@ -292,7 +292,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             int tax;
             try {
                 tax = Integer.parseInt(element.getAttribute("amount"));
-                accept = getAIPlayer().acceptTax(tax);
+                accept = ((EuropeanAIPlayer) getAIPlayer()).acceptTax(tax);
             } catch (Exception e) {
                 tax = -1;
                 accept = false;
@@ -301,9 +301,9 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
-            
+
         case OFFER_MERCENARIES:
-            accept = getAIPlayer().acceptMercenaryOffer();
+            accept = ((EuropeanAIPlayer) getAIPlayer()).acceptMercenaryOffer();
             element.setAttribute("accepted", String.valueOf(accept));
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
@@ -319,7 +319,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
     /**
      * Handles an "indianDemand"-message.
-     * 
+     *
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
@@ -336,14 +336,15 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         } else {
             goods = new Goods(game, goodsElement);
         }
-        boolean accept = getAIPlayer().acceptIndianDemand(unit, colony, goods, gold);
+        boolean accept = ((EuropeanAIPlayer) getAIPlayer())
+            .acceptIndianDemand(unit, colony, goods, gold);
         element.setAttribute("accepted", String.valueOf(accept));
         return element;
     }
 
     /**
      * Handles an "diplomaticTrade"-message.
-     * 
+     *
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.

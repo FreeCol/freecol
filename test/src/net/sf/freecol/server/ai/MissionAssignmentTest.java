@@ -52,7 +52,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
     private static final TileType plainsType
         = spec().getTileType("model.tile.plains");
-	
+
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType veteranType
@@ -63,10 +63,10 @@ public class MissionAssignmentTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.artillery");
     private static final UnitType galleonType
         = spec().getUnitType("model.unit.galleon");
-	
+
     final int MISSION_IMPOSSIBLE = Integer.MIN_VALUE;
-	
-	
+
+
     @Override
     public void tearDown() throws Exception {
         ServerTestHelper.stopServerGame();
@@ -81,29 +81,29 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create attacking player and units
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
+        EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Tile tile2 = map.getTile(2, 1);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         Unit friendlyColonist = new ServerUnit(game, tile2, dutch, colonistType, UnitState.ACTIVE);
-        
+
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
-        
+
         // Create defending player and unit
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
 
         Tile tile3 = map.getTile(1, 2);
         Unit enemyColonist = new ServerUnit(game, tile3, french, colonistType, UnitState.ACTIVE);
-        
+
         Tile tile4 = map.getTile(12, 12); // in the water
         assertFalse("Tle should be water",tile4.isLand());
-        
+
         Unit enemyGalleon = new ServerUnit(game, tile4, french, galleonType, UnitState.ACTIVE);
         //Make tests
         int turnsToReach = 1; // not important
-        
+
         assertTrue("Cannot attack own unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, friendlyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
         assertTrue("Players are not at war", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
 
@@ -113,7 +113,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertFalse("Unit should be able to attack land unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
         assertTrue("Land unit cannot attack naval unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyGalleon.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
     }
-	
+
     public void testIsTargetValidForSeekAndDestroy() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
@@ -121,7 +121,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer incaPlayer = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(incaPlayer);
+        NativeAIPlayer aiInca = (NativeAIPlayer)aiMain.getAIPlayer(incaPlayer);
         ServerPlayer dutchPlayer = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile dutchUnitTile = map.getTile(9, 9);
@@ -141,7 +141,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         dutchPlayer.setStance(incaPlayer, Stance.WAR);
         assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
     }
-	
+
     public void testGiveMilitaryMission() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
@@ -149,18 +149,18 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create attacking player and units
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
+        EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
-        
+
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
-        
+
         // Create defending player
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
 
-        //Make tests        
+        //Make tests
 
         aiDutch.giveMilitaryMission(aiUnit);
 
@@ -168,7 +168,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
 
-        // Add non-hostile unit 
+        // Add non-hostile unit
         Tile tile2 = map.getTile(2, 1);
         new ServerUnit(game, tile2, french, colonistType, UnitState.ACTIVE);
 
@@ -189,7 +189,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertFalse("Enemy unit is present, should not be UnitWanderHostileMission", isUnitWanderHostileMission);
         assertTrue("Enemy unit is present, should be UnitSeekAndDestroyMission", isSeekAndDestroyMission);
     }
-	
+
     public void testAssignDefendSettlementMission() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
@@ -197,14 +197,14 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        StandardAIPlayer aiDutch = (StandardAIPlayer)aiMain.getAIPlayer(dutch);
+        EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
-        
+
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
-                
+
         aiDutch.giveMilitaryMission(aiUnit);
 
         boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
@@ -220,7 +220,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue(colonyTile.getSettlement() == colony);
         assertTrue(colony.getOwner() == dutch);
         assertTrue(colony.getUnitCount() == 1);
-        
+
         int turnsToColony = 1;
         // reassign mission and check
 
@@ -248,7 +248,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer inca = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(inca);
+        NativeAIPlayer aiInca = (NativeAIPlayer)aiMain.getAIPlayer(inca);
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile settlementTile = map.getTile(9, 9);
@@ -307,8 +307,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
             }
         }
         assertTrue("One brave should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
-    }	
-	
+    }
+
     /**
      * When searching for threats to a settlement, the indian player
      * should ignore naval threats, as he does not have naval power
@@ -321,7 +321,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer inca = (ServerPlayer) game.getPlayer("model.nation.inca");
-        StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIPlayer(inca);
+        NativeAIPlayer aiInca = (NativeAIPlayer)aiMain.getAIPlayer(inca);
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile settlementTile = map.getTile(9, 9);

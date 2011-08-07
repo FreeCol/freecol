@@ -44,6 +44,7 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TileImprovementPlan;
 
 import org.w3c.dom.Element;
@@ -141,7 +142,7 @@ public class PioneeringMission extends Mission {
     }
 
     private void updateTileImprovementPlan() {
-        final AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
+        final EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
         final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
 
         Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
@@ -499,7 +500,8 @@ public class PioneeringMission extends Mission {
             return false;
         }
 
-        AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(aiUnit.getUnit().getOwner());
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiUnit.getAIMain()
+            .getAIPlayer(aiUnit.getUnit().getOwner());
         Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
 
 

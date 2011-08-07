@@ -337,7 +337,14 @@ public class AIMain extends FreeColObject
         if (freeColGameObject instanceof Unit) {
             new AIUnit(this, (Unit) freeColGameObject);
         } else if (freeColGameObject instanceof ServerPlayer) {
-            new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
+            ServerPlayer p = (ServerPlayer) freeColGameObject;
+            if (p.isIndian()) {
+                new NativeAIPlayer(this, p);
+            } else if (p.isREF()) {
+                new EuropeanAIPlayer(this, p);
+            } else if (p.isEuropean()) {
+                new EuropeanAIPlayer(this, p);
+            }
         } else if (freeColGameObject instanceof Colony) {
             new AIColony(this, (Colony) freeColGameObject);
         }
@@ -475,7 +482,16 @@ public class AIMain extends FreeColObject
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
                 } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
-                    new StandardAIPlayer(this, in);
+                    Player p = (Player) getGame().getFreeColGameObject(oid);
+                    if (p != null) {
+                        if (p.isIndian()) {
+                            new NativeAIPlayer(this, in);
+                        } else if (p.isREF()) {
+                            new EuropeanAIPlayer(this, in);
+                        } else if (p.isEuropean()) {
+                            new EuropeanAIPlayer(this, in);
+                        }
+                    }
                     /*
                 } else if (tagName.equals(ColonialAIPlayer.getXMLElementTagName())) {
                     new ColonialAIPlayer(this, in);

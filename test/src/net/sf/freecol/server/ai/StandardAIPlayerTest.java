@@ -57,14 +57,14 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.veteranSoldier");
     private static final UnitType indenturedServantType
         = spec().getUnitType("model.unit.indenturedServant");
-    
-	
+
+
     @Override
     public void tearDown() throws Exception {
         ServerTestHelper.stopServerGame();
         super.tearDown();
     }
-    
+
 
     public void testSwitchIndenturedServantInsideColonyWithFreeColonistSoldier(){
         Game game = ServerTestHelper.startServerGame(getTestMap());
@@ -75,35 +75,35 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         builder.initialColonists(1).addColonist(indenturedServantType);
         Colony colony = builder.build();
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
-        
+
         Unit indenturedServant = colony.getUnitList().get(0);
         Unit freeColonist = new ServerUnit(game, colony.getTile(),
                                            colony.getOwner(), colonistType,
                                            UnitState.ACTIVE,
                                            musketsEqType, horsesEqType);
 
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
+        EuropeanAIPlayer player = (EuropeanAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
-        
+
         player.reOrganizeSoldiersOfColony(colony);
-        
+
         assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
-        
+
         assertTrue("Indentured servant should now have horses", indenturedServant.getEquipmentCount(horsesEqType) == 1);
         assertTrue("Indentured servant should now have muskets",indenturedServant.getEquipmentCount(musketsEqType) == 1);
-        
+
         assertFalse("Free colonist should not have horses",freeColonist.getEquipmentCount(horsesEqType) == 1);
         assertFalse("Free colonist should not have muskets",freeColonist.getEquipmentCount(musketsEqType) == 1);
     }
-    
+
     public void testSwitchArmedFreeColonistSoldierEquipmentWithUnarmedExpertSoldierOutsideColony(){
         Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-        
+
         Colony colony = getStandardColony(1);
 
         colony.addGoods(horsesType, 10);
-        
+
         Unit expertSoldier = new ServerUnit(game, colony.getTile(),
                                             colony.getOwner(),
                                             expertSoldierType,
@@ -113,25 +113,25 @@ public class StandardAIPlayerTest extends FreeColTestCase {
                                            colony.getOwner(), colonistType,
                                            UnitState.ACTIVE,
                                            musketsEqType, horsesEqType);
-        StandardAIPlayer player
-            = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
+        EuropeanAIPlayer player
+            = (EuropeanAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
-        
+
         assertTrue("Free colonist should have horses",freeColonist.getEquipmentCount(horsesEqType) == 1);
         assertTrue("Free colonist should have muskets",freeColonist.getEquipmentCount(musketsEqType) == 1);
-        
+
         assertFalse("Expert soldier should not have muskets yet",expertSoldier.getEquipmentCount(musketsEqType) == 1);
         assertFalse("Expert soldier should not have horses yet", expertSoldier.getEquipmentCount(horsesEqType) == 1);
-        
+
         player.reOrganizeSoldiersOfColony(colony);
-        
+
         assertTrue("Expert soldier should now have muskets",expertSoldier.getEquipmentCount(musketsEqType) == 1);
         assertTrue("Expert soldier should now have horses", expertSoldier.getEquipmentCount(horsesEqType) == 1);
-        
+
         assertFalse("Free colonist should not have horses",freeColonist.getEquipmentCount(horsesEqType) == 1);
         assertFalse("Free colonist should not have muskets",freeColonist.getEquipmentCount(musketsEqType) == 1);
     }
-    
+
     public void testEquipExpertSoldiersOutsideColony(){
         Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
@@ -140,13 +140,13 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         colony.addGoods(musketsType, 100);
         colony.addGoods(horsesType, 100);
         assertTrue("Colony should be hable to equip units with horses",colony.canBuildEquipment(horsesEqType));
-        
+
         Unit expertSoldier = new ServerUnit(game, colony.getTile(),
                                             colony.getOwner(),
                                             expertSoldierType,
                                             UnitState.ACTIVE,
                                             new EquipmentType[0]);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony.getOwner());
+        EuropeanAIPlayer player = (EuropeanAIPlayer) aiMain.getAIPlayer(colony.getOwner());
         game.setCurrentPlayer(colony.getOwner());
 
         assertTrue("Expert soldier should not have any equipment",expertSoldier.getEquipment().isEmpty());
@@ -162,7 +162,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
+        EuropeanAIPlayer player = (EuropeanAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
         game.setCurrentPlayer(colony1.getOwner());
         Tile col1Tile = colony1.getTile();
         Tile otherTile = col1Tile.getAdjacentTile(Direction.N);
@@ -238,7 +238,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony1 = getStandardColony(1);
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
+        EuropeanAIPlayer player = (EuropeanAIPlayer) aiMain.getAIPlayer(colony1.getOwner());
         game.setCurrentPlayer(colony1.getOwner());
         Tile col1Tile = colony1.getTile();
 
@@ -268,7 +268,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(camp.getOwner());
+        NativeAIPlayer player = (NativeAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount();
@@ -327,7 +327,7 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.initialBravesInCamp(3).build();
-        StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIPlayer(camp.getOwner());
+        NativeAIPlayer player = (NativeAIPlayer) aiMain.getAIPlayer(camp.getOwner());
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount() - 1;
