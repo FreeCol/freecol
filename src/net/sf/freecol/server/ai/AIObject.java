@@ -38,11 +38,11 @@ public abstract class AIObject extends FreeColObject {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
-    
+
     private final AIMain aiMain;
     protected boolean uninitialized = false;
 
-    
+
     /**
      * Creates a new <code>AIObject</code>.
      * @param aiMain The main AI-object.
@@ -54,7 +54,7 @@ public abstract class AIObject extends FreeColObject {
     /**
      * Creates a new <code>AIObject</code> and registers
      * this object with <code>AIMain</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param id The unique identifier.
      * @see AIMain#addAIObject(String, AIObject)
@@ -65,7 +65,7 @@ public abstract class AIObject extends FreeColObject {
         aiMain.addAIObject(id, this);
     }
 
-    
+
     /**
      * Returns the main AI-object.
      * @return The <code>AIMain</code>.
@@ -75,17 +75,17 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Checks if this <code>AIObject</code> 
+     * Checks if this <code>AIObject</code>
      * is uninitialized. That is: it has been referenced
      * by another object, but has not yet been updated with
      * {@link #readFromXML}.
-     * 
+     *
      * @return <code>true</code> if this object is not initialized.
      */
     public boolean isUninitialized() {
         return uninitialized;
     }
-    
+
     /**
      * Gets the random number generator to use in the AI.
      *
@@ -95,7 +95,7 @@ public abstract class AIObject extends FreeColObject {
         return aiMain.getAIRandom();
     }
 
-    
+
     /**
      * Disposes this <code>AIObject</code> by removing
      * any referances to this object.
@@ -103,8 +103,8 @@ public abstract class AIObject extends FreeColObject {
     public void dispose() {
         getAIMain().removeAIObject(getId());
     }
-    
-        
+
+
     /**
     * Returns the game.
     * @return The <code>Game</code>.
