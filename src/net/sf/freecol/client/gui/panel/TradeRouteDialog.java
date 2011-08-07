@@ -92,6 +92,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
                     if (parent.showFreeColDialog(new TradeRouteInputDialog(parent, newRoute))) {
                         listModel.addElement(newRoute);
+                        tradeRoutes.setSelectedValue(newRoute, true);
                     }
                 }
             });
