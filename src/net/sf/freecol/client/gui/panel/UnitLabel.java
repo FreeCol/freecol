@@ -59,9 +59,19 @@ public final class UnitLabel extends JLabel implements ActionListener {
     @SuppressWarnings("unused")
         private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    public static enum UnitAction { ASSIGN,
-            CLEAR_SPECIALITY, ACTIVATE_UNIT, FORTIFY, SENTRY,
-            COLOPEDIA, LEAVE_TOWN, WORK_TILE, WORK_BUILDING, CLEAR_ORDERS }
+    public static enum UnitAction {
+        ASSIGN,
+        CLEAR_SPECIALITY,
+        ACTIVATE_UNIT,
+        FORTIFY,
+        SENTRY,
+        COLOPEDIA,
+        LEAVE_TOWN,
+        WORK_TILE,
+        WORK_BUILDING,
+        CLEAR_ORDERS,
+        ASSIGN_TRADE_ROUTE,
+    }
 
     private final Unit unit;
 
@@ -353,6 +363,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
             break;
         case CLEAR_ORDERS:
             inGameController.clearOrders(unit);
+            break;
+        case ASSIGN_TRADE_ROUTE:
+            inGameController.assignTradeRoute(unit);
+            break;
         }
         updateIcon();
     }
