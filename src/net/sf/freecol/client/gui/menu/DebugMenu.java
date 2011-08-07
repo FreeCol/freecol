@@ -422,7 +422,7 @@ public class DebugMenu extends JMenu {
         monarchPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     canvas.showFreeColDialog(new MonarchPanel(canvas,
-                            Monarch.MonarchAction.RAISE_TAX));
+                            Monarch.MonarchAction.RAISE_TAX_WAR));
                 }
             });
         panelMenu.add(monarchPanel);

@@ -85,8 +85,11 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** Constants describing monarch actions. */
     public static enum MonarchAction {
         NO_ACTION,
-        RAISE_TAX, FORCE_TAX,
-        LOWER_TAX,
+        RAISE_TAX_ACT,
+        RAISE_TAX_WAR,
+        FORCE_TAX,
+        LOWER_TAX_WAR,
+        LOWER_TAX_OTHER,
         WAIVE_TAX,
         ADD_TO_REF,
         DECLARE_WAR,
@@ -303,11 +306,13 @@ public final class Monarch extends FreeColGameObject implements Named {
         switch (action) {
         case NO_ACTION:
             return true;
-        case RAISE_TAX:
+        case RAISE_TAX_ACT:
+        case RAISE_TAX_WAR:
             return player.getTax() < taxMaximum();
         case FORCE_TAX:
             return false;
-        case LOWER_TAX:
+        case LOWER_TAX_WAR:
+        case LOWER_TAX_OTHER:
             return player.getTax() > MINIMUM_TAX_RATE + 10;
         case WAIVE_TAX:
             return true;
@@ -349,54 +354,31 @@ public final class Monarch extends FreeColGameObject implements Named {
             return choices;
         }
 
-        MonarchAction a = MonarchAction.NO_ACTION;
-        if (actionIsValid(a)) {
-            // The more time has passed, the less likely the monarch
-            // will do nothing.
-            choices.add(new RandomChoice<MonarchAction>(a,
-                    Math.max(200 - turn, 100)));
+        // The more time has passed, the less likely the monarch will
+        // do nothing.
+        addIfValid(choices, MonarchAction.NO_ACTION, Math.max(200 - turn, 100));
+        addIfValid(choices, MonarchAction.RAISE_TAX_ACT, 5 + dx);
+        addIfValid(choices, MonarchAction.RAISE_TAX_WAR, 5 + dx);
+        addIfValid(choices, MonarchAction.LOWER_TAX_WAR, 5 - dx);
+        addIfValid(choices, MonarchAction.LOWER_TAX_OTHER, 5 - dx);
+        addIfValid(choices, MonarchAction.ADD_TO_REF, 10 + dx);
+        addIfValid(choices, MonarchAction.DECLARE_WAR, 5 + dx);
+        if (player.checkGold(MINIMUM_PRICE)) {
+            addIfValid(choices, MonarchAction.OFFER_MERCENARIES, 6 - dx);
+        } else if (dx < 3) {
+            addIfValid(choices, MonarchAction.SUPPORT_LAND, 3 - dx);
         }
-
-        a = MonarchAction.RAISE_TAX;
-        if (actionIsValid(a)) {
-            choices.add(new RandomChoice<MonarchAction>(a, 10 + dx));
-        }
-
-        a = MonarchAction.LOWER_TAX;
-        if (actionIsValid(a)) {
-            choices.add(new RandomChoice<MonarchAction>(a, 10 - dx));
-        }
-
-        a = MonarchAction.ADD_TO_REF;
-        if (actionIsValid(a)) {
-            choices.add(new RandomChoice<MonarchAction>(a, 10 + dx));
-        }
-
-        a = MonarchAction.DECLARE_WAR;
-        if (actionIsValid(a)) {
-            choices.add(new RandomChoice<MonarchAction>(a, 5 + dx));
-        }
-
-        a = MonarchAction.SUPPORT_LAND;
-        if (actionIsValid(a)) {
-            if (!player.checkGold(MINIMUM_PRICE)) {
-                if (dx < 3) {
-                    choices.add(new RandomChoice<MonarchAction>(a, 3 - dx));
-                }
-            } else {
-                a = MonarchAction.OFFER_MERCENARIES;
-                choices.add(new RandomChoice<MonarchAction>(a, 6 - dx));
-            }
-        }
-
-        a = MonarchAction.SUPPORT_SEA;
-        if (actionIsValid(a)) {
-            choices.add(new RandomChoice<MonarchAction>(a, 6 - dx));
-        }
+        addIfValid(choices, MonarchAction.SUPPORT_SEA, 6 - dx);
 
         return choices;
     }
 
+    private void addIfValid(List<RandomChoice<MonarchAction>> choices,
+                            MonarchAction action, int weight) {
+        if (actionIsValid(action)) {
+            choices.add(new RandomChoice<MonarchAction>(action, weight));
+        }
+    }
 
     /**
      * Calculates a tax raise.

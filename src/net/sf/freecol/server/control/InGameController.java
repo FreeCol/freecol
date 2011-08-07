@@ -750,7 +750,8 @@ public final class InGameController extends Controller {
         switch (action) {
         case NO_ACTION:
             break;
-        case RAISE_TAX:
+        case RAISE_TAX_WAR:
+        case RAISE_TAX_ACT:
             final int taxRaise = monarch.raiseTax(random);
             final Goods goods = serverPlayer.getMostValuableGoods();
             if (goods == null) {
@@ -760,19 +761,25 @@ public final class InGameController extends Controller {
             new Thread(FreeCol.SERVER_THREAD + action.toString()
                 + " " + serverPlayer.getName()) {
                 public void run() {
-                    monarchRaiseTax(serverPlayer, taxRaise, goods);
+                    monarchRaiseTax(serverPlayer, taxRaise, goods, action);
                 }
             }.start();
             break;
-        case LOWER_TAX:
+        case LOWER_TAX_WAR:
+        case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
             int taxLower = monarch.lowerTax(random);
             serverPlayer.csSetTax(taxLower, cs);
+            StringTemplate template = StringTemplate.template(messageId)
+                .addAmount("%difference%", oldTax - taxLower)
+                .addAmount("%newTax%", taxLower);
+            if (action == MonarchAction.LOWER_TAX_WAR) {
+                template = template.add("%nation%", getNonPlayerNation());
+            } else {
+                template = template.addAmount("%number%", random.nextInt(5));
+            }
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)
-                    .addAmount("%difference%", oldTax - taxLower)
-                    .addAmount("%newTax%", taxLower)));
+                   new MonarchActionMessage(action, template));
             break;
         case WAIVE_TAX:
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
@@ -838,26 +845,25 @@ public final class InGameController extends Controller {
      * @param goods The <code>Goods</code> to use in case of a tea party.
      */
     private void monarchRaiseTax(ServerPlayer serverPlayer, int tax,
-                                 Goods goods) {
+                                 Goods goods, MonarchAction action) {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         ChangeSet cs = new ChangeSet();
-        int nations = Nation.EUROPEAN_NATIONS.length;
-        int start = random.nextInt(nations);
-        String nationKey = null;
-        for (int index = 0; index < nations; index++) {
-            String nationId = "model.nation." + Nation.EUROPEAN_NATIONS[(start+index)%nations];
-            if (getGame().getPlayer(nationId) == null) {
-                nationKey = nationId + ".name";
-                break;
-            }
+        StringTemplate sTemplate =
+            StringTemplate.template("model.monarch.action." + action.toString())
+            .addStringTemplate("%goods%", goods.getType().getLabel(true))
+            .addAmount("%amount%", tax);
+        switch (action) {
+        case RAISE_TAX_WAR:
+            sTemplate = sTemplate.add("%nation%", getNonPlayerNation());
+            break;
+        case RAISE_TAX_ACT:
+            sTemplate = sTemplate.addAmount("%number%", random.nextInt(6))
+                .addName("%newWorld%", serverPlayer.getNewLandName());
+            break;
         }
         MonarchActionMessage message
-            = new MonarchActionMessage(MonarchAction.RAISE_TAX,
-                StringTemplate.template("model.monarch.action.RAISE_TAX")
-                .addStringTemplate("%goods%", goods.getType().getLabel(true))
-                .add("%nation%", nationKey)
-                .addAmount("%amount%", tax));
+            = new MonarchActionMessage(action, sTemplate);
         message.setTax(tax);
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
             message);
@@ -3815,4 +3821,18 @@ public final class InGameController extends Controller {
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
+
+    private String getNonPlayerNation() {
+        int nations = Nation.EUROPEAN_NATIONS.length;
+        int start = random.nextInt(nations);
+        for (int index = 0; index < nations; index++) {
+            String nationId = "model.nation." + Nation.EUROPEAN_NATIONS[(start+index)%nations];
+            if (getGame().getPlayer(nationId) == null) {
+                return nationId + ".name";
+            }
+        }
+        // this should never happen
+        return "";
+    }
+
 }

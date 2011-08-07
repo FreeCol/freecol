@@ -45,6 +45,7 @@ public class MonarchTest extends FreeColTestCase {
             dutch.getMonarch().toXML(xsw);
             xsw.close();
         } catch (XMLStreamException e) {
+            fail(e.toString());
         }
 
     }
@@ -62,19 +63,25 @@ public class MonarchTest extends FreeColTestCase {
         game.setTurn(new Turn(100));
         dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
         choices = dutch.getMonarch().getActionChoices();
-        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
-        assertFalse(choicesContain(choices, MonarchAction.LOWER_TAX));
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX_WAR));
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX_ACT));
+        assertFalse(choicesContain(choices, MonarchAction.LOWER_TAX_WAR));
+        assertFalse(choicesContain(choices, MonarchAction.LOWER_TAX_OTHER));
 
         int maximumTax = spec().getIntegerOption("model.option.maximumTax").getValue();
         dutch.setTax(maximumTax / 2);
         choices = dutch.getMonarch().getActionChoices();
-        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
-        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX_WAR));
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX_ACT));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_WAR));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_OTHER));
 
         dutch.setTax(maximumTax + 2);
         choices = dutch.getMonarch().getActionChoices();
-        assertFalse(choicesContain(choices, MonarchAction.RAISE_TAX));
-        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));
+        assertFalse(choicesContain(choices, MonarchAction.RAISE_TAX_WAR));
+        assertFalse(choicesContain(choices, MonarchAction.RAISE_TAX_ACT));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_WAR));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX_OTHER));
 
         dutch.setPlayerType(Player.PlayerType.REBEL);
         choices = dutch.getMonarch().getActionChoices();

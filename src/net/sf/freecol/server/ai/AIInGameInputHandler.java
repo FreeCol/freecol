@@ -288,7 +288,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
         boolean accept = false;
         switch (action) {
-        case RAISE_TAX:
+        case RAISE_TAX_WAR:
+        case RAISE_TAX_ACT:
             int tax;
             try {
                 tax = Integer.parseInt(element.getAttribute("amount"));
