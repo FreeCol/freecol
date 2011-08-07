@@ -1073,11 +1073,12 @@ System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
             // Look for valid destinations
             if ((destination = unit.getDestination()) == null) {
                 break; // No destination
-            } else if (destination instanceof Europe
-                && (unit.isInEurope() || unit.isAtSea())) {
-                break; // Arrived in Europe
+            } else if (destination instanceof Europe) {
+                if (unit.isInEurope() || unit.isAtSea()) {
+                    break; // Arrived in or between New World and Europe.
+                }
             } else if (destination.getTile() == null) {
-                break; // Not on the map
+                break; // Not on the map, findPath* can not help.
             } else if (unit.getTile() == destination.getTile()) {
                 break; // Arrived at on-map destination
             }
@@ -1100,8 +1101,7 @@ System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
             if (!movePath(unit, path)) break;
         }
 
-        // Clear ordinary destinations, leave trade routes but display their
-        // messages if required.
+        // Clear ordinary destinations if arrived.
         Location location = unit.getDestination();
         if (location != null) {
             if (unit.getTile() == null) {
@@ -1111,19 +1111,18 @@ System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
             } else {
                 if (unit.getTile() == location.getTile()) {
                     clearGotoOrders(unit);
+                    // Check cash-in, and if the unit has moves left
+                    // and was not set to SKIPPED by moveDirection,
+                    // then make sure it remains selected to show that
+                    // this unit could continue.
+                    if (!checkCashInTreasureTrain(unit)
+                        && unit.getMovesLeft() > 0
+                        && unit.getState() != UnitState.SKIPPED) {
+                        freeColClient.getGUI().setActiveUnit(unit);
+                        return true;
+                    }
                 }
             }
-        }
-        // Check cashin, and if the unit is still on the map, has
-        // moves left and was not set to SKIPPED by moveDirection,
-        // then make sure it remains selected and warn that this
-        // unit could continue.
-        if (!checkCashInTreasureTrain(unit)
-            && unit.getTile() != null
-            && unit.getMovesLeft() > 0
-            && unit.getState() != UnitState.SKIPPED) {
-            freeColClient.getGUI().setActiveUnit(unit);
-            return true;
         }
         return false;
     }
