@@ -31,6 +31,15 @@ public class Nation extends FreeColGameObjectType {
 
     public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
+    public static final String[] EUROPEAN_NATIONS = new String[] {
+        // the original game's nations
+        "english", "french", "spanish", "dutch",
+        // FreeCol's additions
+        "portuguese", "danish", "swedish", "russian",
+        // other Europeans, used to generate Monarch messages
+        "german", "austrian", "prussian", "turkish"
+    };
+
     /**
      * Describe type here.
      */

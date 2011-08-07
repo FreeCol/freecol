@@ -842,10 +842,21 @@ public final class InGameController extends Controller {
         GoodsType goodsType = goods.getType();
         Colony colony = (Colony) goods.getLocation();
         ChangeSet cs = new ChangeSet();
+        int nations = Nation.EUROPEAN_NATIONS.length;
+        int start = random.nextInt(nations);
+        String nationKey = null;
+        for (int index = 0; index < nations; index++) {
+            String nationId = "model.nation." + Nation.EUROPEAN_NATIONS[(start+index)%nations];
+            if (getGame().getPlayer(nationId) == null) {
+                nationKey = nationId + ".name";
+                break;
+            }
+        }
         MonarchActionMessage message
             = new MonarchActionMessage(MonarchAction.RAISE_TAX,
                 StringTemplate.template("model.monarch.action.RAISE_TAX")
                 .addStringTemplate("%goods%", goods.getType().getLabel(true))
+                .add("%nation%", nationKey)
                 .addAmount("%amount%", tax));
         message.setTax(tax);
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
