@@ -161,7 +161,6 @@ public class NativeAIPlayer extends AIPlayer {
         clearAIUnits();
         determineStances();
         abortInvalidAndOneTimeMissions();
-        ensureCorrectMissions();
         secureSettlements();
         giveNormalMissions();
         bringGifts();
@@ -172,31 +171,7 @@ public class NativeAIPlayer extends AIPlayer {
         giveNormalMissions();
         doMissions();
         abortInvalidMissions();
-        ensureCorrectMissions();
         clearAIUnits();
-    }
-
-    /**
-     * Returns an <code>Iterator</code> for all the wishes. The items are
-     * sorted by the {@link Wish#getValue value}, with the item having the
-     * highest value appearing first in the <code>Iterator</code>.
-     *
-     * @return The <code>Iterator</code>.
-     * @see Wish
-     */
-    public Iterator<Wish> getWishIterator() {
-        ArrayList<Wish> wishList = new ArrayList<Wish>();
-        Iterator<AIColony> ai = getAIColonyIterator();
-        while (ai.hasNext()) {
-            AIColony ac = ai.next();
-            Iterator<Wish> wishIterator = ac.getWishIterator();
-            while (wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
-                wishList.add(w);
-            }
-        }
-        Collections.sort(wishList);
-        return wishList.iterator();
     }
 
     public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
@@ -421,31 +396,6 @@ public class NativeAIPlayer extends AIPlayer {
 
 /* Internal methods ***********************************************************/
 
-
-    /**
-     * Ensures that all workers inside a colony gets a
-     * {@link WorkInsideColonyMission}.
-     */
-    private void ensureCorrectMissions() {
-        logger.finest("Entering method ensureCorrectMissions");
-        if (getPlayer().isIndian()) return;
-
-        for (AIUnit au : getAIUnits()) {
-            if (au.hasMission()) continue;
-
-            // TODO: Find out why this happens, or even if it still does.
-            Unit u = au.getUnit();
-            if (u.getLocation() instanceof WorkLocation) {
-                AIColony ac = getAIColony(u.getColony());
-                if (ac == null) {
-                    logger.warning("No AIColony for unit: " + u
-                                   + " at: " + u.getLocation());
-                    continue;
-                }
-                au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
-            }
-        }
-    }
 
     /**
      * Determines the stances towards each player.
