@@ -3288,40 +3288,43 @@ public class Unit extends FreeColGameObject
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", state.toString());
         out.writeAttribute("role", role.toString());
-        Player who = (full || !hasAbility(Ability.PIRACY)) ? owner
-            : getGame().getUnknownEnemy();
-        out.writeAttribute("owner", who.getId());
-        if (nationality != null) {
-            out.writeAttribute("nationality", nationality);
-        } else if(hasAbility(Ability.BORN_IN_COLONY)
-                  || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                  || hasAbility("model.ability.foundColony")) {
-            // 0.10.0 and earlier games have no model.ability.person,
-            // so instead we check several other abilities to exclude
-            // ships, artillery, wagons and treasure trains.
-            // foundColony is for additional backwards compatibility,
-            // as inheritance of model.ability.bornInColony is quite new.
-            out.writeAttribute("nationality", owner.getNationID());
-        }
-        if (ethnicity != null) {
-            out.writeAttribute("ethnicity", ethnicity);
-        } else if(hasAbility(Ability.BORN_IN_COLONY)
-                  || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                  || hasAbility("model.ability.foundColony")) {
-            // 0.10.0 and earlier games have no model.ability.person,
-            // so instead we check several other abilities to exclude
-            // ships, artillery, wagons and treasure trains.
-            // foundColony is for additional backwards compatibility,
-            // as inheritance of model.ability.bornInColony is quite new.
-            if(!hasAbility("model.ability.convert")) {
-                out.writeAttribute("ethnicity", owner.getNationID());
-            } else if(indianSettlement != null
-                      && indianSettlement.getOwner() != null) {
-                out.writeAttribute("ethnicity",
-                                   indianSettlement.getOwner().getNationID());
+        if (!full && hasAbility(Ability.PIRACY)) {
+            // Pirates do not disclose national characteristics.
+            out.writeAttribute("owner", getGame().getUnknownEnemy().getId());
+        } else {
+            out.writeAttribute("owner", getOwner().getId());
+            if (nationality != null) {
+                out.writeAttribute("nationality", nationality);
+            } else if(hasAbility(Ability.BORN_IN_COLONY)
+                || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                || hasAbility("model.ability.foundColony")) {
+                // 0.10.0 and earlier games have no model.ability.person,
+                // so instead we check several other abilities to exclude
+                // ships, artillery, wagons and treasure trains.
+                // foundColony is for additional backwards compatibility,
+                // as inheritance of model.ability.bornInColony is quite new.
+                out.writeAttribute("nationality", owner.getNationID());
             }
-            // do not compute the ethnicity of a convert with a null
-            // indianSettlement, that information is now unretrievable
+            if (ethnicity != null) {
+                out.writeAttribute("ethnicity", ethnicity);
+            } else if(hasAbility(Ability.BORN_IN_COLONY)
+                || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                || hasAbility("model.ability.foundColony")) {
+                // 0.10.0 and earlier games have no model.ability.person,
+                // so instead we check several other abilities to exclude
+                // ships, artillery, wagons and treasure trains.
+                // foundColony is for additional backwards compatibility,
+                // as inheritance of model.ability.bornInColony is quite new.
+                if(!hasAbility("model.ability.convert")) {
+                    out.writeAttribute("ethnicity", owner.getNationID());
+                } else if(indianSettlement != null
+                    && indianSettlement.getOwner() != null) {
+                    out.writeAttribute("ethnicity",
+                        indianSettlement.getOwner().getNationID());
+                }
+                // do not compute the ethnicity of a convert with a null
+                // indianSettlement, that information is now unretrievable
+            }
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         if (workType != null) out.writeAttribute("workType", workType.getId());
