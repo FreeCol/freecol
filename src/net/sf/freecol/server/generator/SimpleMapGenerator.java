@@ -430,7 +430,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = spec.getRangeOption("model.option.settlementNumber").getValue();
         List<Tile> settlementTiles = new ArrayList<Tile>();
         tiles: for (Tile tile : map.getAllTiles()) {
-            if (!map.isPolar(tile) && tile.getType().canSettle()) {
+            if (!map.isPolar(tile) && suitableForNativeSettlement(tile)) {
                 for (Tile t : settlementTiles) {
                     if (tile.getDistanceTo(t) < minSettlementDistance) {
                         continue tiles;
@@ -645,6 +645,25 @@ public class SimpleMapGenerator implements MapGenerator {
 
         logger.info("Created " + settlementsPlaced
                     + " Indian settlements of maximum " + settlementsToPlace);
+    }
+
+    /**
+     * Is a tile suitable for a native settlement?
+     * Require the tile be settleable, and at least half its neighbours
+     * also be settleable.  TODO: degrade the second test to usability,
+     * but fix this when the natives-use-water situation is sorted.
+     *
+     * @param tile The <code>Tile</code> to examine.
+     * @return True if this tile is suitable.
+     */
+    private boolean suitableForNativeSettlement(Tile tile) {
+        if (!tile.getType().canSettle()) return false;
+        int good = 0, n = 0;
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.getType().canSettle()) good++;
+            n++;
+        }
+        return good >= n / 2;
     }
 
     private Tile findFreeNeighbouringTile(IndianSettlement is,
