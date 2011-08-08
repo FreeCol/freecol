@@ -1086,16 +1086,6 @@ public class IndianSettlement extends Settlement {
         return super.disposeList();
     }
 
-    /**
-     * Creates the {@link GoodsContainer}.
-     * <br><br>
-     * DO NOT USE OTHER THAN IN {@link net.sf.freecol.server.FreeColServer#loadGame}:
-     * Only for compatibility when loading savegames with pre-0.0.3 protocols.
-     */
-    public void createGoodsContainer() {
-        setGoodsContainer(new GoodsContainer(getGame(), this));
-    }
-
 
     /**
      * This method writes an XML-representation of this object to
