@@ -20,30 +20,21 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -51,10 +42,8 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -66,26 +55,14 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.pathfinding.CostDeciders;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.server.ai.mission.BuildColonyMission;
-import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
-import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
-import net.sf.freecol.server.ai.mission.PrivateerMission;
-import net.sf.freecol.server.ai.mission.ScoutingMission;
-import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
-import net.sf.freecol.server.ai.mission.UnitWanderMission;
-import net.sf.freecol.server.ai.mission.WishRealizationMission;
-import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -469,50 +446,6 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
-     * Remove all equipment on a unit.
-     *
-     * @param unit The <code>Unit</code> to remove equipment from.
-     */
-    public void removeAllEquipment(Unit unit) {
-        AIUnit aiUnit = getAIUnit(unit);
-        Set<EquipmentType> kit = unit.getEquipment().keySet();
-        for (EquipmentType type : new ArrayList<EquipmentType>(kit)) {
-            AIMessage.askEquipUnit(aiUnit, type, -unit.getEquipmentCount(type));
-        }
-    }
-
-    /**
-     * Switches equipment between colonists
-     */
-    public void switchEquipmentWith(Unit unit1, Unit unit2){
-        if(!unit1.isColonist() || !unit2.isColonist()){
-            throw new IllegalArgumentException("Both units need to be colonists to switch equipment");
-        }
-
-        if(unit1.getTile() != unit2.getTile()){
-            throw new IllegalStateException("Units can only switch equipment in the same location");
-        }
-
-        if(unit1.getSettlement() == null){
-            throw new IllegalStateException("Units can only switch equipment in a settlement");
-        }
-
-        // TODO: use the TypeCountMap that getEquipment() returns and
-        // swap the counts as well.
-        List<EquipmentType> equipList1 = new ArrayList<EquipmentType>(unit1.getEquipment().keySet());
-        List<EquipmentType> equipList2 = new ArrayList<EquipmentType>(unit2.getEquipment().keySet());
-        removeAllEquipment(unit1);
-        removeAllEquipment(unit2);
-        for(EquipmentType equip : equipList2){
-            AIMessage.askEquipUnit(getAIUnit(unit1), equip, 1);
-        }
-        for(EquipmentType equip : equipList1){
-            AIMessage.askEquipUnit(getAIUnit(unit2), equip, 1);
-        }
-    }
-
-
-    /**
      * Takes the necessary actions to secure an indian settlement
      *
      * TODO: Package for access by a test only - necessary?
@@ -793,25 +726,6 @@ public class NativeAIPlayer extends AIPlayer {
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     * Makes every unit perform their mission.
-     */
-    private void doMissions() {
-        logger.finest("Entering method doMissions");
-        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
-        while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = aiUnitsIterator.next();
-            if (aiUnit.hasMission() && aiUnit.getMission().isValid()
-                    && !(aiUnit.getUnit().isOnCarrier())) {
-                try {
-                    aiUnit.doMission(getConnection());
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "doMissions failed", e);
                 }
             }
         }

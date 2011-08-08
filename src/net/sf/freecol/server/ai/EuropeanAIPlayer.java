@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -43,7 +42,6 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -83,7 +81,6 @@ import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
-import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -1677,32 +1674,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void createAIGoodsInColonies() {
         logger.finest("Entering method createAIGoodsInColonies");
-        if (!getPlayer().isEuropean()) {
-            return;
-        }
         Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
             AIColony c = ci.next();
             c.createAIGoods();
-        }
-    }
-
-    /**
-     * Makes every unit perform their mission.
-     */
-    private void doMissions() {
-        logger.finest("Entering method doMissions");
-        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
-        while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = aiUnitsIterator.next();
-            if (aiUnit.hasMission() && aiUnit.getMission().isValid()
-                    && !(aiUnit.getUnit().isOnCarrier())) {
-                try {
-                    aiUnit.doMission(getConnection());
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "doMissions failed", e);
-                }
-            }
         }
     }
 

@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,7 +33,6 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -418,6 +418,25 @@ public abstract class AIPlayer extends AIObject {
                 logger.finest("Abort one-time mission: " + mission
                               + " for: " + au.getUnit());
                 au.setMission(null);
+            }
+        }
+    }
+
+    /**
+     * Makes every unit perform their mission.
+     */
+    protected void doMissions() {
+        logger.finest("Entering method doMissions");
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
+        while (aiUnitsIterator.hasNext()) {
+            AIUnit aiUnit = aiUnitsIterator.next();
+            if (aiUnit.hasMission() && aiUnit.getMission().isValid()
+                    && !(aiUnit.getUnit().isOnCarrier())) {
+                try {
+                    aiUnit.doMission(getConnection());
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "doMissions failed", e);
+                }
             }
         }
     }
