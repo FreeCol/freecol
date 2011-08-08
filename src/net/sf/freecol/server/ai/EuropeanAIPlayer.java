@@ -173,7 +173,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         determineStances();
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
-        ensureCorrectMissions();
+        ensureColonyMissions();
         giveNavalMissions();
         secureSettlements();
         giveNormalMissions();
@@ -189,7 +189,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         doMissions();
         rearrangeWorkersInColonies();
         abortInvalidMissions();
-        ensureCorrectMissions();
+        ensureColonyMissions();
         clearAIUnits();
     }
 
@@ -690,8 +690,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Ensures that all workers inside a colony gets a
      * {@link WorkInsideColonyMission}.
      */
-    private void ensureCorrectMissions() {
-        logger.finest("Entering method ensureCorrectMissions");
+    private void ensureColonyMissions() {
+        logger.finest("Entering method ensureColonyMissions");
         if (getPlayer().isIndian()) return;
 
         for (AIUnit au : getAIUnits()) {
