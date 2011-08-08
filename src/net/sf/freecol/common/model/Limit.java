@@ -198,6 +198,9 @@ public final class Limit extends FreeColGameObjectType {
         switch(leftHandSide.getScopeLevel()) {
         case SETTLEMENT:
             lhs = leftHandSide.getValue(settlement);
+            lhs += getSpecification()
+                .getIntegerOption("model.option.settlementLimitModifier")
+                .getValue();
             break;
         case PLAYER:
             lhs = leftHandSide.getValue(settlement.getOwner());

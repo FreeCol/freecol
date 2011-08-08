@@ -1907,6 +1907,9 @@
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"
                        defaultValue="false"/>
+        <!-- Relax settlement limits -->
+        <integerOption id="model.option.settlementLimitModifier" defaultValue="0"/>
+        <!-- Types of starting positions -->
         <selectOption id="model.option.startingPositions" defaultValue="0" localizedLabels="true">
           <selectValue label="model.option.startingPositions.classic" value="0"/>
           <selectValue label="model.option.startingPositions.random" value="1"/>

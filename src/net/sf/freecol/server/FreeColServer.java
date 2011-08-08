@@ -898,6 +898,9 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption("model.option.continueFoundingFatherRecruitment",
             "gameOptions.map", false);
+        // Introduced: SAVEGAME_VERSION == 12
+        addIntegerOption("model.option.settlementLimitModifier",
+            "gameOptions.map", 0);
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {
