@@ -379,6 +379,15 @@ public abstract class Mission extends AIObject {
         return getUnit() != null && !getUnit().isDisposed();
     }
 
+    /**
+     * Returns true if this Mission should only be carried out once.
+     *
+     * @return false
+     */
+    public boolean isOneTime() {
+        return false;
+    }
+
 
     /**
     * Gets the unit this mission has been created for.

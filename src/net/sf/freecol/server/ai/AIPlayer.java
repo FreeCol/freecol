@@ -410,11 +410,7 @@ public abstract class AIPlayer extends AIObject {
                 logger.finest("Abort invalid mission: " + mission
                               + " for: " + au.getUnit());
                 au.setMission(null);
-            } else if (mission instanceof UnitWanderHostileMission
-                       || mission instanceof UnitWanderMission
-                       || mission instanceof IdleAtColonyMission
-                       // TODO: Mission.isOneTime()
-                       ) {
+            } else if (mission.isOneTime()) {
                 logger.finest("Abort one-time mission: " + mission
                               + " for: " + au.getUnit());
                 au.setMission(null);

@@ -96,14 +96,13 @@ public class UnitWanderMission extends Mission {
     }
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Returns true if this Mission should only be carried out once.
      *
-     * @return True if this mission is still valid to perform.
+     * @return true
      */
-    public boolean isValid() {
-        return super.isValid();
+    public boolean isOneTime() {
+        return true;
     }
-
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
