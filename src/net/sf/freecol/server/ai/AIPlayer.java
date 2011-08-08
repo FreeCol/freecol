@@ -41,6 +41,10 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
+import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -328,7 +332,7 @@ public abstract class AIPlayer extends AIObject {
      * @return The <code>Iterator</code>.
      * @see Wish
      */
-    public abstract Iterator<Wish> getWishIterator();
+    //public abstract Iterator<Wish> getWishIterator();
 
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
 
@@ -368,6 +372,55 @@ public abstract class AIPlayer extends AIObject {
      */
     public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
 
+
+    /**
+     * Determines the stances towards each player.
+     * That is: should we declare war?
+     * TODO: something better, that includes peacemaking.
+     */
+    protected void determineStances() {
+        logger.finest("Entering method determineStances");
+        Player player = getPlayer();
+        for (Player p : getGame().getPlayers()) {
+            if (p != player && !p.isDead()) determineStance(p);
+        }
+    }
+
+    /**
+     * Aborts all the missions which are no longer valid.
+     */
+    protected void abortInvalidMissions() {
+        for (AIUnit au : getAIUnits()) {
+            if (au.getMission() == null) continue;
+            if (!au.getMission().isValid()) {
+                logger.finest("Abort invalid mission for: " + au.getUnit());
+                au.setMission(null);
+            }
+        }
+    }
+
+    /**
+     * Aborts all the missions which are no longer valid.
+     */
+    protected void abortInvalidAndOneTimeMissions() {
+        for (AIUnit au : getAIUnits()) {
+            Mission mission = au.getMission();
+            if (mission == null) continue;
+            if (!mission.isValid()) {
+                logger.finest("Abort invalid mission: " + mission
+                              + " for: " + au.getUnit());
+                au.setMission(null);
+            } else if (mission instanceof UnitWanderHostileMission
+                       || mission instanceof UnitWanderMission
+                       || mission instanceof IdleAtColonyMission
+                       // TODO: Mission.isOneTime()
+                       ) {
+                logger.finest("Abort one-time mission: " + mission
+                              + " for: " + au.getUnit());
+                au.setMission(null);
+            }
+        }
+    }
 
     /**
      * Writes this object to an XML stream.

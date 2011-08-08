@@ -824,7 +824,8 @@ public class TransportMission extends Mission {
          * Add the colony containing the wish with the highest value to the
          * "aiColonies"-list:
          */
-        Iterator<Wish> highValueWishIterator = (getAIMain().getAIPlayer(getUnit().getOwner())).getWishIterator();
+        EuropeanAIPlayer player = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
+        Iterator<Wish> highValueWishIterator = player.getWishIterator();
         while (highValueWishIterator.hasNext()) {
             Wish w = highValueWishIterator.next();
             if (w.getTransportable() != null) {

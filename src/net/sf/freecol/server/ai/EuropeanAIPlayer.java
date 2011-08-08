@@ -712,60 +712,10 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Determines the stances towards each player.
-     * That is: should we declare war?
-     * TODO: something better, that includes peacemaking.
-     */
-    private void determineStances() {
-        logger.finest("Entering method determineStances");
-        Player player = getPlayer();
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) determineStance(p);
-        }
-    }
-
-    /**
-     * Aborts all the missions which are no longer valid.
-     */
-    private void abortInvalidMissions() {
-        for (AIUnit au : getAIUnits()) {
-            if (au.getMission() == null) continue;
-            if (!au.getMission().isValid()) {
-                logger.finest("Abort invalid mission for: " + au.getUnit());
-                au.setMission(null);
-            }
-        }
-    }
-
-    /**
-     * Aborts all the missions which are no longer valid.
-     */
-    private void abortInvalidAndOneTimeMissions() {
-        for (AIUnit au : getAIUnits()) {
-            Mission mission = au.getMission();
-            if (mission == null) continue;
-            if (!mission.isValid()) {
-                logger.finest("Abort invalid mission: " + mission
-                              + " for: " + au.getUnit());
-                au.setMission(null);
-            } else if (mission instanceof UnitWanderHostileMission
-                       || mission instanceof UnitWanderMission
-                       || mission instanceof IdleAtColonyMission
-                       // TODO: Mission.isOneTime()
-                       ) {
-                logger.finest("Abort one-time mission: " + mission
-                              + " for: " + au.getUnit());
-                au.setMission(null);
-            }
-        }
-    }
-
-    /**
      * Gives missions to all the naval units this player owns.
      */
     private void giveNavalMissions() {
         logger.finest("Entering method giveNavalMissions");
-        if (!getPlayer().isEuropean()) return;
 
         for (AIUnit au : getAIUnits()) {
             if (au.hasMission() || !au.getUnit().isNaval()) continue;
@@ -783,9 +733,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void rearrangeWorkersInColonies() {
         logger.finest("Entering method rearrangeWorkersInColonies");
-        if (!getPlayer().isEuropean()) {
-            return;
-        }
+
         Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
             AIColony c = ci.next();
