@@ -1771,7 +1771,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if ((showAll || toSavedGame || settlement == null
                  || settlement.getOwner() == player)
                 && !isEmpty()) {
-                super.writeChildren(out);
+                super.writeChildren(out, player, showAll, toSavedGame);
             }
         } else if (pet != null) {
             // Only display the settlement if we know it owns the tile
