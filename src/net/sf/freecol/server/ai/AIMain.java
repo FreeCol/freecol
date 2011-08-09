@@ -490,6 +490,9 @@ public class AIMain extends FreeColObject
                             new EuropeanAIPlayer(this, in);
                         } else if (p.isEuropean()) {
                             new EuropeanAIPlayer(this, in);
+                        } else {
+                            logger.warning("Bogus AIPlayer: " + p);
+                            in.nextTag();
                         }
                     }
                 } else if (tagName.equals("colonialAIPlayer")) {
