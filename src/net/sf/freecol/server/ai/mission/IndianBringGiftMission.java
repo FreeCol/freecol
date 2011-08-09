@@ -249,13 +249,15 @@ public class IndianBringGiftMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("unit", getUnit().getId());
+        toXML(out, getXMLElementTagName());
+    }
+
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         if (target != null) {
             out.writeAttribute("target", target.getId());
         }
         out.writeAttribute("completed", Boolean.toString(completed));
-        out.writeEndElement();
     }
 
     /**
@@ -266,10 +268,8 @@ public class IndianBringGiftMission extends Mission {
      * @throws XMLStreamException if there are any problems reading
      *             from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        String unitString = in.getAttributeValue(null, "unit");
-        setAIUnit((AIUnit) getAIMain().getAIObject(unitString));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         String targetString = in.getAttributeValue(null, "target");
         target = (targetString == null) ? null
             : (Colony) getGame().getFreeColGameObject(targetString);
@@ -278,7 +278,6 @@ public class IndianBringGiftMission extends Mission {
             completedString = in.getAttributeValue(null, "giftDelivered");
         }
         completed = Boolean.valueOf(completedString).booleanValue();
-        in.nextTag();
     }
 
     /**

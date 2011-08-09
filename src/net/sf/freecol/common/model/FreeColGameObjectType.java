@@ -226,7 +226,7 @@ public class FreeColGameObjectType extends FreeColObject {
 
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // currently, FreeColGameObjectTypes are not serialized
+        // don't use this
     }
 
     /**

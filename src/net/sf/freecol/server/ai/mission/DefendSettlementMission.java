@@ -254,14 +254,14 @@ public class DefendSettlementMission extends Mission {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute("unit", getUnit().getId());
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         if (settlement != null) {
             out.writeAttribute("settlement", settlement.getId());
         }
-
-        out.writeEndElement();
     }
 
     /**
@@ -270,14 +270,10 @@ public class DefendSettlementMission extends Mission {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         settlement = (Settlement) getGame()
             .getFreeColGameObject(in.getAttributeValue(null, "settlement"));
-
-        in.nextTag();
     }
 
     /**

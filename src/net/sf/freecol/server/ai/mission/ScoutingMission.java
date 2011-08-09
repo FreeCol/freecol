@@ -351,7 +351,6 @@ public class ScoutingMission extends Mission {
         return debugAction;
     }
 
-
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
@@ -361,25 +360,9 @@ public class ScoutingMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-
-        out.writeEndElement();
+        toXML(out, getXMLElementTagName());
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain()
-            .getAIObject(in.getAttributeValue(null, "unit")));
-        in.nextTag();
-    }
 
     /**
      * Returns the tag name of the root element representing this object.

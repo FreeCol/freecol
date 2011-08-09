@@ -135,24 +135,7 @@ public class UnitWanderHostileMission extends Mission {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain()
-            .getAIObject(in.getAttributeValue(null, "unit")));
-        in.nextTag();
+        toXML(out, getXMLElementTagName());
     }
 
     /**

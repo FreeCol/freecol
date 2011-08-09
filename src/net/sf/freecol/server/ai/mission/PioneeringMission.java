@@ -677,31 +677,20 @@ public class PioneeringMission extends Mission {
      * information to an XML-stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-        if (tileImprovementPlan != null) {
-            out.writeAttribute("tileImprovementPlan",
-                tileImprovementPlan.getId());
-        }
-
-        out.writeEndElement();
+        toXML(out, getXMLElementTagName());
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        writeAttribute(out, "tileImprovementPlan", tileImprovementPlan);
+    }
+
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
         final String tileImprovementPlanStr
             = in.getAttributeValue(null, "tileImprovementPlan");
@@ -714,7 +703,6 @@ public class PioneeringMission extends Mission {
             tileImprovementPlan = null;
         }
 
-        in.nextTag();
     }
 
     /**

@@ -225,30 +225,24 @@ public class WishRealizationMission extends Mission {
      * information to an XML-stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (wish.shouldBeStored()) {
-            out.writeStartElement(getXMLElementTagName());
-
-            out.writeAttribute("unit", getUnit().getId());
-            out.writeAttribute("wish", wish.getId());
-
-            out.writeEndElement();
+            toXML(out, getXMLElementTagName());
         }
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("wish", wish.getId());
+    }
+
+
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
+        super.readAttributes(in);
         wish = (Wish) getAIMain().getAIObject(in.getAttributeValue(null,
                 "wish"));
         if (wish == null) {
@@ -261,7 +255,6 @@ public class WishRealizationMission extends Mission {
                 logger.warning("Unknown type of Wish.");
             }
         }
-        in.nextTag();
     }
 
     /**

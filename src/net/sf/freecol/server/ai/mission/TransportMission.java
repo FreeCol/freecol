@@ -1496,10 +1496,10 @@ public class TransportMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute("unit", getUnit().getId());
-
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
             Transportable t = tli.next();
@@ -1507,20 +1507,10 @@ public class TransportMission extends Mission {
             out.writeAttribute(ID_ATTRIBUTE, ((AIObject) t).getId());
             out.writeEndElement();
         }
-        out.writeEndElement();
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void readChildren(XMLStreamReader in)
         throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
-
         transportList.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

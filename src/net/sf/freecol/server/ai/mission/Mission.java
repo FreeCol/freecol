@@ -21,6 +21,10 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
@@ -463,4 +467,15 @@ public abstract class Mission extends AIObject {
 
         return nearestColony;
     }
+
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeAttribute("unit", getUnit().getId());
+    }
+
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    }
+
 }

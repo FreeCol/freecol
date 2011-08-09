@@ -401,31 +401,21 @@ public class PrivateerMission extends Mission {
      * information to an XML-stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("state", state.toString());
-
-        out.writeEndElement();
+        toXML(out, getXMLElementTagName());
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
-        state = PrivateerMissionState.valueOf(in.getAttributeValue(null,
-                "state"));
-        in.nextTag();
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("state", state.toString());
+    }
+
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+        state = PrivateerMissionState.valueOf(in.getAttributeValue(null, "state"));
     }
 
     /**

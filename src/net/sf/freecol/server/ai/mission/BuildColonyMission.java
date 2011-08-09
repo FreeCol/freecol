@@ -409,16 +409,14 @@ public class BuildColonyMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute("unit", getUnit().getId());
-        if (target != null) {
-            out.writeAttribute("target", target.getId());
-        }
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        writeAttribute(out, "target", target);
         out.writeAttribute("doNotGiveUp", Boolean.toString(doNotGiveUp));
         out.writeAttribute("colonyBuilt", Boolean.toString(colonyBuilt));
-
-        out.writeEndElement();
     }
 
     /**
@@ -427,9 +425,8 @@ public class BuildColonyMission extends Mission {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
         final String targetStr = in.getAttributeValue(null, "target");
         if (targetStr != null) {
@@ -446,7 +443,6 @@ public class BuildColonyMission extends Mission {
             doNotGiveUp = false;
         }
         colonyBuilt = Boolean.valueOf(in.getAttributeValue(null, "colonyBuilt")).booleanValue();
-        in.nextTag();
     }
 
     /**

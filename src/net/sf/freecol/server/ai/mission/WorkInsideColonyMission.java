@@ -126,31 +126,23 @@ public class WorkInsideColonyMission extends Mission{
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("colony", aiColony.getId());
-
-        out.writeEndElement();
+        toXML(out, getXMLElementTagName());
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("colony", aiColony.getId());
+    }
+
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
+        super.readAttributes(in);
         aiColony = (AIColony) getAIMain()
             .getAIObject(in.getAttributeValue(null, "colony"));
         if (aiColony == null) {
             aiColony = new AIColony(getAIMain(),
                 in.getAttributeValue(null, "colony"));
         }
-        in.nextTag();
     }
 
     /**

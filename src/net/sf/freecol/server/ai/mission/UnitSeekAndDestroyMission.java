@@ -331,35 +331,27 @@ public class UnitSeekAndDestroyMission extends Mission {
      * information to an XML-stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
-    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        toXML(out, getXMLElementTagName());
+    }
 
-        out.writeAttribute("unit", getUnit().getId());
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
         if (getTarget() != null) {
             out.writeAttribute("target", getTarget().getId());
         }
-
-        out.writeEndElement();
     }
 
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null,
-                    "unit")));
+        super.readAttributes(in);
         setTarget((Location) getGame()
             .getFreeColGameObject(in.getAttributeValue(null, "target")));
-        in.nextTag();
     }
 
     /**
