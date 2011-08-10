@@ -25,7 +25,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
@@ -59,16 +58,14 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
-        Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
-                                       UnitState.ACTIVE);
+        Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
-        Unit defender = new ServerUnit(game, tile2, player2, veteranType,
-                                       UnitState.ACTIVE, muskets);
+        Unit defender = new ServerUnit(game, tile2, player2, veteranType, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
@@ -96,16 +93,14 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
-        Unit attacker = new ServerUnit(game, tile1, player1, veteranType,
-                                       UnitState.ACTIVE);
+        Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
         ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile defenderTile = map.getTile(2, 1);
-        Unit defender = new ServerUnit(game, defenderTile, player2, veteranType,
-                                       UnitState.ACTIVE, muskets);
+        Unit defender = new ServerUnit(game, defenderTile, player2, veteranType, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);

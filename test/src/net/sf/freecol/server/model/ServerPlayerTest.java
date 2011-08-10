@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
@@ -141,8 +140,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
 
-        new ServerUnit(game, tile1, dutch, colonistType, UnitState.SENTRY);
-        new ServerUnit(game, tile2, french, colonistType, UnitState.SENTRY);
+        new ServerUnit(game, tile1, dutch, colonistType);
+        new ServerUnit(game, tile2, french, colonistType);
         assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
         assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
@@ -157,10 +156,9 @@ public class ServerPlayerTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Unit wagonInColony = new ServerUnit(game, colony.getTile(), dutch,
-                                            wagonTrainType, UnitState.ACTIVE);
+                                            wagonTrainType);
         Unit wagonNotInColony = new ServerUnit(game, map.getTile(10, 10), dutch,
-                                               wagonTrainType,
-                                               UnitState.ACTIVE);
+                                               wagonTrainType);
         Goods cotton = new Goods(game, null, cottonType, 75);
 
         // Check if location null
@@ -217,10 +215,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Goods cotton = new Goods(game, null, cottonType, 75);
         Europe europe = dutch.getEurope();
         Map america = game.getMap();
-        Unit privateer1 = new ServerUnit(game, europe, dutch,
-                                         privateerType, UnitState.ACTIVE);
-        Unit privateer2 = new ServerUnit(game, europe, dutch,
-                                         privateerType, UnitState.ACTIVE);
+        Unit privateer1 = new ServerUnit(game, europe, dutch, privateerType);
+        Unit privateer2 = new ServerUnit(game, europe, dutch, privateerType);
 
         // While source in Europe, target in Europe
         cotton.setLocation(privateer1);
@@ -336,7 +332,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        new ServerUnit(game, map.getTile(4, 7), dutch, colonistType, UnitState.ACTIVE);
+        new ServerUnit(game, map.getTile(4, 7), dutch, colonistType);
 
         assertFalse("Should not be game over, has units",
                     dutch.checkForDeath());
@@ -348,10 +344,8 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        new ServerUnit(game, dutch.getEurope(), dutch, colonistType,
-                       UnitState.SENTRY);
-        new ServerUnit(game, dutch.getEurope(), dutch, galleonType,
-                       UnitState.SENTRY);
+        new ServerUnit(game, dutch.getEurope(), dutch, colonistType);
+        new ServerUnit(game, dutch.getEurope(), dutch, galleonType);
         assertFalse("Should not be game over, not 1600 yet",
                     dutch.checkForDeath());
 
@@ -367,10 +361,8 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch,
-                                      galleonType, UnitState.ACTIVE);
-        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType,
-                                       UnitState.SENTRY);
+        Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch, galleonType);
+        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType);
         assertTrue("Colonist should be aboard the galleon",
                    colonist.getLocation() == galleon);
         assertEquals("Galleon should have a colonist onboard",
@@ -392,8 +384,8 @@ public class ServerPlayerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
-        Unit galleon = new ServerUnit(game,dutch.getEurope() , dutch, galleonType, UnitState.ACTIVE);
-        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType, UnitState.SENTRY);
+        Unit galleon = new ServerUnit(game,dutch.getEurope(), dutch, galleonType);
+        Unit colonist = new ServerUnit(game, galleon, dutch, colonistType);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
         assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
         igc.moveTo(dutch, galleon, map);

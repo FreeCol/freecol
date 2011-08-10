@@ -22,13 +22,13 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit;
+
 
 /**
-* An action to set sentry state to the active unit.
-*/
+ * An action to set sentry state to the active unit.
+ */
 public class SentryAction extends UnitAction {
 
     public static final String id = "sentryAction";
@@ -47,8 +47,9 @@ public class SentryAction extends UnitAction {
      * @param actionEvent The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent actionEvent) {
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
-                                                             UnitState.SENTRY);
+        getFreeColClient().getInGameController()
+            .changeState(getFreeColClient().getGUI().getActiveUnit(),
+                Unit.UnitState.SENTRY);
     }
 
 }

@@ -26,7 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
+
 
 /**
  * An action for using the active unit to plow/clear a forest.
@@ -58,7 +58,7 @@ public class ImprovementAction extends UnitAction {
         if (super.shouldBeEnabled()) {
             Unit selectedUnit = getFreeColClient().getGUI().getActiveUnit();
             Tile tile = selectedUnit.getTile();
-            return selectedUnit.checkSetState(UnitState.IMPROVING)
+            return selectedUnit.checkSetState(Unit.UnitState.IMPROVING)
                 && improvement.isTileAllowed(tile)
                 && improvement.isWorkerAllowed(selectedUnit);
         }

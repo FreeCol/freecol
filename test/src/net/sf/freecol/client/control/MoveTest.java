@@ -28,7 +28,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerUnit;
@@ -67,8 +66,7 @@ public class MoveTest extends FreeColTestCase {
             plain2.setExploredBy(dutch, true);
     
             Unit hardyPioneer = new ServerUnit(game, plain1, dutch,
-                                               pioneerType,
-                                               UnitState.ACTIVE);
+                                               pioneerType);
     
             client.getPreGameController().startGame();
             assertEquals(plain1.getNeighbourOrNull(Direction.NE), plain2);

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -93,8 +92,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         assertTrue(change.appliesTo(dutch));
         assertEquals(farmer, gardener.getTargetType(creation, dutch));
 
-        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener,
-                                           UnitState.ACTIVE);
+        Unit gardenerUnit = new ServerUnit(game, null, dutch, gardener);
         assertEquals(farmer, gardenerUnit.getType());
 
     }

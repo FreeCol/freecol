@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -102,11 +103,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param location The <code>Location</code> to place this at.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param state The initial state for this unit.
      */
     public ServerUnit(Game game, Location location, Player owner,
-                      UnitType type, UnitState state) {
-        this(game, location, owner, type, state, type.getDefaultEquipment());
+                      UnitType type) {
+        this(game, location, owner, type, type.getDefaultEquipment());
     }
 
     /**
@@ -116,12 +116,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param location The <code>Location</code> to place this at.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param state The initial state for this unit.
      * @param initialEquipment The list of initial EquimentTypes
      */
     public ServerUnit(Game game, Location location, Player owner,
-                      UnitType type, UnitState state,
-                      EquipmentType... initialEquipment) {
+                      UnitType type, EquipmentType... initialEquipment) {
         super(game);
 
         visibleGoodsCount = -1;
@@ -648,8 +646,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
             unitType = Utils.getRandomMember(logger, "Choose found",
                 foundTypes, random);
-            newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                UnitState.ACTIVE);
+            newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.Colonist", serverPlayer, newUnit));
@@ -661,8 +658,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = Utils.getRandomMember(logger, "Choose train",
                     treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                    UnitState.ACTIVE);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -688,8 +684,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             } else {
                 unitType = Utils.getRandomMember(logger, "Choose train",
                                                  treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType,
-                                         UnitState.ACTIVE);
+                newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             cs.addMessage(See.only(serverPlayer),
@@ -722,8 +717,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         UnitType type = RandomChoice
                             .getWeightedRandom(logger,
                                 "Choose FoY", random, recruitables);
-                        new ServerUnit(game, europe, serverPlayer, type,
-                            UnitState.SENTRY);
+                        new ServerUnit(game, europe, serverPlayer, type);
                     }
                     cs.add(See.only(serverPlayer), europe);
                 }

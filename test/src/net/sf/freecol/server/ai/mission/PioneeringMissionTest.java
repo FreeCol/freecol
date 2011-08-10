@@ -27,7 +27,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
@@ -63,8 +62,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
         Tile unitTile = map.getTile(2, 2);
-        Unit colonist = new ServerUnit(game, unitTile, player, colonistType,
-                                       UnitState.ACTIVE, toolsEqType);
+        Unit colonist = new ServerUnit(game, unitTile, player, colonistType, toolsEqType);
 
         // Setup mission
         AIUnit aiUnit = aiMain.getAIUnit(colonist);

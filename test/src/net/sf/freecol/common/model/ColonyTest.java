@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -139,8 +138,7 @@ public class ColonyTest extends FreeColTestCase {
 
         // colonist with no skill or experience will produce food
         Unit colonist = new ServerUnit(game, colony.getTile(),
-                                       colony.getOwner(), freeColonistType,
-                                       UnitState.ACTIVE);
+                                       colony.getOwner(), freeColonistType);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(grainGoodsType, colonist.getWorkType());
@@ -225,9 +223,7 @@ public class ColonyTest extends FreeColTestCase {
 
         // colonist produces bells because they require no input
         Unit colonist = new ServerUnit(game, colony.getTile(),
-                                       colony.getOwner(),
-                                       freeColonistType,
-                                       UnitState.ACTIVE);
+                                       colony.getOwner(), freeColonistType);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
         Building townHall = colony.getBuilding(townHallType);

@@ -30,7 +30,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ServerTestHelper;
@@ -85,9 +84,7 @@ public class TensionTest extends FreeColTestCase {
         int unitCount = settlement.getType().getMaximumSize();
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = spec().getUnitType("model.unit.brave");
-            Unit unit = new ServerUnit(game, settlement, indian, unitType,
-                                       UnitState.ACTIVE,
-                                       unitType.getDefaultEquipment());
+            Unit unit = new ServerUnit(game, settlement, indian, unitType);
             unit.setIndianSettlement(settlement);
             if (i == 0) {
                 unit.setLocation(tile);
@@ -104,11 +101,9 @@ public class TensionTest extends FreeColTestCase {
         // create 2 unarmed european units next to the indianSettlement
         UnitType unitType = spec().getUnitType("model.unit.hardyPioneer");
         @SuppressWarnings("unused") Unit unit1
-            = new ServerUnit(game, map.getTile(7, 9), european, unitType,
-                             UnitState.ACTIVE);
+            = new ServerUnit(game, map.getTile(7, 9), european, unitType);
         @SuppressWarnings("unused") Unit unit2
-            = new ServerUnit(game, map.getTile(5, 9), european, unitType,
-                             UnitState.ACTIVE);
+            = new ServerUnit(game, map.getTile(5, 9), european, unitType);
 
         // the european player steals 1 tile from the indians
         Tile tile2 = map.getTile(6,8);

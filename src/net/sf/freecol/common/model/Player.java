@@ -41,7 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
@@ -3186,7 +3186,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return !unit.isDisposed()
                 && unit.getOwner() == player
                 && unit.getMovesLeft() > 0
-                && unit.getState() == UnitState.ACTIVE
+                && unit.getState() == Unit.UnitState.ACTIVE
                 && unit.getDestination() == null
                 && unit.getTradeRoute() == null
                 && !(unit.getLocation() instanceof WorkLocation)
@@ -3212,7 +3212,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return !unit.isDisposed()
                 && unit.getOwner() == player
                 && unit.getMovesLeft() > 0
-                && unit.getState() != UnitState.SKIPPED
+                && unit.getState() != Unit.UnitState.SKIPPED
                 && (unit.getDestination() != null
                     || unit.getTradeRoute() != null)
                 && !(unit.getLocation() instanceof WorkLocation)

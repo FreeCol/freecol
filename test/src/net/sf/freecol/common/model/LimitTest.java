@@ -66,7 +66,7 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colony.canBuild(wagonTrain));
 
         @SuppressWarnings("unused")
-        Unit wagon = new ServerUnit(game, colony.getTile(), dutch, wagonTrain, Unit.UnitState.ACTIVE);
+        Unit wagon = new ServerUnit(game, colony.getTile(), dutch, wagonTrain);
         assertEquals(Colony.NoBuildReason.LIMIT_EXCEEDED, colony.getNoBuildReason(wagonTrain));
         assertFalse(wagonTrainLimit.evaluate(colony));
         assertFalse(colony.canBuild(wagonTrain));

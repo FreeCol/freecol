@@ -8,7 +8,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
@@ -149,18 +148,14 @@ public class FreeColTestUtils {
                 UnitType type = iter.next();
                 Integer n = colonists.get(type);
                 for (int i = 0; i < n; i++) {
-                    Unit colonist = new ServerUnit(game, colonyTile, player,
-                        type, UnitState.ACTIVE,
-                        colonistType.getDefaultEquipment());
+                    Unit colonist = new ServerUnit(game, colonyTile, player, type);
                     colonist.setLocation(colony);
                     nCol++;
                 }
             }
             // add rest of colonists as simple free colonists
             for (int i = nCol; i < initialColonists; i++) {
-                Unit colonist = new ServerUnit(game, colonyTile, player,
-                    colonistType, UnitState.ACTIVE,
-                    colonistType.getDefaultEquipment());
+                Unit colonist = new ServerUnit(game, colonyTile, player, colonistType);
                 colonist.setLocation(colony);
             }
 

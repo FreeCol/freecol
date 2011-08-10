@@ -209,8 +209,7 @@ public class ScopeTest extends FreeColTestCase {
         Tile unitTile = map.getTile(6, 8);
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         
-        Unit unit = new ServerUnit(game, unitTile, dutch, colonistType,
-                                   Unit.UnitState.ACTIVE);
+        Unit unit = new ServerUnit(game, unitTile, dutch, colonistType);
 
         Scope scope = new Scope();
         scope.setAbilityID("model.ability.foundColony");

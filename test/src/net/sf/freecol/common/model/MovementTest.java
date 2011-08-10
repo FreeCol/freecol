@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -51,8 +50,7 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
         int moveCost = plains.getBasicMoveCost();
         assertEquals(moveCost, colonist.getMoveCost(tile2));
@@ -83,8 +81,7 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
         int moveCost = hills.getBasicMoveCost();
         assertTrue(moveCost > colonist.getMovesLeft());
@@ -121,8 +118,7 @@ public class MovementTest extends FreeColTestCase {
         assertTrue(road2.isComplete());
         assertTrue(tile2.hasRoad());
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
         int moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
@@ -157,8 +153,7 @@ public class MovementTest extends FreeColTestCase {
         assertTrue(river2.isComplete());
         assertTrue(tile2.hasRiver());
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
         int moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
@@ -192,8 +187,7 @@ public class MovementTest extends FreeColTestCase {
 
         assertEquals(tile1.getColony(), colony);
 
-        Unit colonist = new ServerUnit(game, tile2, french, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile2, french, colonistType);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT,
                      colonist.getMoveType(tile1));
         colonist.changeEquipment(horses, 1);
@@ -203,8 +197,7 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
 
-        Unit brave = new ServerUnit(game, tile3, iroquois, braveType,
-                                    UnitState.ACTIVE);
+        Unit brave = new ServerUnit(game, tile3, iroquois, braveType);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianHorses, 1);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
@@ -235,8 +228,7 @@ public class MovementTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
 
-        Unit colonist = new ServerUnit(game, tile2, french, colonistType,
-                                       UnitState.ACTIVE);
+        Unit colonist = new ServerUnit(game, tile2, french, colonistType);
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_CONTACT,
                      colonist.getMoveType(tile1));
         Player.makeContact(french, inca);
@@ -249,8 +241,7 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT,
                      colonist.getMoveType(tile1));
 
-        Unit brave = new ServerUnit(game, tile3, iroquois, braveType,
-                                    UnitState.ACTIVE);
+        Unit brave = new ServerUnit(game, tile3, iroquois, braveType);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));
         brave.changeEquipment(indianHorses, 1);
         assertEquals(Unit.MoveType.ATTACK_SETTLEMENT, brave.getMoveType(tile1));

@@ -76,7 +76,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -792,11 +791,11 @@ public final class FreeColServer {
                             //  use setLocation() so that units are removed from Europe,
                             //  and appear in correct panes in the EuropePanel
                             //  do not set the UnitState, as this clears workLeft
-                            if (u.getState() == UnitState.TO_EUROPE) {
+                            if (u.getState() == Unit.UnitState.TO_EUROPE) {
                                 logger.info("Found unit on way to europe: "+u.toString());
                                 u.setLocation(p.getHighSeas());
                                 u.setDestination(p.getEurope());
-                            } else if (u.getState() == UnitState.TO_AMERICA) {
+                            } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
                                 logger.info("Found unit on way to new world: "+u.toString());
                                 u.setLocation(p.getHighSeas());
                                 u.setDestination(getGame().getMap());

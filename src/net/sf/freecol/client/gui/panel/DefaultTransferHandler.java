@@ -63,7 +63,7 @@ import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
+
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.

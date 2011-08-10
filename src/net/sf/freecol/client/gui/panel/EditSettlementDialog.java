@@ -47,7 +47,6 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -184,8 +183,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             if (numberOfUnits > 0) {
                 UnitType BRAVE = getSpecification().getUnitType("model.unit.brave");
                 for (int index = 0; index < numberOfUnits; index++) {
-                    settlement.add(new ServerUnit(settlement.getGame(), settlement, settlement.getOwner(),
-                                            BRAVE, UnitState.ACTIVE));
+                    settlement.add(new ServerUnit(settlement.getGame(),
+                            settlement, settlement.getOwner(), BRAVE));
                 }
             } else if (numberOfUnits < 0) {
                 List<Unit> unitList = settlement.getUnitList().subList(0, -numberOfUnits);

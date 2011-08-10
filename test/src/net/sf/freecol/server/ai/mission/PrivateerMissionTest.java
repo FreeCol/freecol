@@ -25,7 +25,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
@@ -75,12 +74,9 @@ public class PrivateerMissionTest extends FreeColTestCase {
 
         // setup colony and units
         getStandardColony(1, colonyTile.getX(), colonyTile.getY());
-        new ServerUnit(game, privateerTile, dutch, privateerType,
-                       UnitState.ACTIVE);
-        new ServerUnit(game, frenchGalleonTile, french, galleonType,
-                       UnitState.ACTIVE);
-        new ServerUnit(game, dutchGalleonTile, dutch, galleonType,
-                       UnitState.ACTIVE);
+        new ServerUnit(game, privateerTile, dutch, privateerType);
+        new ServerUnit(game, frenchGalleonTile, french, galleonType);
+        new ServerUnit(game, dutchGalleonTile, dutch, galleonType);
     }
 
     private Game setupPrivateerTestGame() {

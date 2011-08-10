@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
@@ -54,7 +53,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         game.setMap(map);
         UnitType veteran = spec().getUnitType("model.unit.veteranSoldier");
-        Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
+        Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
         GoodsType foodType = spec().getGoodsType("model.goods.grain");
@@ -120,9 +119,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(map);
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         GoodsType foodType = spec().getGoodsType("model.goods.grain");
-        Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch,
-                                      pioneerType, UnitState.ACTIVE,
-                                      pioneerType.getDefaultEquipment());
+        Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch, pioneerType);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
         pioneer.setWorkType(foodType);

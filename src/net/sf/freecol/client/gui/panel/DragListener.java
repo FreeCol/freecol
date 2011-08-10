@@ -54,11 +54,12 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+
 
 /**
  * A DragListener should be attached to Swing components that have a
@@ -406,7 +407,7 @@ public final class DragListener extends MouseAdapter {
         JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
+        menuItem.setEnabled(tempUnit.getState() != Unit.UnitState.ACTIVE
                                 && !isUnitAtSea);
         menu.add(menuItem);
 
@@ -415,8 +416,8 @@ public final class DragListener extends MouseAdapter {
             menuItem.setActionCommand(UnitAction.FORTIFY.toString());
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
-                                && !(tempUnit.getState() == UnitState.FORTIFIED ||
-                                     tempUnit.getState() == UnitState.FORTIFYING));
+                && !(tempUnit.getState() == Unit.UnitState.FORTIFIED
+                    || tempUnit.getState() == Unit.UnitState.FORTIFYING));
             menu.add(menuItem);
         }
 
@@ -424,16 +425,17 @@ public final class DragListener extends MouseAdapter {
         menuItem = new JMenuItem(Messages.message("sentryUnit"));
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(unitState != UnitState.SENTRY
-                                && !isUnitAtSea);
+        menuItem.setEnabled(unitState != Unit.UnitState.SENTRY
+            && !isUnitAtSea);
         menu.add(menuItem);
 
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
         menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-                            && !isUnitAtSea);
+        menuItem.setEnabled((unitState != Unit.UnitState.ACTIVE
+                || hasTradeRoute)
+            && !isUnitAtSea);
         menu.add(menuItem);
 
         menuItem = new JMenuItem(Messages.message("assignTradeRoute"));

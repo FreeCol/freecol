@@ -46,7 +46,6 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -242,7 +241,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      */
     public void paintComponent(Graphics g) {
 
-        if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
+        if (ignoreLocation || selected
+            || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
             setEnabled(true);
         } else if (unit.getOwner() != parent.getFreeColClient().getMyPlayer()
             && unit.getColony() == null) {
@@ -343,14 +343,14 @@ public final class UnitLabel extends JLabel implements ActionListener {
             }
             break;
         case ACTIVATE_UNIT:
-            inGameController.changeState(unit, UnitState.ACTIVE);
+            inGameController.changeState(unit, Unit.UnitState.ACTIVE);
             parent.getGUI().setActiveUnit(unit);
             break;
         case FORTIFY:
-            inGameController.changeState(unit, UnitState.FORTIFYING);
+            inGameController.changeState(unit, Unit.UnitState.FORTIFYING);
             break;
         case SENTRY:
-            inGameController.changeState(unit, UnitState.SENTRY);
+            inGameController.changeState(unit, Unit.UnitState.SENTRY);
             break;
         case COLOPEDIA:
             getCanvas().showPanel(new ColopediaPanel(getCanvas(), null, unit.getType()));

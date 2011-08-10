@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -630,8 +629,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Building university = colony.getBuilding(universityType);
         Iterator<Unit> units = colony.getUnitIterator();
         Unit outsider = new ServerUnit(game, colony.getTile(),
-                                       colony.getOwner(), freeColonistType,
-                                       UnitState.ACTIVE);
+                                       colony.getOwner(), freeColonistType);
 
         Building townHall = colony.getBuilding(townHallType);
         Unit colonist = units.next();

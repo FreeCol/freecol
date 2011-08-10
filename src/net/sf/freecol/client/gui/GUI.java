@@ -87,7 +87,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -1184,10 +1183,11 @@ public final class GUI {
                     occupationString = "model.unit.occupation.inTradeRoute";
                 else
                     occupationString = "model.unit.occupation.goingSomewhere";
-            } else if (unit.getState() == UnitState.IMPROVING
+            } else if (unit.getState() == Unit.UnitState.IMPROVING
                        && unit.getWorkImprovement() != null) {
                 occupationString = unit.getWorkImprovement().getType().getId() + ".occupationString";
-            } else if (unit.getState() == UnitState.ACTIVE && unit.getMovesLeft() == 0) {
+            } else if (unit.getState() == Unit.UnitState.ACTIVE
+                && unit.getMovesLeft() == 0) {
                 if(unit.isUnderRepair())
                     occupationString = "model.unit.occupation.underRepair";
                 else
@@ -1196,7 +1196,7 @@ public final class GUI {
                 occupationString = "model.unit.occupation." + unit.getState().toString().toLowerCase();
             }
             occupationString = Messages.message(occupationString);
-            if (unit.getState() == UnitState.FORTIFIED)
+            if (unit.getState() == Unit.UnitState.FORTIFIED)
                 foregroundColor = Color.GRAY;
         }
         // Lookup in the cache if the image has been generated already
@@ -1461,7 +1461,7 @@ public final class GUI {
 
         if (activeUnit != null) {
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                if (activeUnit.getState() != UnitState.ACTIVE) {
+                if (activeUnit.getState() != Unit.UnitState.ACTIVE) {
                     freeColClient.getInGameController().clearOrders(activeUnit);
                 }
             } else {
@@ -2697,7 +2697,7 @@ public final class GUI {
 
             // Draw the unit.
             // If unit is sentry, draw in grayscale
-            boolean fade = (unit.getState() == UnitState.SENTRY)
+            boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
                 || (unit.getTile() != null
                     && !freeColClient.getMyPlayer().canSee(unit.getTile()));
             Image image = lib.getUnitImageIcon(unit, fade).getImage();

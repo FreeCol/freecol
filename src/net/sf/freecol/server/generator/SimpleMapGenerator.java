@@ -68,7 +68,6 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -742,8 +741,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(map.getGame(), settlement, player,
-                                       unitType, UnitState.ACTIVE,
-                                       unitType.getDefaultEquipment());
+                unitType, unitType.getDefaultEquipment());
             unit.setIndianSettlement(settlement);
 
             if (i == 0) {
@@ -850,12 +848,12 @@ public class SimpleMapGenerator implements MapGenerator {
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new ServerUnit(game, null, player,
                                               startingUnit.getUnitType(spec),
-                                              UnitState.SENTRY,
                                               startingUnit.getEquipment(spec));
                 if (newUnit.canCarryUnits() && newUnit.isNaval()) {
-                    newUnit.setState(UnitState.ACTIVE);
+                    newUnit.setState(Unit.UnitState.ACTIVE);
                     carriers.add(newUnit);
                 } else {
+                    newUnit.setState(Unit.UnitState.SENTRY);
                     passengers.add(newUnit);
                 }
 
@@ -924,26 +922,21 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
-        Unit unit4 = new ServerUnit(game, startTile, player, unitType,
-                                    UnitState.ACTIVE);
+        Unit unit4 = new ServerUnit(game, startTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.privateer");
         @SuppressWarnings("unused")
-        Unit privateer = new ServerUnit(game, startTile, player,
-                                        unitType, UnitState.ACTIVE);
+        Unit privateer = new ServerUnit(game, startTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.freeColonist");
         @SuppressWarnings("unused")
-        Unit unit5 = new ServerUnit(game, unit4, player, unitType,
-                                    UnitState.SENTRY);
+        Unit unit5 = new ServerUnit(game, unit4, player, unitType);
         unitType = spec.getUnitType("model.unit.veteranSoldier");
         @SuppressWarnings("unused")
-        Unit unit6 = new ServerUnit(game, unit4, player, unitType,
-                                    UnitState.SENTRY);
+        Unit unit6 = new ServerUnit(game, unit4, player, unitType);
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
         @SuppressWarnings("unused")
-        Unit unit7 = new ServerUnit(game, unit4, player, unitType,
-                                    UnitState.SENTRY);
+        Unit unit7 = new ServerUnit(game, unit4, player, unitType);
 
         Tile colonyTile = null;
         Iterator<Position> cti
@@ -972,8 +965,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         unitType = spec.getUnitType("model.unit.expertFarmer");
         Unit buildColonyUnit = new ServerUnit(game, colonyTile,
-                                              player, unitType,
-                                              UnitState.ACTIVE);
+                                              player, unitType);
         String colonyName = Messages.message(player.getNationName())
             + " Colony";
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
@@ -1014,18 +1006,15 @@ public class SimpleMapGenerator implements MapGenerator {
         Building schoolhouse = new ServerBuilding(game, colony, schoolType);
         colony.addBuilding(schoolhouse);
         unitType = spec.getUnitType("model.unit.masterCarpenter");
-        Unit carpenter = new ServerUnit(game, colonyTile, player,
-                                        unitType, UnitState.ACTIVE);
+        Unit carpenter = new ServerUnit(game, colonyTile, player, unitType);
         carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
         unitType = spec.getUnitType("model.unit.elderStatesman");
-        Unit statesman = new ServerUnit(game, colonyTile, player,
-                                        unitType, UnitState.ACTIVE);
+        Unit statesman = new ServerUnit(game, colonyTile, player, unitType);
         statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
         unitType = spec.getUnitType("model.unit.expertLumberJack");
-        Unit lumberjack = new ServerUnit(game, colony, player,
-                                         unitType, UnitState.ACTIVE);
+        Unit lumberjack = new ServerUnit(game, colony, player, unitType);
         if (lumberjack.getLocation() instanceof ColonyTile) {
             Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
             for (TileType t : spec.getTileTypeList()) {
@@ -1039,50 +1028,40 @@ public class SimpleMapGenerator implements MapGenerator {
 
         unitType = spec.getUnitType("model.unit.seasonedScout");
         @SuppressWarnings("unused")
-        Unit scout = new ServerUnit(game, colonyTile, player,
-                                    unitType, UnitState.ACTIVE);
+        Unit scout = new ServerUnit(game, colonyTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.veteranSoldier");
         @SuppressWarnings("unused")
-        Unit unit8 = new ServerUnit(game, colonyTile, player,
-                                    unitType, UnitState.ACTIVE);
+        Unit unit8 = new ServerUnit(game, colonyTile, player, unitType);
 
         @SuppressWarnings("unused")
-        Unit unit9 = new ServerUnit(game, colonyTile, player,
-                                    unitType, UnitState.ACTIVE);
+        Unit unit9 = new ServerUnit(game, colonyTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.artillery");
         @SuppressWarnings("unused")
-        Unit unit10 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit10 = new ServerUnit(game, colonyTile, player, unitType);
 
         @SuppressWarnings("unused")
-        Unit unit11 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit11 = new ServerUnit(game, colonyTile, player, unitType);
 
         @SuppressWarnings("unused")
-        Unit unit12 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit12 = new ServerUnit(game, colonyTile, player, unitType);
 
         unitType = spec.getUnitType("model.unit.treasureTrain");
-        Unit unit13 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit13 = new ServerUnit(game, colonyTile, player, unitType);
         unit13.setTreasureAmount(10000);
 
         unitType = spec.getUnitType("model.unit.wagonTrain");
-        Unit unit14 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit14 = new ServerUnit(game, colonyTile, player, unitType);
         GoodsType cigarsType = spec.getGoodsType("model.goods.cigars");
         Goods cigards = new Goods(game, unit14, cigarsType, 5);
         unit14.add(cigards);
 
         unitType = spec.getUnitType("model.unit.jesuitMissionary");
         @SuppressWarnings("unused")
-        Unit unit15 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit15 = new ServerUnit(game, colonyTile, player, unitType);
         @SuppressWarnings("unused")
-        Unit unit16 = new ServerUnit(game, colonyTile, player,
-                                     unitType, UnitState.ACTIVE);
+        Unit unit16 = new ServerUnit(game, colonyTile, player, unitType);
         // END DEBUG
     }
 

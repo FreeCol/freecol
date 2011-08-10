@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
@@ -399,8 +398,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     t.setSettlement(settlement);
                     UnitType brave = getSpecification().getUnitType("model.unit.brave");
                     for (int index = 0; index < 5; index++) {
-                        settlement.add(new ServerUnit(settlement.getGame(), settlement, settlement.getOwner(),
-                                                brave, UnitState.ACTIVE));
+                        settlement.add(new ServerUnit(settlement.getGame(),
+                                settlement, settlement.getOwner(), brave));
                     }
                 }
             }

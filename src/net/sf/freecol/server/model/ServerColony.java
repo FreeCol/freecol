@@ -49,7 +49,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -481,8 +480,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     private Unit csBuildUnit(BuildQueue buildQueue, Random random,
                              ChangeSet cs) {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
-                                   (UnitType) buildQueue.getCurrentlyBuilding(),
-                                   UnitState.ACTIVE);
+            (UnitType) buildQueue.getCurrentlyBuilding());
         if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,

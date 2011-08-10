@@ -24,7 +24,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIMain;
@@ -63,8 +62,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         builder.player(player1).settlementTile(settlementTile).build();
 
         Tile unitTile = map.getTile(2, 2);
-        Unit scout = new ServerUnit(game, unitTile, player2, scoutType,
-                                    UnitState.ACTIVE, horsesEqType);
+        Unit scout = new ServerUnit(game, unitTile, player2, scoutType, horsesEqType);
 
         // Setup mission
         // this will call AIPlayer.giveNormalMissions() and set the scout mission

@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.ai.AIColony;
@@ -597,9 +596,7 @@ public final class TilePopup extends JPopupMenu {
         Tile serverTile = (Tile) serverGame
             .getFreeColGameObject(tile.getId());
         ServerUnit serverUnit
-            = new ServerUnit(serverGame, serverTile, serverPlayer,
-                             unitChoice, UnitState.ACTIVE,
-                             unitChoice.getDefaultEquipment());
+            = new ServerUnit(serverGame, serverTile, serverPlayer, unitChoice);
         serverUnit.setMovesLeft(serverUnit.getInitialMovesLeft());
         Unit unit = new Unit(freeColClient.getGame(),
                 serverUnit.toXMLElement(DOMMessage.createNewDocument()));

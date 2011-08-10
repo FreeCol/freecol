@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -79,8 +78,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Colony colony = FreeColTestUtils.getColonyBuilder()
             .colonyTile(map.getTile(5, 8)).build();
         new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
-                       colonistType, UnitState.ACTIVE,
-                       colonistType.getDefaultEquipment());
+                       colonistType);
         assertEquals(0, colony.getGoodsCount(foodType));
 
         int quantity = colony.getFoodConsumption() * 2;
@@ -136,8 +134,7 @@ public class ServerColonyTest extends FreeColTestCase {
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
-                       colonistType, UnitState.ACTIVE,
-                       colonistType.getDefaultEquipment());
+                       colonistType);
 
 
         // Verify that there is enough food stored
@@ -178,8 +175,7 @@ public class ServerColonyTest extends FreeColTestCase {
 
         for(int i=0; i<unitsBeforeNewTurn;i++){
             new ServerUnit(game, colony.getBuildingForProducing(bellsType),
-                           dutch, pioneerType, UnitState.ACTIVE,
-                           pioneerType.getDefaultEquipment());
+                           dutch, pioneerType);
         };
 
         int consumption = colony.getFoodConsumption();

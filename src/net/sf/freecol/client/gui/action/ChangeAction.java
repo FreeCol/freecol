@@ -30,7 +30,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 
 
 /**
@@ -111,7 +110,9 @@ public class ChangeAction extends UnitAction {
                 Unit u = unitIterator.next();
                 if (u == unit) {
                     activeUnitFound = true;
-                } else if (activeUnitFound && u.getState() == UnitState.ACTIVE && u.getMovesLeft() > 0) {
+                } else if (activeUnitFound
+                    && u.getState() == Unit.UnitState.ACTIVE
+                    && u.getMovesLeft() > 0) {
                     getFreeColClient().getGUI().setActiveUnit(u);
                     return;
                 }
@@ -121,7 +122,8 @@ public class ChangeAction extends UnitAction {
                 Unit u = unitIterator.next();
                 if (u == unit) {
                     return;
-                } else if (u.getState() == UnitState.ACTIVE && u.getMovesLeft() > 0) {
+                } else if (u.getState() == Unit.UnitState.ACTIVE
+                    && u.getMovesLeft() > 0) {
                     getFreeColClient().getGUI().setActiveUnit(u);
                     return;
                 }

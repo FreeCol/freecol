@@ -26,7 +26,6 @@ import java.util.Set;
 
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -261,7 +260,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
 
         Unit missionary = new ServerUnit(game, null, dutch, colonistType,
-                                   UnitState.ACTIVE, bibleType);
+                                         bibleType);
         camp.setMissionary(missionary);
 
         assertTrue(bibleType.hasAbility("model.ability.missionary"));

@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
@@ -250,7 +249,7 @@ public class AIColonyTest extends FreeColTestCase {
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
         Unit scout = new ServerUnit(getGame(), colony.getTile(), colony.getOwner(),
-                                    colonistType, UnitState.ACTIVE, horsesEqType);
+                                    colonistType, horsesEqType);
         assertTrue("Scout should be mounted", scout.isMounted());
 
         assertEquals("Setup error, colony should not have horses in stock",
@@ -278,28 +277,24 @@ public class AIColonyTest extends FreeColTestCase {
         assertNull(AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
 
         final UnitType servantType = spec().getUnitType("model.unit.indenturedServant");
-        Unit servant = new ServerUnit(getGame(), null, dutch, servantType,
-                                      UnitState.ACTIVE);
+        Unit servant = new ServerUnit(getGame(), null, dutch, servantType);
         units.add(servant);
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         final UnitType criminalType = spec().getUnitType("model.unit.pettyCriminal");
-        Unit criminal = new ServerUnit(getGame(), null, dutch, criminalType,
-                                       UnitState.ACTIVE);
+        Unit criminal = new ServerUnit(getGame(), null, dutch, criminalType);
         units.add(criminal);
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
         final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        Unit colonist1 = new ServerUnit(getGame(), null, dutch, colonistType,
-                                        UnitState.ACTIVE);
+        Unit colonist1 = new ServerUnit(getGame(), null, dutch, colonistType);
         units.add(colonist1);
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 
-        Unit colonist2 = new ServerUnit(getGame(), null, dutch, colonistType,
-                                        UnitState.ACTIVE);
+        Unit colonist2 = new ServerUnit(getGame(), null, dutch, colonistType);
         units.add(colonist2);
         colonist2.setWorkType(sugarType);
         colonist2.modifyExperience(100);
@@ -316,16 +311,14 @@ public class AIColonyTest extends FreeColTestCase {
         assertEquals(null, AIColony.bestUnitForWorkLocation(units, colonyTile, lumberType));
 
         final UnitType convertType = spec().getUnitType("model.unit.indianConvert");
-        Unit convert = new ServerUnit(getGame(), null, dutch, convertType,
-                                      UnitState.ACTIVE);
+        Unit convert = new ServerUnit(getGame(), null, dutch, convertType);
         units.add(convert);
         assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
         units.remove(convert);
 
         final UnitType sugarPlanterType = spec().getUnitType("model.unit.masterSugarPlanter");
-        Unit sugarPlanter = new ServerUnit(getGame(), null, dutch,
-                                           sugarPlanterType, UnitState.ACTIVE);
+        Unit sugarPlanter = new ServerUnit(getGame(), null, dutch, sugarPlanterType);
         units.add(sugarPlanter);
         assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         // prefer colonist over wrong type of expert
@@ -333,8 +326,7 @@ public class AIColonyTest extends FreeColTestCase {
         units.remove(sugarPlanter);
 
         final UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
-        Unit farmer = new ServerUnit(getGame(), null, dutch, farmerType,
-                                     UnitState.ACTIVE);
+        Unit farmer = new ServerUnit(getGame(), null, dutch, farmerType);
         units.add(farmer);
         // prefer colonist over wrong type of expert
         assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));

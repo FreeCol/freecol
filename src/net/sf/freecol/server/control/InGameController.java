@@ -87,8 +87,8 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
@@ -1725,7 +1725,6 @@ public final class InGameController extends Controller {
         Location oldLocation = unit.getLocation();
         unit.setLocation(carrier);
         unit.setMovesLeft(0);
-        unit.setState(UnitState.SENTRY);
         cs.add(See.only(serverPlayer), (FreeColGameObject) oldLocation);
         if (carrier.getLocation() != oldLocation) {
             cs.add(See.only(serverPlayer), carrier);
@@ -1767,7 +1766,6 @@ public final class InGameController extends Controller {
             : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());
         unit.setLocation(newLocation);
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
-        unit.setState(UnitState.ACTIVE);
         cs.add(See.perhaps(), (FreeColGameObject) newLocation);
         if (newTiles != null) {
             serverPlayer.csSeeNewTiles(newTiles, cs);
@@ -3394,8 +3392,7 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Not enough gold to train " + type);
         }
 
-        new ServerUnit(getGame(), europe, serverPlayer, type,
-                       (type.isNaval()) ? UnitState.ACTIVE : UnitState.SENTRY);
+        new ServerUnit(getGame(), europe, serverPlayer, type);
         serverPlayer.modifyGold(-price);
         ((ServerEurope) europe).increasePrice(type, price);
 
@@ -3793,12 +3790,11 @@ public final class InGameController extends Controller {
                 "Choose undead navy", random, navalUnits.size()));
         Tile start = ((Tile) serverPlayer.getEntryLocation())
             .getSafeTile(serverPlayer, random);
-        Unit theFlyingDutchman = new ServerUnit(game, start, serverPlayer,
-            navalType, UnitState.ACTIVE);
+        Unit theFlyingDutchman
+            = new ServerUnit(game, start, serverPlayer, navalType);
         UnitType landType = landUnits.get(Utils.randomInt(logger,
                 "Choose undead army", random, landUnits.size()));
-        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType,
-            UnitState.SENTRY);
+        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);
         serverPlayer.setDead(false);
         serverPlayer.setPlayerType(PlayerType.UNDEAD);
 

@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
@@ -145,8 +144,7 @@ public class ServerIndianSettlement extends IndianSettlement
             // without discussing it on the developer's mailing list first.
             UnitType type = Utils.getRandomMember(logger, "Choose birth",
                                                   unitTypes, random);
-            Unit unit = new ServerUnit(getGame(), getTile(), owner, type,
-                                       UnitState.ACTIVE);
+            Unit unit = new ServerUnit(getGame(), getTile(), owner, type);
             consumeGoods(foodType, FOOD_PER_COLONIST);
             consumeGoods(rumType, FOOD_PER_COLONIST/4);
             // New units quickly go out of their city and start annoying.

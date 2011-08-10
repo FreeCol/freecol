@@ -62,7 +62,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;

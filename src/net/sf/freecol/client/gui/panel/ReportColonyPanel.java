@@ -66,7 +66,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -557,8 +556,8 @@ public final class ReportColonyPanel extends ReportPanel
         List<Unit> teachers = new ArrayList<Unit>();
         List<Unit> notWorking = new ArrayList<Unit>();
         for (Unit u : colony.getTile().getUnitList()) {
-            if (u.getState() != UnitState.FORTIFIED
-                && u.getState() != UnitState.SENTRY) {
+            if (u.getState() != Unit.UnitState.FORTIFIED
+                && u.getState() != Unit.UnitState.SENTRY) {
                 notWorking.add(u);
             }
         }

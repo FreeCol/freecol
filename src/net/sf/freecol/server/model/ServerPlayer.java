@@ -74,7 +74,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
@@ -829,9 +828,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
                 units.add(new ServerUnit(game, europe, this,
-                                         au.getUnitType(spec),
-                                         UnitState.ACTIVE,
-                                         au.getEquipment(spec)));
+                        au.getUnitType(spec), au.getEquipment(spec)));
             }
         }
         return units;
@@ -1564,8 +1561,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Europe europe = getEurope();
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
-        Unit unit = new ServerUnit(game, europe, this, recruitType,
-                                   UnitState.ACTIVE);
+        Unit unit = new ServerUnit(game, europe, this, recruitType);
         unit.setLocation(europe);
 
         // Handle migration type specific changes.
@@ -2358,7 +2354,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         loser.setOwner(winnerPlayer);
         if (type != null) loser.setType(type);
         loser.setLocation(winner.getTile());
-        loser.setState(UnitState.ACTIVE);
+        loser.setState(Unit.UnitState.ACTIVE);
 
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
@@ -2485,7 +2481,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ship.setHitpoints(1);
         ship.setDestination(null);
         ship.setLocation(repair);
-        ship.setState(UnitState.ACTIVE);
+        ship.setState(Unit.UnitState.ACTIVE);
         ship.setMovesLeft(0);
         cs.add(See.only(player), (FreeColGameObject) repair);
     }
@@ -2617,8 +2613,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .getUnitTypesWithAbility(Ability.CARRY_TREASURE);
             UnitType type = Utils.getRandomMember(logger, "Choose train",
                 unitTypes, random);
-            Unit train = new ServerUnit(game, tile, attackerPlayer, type,
-                UnitState.ACTIVE);
+            Unit train = new ServerUnit(game, tile, attackerPlayer, type);
             train.setTreasureAmount(plunder);
         }
 
@@ -2810,7 +2805,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 new LootCargoMessage(winner, loser.getId(), capture));
         }
         loser.getGoodsContainer().removeAll();
-        loser.setState(UnitState.ACTIVE);
+        loser.setState(Unit.UnitState.ACTIVE);
     }
 
     /**
@@ -2888,7 +2883,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         String messageId;
         if (loser.getEquipment().isEmpty()) {
             messageId = "model.unit.unitDemotedToUnarmed";
-            loser.setState(UnitState.ACTIVE);
+            loser.setState(Unit.UnitState.ACTIVE);
         } else {
             messageId = loser.getType().getId() + ".demoted";
         }

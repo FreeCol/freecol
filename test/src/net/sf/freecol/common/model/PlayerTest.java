@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.Iterator;
 
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -47,13 +46,13 @@ public class PlayerTest extends FreeColTestCase {
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 
         Unit unit1 = new ServerUnit(game, map.getTile(4, 7), dutch,
-                                    freeColonist, UnitState.ACTIVE);
+                                    freeColonist);
         Unit unit2 = new ServerUnit(game, map.getTile(4, 8), dutch,
-                                    freeColonist, UnitState.ACTIVE);
+                                    freeColonist);
         Unit unit3 = new ServerUnit(game, map.getTile(5, 7), dutch,
-                                    freeColonist, UnitState.ACTIVE);
+                                    freeColonist);
         Unit unit4 = new ServerUnit(game, map.getTile(5, 8), dutch,
-                                    freeColonist, UnitState.ACTIVE);
+                                    freeColonist);
 
         int count = 0;
         Iterator<Unit> unitIterator = dutch.getUnitIterator();
@@ -285,7 +284,7 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals("Wrong number of units for french player",0,french.getUnits().size());
 
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
-                                       freeColonist, UnitState.ACTIVE);
+                                       freeColonist);
         assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
         assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
 

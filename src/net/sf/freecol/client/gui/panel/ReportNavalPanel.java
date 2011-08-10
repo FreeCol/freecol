@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;

@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -95,8 +94,9 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
-        Unit soldier = new ServerUnit(game, tile2, french, veteranType, UnitState.ACTIVE, muskets, horses);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
+        colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
+        Unit soldier = new ServerUnit(game, tile2, french, veteranType, muskets, horses);
         soldier.setMovesLeft(1);
 
         Modifier bigMovementPenalty = spec().getModifiers(SimpleCombatModel.BIG_MOVEMENT_PENALTY)
@@ -164,8 +164,8 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit galleon = new ServerUnit(game, tile1, dutch, galleonType, UnitState.ACTIVE);
-        Unit privateer = new ServerUnit(game, tile2, french, privateerType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, tile1, dutch, galleonType);
+        Unit privateer = new ServerUnit(game, tile2, french, privateerType);
 
         /**
          * Only base modifiers should apply.
@@ -181,8 +181,7 @@ public class CombatTest extends FreeColTestCase {
         /**
          * Fortification should have no effect.
          */
-        galleon.setState(UnitState.FORTIFYING);
-        galleon.setState(UnitState.FORTIFIED);
+        galleon.setStateUnchecked(Unit.UnitState.FORTIFIED);
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
         assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
@@ -262,13 +261,13 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = colony.getUnitIterator().next();
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       UnitState.ACTIVE, indianHorses, indianMuskets);
+                                       indianHorses, indianMuskets);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
         assertEquals(colonist, colony.getTile().getDefendingUnit(attacker));
 
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
-                                       colonistType, UnitState.ACTIVE);
+                                       colonistType);
         assertFalse("Colonist should not be defensive unit",defender.isDefensiveUnit());
         assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
 
@@ -290,8 +289,7 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(inca, true);
 
         Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
-                                       UnitState.ACTIVE, indianHorses, indianMuskets);
+        Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType, indianHorses, indianMuskets);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
 
@@ -333,10 +331,8 @@ public class CombatTest extends FreeColTestCase {
         IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).capital(true).build();
 
         //IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
-        Unit defender = new ServerUnit(game, settlement, inca, braveType,
-                                       UnitState.ACTIVE);
-        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType,
-                                       UnitState.ACTIVE, horses, muskets);
+        Unit defender = new ServerUnit(game, settlement, inca, braveType);
+        Unit attacker = new ServerUnit(game, tile2, dutch, colonistType, horses, muskets);
 
         for (EquipmentType equipment : dragoonEquipment) {
             for (AbstractGoods goods : equipment.getGoodsRequired()) {
@@ -368,10 +364,11 @@ public class CombatTest extends FreeColTestCase {
         dutch.setStance(french, Player.Stance.WAR);
         french.setStance(dutch, Player.Stance.WAR);
 
-        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType,
-                                       UnitState.FORTIFIED);
+        Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
+        colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
         Unit soldier = new ServerUnit(game, tile2, french, veteranType,
-                                      UnitState.ACTIVE, muskets, horses);
+                                      muskets, horses);
+        soldier.setStateUnchecked(Unit.UnitState.FORTIFIED);
 
         assertEquals(tile1, colonist.getLocation());
         assertEquals(tile2, soldier.getLocation());
@@ -404,9 +401,8 @@ public class CombatTest extends FreeColTestCase {
         tupi.setStance(spanish, Player.Stance.WAR);
 
         Unit soldier = new ServerUnit(game, tile1, spanish, colonistType,
-                                      UnitState.ACTIVE, muskets);
-        Unit brave = new ServerUnit(game, tile2, tupi, braveType,
-                                    UnitState.ACTIVE);
+                                      muskets);
+        Unit brave = new ServerUnit(game, tile2, tupi, braveType);
 
         assertEquals(tile1, soldier.getLocation());
         assertEquals(tile2, brave.getLocation());
@@ -445,10 +441,8 @@ public class CombatTest extends FreeColTestCase {
         spanish.setStance(tupi, Player.Stance.WAR);
         tupi.setStance(spanish, Player.Stance.WAR);
 
-        Unit galleon = new ServerUnit(game, tile2, spanish, galleonType,
-                                      UnitState.ACTIVE);
-        Unit brave = new ServerUnit(game, tile1, tupi, braveType,
-                                    UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, tile2, spanish, galleonType);
+        Unit brave = new ServerUnit(game, tile1, tupi, braveType);
 
         assertEquals(tile1, brave.getLocation());
         assertEquals(tile2, galleon.getLocation());

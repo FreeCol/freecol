@@ -65,7 +65,6 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 
 
 /**
@@ -605,8 +604,8 @@ public final class EuropePanel extends FreeColPanel {
             UnitLabel prevCarrier = null;
             for (Unit unit : europe.getUnitList()) {
                 if (unit.isNaval()
-                    && (unit.getState() == UnitState.ACTIVE
-                        || unit.getState() == UnitState.SENTRY)) {
+                    && (unit.getState() == Unit.UnitState.ACTIVE
+                        || unit.getState() == Unit.UnitState.SENTRY)) {
                     UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);

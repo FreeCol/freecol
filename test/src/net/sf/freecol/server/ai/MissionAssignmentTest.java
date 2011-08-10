@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -85,8 +84,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Tile tile1 = map.getTile(2, 2);
         Tile tile2 = map.getTile(2, 1);
-        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
-        Unit friendlyColonist = new ServerUnit(game, tile2, dutch, colonistType, UnitState.ACTIVE);
+        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType);
+        Unit friendlyColonist = new ServerUnit(game, tile2, dutch, colonistType);
 
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
@@ -95,12 +94,12 @@ public class MissionAssignmentTest extends FreeColTestCase {
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
 
         Tile tile3 = map.getTile(1, 2);
-        Unit enemyColonist = new ServerUnit(game, tile3, french, colonistType, UnitState.ACTIVE);
+        Unit enemyColonist = new ServerUnit(game, tile3, french, colonistType);
 
         Tile tile4 = map.getTile(12, 12); // in the water
         assertFalse("Tle should be water",tile4.isLand());
 
-        Unit enemyGalleon = new ServerUnit(game, tile4, french, galleonType, UnitState.ACTIVE);
+        Unit enemyGalleon = new ServerUnit(game, tile4, french, galleonType);
         //Make tests
         int turnsToReach = 1; // not important
 
@@ -127,8 +126,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         Tile dutchUnitTile = map.getTile(9, 9);
         Tile braveUnitTile = map.getTile(9, 8);;
 
-        Unit brave = new ServerUnit(game, braveUnitTile, incaPlayer, braveType, UnitState.ACTIVE);
-        Unit soldier = new ServerUnit(game, dutchUnitTile, dutchPlayer, veteranType, UnitState.ACTIVE);
+        Unit brave = new ServerUnit(game, braveUnitTile, incaPlayer, braveType);
+        Unit soldier = new ServerUnit(game, dutchUnitTile, dutchPlayer, veteranType);
 
         Player.makeContact(incaPlayer, dutchPlayer);
 
@@ -152,7 +151,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
-        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
+        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType);
 
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
@@ -170,7 +169,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Add non-hostile unit
         Tile tile2 = map.getTile(2, 1);
-        new ServerUnit(game, tile2, french, colonistType, UnitState.ACTIVE);
+        new ServerUnit(game, tile2, french, colonistType);
 
         // reassign mission and check
         aiDutch.giveMilitaryMission(aiUnit);
@@ -200,7 +199,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
-        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
+        Unit soldier = new ServerUnit(game, tile1, dutch, veteranType);
 
         AIUnit aiUnit = aiMain.getAIUnit(soldier);
         assertNotNull(aiUnit);
@@ -259,13 +258,13 @@ public class MissionAssignmentTest extends FreeColTestCase {
         IndianSettlement camp = builder.player(inca).settlementTile(settlementTile).build();
 
         // put one brave outside the camp, but in the settlement tile, so that he may defend the settlement
-        Unit braveOutside = new ServerUnit(game, settlementTile, inca, braveType, UnitState.ACTIVE,braveType.getDefaultEquipment());
+        Unit braveOutside = new ServerUnit(game, settlementTile, inca, braveType);
         braveOutside.setIndianSettlement(camp);
 
         // Setup enemy units
         int enemyUnits = camp.getUnitCount() + 1;
         for(int i=0; i< enemyUnits; i++){
-            new ServerUnit(game, adjacentTile, dutch, veteranType, UnitState.ACTIVE);
+            new ServerUnit(game, adjacentTile, dutch, veteranType);
         }
 
         Iterator<Unit> campUnitIter = camp.getOwnedUnitsIterator();
@@ -331,12 +330,12 @@ public class MissionAssignmentTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca).settlementTile(settlementTile).initialBravesInCamp(10).build();
 
-        Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType, UnitState.ACTIVE);
+        Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
 
         int unitsInGalleon = 6;
         for (int i = 0; i < unitsInGalleon; i++) {
             Unit artillery = new ServerUnit(game, settlementTile, dutch,
-                artilleryType, UnitState.ACTIVE);
+                artilleryType);
             igc.embarkUnit(dutch, artillery, galleon);
         }
         assertEquals("Wrong number of units onboard galleon",unitsInGalleon,galleon.getUnitCount());
