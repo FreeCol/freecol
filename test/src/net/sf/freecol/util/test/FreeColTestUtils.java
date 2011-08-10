@@ -145,22 +145,22 @@ public class FreeColTestUtils {
             // Add colonists
             int nCol = 0;
             Iterator<UnitType> iter = colonists.keySet().iterator();
-            while(iter.hasNext()){
+            while (iter.hasNext()) {
                 UnitType type = iter.next();
                 Integer n = colonists.get(type);
-                for(int i=0; i < n; i++){
-                    Unit colonist = new ServerUnit(game, colony, player, type,
-                                                   UnitState.IN_COLONY,
-                            colonistType.getDefaultEquipment());
+                for (int i = 0; i < n; i++) {
+                    Unit colonist = new ServerUnit(game, colonyTile, player,
+                        type, UnitState.ACTIVE,
+                        colonistType.getDefaultEquipment());
                     colonist.setLocation(colony);
                     nCol++;
                 }
             }
             // add rest of colonists as simple free colonists
-            for(int i=nCol; i < initialColonists; i++){
-                Unit colonist = new ServerUnit(game, colony, player,
-                                               colonistType, UnitState.IN_COLONY,
-                        colonistType.getDefaultEquipment());
+            for (int i = nCol; i < initialColonists; i++) {
+                Unit colonist = new ServerUnit(game, colonyTile, player,
+                    colonistType, UnitState.ACTIVE,
+                    colonistType.getDefaultEquipment());
                 colonist.setLocation(colony);
             }
 

@@ -343,7 +343,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     port.isLandLocked());
         assertTrue("Standard colony is connected to Europe",
                    port.isConnected());
-        treasure.setLocation(port);
+        treasure.setLocation(port.getTile());
         assertTrue("Can cash in treasure from a port",
                    treasure.canCashInTreasureTrain());
 
@@ -353,7 +353,7 @@ public class InGameControllerTest extends FreeColTestCase {
                    inland.isLandLocked());
         assertFalse("Inland colony is not connected to Europe",
                     inland.isConnected());
-        treasure.setLocation(inland);
+        treasure.setLocation(inland.getTile());
         assertFalse("Can not cash in treasure from inland colony",
                     treasure.canCashInTreasureTrain());
 
@@ -364,7 +364,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     lake.isLandLocked());
         assertFalse("Lake colony is not connected to Europe",
                     lake.isConnected());
-        treasure.setLocation(lake);
+        treasure.setLocation(lake.getTile());
         assertFalse("Can not cash in treasure from lake colony",
                     treasure.canCashInTreasureTrain());
     }

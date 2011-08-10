@@ -40,7 +40,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
@@ -1010,12 +1010,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 while (childUnitIterator.hasNext()) {
                     Unit childUnit = childUnitIterator.next();
 
-                    if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == UnitState.ACTIVE)) {
+                    if (childUnit.getMovesLeft() > 0
+                        && childUnit.getState() == Unit.UnitState.ACTIVE) {
                         return childUnit;
                     }
                 }
 
-                if ((u.getMovesLeft() > 0) && (u.getState() == UnitState.ACTIVE)) {
+                if (u.getMovesLeft() > 0
+                    && u.getState() == Unit.UnitState.ACTIVE) {
                     return u;
                 }
             }
@@ -1484,7 +1486,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (owner != null && unit != null && unit.getOwner() != owner
             && owner.getStance(unit.getOwner()) != Stance.ALLIANCE) {
             for(Unit enemyUnit : getUnitList()) {
-                if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == UnitState.FORTIFIED) {
+                if (enemyUnit.isOffensiveUnit()
+                    && enemyUnit.getState() == Unit.UnitState.FORTIFIED) {
                     return enemyUnit;
                 }
             }

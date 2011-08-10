@@ -334,8 +334,9 @@ public class MissionAssignmentTest extends FreeColTestCase {
         Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType, UnitState.ACTIVE);
 
         int unitsInGalleon = 6;
-        for(int i=0; i < unitsInGalleon; i ++){
-            Unit artillery = new ServerUnit(game, seaTile, dutch, artilleryType, UnitState.SENTRY);
+        for (int i = 0; i < unitsInGalleon; i++) {
+            Unit artillery = new ServerUnit(game, settlementTile, dutch,
+                artilleryType, UnitState.ACTIVE);
             igc.embarkUnit(dutch, artillery, galleon);
         }
         assertEquals("Wrong number of units onboard galleon",unitsInGalleon,galleon.getUnitCount());

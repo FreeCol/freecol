@@ -840,7 +840,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             units.add(unit);
             //don't set location to null, but to the tile of the colony this
             //unit is being removed from!
-            unit.putOutsideColony();
+            unit.setLocation(colony.getTile());
         }
 
         // Place the experts:
@@ -971,7 +971,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 if (ct.getProductionOf(u, foodType) > 1) {
                     AIMessage.askChangeWorkType(getAIUnit(u), foodType);
                 } else {
-                    u.putOutsideColony();
+                    u.setLocation(colony.getTile());
                     AIUnit au = getAIUnit(u);
                     if (au.getMission() instanceof WorkInsideColonyMission) {
                         au.setMission(null);
@@ -988,7 +988,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         break;
                     }
                 }
-                bestUnit.putOutsideColony();
+                bestUnit.setLocation(colony.getTile());
                 AIUnit au = getAIUnit(bestUnit);
                 if (au.getMission() instanceof WorkInsideColonyMission) {
                     au.setMission(null);
@@ -1030,7 +1030,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         break;
                     }
                 } else {
-                    bestPick.putOutsideColony();
+                    bestPick.setLocation(colony.getTile());
                 }
                 if (w == wl) break;
             }
@@ -1053,7 +1053,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     Unit unit = unitIterator.next();
                     if (unit.getWorkType() == goodsType) {
                         final Location oldLocation = unit.getLocation();
-                        unit.putOutsideColony();
+                        unit.setLocation(colony.getTile());
                         boolean working = false;
                         waste = colony.getGoodsCount(goodsType)
                             + colony.getNetProductionOf(goodsType)
@@ -1068,7 +1068,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                             if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
                                 + colony.getNetProductionOf(goodsType2) < colony.getWarehouseCapacity()){
                                 if (working){
-                                    unit.putOutsideColony();
+                                    unit.setLocation(colony.getTile());
                                 }
                                 if (AIMessage.askWork(getAIUnit(unit), bestTile)) {
                                     AIMessage.askChangeWorkType(getAIUnit(unit), goodsType2);
@@ -1131,7 +1131,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Iterator<Unit> ui6 = units.iterator();
         while (ui6.hasNext()) {
             Unit u = ui6.next();
-            u.putOutsideColony();
+            u.setLocation(colony.getTile());
             AIUnit au = getAIUnit(u);
             if (au.getMission() instanceof WorkInsideColonyMission) {
                 au.setMission(null);
@@ -1199,7 +1199,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if(!PioneeringMission.isValid(aiu)){
                 return;
             }
-            unit.putOutsideColony();
+            unit.setLocation(colony.getTile());
             aiu.setMission(new PioneeringMission(getAIMain(), aiu));
             return;
         }
@@ -1328,7 +1328,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             // check if colony has goods to equip unit
             if(colony.canBuildEquipment(musketsEqType)){
-                unit.putOutsideColony();
+                unit.setLocation(colony.getTile());
                 continue;
             }
 
@@ -1336,7 +1336,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             for(Unit outsideUnit : colony.getTile().getUnitList()){
                 if(outsideUnit.isArmed()
                         && !outsideUnit.hasAbility("model.ability.expertSoldier")){
-                    unit.putOutsideColony();
+                    unit.setLocation(colony.getTile());
                     break;
                 }
             }

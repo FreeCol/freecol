@@ -26,7 +26,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.Utils;
 
@@ -372,7 +372,7 @@ public class SimpleCombatModel extends CombatModel {
             }
         }
         // Fortify bonus
-        if (defenderUnit.getState() == UnitState.FORTIFIED) {
+        if (defenderUnit.getState() == Unit.UnitState.FORTIFIED) {
             result.addAll(spec.getModifiers(FORTIFIED));
         }
         Tile tile = defenderUnit.getTile();
@@ -384,7 +384,7 @@ public class SimpleCombatModel extends CombatModel {
                 }
                 // Artillery in the Open penalty
                 if (defenderUnit.hasAbility("model.ability.bombard")
-                    && defenderUnit.getState() != UnitState.FORTIFIED) {
+                    && defenderUnit.getState() != Unit.UnitState.FORTIFIED) {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement

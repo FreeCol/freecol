@@ -205,6 +205,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                 } else if (buildable instanceof BuildingType) {
                     if (csBuildBuilding(queue, cs)) {
                         built.add(queue);
+                        // Building *might* have ejected units.
+                        tileDirty = true;
                     }
                 } else {
                     throw new IllegalStateException("Bogus buildable: "
@@ -618,7 +620,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         Tile centerTile = getTile();
 
         for (Unit unit : ct.getUnitList()) {
-            unit.setState(UnitState.ACTIVE);
             unit.setLocation(centerTile);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.WARNING,

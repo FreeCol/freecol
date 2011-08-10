@@ -307,10 +307,6 @@ public class Colony extends Settlement implements Nameable {
             updateSoL();
             updateProductionBonus();
         }
-        // TODO: Clean this up, but beware it is vital for the AI ATM.
-        if (difference != 0) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-        }
     }
 
     /**
@@ -601,32 +597,117 @@ public class Colony extends Settlement implements Nameable {
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit newUnit = (Unit) locatable;
-            if (newUnit.isColonist()) {
-                Occupation occupation = getOccupationFor(newUnit);
-                if (occupation == null) {
-                    logger.warning("Could not find a 'WorkLocation' for " + newUnit.toString()
-                                   + " in " + getName());
-                    newUnit.putOutsideColony();
-                } else {
-                    newUnit.setLocation(occupation.workLocation);
-                    if (occupation.workType != null) {
-                        newUnit.setWorkType(occupation.workType);
-                    }
-                    updatePopulation(1);
+        return (locatable instanceof Unit) ? addUnit((Unit) locatable, null)
+            : super.add(locatable);
+    }
+
+    /**
+     * Removes a <code>Locatable</code> from this Location.
+     *
+     * @param locatable The <code>Locatable</code> to remove from this Location.
+     * @return True if the remove succeeded.
+     */
+    public boolean remove(Locatable locatable) {
+        return (locatable instanceof Unit) ? removeUnit((Unit) locatable)
+            : super.remove(locatable);
+    }
+
+
+    /**
+     * Gets a work location within this colony to put a unit in.
+     *
+     * @param unit The <code>Unit</code> to place.
+     * @return A work location for the unit, or null if none available.
+     */
+    public WorkLocation getWorkLocationFor(Unit unit) {
+        Occupation occupation = getOccupationFor(unit);
+        if (occupation == null) {
+            logger.warning("Could not find a WorkLocation for: "
+                + unit.toString() + " in: " + getName());
+            return null;
+        }
+        if (occupation.workType != null) {
+            unit.setWorkType(occupation.workType);
+        }
+        return occupation.workLocation;
+    }
+
+    /**
+     * Adds a <code>Unit</code> to an optional
+     * <code>WorkLocation</code> in this Colony.
+     *
+     * @param Unit The <code>Unit</code> to add.
+     * @param loc The <code>WorkLocation</code> to add to (if null,
+     *     one is chosen.
+     * @return True if the add succeeded.
+     */
+    public boolean addUnit(Unit unit, WorkLocation loc) {
+        if (!unit.isColonist()) return false;
+        if (loc == null) loc = getWorkLocationFor(unit);
+        for (WorkLocation w : getWorkLocations()) {
+            if (w == loc && w.add(unit)) {
+                Player owner = unit.getOwner();
+                owner.modifyScore(unit.getType().getScoreValue());
+                updatePopulation(1);
+                unit.setState(Unit.UnitState.IN_COLONY);
+                if (owner.isAI()) {
+                    firePropertyChange(REARRANGE_WORKERS, true, false);
                 }
-            } else {
-                newUnit.putOutsideColony();
+                return true;
             }
-            return true;
-        } else if (locatable instanceof Goods) {
-            return addGoods((Goods) locatable);
-        } else {
-            logger.warning("Tried to add an unrecognized 'Locatable' to a 'Colony'.");
         }
         return false;
     }
+
+    /**
+     * Removes a <code>Unit</code> from this Colony.
+     *
+     * @param unit The <code>Unit</code> to remove.
+     * @return True if the remove succeeded.
+     */
+    public boolean removeUnit(Unit unit) {
+        Player owner = unit.getOwner();
+        for (WorkLocation w : getWorkLocations()) {
+            if (w.contains(unit) && w.remove(unit)) {
+                Unit teacher = unit.getTeacher();
+                if (teacher != null) {
+                    teacher.setStudent(null);
+                    unit.setTeacher(null);
+                }
+                owner.modifyScore(-unit.getType().getScoreValue());
+                updatePopulation(-1);
+                unit.setState(Unit.UnitState.ACTIVE);
+                if (owner.isAI()) {
+                    firePropertyChange(REARRANGE_WORKERS, true, false);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Add goods to this colony;
+     *
+     * @param goods an <code>AbstractGoods</code> value
+     */
+    public boolean addGoods(AbstractGoods goods) {
+        return addGoods(goods.getType(), goods.getAmount());
+    }
+
+    /**
+     * Add goods to this colony.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public boolean addGoods(GoodsType type, int amount) {
+        super.addGoods(type, amount);
+        productionCache.invalidate(type);
+        modifySpecialGoods(type, amount);
+        return true;
+    }
+
     /**
      * Removes a specified amount of a type of Goods from this Settlement.
      *
@@ -661,28 +742,6 @@ public class Colony extends Settlement implements Nameable {
         return removed;
     }
 
-    /**
-     * Add goods to this colony;
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
-    public boolean addGoods(AbstractGoods goods) {
-        return addGoods(goods.getType(), goods.getAmount());
-    }
-
-    /**
-     * Add goods to this colony.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @param amount an <code>int</code> value
-     */
-    public boolean addGoods(GoodsType type, int amount) {
-        super.addGoods(type, amount);
-        productionCache.invalidate(type);
-        modifySpecialGoods(type, amount);
-        return true;
-    }
-
     protected void modifySpecialGoods(GoodsType goodsType, int amount) {
         FeatureContainer container = goodsType.getFeatureContainer();
         Set<Modifier> libertyModifiers = container.getModifierSet("model.modifier.liberty");
@@ -703,30 +762,6 @@ public class Colony extends Settlement implements Nameable {
             getOwner().incrementImmigration(newImmigration);
         }
 
-    }
-
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this
-     *            Location.
-     */
-    public boolean remove(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            for (WorkLocation w : getWorkLocations()) {
-                if (w.contains(locatable)) {
-                    w.remove(locatable);
-                    updatePopulation(-1);
-                    return true;
-                }
-            }
-        } else if (locatable instanceof Goods) {
-            return removeGoods((Goods) locatable) != null;
-        } else {
-            logger.warning("Tried to remove an unrecognized 'Locatable' from a 'Colony'.");
-        }
-        return false;
     }
 
     /**
@@ -1133,18 +1168,6 @@ public class Colony extends Settlement implements Nameable {
      */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
         buildQueue.setValues(newBuildQueue);
-    }
-
-    /**
-     * Damage or even destroy a building.
-     *
-     * @param building The <code>Building</code> to damage.
-     * @return True if the building was damaged or destroyed.
-     */
-    public boolean damageBuilding(Building building) {
-        BuildingType type = building.getType().getUpgradesFrom();
-        return (type == null) ? removeBuilding(building)
-            : building.damage();
     }
 
     /**

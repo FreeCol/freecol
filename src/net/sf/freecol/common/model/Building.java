@@ -217,18 +217,19 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
-        getColony().getFeatureContainer().remove(buildingType.getFeatureContainer());
+        Colony colony = getColony();
+        colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
 
             // add new features and abilities from new type
-            getColony().getFeatureContainer().add(buildingType.getFeatureContainer());
+            colony.getFeatureContainer().add(buildingType.getFeatureContainer());
 
             // Colonists which can't work here must be put outside
             for (Unit unit : getUnitList()) {
                 if (!canAdd(unit.getType())) {
-                    unit.putOutsideColony();
+                    unit.setLocation(colony.getTile());
                 }
             }
         }
@@ -237,7 +238,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (getUnitCount() > getUnitCapacity()) {
             for (Unit unit : getUnitList().subList(getUnitCapacity(),
                                                    getUnitCount())) {
-                unit.putOutsideColony();
+                unit.setLocation(colony.getTile());
             }
         }
     }
@@ -305,19 +306,19 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add " + locatable
-                                            + " to " + toString()
-                                            + " because " + reason);
+                + " to " + toString() + " because " + reason);
         }
         Unit unit = (Unit) locatable;
         if (contains(unit)) return true;
 
-        boolean result = super.add(unit);
+        if (super.add(unit)) {
+            unit.setState(Unit.UnitState.IN_COLONY);
+            unit.setWorkType(getGoodsOutputType());
 
-        unit.setState(Unit.UnitState.IN_COLONY);
-        unit.setWorkType(getGoodsOutputType());
-
-        getColony().invalidateCache();
-        return result;
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -332,13 +333,14 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         Unit unit = (Unit) locatable;
         if (!contains(unit)) return true;
 
-        boolean result = super.remove(unit);
+        if (super.remove(unit)) {
+            unit.setState(Unit.UnitState.ACTIVE);
+            unit.setMovesLeft(0);
 
-        unit.setMovesLeft(0);
-        unit.setState(Unit.UnitState.ACTIVE);
-
-        getColony().invalidateCache();
-        return result;
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
     }
 
     /**

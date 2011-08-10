@@ -525,6 +525,8 @@ public class Unit extends FreeColGameObject
         if (!canCarryTreasure()) {
             throw new IllegalStateException("Can't carry treasure");
         }
+        if (loc == null) return false;
+
         if (getOwner().getEurope() == null) {
             // Any colony will do once independent, as the treasure stays
             // in the New World.
@@ -536,7 +538,7 @@ public class Unit extends FreeColGameObject
         }
         // Otherwise, cash in if in Europe.
         return loc instanceof Europe
-            || (loc instanceof Unit && ((Unit) loc).isInEurope());
+            || (loc instanceof Unit && ((Unit)loc).isInEurope());
     }
 
     /**
@@ -2011,6 +2013,7 @@ public class Unit extends FreeColGameObject
 
     /**
      * Sets the units location without updating any other variables
+     *
      * @param newLocation The new Location
      */
     public void setLocationNoUpdate(Location newLocation) {
@@ -2020,47 +2023,50 @@ public class Unit extends FreeColGameObject
     /**
      * Sets the location of this Unit.
      *
-     * @param newLocation The new Location of the Unit.
+     * @param newLocation The new <code>Location</code>.
+     * @return True if the location setting succeeded.
      */
     public void setLocation(Location newLocation) {
         Location oldLocation = location;
-        Colony oldColony = this.getColony();
-        Colony newColony = null;
 
+        // If either the add or remove involves a colony, call the
+        // colony-specific routine...
+        Colony oldColony = (location instanceof WorkLocation)
+            ? this.getColony() : null;
+        Colony newColony = (newLocation instanceof WorkLocation)
+            ? newLocation.getColony() : null;
+        // However if the unit is moving within the same colony,
+        // do not call the colony-specific routines.
+        if (oldColony == newColony) oldColony = newColony = null;
+
+        boolean result = true;
         if (location != null) {
-            location.remove(this);
+            result = (oldColony != null)
+                ? oldColony.removeUnit(this)
+                : location.remove(this);
         }
+        /*if (!result) return false;*/
+
         location = newLocation;
-        if (newLocation != null) {
-            newLocation.add(this);
-            newColony = newLocation.getColony();
-        }
+        // Explore the new location now to prevent dealing with tiles
+        // with null (unexplored) type.
         getOwner().setExplored(this);
 
-        // Ugly hooks that should be moved to WorkLocation.add/remove
-        // if there was one.
-        if (oldLocation instanceof WorkLocation
-            && !(newLocation instanceof WorkLocation)) {
-            // Leaving colony.
-            getOwner().modifyScore(-getType().getScoreValue());
-            oldColony.updatePopulation(-1);
-        } else if (newLocation instanceof WorkLocation
-                   && !(oldLocation instanceof WorkLocation)) {
-            // Entering colony.
-            getOwner().modifyScore(getType().getScoreValue());
-            newColony.updatePopulation(1);
-
-            if (getState() != UnitState.IN_COLONY) {
-                logger.warning("Adding unit " + getId() + " with state==" + getState()
-                               + " (should be IN_COLONY) to WorkLocation in "
-                               + newLocation.getColony().getName() + ". Fixing: ");
-                setState(UnitState.IN_COLONY);
-            }
+        // It is possible to add a unit to a non-specific location
+        // within a colony by specifying the colony as the new
+        // location.
+        if (newLocation instanceof Colony) {
+            newColony = (Colony) newLocation;
+            location = newLocation = newColony.getWorkLocationFor(this);
         }
 
-        if (newColony != oldColony) {
-            setTurnsOfTraining(0); // Reset training when leaving colony
+        if (newLocation != null) {
+            result = (newColony != null)
+                ? newColony.addUnit(this, (WorkLocation) newLocation)
+                : newLocation.add(this);
         }
+
+        return /*result*/;
     }
 
     /**
@@ -2097,22 +2103,6 @@ public class Unit extends FreeColGameObject
      */
     public Location getLocation() {
         return location;
-    }
-
-    /**
-     * Puts this <code>Unit</code> outside the {@link Colony} by moving it to
-     * the {@link Tile} below.
-     */
-    public void putOutsideColony() {
-        if (getSettlement() == null) {
-            throw new IllegalStateException();
-        }
-
-        if (getState() == UnitState.IN_COLONY) {
-            setState(UnitState.ACTIVE);
-        }
-
-        setLocation(getTile());
     }
 
     /**

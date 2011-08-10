@@ -2681,7 +2681,6 @@ public final class InGameController extends Controller {
         }
 
         // Join.
-        unit.setState(UnitState.IN_COLONY);
         unit.setLocation(settlement);
         unit.setMovesLeft(0);
         ((ServerUnit)unit).csRemoveEquipment(settlement,
@@ -2728,7 +2727,6 @@ public final class InGameController extends Controller {
         Tile tile = colony.getTile();
 
         // Join.
-        unit.setState(UnitState.IN_COLONY);
         unit.setLocation(colony);
         unit.setMovesLeft(0);
         ((ServerUnit)unit).csRemoveEquipment(colony,
@@ -3079,7 +3077,6 @@ public final class InGameController extends Controller {
         // We could avoid updating the whole tile if we knew that this
         // was definitely a move between locations and no student/teacher
         // interaction occurred.
-        unit.setState(UnitState.IN_COLONY);
         unit.setLocation(workLocation);
         cs.add(See.perhaps(), colony.getTile());
         // Others can see colony change size
@@ -3455,7 +3452,6 @@ public final class InGameController extends Controller {
     public Element putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
         Tile tile = unit.getTile();
         Colony colony = unit.getColony();
-        unit.setState(UnitState.ACTIVE);
         unit.setLocation(tile);
 
         // Full tile update for the player, the rest get their limited

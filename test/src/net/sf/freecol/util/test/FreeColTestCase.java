@@ -618,7 +618,6 @@ public class FreeColTestCase extends TestCase {
      * Join a colony with a unit, without requiring the server.
      */
     public void nonServerJoinColony(Unit builder, Colony colony) {
-        builder.setState(UnitState.IN_COLONY);
         builder.setLocation(colony);
         builder.setMovesLeft(0);
     }

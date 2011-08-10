@@ -147,7 +147,7 @@ public class ColonyTest extends FreeColTestCase {
 
         // colonist with experience in producing farmed goods will
         // produce that type of goods
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
@@ -155,14 +155,14 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(cottonGoodsType, colonist.getWorkType());
 
         // expert will produce expert goods
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setType(cottonPlanterType);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
         assertEquals(cottonGoodsType, colonist.getWorkType());
 
         // expert will produce expert goods
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setType(elderStatesmanType);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof Building);
@@ -235,7 +235,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(townHall, colony.getBuildingFor(colonist));
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
@@ -243,7 +243,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(townHallType, ((Building) colonist.getLocation()).getType());
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setType(cottonPlanterType);
         nonServerJoinColony(colonist, colony);
         assertEquals(townHallType, colony.getBuildingFor(colonist).getType());
@@ -251,7 +251,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
         // colonist produces cloth, because there is cotton now
-        colonist.putOutsideColony();
+        colonist.setLocation(colony.getTile());
         colonist.setType(masterWeaverType);
         colony.addGoods(cottonGoodsType, 100);
         nonServerJoinColony(colonist, colony);

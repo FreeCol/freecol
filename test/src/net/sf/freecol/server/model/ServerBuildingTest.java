@@ -707,19 +707,17 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, masterCarpenterType).size());
 
         // Now we want the colonist to be a carpenter. We just want to
-        // shuffle the teachers.
+        // shuffle the teachers.  Move them out of the school.
         teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true,
                                                            grainType));
-        // outside the colony is still considered OK (same Tile)
-        teacher1.putOutsideColony();
-
+        teacher1.setLocation(colony.getTile());
         assertNull(teacher1.getStudent());
         assertNull(teacher2.getStudent());
 
-        // Passing a turn outside school does not reset training at this time
+        // Moving outside school resets training
         ServerTestHelper.newTurn();
-        assertEquals(2, teacher1.getTurnsOfTraining());
-        assertEquals(2, teacher2.getTurnsOfTraining());
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, pettyCriminalType).size());
 
@@ -728,11 +726,13 @@ public class ServerBuildingTest extends FreeColTestCase {
         teacher2.setLocation(university);
 
         ServerTestHelper.newTurn();
-        assertEquals(3, teacher1.getTurnsOfTraining());
-        assertEquals(3, teacher2.getTurnsOfTraining());
+        assertEquals(1, teacher1.getTurnsOfTraining());
+        assertEquals(1, teacher2.getTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, pettyCriminalType).size());
 
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
         ServerTestHelper.newTurn();
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
@@ -777,16 +777,16 @@ public class ServerBuildingTest extends FreeColTestCase {
                                                            grainType));
         teacher2.setLocation(university);
         ServerTestHelper.newTurn();
-        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(1, teacher2.getTurnsOfTraining());
 
-        // If we now also add teacher2 to the university, then
-        // Teacher1 will still be the teacher in charge
+        // If we now also add teacher1 to the university, but
+        // teacher2 should still be the teacher in charge
         teacher1.setLocation(university);
         assertNull(teacher1.getStudent());
         ServerTestHelper.newTurn();
 
-        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(2, teacher2.getTurnsOfTraining());
     }
 

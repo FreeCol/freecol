@@ -122,7 +122,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         // Set up disputed tile
         ColonyTile colonyTile = colony.getColonyTile(disputedTile);
         for (Unit u : colonyTile.getUnitList()) {
-            u.putOutsideColony();
+            u.setLocation(colony.getTile());
         }
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);

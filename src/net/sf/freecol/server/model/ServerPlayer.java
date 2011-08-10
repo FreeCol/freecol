@@ -2948,7 +2948,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addName("%colony%", colony.getName())
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
-            colony.damageBuilding(building);
+            if (building.getType().getUpgradesFrom() == null) {
+                colony.removeBuilding(building);
+            } else if (building.canBeDamaged()) {
+                building.damage();
+            }
         } else if (pillage < buildingList.size() + shipList.size()) {
             Unit ship = shipList.get(pillage - buildingList.size());
             if (ship.getRepairLocation() == null) {

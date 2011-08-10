@@ -914,11 +914,9 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             Location loc = unitInside.getLocation();
 
-            unitInside.putOutsideColony();
+            unitInside.setLocation(colony.getTile());
             switchEquipmentWith(unit, unitInside);
             unit.setLocation(loc);
-            unit.setState(UnitState.IN_COLONY);
-            unitInside.setState(UnitState.ACTIVE);
             getAIUnit(unit).setMission(null);
             getAIUnit(unitInside).setMission(null);
         }

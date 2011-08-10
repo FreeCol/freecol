@@ -249,31 +249,31 @@ public class ColonyTile extends WorkLocation implements Ownable {
         NoAddReason reason = getNoAddReason(locatable);
         if (reason != NoAddReason.NONE) {
             throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString()
-                + " because " + reason);
+                + " to " + toString() + " because " + reason);
         }
         Unit unit = (Unit) locatable;
         if (contains(unit)) return true;
 
-        boolean result = super.add(unit);
+        if (super.add(unit)) {
+            unit.setState(Unit.UnitState.IN_COLONY);
 
-        unit.setState(Unit.UnitState.IN_COLONY);
-
-        // Choose a sensible work type only if none already specified.
-        if (unit.getWorkType() == null) {
-            AbstractGoods goods = workTile.getType().getPrimaryGoods();
-            if (goods == null) {
-                goods = workTile.getType().getSecondaryGoods();
-                if (goods == null
-                    && !workTile.getType().getProduction().isEmpty()) {
-                    goods = workTile.getType().getProduction().get(0);
+            // Choose a sensible work type only if none already specified.
+            if (unit.getWorkType() == null) {
+                AbstractGoods goods = workTile.getType().getPrimaryGoods();
+                if (goods == null) {
+                    goods = workTile.getType().getSecondaryGoods();
+                    if (goods == null
+                        && !workTile.getType().getProduction().isEmpty()) {
+                        goods = workTile.getType().getProduction().get(0);
+                    }
                 }
+                if (goods != null) unit.setWorkType(goods.getType());
             }
-            if (goods != null) unit.setWorkType(goods.getType());
-        }
 
-        getColony().invalidateCache();
-        return result;
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -288,13 +288,14 @@ public class ColonyTile extends WorkLocation implements Ownable {
         Unit unit = (Unit) locatable;
         if (!contains(unit)) return true;
 
-        boolean result = super.remove(unit);
+        if (super.remove(unit)) {
+            unit.setState(Unit.UnitState.ACTIVE);
+            unit.setMovesLeft(0);
 
-        unit.setMovesLeft(0);
-        unit.setState(Unit.UnitState.ACTIVE);
-
-        getColony().invalidateCache();
-        return result;
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
     }
 
     /**

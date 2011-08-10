@@ -989,7 +989,6 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         }
-        buildColonyUnit.setState(UnitState.IN_COLONY);
         buildColonyUnit.setLocation(colony);
         if (buildColonyUnit.getLocation() instanceof ColonyTile) {
             Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
@@ -1015,9 +1014,6 @@ public class SimpleMapGenerator implements MapGenerator {
         Building schoolhouse = new ServerBuilding(game, colony, schoolType);
         colony.addBuilding(schoolhouse);
         unitType = spec.getUnitType("model.unit.masterCarpenter");
-        while (!schoolhouse.canAdd(unitType)) {
-            schoolhouse.upgrade();
-        }
         Unit carpenter = new ServerUnit(game, colonyTile, player,
                                         unitType, UnitState.ACTIVE);
         carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));

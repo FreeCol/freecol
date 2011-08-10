@@ -240,25 +240,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         }
 
         Unit unit = (Unit) locatable;
-        boolean result = super.add(unit);
-
-        if (canTeach()) {
-            Unit student = unit.getStudent();
-            if (student == null
-                && (student = getColony().findStudent(unit)) != null) {
-                unit.setStudent(student);
-                student.setTeacher(unit);
+        if (super.add(unit)) {
+            if (this.canTeach()) {
+                Unit student = unit.getStudent();
+                if (student == null
+                    && (student = getColony().findStudent(unit)) != null) {
+                    unit.setStudent(student);
+                    student.setTeacher(unit);
+                }
+                unit.setWorkType(null);
+            } else {
+                Unit teacher = unit.getTeacher();
+                if (teacher == null
+                    && (teacher = getColony().findTeacher(unit)) != null) {
+                    unit.setTeacher(teacher);
+                    teacher.setStudent(unit);
+                }
             }
-            unit.setWorkType(null);
-        } else {
-            Unit teacher = unit.getTeacher();
-            if (teacher == null
-                && (teacher = getColony().findTeacher(unit)) != null) {
-                unit.setTeacher(teacher);
-                teacher.setStudent(unit);
-            }
+            return true;
         }
-        return result;
+        return false;
     }
 
     /**
@@ -272,22 +273,21 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         }
 
         Unit unit = (Unit) locatable;
-        boolean result = super.remove(unit);
-
-        if (canTeach()) {
-            Unit student = unit.getStudent();
-            if (student != null) {
-                student.setTeacher(null);
-                unit.setStudent(null);
+        if (super.remove(unit)) {
+            if (this.canTeach()) {
+                Unit student = unit.getStudent();
+                if (student != null) {
+                    student.setTeacher(null);
+                    unit.setStudent(null);
+                }
+                unit.setTurnsOfTraining(0);
             }
-        } else {
-            Unit teacher = unit.getTeacher();
-            if (teacher != null) {
-                teacher.setStudent(null);
-                unit.setTeacher(null);
-            }
+            // Do not clear teacher like in add(), do that at the
+            // colony level so that students can be moved from one
+            // work location to another without disrupting teaching.
+            return true;
         }
-        return result;
+        return false;
     }
 
     /**
