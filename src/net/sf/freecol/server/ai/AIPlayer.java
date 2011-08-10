@@ -38,6 +38,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
@@ -435,6 +437,65 @@ public abstract class AIPlayer extends AIObject {
                 }
             }
         }
+    }
+
+    /**
+     * Find out if a tile contains a suitable target for seek-and-destroy.
+     * TODO: Package for access by a test only - necessary?
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param tile The <code>Tile</code> to attack into.
+     * @return True if an attack can be launched.
+     */
+    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
+        Player attackerPlayer = attacker.getOwner();
+
+        // Insist the attacker exists.
+        if (attacker == null) return false;
+
+        // Determine the defending player.
+        Settlement settlement = tile.getSettlement();
+        Unit defender = tile.getDefendingUnit(attacker);
+        Player defenderPlayer = (settlement != null) ? settlement.getOwner()
+            : (defender != null) ? defender.getOwner()
+            : null;
+
+        // Insist there be a defending player.
+        if (defenderPlayer == null) return false;
+
+        // Can not attack our own units.
+        if (attackerPlayer == defenderPlayer) return false;
+
+        // If European, do not attack if not at war.
+        // If native, do not attack if not at war and at least content.
+        // Otherwise some attacks are allowed even if not at war.
+        boolean atWar = attackerPlayer.atWarWith(defenderPlayer);
+        if (attackerPlayer.isEuropean()) {
+            if (!atWar) return false;
+        } else if (attackerPlayer.isIndian()) {
+            if (!atWar && attackerPlayer.getTension(defenderPlayer)
+                .getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
+                return false;
+            }
+        }
+
+        // A naval unit can never attack a land unit or settlement,
+        // but a land unit *can* attack a naval unit if it is on land.
+        // Otherwise naval units can only fight at sea, land units
+        // only on land.
+        if (attacker.isNaval()) {
+            if (settlement != null
+                || !defender.isNaval() || defender.getTile().isLand()) {
+                return false;
+            }
+        } else {
+            if (defender != null && !defender.getTile().isLand()) {
+                return false;
+            }
+        }
+
+        // Otherwise, attack.
+        return true;
     }
 
     /**

@@ -307,67 +307,46 @@ public class NativeAIPlayer extends AIPlayer {
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
         Player seller = unit.getOwner();
-        if (settlement instanceof IndianSettlement) {
-            String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
-            String hagglingKey = "tradeHaggling#" + unit.getId();
-            int price;
-            if (sessionRegister.containsKey(goldKey)) {
-                price = sessionRegister.get(goldKey).intValue();
-                if (price <= 0) {
-                    return price;
-                }
-            } else {
-                price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(seller).getValue();
-                Unit missionary = ((IndianSettlement) settlement).getMissionary(seller);
-                if (missionary != null && getSpecification()
-                    .getBoolean("model.option.enhancedMissionaries")) {
-                    // 10% bonus for missionary, 20% if expert
-                    int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 12
-                        : 11;
-                    price = (price * bonus) / 10;
-                }
-                if (price <= 0) return 0;
-                sessionRegister.put(goldKey, new Integer(price));
-            }
-            if (gold < 0 || price == gold) {
+        String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
+        String hagglingKey = "tradeHaggling#" + unit.getId();
+        int price;
+        if (sessionRegister.containsKey(goldKey)) {
+            price = sessionRegister.get(goldKey).intValue();
+            if (price <= 0) {
                 return price;
-            } else if (gold > (price * 11) / 10) {
-                logger.warning("Cheating attempt: haggling with a request too high");
+            }
+        } else {
+            price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(seller).getValue();
+            Unit missionary = ((IndianSettlement) settlement).getMissionary(seller);
+            if (missionary != null && getSpecification()
+                .getBoolean("model.option.enhancedMissionaries")) {
+                // 10% bonus for missionary, 20% if expert
+                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 12
+                    : 11;
+                price = (price * bonus) / 10;
+            }
+            if (price <= 0) return 0;
+            sessionRegister.put(goldKey, new Integer(price));
+        }
+        if (gold < 0 || price == gold) {
+            return price;
+        } else if (gold > (price * 11) / 10) {
+            logger.warning("Cheating attempt: haggling with a request too high");
+            sessionRegister.put(goldKey, new Integer(-1));
+            return NetworkConstants.NO_TRADE;
+        } else {
+            int haggling = 1;
+            if (sessionRegister.containsKey(hagglingKey)) {
+                haggling = sessionRegister.get(hagglingKey).intValue();
+            }
+            if (getAIRandom().nextInt(3 + haggling) <= 3) {
+                sessionRegister.put(goldKey, new Integer(gold));
+                sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+                return gold;
+            } else {
                 sessionRegister.put(goldKey, new Integer(-1));
                 return NetworkConstants.NO_TRADE;
-            } else {
-                int haggling = 1;
-                if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey).intValue();
-                }
-                if (getAIRandom().nextInt(3 + haggling) <= 3) {
-                    sessionRegister.put(goldKey, new Integer(gold));
-                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
-                    return gold;
-                } else {
-                    sessionRegister.put(goldKey, new Integer(-1));
-                    return NetworkConstants.NO_TRADE;
-                }
             }
-        } else if (settlement instanceof Colony) {
-            Colony colony = (Colony) settlement;
-            Player otherPlayer = unit.getOwner();
-            // the client should have prevented this
-            if (getPlayer().atWarWith(otherPlayer)) {
-                return NetworkConstants.NO_TRADE;
-            }
-            // don't pay for more than fits in the warehouse
-            int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
-            amount = Math.min(amount, goods.getAmount());
-            // get a good price
-            Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();
-            int percentage = (9 - tensionLevel.ordinal()) * 10;
-            // what we could get for the goods in Europe (minus taxes)
-            int netProfits = ((100 - getPlayer().getTax()) * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
-            int price = (netProfits * percentage) / 100;
-            return price;
-        } else {
-            throw new IllegalArgumentException("Unknown type of settlement.");
         }
     }
 
@@ -793,65 +772,6 @@ public class NativeAIPlayer extends AIPlayer {
                                  : "none")
                       + " = " + value);
         return value;
-    }
-
-    /**
-     * Find out if a tile contains a suitable target for seek-and-destroy.
-     * TODO: Package for access by a test only - necessary?
-     *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param tile The <code>Tile</code> to attack into.
-     * @return True if an attack can be launched.
-     */
-    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
-        Player attackerPlayer = attacker.getOwner();
-
-        // Insist the attacker exists.
-        if (attacker == null) return false;
-
-        // Determine the defending player.
-        Settlement settlement = tile.getSettlement();
-        Unit defender = tile.getDefendingUnit(attacker);
-        Player defenderPlayer = (settlement != null) ? settlement.getOwner()
-            : (defender != null) ? defender.getOwner()
-            : null;
-
-        // Insist there be a defending player.
-        if (defenderPlayer == null) return false;
-
-        // Can not attack our own units.
-        if (attackerPlayer == defenderPlayer) return false;
-
-        // If European, do not attack if not at war.
-        // If native, do not attack if not at war and at least content.
-        // Otherwise some attacks are allowed even if not at war.
-        boolean atWar = attackerPlayer.atWarWith(defenderPlayer);
-        if (attackerPlayer.isEuropean()) {
-            if (!atWar) return false;
-        } else if (attackerPlayer.isIndian()) {
-            if (!atWar && attackerPlayer.getTension(defenderPlayer)
-                .getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                return false;
-            }
-        }
-
-        // A naval unit can never attack a land unit or settlement,
-        // but a land unit *can* attack a naval unit if it is on land.
-        // Otherwise naval units can only fight at sea, land units
-        // only on land.
-        if (attacker.isNaval()) {
-            if (settlement != null
-                || !defender.isNaval() || defender.getTile().isLand()) {
-                return false;
-            }
-        } else {
-            if (defender != null && !defender.getTile().isLand()) {
-                return false;
-            }
-        }
-
-        // Otherwise, attack.
-        return true;
     }
 
     /**
