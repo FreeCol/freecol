@@ -319,6 +319,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         GoodsType goodsType = toBeDestroyed.getType();
         if (goodsType.isFoodType() || goodsType.isBreedable()) {
             // we should be able to produce food and horses ourselves
+            // TODO: check whether we already have horses!
             return false;
         } else if (goodsType.isMilitaryGoods() ||
                    goodsType.isTradeGoods() ||
@@ -326,6 +327,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (getGame().getTurn().getAge() == 3) {
                 // by this time, we should be able to produce
                 // enough ourselves
+                // TODO: check whether we have an armory, at least
                 return false;
             } else {
                 return true;
@@ -333,6 +335,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
+            // TODO: consider the amount of goods produced. If we
+            // depend on shipping huge amounts of cheap goods, we
+            // don't want these goods to be boycotted.
             List<GoodsType> goodsTypes = getAIMain().getGame().getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
@@ -361,7 +366,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      *         indian demand and <code>false</code> otherwise.
      */
     public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
-        // TODO: make a better choice
+        // TODO: make a better choice, check whether the colony is
+        // well defended
         if (strategy == AIStrategy.CONQUEST) {
             return false;
         } else {
@@ -689,7 +695,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void ensureColonyMissions() {
         logger.finest("Entering method ensureColonyMissions");
-        if (getPlayer().isIndian()) return;
 
         for (AIUnit au : getAIUnits()) {
             if (au.hasMission()) continue;
@@ -978,6 +983,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Switches equipment between colonists
      */
     public void switchEquipmentWith(Unit unit1, Unit unit2){
+        // TODO: should use canBeEquipped()
         if(!unit1.isColonist() || !unit2.isColonist()){
             throw new IllegalArgumentException("Both units need to be colonists to switch equipment");
         }
@@ -1004,89 +1010,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
     }
 
-
-    /**
-     * Takes the necessary actions to secure an indian settlement
-     *
-     * TODO: Package for access by a test only - necessary?
-     */
-    void secureIndianSettlement(IndianSettlement is) {
-        // if not at war, no need to secure settlement
-        if (!is.getOwner().isAtWar()) {
-            return;
-        }
-
-        int defenders = is.getTile().getUnitCount();
-        int threat = 0;
-        int worstThreat = 0;
-        Location bestTarget = null;
-
-        for (Tile t: is.getTile().getSurroundingTiles(2)) {
-            // Do not check ocean tiles
-            // Indians do not have naval power
-            if(!t.isLand()){
-                continue;
-            }
-
-            // No units on tile
-            if (t.getUnitCount() == 0) {
-                continue;
-            }
-
-            Player enemy = t.getFirstUnit().getOwner();
-
-            // Own units on tile
-            if (enemy == getPlayer()) {
-                defenders++;
-                continue;
-            }
-
-            if (!getPlayer().hasContacted(enemy)) continue;
-            int value = getPlayer().getTension(enemy).getValue();
-            int threatModifier = 0;
-            int unitThreat = 0;
-            if (value >= Tension.TENSION_ADD_MAJOR) {
-                threatModifier = 2;
-                unitThreat = t.getUnitCount() * 2;
-            } else if (value >= Tension.TENSION_ADD_MINOR) {
-                threatModifier = 1;
-                unitThreat = t.getUnitCount();
-            }
-
-            threat += threatModifier;
-            if (unitThreat > worstThreat) {
-                if (t.getSettlement() != null) {
-                    bestTarget = t.getSettlement();
-                } else {
-                    bestTarget = t.getFirstUnit();
-                }
-                worstThreat = unitThreat;
-            }
-        }
-        //Note: this is totally arbitrary
-        if (threat > defenders && bestTarget != null) {
-            AIUnit newDefenderAI = getBraveForSeekAndDestroy(is);
-            if (newDefenderAI != null) {
-                Tile targetTile = bestTarget.getTile();
-                if (isTargetValidForSeekAndDestroy(newDefenderAI.getUnit(), targetTile)) {
-                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
-                }
-            }
-        }
-    }
-
-    private AIUnit getBraveForSeekAndDestroy(final IndianSettlement indianSettlement) {
-        final Iterator<Unit> it = indianSettlement.getOwnedUnitsIterator();
-        while (it.hasNext()) {
-            final AIUnit chosenOne = getAIUnit(it.next());
-            if (chosenOne.getUnit().getLocation() instanceof Tile
-                && (chosenOne.getMission() == null
-                    || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
-                return chosenOne;
-            }
-        }
-        return null;
-    }
 
     /**
      * Takes the necessary actions to secure a european colony
@@ -1404,7 +1327,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (unit.isColonist() && unit.getOwner().isEuropean()) {
+            if (unit.isColonist()) {
                 /*
                  * Motivated by (speed) performance: This map stores the
                  * distance between the unit and the destination of a Wish:
@@ -1539,7 +1462,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     private void bringGifts() {
         logger.finest("Entering method bringGifts");
         if (!getPlayer().isIndian()) {
-            // TODO: European players can also bring gifts!
+            // TODO: European players can also bring gifts! However,
+            // this might be folded into a trade mission, since
+            // European gifts are just a special case of trading.
             return;
         }
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
