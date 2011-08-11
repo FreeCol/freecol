@@ -421,29 +421,25 @@ public final class EuropePanel extends FreeColPanel {
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        try {
-            String command = event.getActionCommand();
-            // Close any open Europe Dialog, and show new one if required
-            EuropeAction act = EuropeAction.valueOf(command);
-            getCanvas().showEuropeDialog(act);
-            switch (act) {
-            case EXIT:
-                exitAction();
-                break;
-            case RECRUIT: case PURCHASE: case TRAIN:
-                requestFocus(); // handled by docks panel
-                break;
-            case UNLOAD:
-                unloadAction();
-                break;
-            case SAIL:
-                sailAction();
-                break;
-            default:
-                logger.warning("Invalid action command");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid action number: '" + event.getActionCommand() + "'");
+        String command = event.getActionCommand();
+        // Close any open Europe Dialog, and show new one if required
+        EuropeAction act = EuropeAction.valueOf(command);
+        getCanvas().showEuropeDialog(act);
+        switch (act) {
+        case EXIT:
+            exitAction();
+            break;
+        case RECRUIT: case PURCHASE: case TRAIN:
+            requestFocus(); // handled by docks panel
+            break;
+        case UNLOAD:
+            unloadAction();
+            break;
+        case SAIL:
+            sailAction();
+            break;
+        default:
+            logger.warning("Invalid action command: " + command);
         }
     }
 
