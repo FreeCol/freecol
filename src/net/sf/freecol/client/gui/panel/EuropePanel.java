@@ -424,7 +424,7 @@ public final class EuropePanel extends FreeColPanel {
         try {
             String command = event.getActionCommand();
             // Close any open Europe Dialog, and show new one if required
-            EuropeAction act = Enum.valueOf(EuropeAction.class, command);
+            EuropeAction act = EuropeAction.valueOf(command);
             getCanvas().showEuropeDialog(act);
             switch (act) {
             case EXIT:
@@ -443,7 +443,7 @@ public final class EuropePanel extends FreeColPanel {
                 logger.warning("Invalid action command");
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid action number");
+            logger.warning("Invalid action number: '" + event.getActionCommand() + "'");
         }
     }
 
