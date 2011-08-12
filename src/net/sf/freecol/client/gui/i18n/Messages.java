@@ -314,7 +314,7 @@ public class Messages {
     private static String parsePluralSelector(String selector, String input) {
         String result = Number.Category.other.toString();
         try {
-            selector = grammaticalNumber.getKey(selector);
+            result = grammaticalNumber.getKey(selector);
         } catch(NumberFormatException e) {
             logger.warning("Syntax error in string template '" + input + "'");
         }
