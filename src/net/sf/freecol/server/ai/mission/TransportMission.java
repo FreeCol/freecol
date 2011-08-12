@@ -956,7 +956,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
-        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
@@ -1005,7 +1005,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getCheapestUnitInEurope(Connection connection) {
-        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 

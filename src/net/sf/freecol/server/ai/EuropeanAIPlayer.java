@@ -225,6 +225,64 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Helper function for server communication - Ask the server
+     * to recruit a unit in Europe on behalf of the AIGetPlayer().
+     *
+     * TODO: Move this to a specialized Handler class (AIEurope?)
+     * TODO: Give protected access?
+     *
+     * @param index The index of the unit to recruit in the recruitables list.
+     * @return the new AIUnit created by this action. May be null.
+     */
+    public AIUnit recruitAIUnitInEurope(int index) {
+        AIUnit aiUnit = null;
+        Europe europe = getPlayer().getEurope();
+        int n = europe.getUnitCount();
+
+        // CHEAT: give the AI a selection ability
+        final String selectAbility = "model.ability.selectRecruit";
+        boolean canSelect = getPlayer().hasAbility(selectAbility);
+        Ability ability = null;
+        if (!canSelect) {
+            ability = new Ability(selectAbility);
+            getPlayer().getFeatureContainer().addAbility(ability);
+        }
+        if (AIMessage.askEmigrate(getConnection(), index+1)
+            && europe.getUnitCount() == n+1) {
+            aiUnit = getAIUnit(europe.getUnitList().get(n));
+        }
+        if (ability != null) {
+            getPlayer().getFeatureContainer().removeAbility(ability);
+        }
+        return aiUnit;
+    }
+
+    /**
+     * Helper function for server communication - Ask the server
+     * to train a unit in Europe on behalf of the AIGetPlayer().
+     *
+     * TODO: Move this to a specialized Handler class (AIEurope?)
+     * TODO: Give protected access?
+     *
+     * @return the new AIUnit created by this action. May be null.
+     */
+    public AIUnit trainAIUnitInEurope(UnitType unitType) {
+        if (unitType==null) {
+            throw new IllegalArgumentException("Invalid UnitType.");
+        }
+
+        AIUnit aiUnit = null;
+        Europe europe = getPlayer().getEurope();
+        int n = europe.getUnitCount();
+
+        if (AIMessage.askTrainUnitInEurope(getConnection(), unitType)
+            && europe.getUnitCount() == n+1) {
+            aiUnit = getAIUnit(europe.getUnitList().get(n));
+        }
+        return aiUnit;
+    }
+
+    /**
      * This is a temporary method which are used for forcing the
      * computer players into building more colonies. The method will
      * be removed after the proper code for deciding whether a colony
