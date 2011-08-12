@@ -376,13 +376,20 @@ public final class ReportColonyPanel extends ReportPanel
             roadTiles);
         boolean plowMe = plowTiles.size() > 0
             && plowTiles.get(0) == colony.getTile();
-        int newFood = colony.getAdjustedNetProductionOf(foodType);
-        boolean famine = newFood < 0
-            && colony.getGoodsCount(foodType) / -newFood <= 3;
-        int newColonist = (newFood == 0) ? 0
-            : (newFood < 0) ? colony.getGoodsCount(foodType) / newFood - 1
-            : (Settlement.FOOD_PER_COLONIST - colony.getGoodsCount(foodType))
-                / newFood + 1;
+        int newColonist;
+        boolean famine;
+        if (colony.getGoodsCount(foodType) > Settlement.FOOD_PER_COLONIST) {
+            famine = false;
+            newColonist = 1;
+        } else {
+            int newFood = colony.getAdjustedNetProductionOf(foodType);
+            famine = newFood < 0
+                && (colony.getGoodsCount(foodType) / -newFood) <= 3;
+            newColonist = (newFood == 0) ? 0
+                : (newFood < 0) ? colony.getGoodsCount(foodType) / newFood - 1
+                : (Settlement.FOOD_PER_COLONIST
+                    - colony.getGoodsCount(foodType)) / newFood + 1;
+        }
         int pop = colony.getUnitCount();
         int grow, bonus = colony.getProductionBonus();
         if (bonus < 0) {
@@ -673,13 +680,16 @@ public final class ReportColonyPanel extends ReportPanel
                         .add("%buildable%", build.getNameKey())
                         .addAmount("%turns%", turns));;
             } else if (turns < 0) {
+                GoodsType goodsType = needed.getType();
+                int goodsAmount = needed.getAmount()
+                    - colony.getGoodsCount(goodsType);
                 turns = -turns;
                 name += " " + Integer.toString(turns);
                 b = colourButton(qac, name, null, cAlarm,
                     stpl("report.colony.making.blocking.description")
                         .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", needed.getAmount())
-                        .add("%goods%", needed.getType().getNameKey())
+                        .addAmount("%amount%", goodsAmount)
+                        .add("%goods%", goodsType.getNameKey())
                         .add("%buildable%", build.getNameKey())
                         .addAmount("%turns%", turns));
             }
