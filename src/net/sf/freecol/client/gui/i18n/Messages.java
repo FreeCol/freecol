@@ -311,6 +311,17 @@ public class Messages {
         return result.toString();
     }
 
+    /**
+     * Return the number category of the given number as a String, or
+     * "other" if the first argument can not be parsed.
+     *
+     * @param selector the <code>String</code> representation of a
+     * number
+     * @param input the <code>String</code> template that contains the
+     * selector (only used for error reporting)
+     * @return a <code>String</code> value
+     * @see Number.Category
+     */
     private static String parsePluralSelector(String selector, String input) {
         String result = Number.Category.other.toString();
         try {
