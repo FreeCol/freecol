@@ -245,12 +245,12 @@ public class Messages {
                     } else {
                         selector = message(replacement);
                         if ("plural".equalsIgnoreCase(tag)) {
-                            selector = grammaticalNumber.getKey(selector);
+                            selector = parsePluralSelector(selector, input);
                         }
                     }
                 }
             } else if ("plural".equalsIgnoreCase(tag)) {
-                selector = grammaticalNumber.getKey(selector);
+                selector = parsePluralSelector(selector, input);
             }
             int keyIndex = input.indexOf(selector, pipeIndex + 1);
             if (keyIndex < 0 || keyIndex > closeChoice) {
@@ -309,6 +309,16 @@ public class Messages {
         }
         result.append(input.substring(highWaterMark));
         return result.toString();
+    }
+
+    private static String parsePluralSelector(String selector, String input) {
+        String result = Number.Category.other.toString();
+        try {
+            selector = grammaticalNumber.getKey(selector);
+        } catch(NumberFormatException e) {
+            logger.warning("Syntax error in string template '" + input + "'");
+        }
+        return result;
     }
 
     /**
