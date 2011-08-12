@@ -470,7 +470,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      tile3, galleon.getDestination());
         galleon.getTile().setConnected(true);
         assertEquals("Galleon repair location is Europe",
-                     galleon.getRepairLocation(), dutch.getEurope());
+            dutch.getEurope(), galleon.getRepairLocation(null));
 
         // Privateer should win, loot and damage the galleon
         crs = fakeAttackResult(CombatResult.WIN, privateer, galleon);

@@ -409,8 +409,7 @@ public class SimpleCombatModel extends CombatModel {
      * @return The results of the combat.
      */
     public List<CombatResult> generateAttackResult(Random random,
-                                                   FreeColGameObject attacker,
-                                                   FreeColGameObject defender) {
+        FreeColGameObject attacker, FreeColGameObject defender) {
         ArrayList<CombatResult> crs = new ArrayList<CombatResult>();
         CombatOdds odds = calculateCombatOdds(attacker, defender);
         float r = random.nextFloat();
@@ -441,8 +440,8 @@ public class SimpleCombatModel extends CombatModel {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
                 resolveAttack(attackerUnit, defenderUnit, great,
-                              r / (0.1f * odds.win), // Rescale to 0 <= r < 1
-                              crs);
+                    // Rescale to 0 <= r < 1
+                    r / (0.1f * odds.win), crs);
             } else if (r < 0.8f * odds.win + 0.2f
                     && defenderUnit.hasAbility("model.ability.evadeAttack")) {
                 crs.add(CombatResult.NO_RESULT);
@@ -451,10 +450,9 @@ public class SimpleCombatModel extends CombatModel {
                 great = r >= 0.1f * odds.win + 0.9f; // Great Loss
                 crs.add(CombatResult.LOSE);
                 resolveAttack(defenderUnit, attackerUnit, great,
-                              // Rescaling to 0 <= r < 1
-                              // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
-                              (1.25f * r - 0.25f - odds.win)/(1.0f - odds.win),
-                              crs);
+                    // Rescaling to 0 <= r < 1
+                    // (rearrange: 0.8 * odds.win + 0.2 <= r < 1.0)
+                    (1.25f * r - 0.25f - odds.win)/(1.0f - odds.win), crs);
             }
 
         } else if (combatIsBombard(attacker, defender)) {
@@ -479,7 +477,7 @@ public class SimpleCombatModel extends CombatModel {
 
                 // Sink the defender on great wins or lack of repair
                 // location, otherwise just damage.
-                if (great || defenderUnit.getRepairLocation() == null) {
+                if (great || defenderUnit.getRepairLocation(null) == null) {
                     crs.add(CombatResult.SINK_SHIP_BOMBARD);
                 } else {
                     crs.add(CombatResult.DAMAGE_SHIP_BOMBARD);
@@ -535,7 +533,8 @@ public class SimpleCombatModel extends CombatModel {
                 && !loser.getGoodsList().isEmpty()) {
                 crs.add(CombatResult.LOOT_SHIP);
             }
-            if (great || loser.getRepairLocation() == null
+            if (great
+                || loser.getRepairLocation(null) == null
                 || isBeached(loser)) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
@@ -567,23 +566,26 @@ public class SimpleCombatModel extends CombatModel {
                 // Ships in a falling colony will be damaged or sunk
                 // if they have no repair location.
                 Colony colony = (Colony) settlement;
-                CombatResult shipResult
-                    = (colony.getShipList().isEmpty()) ? null
-                    : (colony.getShipList().get(0).getRepairLocation() == null)
-                    ? CombatResult.SINK_COLONY_SHIPS
-                    : CombatResult.DAMAGE_COLONY_SHIPS;
-                if (winnerPlayer.isEuropean()) {
+                CombatResult colonyResult = (winnerPlayer.isEuropean())
+                    ? CombatResult.CAPTURE_COLONY
+                    : (!great && colony.canBePillaged(winner))
+                    ? CombatResult.PILLAGE_COLONY
+                    : (colony.getUnitCount() > 1
+                        || loser.getLocation() == tile)
+                    ? CombatResult.SLAUGHTER_UNIT
+                    : CombatResult.DESTROY_COLONY;
+                if (colonyResult == CombatResult.CAPTURE_COLONY
+                    || colonyResult == CombatResult.DESTROY_COLONY) {
+                    CombatResult shipResult = null;
+                    List<Colony> exclude = new ArrayList<Colony>();
+                    exclude.add(colony);
+                    shipResult = (colony.getShipList().isEmpty()) ? null
+                        : (colony.getShipList().get(0).getRepairLocation(exclude) == null)
+                        ? CombatResult.SINK_COLONY_SHIPS
+                        : CombatResult.DAMAGE_COLONY_SHIPS;
                     if (shipResult != null) crs.add(shipResult);
-                    crs.add(CombatResult.CAPTURE_COLONY);
-                } else if (!great && colony.canBePillaged(winner)) {
-                    crs.add(CombatResult.PILLAGE_COLONY);
-                } else if (colony.getUnitCount() > 1
-                           || loser.getLocation() == tile) {
-                    crs.add(CombatResult.SLAUGHTER_UNIT);
-                } else {
-                    if (shipResult != null) crs.add(shipResult);
-                    crs.add(CombatResult.DESTROY_COLONY);
                 }
+                crs.add(colonyResult);
 
             // Failed to defend a native settlement.
             } else if (settlement instanceof IndianSettlement) {
