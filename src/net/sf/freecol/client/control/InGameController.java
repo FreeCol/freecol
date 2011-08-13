@@ -1179,7 +1179,6 @@ System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
     /**
      * Declares independence for the home country.
      *
-     * TODO: Move magic 50% number to the spec.
      */
     public void declareIndependence() {
         if (!requireOurTurn()) return;

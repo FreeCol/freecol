@@ -795,6 +795,7 @@
               <xs:enumeration value="SETTLEMENTS" />
               <xs:enumeration value="FOUNDING_FATHERS" />
               <xs:enumeration value="YEAR" />
+              <xs:enumeration value="OPTION" />
               <xs:enumeration value="NONE" />
             </xs:restriction>
           </xs:simpleType>

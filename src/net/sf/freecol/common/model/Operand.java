@@ -49,7 +49,7 @@ public class Operand extends Scope {
     private static final Logger logger = Logger.getLogger(Operand.class.getName());
 
     public static enum OperandType {
-        UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, YEAR, NONE
+        UNITS, BUILDINGS, SETTLEMENTS, FOUNDING_FATHERS, YEAR, OPTION, NONE
     }
 
     public static enum ScopeLevel {
@@ -163,52 +163,59 @@ public class Operand extends Scope {
      */
     public Integer getValue(Game game) {
         if (value == null) {
-            if (scopeLevel == ScopeLevel.GAME) {
-                List<FreeColObject> list = new LinkedList<FreeColObject>();
-                if (operandType == OperandType.NONE
-                    && getMethodName() != null) {
-                    try {
-                        Method method = game.getClass().getMethod(getMethodName());
-                        if (method != null &&
-                            Integer.class.isAssignableFrom(method.getReturnType())) {
-                            return (Integer) method.invoke(game);
-                        } else {
-                            return null;
-                        }
-                    } catch(Exception e) {
-                        logger.warning(e.toString());
-                        return null;
-                    }
-                } else if (operandType == OperandType.YEAR) {
-                    return game.getTurn().getYear();
-                } else {
-                    for (Player player : game.getPlayers()) {
-                        switch(operandType) {
-                        case UNITS:
-                            list.addAll(player.getUnits());
-                            break;
-                        case BUILDINGS:
-                            for (Colony colony : player.getColonies()) {
-                                list.addAll(colony.getBuildings());
-                            }
-                            break;
-                        case SETTLEMENTS:
-                            list.addAll(player.getSettlements());
-                            break;
-                        case FOUNDING_FATHERS:
-                            list.addAll(player.getFathers());
-                            break;
-                        default:
-                            return null;
-                        }
-                    }
-                    return count(list);
-                }
+            if (scopeLevel == ScopeLevel.GAME){
+                return calculateGameValue(game);
             } else {
                 return null;
             }
         } else {
             return value;
+        }
+    }
+
+
+    private Integer calculateGameValue(Game game) {
+        switch(operandType) {
+        case NONE:
+            if (getMethodName() != null) {
+                try {
+                    Method method = game.getClass().getMethod(getMethodName());
+                    if (method != null &&
+                        Integer.class.isAssignableFrom(method.getReturnType())) {
+                        return (Integer) method.invoke(game);
+                    }
+                } catch(Exception e) {
+                    logger.warning(e.toString());
+                }
+            }
+            return null;
+        case YEAR:
+            return game.getTurn().getYear();
+        case OPTION:
+            return game.getSpecification().getInteger(getType());
+        default:
+            List<FreeColObject> list = new LinkedList<FreeColObject>();
+            for (Player player : game.getPlayers()) {
+                switch(operandType) {
+                case UNITS:
+                    list.addAll(player.getUnits());
+                    break;
+                case BUILDINGS:
+                    for (Colony colony : player.getColonies()) {
+                        list.addAll(colony.getBuildings());
+                    }
+                    break;
+                case SETTLEMENTS:
+                    list.addAll(player.getSettlements());
+                    break;
+                case FOUNDING_FATHERS:
+                    list.addAll(player.getFathers());
+                    break;
+                default:
+                    return null;
+                }
+            }
+            return count(list);
         }
     }
 
@@ -255,6 +262,8 @@ public class Operand extends Scope {
                     return null;
                 }
                 return count(list);
+            } else if (scopeLevel == ScopeLevel.GAME) {
+                return getValue(player.getGame());
             } else {
                 return null;
             }

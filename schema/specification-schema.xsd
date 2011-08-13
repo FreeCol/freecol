@@ -704,7 +704,7 @@
       <xs:attribute name="localizedLabels" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="audioMixerOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
@@ -719,7 +719,7 @@
       <xs:attribute name="previewEnabled" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
-  
+
   <xs:element name="rangeValue">
     <xs:complexType>
       <xs:attribute name="label" use="required" type="xs:string"/>
@@ -936,6 +936,7 @@
               <xs:enumeration value="SETTLEMENTS" />
               <xs:enumeration value="FOUNDING_FATHERS" />
               <xs:enumeration value="YEAR" />
+              <xs:enumeration value="OPTION" />
               <xs:enumeration value="NONE" />
             </xs:restriction>
           </xs:simpleType>

@@ -68,6 +68,11 @@
                       method-name="isConnected" method-value="true" />
         <rightHandSide value="0" />
       </limit>
+      <limit id="model.limit.independence.year" operator="LE">
+        <leftHandSide operandType="YEAR" scopeLevel="GAME"/>
+        <rightHandSide operandType="OPTION" scopeLevel="GAME"
+                       type="model.option.lastColonialYear"/>
+      </limit>
       <ability id="model.ability.independenceDeclared" />
     </event>
     <event id="model.event.spanishSuccession">

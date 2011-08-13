@@ -34,7 +34,7 @@ public class Scope extends FreeColObject implements Cloneable {
 
 
     /**
-     * The ID of a <code>FreeColGameObjectType</code>.
+     * The ID of a <code>FreeColGameObjectType</code>, or <code>Option</code>.
      */
     private String type;
 
@@ -245,7 +245,6 @@ public class Scope extends FreeColObject implements Cloneable {
                     return matchNegated;
                 }
             } else {
-                
                 return matchNegated;
             }
         }
@@ -255,7 +254,7 @@ public class Scope extends FreeColObject implements Cloneable {
         if (methodName != null) {
             try {
                 Method method = object.getClass().getMethod(methodName);
-                if (method != null 
+                if (method != null
                     && !String.valueOf(method.invoke(object)).equals(methodValue)) {
                     return matchNegated;
                 }
@@ -368,7 +367,7 @@ public class Scope extends FreeColObject implements Cloneable {
             }
         }
     }
-    
+
     /**
      * Reads the attributes of this object from an XML stream.
      *

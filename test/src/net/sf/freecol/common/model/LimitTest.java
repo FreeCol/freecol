@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Operand.OperandType;
 import net.sf.freecol.common.model.Operand.ScopeLevel;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -86,9 +88,11 @@ public class LimitTest extends FreeColTestCase {
         Event event = spec().getEvent("model.event.declareIndependence");
         assertNotNull(event);
         assertNotNull(event.getLimits());
+        assertNotNull(spec().getOption(GameOptions.LAST_COLONIAL_YEAR));
 
         Limit rebelLimit = event.getLimit("model.limit.independence.rebels");
         Limit colonyLimit = event.getLimit("model.limit.independence.colonies");
+        Limit yearLimit = event.getLimit("model.limit.independence.year");
 
         assertNotNull(rebelLimit);
         assertEquals(Limit.Operator.GE, rebelLimit.getOperator());
@@ -106,6 +110,15 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(new Integer(0), colonyLimit.getRightHandSide().getValue(dutch));
         assertFalse(colonyLimit.evaluate(dutch));
 
+        assertNotNull(yearLimit);
+        assertEquals(Limit.Operator.LE, yearLimit.getOperator());
+        assertEquals(Operand.OperandType.YEAR, yearLimit.getLeftHandSide().getOperandType());
+        assertEquals(Operand.OperandType.OPTION, yearLimit.getRightHandSide().getOperandType());
+        assertEquals(GameOptions.LAST_COLONIAL_YEAR, yearLimit.getRightHandSide().getType());
+        assertEquals(new Integer(1492), yearLimit.getLeftHandSide().getValue(dutch));
+        assertEquals(new Integer(1800), yearLimit.getRightHandSide().getValue(dutch));
+        assertTrue(yearLimit.evaluate(dutch));
+
         colony.incrementLiberty(10000);
         colony.updateSoL();
         assertTrue(rebelLimit.evaluate(dutch));
@@ -116,6 +129,10 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colony.isConnected());
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
+
+        IntegerOption option = spec().getIntegerOption(GameOptions.LAST_COLONIAL_YEAR);
+        option.setValue(1300);
+        assertFalse(yearLimit.evaluate(dutch));
 
     }
 
