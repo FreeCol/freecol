@@ -1179,12 +1179,19 @@ public final class Specification {
         }
         // end TODO
 
-        // TODO: remove 0.10.x compatibility code
-        String id = "model.option.mandatoryColonyYear";
-        if (allOptions.get(id) == null) {
-            IntegerOption option = new IntegerOption(id);
-            option.setValue(1600);
-            allOptions.put(id, option);
+        // TODO: remove 0.10.1 compatibility code
+        String[] years = new String[] {
+            "startingYear", "seasonYear", "mandatoryColonyYear",
+            "lastYear", "lastColonialYear"
+        };
+        int[] values = new int[] { 1492, 1600, 1600, 1850, 1800 };
+        for (int index = 0; index < years.length; index++) {
+            String id = "model.option." + years[index];
+            if (allOptions.get(id) == null) {
+                IntegerOption option = new IntegerOption(id);
+                option.setValue(values[index]);
+                allOptions.put(id, option);
+            }
         }
         // end TODO
 
