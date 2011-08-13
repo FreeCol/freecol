@@ -48,13 +48,13 @@ public class AIGoods extends AIObject implements Transportable {
 
     public static final int IMPORTANT_DELIVERY = 110;
     public static final int FULL_DELIVERY = 100;
-    
+
     /**
      * The priority of tools intended for a Colony with none stored
      * at the present (and with no special needs).
      */
     public static final int TOOLS_FOR_COLONY_PRIORITY = 10;
-    
+
     /**
      * The extra priority value added to the base value of
      * {@link #TOOLS_FOR_COLONY_PRIORITY}
@@ -76,7 +76,7 @@ public class AIGoods extends AIObject implements Transportable {
      * is also added to the total amount.
      */
     public static final int TOOLS_FOR_BUILDING = 100;
-    
+
     private Goods goods;
     private Location destination;
     private int transportPriority;
@@ -85,7 +85,7 @@ public class AIGoods extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIGoods</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param location The location of the goods.
      * @param type The type of goods.
@@ -103,35 +103,35 @@ public class AIGoods extends AIObject implements Transportable {
 
     /**
      * Creates a new <code>AIGoods</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
-     */    
+     */
     public AIGoods(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
     }
-    
+
     /**
      * Creates a new <code>AIGoods</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     */    
+     */
     public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
-    
+
     /**
      * Creates a new <code>AIGoods</code>.
-     * 
+     *
      * @param aiMain The main AI-object.
      * @param id The unique ID of this object.
-     */    
+     */
     public AIGoods(AIMain aiMain, String id) {
         super(aiMain, id);
         uninitialized = true;
@@ -174,7 +174,7 @@ public class AIGoods extends AIObject implements Transportable {
     public Location getTransportDestination() {
         return destination;
     }
-    
+
 
     /**
     * Gets the <code>Locatable</code> which should be transported.
@@ -199,17 +199,17 @@ public class AIGoods extends AIObject implements Transportable {
         }
     }
 
-    
+
     /**
     * Increases the transport priority of this <code>Transportable</code>.
     * This method gets called every turn the <code>Transportable</code>
     * have not been put on a carrier's transport list.
-    */    
+    */
     public void increaseTransportPriority() {
         transportPriority++;
     }
 
-    
+
     /**
     * Gets the carrier responsible for transporting this <code>Transportable</code>.
     *
@@ -238,7 +238,7 @@ public class AIGoods extends AIObject implements Transportable {
         }
         super.dispose();
     }
-    
+
     /**
     * Sets the carrier responsible for transporting this <code>Transportable</code>.
     *
@@ -250,7 +250,7 @@ public class AIGoods extends AIObject implements Transportable {
     public void setTransport(AIUnit transport) {
         AIUnit oldTransport = this.transport;
         this.transport = transport;
-        
+
         if (oldTransport != null) {
             // Remove from old carrier:
             if (oldTransport.getMission() != null
@@ -261,7 +261,7 @@ public class AIGoods extends AIObject implements Transportable {
                 }
             }
         }
-            
+
         if (transport != null
                 && transport.getMission() instanceof TransportMission
                 && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
@@ -269,7 +269,7 @@ public class AIGoods extends AIObject implements Transportable {
             ((TransportMission) transport.getMission()).addToTransportList(this);
         }
     }
-    
+
 
     /**
      * Sets the priority of getting the goods to the {@link #getTransportDestination}.
@@ -279,7 +279,7 @@ public class AIGoods extends AIObject implements Transportable {
         this.transportPriority = transportPriority;
     }
 
-    
+
     /**
     * Gets the goods this <code>AIGoods</code> is controlling.
     * @return The <code>Goods</code>.
@@ -292,15 +292,15 @@ public class AIGoods extends AIObject implements Transportable {
     /**
      * Sets the goods this <code>AIGoods</code> is controlling.
      * @param goods The <code>Goods</code>.
-     */    
-    public void setGoods(Goods goods) {        
+     */
+    public void setGoods(Goods goods) {
         if (goods == null) {
             throw new NullPointerException();
         }
         this.goods = goods;
     }
-    
-    
+
+
     /**
      * Writes this object to an XML stream.
      *
@@ -362,7 +362,7 @@ public class AIGoods extends AIObject implements Transportable {
         } else {
             transport = null;
         }
-        
+
         in.nextTag();
 
         if (goods != null) {
