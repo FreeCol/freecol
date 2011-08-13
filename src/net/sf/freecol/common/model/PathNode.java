@@ -35,8 +35,8 @@ public class PathNode implements Comparable<PathNode> {
 
     private Tile tile;
     private int cost;
-    
-    /** 
+
+    /**
     * This is <code>cost + heuristics</code>. The latter one is an estimate
     * for the cost from this <code>tile</code> and to the goal.
     */
@@ -58,7 +58,7 @@ public class PathNode implements Comparable<PathNode> {
     public PathNode previous = null;
 
 
-    
+
     /**
     * Creates a new <code>PathNode</code>.
     *
@@ -110,7 +110,7 @@ public class PathNode implements Comparable<PathNode> {
         return tile;
     }
 
-    
+
     /**
     * Checks if the unit using this path is still onboard
     * it's transport.
@@ -122,7 +122,7 @@ public class PathNode implements Comparable<PathNode> {
     public boolean isOnCarrier() {
         return onCarrier;
     }
-    
+
 
     /**
     * Sets if the unit using this path is still onboard
@@ -140,11 +140,11 @@ public class PathNode implements Comparable<PathNode> {
 
 
     /**
-    * Returns the number of turns it takes to reach the 
+    * Returns the number of turns it takes to reach the
     * {@link #getTransportDropNode transport node}.
-    * 
-    * @return The number of turns in takes to get to the node 
-    *       where the unit using this path should leave it's 
+    *
+    * @return The number of turns in takes to get to the node
+    *       where the unit using this path should leave it's
     *       transport.
     */
     public int getTransportDropTurns() {
@@ -154,12 +154,12 @@ public class PathNode implements Comparable<PathNode> {
         }
         return temp.getTurns();
     }
-    
+
 
     /**
     * Returns the node where the unit using this path should
     * leave it's transport.
-    * 
+    *
     * @return The node where the unit leaves it's carrier.
     */
     public PathNode getTransportDropNode() {
@@ -169,8 +169,8 @@ public class PathNode implements Comparable<PathNode> {
         }
         return temp;
     }
-    
-    
+
+
     /**
     * Returns the last node of this path.
     * @return The last <code>PathNode</code>.
@@ -243,7 +243,7 @@ public class PathNode implements Comparable<PathNode> {
         return movesLeft;
     }
 
-    
+
     /**
     * Sets the number of moves remaining at this point in the path.
     * @param movesLeft The number of moves remaining.
@@ -269,10 +269,10 @@ public class PathNode implements Comparable<PathNode> {
     public int compareTo(PathNode o) {
         return o.getF()-f;
     }
-    
+
     /**
      * Checks if this <code>PathNode</code> is equal to another object.
-     * 
+     *
      * @param o The <code>Object</code> to compare with.
      * @return <code>true</code> if the given object is a <code>PathNode</code>
      *      with the same {@link #getTile() tile} as this one.
@@ -281,10 +281,10 @@ public class PathNode implements Comparable<PathNode> {
         if (!(o instanceof PathNode)) {
             return false;
         } else {
-            return tile.getId().equals(((PathNode) o).getTile().getId()); 
+            return tile.getId().equals(((PathNode) o).getTile().getId());
         }
     }
-    
+
     /**
      * Returns the hashCode of this object.
      */
