@@ -1040,6 +1040,19 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Checks whether this player is at war with any other European
+     * player.
+     *
+     * @return <i>true</i> if this player is at war with any other.
+     */
+    public boolean isAtWarWithEuropeans() {
+        for (Player player : getGame().getLiveEuropeanPlayers()) {
+            if (atWarWith(player)) return true;
+        }
+        return false;
+    }
+
+    /**
      * Checks if this player has work to do if it is a REF-player.
      *
      * @return True if any of our units are located in the new

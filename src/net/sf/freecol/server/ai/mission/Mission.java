@@ -384,6 +384,19 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The unit.
+     * @return <code>true</code> if this mission is valid to perform
+     *         and <code>false</code> otherwise.
+     */
+    public static boolean isValid(AIUnit aiUnit) {
+        return aiUnit.getMission() == null
+            && aiUnit.getUnit() != null
+            && !aiUnit.getUnit().isUnderRepair();
+    }
+
+    /**
      * Returns true if this Mission should only be carried out once.
      *
      * @return false

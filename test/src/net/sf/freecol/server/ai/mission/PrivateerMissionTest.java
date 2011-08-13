@@ -105,31 +105,12 @@ public class PrivateerMissionTest extends FreeColTestCase {
         AIPlayer aiPlayer = aiMain.getAIPlayer(privateer.getOwner());
         AIUnit privateerAI = aiMain.getAIUnit(privateer);
         assertNotNull("Setup error, couldnt get privateerAI", privateerAI);
-        // test PrivateerMission assignment
-        String errMsg = "Privateer should not be allowed a PrivateerMission, no TransportMission assigned";
-        assertFalse(errMsg,PrivateerMission.isValid(privateerAI));
 
-        //Lets assign a transport mission to the privateer
-        privateerAI.setMission(new TransportMission(aiMain,privateerAI));
-        errMsg = "Privateer should have a TransportMission assigned";
-        assertTrue(errMsg,privateerAI.getMission() instanceof TransportMission);
-        int transportMissions = TransportMission.getPlayerNavalTransportMissionCount(aiPlayer,null);
-        assertEquals("Wrong number of TransportMission assignments",1,transportMissions);
-        // test PrivateerMission assignment
-        errMsg = "Privateer should not be allowed a PrivateerMission, no other unit has a TransportMission assigned";
-        assertFalse(errMsg,PrivateerMission.isValid(privateerAI));
+        privateerAI.setMission(null);
+        assertNull(privateerAI.getMission());
+        assertNotNull(privateerAI.getUnit());
+        assertTrue(Mission.isValid(privateerAI));
+        assertTrue(PrivateerMission.isValid(privateerAI));
 
-        // Lets assign a transport mission to the galleon
-        // We now will have more than one unit with a TransportMission
-        AIUnit galleonAI = aiMain.getAIUnit(dutchGalleon);
-        assertNotNull("Setup error, couldnt get galleonAI", galleonAI);
-        galleonAI.setMission(new TransportMission(aiMain,galleonAI));
-        errMsg = "Galleon should have a TransportMission assigned";
-        assertTrue(errMsg,galleonAI.getMission() instanceof TransportMission);
-        transportMissions = TransportMission.getPlayerNavalTransportMissionCount(aiPlayer,null);
-        assertEquals("Wrong number of TransportMission assignments",2,transportMissions);
-        // test PrivateerMission assignment
-        errMsg = "Privateer should be allowed a PrivateerMission, another unit has a TransportMission assigned";
-        assertTrue(errMsg,PrivateerMission.isValid(privateerAI));
     }
 }

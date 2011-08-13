@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -58,6 +59,8 @@ public class TransportMissionTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.galleon");
     private static final UnitType privateerType
         = spec().getUnitType("model.unit.privateer");
+    private static final UnitType wagonType
+        = spec().getUnitType("model.unit.wagonTrain");
 
 
     @Override
@@ -262,4 +265,44 @@ public class TransportMissionTest extends FreeColTestCase {
         assertNotNull("Unit should have a path", destPath);
         assertEquals("Unit destiny should be the colony", destPath.getLastNode().getTile(),colonyTile);
     }
+
+    public void testWagonTrain() {
+        Map map = getTestMap();
+        Game game = ServerTestHelper.startServerGame(map);
+        Colony one = getStandardColony(3, 3, 3);
+        Colony two = getStandardColony(3, 8, 8);
+        assertEquals(one.getOwner(), two.getOwner());
+
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
+        assertNotNull(aiMain);
+
+        Unit wagonTrain = new ServerUnit(game, one.getTile(), (ServerPlayer) one.getOwner(), wagonType);
+        AIUnit wagon = aiMain.getAIUnit(wagonTrain);
+        assertNotNull(wagon);
+
+        wagon.setMission(null);
+        assertTrue(TransportMission.isValid(wagon));
+        TransportMission mission = new TransportMission(aiMain, wagon);
+
+        Destination destination = mission.getDefaultDestination();
+        assertNotNull(destination);
+        assertTrue("Wagon should already be in colony one.",
+                   destination.isAtDestination());
+
+        wagonTrain.setLocation(one.getTile().getAdjacentTile(Map.Direction.NE));
+        destination = mission.getDefaultDestination();
+        assertNotNull(destination);
+        assertFalse(destination.isAtDestination());
+        assertNotNull(destination.getPath());
+        assertEquals("Default destination should be colony one.",
+                     one.getTile(), destination.getPath().getLastNode().getTile());
+
+
+        AIGoods goods = new AIGoods(aiMain, two, horsesType, 20, one);
+        mission.addToTransportList(goods);
+        assertEquals("Destination should now be colony two.",
+                     mission.getNextStop().getPath().getLastNode().getTile(), two.getTile());
+
+    }
+
 }

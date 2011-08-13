@@ -171,7 +171,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
         ensureColonyMissions();
-        giveNavalMissions();
         secureSettlements();
         giveNormalMissions();
         bringGifts();
@@ -730,22 +729,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Gives missions to all the naval units this player owns.
-     */
-    private void giveNavalMissions() {
-        logger.finest("Entering method giveNavalMissions");
-
-        for (AIUnit au : getAIUnits()) {
-            if (au.hasMission() || !au.getUnit().isNaval()) continue;
-
-            Mission mission = (PrivateerMission.isValid(au))
-                ? new PrivateerMission(getAIMain(), au)
-                : new TransportMission(getAIMain(), au);
-            au.setMission(mission);
-        }
-    }
-
-    /**
      * Calls {@link AIColony#rearrangeWorkers} for every colony this player
      * owns.
      */
@@ -1262,15 +1245,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (UnitType unitType : getAIMain().getGame().getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
-        if (getPlayer().isEuropean()) {
-            Iterator<AIColony> aIterator = getAIColonyIterator();
-            while (aIterator.hasNext()) {
-                Iterator<Wish> wIterator = aIterator.next().getWishIterator();
-                while (wIterator.hasNext()) {
-                    Wish w = wIterator.next();
-                    if (w instanceof WorkerWish && w.getTransportable() == null) {
-                        workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
-                    }
+        Iterator<AIColony> aIterator = getAIColonyIterator();
+        while (aIterator.hasNext()) {
+            Iterator<Wish> wIterator = aIterator.next().getWishIterator();
+            while (wIterator.hasNext()) {
+                Wish w = wIterator.next();
+                if (w instanceof WorkerWish && w.getTransportable() == null) {
+                    workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
                 }
             }
         }
@@ -1298,9 +1279,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            // only processing naval units
-            if(unit.isNaval()){
-            	continue;
+            if (PrivateerMission.isValid(aiUnit)) {
+                aiUnit.setMission(new PrivateerMission(getAIMain(), aiUnit));
+                continue;
+            }
+
+            if (unit.isCarrier()) {
+                aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
             }
 
             if (unit.canCarryTreasure()) {
@@ -1320,11 +1305,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             			&& !owner.getSettlements().isEmpty();
 
             	if(!unit.isColonist() 
-            			|| isPastStart
-            			|| owner.isIndian()
-            			|| owner.isREF()){
-            		giveMilitaryMission(aiUnit);
-            		continue;
+                   || isPastStart
+                   || owner.isIndian()
+                   || owner.isREF()){
+                    giveMilitaryMission(aiUnit);
+                    continue;
             	}
             }
 
