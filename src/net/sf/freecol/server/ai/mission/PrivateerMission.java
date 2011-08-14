@@ -334,9 +334,9 @@ public class PrivateerMission extends Mission {
      */
     public static boolean isValid(AIUnit aiUnit) {
         Unit unit = aiUnit.getUnit();
-        AIPlayer aiPlayer = aiUnit.getAIMain().getAIPlayer(unit.getOwner());
         return Mission.isValid(aiUnit)
-            && unit.isNaval()
+            && unit.isCarrier()
+            && unit.isOffensiveUnit()
             && unit.hasAbility(Ability.PIRACY)
             && unit.getGoodsCount() == 0
             && unit.getUnitCount() == 0;

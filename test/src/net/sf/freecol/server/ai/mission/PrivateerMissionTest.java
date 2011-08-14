@@ -98,13 +98,13 @@ public class PrivateerMissionTest extends FreeColTestCase {
         Tile dutchGalleonTile = map.getTile(12, 9);
 
         Unit privateer = privateerTile.getFirstUnit();
-        assertNotNull("Setup error, couldnt get privateer", privateer);
+        assertNotNull("Setup error, could not get privateer", privateer);
         Unit dutchGalleon = dutchGalleonTile.getFirstUnit();
-        assertNotNull("Setup error, couldnt get galleon", dutchGalleon);
+        assertNotNull("Setup error, could not get galleon", dutchGalleon);
 
         AIPlayer aiPlayer = aiMain.getAIPlayer(privateer.getOwner());
         AIUnit privateerAI = aiMain.getAIUnit(privateer);
-        assertNotNull("Setup error, couldnt get privateerAI", privateerAI);
+        assertNotNull("Setup error, could not get privateerAI", privateerAI);
 
         privateerAI.setMission(null);
         assertNull(privateerAI.getMission());

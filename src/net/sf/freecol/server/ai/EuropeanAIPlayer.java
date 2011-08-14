@@ -1283,9 +1283,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                 aiUnit.setMission(new PrivateerMission(getAIMain(), aiUnit));
                 continue;
             }
+            /* TODO: we need a mission for frigates and similar
+             * units to patrol enemy shipping lanes
+             */
 
             if (unit.isCarrier()) {
                 aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
+                continue;
             }
 
             if (unit.canCarryTreasure()) {
@@ -1293,8 +1297,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
-                       ScoutingMission.isValid(aiUnit)) {
+            if (ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
                 continue;
             }
@@ -1304,9 +1307,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             	boolean isPastStart = getGame().getTurn().getNumber() > 5
             			&& !owner.getSettlements().isEmpty();
 
-            	if(!unit.isColonist() 
+            	if(!unit.isColonist()
                    || isPastStart
-                   || owner.isIndian()
                    || owner.isREF()){
                     giveMilitaryMission(aiUnit);
                     continue;
@@ -1327,120 +1329,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (unit.isColonist()) {
-                /*
-                 * Motivated by (speed) performance: This map stores the
-                 * distance between the unit and the destination of a Wish:
-                 */
-                HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
-                for (ArrayList<Wish> al : workerWishes.values()) {
-                    for (Wish w : al) {
-                        if (!distances.containsKey(w.getDestination())) {
-                            distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
-                        }
-                    }
-                }
-
-                // Check if this unit is needed as an expert (using:
-                // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
-                WorkerWish bestWish = null;
-                int bestTurns = Integer.MAX_VALUE;
-                for (int i = 0; i < wishList.size(); i++) {
-                    WorkerWish ww = (WorkerWish) wishList.get(i);
-                    if (ww.getTransportable() != null) {
-                        wishList.remove(i);
-                        i--;
-                        continue;
-                    }
-                    int turns = distances.get(ww.getDestination());
-                    if (turns == Integer.MAX_VALUE) {
-                        if (ww.getDestination().getTile() == null) {
-                            turns = 5;
-                        } else {
-                            turns = 10;
-                        }
-                    } else if (turns > 5) {
-                        turns = 5;
-                    }
-                    if (bestWish == null
-                            || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
-                        bestWish = ww;
-                        bestTurns = turns;
-                    }
-                }
-                if (bestWish != null) {
-                    bestWish.setTransportable(aiUnit);
-                    aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
-                    continue;
-                }
-                // Find a site for a new colony:
-                Tile colonyTile = null;
-                if (getPlayer().canBuildColonies()) {
-                    colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
-                    if (colonyTile != null) {
-                        bestTurns = unit.getTurnsToReach(colonyTile);
-                    }
-                }
-
-                // Check if we can find a better site to work than a new colony:
-                if (!fewColonies || colonyTile == null || bestTurns > 10) {
-                    for (List<Wish> wishes : workerWishes.values()) {
-                        for (int j = 0; j < wishes.size(); j++) {
-                            WorkerWish ww = (WorkerWish) wishes.get(j);
-                            if (ww.getTransportable() != null) {
-                                wishes.remove(j);
-                                j--;
-                                continue;
-                            }
-                            int turns = distances.get(ww.getDestination());
-                            if (turns == Integer.MAX_VALUE) {
-                                if (ww.getDestination().getTile() == null) {
-                                    turns = 5;
-                                } else {
-                                    turns = 10;
-                                }
-                            } else if (turns > 5) {
-                                turns = 5;
-                            }
-                            // TODO: Choose to build colony if the value of the
-                            // wish is low.
-                            if (bestWish == null
-                                    || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
-                                bestWish = ww;
-                                bestTurns = turns;
-                            }
-                        }
-                    }
-                }
-                if (bestWish != null) {
-                    bestWish.setTransportable(aiUnit);
-                    aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
-                    continue;
-                }
-                // Choose to build a new colony:
-                if (colonyTile != null) {
-                    Mission mission = new BuildColonyMission(getAIMain(),
-                                                             aiUnit,
-                                                             colonyTile,
-                                                             getPlayer().getColonyValue(colonyTile));
-                    aiUnit.setMission(mission);
-
-                    boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
-                    if (isUnitOnCarrier) {
-                        AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit().getLocation());
-
-                        //make verification of carrier mission
-                        Mission carrierMission = carrier.getMission();
-
-                        boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission;
-                        if(!isCarrierMissionToTransport){
-                        	throw new IllegalStateException("Carrier carrying unit not on a transport mission");
-                        }
-                        //transport unit to carrier destination (is this what is truly wanted?)
-                        ((TransportMission) carrierMission).addToTransportList(aiUnit);
-                    }
-                    continue;
-                }
+                giveColonistMission(aiUnit, fewColonies, workerWishes);
             }
 
             if (!aiUnit.hasMission()) {
@@ -1452,6 +1341,118 @@ public class EuropeanAIPlayer extends AIPlayer {
                     aiUnit.setMission(new IdleAtColonyMission(getAIMain(), aiUnit));
                 }
             }
+        }
+    }
+
+    private void giveColonistMission(AIUnit aiUnit, boolean fewColonies,
+                                     java.util.Map<UnitType, ArrayList<Wish>> workerWishes) {
+        Unit unit = aiUnit.getUnit();
+        /*
+         * Motivated by (speed) performance: This map stores the
+         * distance between the unit and the destination of a Wish:
+         */
+        HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
+        for (ArrayList<Wish> al : workerWishes.values()) {
+            for (Wish w : al) {
+                if (!distances.containsKey(w.getDestination())) {
+                    distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
+                }
+            }
+        }
+
+        // Check if this unit is needed as an expert (using:
+        // "WorkerWish"):
+        ArrayList<Wish> wishList = workerWishes.get(unit.getType());
+        WorkerWish bestWish = null;
+        int bestTurns = Integer.MAX_VALUE;
+        for (int i = 0; i < wishList.size(); i++) {
+            // TODO: is this necessary? If so, use Iterator?
+            WorkerWish ww = (WorkerWish) wishList.get(i);
+            if (ww.getTransportable() != null) {
+                wishList.remove(i);
+                i--;
+                continue;
+            }
+            int turns = getScaledTurns(distances, ww.getDestination());
+            if (bestWish == null
+                || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
+                bestWish = ww;
+                bestTurns = turns;
+            }
+        }
+        if (bestWish != null) {
+            bestWish.setTransportable(aiUnit);
+            aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+            return;
+        }
+        // Find a site for a new colony:
+        Tile colonyTile = null;
+        if (getPlayer().canBuildColonies() && unit.canBuildColony()) {
+            colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
+            if (colonyTile != null) {
+                bestTurns = unit.getTurnsToReach(colonyTile);
+            }
+        }
+
+        // Check if we can find a better site to work than a new colony:
+        if (!fewColonies || colonyTile == null || bestTurns > 10) {
+            for (List<Wish> wishes : workerWishes.values()) {
+                for (int j = 0; j < wishes.size(); j++) {
+                    WorkerWish ww = (WorkerWish) wishes.get(j);
+                    if (ww.getTransportable() != null) {
+                        wishes.remove(j);
+                        j--;
+                        continue;
+                    }
+                    int turns = getScaledTurns(distances, ww.getDestination());
+                    // TODO: Choose to build colony if the value of the
+                    // wish is low.
+                    if (bestWish == null
+                        || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
+                        bestWish = ww;
+                        bestTurns = turns;
+                    }
+                }
+            }
+        }
+        if (bestWish != null) {
+            bestWish.setTransportable(aiUnit);
+            aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+            return;
+        }
+        // Choose to build a new colony:
+        if (colonyTile != null) {
+            Mission mission = new BuildColonyMission(getAIMain(),
+                                                     aiUnit,
+                                                     colonyTile,
+                                                     getPlayer().getColonyValue(colonyTile));
+            aiUnit.setMission(mission);
+
+            boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
+            if (isUnitOnCarrier) {
+                AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit().getLocation());
+
+                //make verification of carrier mission
+                Mission carrierMission = carrier.getMission();
+
+                boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission;
+                if(!isCarrierMissionToTransport){
+                    throw new IllegalStateException("Carrier carrying unit not on a transport mission");
+                }
+                //transport unit to carrier destination (is this what is truly wanted?)
+                ((TransportMission) carrierMission).addToTransportList(aiUnit);
+            }
+            return;
+        }
+    }
+
+    private int getScaledTurns(java.util.Map<Location, Integer> distances, Location destination) {
+        int turns = distances.get(destination);
+        // TODO: what do these calcuations mean?
+        if (turns == Integer.MAX_VALUE) {
+            return (destination.getTile() == null) ? 5 : 10;
+        } else {
+            return Math.min(5, turns);
         }
     }
 

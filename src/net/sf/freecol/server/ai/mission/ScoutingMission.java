@@ -328,6 +328,9 @@ public class ScoutingMission extends Mission {
      *         <code>false</code> otherwise.
      */
     public static boolean isValid(AIUnit au) {
+        if (!au.getUnit().hasAbility("model.ability.scoutIndianSettlement")) {
+            return false;
+        }
         if (au.getUnit().getTile() == null) {
             return true;
         }
