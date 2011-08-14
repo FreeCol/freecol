@@ -205,7 +205,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
             ? NoAddReason.COLONY_CENTER
             : (tile.getOccupyingUnit() != null)
             ? NoAddReason.OCCUPIED_BY_ENEMY
-            : (!getColony().hasAbility("model.ability.produceInWater")
+            : (!getColony().hasAbility(Ability.PRODUCE_IN_WATER)
                 && !tile.isLand())
             ? NoAddReason.MISSING_ABILITY
             : (tile.getOwningSettlement() == getColony())
@@ -488,7 +488,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public int getProductionOf(Unit unit, GoodsType goodsType) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
-        } else if (workTile.isLand() || getColony().hasAbility("model.ability.produceInWater")) {
+        } else if (workTile.isLand() || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType, unit.getType());
             if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), modifiers) > 0) {
                 modifiers.addAll(unit.getModifierSet(goodsType.getId()));
@@ -516,7 +516,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public int getPotentialProduction(UnitType unitType, GoodsType goodsType) {
         int production = 0;
         if (workTile.isLand()
-            || getColony().hasAbility("model.ability.produceInWater")) {
+            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
                                                                   unitType);
             if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(),

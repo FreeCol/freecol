@@ -857,7 +857,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 WorkLocation wl = wlp.getWorkLocation();
                 if (wlp.getGoodsType() == foodType
                     && (((ColonyTile) wl).getWorkTile().isLand()
-                        || colony.hasAbility("model.ability.produceInWater"))) {
+                        || colony.hasAbility(Ability.PRODUCE_IN_WATER))) {
                     Unit bestUnit = null;
                     int bestProduction = 0;
                     Iterator<Unit> unitIterator = units.iterator();
@@ -1101,7 +1101,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             WorkLocation wl = wlp.getWorkLocation();
             if (wlp.getGoodsType() == foodType
                 && (((ColonyTile) wl).getWorkTile().isLand()
-                    || colony.hasAbility("model.ability.produceInWater"))) {
+                    || colony.hasAbility(Ability.PRODUCE_IN_WATER))) {
                 Unit bestUnit = null;
                 int bestProduction = 0;
                 Iterator<Unit> unitIterator = units.iterator();
@@ -1378,7 +1378,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     private void placeExpertsInWorkPlaces(List<Unit> units, List<WorkLocationPlan> workLocationPlans) {
-        boolean canProduceInWater = colony.hasAbility("model.ability.produceInWater");
+        boolean canProduceInWater = colony.hasAbility(Ability.PRODUCE_IN_WATER);
 
         // Since we will change the original list, we need to make a copy to iterate from
         Iterator<Unit> uit = new ArrayList<Unit>(units).iterator();

@@ -210,7 +210,7 @@ public class ColonyPlan {
         List<BuildingType> townHalls = new ArrayList<BuildingType>();
 
         for (BuildingType type : colony.getSpecification().getBuildingTypeList()) {
-            if (type.hasAbility("model.ability.produceInWater")) {
+            if (type.hasAbility(Ability.PRODUCE_IN_WATER)) {
                 docks.add(type);
             }
             if (type.hasAbility(Ability.EXPORT)) {
@@ -277,7 +277,7 @@ public class ColonyPlan {
                                                  * (disconnectedColonies - wagonTrains)));
                 }
             }
-        } else if (!colony.hasAbility("model.ability.produceInWater")) {
+        } else if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)) {
             // coastal colonies need docks
             int potential = 0;
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
@@ -552,8 +552,10 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator.next();
                 // TODO: find out about unit working here, if any (?)
                 if (wlp.getWorkLocation() instanceof ColonyTile
-                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(buildingRawMat, null) > highestPotential) {
-                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(buildingRawMat, null);
+                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(buildingRawMat, null)
+                    > highestPotential) {
+                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile()
+                        .potential(buildingRawMat, null);
                     bestChoice = wlp;
                 }
             }
