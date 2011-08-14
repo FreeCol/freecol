@@ -242,16 +242,17 @@ public class ColonyPlan {
         List<UnitType> buildableDefenders = new ArrayList<UnitType>();
         UnitType bestWagon = null;
         for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
-            if (unitType.getDefence() > UnitType.DEFAULT_DEFENCE
-                && !unitType.hasAbility(Ability.NAVAL_UNIT)
-                && !unitType.getGoodsRequired().isEmpty()) {
-                buildableDefenders.add(unitType);
-            }
-            if (unitType.hasAbility(Ability.CARRY_GOODS)
-                && !unitType.hasAbility(Ability.NAVAL_UNIT)
-                && colony.canBuild(unitType)
-                && (bestWagon == null || unitType.getSpace() > bestWagon.getSpace())) {
-                bestWagon = unitType;
+            if (!unitType.hasAbility(Ability.NAVAL_UNIT)
+                && colony.canBuild(unitType)) {
+                if (unitType.getDefence() > UnitType.DEFAULT_DEFENCE
+                    && !unitType.getGoodsRequired().isEmpty()) {
+                    buildableDefenders.add(unitType);
+                }
+                if (unitType.hasAbility(Ability.CARRY_GOODS)
+                    && !unitType.hasAbility(Ability.NAVAL_UNIT)
+                    && (bestWagon == null || unitType.getSpace() > bestWagon.getSpace())) {
+                    bestWagon = unitType;
+                }
             }
         }
 
@@ -262,21 +263,20 @@ public class ColonyPlan {
             }
         }
 
-        if (colony.isLandLocked()) {
-            // landlocked colonies need transportation
-            /* Disable this until the AI actually does something with
-               its wagon trains
-            int landLockedColonies = 0;
-            for (Colony otherColony : colony.getOwner().getColonies()) {
-                if (otherColony.isLandLocked()) {
-                    landLockedColonies++;
+        if (!colony.isConnected()) {
+            // disconnected colonies need transportation
+            if (bestWagon != null) {
+                int disconnectedColonies = 0;
+                for (Colony otherColony : colony.getOwner().getColonies()) {
+                    if (!otherColony.isConnected()) {
+                        disconnectedColonies++;
+                    }
+                }
+                if (disconnectedColonies > wagonTrains) {
+                    buildables.add(new Buildable(bestWagon, WAGON_TRAIN_PRIORITY
+                                                 * (disconnectedColonies - wagonTrains)));
                 }
             }
-            if (bestWagon != null && landLockedColonies > wagonTrains) {
-                buildables.add(new Buildable(bestWagon, WAGON_TRAIN_PRIORITY
-                                             * (landLockedColonies - wagonTrains)));
-            }
-            */
         } else if (!colony.hasAbility("model.ability.produceInWater")) {
             // coastal colonies need docks
             int potential = 0;
