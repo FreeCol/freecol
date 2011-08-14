@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -38,20 +37,6 @@ import net.sf.freecol.common.util.RandomChoice;
  * Represents one of the Indian nations present in the game.
  */
 public class IndianNationType extends NationType {
-
-    public static enum SettlementNumber { LOW, AVERAGE, HIGH }
-    public static enum AggressionLevel { LOW, AVERAGE, HIGH }
-
-
-    /**
-     * The number of settlements this Nation has.
-     */
-    private SettlementNumber numberOfSettlements = SettlementNumber.AVERAGE;
-
-    /**
-     * The aggression of this Nation.
-     */
-    private AggressionLevel aggression = AggressionLevel.AVERAGE;
 
     /**
      * Stores the ids of the skills taught by this Nation.
@@ -95,42 +80,6 @@ public class IndianNationType extends NationType {
      */
     public boolean isREF() {
         return false;
-    }
-
-    /**
-     * Get the <code>NumberOfSettlements</code> value.
-     *
-     * @return a <code>SettlementNumber</code> value
-     */
-    public final SettlementNumber getNumberOfSettlements() {
-        return numberOfSettlements;
-    }
-
-    /**
-     * Set the <code>NumberOfSettlements</code> value.
-     *
-     * @param newNumberOfSettlements The new NumberOfSettlements value.
-     */
-    public final void setNumberOfSettlements(final SettlementNumber newNumberOfSettlements) {
-        this.numberOfSettlements = newNumberOfSettlements;
-    }
-
-    /**
-     * Get the <code>Aggression</code> value.
-     *
-     * @return an <code>AggressionLevel</code> value
-     */
-    public final AggressionLevel getAggression() {
-        return aggression;
-    }
-
-    /**
-     * Set the <code>Aggression</code> value.
-     *
-     * @param newAggression The new Aggression value.
-     */
-    public final void setAggression(final AggressionLevel newAggression) {
-        this.aggression = newAggression;
     }
 
     /**
@@ -243,24 +192,6 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-
-        out.writeAttribute("number-of-settlements",
-            numberOfSettlements.toString().toLowerCase(Locale.US));
-        out.writeAttribute("aggression",
-            aggression.toString().toLowerCase(Locale.US));
-    }
-
-    /**
      * Write the children of this object to a stream.
      *
      * @param out The target stream.
@@ -302,30 +233,8 @@ public class IndianNationType extends NationType {
         String extendString = in.getAttributeValue(null, "extends");
         IndianNationType parent = (extendString == null) ? this :
             getSpecification().getType(extendString, IndianNationType.class);
-        String valueString = in.getAttributeValue(null,
-            "number-of-settlements");
-        if (valueString == null) {
-            numberOfSettlements = parent.numberOfSettlements;
-        } else {
-            numberOfSettlements = Enum.valueOf(SettlementNumber.class,
-                valueString.toUpperCase(Locale.US));
-        }
-
-        valueString = in.getAttributeValue(null, "aggression");
-        if (valueString == null) {
-            aggression = parent.aggression;
-        } else {
-            aggression = Enum.valueOf(AggressionLevel.class,
-                valueString.toUpperCase(Locale.US));
-        }
-
         if (parent != this) {
             skills.addAll(parent.skills);
-            getSettlementTypes().addAll(parent.getSettlementTypes());
-            getFeatureContainer().add(parent.getFeatureContainer());
-            if (parent.isAbstractType()) {
-                getFeatureContainer().replaceSource(parent, this);
-            }
         }
 
     }

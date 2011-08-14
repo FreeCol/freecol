@@ -359,7 +359,11 @@
             <xs:attribute name="id" use="required" type="NationId"/>
           </xs:complexType>
         </xs:element>
-        <xs:element ref="nation-type"/>
+        <xs:element name="nation-type">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="NationTypeId"/>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="unit">
           <xs:complexType>
             <xs:attribute name="id" use="required" type="UnitTypeId"/>
@@ -411,16 +415,11 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="nation-type">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="NationTypeId"/>
-    </xs:complexType>
-  </xs:element>
-
   <xs:element name="european-nation-types">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="european-nation-type"/>
+        <xs:element maxOccurs="unbounded" name="european-nation-type"
+                    type="european-nation-type"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
       </xs:sequence>
     </xs:complexType>
@@ -429,100 +428,109 @@
   <xs:element name="indian-nation-types">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="indian-nation-type"/>
+        <xs:element maxOccurs="unbounded" name="indian-nation-type"
+                    type="indian-nation-type"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="NationTypeId" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="european-nation-type">
-    <xs:complexType>
-      <xs:sequence>
+  <xs:complexType name="european-nation-type">
+    <xs:complexContent>
+      <xs:extension base="nation-type">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="unit">
+              <xs:complexType>
+                <xs:attribute name="id" use="required" type="xs:string"/>
+                <xs:attribute name="type" use="required" type="UnitTypeId"/>
+                <xs:attribute name="role">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="default"/>
+                      <xs:enumeration value="pioneer"/>
+                      <xs:enumeration value="missionary"/>
+                      <xs:enumeration value="soldier"/>
+                      <xs:enumeration value="scout"/>
+                      <xs:enumeration value="dragoon"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="expert-starting-units" type="xs:string"/>
+                <xs:attribute name="mounted" type="xs:boolean"/>
+                <xs:attribute name="missionary" type="xs:boolean"/>
+                <xs:attribute name="tools" type="xs:nonNegativeInteger"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element ref="ability"/>
+            <xs:element ref="modifier"/>
+            <xs:element ref="settlement"/>
+        </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="ref" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="nation-type">
+    <xs:attribute name="id" use="required" type="xs:string"/>
+    <xs:attribute name="abstract" type="xs:boolean" />
+    <xs:attribute name="extends" type="xs:string" />
+    <xs:attribute name="number-of-settlements">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="high"/>
+          <xs:enumeration value="low"/>
+          <xs:enumeration value="average"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="aggression">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="high"/>
+          <xs:enumeration value="low"/>
+          <xs:enumeration value="average"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+
+  <xs:complexType name="indian-nation-type">
+    <xs:complexContent>
+      <xs:extension base="nation-type">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="unit">
-            <xs:complexType>
-              <xs:attribute name="id" use="required" type="xs:string"/>
-              <xs:attribute name="type" use="required" type="UnitTypeId"/>
-              <xs:attribute name="role">
-                <xs:simpleType>
-                  <xs:restriction base="xs:token">
-                    <xs:enumeration value="default"/>
-                    <xs:enumeration value="pioneer"/>
-                    <xs:enumeration value="missionary"/>
-                    <xs:enumeration value="soldier"/>
-                    <xs:enumeration value="scout"/>
-                    <xs:enumeration value="dragoon"/>
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:attribute>
-              <xs:attribute name="expert-starting-units" type="xs:string"/>
-              <xs:attribute name="mounted" type="xs:boolean"/>
-              <xs:attribute name="missionary" type="xs:boolean"/>
-              <xs:attribute name="tools" type="xs:nonNegativeInteger"/>
-            </xs:complexType>
-          </xs:element>
           <xs:element ref="ability"/>
           <xs:element ref="modifier"/>
           <xs:element ref="settlement"/>
+          <xs:element ref="skill"/>
+          <xs:element name="region">
+            <xs:complexType>
+              <xs:attribute name="id">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="model.region.center"/>
+                    <xs:enumeration value="model.region.north"/>
+                    <xs:enumeration value="model.region.northEast"/>
+                    <xs:enumeration value="model.region.east"/>
+                    <xs:enumeration value="model.region.southEast"/>
+                    <xs:enumeration value="model.region.south"/>
+                    <xs:enumeration value="model.region.southWest"/>
+                    <xs:enumeration value="model.region.west"/>
+                    <xs:enumeration value="model.region.northWest"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
         </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="abstract" type="xs:boolean" />
-      <xs:attribute name="extends" type="xs:string" />
-      <xs:attribute name="ref" type="xs:boolean"/>
-    </xs:complexType>
-  </xs:element>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-  <xs:element name="indian-nation-type">
-    <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="ability"/>
-        <xs:element ref="modifier"/>
-        <xs:element ref="skill"/>
-        <xs:element ref="settlement"/>
-        <xs:element name="region">
-          <xs:complexType>
-            <xs:attribute name="id">
-              <xs:simpleType>
-                <xs:restriction base="xs:token">
-                  <xs:enumeration value="model.region.center"/>
-                  <xs:enumeration value="model.region.north"/>
-                  <xs:enumeration value="model.region.northEast"/>
-                  <xs:enumeration value="model.region.east"/>
-                  <xs:enumeration value="model.region.southEast"/>
-                  <xs:enumeration value="model.region.south"/>
-                  <xs:enumeration value="model.region.southWest"/>
-                  <xs:enumeration value="model.region.west"/>
-                  <xs:enumeration value="model.region.northWest"/>
-                </xs:restriction>
-              </xs:simpleType>
-            </xs:attribute>
-          </xs:complexType>
-        </xs:element>
-      </xs:choice>
-      <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="abstract" type="xs:boolean" />
-      <xs:attribute name="extends" type="xs:string" />
-      <xs:attribute name="number-of-settlements">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="high"/>
-            <xs:enumeration value="low"/>
-            <xs:enumeration value="average"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="aggression">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="high"/>
-            <xs:enumeration value="low"/>
-            <xs:enumeration value="average"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+
 
   <xs:element name="skill">
     <xs:complexType>

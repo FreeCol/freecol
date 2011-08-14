@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -31,6 +32,20 @@ import javax.xml.stream.XMLStreamWriter;
  * Represents one of the nations present in the game.
  */
 public abstract class NationType extends FreeColGameObjectType {
+
+    public static enum SettlementNumber { LOW, AVERAGE, HIGH }
+    public static enum AggressionLevel { LOW, AVERAGE, HIGH }
+
+
+    /**
+     * The number of settlements this Nation has.
+     */
+    private SettlementNumber numberOfSettlements = SettlementNumber.AVERAGE;
+
+    /**
+     * The aggression of this Nation.
+     */
+    private AggressionLevel aggression = AggressionLevel.AVERAGE;
 
     /**
      * The types of settlement this Nation has.
@@ -96,6 +111,42 @@ public abstract class NationType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>NumberOfSettlements</code> value.
+     *
+     * @return a <code>SettlementNumber</code> value
+     */
+    public final SettlementNumber getNumberOfSettlements() {
+        return numberOfSettlements;
+    }
+
+    /**
+     * Set the <code>NumberOfSettlements</code> value.
+     *
+     * @param newNumberOfSettlements The new NumberOfSettlements value.
+     */
+    public final void setNumberOfSettlements(final SettlementNumber newNumberOfSettlements) {
+        this.numberOfSettlements = newNumberOfSettlements;
+    }
+
+    /**
+     * Get the <code>Aggression</code> value.
+     *
+     * @return an <code>AggressionLevel</code> value
+     */
+    public final AggressionLevel getAggression() {
+        return aggression;
+    }
+
+    /**
+     * Set the <code>Aggression</code> value.
+     *
+     * @param newAggression The new Aggression value.
+     */
+    public final void setAggression(final AggressionLevel newAggression) {
+        this.aggression = newAggression;
+    }
+
+    /**
      * Whether this is a EuropeanNation, i.e. a player or a REF.
      *
      */
@@ -113,22 +164,46 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     public abstract boolean isREF();
 
-
     /**
-     * Write the children of this object to a stream.
+     * Reads the attributes of this object from an XML stream.
      *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * @param in The XML input stream.
+     * @throws XMLStreamException if a problem was encountered
+     *     during parsing.
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        super.writeChildren(out);
+        super.readAttributes(in);
 
-        for (SettlementType settlementType : settlementTypes) {
-            settlementType.toXML(out, "settlement");
+        String extendString = in.getAttributeValue(null, "extends");
+        NationType parent = (extendString == null) ? this :
+            getSpecification().getType(extendString, NationType.class);
+        String valueString = in.getAttributeValue(null,
+            "number-of-settlements");
+        if (valueString == null) {
+            numberOfSettlements = parent.numberOfSettlements;
+        } else {
+            numberOfSettlements = Enum.valueOf(SettlementNumber.class,
+                valueString.toUpperCase(Locale.US));
         }
+
+        valueString = in.getAttributeValue(null, "aggression");
+        if (valueString == null) {
+            aggression = parent.aggression;
+        } else {
+            aggression = Enum.valueOf(AggressionLevel.class,
+                valueString.toUpperCase(Locale.US));
+        }
+
+        if (parent != this) {
+            getSettlementTypes().addAll(parent.getSettlementTypes());
+            getFeatureContainer().add(parent.getFeatureContainer());
+            if (parent.isAbstractType()) {
+                getFeatureContainer().replaceSource(parent, this);
+            }
+        }
+
     }
 
     /**
@@ -150,4 +225,40 @@ public abstract class NationType extends FreeColGameObjectType {
             super.readChild(in);
         }
     }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("number-of-settlements",
+            numberOfSettlements.toString().toLowerCase(Locale.US));
+        out.writeAttribute("aggression",
+            aggression.toString().toLowerCase(Locale.US));
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to
+     *     the stream.
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (SettlementType settlementType : settlementTypes) {
+            settlementType.toXML(out, "settlement");
+        }
+    }
+
 }

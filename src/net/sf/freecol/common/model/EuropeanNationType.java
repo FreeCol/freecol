@@ -231,11 +231,6 @@ public class EuropeanNationType extends NationType {
                 startingUnitMap.put(entry.getKey(),
                     new HashMap<String, AbstractUnit>(entry.getValue()));
             }
-            getSettlementTypes().addAll(parent.getSettlementTypes());
-            getFeatureContainer().add(parent.getFeatureContainer());
-            if (parent.isAbstractType()) {
-                getFeatureContainer().replaceSource(parent, this);
-            }
         }
     }
 
