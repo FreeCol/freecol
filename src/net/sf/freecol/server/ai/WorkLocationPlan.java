@@ -20,6 +20,8 @@
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
@@ -231,6 +233,10 @@ public class WorkLocationPlan extends ValuedAIObject {
         setValue(getProductionOf(goodsType));
     }
 
+
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // do nothing
+    }
 
     /**
      * Creates an XML-representation of this object.

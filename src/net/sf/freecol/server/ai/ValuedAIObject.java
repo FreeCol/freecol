@@ -19,21 +19,29 @@
 
 package net.sf.freecol.server.ai;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
-
-public class ValuedAIObject extends AIObject implements Comparable<ValuedAIObject> {
+public abstract class ValuedAIObject extends AIObject implements Comparable<ValuedAIObject> {
 
     /**
-     * Describe value here.
+     * The value of this AIObject.
      */
     private int value;
 
+    /**
+     * Creates a new <code>ValuedAIObject</code> instance.
+     *
+     * @param aiMain an <code>AIMain</code> value
+     */
     public ValuedAIObject(AIMain aiMain) {
         super(aiMain);
     }
 
+    /**
+     * Creates a new <code>ValuedAIObject</code> instance.
+     *
+     * @param aiMain an <code>AIMain</code> value
+     * @param id a <code>String</code> value
+     */
     public ValuedAIObject(AIMain aiMain, String id) {
         super(aiMain, id);
     }
@@ -62,7 +70,4 @@ public class ValuedAIObject extends AIObject implements Comparable<ValuedAIObjec
     }
 
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // do nothing
-    }
 }
