@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -373,39 +372,6 @@ public class TileImprovement extends TileItem implements Named {
         for (int i = 0; i < base.length; i++) {
             style += base[i] * breakdown[i];
         }
-    }
-
-    /**
-     * Method for returning the 'most effective' TileImprovementType
-     * allowed for a given <code>Tile</code>.  Useful for AI in
-     * deciding the Improvements to prioritize.
-     *
-     * @param tile The <code>Tile</code> that will be improved
-     * @param goodsType The <code>GoodsType</code> to be prioritized.
-     * @return The best TileImprovementType available to be done.
-     */
-    public static TileImprovementType findBestTileImprovementType(Tile tile, GoodsType goodsType) {
-        // Get list of TileImprovementTypes from Specification
-        List<TileImprovementType> impTypeList = tile.getSpecification().getTileImprovementTypeList();
-        int bestValue = 0;
-        TileImprovementType bestType = null;
-        for (TileImprovementType impType : impTypeList) {
-            if (impType.isNatural()) {
-                continue;   // Cannot be built
-            }
-            if (!impType.isTileTypeAllowed(tile.getType())) {
-                continue;   // Not for this TileType
-            }
-            if (tile.findTileImprovementType(impType) != null) {
-                continue;   // Already built
-            }
-            int value = impType.getValue(tile.getType(), goodsType);
-            if (value > bestValue) {
-                bestValue = value;
-                bestType = impType;
-            }
-        }
-        return bestType;
     }
 
     /**

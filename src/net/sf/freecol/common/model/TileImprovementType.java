@@ -227,39 +227,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
-     * Returns a value for use in AI decision making.
-     * @param tileType The <code>TileType</code> to be considered. A <code>null</code> entry
-     *        denotes no interest in a TileImprovementType that changes TileTypes
-     * @param goodsType A preferred <code>GoodsType</code> or <code>null</code>
-     * @return Sum of all bonuses with a triple bonus for the preferred GoodsType
-     */
-    public int getValue(TileType tileType, GoodsType goodsType) {
-        int value = 0;
-        if (goodsType.isFarmed()) {
-            TileType newTileType = getChange(tileType);
-            // 2 main types TileImprovementTypes - Changing of TileType and Simple Bonus
-            if (newTileType != null) {
-                int change = newTileType.getProductionOf(goodsType, null)
-                    - tileType.getProductionOf(goodsType, null);
-                if (change > 0) {
-                    value += change * 3;
-                }
-            } else if (tileType.getProductionOf(goodsType, null) > 0) {
-                // Calculate bonuses from TileImprovementType
-                for (Modifier modifier : getFeatureContainer().getModifiers()) {
-                    float change = modifier.applyTo(1);
-                    if (modifier.getId().equals(goodsType.getId())) {
-                        if (change > 1) {
-                            value += change * 3;
-                        }
-                    }
-                }
-            }
-        }
-        return value;
-    }
-
-    /**
      * Performs reduction of the movement-cost.
      * @param moveCost Original movement cost
      * @return The movement cost after any change

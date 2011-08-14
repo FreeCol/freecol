@@ -258,7 +258,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         Tile centerTile = colony.getTile();
         TileImprovementPlan centerPlan = plans.get(centerTile);
-        TileImprovementType type = TileImprovement
+        TileImprovementType type = WorkLocationPlan
             .findBestTileImprovementType(centerTile, colony.getSpecification()
                                          .getGoodsType("model.goods.grain"));
         if (type == null) {

@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ServerTestHelper;
@@ -49,6 +50,8 @@ public class ColonyPlanTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.grain");
     private static final GoodsType sugarType
         = spec().getGoodsType("model.goods.sugar");
+    private static final GoodsType tobaccoType
+        = spec().getGoodsType("model.goods.tobacco");
     private static final GoodsType rumType
         = spec().getGoodsType("model.goods.rum");
 
@@ -69,6 +72,62 @@ public class ColonyPlanTest extends FreeColTestCase {
         = spec().getTileType("model.tile.prairie");
     private static final TileType savannahType
         = spec().getTileType("model.tile.savannah");
+
+    private static final TileImprovementType clearForest
+        = spec().getTileImprovementType("model.improvement.clearForest");
+    private static final TileImprovementType fishBonusLand
+        = spec().getTileImprovementType("model.improvement.fishBonusLand");
+    private static final TileImprovementType fishBonusRiver
+        = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+    private static final TileImprovementType plow
+        = spec().getTileImprovementType("model.improvement.plow");
+    private static final TileImprovementType river
+        = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType road
+        = spec().getTileImprovementType("model.improvement.road");
+
+    private static final TileType arctic
+        = spec().getTileType("model.tile.arctic");
+    private static final TileType desert
+        = spec().getTileType("model.tile.desert");
+    private static final TileType desertForest
+        = spec().getTileType("model.tile.scrubForest");
+    private static final TileType grassland
+        = spec().getTileType("model.tile.grassland");
+    private static final TileType grasslandForest
+        = spec().getTileType("model.tile.coniferForest");
+    private static final TileType highSeas
+        = spec().getTileType("model.tile.highSeas");
+    private static final TileType hills
+        = spec().getTileType("model.tile.hills");
+    private static final TileType marsh
+        = spec().getTileType("model.tile.marsh");
+    private static final TileType marshForest
+        = spec().getTileType("model.tile.wetlandForest");
+    private static final TileType mountains
+        = spec().getTileType("model.tile.mountains");
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
+    private static final TileType plainsForest
+        = spec().getTileType("model.tile.mixedForest");
+    private static final TileType prairie
+        = spec().getTileType("model.tile.prairie");
+    private static final TileType prairieForest
+        = spec().getTileType("model.tile.broadleafForest");
+    private static final TileType savannah
+        = spec().getTileType("model.tile.savannah");
+    private static final TileType savannahForest
+        = spec().getTileType("model.tile.tropicalForest");
+    private static final TileType swamp
+        = spec().getTileType("model.tile.swamp");
+    private static final TileType swampForest
+        = spec().getTileType("model.tile.rainForest");
+    private static final TileType tundra
+        = spec().getTileType("model.tile.tundra");
+    private static final TileType tundraForest
+        = spec().getTileType("model.tile.borealForest");
 
 
     @Override
@@ -255,4 +314,49 @@ public class ColonyPlanTest extends FreeColTestCase {
         assertEquals("Unit should have been shifted", rumType, u.getWorkType());
         assertEquals("Wrong number of units in waever house", 1, distillery.getUnitCount());
     }
+
+    public void testBestImprovements() throws Exception {
+
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+
+        tile1.setType(savannah);
+        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
+        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+
+        tile1.setType(marsh);
+        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
+        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
+        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+
+        tile1.setType(savannahForest);
+        assertEquals(clearForest, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
+        assertEquals(clearForest, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+
+        tile1.setType(hills);
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
+        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+
+        tile1.setType(arctic);
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+
+    }
+
 }

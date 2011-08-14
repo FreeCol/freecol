@@ -448,50 +448,6 @@ public class TileTest extends FreeColTestCase {
         assertFalse(colony.getTile().hasRoad());
     }
 
-    public void testBestImprovements() throws Exception {
-
-        Game game = getStandardGame();
-        Map map = getTestMap(plains);
-        game.setMap(map);
-        Tile tile1 = map.getTile(5, 8);
-
-        tile1.setType(savannah);
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, grain));
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, sugar));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
-
-        tile1.setType(marsh);
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, grain));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
-        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, tobacco));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
-        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
-
-        tile1.setType(savannahForest);
-        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, grain));
-        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, sugar));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
-        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, lumber));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
-
-        tile1.setType(hills);
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, grain));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
-        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
-
-        tile1.setType(arctic);
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, grain));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
-        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
-
-    }
-
     /*
     public void testSortedPotential() {
         Game game = getStandardGame();
