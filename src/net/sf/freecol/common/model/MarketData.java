@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -31,6 +33,8 @@ import org.w3c.dom.Element;
  * good.
  */
 public class MarketData extends FreeColGameObject {
+
+    private static final Logger logger = Logger.getLogger(MarketData.class.getName());
 
     /**
      * Bounds on price movements.
@@ -181,15 +185,26 @@ public class MarketData extends FreeColGameObject {
 
         // Another hack to prevent price changing too fast in one hit.
         // Push the amount in market back as well to keep this stable.
+        //
+        // Prices that change by more than the buy/sell difference
+        // allow big traders to exploit the market and extract free
+        // money... not sure I want to be fighting economic reality
+        // but game balance demands it here.
         if (newPrice > costToBuy + diff) {
             amountPrice -= newPrice - (costToBuy + diff);
             amountInMarket = Math.round(goodsType.getInitialAmount()
                 * (initialPrice / amountPrice));
+            logger.warning("Clamped price rise for " + getId()
+                + " from " + newPrice
+                + " to " + (costToBuy + diff));
             newPrice = costToBuy + diff;
         } else if (newPrice < costToBuy - diff) {
             amountPrice += (costToBuy - diff) - newPrice;
             amountInMarket = Math.round(goodsType.getInitialAmount()
                 * (initialPrice / amountPrice));
+            logger.warning("Clamped price fall for " + getId()
+                + " from " + newPrice
+                + " to " + (costToBuy - diff));
             newPrice = costToBuy - diff;
         }
         newSalePrice = newPrice - diff;
