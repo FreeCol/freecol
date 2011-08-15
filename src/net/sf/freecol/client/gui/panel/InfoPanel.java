@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -294,7 +295,7 @@ public final class InfoPanel extends FreeColPanel {
                     }
 
                     int defenceBonus = (int) tile.getType().getFeatureContainer()
-                        .applyModifier(100, "model.modifier.defence") - 100;
+                        .applyModifier(100, Modifier.DEFENCE) - 100;
                     JLabel defenceLabel = new JLabel(Messages.message("colopedia.terrain.defenseBonus") +
                                                      " " + defenceBonus + "%");
                     defenceLabel.setFont(font);

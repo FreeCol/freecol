@@ -2034,7 +2034,7 @@ public class Colony extends Settlement implements Nameable {
     public Building getStockade() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (!building.getType().getModifierSet("model.modifier.defence").isEmpty()) {
+            if (!building.getType().getModifierSet(Modifier.DEFENCE).isEmpty()) {
                 return building;
             }
         }

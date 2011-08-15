@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -219,7 +220,7 @@ public class ColonyPlan {
             if (type.hasAbility(Ability.CAN_TEACH)) {
                 schools.add(type);
             }
-            if (!type.getModifierSet("model.modifier.defence").isEmpty()) {
+            if (!type.getModifierSet(Modifier.DEFENCE).isEmpty()) {
                 defence.add(type);
             }
             if (type.getProducedGoodsType() != null) {

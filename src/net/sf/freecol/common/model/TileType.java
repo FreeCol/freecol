@@ -150,7 +150,7 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     public Set<Modifier> getDefenceBonus() {
-        return getModifierSet("model.modifier.defence");
+        return getModifierSet(Modifier.DEFENCE);
     }
 
     /**
