@@ -217,6 +217,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return wishes.iterator();
     }
 
+    public List<WorkerWish> getWorkerWishes() {
+        List<WorkerWish> result = new ArrayList<WorkerWish>();
+        for (Wish wish : wishes) {
+            if (wish instanceof WorkerWish) {
+                result.add((WorkerWish) wish);
+            }
+        }
+        return result;
+    }
+
+
     /**
      * Creates a list of the <code>Tile</code>-improvements which will
      * increase the production by this <code>Colony</code>.
@@ -301,10 +312,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void createWishes() {
         wishes.clear();
-        int expertValue = 100;
-        int goodsWishValue = 50;
+        createWorkerWishes();
+        createGoodsWishes();
+    }
 
-        // for every non-expert, request expert replacement
+    private void createWorkerWishes() {
+
+        int expertValue = 100;
+
+        // For every non-expert, request expert replacement. TODO:
+        // value should depend on how urgently the unit is needed, and
+        // possibly on skill, too.
         for (Unit unit : colony.getUnitList()) {
             if (unit.getWorkType() != null
                 && unit.getWorkType() != unit.getType().getExpertProduction()) {
@@ -327,23 +345,39 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // TODO: check for students
+        // TODO: add missionaries
 
         // increase defense value
         boolean badlyDefended = isBadlyDefended();
         if (badlyDefended) {
-            UnitType bestDefender = null;
-            for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
-                if ((bestDefender == null
-                     || bestDefender.getDefence() < unitType.getDefence())
-                    && !unitType.hasAbility(Ability.NAVAL_UNIT)
-                    && unitType.isAvailableTo(colony.getOwner())) {
-                    bestDefender = unitType;
-                }
-            }
+            UnitType bestDefender = getBestDefender(colony);
             if (bestDefender != null) {
                 wishes.add(new WorkerWish(getAIMain(), colony, expertValue, bestDefender, true));
             }
         }
+    }
+
+    /**
+     * Returns the best defender for the given colony.
+     *
+     * @param colony a <code>Colony</code> value
+     * @return an <code>UnitType</code> value
+     */
+    public static UnitType getBestDefender(Colony colony) {
+        UnitType bestDefender = null;
+        for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
+            if ((bestDefender == null
+                 || bestDefender.getDefence() < unitType.getDefence())
+                && !unitType.hasAbility(Ability.NAVAL_UNIT)
+                && unitType.isAvailableTo(colony.getOwner())) {
+                bestDefender = unitType;
+            }
+        }
+        return bestDefender;
+    }
+
+    private void createGoodsWishes() {
+        int goodsWishValue = 50;
 
         // request goods
         // TODO: improve heuristics
@@ -387,7 +421,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // add materials required to build military equipment
-        if (badlyDefended) {
+        if (isBadlyDefended()) {
             for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
                 if (type.isMilitaryEquipment()) {
                     for (Unit unit : colony.getUnitList()) {

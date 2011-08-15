@@ -74,6 +74,8 @@ public class AIColonyTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType lumberJackType
         = spec().getUnitType("model.unit.expertLumberJack");
+    private static final UnitType artilleryType
+        = spec().getUnitType("model.unit.artillery");
 
     final int fullStock = 100;
 
@@ -361,4 +363,15 @@ public class AIColonyTest extends FreeColTestCase {
         assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, townHall, null));
 
     }
+
+
+    public void testBestDefender() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
+        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
+
+        Colony colony = getStandardColony();
+        assertEquals(artilleryType, AIColony.getBestDefender(colony));
+
+    }
+
 }

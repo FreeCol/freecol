@@ -639,45 +639,44 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
-        if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isEuropean() && !getPlayer().isREF() && getPlayer().isAI()
-                && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
+        if (getAIMain().getFreeColServer().isSingleplayer()
+            && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = getAIMain().getGame().getSpecification().getUnitTypeList();
 
             if (getAIRandom().nextInt(10) == 1) {
-                int price = 0;
-                UnitType unitToTrain = null;
-                for (UnitType unitType : unitTypes) {
-                    if (unitType.hasPrice()) {
-                        int unitPrice = europe.getUnitPrice(unitType);
-                        if (unitToTrain == null || unitPrice < price) {
-                            unitToTrain = unitType;
-                            price = unitPrice;
+                List<WorkerWish> workerWishes = new ArrayList<WorkerWish>();
+                for (Colony colony : getPlayer().getColonies()) {
+                    AIColony aiColony = getAIMain().getAIColony(colony);
+                    workerWishes.addAll(aiColony.getWorkerWishes());
+                }
+                if (!workerWishes.isEmpty()) {
+                    Collections.sort(workerWishes);
+                    UnitType unitToTrain = workerWishes.get(0).getUnitType();
+                    int unitPrice = europe.getUnitPrice(unitToTrain);
+                    // add the necessary amount of money
+                    getPlayer().modifyGold(unitPrice);
+                    AIUnit aiUnit = trainAIUnitInEurope(unitToTrain);
+                    if (aiUnit != null) {
+                        Unit unit = aiUnit.getUnit();
+                        if (unit != null && unit.isColonist()) {
+                            // no need to equip artillery units with muskets or horses
+                            // TODO: cleanup magic numbers 50 and 1
+                            Specification spec = getAIMain().getGame().getSpecification();
+                            GoodsType muskets = spec.getGoodsType("model.goods.muskets");
+                            GoodsType horses = spec.getGoodsType("model.goods.horses");
+                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
+                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
+
+                            EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
+                            EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
+                            AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
+                            AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
                         }
                     }
                 }
-                Unit unit = null;
-                if (unitToTrain != null) {
-                    getPlayer().modifyGold(price);
-                    AIUnit aiUnit = this.trainAIUnitInEurope(unitToTrain);
-                    if (aiUnit != null) unit = aiUnit.getUnit();
-                }
-                if (unit != null && unit.isColonist()) {
-                    // no need to equip artillery units with muskets or horses
-                    // TODO: cleanup magic numbers 50 and 1
-                    Specification spec = getAIMain().getGame().getSpecification();
-                    GoodsType muskets = spec.getGoodsType("model.goods.muskets");
-                    GoodsType horses = spec.getGoodsType("model.goods.horses");
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
-
-                    AIMessage.askClearSpeciality(getAIUnit(unit));
-                    EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
-                    EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
-                    AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
-                    AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
-                }
             }
+            // TODO: better heuristics to determine which ship to buy
             if (getAIRandom().nextInt(40) == 21) {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
