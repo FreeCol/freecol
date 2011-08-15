@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Modifier;
@@ -323,18 +324,26 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return true;
                 }
             } else if (data instanceof GoodsLabel) {
-
-                // Check if the unit can be dragged to comp.
-
-                GoodsLabel label = ((GoodsLabel)data);
+                // Check if the goods can be dragged to comp.
+                GoodsLabel label = (GoodsLabel)data;
 
                 // Import the data.
-
                 if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getGoods().getType(), label.getGoods().getAmount(), false);
-                    if (amount <= 0) {
-                        return false;
+                    Goods goods = label.getGoods();
+                    int defaultAmount = -1;
+                    if (goods.getLocation() instanceof GoodsLocation) {
+                        GoodsLocation loc = (GoodsLocation)goods.getLocation();
+                        if (goods.getAmount() > loc.getGoodsCapacity()) {
+                            // If over capacity, favour the amount that would
+                            // correct the problem.
+                            defaultAmount = Math.min(goods.getAmount()
+                                - loc.getGoodsCapacity(),
+                                GoodsContainer.CARGO_SIZE);
+                        }
                     }
+                    int amount = getAmount(label.getGoods().getType(),
+                        label.getGoods().getAmount(), defaultAmount, false);
+                    if (amount <= 0) return false;
                     label.getGoods().setAmount(amount);
                 } else if (label.getGoods().getAmount() > GoodsContainer.CARGO_SIZE) {
                     label.getGoods().setAmount(GoodsContainer.CARGO_SIZE);
@@ -410,7 +419,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 // Import the data.
 
                 if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getType(), label.getAmount(), true);
+                    int amount = getAmount(label.getType(), label.getAmount(), -1, true);
                     if (amount <= 0) {
                         return false;
                     }
@@ -473,8 +482,8 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
-    private int getAmount(GoodsType goodsType, int available, boolean needToPay) {
-        return canvas.showFreeColDialog(new SelectAmountDialog(canvas, goodsType, available, needToPay));
+    private int getAmount(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
+        return canvas.showFreeColDialog(new SelectAmountDialog(canvas, goodsType, available, defaultAmount, needToPay));
     }
 
 

@@ -53,7 +53,8 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
     /**
      * The constructor to use.
      */
-    public SelectAmountDialog(Canvas parent, GoodsType goodsType, int available, boolean needToPay) {
+    public SelectAmountDialog(Canvas parent, GoodsType goodsType,
+        int available, int defaultAmount, boolean needToPay) {
         super(parent);
 
         setFocusCycleRoot(true);
@@ -66,18 +67,31 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
             available = Math.min(available, gold/price);
         }
 
+        int defaultIndex = -1;
         Vector<Integer> values = new Vector<Integer>();
         for (int index = 0; index < amounts.length; index++) {
             if (amounts[index] < available) {
+                if (amounts[index] == defaultAmount) defaultIndex = index;
                 values.add(amounts[index]);
             } else {
+                if (available == defaultAmount) defaultIndex = index;
                 values.add(available);
                 break;
+            }
+        }
+        if (defaultAmount > 0 && defaultIndex < 0) {
+            for (int index = 0; index < values.size(); index++) {
+                if (defaultAmount < values.get(index)) {
+                    values.insertElementAt(new Integer(defaultAmount), index);
+                    defaultIndex = index;
+                    break;
+                }
             }
         }
 
         comboBox = new JComboBox(values);
         comboBox.setEditable(true);
+        if (defaultIndex >= 0) comboBox.setSelectedIndex(defaultIndex);
 
         okButton.addActionListener(this);
 
