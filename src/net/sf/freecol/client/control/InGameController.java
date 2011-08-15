@@ -505,7 +505,8 @@ public final class InGameController implements NetworkConstants {
             if (colony != null) {
                 if (type != newType && newType != null) {
                     String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
-                    colony.firePropertyChange(pc, type, newType);
+                    colony.firePropertyChange(pc, type.toString(),
+                                              newType.toString());
                 } else if (role != newRole && newRole != null) {
                     String pc = Tile.UNIT_CHANGE.toString();
                     colony.firePropertyChange(pc, role.toString(),
@@ -701,7 +702,6 @@ public final class InGameController implements NetworkConstants {
                     unit.setState(UnitState.SKIPPED);
                     break;
                 }
-System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
 
                 // Check for and notify of missing stops.
                 if (detailed) {
@@ -728,7 +728,8 @@ System.err.println("@4 " + unit + " = " + unit.getMovesLeft());
 
             // Find a path to the destination.  Skip if none.
             Location destination = unit.getDestination();
-            if (unit.getTile() == destination.getTile()) continue;
+            if (destination == null
+                || unit.getTile() == destination.getTile()) continue;
             PathNode path = (destination instanceof Europe)
                 ? unit.findPathToEurope()
                 : unit.findPath(destination.getTile());
