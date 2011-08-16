@@ -370,11 +370,12 @@ public final class TilePopup extends JPopupMenu {
             dumpItem.setOpaque(false);
             dumpItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        System.err.println("\nClient side:\n");
+                        System.err.println("\nClient side:");
                         tile.dumpObject();
-                        System.err.println("\nServer side:\n");
+                        System.err.println("\n\nServer side:");
                         serverGame.getFreeColGameObject(tile.getId())
                             .dumpObject();
+                        System.err.println("\n");
                     }
                 });
             add(dumpItem);
