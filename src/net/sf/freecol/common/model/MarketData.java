@@ -190,24 +190,26 @@ public class MarketData extends FreeColGameObject {
         // allow big traders to exploit the market and extract free
         // money... not sure I want to be fighting economic reality
         // but game balance demands it here.
-        if (newPrice > costToBuy + diff) {
-            amountPrice -= newPrice - (costToBuy + diff);
-            amountInMarket = Math.round(goodsType.getInitialAmount()
-                * (initialPrice / amountPrice));
-            logger.warning("Clamped price rise for " + getId()
-                + " from " + newPrice
-                + " to " + (costToBuy + diff));
-            newPrice = costToBuy + diff;
-        } else if (newPrice < costToBuy - diff) {
-            amountPrice += (costToBuy - diff) - newPrice;
-            amountInMarket = Math.round(goodsType.getInitialAmount()
-                * (initialPrice / amountPrice));
-            logger.warning("Clamped price fall for " + getId()
-                + " from " + newPrice
-                + " to " + (costToBuy - diff));
-            newPrice = costToBuy - diff;
+        if (costToBuy > 0) {
+            if (newPrice > costToBuy + diff) {
+                amountPrice -= newPrice - (costToBuy + diff);
+                amountInMarket = Math.round(goodsType.getInitialAmount()
+                    * (initialPrice / amountPrice));
+                logger.warning("Clamped price rise for " + getId()
+                    + " from " + newPrice
+                    + " to " + (costToBuy + diff));
+                newPrice = costToBuy + diff;
+            } else if (newPrice < costToBuy - diff) {
+                amountPrice += (costToBuy - diff) - newPrice;
+                amountInMarket = Math.round(goodsType.getInitialAmount()
+                    * (initialPrice / amountPrice));
+                logger.warning("Clamped price fall for " + getId()
+                    + " from " + newPrice
+                    + " to " + (costToBuy - diff));
+                newPrice = costToBuy - diff;
+            }
+            newSalePrice = newPrice - diff;
         }
-        newSalePrice = newPrice - diff;
 
         // Clamp extremes.
         if (newPrice > MAXIMUM_PRICE) {
@@ -478,6 +480,7 @@ public class MarketData extends FreeColGameObject {
         incomeBeforeTaxes = getAttribute(in, "incomeBeforeTaxes", 0);
         incomeAfterTaxes = getAttribute(in, "incomeAfterTaxes", 0);
         traded = getAttribute(in, "traded", sales != 0);
+        costToBuy = -1; // Disable price change clamping
         price();
         oldPrice = costToBuy;
         in.nextTag();
