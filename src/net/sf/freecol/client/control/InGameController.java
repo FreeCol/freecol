@@ -3994,17 +3994,15 @@ public final class InGameController implements NetworkConstants {
         if (messages.size() > 0) {
             final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
             final Canvas canvas = freeColClient.getCanvas();
-            Runnable uiTask = (endOfTurn)
-                ? new Runnable() {
-                        public void run() {
+            Runnable uiTask = new Runnable() {
+                    public void run() {
+                        if (endOfTurn) {
                             canvas.showReportTurnPanel(a);
-                        }
-                    }
-                : new Runnable() {
-                        public void run() {
+                        } else {
                             canvas.showModelMessages(a);
                         }
-                    };
+                    }
+                };
             freeColClient.getActionManager().update();
             if (SwingUtilities.isEventDispatchThread()) {
                 uiTask.run();
@@ -4012,9 +4010,9 @@ public final class InGameController implements NetworkConstants {
                 try {
                     SwingUtilities.invokeAndWait(uiTask);
                 } catch (InterruptedException e) {
-                    // Ignore
+                    logger.log(Level.WARNING, "Message display", e);
                 } catch (InvocationTargetException e) {
-                    // Ignore
+                    logger.log(Level.WARNING, "Message display", e);
                 }
             }
         }

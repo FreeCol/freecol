@@ -1706,6 +1706,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showModelMessages(ModelMessage... modelMessages) {
         List<ModelMessage> messages = filterEventPanels(modelMessages);
+        if (messages.size() <= 0) return;
         Game game = freeColClient.getGame();
         String okText = "ok";
         String cancelText = "display";
