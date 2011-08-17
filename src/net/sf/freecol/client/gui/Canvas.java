@@ -2377,10 +2377,17 @@ public final class Canvas extends JDesktopPane {
             height = Math.min(height, getHeight());
         }
         f.setSize(width, height);
-        Point p = (comp instanceof FreeColPanel)
-            ? ((FreeColPanel) comp).getSavedPosition()
-            : null;
-
+        Point p = null;
+        if (comp instanceof FreeColPanel) {
+            p = ((FreeColPanel) comp).getSavedPosition();
+            // Sanity check stuff coming out of client options.
+            if (p.getX() < 0
+                || p.getX() >= getWidth() - f.getWidth()
+                || p.getY() < 0
+                || p.getY() >= getHeight() - f.getHeight()) {
+                p = null;
+            }
+        }
         if (p == null) {
             switch (popupPosition) {
             case CENTERED:
