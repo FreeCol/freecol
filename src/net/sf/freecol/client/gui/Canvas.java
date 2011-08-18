@@ -654,7 +654,7 @@ public final class Canvas extends JDesktopPane {
         if (display == null || "".equals(display)) display = message;
         ErrorPanel errorPanel = new ErrorPanel(this);
         errorPanel.initialize(display);
-        showFreeColDialog(errorPanel);
+        showFreeColPanel(errorPanel);
     }
 
     /**
@@ -1425,7 +1425,26 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(Tile tile, EventType type) {
-        showFreeColDialog(new EventPanel(this, type), tile);
+        showFreeColPanel(new EventPanel(this, type), tile);
+    }
+
+    /**
+     * Displays the given panel.
+     *
+     * @param panel The panel to be displayed
+     */
+    public void showFreeColPanel(FreeColPanel panel) {
+        showSubPanel(panel, null);
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the panel!)
+     */
+    public void showFreeColPanel(FreeColPanel panel, Tile tile) {
+        showSubPanel(panel, getPopupPosition(tile));
     }
 
     /**
@@ -1534,7 +1553,7 @@ public final class Canvas extends JDesktopPane {
                     .invoke(displayObject);
             } catch (Exception e) { /* Ignore failure */ }
         }
-        showFreeColDialog(new InformationDialog(this, text, icon), tile);
+        showFreeColPanel(new InformationDialog(this, text, icon), tile);
     }
 
     public void showInformationMessage(ModelMessage message) {
@@ -1598,7 +1617,7 @@ public final class Canvas extends JDesktopPane {
                 logger.warning("could not find message with id: "
                                + txt + " or " + okTxt + ".");
             }
-            showFreeColDialog(new InformationDialog(this, txt, null), tile);
+            showFreeColPanel(new InformationDialog(this, txt, null), tile);
         }
         return response;
     }
@@ -1756,7 +1775,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            showFreeColDialog(new InformationDialog(this,
+            showFreeColPanel(new InformationDialog(this,
                     messageText, messageIcon));
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
@@ -2188,7 +2207,8 @@ public final class Canvas extends JDesktopPane {
      * Displays a <code>FreeColPanel</code> at a generalized position.
      *
      * @param panel <code>FreeColPanel</code>, panel to show
-     * @param popupPosition <code>PopupPosition</code>, The generalized position to place the panel.
+     * @param popupPosition <code>PopupPosition</code> The generalized
+     *     position to place the panel.
      */
     public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
         repaint();

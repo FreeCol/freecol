@@ -54,9 +54,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
-* Superclass for all dialogs in FreeCol. This class also contains
-* methods to create simple dialogs.
-*/
+ * Superclass for all dialogs in FreeCol. This class also contains
+ * methods to create simple dialogs.
+ */
 public class FreeColDialog<T> extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
@@ -71,9 +71,11 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     protected JButton cancelButton = new JButton(Messages.message("cancel"));
 
+
     /**
      * Constructor.
-     * @param parent <code>Canvas</code>
+     *
+     * @param parent The parent <code>Canvas</code>.
      */
     public FreeColDialog(Canvas parent) {
         super(parent);
@@ -85,10 +87,12 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-    * Sets the <code>response</code> and wakes up any thread waiting for this information.
-    *
-    * @param response The object that should be returned by {@link #getResponse}.
-    */
+     * Sets the <code>response</code> and wakes up any thread waiting
+     * for this information.
+     *
+     * @param response The object that should be returned by
+     *      {@link #getResponse}.
+     */
     public synchronized void setResponse(T response) {
         this.response = response;
         responseGiven = true;
@@ -96,16 +100,17 @@ public class FreeColDialog<T> extends FreeColPanel {
         notifyAll();
     }
 
-
     /**
-    * Returns the <code>response</code> when set by <code>setResponse(Object response)</code>.
-    * Waits the thread until then.
-    *
-    * @return The object as set by {@link #setResponse}.
-    */
+     * Returns the <code>response</code> when set by
+     * <code>setResponse(Object response)</code>.
+     * Waits the thread until then.
+     *
+     * @return The object as set by {@link #setResponse}.
+     */
     public synchronized T getResponse() {
-        // Wait the thread until 'response' is available. Notice that we have to process
-        // the events manually if the current thread is the Event Dispatch Thread (EDT).
+        // Wait the thread until 'response' is available. Notice that
+        // we have to process the events manually if the current
+        // thread is the Event Dispatch Thread (EDT).
 
         try {
             if (SwingUtilities.isEventDispatchThread()) {
@@ -116,15 +121,21 @@ public class FreeColDialog<T> extends FreeColPanel {
                     AWTEvent event = theQueue.getNextEvent();
                     Object src = event.getSource();
 
-                    // We cannot call theQueue.dispatchEvent, so I pasted its body here:
-                    if (event instanceof ActiveEvent) {
-                        ((ActiveEvent) event).dispatch();
-                    } else if (src instanceof Component) {
-                        ((Component) src).dispatchEvent(event);
-                    } else if (src instanceof MenuComponent) {
-                        ((MenuComponent) src).dispatchEvent(event);
-                    } else {
-                        logger.warning("unable to dispatch event: " + event);
+                    try {
+                        // We cannot call theQueue.dispatchEvent, so I
+                        // pasted its body here:
+                        if (event instanceof ActiveEvent) {
+                            ((ActiveEvent) event).dispatch();
+                        } else if (src instanceof Component) {
+                            ((Component) src).dispatchEvent(event);
+                        } else if (src instanceof MenuComponent) {
+                            ((MenuComponent) src).dispatchEvent(event);
+                        } else {
+                            logger.warning("unable to dispatch event: "
+                                + event);
+                        }
+                    } finally {
+                        continue;
                     }
                 }
             } else {
@@ -132,7 +143,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                     wait();
                 }
             }
-        } catch(InterruptedException e){}
+        } catch (InterruptedException e) {}
 
         T tempResponse = response;
         response = null;
@@ -150,37 +161,37 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-    * Creates a new <code>FreeColDialog</code> with a text and a cancel-button,
-    * in addition to buttons for each of the objects in the given array.
-    *
-    * @param text String, text that explains the choice for the user
-    * @param cancelText String, text displayed on the "cancel"-button
-    * @param choices List of <code>ChoiceItem<T> <code> the choice items
-    * @return <code>FreeColDialog</code>
-    * @see ChoiceItem
-    */
-    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text, String cancelText,
-                                                                      List<ChoiceItem<T>> choices) {
+     * Creates a new <code>FreeColDialog</code> with a text and a
+     * cancel-button, in addition to buttons for each of the objects
+     * in the given array.
+     *
+     * @param text String, text that explains the choice for the user
+     * @param cancelText String, text displayed on the "cancel"-button
+     * @param choices List of <code>ChoiceItem<T> <code> the choice items
+     * @return <code>FreeColDialog</code>
+     * @see ChoiceItem
+     */
+    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text,
+        String cancelText, List<ChoiceItem<T>> choices) {
 
         if (choices.isEmpty()) {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
         }
 
-
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
-
-        final FreeColDialog<ChoiceItem<T>> choiceDialog =
-            new FreeColDialog<ChoiceItem<T>>(FreeCol.getFreeColClient().getCanvas()) {
-           @Override
-           public void requestFocus() {
-            	for(JButton b : choiceBtnLst){
-            		if(b.isEnabled()){
-            			b.requestFocus();
-            			return;
-            		}
-            	}
-            }
-        };
+        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final FreeColDialog<ChoiceItem<T>> choiceDialog
+            = new FreeColDialog<ChoiceItem<T>>(canvas) {
+                @Override
+                public void requestFocus() {
+                    for (JButton b : choiceBtnLst) {
+                        if (b.isEnabled()) {
+                            b.requestFocus();
+                            return;
+                        }
+                    }
+                }
+            };
 
         choiceDialog.setLayout(new MigLayout("fillx, wrap 1", "[align center]", ""));
         JTextArea textArea = getDefaultTextArea(text);
@@ -197,31 +208,31 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         JPanel choicesPanel = new JPanel(new GridLayout(0, columns, 10, 10));
         choicesPanel.setBorder(new CompoundBorder(choicesPanel.getBorder(),
-                                                  new EmptyBorder(10, 20, 10, 20)));
+                new EmptyBorder(10, 20, 10, 20)));
 
         /*
         final ChoiceItem<T> firstObject = choices.get(0);
         if(firstObject.isEnabled()){
-        	firstButton.addActionListener(new ActionListener() {
-        		public void actionPerformed(ActionEvent event) {
-        			choiceDialog.setResponse(firstObject);
-        		}
-        	});
+            firstButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    choiceDialog.setResponse(firstObject);
+                }
+            });
         }
         firstButton.setEnabled(firstObject.isEnabled());
         choicesPanel.add(firstButton);
         choices.remove(0);
-		*/
+        */
 
         for (final ChoiceItem<T> object : choices) {
             final JButton objectButton = new JButton(object.toString());
-            if(object.isEnabled()){
-            	objectButton.addActionListener(new ActionListener() {
-            		public void actionPerformed(ActionEvent event) {
-            			choiceDialog.setResponse(object);
-            		}
-            	});
-            	enterPressesWhenFocused(objectButton);
+            if (object.isEnabled()) {
+                objectButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        choiceDialog.setResponse(object);
+                    }
+                });
+                enterPressesWhenFocused(objectButton);
             }
             objectButton.setEnabled(object.isEnabled());
             choiceBtnLst.add(objectButton);
@@ -229,8 +240,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         }
         if (choices.size() > 20) {
             JScrollPane scrollPane = new JScrollPane(choicesPanel,
-                                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             choiceDialog.add(scrollPane, "newline 20");
         } else {
             choicesPanel.setOpaque(false);
@@ -249,24 +260,26 @@ public class FreeColDialog<T> extends FreeColPanel {
 
 
     /**
-    * Creates a new <code>FreeColDialog</code> with a text and a ok/cancel option.
-    * The "ok"-option calls {@link #setResponse setResponse(new Boolean(true))}
-    * and the "cancel"-option calls {@link #setResponse setResponse(new Boolean(false))}.
-    *
-    * @param text The text that explains the choice for the user.
-    * @param okText The text displayed on the "ok"-button.
-    * @param cancelText The text displayed on the "cancel"-button.
-    * @return The <code>FreeColDialog</code>.
-    */
+     * Creates a new <code>FreeColDialog</code> with a text and a
+     * ok/cancel option.  The "ok"-option calls {@link #setResponse
+     * setResponse(new Boolean(true))} and the "cancel"-option calls
+     * {@link #setResponse setResponse(new Boolean(false))}.
+     *
+     * @param text The text that explains the choice for the user.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @return The <code>FreeColDialog</code>.
+     */
     public static FreeColDialog<Boolean> createConfirmDialog(String text, String okText, String cancelText) {
         return createConfirmDialog(new String[] {text}, null, okText, cancelText);
     }
 
-    public static FreeColDialog<Boolean> createConfirmDialog(String[] texts, ImageIcon[] icons,
-                                                             String okText, String cancelText) {
+    public static FreeColDialog<Boolean> createConfirmDialog(String[] texts,
+        ImageIcon[] icons, String okText, String cancelText) {
         // create the dialog
-        final FreeColDialog<Boolean> confirmDialog =
-            new FreeColDialog<Boolean>(FreeCol.getFreeColClient().getCanvas());
+        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final FreeColDialog<Boolean> confirmDialog
+            = new FreeColDialog<Boolean>(canvas);
 
         confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
@@ -301,28 +314,29 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-    * Creates a new <code>FreeColDialog</code> with a text field and a ok/cancel option.
-    * The "ok"-option calls {@link #setResponse setResponse(textField.getText())}
-    * and the "cancel"-option calls {@link #setResponse setResponse(null)}.
-    *
-    * @param text The text that explains the action to the user.
-    * @param defaultValue The default value appearing in the text field.
-    * @param okText The text displayed on the "ok"-button.
-    * @param cancelText The text displayed on the "cancel"-button.
-    * @return The <code>FreeColDialog</code>.
-    */
-    public static FreeColDialog<String> createInputDialog(String text, String defaultValue,
-                                                          String okText, String cancelText) {
+     * Creates a new <code>FreeColDialog</code> with a text field and a
+     * ok/cancel option.  The "ok"-option calls {@link #setResponse
+     * setResponse(textField.getText())} and the "cancel"-option calls
+     * {@link #setResponse setResponse(null)}.
+     *
+     * @param text The text that explains the action to the user.
+     * @param defaultValue The default value appearing in the text field.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @return The <code>FreeColDialog</code>.
+     */
+    public static FreeColDialog<String> createInputDialog(String text,
+        String defaultValue, String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
-
-        final FreeColDialog<String> inputDialog =
-            new FreeColDialog<String>(FreeCol.getFreeColClient().getCanvas())  {
-            @Override
-            public void requestFocus() {
-                input.requestFocus();
-            }
-        };
+        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final FreeColDialog<String> inputDialog
+            = new FreeColDialog<String>(canvas)  {
+                @Override
+                public void requestFocus() {
+                    input.requestFocus();
+                }
+            };
 
         inputDialog.setLayout(new MigLayout("wrap 1, gapy 20", "", ""));
 
@@ -412,17 +426,19 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
     /**
-    * Creates a new <code>FreeColDialog</code> in which the user
-    * may choose a savegame to load.
-    *
-    * @param directory The directory to display when choosing the file.
-    * @param fileFilters The available file filters in the
-    *       dialog.
-    * @return The <code>FreeColDialog</code>.
-    */
-    public static FreeColDialog<File> createLoadDialog(File directory, FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog =
-            new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
+     * Creates a new <code>FreeColDialog</code> in which the user
+     * may choose a savegame to load.
+     *
+     * @param directory The directory to display when choosing the file.
+     * @param fileFilters The available file filters in the
+     *       dialog.
+     * @return The <code>FreeColDialog</code>.
+     */
+    public static FreeColDialog<File> createLoadDialog(File directory,
+                                                       FileFilter[] fileFilters) {
+        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final FreeColDialog<File> loadDialog
+            = new FreeColDialog<File>(canvas);
         final JFileChooser fileChooser = new JFileChooser(directory);
 
         loadDialog.okButton.addActionListener(new ActionListener() {
@@ -456,21 +472,22 @@ public class FreeColDialog<T> extends FreeColPanel {
 
 
     /**
-    * Creates a new <code>FreeColDialog</code> in which the user
-    * may choose the destination of the savegame.
-    *
-    * @param directory The directory to display when choosing the name.
-    * @param standardName This extension will be added to the
-    *       specified filename (if not added by the user).
-    * @param fileFilters The available file filters in the
-    *       dialog.
-    * @param defaultName Default filename for the savegame.
-    * @return The <code>FreeColDialog</code>.
-    */
-    public static FreeColDialog<File> createSaveDialog(File directory, final String standardName,
-                                                       FileFilter[] fileFilters, String defaultName) {
-        final FreeColDialog<File> saveDialog =
-            new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
+     * Creates a new <code>FreeColDialog</code> in which the user
+     * may choose the destination of the savegame.
+     *
+     * @param directory The directory to display when choosing the name.
+     * @param standardName This extension will be added to the
+     *       specified filename (if not added by the user).
+     * @param fileFilters The available file filters in the
+     *       dialog.
+     * @param defaultName Default filename for the savegame.
+     * @return The <code>FreeColDialog</code>.
+     */
+    public static FreeColDialog<File> createSaveDialog(File directory,
+        final String standardName, FileFilter[] fileFilters, String defaultName) {
+        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final FreeColDialog<File> saveDialog
+            = new FreeColDialog<File>(canvas);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 
@@ -507,36 +524,30 @@ public class FreeColDialog<T> extends FreeColPanel {
         return saveDialog;
     }
 
-
     /**
-    * Returns a filter accepting "*.fsg".
-    * @return The filter.
-    */
+     * Returns a filter accepting "*.fsg".
+     * @return The filter.
+     */
     public static FileFilter getFSGFileFilter() {
-
         return new FreeColFileFilter( ".fsg", "filter.savedGames" );
     }
 
-
     /**
-    * Returns a filter accepting "*.fgo".
-    * @return The filter.
-    */
+     * Returns a filter accepting "*.fgo".
+     * @return The filter.
+     */
     public static FileFilter getFGOFileFilter() {
-
         return new FreeColFileFilter( ".fgo", "filter.gameOptions" );
     }
 
-
     /**
-    * Returns a filter accepting all files containing a
-    * {@link net.sf.freecol.common.model.GameOptions}.
-    * That is; both "*.fgo" and "*.fsg".
-    *
-    * @return The filter.
-    */
+     * Returns a filter accepting all files containing a
+     * {@link net.sf.freecol.common.model.GameOptions}.
+     * That is; both "*.fgo" and "*.fsg".
+     *
+     * @return The filter.
+     */
     public static FileFilter getGameOptionsFileFilter() {
-
         return new FreeColFileFilter( ".fgo", ".fsg", "filter.gameOptionsAndSavedGames" );
     }
 
@@ -581,8 +592,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     public void initialize() {}
 
     /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
+     * This function analyses an event and calls the right methods to
+     * take care of the user's requests.
      *
      * @param event The incoming ActionEvent.
      */
@@ -595,5 +606,4 @@ public class FreeColDialog<T> extends FreeColPanel {
             super.actionPerformed(event);
         }
     }
-
 }
