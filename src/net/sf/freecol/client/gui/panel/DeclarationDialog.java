@@ -51,7 +51,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
     private final SignaturePanel signaturePanel;
 
-    final DeclarationDialog theDialog = this;
+    private final DeclarationDialog theDialog = this;
 
 
     /**
@@ -89,6 +89,8 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
                 theDialog.setResponse(Boolean.TRUE);
             }
         });
+
+        initialize();
     }
 
     /**
@@ -115,7 +117,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
                 signaturePanel.startAnimation();
             }
         };
-        Timer t = new Timer(3000, al);
+        Timer t = new Timer(2000, al);
         t.setRepeats(false);
         t.start();
     }
@@ -251,6 +253,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
                             ((Timer) evt.getSource()).stop();
                             notifyStopped();
                         }
+                        validate();
                         repaint();
                     } else {
                         ((Timer) evt.getSource()).stop();
@@ -275,9 +278,11 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
             g.setColor(Color.BLACK);
             ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
 
-            for (int i = 0; i < counter; i++) {
-                Point p = points[i];
-                g.drawLine((int) p.getX(), (int) p.getY(), (int) p.getX(), (int) p.getY());
+            for (int i = 0; i < counter-1; i++) {
+                Point p1 = points[i];
+                Point p2 = points[i+1];
+                g.drawLine((int) p1.getX(), (int) p1.getY(),
+                    (int) p2.getX(), (int) p2.getY());
             }
         }
     }
