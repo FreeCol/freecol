@@ -2399,8 +2399,8 @@ public final class Canvas extends JDesktopPane {
         }
         f.setSize(width, height);
         Point p = null;
-        if (comp instanceof FreeColPanel) {
-            p = ((FreeColPanel) comp).getSavedPosition();
+        if (comp instanceof FreeColPanel
+            && (p = ((FreeColPanel) comp).getSavedPosition()) != null) {
             // Sanity check stuff coming out of client options.
             if (p.getX() < 0
                 || p.getX() >= getWidth() - f.getWidth()
