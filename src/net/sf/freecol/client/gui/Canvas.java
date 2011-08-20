@@ -437,7 +437,7 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsFrame(JComponent comp) {
-        return addAsFrame(comp, false);
+        return addAsFrame(comp, false, PopupPosition.CENTERED);
     }
 
     /**
@@ -1434,7 +1434,7 @@ public final class Canvas extends JDesktopPane {
      * @param panel The panel to be displayed
      */
     public void showFreeColPanel(FreeColPanel panel) {
-        showSubPanel(panel, null);
+        showFreeColPanel(panel, null);
     }
 
     /**
@@ -1444,7 +1444,8 @@ public final class Canvas extends JDesktopPane {
      * @param tile A <code>Tile</code> to make visible (not under the panel!)
      */
     public void showFreeColPanel(FreeColPanel panel, Tile tile) {
-        showSubPanel(panel, getPopupPosition(tile));
+        showSubPanel(panel, (tile == null) ? PopupPosition.CENTERED
+            : getPopupPosition(tile));
     }
 
     /**
