@@ -162,10 +162,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         clearAIUnits();
-        if (player.isREF() && !player.isWorkForREF()) {
-            logger.warning("No work for REF: " + player);
-            return;
-        }
         cheat();
         determineStances();
         rearrangeWorkersInColonies();
@@ -1235,7 +1231,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Gives a mission to non-naval units.
      */
-    private void giveNormalMissions() {
+    protected void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
 
         // Create a datastructure for the worker wishes:
@@ -1302,16 +1298,14 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (unit.isOffensiveUnit() || unit.isDefensiveUnit()){
-            	Player owner = unit.getOwner();
-            	boolean isPastStart = getGame().getTurn().getNumber() > 5
-            			&& !owner.getSettlements().isEmpty();
+                Player owner = unit.getOwner();
+                boolean isPastStart = getGame().getTurn().getNumber() > 5
+                    && !owner.getSettlements().isEmpty();
 
-            	if(!unit.isColonist()
-                   || isPastStart
-                   || owner.isREF()){
+                if (!unit.isColonist() || isPastStart) {
                     giveMilitaryMission(aiUnit);
                     continue;
-            	}
+                }
             }
 
             // Setup as a pioneer if unit is:
@@ -1606,10 +1600,27 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Counts the number of defenders in a colony.
+     *
+     * @param colony The <code>Colony</code> to examine.
+     * @return The number of defenders.
+     */
+    protected int getColonyDefenders(Colony colony) {
+        int defenders = 0;
+        for (AIUnit au : getAIUnits()) {
+            Mission m = au.getMission();
+            if (m != null && m instanceof DefendSettlementMission
+                && ((DefendSettlementMission) m).getSettlement() == colony
+                && au.getUnit().getColony() == colony) {
+                defenders++;
+            }
+        }
+        return defenders;
+    }
+
+    /**
      * Evaluate allocating a unit to the defence of a colony.
      * Temporary helper method for giveMilitaryMission.
-     *
-     * Only public for testAssignDefendSettlementMission.
      *
      * @param unit The <code>Unit</code> that is to defend.
      * @param colony The <code>Colony</code> to defend.
@@ -1622,24 +1633,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (unit == null || colony == null) return Integer.MIN_VALUE;
 
         int value = 10025 - 10 * turns;
-        int defenders = 0;
+        int defenders = getColonyDefenders(colony);
 
         // Reduce value in proportion to the number of defenders.
-        for (AIUnit au : getAIUnits()) {
-            Mission m = au.getMission();
-            if (m != null && m instanceof DefendSettlementMission
-                && ((DefendSettlementMission) m).getSettlement() == colony
-                && au.getUnit().getColony() == colony) {
-                value -= 500;
-                defenders++;
-            }
-        }
-
-        // The REF garrisons thinly.
-        if (unit.getOwner().isREF()) {
-            if (defenders > 0) return 0;
-            value -= 100;
-        }
+        value -= 500 * defenders;
 
         // Reduce value if defenders are protected.
         if (colony.hasStockade()) {
@@ -1664,7 +1661,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param turns How long to travel to the tile.
      * @return A score for the proposed mission.
      */
-    int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
+    public int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
         if (!isTargetValidForSeekAndDestroy(unit, newTile)) {
             return Integer.MIN_VALUE;
         }
@@ -1724,16 +1721,12 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Gives a military mission to the given unit.
+     * Chooses the best target for an AI unit to attack.
      *
-     * Old comment: Temporary method for giving a military mission.
-     * This method will be removed when "MilitaryStrategy" and the
-     * "Tactic"-classes has been implemented.
-     *
-     * @param aiUnit The <code>AIUnit</code> to give a mission to.
+     * @param aiUnit The <code>AIUnit</code> that will attack.
+     * @return The best target for a military mission.
      */
-    public void giveMilitaryMission(AIUnit aiUnit) {
-        logger.finest("Entering giveMilitaryMission for: " + aiUnit.getUnit());
+    public Ownable chooseMilitaryTarget(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         Mission mission = null;
@@ -1752,9 +1745,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 .getFullEntryLocation();
         }
         if (startTile == null) {
-            logger.warning("giveMilitaryMission failed, no tile for: "
+            logger.warning("chooseMilitaryTarget failed, no tile for: "
                            + unit);
-            return;
+            return null;
         }
 
         // Check if the unit is located on a Tile with a
@@ -1895,21 +1888,35 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
         }
+        return (bestValue > 0) ? bestTarget : null;
+    }
 
-        // Use the best target.
-        if (bestTarget != null && bestValue > 0) {
-            if (bestTarget instanceof Settlement
-                && ((Settlement) bestTarget).getOwner() == player) {
-                Settlement settlement = (Settlement) bestTarget;
-                mission = new DefendSettlementMission(aiMain, aiUnit,
-                                                      settlement);
-            } else {
-                mission = new UnitSeekAndDestroyMission(aiMain, aiUnit,
-                                                        (Location) bestTarget);
-            }
-        } else {
+    /**
+     * Gives a military mission to the given unit.
+     *
+     * Old comment: Temporary method for giving a military mission.
+     * This method will be removed when "MilitaryStrategy" and the
+     * "Tactic"-classes has been implemented.
+     *
+     * @param aiUnit The <code>AIUnit</code> to give a mission to.
+     */
+    public void giveMilitaryMission(AIUnit aiUnit) {
+        logger.finest("Entering giveMilitaryMission for: " + aiUnit.getUnit());
+
+        final AIMain aiMain = getAIMain();
+        final Player player = getPlayer();
+        Mission mission;
+        Ownable bestTarget = chooseMilitaryTarget(aiUnit);
+        if (bestTarget == null) {
             // Just wander around if there is nothing better to do.
             mission = new UnitWanderHostileMission(aiMain, aiUnit);
+        } else if (bestTarget instanceof Settlement
+            && ((Settlement) bestTarget).getOwner() == player) {
+            Settlement settlement = (Settlement) bestTarget;
+            mission = new DefendSettlementMission(aiMain, aiUnit, settlement);
+        } else {
+            mission = new UnitSeekAndDestroyMission(aiMain, aiUnit,
+                (Location) bestTarget);
         }
 
         aiUnit.setMission(mission);

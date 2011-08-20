@@ -341,7 +341,7 @@ public class AIMain extends FreeColObject
             if (p.isIndian()) {
                 new NativeAIPlayer(this, p);
             } else if (p.isREF()) {
-                new EuropeanAIPlayer(this, p);
+                new REFAIPlayer(this, p);
             } else if (p.isEuropean()) {
                 new EuropeanAIPlayer(this, p);
             }
@@ -487,7 +487,7 @@ public class AIMain extends FreeColObject
                         if (p.isIndian()) {
                             new NativeAIPlayer(this, in);
                         } else if (p.isREF()) {
-                            new EuropeanAIPlayer(this, in);
+                            new REFAIPlayer(this, in);
                         } else if (p.isEuropean()) {
                             new EuropeanAIPlayer(this, in);
                         } else {

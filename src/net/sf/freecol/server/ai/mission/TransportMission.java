@@ -1372,7 +1372,7 @@ public class TransportMission extends Mission {
      * @return <code>true</code>
      */
     public boolean isValid() {
-        return super.isValid() && isValid(getAIUnit());
+        return !transportList.isEmpty() && super.isValid();
     }
 
     /**

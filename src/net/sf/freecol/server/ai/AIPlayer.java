@@ -335,9 +335,11 @@ public abstract class AIPlayer extends AIObject {
      */
     protected void abortInvalidMissions() {
         for (AIUnit au : getAIUnits()) {
-            if (au.getMission() == null) continue;
-            if (!au.getMission().isValid()) {
-                logger.finest("Abort invalid mission for: " + au.getUnit());
+            Mission mission = au.getMission();
+            if (mission == null) continue;
+            if (!mission.isValid()) {
+                logger.finest("Abort invalid mission: " + mission
+                    + " for: " + au.getUnit());
                 au.setMission(null);
             }
         }
