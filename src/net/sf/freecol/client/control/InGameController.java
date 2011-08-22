@@ -980,8 +980,11 @@ public final class InGameController implements NetworkConstants {
             Goods cargo = (goods.getAmount() == toUnload) ? goods
                 : new Goods(game, unit, type, toUnload);
             if (unloadGoods(cargo, unit, colony)) {
-                messages.add(getUnloadGoodsMessage(unit, type,
-                    cargo.getAmount(), atStop, goods.getAmount(), toUnload));
+                if (messages != null) {
+                    messages.add(getUnloadGoodsMessage(unit, type,
+                            cargo.getAmount(), atStop, goods.getAmount(),
+                            toUnload));
+                }
                 ret = true;
             }
         }
@@ -1016,11 +1019,12 @@ public final class InGameController implements NetworkConstants {
             overflow = present - atStop;
         }
 
+        StringTemplate loc = unit.getLocation().getLocationNameFor(unit.getOwner());
         return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key,
             unit)
             .addName("%route%", unit.getTradeRoute().getName())
             .addStringTemplate("%unit%", Messages.getLabel(unit))
-            .addStringTemplate("%location%", unit.getLocation().getLocationNameFor(unit.getOwner()))
+            .addStringTemplate("%location%", loc)
             .addAmount("%amount%", amount)
             .addAmount("%overflow%", overflow)
             .add("%goods%", type.getNameKey());
