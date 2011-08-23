@@ -652,8 +652,7 @@ public final class Canvas extends JDesktopPane {
             }
         }
         if (display == null || "".equals(display)) display = message;
-        ErrorPanel errorPanel = new ErrorPanel(this);
-        errorPanel.initialize(display);
+        ErrorPanel errorPanel = new ErrorPanel(this, display);
         showFreeColPanel(errorPanel);
     }
 
