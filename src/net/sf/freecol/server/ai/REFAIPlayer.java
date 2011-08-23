@@ -47,8 +47,10 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -114,6 +116,151 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         super.startWorking();
     }
 
+    /**
+     * Initialize the REF.
+     * - Find the initial target
+     * - Give valid missions to all the units
+     *
+     * Note that we can not rely on normal AI processing as the
+     * "teleporting" Col1-style REF needs to be placed on the map
+     * before its first turn starts, so the server should ask this
+     * AI where it should arrive on the map.
+     *
+     * Note also that to find a target we can not just call
+     * getMilitaryMission and aim for it as the getMilitaryMission
+     * scoring includes distance from starting point, which is what we
+     * are trying to determine.
+     * So, just choose the best coastal colony.
+     *
+     * FIXME: Mission assignment is done here because ATM the European
+     * AI is prone to send ships full of troops off to attack the
+     * rebel navy.  If this is fixed check if the normal mission
+     * assignment works and drop it from here.
+     *
+     * @param teleport "Teleporting" in is allowed.
+     * @return The preferred entry location, or null if no useful preference.
+     */
+    public Tile initialize(boolean teleport) {
+        // Find a representative offensive land unit to use to search
+        // for the initial target.
+        AIUnit aiUnit = null;
+        for (AIUnit aiu : getAIUnits()) {
+            if (!aiu.getUnit().isNaval() && aiu.getUnit().isOffensiveUnit()) {
+                aiUnit = aiu;
+                break;
+            }
+        }
+        if (aiUnit == null) {
+            logger.warning("New REF has no army?!?");
+            return null;
+        }
+        Unit unit = aiUnit.getUnit();
+
+        // Find the best coastal colony.
+        Colony target = null;
+        int bestScore = Integer.MIN_VALUE;
+        Player player = getPlayer();
+        for (Player p : player.getRebels()) {
+            for (Colony c : p.getColonies()) {
+                if (c.isConnected()) {
+                    int score = getUnitSeekAndDestroyMissionValue(unit,
+                        c.getTile(), INFINITY);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        target = c;
+                    }
+                }
+            }
+        }
+        if (target == null) {
+            logger.warning("Rebels have no connected colonies?!?");
+            return null;
+        }
+        Tile tile = target.getTile();
+
+        // Give the army seek-and-destroy missions for the target,
+        // then once the army has missions it is possible to give the
+        // navy valid transport missions where needed.
+        final AIMain aiMain = getAIMain();
+        for (AIUnit aiu : getAIUnits()) {
+            if (!aiu.getUnit().isNaval()) {
+                aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
+                        target));
+            }
+        }
+        for (AIUnit aiu : getAIUnits()) {
+            if (aiu.getUnit().isNaval()) {
+                Unit ship = aiu.getUnit();
+                if (ship.getUnitCount() > 0) {
+                    TransportMission tm = new TransportMission(aiMain, aiu);
+                    for (Unit u : ship.getUnitList()) {
+                        tm.addToTransportList(aiMain.getAIUnit(u));
+                    }
+                    aiu.setMission(tm);
+                }
+            }
+        }
+
+        // Search from the target position to find a Tile to disembark
+        // to, which must be:
+        // - Unoccupied
+        // - Have an unoccupied connected neighbour
+        //
+        // TODO: pick the tile with the best defence and try to avoid
+        // hostile fortifications.
+        Map map = getGame().getMap();
+        GoalDecider gd = new GoalDecider() {
+                private PathNode goal = null;
+
+                public PathNode getGoal() {
+                    return goal;
+                }
+
+                public boolean hasSubGoals() {
+                    return false;
+                }
+
+                public boolean check(Unit u, PathNode pathNode) {
+                    if (!pathNode.getTile().isEmpty()) return false;
+                    for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
+                        if (t.isConnected() && t.isEmpty()) {
+                            goal = pathNode;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+        PathNode path = map.search(unit, tile, gd, 10, null);
+        if (path == null) {
+            logger.warning("Can not find suitable REF landing site for: "
+                + target);
+            return null;
+        }
+        tile = path.getTile();
+
+        // If teleporting in, the connected tile is an acceptable target.
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.isConnected() && t.isEmpty()) {
+                tile = t;
+                break;
+            }
+        }
+        if (teleport) return tile;
+
+        // Unit should be aboard a man-o-war which we can use to find a
+        // path to Europe.  Use the end of that path.
+        if (unit.getLocation() instanceof Unit) {
+            path = map.findPathToEurope((Unit) unit.getLocation(), tile);
+            if (path == null) {
+                logger.warning("Can not find path to Europe from: " + tile);
+                return null;
+            }
+            return path.getLastNode().getTile();
+        }
+        logger.warning("REF land unit not aboard a ship: " + unit);
+        return null;
+    }
 
     /**
      * Evaluate allocating a unit to the defence of a colony.
@@ -138,7 +285,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     /**
      * Evaluate a potential seek and destroy mission for a given unit
      * to a given tile.
-     * TODO: revisit and rebalance the mass of magic numbers.
      *
      * @param unit The <code>Unit</code> to do the mission.
      * @param newTile The <code>Tile</code> to go to.
@@ -155,9 +301,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         Settlement settlement = newTile.getSettlement();
         Unit defender = newTile.getDefendingUnit(unit);
         if (settlement == null) {
+            if (unit.getOwner().getNumberOfSettlements() <= 0) {
+                // Do not chase units until at least one colony is captured.
+                return Integer.MIN_VALUE;
+            }
             // Do not all chase the one unit!
-            if (alreadySeeking(defender)) return 0;
-
+            if (alreadySeeking(defender)) return Integer.MIN_VALUE;
             // The REF is more interested in colonies.
             value /= 2;
         } else {
@@ -194,7 +343,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // Give military missions to all offensive units.
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
-            if (u.isNaval()) continue;
+            if (u.isNaval() || aiu.hasMission()) continue;
             if (u.isOffensiveUnit()) giveMilitaryMission(aiu);
         }
 

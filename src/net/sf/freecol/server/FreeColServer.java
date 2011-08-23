@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
@@ -89,6 +90,7 @@ import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.InGameInputHandler;
@@ -900,6 +902,12 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addIntegerOption("model.option.settlementLimitModifier",
             "gameOptions.map", 0);
+        // Introduced: SAVEGAME_VERSION == 12
+        addIntegerOption("model.option.startingPositions",
+            "gameOptions.map", 0);
+        // Introduced: SAVEGAME_VERSION == 12
+        addBooleanOption(GameOptions.TELEPORT_REF,
+            "gameOptions.map", false);
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {

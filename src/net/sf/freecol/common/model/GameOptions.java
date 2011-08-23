@@ -28,6 +28,9 @@ package net.sf.freecol.common.model;
  */
 public class GameOptions {
 
+    /** Enables/disables fog of war. */
+    public static final String FOG_OF_WAR = "model.option.fogOfWar";
+
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "model.option.startingMoney";
 
@@ -45,9 +48,6 @@ public class GameOptions {
 
     /** Whether to award exploration points or not. */
     public static final String EXPLORATION_POINTS = "model.option.explorationPoints";
-
-    /** Enables/disables fog of war. */
-    public static final String FOG_OF_WAR = "model.option.fogOfWar";
 
     /**
      * Victory condition: Should the <code>Player</code> who first defeats the
@@ -113,4 +113,8 @@ public class GameOptions {
     public static final int STARTING_POSITIONS_RANDOM = 1;
     public static final int STARTING_POSITIONS_HISTORICAL = 2;
 
+    /**
+     * Does the REF "teleport" to its first target.
+     */
+    public static final String TELEPORT_REF = "model.option.teleportREF";
 }

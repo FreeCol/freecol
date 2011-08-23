@@ -106,6 +106,7 @@ import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.REFAIPlayer;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.ServerColony;
@@ -321,7 +322,7 @@ public final class InGameController extends Controller {
         Nation refNation = serverPlayer.getNation().getRefNation();
         Monarch monarch = serverPlayer.getMonarch();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
-        refPlayer.setEntryLocation(serverPlayer.getEntryLocation());
+        refPlayer.setEntryLocation(null); // Trigger initial placement routine
         Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
 
         // Instantiate the REF in Europe
@@ -612,6 +613,34 @@ public final class InGameController extends Controller {
             // Do "new turn"-like actions that need to wait until right
             // before the player is about to move.
             game.setCurrentPlayer(player);
+            if (player.isREF() && player.getEntryLocation() == null) {
+                // Initialize this newly created REF, determining its
+                // entry location.
+                // If the teleportREF option is enabled, teleport it in.
+                REFAIPlayer refAIPlayer = (REFAIPlayer) freeColServer
+                    .getAIPlayer(player);
+                boolean teleport = getGame().getSpecification()
+                    .getBoolean(GameOptions.TELEPORT_REF);
+                Tile entry = refAIPlayer.initialize(teleport);
+                if (entry == null) {
+                    for (Player p : player.getRebels()) {
+                        entry = p.getEntryLocation().getTile();
+                        break;
+                    }
+                }
+                player.setEntryLocation(entry);
+                logger.info(player.getName() + " will appear at " + entry);
+                if (teleport) {
+                    for (Unit u : player.getUnits()) {
+                        if (u.isNaval()) {
+                            u.setLocation(entry);
+                            u.setWorkLeft(-1);
+                            u.setState(Unit.UnitState.ACTIVE);
+                        }
+                    }
+                    cs.add(See.perhaps(), entry);
+                }
+            }
             player.csStartTurn(random, cs);
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,

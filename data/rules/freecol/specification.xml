@@ -93,6 +93,8 @@
         <!-- Missionaries grant visibility and enhance trade and training -->
         <booleanOption id="model.option.enhancedMissionaries"
                        defaultValue="true"/>
+        <!-- Does the REF "teleport" to its first target or does it sail in. -->
+        <booleanOption id="model.option.teleportREF" defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

@@ -1920,6 +1920,8 @@
           <selectValue label="model.option.startingPositions.random" value="1"/>
           <selectValue label="model.option.startingPositions.historical" value="2"/>
         </selectOption>
+        <!-- Does the REF "teleport" to its first target or does it sail in. -->
+        <booleanOption id="model.option.teleportREF" defaultValue="true"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

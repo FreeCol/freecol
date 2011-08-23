@@ -375,10 +375,8 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean isConnected() {
-        for (ColonyTile colonyTile : colonyTiles) {
-            if (colonyTile.getWorkTile().isConnected()) {
-                return true;
-            }
+        for (Tile t : getTile().getSurroundingTiles(1)) {
+            if (t.isConnected()) return true;
         }
         return false;
     }

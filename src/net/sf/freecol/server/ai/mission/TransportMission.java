@@ -490,7 +490,7 @@ public class TransportMission extends Mission {
             return true;
         }
         final Unit carrier = getUnit();
-        if (hasCargo() && !carrier.getOwner().isREF()) {
+        if (hasCargo()) {
             // Do not search for a target if we have cargo onboard.
             return true;
         }
@@ -1372,6 +1372,7 @@ public class TransportMission extends Mission {
      * @return <code>true</code>
      */
     public boolean isValid() {
+        updateTransportList();
         return !transportList.isEmpty() && super.isValid();
     }
 
@@ -1516,7 +1517,8 @@ public class TransportMission extends Mission {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Transport list:\n");
+        StringBuilder sb = new StringBuilder(super.toString());
+        sb.append("\nTransport list:\n");
         List<Transportable> ts = new LinkedList<Transportable>();
         for(Transportable t : transportList) {
             Locatable l = t.getTransportLocatable();

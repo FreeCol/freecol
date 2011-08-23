@@ -2879,8 +2879,9 @@ public class Unit extends FreeColGameObject
      * @return The entry tile.
      */
     public Tile getFullEntryLocation() {
-        return (entryLocation == null) ? owner.getEntryLocation().getTile()
-            : (Tile) entryLocation;
+        return (entryLocation != null) ? (Tile) entryLocation
+            : (owner.getEntryLocation() == null) ? null
+            : owner.getEntryLocation().getTile();
     }
 
     /**
