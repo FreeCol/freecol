@@ -278,7 +278,8 @@ public class ColonyPlan {
                                                  * (disconnectedColonies - wagonTrains)));
                 }
             }
-        } else if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)) {
+        }
+        if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)) {
             // coastal colonies need docks
             int potential = 0;
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
