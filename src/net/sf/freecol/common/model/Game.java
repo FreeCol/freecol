@@ -137,7 +137,15 @@ public class Game extends FreeColGameObject {
     protected Game(Specification specification) {
         super(null);
         this.specification = specification;
-        initializeTurn();
+
+        // Initialize the Turn class using GameOptions.
+        try {
+            Turn.setStartingYear(specification.getInteger(GameOptions.STARTING_YEAR));
+            Turn.setSeasonYear(specification.getInteger(GameOptions.SEASON_YEAR));
+            logger.info("Initialized turn.");
+        } catch(Exception e) {
+            logger.warning("Failed to set year options: " + e.toString());
+        }
     }
 
     /**
@@ -150,19 +158,6 @@ public class Game extends FreeColGameObject {
      */
     protected Game(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-    }
-
-    /**
-     * Initialize the Turn class using GameOptions.
-     *
-     */
-    private void initializeTurn() {
-        try {
-            Turn.setStartingYear(specification.getInteger(GameOptions.STARTING_YEAR));
-            Turn.setSeasonYear(specification.getInteger(GameOptions.SEASON_YEAR));
-        } catch(Exception e) {
-            logger.warning("Failed to set year options.");
-        }
     }
 
     /*
@@ -1097,7 +1092,6 @@ public class Game extends FreeColGameObject {
         }
 
         turn = new Turn(getAttribute(in, "turn", 1));
-        initializeTurn();
         setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
 
         final String nextIDStr = in.getAttributeValue(null, "nextID");
