@@ -19,9 +19,21 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -33,6 +45,8 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
+    private static final String SHOW = "show";
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -43,8 +57,60 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
         super(parent);
 
         setLayout(new MigLayout());
+
+        JButton showButton = new JButton(Messages.message("errorMessage.showLogFile"));
+        showButton.setActionCommand(SHOW);
+        showButton.addActionListener(this);
+
         add(getDefaultTextArea(message, 40), "wrap 20");
+        add(okButton, "split 2, tag ok");
+        add(showButton);
+    }
+
+    private ErrorPanel(Canvas parent, String message, boolean scroll) {
+        super(parent);
+
+        setLayout(new MigLayout());
+
+        JTextArea textArea = getDefaultTextArea(message, 40);
+        textArea.setFocusable(true);
+        textArea.setEditable(false);
+        JScrollPane scrollPane =
+            new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getViewport().setOpaque(false);
+
+        add(scrollPane, "height 200:200:, wrap 20");
         add(okButton, "tag ok");
     }
+
+
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (SHOW.equals(command)) {
+            File logFile = new File(FreeCol.getLogFile());
+            byte[] buffer = new byte[(int) logFile.length()];
+            BufferedInputStream logFileStream = null;
+            try {
+                logFileStream = new BufferedInputStream(new FileInputStream(logFile));
+                logFileStream.read(buffer);
+                getCanvas().showFreeColPanel(new ErrorPanel(getCanvas(), new String(buffer), true));
+            } catch(Exception e) {
+                // ignore
+            } finally {
+                if (logFileStream != null) {
+                    try {
+                        logFileStream.close();
+                    } catch (IOException e) {
+                        // failed
+                    }
+                }
+            }
+        } else {
+            super.actionPerformed(event);
+        }
+    }
+
+
 
 }

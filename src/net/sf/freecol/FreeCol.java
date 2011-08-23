@@ -819,6 +819,16 @@ public final class FreeCol {
         return FREECOL_REVISION;
     }
 
+
+    /**
+     * Returns the name of the log file.
+     *
+     * @return a <code>String</code> value
+     */
+    public static String getLogFile() {
+        return logFile;
+    }
+
     /**
      * Checks if the program is in "Debug mode".
      * @return <code>true</code> if the program is in debug
