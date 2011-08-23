@@ -84,6 +84,11 @@ public class DebugMenu extends JMenu {
 
     private final GUI gui;
 
+    private static final String ERROR_MESSAGE =
+        "This is a long error message, indicating that some error has occurred. " +
+        "This is a long error message, indicating that some error has occurred. " +
+        "This is a long error message, indicating that some error has occurred.";
+
 
     public DebugMenu(FreeColClient fcc) {
         super(Messages.message("menuBar.debug"));
@@ -445,6 +450,16 @@ public class DebugMenu extends JMenu {
                 });
             panelMenu.add(mItem);
         }
+
+        final JMenuItem errorMessage =
+            new JMenuItem(Messages.message("menuBar.debug.displayErrorMessage"));
+        errorMessage.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    canvas.errorMessage(ERROR_MESSAGE);
+                }
+            });
+        panelMenu.add(errorMessage);
+
         this.add(panelMenu);
 
         final JMenuItem europeStatus
