@@ -872,6 +872,8 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.evadeAttack" value="true"/>
+      <modifier id="model.modifier.tradeVolumePenalty"
+                value="-75" type="percentage"/>
     </unit-type>
     <unit-type id="model.unit.caravel" extends="ship" offence="0" defence="2" movement="12"
                lineOfSight="1" space="2" spaceTaken="24" hitPoints="6" price="1000" scoreValue="3">

@@ -904,12 +904,13 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the goods this settlement can sell.
+     * Gets the goods this settlement is willing to sell.
      *
      * @param limit The maximum number of goods required.
+     * @param unit The <code>Unit</code> that is trading.
      * @return A list of goods to sell.
      */
-    public List<Goods> getSellGoods(int limit) {
+    public List<Goods> getSellGoods(int limit, Unit unit) {
         List<Goods> result = new ArrayList<Goods>();
         List<Goods> settlementGoods = getCompactGoods();
         Collections.sort(settlementGoods, exportGoodsComparator);
@@ -923,6 +924,11 @@ public class IndianSettlement extends Settlement {
             amount -= retain;
             if (amount > GoodsContainer.CARGO_SIZE) {
                 amount = GoodsContainer.CARGO_SIZE;
+            }
+            if (unit != null) {
+                amount = Math.round(FeatureContainer
+                    .applyModifierSet((float) amount, getGame().getTurn(),
+                        unit.getModifierSet("model.modifier.tradeVolumePenalty")));
             }
             result.add(new Goods(getGame(), this, goods.getType(), amount));
             count++;

@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -1383,13 +1384,11 @@ public final class InGameController extends Controller {
 
         if (settlement instanceof IndianSettlement) {
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            sellGoods = indianSettlement.getSellGoods(3);
-            if (!sellGoods.isEmpty()) {
-                AIPlayer aiPlayer = getFreeColServer()
-                    .getAIPlayer(indianSettlement.getOwner());
-                for (Goods goods : sellGoods) {
-                    aiPlayer.registerSellGoods(goods);
-                }
+            AIPlayer aiPlayer = getFreeColServer()
+                .getAIPlayer(indianSettlement.getOwner());
+            sellGoods = indianSettlement.getSellGoods(3, unit);
+            for (Goods goods : sellGoods) {
+                aiPlayer.registerSellGoods(goods);
             }
         } else { // Colony might be supported one day?
             return DOMMessage.clientError("Bogus settlement");
