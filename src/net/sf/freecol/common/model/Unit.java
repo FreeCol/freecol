@@ -3473,19 +3473,6 @@ public class Unit extends FreeColGameObject
         entryLocation = newLocation(in.getAttributeValue(null, "entryLocation"));
 
         location = newLocation(in.getAttributeValue(null, "location"));
-        //TODO: added to fix bug in pre-rev.4883 savegames. Might eventually
-        //be removed later.
-        //Savegame sanitation: A WorkLocation is always inside a colony, so
-        //a unit located there should always have state "IN_COLONY".
-        //If not, parts of the code may consider the unit to be outside
-        //the colony, leading to errors.
-        if ((location instanceof WorkLocation) && state != UnitState.IN_COLONY) {
-            logger.warning("Found " + getId() + " with state==" + state
-                           + " on WorkLocation in "+ location.getColony().getName()
-                           + ". Fixing: ");
-            state = UnitState.IN_COLONY;
-        }
-
         units.clear();
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
