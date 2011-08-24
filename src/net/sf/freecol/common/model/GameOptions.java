@@ -28,11 +28,17 @@ package net.sf.freecol.common.model;
  */
 public class GameOptions {
 
+    /** The amount of money each player will receive before the game starts. */
+    public static final String STARTING_MONEY
+        = "model.option.startingMoney";
+
+    /** The penalty applied to trading with the natives from a ship. */
+    public static final String SHIP_TRADE_PENALTY
+        = "model.option.shipTradePenalty";
+
+
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "model.option.fogOfWar";
-
-    /** The amount of money each player will receive before the game starts. */
-    public static final String STARTING_MONEY = "model.option.startingMoney";
 
     /** The cost of a single hammer when buying a building in a colony. */
     //Unused at the moment
@@ -112,6 +118,12 @@ public class GameOptions {
     public static final int STARTING_POSITIONS_CLASSIC = 0;
     public static final int STARTING_POSITIONS_RANDOM = 1;
     public static final int STARTING_POSITIONS_HISTORICAL = 2;
+
+    /**
+     * Do missionaries provide extra benefits.
+     */
+    public static final String ENHANCED_MISSIONARIES
+        = "model.option.enhancedMissionaries";
 
     /**
      * Does the REF "teleport" to its first target.

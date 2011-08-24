@@ -908,6 +908,14 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.TELEPORT_REF,
             "gameOptions.map", false);
+        // Introduced: SAVEGAME_VERSION == 12
+        if (!spec.hasOption(GameOptions.SHIP_TRADE_PENALTY)) {
+            addIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
+                "gameOptions.map", -30);
+            spec.addModifier(new Modifier("model.modifier.shipTradePenalty",
+                    Specification.SHIP_TRADE_PENALTY_SOURCE,
+                    -30.0f, Modifier.Type.PERCENTAGE));
+        }
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {

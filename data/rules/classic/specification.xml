@@ -55,6 +55,11 @@
               value="50" type="percentage"
               increment="-2" incrementType="additive" />
     <modifier id="model.goods.food" value="0" type="additive"/>
+    <!-- Ship trade penalty modifiers are instantiated on the fly from the
+         corresponding option and the sense of application. -->
+    <modifier id="model.modifier.shipTradePenalty"
+              source="model.source.shipTradePenalty"
+              value="0" type="percentage" />
   </modifiers>
 
   <events>
@@ -487,6 +492,7 @@
     <equipment-type id="model.equipment.missionary" role="missionary">
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
+      <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
@@ -757,6 +763,7 @@
       <default-equipment id="model.equipment.missionary"/>
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.expertMissionary" value="true"/>
+      <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"
                skill="-1" recruitProbability="20" scoreValue="2" >
@@ -1680,6 +1687,7 @@
         <integerOption id="model.option.monarchSupport" value="4"/>
         <integerOption id="model.option.rumourDifficulty" value="0"/>
         <integerOption id="model.option.treasureTransportFee" value="50"/>
+        <integerOption id="model.option.shipTradePenalty" value="-20"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="veryHigh" />
@@ -1718,6 +1726,7 @@
         <integerOption id="model.option.monarchSupport" value="3"/>
         <integerOption id="model.option.rumourDifficulty" value="1"/>
         <integerOption id="model.option.treasureTransportFee" value="55"/>
+        <integerOption id="model.option.shipTradePenalty" value="-25"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="high" />
@@ -1755,6 +1764,7 @@
         <integerOption id="model.option.monarchSupport" value="2"/>
         <integerOption id="model.option.rumourDifficulty" value="2"/>
         <integerOption id="model.option.treasureTransportFee" value="60"/>
+        <integerOption id="model.option.shipTradePenalty" value="-30"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="medium" />
@@ -1791,6 +1801,7 @@
         <integerOption id="model.option.monarchSupport" value="1"/>
         <integerOption id="model.option.rumourDifficulty" value="3"/>
         <integerOption id="model.option.treasureTransportFee" value="65"/>
+        <integerOption id="model.option.shipTradePenalty" value="-35"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="low" />
@@ -1826,6 +1837,7 @@
         <integerOption id="model.option.monarchSupport" value="0"/>
         <integerOption id="model.option.rumourDifficulty" value="4"/>
         <integerOption id="model.option.treasureTransportFee" value="70"/>
+        <integerOption id="model.option.shipTradePenalty" value="-40"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <stringOption  id="model.option.tileProduction" value="veryLow" />
@@ -1861,6 +1873,7 @@
         <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
         <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
         <integerOption id="model.option.treasureTransportFee" value="70" minimumValue="0" maximumValue="100"/>
+        <integerOption id="model.option.shipTradePenalty" value="-40"/>
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="veryLow">
@@ -1893,12 +1906,14 @@
     </optionGroup>
     <optionGroup id="gameOptions">
       <optionGroup id="gameOptions.map">
+        <!-- The number of turns it takes to sail between Europe and the New World -->
+        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+        <!-- Relax settlement limits -->
+        <integerOption id="model.option.settlementLimitModifier" defaultValue="0"/>
         <!-- Enables/disables fog of war -->
         <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
         <!-- Whether to award exploration points or not -->
         <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
-        <!-- The number of turns it takes to sail between Europe and the New World -->
-        <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Whether amphibious moves are allowed. -->
         <booleanOption id="model.option.amphibiousMoves" defaultValue="false"/>
         <!-- Whether all interactions with a native settlement contact the
@@ -1912,16 +1927,14 @@
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"
                        defaultValue="false"/>
-        <!-- Relax settlement limits -->
-        <integerOption id="model.option.settlementLimitModifier" defaultValue="0"/>
+        <!-- Does the REF "teleport" to its first target or does it sail in. -->
+        <booleanOption id="model.option.teleportREF" defaultValue="true"/>
         <!-- Types of starting positions -->
         <selectOption id="model.option.startingPositions" defaultValue="0" localizedLabels="true">
           <selectValue label="model.option.startingPositions.classic" value="0"/>
           <selectValue label="model.option.startingPositions.random" value="1"/>
           <selectValue label="model.option.startingPositions.historical" value="2"/>
         </selectOption>
-        <!-- Does the REF "teleport" to its first target or does it sail in. -->
-        <booleanOption id="model.option.teleportREF" defaultValue="true"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Does the Custom House sell boycotted goods -->

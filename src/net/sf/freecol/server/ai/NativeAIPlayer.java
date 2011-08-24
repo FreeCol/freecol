@@ -21,8 +21,10 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +37,8 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FeatureContainer;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -42,6 +46,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -80,10 +85,25 @@ public class NativeAIPlayer extends AIPlayer {
     private static final Logger logger = Logger.getLogger(NativeAIPlayer.class.getName());
 
     /**
+     * The modifier to apply when a ship is trading.
+     */
+    private static final String SHIP_TRADE_PENALTY
+        = "model.modifier.shipTradePenalty";
+
+    /**
+     * The modifier to apply when to trade with a settlement with a missionary
+     * if the enhancedMissionaries option is enabled.
+     */
+    private static final String MISSIONARY_TRADE_BONUS
+        = "model.modifier.missionaryTradeBonus";
+
+    /**
      * Stores temporary information for sessions (trading with another player
      * etc).
      */
-    private HashMap<String, Integer> sessionRegister = new HashMap<String, Integer>();
+    private HashMap<String, Integer> sessionRegister
+        = new HashMap<String, Integer>();
+
 
     /**
      * Creates a new <code>AIPlayer</code>.
@@ -236,6 +256,48 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
+     * Gets the appropriate missionary trade bonuses.
+     *
+     * @param missionary The missionary <code>Unit</code>.
+     * @param sense The sense to apply the modifiers.
+     * @return The missionary trade bonuses.
+     */
+    private Set<Modifier> getMissionaryTradeBonuses(Unit missionary,
+                                                    boolean sense) {
+        Set<Modifier> missionaryBonuses = missionary
+            .getModifierSet(MISSIONARY_TRADE_BONUS);
+        Set<Modifier> result;
+        if (sense) {
+            result = missionaryBonuses;
+        } else {
+            result = new HashSet<Modifier>();
+            for (Modifier m : missionaryBonuses) {
+                result.add(new Modifier(m.getId(), m.getSource(),
+                        -m.getValue(), m.getType()));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the appropriate ship trade penalties.
+     *
+     * @param sense The sense to apply the modifiers.
+     * @return The ship trade penalties.
+     */
+    private Set<Modifier> getShipTradePenalties(boolean sense) {
+        Specification spec = getGame().getSpecification();
+        List<Modifier> shipPenalties = spec.getModifiers(SHIP_TRADE_PENALTY);
+        Set<Modifier> result = new HashSet<Modifier>();
+        int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
+        for (Modifier m : shipPenalties) {
+            result.add(new Modifier(m.getId(), m.getSource(),
+                    ((sense) ? penalty : -penalty), m.getType()));
+        }
+        return result;
+    }
+
+    /**
      * Called when another <code>Player</code> proposes to buy.
      *
      *
@@ -249,6 +311,8 @@ public class NativeAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
+        Specification spec = getGame().getSpecification();
+        IndianSettlement is = (IndianSettlement) settlement;
         Player buyer = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
@@ -256,16 +320,19 @@ public class NativeAIPlayer extends AIPlayer {
 
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
-            int price = ((IndianSettlement) settlement).getPriceToSell(goods)
+            Set<Modifier> modifiers = new HashSet<Modifier>();
+            int price = is.getPriceToSell(goods)
                 + getPlayer().getTension(buyer).getValue();
-            Unit missionary = ((IndianSettlement) settlement).getMissionary(buyer);
-            if (missionary != null && getSpecification()
-                .getBoolean("model.option.enhancedMissionaries")) {
-                // 10% bonus for missionary, 20% if expert
-                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 8
-                    : 9;
-                price = (price * bonus) / 10;
+            Unit missionary = is.getMissionary(buyer);
+            if (missionary != null
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                modifiers.addAll(getMissionaryTradeBonuses(missionary, false));
             }
+            if (unit.isNaval()) {
+                modifiers.addAll(getShipTradePenalties(false));
+            }
+            price = (int) FeatureContainer.applyModifierSet((float)price,
+                getGame().getTurn(), modifiers);
             sessionRegister.put(goldKey, new Integer(price));
             return price;
         } else {
@@ -306,6 +373,8 @@ public class NativeAIPlayer extends AIPlayer {
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
+        Specification spec = getGame().getSpecification();
+        IndianSettlement is = (IndianSettlement) settlement;
         Player seller = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount() + "#" + unit.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
@@ -316,15 +385,19 @@ public class NativeAIPlayer extends AIPlayer {
                 return price;
             }
         } else {
-            price = ((IndianSettlement) settlement).getPriceToBuy(goods) - getPlayer().getTension(seller).getValue();
-            Unit missionary = ((IndianSettlement) settlement).getMissionary(seller);
-            if (missionary != null && getSpecification()
-                .getBoolean("model.option.enhancedMissionaries")) {
-                // 10% bonus for missionary, 20% if expert
-                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 12
-                    : 11;
-                price = (price * bonus) / 10;
+            Set<Modifier> modifiers = new HashSet<Modifier>();
+            price = is.getPriceToBuy(goods)
+                - getPlayer().getTension(seller).getValue();
+            Unit missionary = is.getMissionary(seller);
+            if (missionary != null
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                modifiers.addAll(getMissionaryTradeBonuses(missionary, true));
             }
+            if (unit.isNaval()) {
+                modifiers.addAll(getShipTradePenalties(true));
+            }
+            price = (int) FeatureContainer.applyModifierSet((float)price,
+                getGame().getTurn(), modifiers);
             if (price <= 0) return 0;
             sessionRegister.put(goldKey, new Integer(price));
         }

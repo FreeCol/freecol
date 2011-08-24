@@ -78,6 +78,8 @@ public final class Specification {
         new FreeColGameObjectType("model.source.ambushBonus");
     public static final FreeColGameObjectType COLONY_GOODS_PARTY_SOURCE =
         new FreeColGameObjectType("model.source.colonyGoodsParty");
+    public static final FreeColGameObjectType SHIP_TRADE_PENALTY_SOURCE =
+        new FreeColGameObjectType("model.source.shipTradePenalty");
 
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
