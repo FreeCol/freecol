@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**
@@ -109,6 +110,21 @@ public class ServerIndianSettlement extends IndianSettlement
             consumeGoods(g, getConsumptionOf(g));
         }
 
+        // Now check the food situation
+        int storedFood = getGoodsCount(spec.getPrimaryFoodType());
+        if (storedFood <= 0) {
+            if (getUnitCount() > 1) {
+                Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                                                    getUnitList(), random);
+                cs.addDispose(See.only(owner), this, victim);
+                logger.finest("Famine in " + getName());
+            } else {
+                cs.addDispose(See.perhaps().always(owner), getTile(), this);
+                logger.info(getName() + " collapsed due to famine.");
+                return;
+            }
+        }
+
         // Check for new resident.
         // Alcohol also contributes to create children.
         GoodsType foodType = spec.getPrimaryFoodType();
@@ -117,8 +133,8 @@ public class ServerIndianSettlement extends IndianSettlement
             = spec.getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
         if (!unitTypes.isEmpty()
             && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
-                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)
-            && ownedUnits.size() <= getType().getMaximumSize()) {
+                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL
+                && ownedUnits.size() <= getType().getMaximumSize()) {
             // Allow one more brave than the initially generated number.
             // This is more than sufficient. Do not increase the amount
             // without discussing it on the developer's mailing list first.
@@ -149,6 +165,7 @@ public class ServerIndianSettlement extends IndianSettlement
 
         getGoodsContainer().removeAbove(getWarehouseCapacity());
         updateWantedGoods();
+        cs.add(See.only(owner), this);
     }
 
     /**
