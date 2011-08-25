@@ -204,11 +204,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
         Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
-        return (units == null
-            || unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
-            ? NoAddReason.CAPACITY_EXCEEDED
-            : (unit == null)
+        return (unit == null)
             ? NoAddReason.WRONG_TYPE
+            : (units == null
+                || unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
+            ? NoAddReason.CAPACITY_EXCEEDED
             : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
             ? NoAddReason.OCCUPIED_BY_ENEMY
             // Always test this last before success (NoAddReason.NONE),
