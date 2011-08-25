@@ -104,29 +104,9 @@ public class ServerIndianSettlement extends IndianSettlement
             addGoods(g.getStoredAs(), getProductionOf(g));
         }
 
-        // Consume goods
-        // TODO: do we need this at all? At the moment, most Indian Settlements
-        // consume more than they produce.
+        // Consume goods.
         for (GoodsType g : goodsList) {
             consumeGoods(g, getConsumptionOf(g));
-        }
-
-        // Do a little ad hoc manufacturing.
-        for (GoodsType g : goodsList) {
-            GoodsType produced;
-            if (g.isRawMaterial()
-                && (produced = g.getProducedMaterial()) != null
-                && produced.isStorable()
-                && getGoodsCount(g) > getWantedGoodsAmount(g)
-                && getGoodsCount(produced) < getWantedGoodsAmount(produced)) {
-                // Say, 1/3 of the units present make quantity 1 of the item.
-                // Leaving efficiency at 1:1 ATM.
-                int production = getUnitCount() / 3;
-                if (production > 0) {
-                    removeGoods(g, production);
-                    addGoods(produced, production);
-                }
-            }
         }
 
         // Check for new resident.

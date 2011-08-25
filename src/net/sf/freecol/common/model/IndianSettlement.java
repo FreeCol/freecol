@@ -735,36 +735,35 @@ public class IndianSettlement extends Settlement {
      */
     private int getNormalGoodsPriceToBuy(GoodsType type, int amount) {
         final int tradeGoodsAdd = 20; // Fake additional trade goods present
+        final int capacity = getGoodsCapacity();
         int current = getGoodsCount(type);
 
         // Increase effective stock if its raw material is produced here.
         GoodsType rawType = type.getRawMaterial();
-        int add = 0;
         if (rawType != null) {
             int rawProduction = getMaximumProduction(rawType);
-            add = (rawProduction < 5)  ? 10 * rawProduction
-                : (rawProduction < 10) ?  5 * rawProduction + 25
-                : (rawProduction < 20) ?  2 * rawProduction + 55
+            int add = (rawProduction < 5) ? 10 * rawProduction
+                : (rawProduction < 10) ? 5 * rawProduction + 25
+                : (rawProduction < 20) ? 2 * rawProduction + 55
                 : 100;
             // Decrease bonus in proportion to current stock, up to capacity.
-            add = (getGoodsCapacity() - Math.min(getGoodsCapacity(), current))
-                * add / getGoodsCapacity();
+            add = add * Math.max(0, capacity - current) / capacity;
+            current += add;
+        } else if (type.isTradeGoods()) {
+            // Small artificial increase of the trade goods stored.
+            current += tradeGoodsAdd;
         }
-        current += add;
-
-        // Small artificial increase of the trade goods stored.
-        if (type.isTradeGoods()) current += tradeGoodsAdd;
 
         // Only interested in the amount of goods that keeps the
         // total under the threshold.
-        int retain = Math.min(getWantedGoodsAmount(type), getGoodsCapacity());
+        int retain = Math.min(getWantedGoodsAmount(type), capacity);
         int valued = (retain <= current) ? 0
             : Math.min(amount, retain - current);
 
         // Unit price then is maximum price plus the bonus for the
         // settlement type, reduced by the proportion of goods present.
         int unitPrice = (GOODS_BASE_PRICE + getType().getTradeBonus())
-            * (getGoodsCapacity() - current) / getGoodsCapacity();
+            * Math.max(0, capacity - current) / capacity;
 
         // But farmed goods are always less interesting.
         // and small settlements are not interested in building.
@@ -1012,12 +1011,46 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Chooses a type of goods for some of the natives in a settlement
+     * to manufacture.
+     * Simple rule: choose the refined goods that is the greatest shortage
+     * for which there is a surplus of the raw material.
+     *
+     * @return A <code>GoodsType</code> to manufacture, or null if
+     *      none suitable.
+     */
+    private GoodsType goodsToMake() {
+        GoodsType wantGoods = null;
+        int diff, wantAmount = -1;
+        for (GoodsType g : getSpecification().getGoodsTypeList()) {
+            GoodsType produced;
+            if (g.isRawMaterial()
+                && (produced = g.getProducedMaterial()) != null
+                && produced.isStorable()
+                && getGoodsCount(g) > getWantedGoodsAmount(g)
+                && (diff = getWantedGoodsAmount(produced)
+                    - getGoodsCount(produced)) > wantAmount) {
+                wantGoods = produced;
+                wantAmount = diff;
+            }
+        }
+        return wantGoods;
+    }
+
+    /**
      * Gets the production of a specified goods type for this settlement.
      *
      * @param type The <code>GoodsType</code> to produce.
      * @return The production potention for the goods type.
      */
     public int getProductionOf(GoodsType type) {
+        if (type.isRefined()) {
+            if (type != goodsToMake()) return 0;
+            // Say, 1/4 of the units present make quantity 1 of the item.
+            // Leaving efficiency at 1:1 ATM.
+            return getUnitCount() / 4;
+        }
+
         int potential = 0;
         int tiles = 1; // Always include center tile
 
