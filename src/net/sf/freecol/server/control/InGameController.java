@@ -2685,7 +2685,7 @@ public final class InGameController extends Controller {
         }
         if (serverPlayer.isEuropean()) {
             settlement = new ServerColony(game, serverPlayer, name, tile);
-            settlement.placeSettlement(false);
+            settlement.placeSettlement(serverPlayer.isAI());
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
@@ -2706,12 +2706,12 @@ public final class InGameController extends Controller {
             // TODO: its lame that the settlement starts with no contacts
         }
 
-        // Join.
-        unit.setLocation(settlement);
-        unit.setMovesLeft(0);
+        // Join.  Remove equipment first in case role confuses placement.
         ((ServerUnit)unit).csRemoveEquipment(settlement,
             new HashSet<EquipmentType>(unit.getEquipment().keySet()),
             0, random, cs);
+        unit.setLocation(settlement);
+        unit.setMovesLeft(0);
 
         // Update with settlement tile, and newly owned tiles.
         List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
