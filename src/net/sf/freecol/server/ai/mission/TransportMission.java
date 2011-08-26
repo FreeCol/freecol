@@ -179,8 +179,8 @@ public class TransportMission extends Mission {
         }
 
         // Remove items that are no longer on the transport list:
-        List<Transportable> ts = new LinkedList<Transportable>();
-        for (Transportable t : new LinkedList<Transportable>(transportList)) {
+        List<Transportable> ts = new ArrayList<Transportable>();
+        for (Transportable t : new ArrayList<Transportable>(transportList)) {
             if (ts.contains(t) || isCarrying(t)) {
                 if (t.getTransportDestination() == null) {
                     removeFromTransportList(t);
@@ -262,17 +262,10 @@ public class TransportMission extends Mission {
      * @param transportable The <code>Transportable</code>.
      */
     public void removeFromTransportList(Transportable transportable) {
-        Iterator<Transportable> ti = transportList.iterator();
-        while (ti.hasNext()) {
-            Transportable t = ti.next();
-            if (t == transportable) {
-                ti.remove();
-                if (transportable.getTransport() == getAIUnit()) {
-                    transportable.setTransport(null);
-                }
-            }
+        transportList.remove(transportable);
+        if (transportable.getTransport() == getAIUnit()) {
+            transportable.setTransport(null);
         }
-
     }
 
     /**
