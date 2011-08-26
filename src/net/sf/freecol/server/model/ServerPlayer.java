@@ -2227,7 +2227,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // active units on the tile need be considered.  Carried and colony
         // workers will just become inaccessible.
         for (Unit u : tile.getUnitList()) {
-            cs.addDispose(See.only(colonyPlayer), tile, u);
+            cs.addDisappear(colonyPlayer, tile, u);
         }
 
         cs.addAttribute(See.only(attackerPlayer), "sound",
