@@ -1046,9 +1046,9 @@ public class IndianSettlement extends Settlement {
     public int getProductionOf(GoodsType type) {
         if (type.isRefined()) {
             if (type != goodsToMake()) return 0;
-            // Say, 1/4 of the units present make quantity 1 of the item.
-            // Leaving efficiency at 1:1 ATM.
-            return getUnitCount() / 4;
+            // Pretend 1/3 of the units present make the item with
+            // basic production of 3.
+            return getUnitCount();
         }
 
         int potential = 0;
@@ -1068,10 +1068,6 @@ public class IndianSettlement extends Settlement {
         if (tiles > getUnitCount()) {
             potential *= (float) getUnitCount() / tiles;
         }
-
-        // And because we are allowing them to simultaneously produce
-        // all goods types available from a tile, derate further.
-        potential /= 2;
 
         // But always add full potential of the center tile.
         potential += getTile().potential(type, null);
