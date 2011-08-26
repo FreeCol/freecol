@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -129,8 +130,10 @@ public class WishRealizationMission extends Mission {
             if (wish.getDestination().getTile() == getUnit().getTile()) {
                 if (wish.getDestination() instanceof Colony) {
                     Colony colony = (Colony) wish.getDestination();
-
-                    if (AIMessage.askWork(getAIUnit(), colony.getVacantWorkLocationFor(getUnit()))) {
+                    WorkLocation loc = colony.getVacantWorkLocationFor(getUnit());
+                    if (getUnit().getLocation() == loc) {
+                        this.wish = null; // Done
+                    } else if (AIMessage.askWork(getAIUnit(), loc)) {
                         //getUnit().setLocation(colony);
                         getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), getAIMain().getAIColony(colony)));
                     } else {

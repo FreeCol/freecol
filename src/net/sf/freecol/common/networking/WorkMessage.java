@@ -115,7 +115,8 @@ public class WorkMessage extends DOMMessage {
         }
         if (!workLocation.canAdd(unit)) {
             return DOMMessage.clientError("Can not add " + unit.toString()
-                + " to " + workLocation.toString());
+                + " to " + workLocation.toString()
+                + ": " + workLocation.getNoAddReason(unit));
         }
 
         // Work.
