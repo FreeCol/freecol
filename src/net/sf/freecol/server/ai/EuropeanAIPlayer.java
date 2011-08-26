@@ -1423,16 +1423,17 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
             if (isUnitOnCarrier) {
-                AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit().getLocation());
-
-                //make verification of carrier mission
+                // Verify carrier mission
+                AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit()
+                    .getLocation());
                 Mission carrierMission = carrier.getMission();
-
-                boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission;
-                if(!isCarrierMissionToTransport){
+                if (carrierMission == null) {
+                    carrierMission = new TransportMission(getAIMain(), carrier);
+                } else if (!(carrierMission instanceof TransportMission)) {
                     throw new IllegalStateException("Carrier carrying unit not on a transport mission");
                 }
-                //transport unit to carrier destination (is this what is truly wanted?)
+                // Transport unit to carrier destination (is this what
+                // is truly wanted?)
                 ((TransportMission) carrierMission).addToTransportList(aiUnit);
             }
             return;
