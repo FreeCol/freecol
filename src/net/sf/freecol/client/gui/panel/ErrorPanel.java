@@ -85,7 +85,6 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
             message = new String(buffer);
         } catch(Exception e) {
             // ignore
-            return;
         } finally {
             if (logFileStream != null) {
                 try {
