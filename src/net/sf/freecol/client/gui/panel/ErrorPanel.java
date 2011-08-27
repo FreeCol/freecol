@@ -48,7 +48,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     private static final String SHOW = "show";
 
     /**
-     * The constructor that will add the items to this panel.
+     * Displays the given error message.
      *
      * @param parent The parent of this panel.
      * @param message The error message to display in this error panel.
@@ -67,8 +67,34 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
         add(showButton);
     }
 
-    private ErrorPanel(Canvas parent, String message, boolean scroll) {
+    /**
+     * Displays the contents of the log file.
+     *
+     * @param parent The parent of this panel.
+     */
+    public ErrorPanel(Canvas parent) {
         super(parent);
+
+        File logFile = new File(FreeCol.getLogFile());
+        byte[] buffer = new byte[(int) logFile.length()];
+        BufferedInputStream logFileStream = null;
+        String message = null;
+        try {
+            logFileStream = new BufferedInputStream(new FileInputStream(logFile));
+            logFileStream.read(buffer);
+            message = new String(buffer);
+        } catch(Exception e) {
+            // ignore
+            return;
+        } finally {
+            if (logFileStream != null) {
+                try {
+                    logFileStream.close();
+                } catch (IOException e) {
+                    // failed
+                }
+            }
+        }
 
         setLayout(new MigLayout());
 
@@ -88,24 +114,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (SHOW.equals(command)) {
-            File logFile = new File(FreeCol.getLogFile());
-            byte[] buffer = new byte[(int) logFile.length()];
-            BufferedInputStream logFileStream = null;
-            try {
-                logFileStream = new BufferedInputStream(new FileInputStream(logFile));
-                logFileStream.read(buffer);
-                getCanvas().showFreeColPanel(new ErrorPanel(getCanvas(), new String(buffer), true));
-            } catch(Exception e) {
-                // ignore
-            } finally {
-                if (logFileStream != null) {
-                    try {
-                        logFileStream.close();
-                    } catch (IOException e) {
-                        // failed
-                    }
-                }
-            }
+            getCanvas().showFreeColPanel(new ErrorPanel(getCanvas()));
         } else {
             super.actionPerformed(event);
         }
