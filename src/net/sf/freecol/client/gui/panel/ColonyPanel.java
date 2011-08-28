@@ -89,6 +89,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 
 
@@ -770,12 +771,12 @@ public final class ColonyPanel extends FreeColPanel
             populationPanel.update();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
             FreeColGameObject object = (FreeColGameObject) event.getSource();
-            String oldType = (String) event.getOldValue();
-            String newType = (String) event.getNewValue();
+            UnitType oldType = (UnitType) event.getOldValue();
+            UnitType newType = (UnitType) event.getNewValue();
             getCanvas().showInformationMessage(object,
-                                               StringTemplate.template("model.colony.unitChange")
-                                               .addName("%oldType%", oldType)
-                                               .addName("%newType%", newType));
+                StringTemplate.template("model.colony.unitChange")
+                    .add("%oldType%", oldType.getNameKey())
+                    .add("%newType%", newType.getNameKey()));
             updateTilePanel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
             // Note: ColonyTile.UNIT_CHANGE.equals(Building.UNIT_CHANGE)

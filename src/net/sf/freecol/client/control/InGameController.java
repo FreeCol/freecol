@@ -505,8 +505,7 @@ public final class InGameController implements NetworkConstants {
             if (colony != null) {
                 if (type != newType && newType != null) {
                     String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
-                    colony.firePropertyChange(pc, type.toString(),
-                                              newType.toString());
+                    colony.firePropertyChange(pc, type, newType);
                 } else if (role != newRole && newRole != null) {
                     String pc = Tile.UNIT_CHANGE.toString();
                     colony.firePropertyChange(pc, role.toString(),
