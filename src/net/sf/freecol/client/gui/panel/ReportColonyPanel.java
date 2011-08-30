@@ -354,7 +354,13 @@ public final class ReportColonyPanel extends ReportPanel
         Market market = getMyPlayer().getMarket();
         conciseHeaders(goodsTypes, true, market);
 
-        for (Colony colony : colonies) updateColony(colony);
+        for (Colony colony : colonies) {
+            // Do not include colonies that have been abandoned but are
+            // still on the colonies list.
+            if (colony.getUnitCount() > 0) {
+                updateColony(colony);
+            }
+        }
 
         conciseHeaders(goodsTypes, false, market);
     }
