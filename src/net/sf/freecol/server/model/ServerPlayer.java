@@ -82,14 +82,16 @@ import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.LootSession;
+import net.sf.freecol.server.model.TransactionSession;
 
 
 /**
-* A <code>Player</code> with additional (server specific) information.
-*
-* That is: pointers to this player's
-* {@link Connection} and {@link Socket}
-*/
+ * A <code>Player</code> with additional (server specific) information.
+ *
+ * That is: pointers to this player's
+ * {@link Connection} and {@link Socket}
+ */
 public class ServerPlayer extends Player implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
@@ -2800,7 +2802,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (loser.getGoodsList().size() > 0 && winner.getSpaceLeft() > 0) {
             List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
             for (Goods g : capture) g.setLocation(null);
-            TransactionSession.establishLootSession(winner, loser, capture);
+            LootSession session = new LootSession(winner, loser);
+            session.setCapture(capture);
             cs.add(See.only(winnerPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                 new LootCargoMessage(winner, loser.getId(), capture));
         }

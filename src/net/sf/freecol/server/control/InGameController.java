@@ -116,6 +116,9 @@ import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.server.model.DiplomacySession;
+import net.sf.freecol.server.model.LootSession;
+import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
 
 import org.w3c.dom.Element;
@@ -1310,15 +1313,14 @@ public final class InGameController extends Controller {
     public Element getTransaction(ServerPlayer serverPlayer, Unit unit,
                                   Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session = TransactionSession.lookup(TradeSession.class,
+            unit, settlement);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
                 return DOMMessage.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            session = TransactionSession.establishTradeSession(unit,
-                                                               settlement);
+            session = new TradeSession(unit, settlement);
             // Sets unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
             // closing the session
@@ -1328,11 +1330,11 @@ public final class InGameController extends Controller {
 
         // Add just the attributes the client needs.
         cs.addAttribute(See.only(serverPlayer), "canBuy",
-                        ((Boolean) session.get("canBuy")).toString());
+            Boolean.toString(session.getBuy()));
         cs.addAttribute(See.only(serverPlayer), "canSell",
-                        ((Boolean) session.get("canSell")).toString());
+            Boolean.toString(session.getSell()));
         cs.addAttribute(See.only(serverPlayer), "canGift",
-                        ((Boolean) session.get("canGift")).toString());
+            Boolean.toString(session.getGift()));
 
         // Others can not see transactions.
         return cs.build(serverPlayer);
@@ -1349,21 +1351,19 @@ public final class InGameController extends Controller {
      */
     public Element closeTransaction(ServerPlayer serverPlayer, Unit unit,
                                     Settlement settlement) {
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TradeSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("No such transaction session.");
         }
 
         ChangeSet cs = new ChangeSet();
         // Restore unit movement if no action taken.
-        Boolean actionTaken = (Boolean) session.get("actionTaken");
-        if (!actionTaken) {
-            Integer unitMoves = (Integer) session.get("unitMoves");
-            unit.setMovesLeft(unitMoves);
+        if (!session.getActionTaken()) {
+            unit.setMovesLeft(session.getMovesLeft());
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         }
-        TransactionSession.forget(unit, settlement);
+        session.complete();
 
         // Others can not see end of transaction.
         return cs.build(serverPlayer);
@@ -1411,12 +1411,12 @@ public final class InGameController extends Controller {
     public Element buyProposition(ServerPlayer serverPlayer,
                                   Unit unit, Settlement settlement,
                                   Goods goods, int price) {
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TradeSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("Proposing to buy without opening a transaction session?!");
         }
-        if (!(Boolean) session.get("canBuy")) {
+        if (!session.getBuy()) {
             return DOMMessage.clientError("Proposing to buy in a session where buying is not allowed.");
         }
 
@@ -1444,12 +1444,12 @@ public final class InGameController extends Controller {
     public Element sellProposition(ServerPlayer serverPlayer,
                                    Unit unit, Settlement settlement,
                                    Goods goods, int price) {
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TradeSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("Proposing to sell without opening a transaction session");
         }
-        if (!(Boolean) session.get("canSell")) {
+        if (!session.getSell()) {
             return DOMMessage.clientError("Proposing to sell in a session where selling is not allowed.");
         }
 
@@ -2337,12 +2337,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         csSpeakToChief(serverPlayer, settlement, false, cs);
 
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TradeSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("Trying to buy without opening a transaction session");
         }
-        if (!(Boolean) session.get("canBuy")) {
+        if (!session.getBuy()) {
             return DOMMessage.clientError("Trying to buy in a session where buying is not allowed.");
         }
         if (unit.getSpaceLeft() <= 0) {
@@ -2373,8 +2373,7 @@ public final class InGameController extends Controller {
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        session.put("actionTaken", true);
-        session.put("canBuy", false);
+        session.setBuy();
         logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
                       + " at " + settlement.getName() + " for " + amount);
 
@@ -2399,12 +2398,12 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         csSpeakToChief(serverPlayer, settlement, false, cs);
 
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TransactionSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("Trying to sell without opening a transaction session");
         }
-        if (!(Boolean) session.get("canSell")) {
+        if (!session.getSell()) {
             return DOMMessage.clientError("Trying to sell in a session where selling is not allowed.");
         }
 
@@ -2429,8 +2428,7 @@ public final class InGameController extends Controller {
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        session.put("actionTaken", true);
-        session.put("canSell", false);
+        session.setSell();
         cs.addSale(serverPlayer, settlement, goods.getType(),
                    (int) Math.round((float) amount / goods.getAmount()));
         logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
@@ -2452,12 +2450,12 @@ public final class InGameController extends Controller {
     public Element deliverGiftToSettlement(ServerPlayer serverPlayer,
                                            Unit unit, Settlement settlement,
                                            Goods goods) {
-        TransactionSession session
-            = TransactionSession.lookup(unit, settlement);
+        TradeSession session
+            = TransactionSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
             return DOMMessage.clientError("Trying to deliverGift without opening a transaction session");
         }
-        if (!(Boolean) session.get("canGift")) {
+        if (!session.getGift()) {
             return DOMMessage.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
         }
 
@@ -2475,8 +2473,7 @@ public final class InGameController extends Controller {
             tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), tile);
         }
-        session.put("actionTaken", true);
-        session.put("canGift", false);
+        session.setGift();
 
         // Inform the receiver of the gift.
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
@@ -2842,11 +2839,11 @@ public final class InGameController extends Controller {
      */
     private Element acceptTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
-                                DiplomaticTrade agreement) {
-        TransactionSession.forget(unit, settlement);
+                                DiplomacySession session) {
+        session.complete();
 
         ChangeSet cs = new ChangeSet();
-
+        DiplomaticTrade agreement = session.getAgreement();
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         for (TradeItem tradeItem : agreement.getTradeItems()) {
             // Check trade carefully before committing.
@@ -2926,13 +2923,13 @@ public final class InGameController extends Controller {
      */
     private Element rejectTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
-                                DiplomaticTrade agreement) {
-        TransactionSession.forget(unit, settlement);
+                                DiplomacySession session) {
+        session.complete();
 
         ChangeSet cs = new ChangeSet();
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-               new DiplomacyMessage(unit, settlement, agreement));
+            new DiplomacyMessage(unit, settlement, session.getAgreement()));
         return cs.build(serverPlayer);
     }
 
@@ -2948,48 +2945,50 @@ public final class InGameController extends Controller {
     public Element diplomaticTrade(ServerPlayer serverPlayer, Unit unit,
                                    Settlement settlement,
                                    DiplomaticTrade agreement) {
-        TransactionSession session;
+        DiplomacySession session;
         DiplomaticTrade current;
         ServerPlayer other = (ServerPlayer) settlement.getOwner();
         unit.setMovesLeft(0);
 
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
-            session = TransactionSession.lookup(unit, settlement);
+            session = TransactionSession.lookup(DiplomacySession.class,
+                unit, settlement);
             if (session == null) {
                 return DOMMessage.clientError("Accepting without open session.");
             }
             // Act on what was proposed, not what is in the accept
             // message to frustrate tricksy client changing the conditions.
-            current = (DiplomaticTrade) session.get("agreement");
+            current = session.getAgreement();
             current.setStatus(TradeStatus.ACCEPT_TRADE);
 
             sendElement(other, new ChangeSet().add(See.only(other),
                     ChangePriority.CHANGE_LATE,
                     new DiplomacyMessage(unit, settlement, current)));
-            return acceptTrade(serverPlayer, other, unit, settlement, current);
+            return acceptTrade(serverPlayer, other, unit, settlement, session);
 
         case REJECT_TRADE:
-            session = TransactionSession.lookup(unit, settlement);
+            session = TransactionSession.lookup(DiplomacySession.class,
+                unit, settlement);
             if (session == null) {
                 return DOMMessage.clientError("Rejecting without open session.");
             }
-            current = (DiplomaticTrade) session.get("agreement");
+            current = session.getAgreement();
             current.setStatus(TradeStatus.REJECT_TRADE);
 
             sendElement(other, new ChangeSet().add(See.only(other),
                     ChangePriority.CHANGE_LATE,
                     new DiplomacyMessage(unit, settlement, current)));
-            return rejectTrade(serverPlayer, other, unit, settlement, current);
+            return rejectTrade(serverPlayer, other, unit, settlement, session);
 
         case PROPOSE_TRADE:
             current = agreement;
-            session = TransactionSession.lookup(unit, settlement);
+            session = TransactionSession.lookup(DiplomacySession.class,
+                unit, settlement);
             if (session == null) {
-                session = TransactionSession
-                    .establishDiplomacySession(unit, settlement);
+                session = new DiplomacySession(unit, settlement);
             }
-            session.put("agreement", agreement);
+            session.setAgreement(agreement);
 
             // If the unit is on a carrier we need to update the
             // client with it first as the diplomacy message refers to it.
@@ -3014,13 +3013,13 @@ public final class InGameController extends Controller {
                 // as accepted.
                 current.setStatus(TradeStatus.ACCEPT_TRADE);
                 return acceptTrade(serverPlayer, other, unit, settlement,
-                                   current);
+                    session);
 
             case PROPOSE_TRADE:
                 // Save the counter-proposal, sanity test, then pass back.
                 if ((ServerPlayer) agreement.getSender() == serverPlayer
                     && (ServerPlayer) agreement.getRecipient() == other) {
-                    session.put("agreement", agreement);
+                    session.setAgreement(agreement);
                     return new ChangeSet().add(See.only(serverPlayer),
                                                ChangePriority.CHANGE_LATE,
                                                diplomacy)
@@ -3034,7 +3033,7 @@ public final class InGameController extends Controller {
                 // Reject the current trade.
                 current.setStatus(TradeStatus.REJECT_TRADE);
                 return rejectTrade(serverPlayer, other, unit, settlement,
-                                   current);
+                    session);
             }
 
         default:
@@ -3126,9 +3125,9 @@ public final class InGameController extends Controller {
     @SuppressWarnings("unchecked")
     public Element lootCargo(ServerPlayer serverPlayer, Unit winner,
                              String loserId, List<Goods> loot) {
-        TransactionSession ts = TransactionSession.lookup(winner.getId(),
-                                                          loserId);
-        if (ts == null) {
+        LootSession session = TransactionSession.lookup(LootSession.class,
+            winner.getId(), loserId);
+        if (session == null) {
             return DOMMessage.clientError("Bogus looting!");
         }
         if (winner.getSpaceLeft() == 0) {
@@ -3137,12 +3136,12 @@ public final class InGameController extends Controller {
         }
 
         ChangeSet cs = new ChangeSet();
-        List<Goods> available = (ArrayList<Goods>) ts.get("lootCargo");
+        List<Goods> available = session.getCapture();
         if (loot == null) { // Initial inquiry
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                    new LootCargoMessage(winner, loserId, available));
         } else {
-            TransactionSession.forget(winner.getId(), loserId);
+            session.complete();
             for (Goods g : loot) {
                 if (!available.contains(g)) {
                     return DOMMessage.clientError("Invalid loot: "
