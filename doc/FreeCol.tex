@@ -24,7 +24,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.10.1}
+\title{FreeCol Documentation\\User Guide for Version v0.10.2}
 \maketitle{}
 
 \tableofcontents
@@ -138,6 +138,61 @@ the Prairie produces three units of Cotton, then this applies to the
 ``Classic'' rule set and the ``FreeCol'' rule set. Another rule set
 might change these values, or might not even include a Lumberjack, the
 Prairie terrain, or Cotton.
+
+\hypertarget{Differences between the rule
+  sets}{\subsection{Differences between the rule sets}}
+
+The following differences between the ``Classic'' rule set and the
+``FreeCol'' rule set exist:
+
+\begin{itemize}
+\item The FreeCol rules introduce four additional nations and four
+  additional national advantages. These additions correct the omission
+  of the Portuguese from the original game, and make multi-player
+  games with up to eight players possible.
+\item Under the Classic rules, the population of a colony with a
+  \hyperlink{Stockade}{stockade} or more advanced fortification can
+  not be reduced below three. Therefore, it is usually impossible to
+  abandon a fortified colony. The FreeCol rule set deliberately
+  ignores this rule of the original game.
+\item While the original game awards
+  \hyperlink{Exploration}{exploration points} only for the discovery
+  of the Pacific Ocean, FreeCol optionally awards exploration points
+  for the discovery of various map regions. The FreeCol rule set
+  enables exploration points by default, whereas the Classic rule set
+  disables them by default.
+\item In the original game, it is impossible to attack units on land
+  with ships or units aboard ships. This makes it possible to create
+  invincible colonies by completely fortifying small islands. FreeCol
+  optionally allows amphibious assaults. The option is on by default
+  in the FreeCol rule set, and off by default in the Classic rule set.
+\item FreeCol optionally makes \hyperlink{Missionary}{missionaries}
+  more useful. Settlements with a mission grant the owner of the
+  mission better prices when trading, and are willing to train more
+  than one of his units. This feature is turned off by default in the
+  Classic rule set and turned on by default in the FreeCol rule set.
+\item In the original game, the \hyperlink{Royal Expeditionary
+  Force}{Royal Expeditionary Force} simply appears out of the blue,
+  and can not be defeated at sea before unloading most of its
+  troops. In FreeCol, you can decide whether the REF must obey the
+  usual sailing rules. By default, the Classic rules emulate the
+  original game, while the FreeCol rules allow a naval defeat of the
+  REF.
+\item In the original game, the \hyperlink{Custom House}{Custom House}
+  ignores all boycotts. This is generally considered a bug rather than
+  a feature. Under the FreeCol rules, custom houses must obey boycotts
+  by default, whereas they ignore boycotts by default under the
+  Classic rules.
+\item It has been claimed that experts can produce a certain amount of
+  goods even if not enough raw materials are available in the original
+  game. Although it is unclear whether this is generally true and is a
+  feature rather than a bug of the original game, the Classic rule set
+  emulates this quirk by default. The FreeCol rule set does not.
+\item In the original game, the least skilled unit is always educated
+  first. FreeCol optionally allows you to select the unit to be
+  trained yourself. This feature is off by default in the Classic
+  rule set and on by default in the FreeCol rule set.
+\end{itemize}
 
 
 \hypertarget{Liberty and Immigration}{\section{Liberty and Immigration}}
@@ -1849,12 +1904,14 @@ as long as you avoid sharing tiles between several colonies as far as
 possible.
 
 
-\hypertarget{No Reforestation}{\subsection{No Reforestation}}
+\hypertarget{Reforestation}{\subsection{Reforestation}}
 
 You can order your pioneers to cut down forests by plowing a tile.
 This will increase the food produced on these tiles, and the lumber
-will be delivered to your colonies. However, you can not plant new
-forests later. Once cleared, a tile will never produce lumber again.
+will be delivered to your colonies. Under the usual rules, you can not
+plant new forests later, however. Once cleared, a tile will never
+produce lumber again. The ``Plant forest'' mod distributed with
+FreeCol corrects this issue, however.
 
 
 \hypertarget{Government Efficiency}{\subsection{Government Efficiency}}
