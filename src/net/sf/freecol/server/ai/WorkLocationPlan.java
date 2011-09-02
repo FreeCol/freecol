@@ -135,10 +135,9 @@ public class WorkLocationPlan extends ValuedAIObject {
      * Returns the increase in production of the given GoodsType this
      * TileImprovementType would yield.
      *
-     * @param tileType The <code>TileType</code> to be considered. A
-     *        <code>null</code> entry denotes no interest in a
-     *        TileImprovementType that changes TileTypes
+     * @param tile The <code>Tile</code> to be considered
      * @param goodsType A preferred <code>GoodsType</code> or <code>null</code>
+     * @param improvementType a <code>TileImprovementType</code> value
      * @return the increase in production
      */
     public static int getImprovementValue(Tile tile, GoodsType goodsType,

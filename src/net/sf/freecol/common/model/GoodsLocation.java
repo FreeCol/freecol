@@ -98,7 +98,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * Gets the maximum number of <code>Goods</code> this Location
      * can hold.
      *
-     * @return 
+     * @return the capacity for goods
      */
     public abstract int getGoodsCapacity();
 
@@ -218,7 +218,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * Gets the storage capacity of this settlement.
      *
      * @return The storage capacity of this settlement.
-     * @see getGoodsCapacity
+     * @see #getGoodsCapacity
      */
     public int getWarehouseCapacity() {
         return getGoodsCapacity();

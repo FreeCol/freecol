@@ -2836,7 +2836,7 @@ public final class InGameController extends Controller {
      * @param other The other <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> to trade with.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @param session a <code>DiplomacySession</code> value
      * @return An <code>Element</code> encapsulating the changes.
      */
     private Element acceptTrade(ServerPlayer serverPlayer, ServerPlayer other,
@@ -2920,7 +2920,7 @@ public final class InGameController extends Controller {
      * @param other The other <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> to trade with.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
+     * @param session a <code>DiplomacySession</code> value
      * @return An <code>Element</code> encapsulating the changes.
      */
     private Element rejectTrade(ServerPlayer serverPlayer, ServerPlayer other,

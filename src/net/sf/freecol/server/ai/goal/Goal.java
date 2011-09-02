@@ -329,9 +329,6 @@ public abstract class Goal extends AIObject implements GoalConstants {
      *
      * @param gt The {@link GoodsType} we're requesting a worker for.
      * @param minProduction The minimum a unit needs to produce to be considered.
-     * Should be 0 if any worker will do, or the value of
-     * {@link UnitType#getProductionFor(GoodsType,int)} if an existing worker
-     * unit is supposed to be replaced.
      */
     protected void requestWorker(GoodsType gt, int minProduction) {
 

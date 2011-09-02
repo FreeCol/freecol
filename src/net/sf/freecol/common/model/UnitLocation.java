@@ -409,7 +409,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out)
@@ -425,7 +425,14 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * {@inheritDoc}
+     * Serialize the children of this UnitLocation, i.e. the Units
+     * themselves.
+     *
+     * @param out a <code>XMLStreamWriter</code> value
+     * @param player a <code>Player</code> value
+     * @param showAll a <code>boolean</code> value
+     * @param toSavedGame a <code>boolean</code> value
+     * @exception XMLStreamException if an error occurs
      */
     protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {

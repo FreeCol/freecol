@@ -169,7 +169,9 @@ public class HighSeas extends UnitLocation {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the tag name of this Object.
+     *
+     * @return "highSeas"
      */
     public static String getXMLElementTagName() {
         return "highSeas";

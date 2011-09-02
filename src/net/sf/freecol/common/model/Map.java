@@ -207,7 +207,7 @@ public class Map extends FreeColGameObject implements Location {
         super(game);
         this.tiles = tiles;
         setLayer(Layer.RESOURCES);
-        setLatitudePerRow();
+        calculateLatitudePerRow();
     }
 
     /**
@@ -284,7 +284,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public final void setMinimumLatitude(final int newMinimumLatitude) {
         this.minimumLatitude = newMinimumLatitude;
-        setLatitudePerRow();
+        calculateLatitudePerRow();
     }
 
     /**
@@ -303,7 +303,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public final void setMaximumLatitude(final int newMaximumLatitude) {
         this.maximumLatitude = newMaximumLatitude;
-        setLatitudePerRow();
+        calculateLatitudePerRow();
     }
 
     /**
@@ -316,11 +316,9 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Set the <code>LatitudePerRow</code> value.
-     *
-     * @param newLatitudePerRow The new LatitudePerRow value.
+     * Calculates the <code>LatitudePerRow</code> value.
      */
-    private final void setLatitudePerRow() {
+    private final void calculateLatitudePerRow() {
         this.latitudePerRow = 1f * (maximumLatitude - minimumLatitude) /
             (getHeight() - 1);
     }
@@ -2102,7 +2100,7 @@ public class Map extends FreeColGameObject implements Location {
 
         minimumLatitude = getAttribute(in, "minimumLatitude", -90);
         maximumLatitude = getAttribute(in, "maximumLatitude", 90);
-        setLatitudePerRow();
+        calculateLatitudePerRow();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Tile.getXMLElementTagName())) {

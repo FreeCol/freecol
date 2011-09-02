@@ -62,7 +62,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * The maximum distance that will still be considered "near" when
      * determining the location name.
      *
-     * @see getLocationName
+     * @see #getLocationName
      */
     public static final int NEAR_RADIUS = 8;
 

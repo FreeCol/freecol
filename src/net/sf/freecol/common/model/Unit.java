@@ -1726,7 +1726,7 @@ public class Unit extends FreeColGameObject
      * Finds the closest <code>Location</code> to this tile where
      * this ship can be repaired.
      *
-     * @param disallow An optional list of colonies to exclude.
+     * @param exclude An optional list of colonies to exclude.
      * @return The closest <code>Location</code> where a ship can be repaired.
      */
     public Location getRepairLocation(List<Colony> exclude) {
@@ -1801,7 +1801,7 @@ public class Unit extends FreeColGameObject
             return goodsContainer.addGoods(goods);
         } else {
             throw new IllegalStateException("Can not be added to unit: "
-                + ((FreeColGameObject) locatable).toString());
+                                            + ((FreeColGameObject) locatable).toString());
         }
     }
 
@@ -2021,7 +2021,6 @@ public class Unit extends FreeColGameObject
      * Sets the location of this Unit.
      *
      * @param newLocation The new <code>Location</code>.
-     * @return True if the location setting succeeded.
      */
     public void setLocation(Location newLocation) {
         Location oldLocation = location;
@@ -2282,16 +2281,17 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Sets the nationality of this Unit.
-     * A unit will change nationality when it switches owners willingly.
-     * Currently only Converts do this, but it opens the possibility of naturalisation.
+     * Sets the nationality of this Unit.  A unit will change
+     * nationality when it switches owners willingly.  Currently only
+     * Converts do this, but it opens the possibility of
+     * naturalisation.
      *
-     * @param owner The new nationality of this Unit.
+     * @param newNationality The new nationality of this Unit.
      */
     public void setNationality(String newNationality) {
         if (hasAbility(Ability.BORN_IN_COLONY)
-			|| hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-			|| hasAbility("model.ability.foundColony")) {
+            || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+            || hasAbility("model.ability.foundColony")) {
             // 0.10.0 and earlier games have no model.ability.person,
             // so instead we check several other abilities to exclude
             // ships, artillery, wagons and treasure trains.
@@ -2318,7 +2318,7 @@ public class Unit extends FreeColGameObject
      * Sets the ethnicity of this Unit.
      * Ethnicity is something units are born with. It cannot be subsequently changed.
      *
-     * @param owner The new ethnicity of this Unit.
+     * @param newEthnicity The new ethnicity of this Unit.
      */
     public void setEthnicity(String newEthnicity) {
         throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
@@ -2331,13 +2331,13 @@ public class Unit extends FreeColGameObject
      */
     public boolean hasNativeEthnicity() {
     	try {
-    		// FIXME: getNation() could fail, but getNationType() doesn't work as expected
+            // FIXME: getNation() could fail, but getNationType() doesn't work as expected
             return getGame().getSpecification().getNation(ethnicity).getType().isIndian();
-//          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
-//          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
-		} catch (Exception e) {
-			return false;
-		}
+            //          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
+            //          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -2417,7 +2417,7 @@ public class Unit extends FreeColGameObject
         Role role = getRole();
         if (role != Role.DEFAULT) {
             result = StringTemplate.template("model.unit." + role.getId()
-                + ".name")
+                                             + ".name")
                 .addStringTemplate("%unit%", result);
         }
         return result;
@@ -3146,8 +3146,8 @@ public class Unit extends FreeColGameObject
         int opt = spec.getIntegerOption("model.option.nativeConvertProbability")
             .getValue();
         return 0.01f * FeatureContainer.applyModifierSet(opt,
-                getGame().getTurn(),
-                getModifierSet("model.modifier.nativeConvertBonus"));
+                                                         getGame().getTurn(),
+                                                         getModifierSet("model.modifier.nativeConvertBonus"));
     }
 
     /**
@@ -3233,7 +3233,7 @@ public class Unit extends FreeColGameObject
 
     private void unitsToXML(XMLStreamWriter out, Player player,
                             boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         if (!units.isEmpty()) {
             out.writeStartElement(UNITS_TAG_NAME);
             for (Unit unit : units) {
@@ -3290,8 +3290,8 @@ public class Unit extends FreeColGameObject
             if (nationality != null) {
                 out.writeAttribute("nationality", nationality);
             } else if(hasAbility(Ability.BORN_IN_COLONY)
-                || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                || hasAbility("model.ability.foundColony")) {
+                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                      || hasAbility("model.ability.foundColony")) {
                 // 0.10.0 and earlier games have no model.ability.person,
                 // so instead we check several other abilities to exclude
                 // ships, artillery, wagons and treasure trains.
@@ -3302,8 +3302,8 @@ public class Unit extends FreeColGameObject
             if (ethnicity != null) {
                 out.writeAttribute("ethnicity", ethnicity);
             } else if(hasAbility(Ability.BORN_IN_COLONY)
-                || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                || hasAbility("model.ability.foundColony")) {
+                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                      || hasAbility("model.ability.foundColony")) {
                 // 0.10.0 and earlier games have no model.ability.person,
                 // so instead we check several other abilities to exclude
                 // ships, artillery, wagons and treasure trains.
@@ -3312,9 +3312,9 @@ public class Unit extends FreeColGameObject
                 if(!hasAbility("model.ability.convert")) {
                     out.writeAttribute("ethnicity", owner.getNationID());
                 } else if(indianSettlement != null
-                    && indianSettlement.getOwner() != null) {
+                          && indianSettlement.getOwner() != null) {
                     out.writeAttribute("ethnicity",
-                        indianSettlement.getOwner().getNationID());
+                                       indianSettlement.getOwner().getNationID());
                 }
                 // do not compute the ethnicity of a convert with a null
                 // indianSettlement, that information is now unretrievable
@@ -3323,7 +3323,7 @@ public class Unit extends FreeColGameObject
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         if (workType != null) out.writeAttribute("workType", workType.getId());
         if (experienceType != null) out.writeAttribute("experienceType",
-                                                        experienceType.getId());
+                                                       experienceType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
@@ -3345,7 +3345,7 @@ public class Unit extends FreeColGameObject
 
         if (location != null) {
             if (full || !(location instanceof Building
-                    || location instanceof ColonyTile)) {
+                          || location instanceof ColonyTile)) {
                 out.writeAttribute("location", location.getId());
             } else {
                 out.writeAttribute("location", getColony().getId());

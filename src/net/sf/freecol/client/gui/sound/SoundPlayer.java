@@ -64,7 +64,7 @@ public class SoundPlayer {
      * Creates a sound player.
      *
      * @param mixerOption The option for setting the mixer to use.
-     * @param volume The volume option to use when playing audio.
+     * @param volumeOption The volume option to use when playing audio.
      */
     public SoundPlayer(AudioMixerOption mixerOption,
                        PercentageOption volumeOption) {

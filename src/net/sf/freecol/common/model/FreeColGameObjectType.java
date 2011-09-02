@@ -268,7 +268,6 @@ public class FreeColGameObjectType extends FreeColObject {
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */

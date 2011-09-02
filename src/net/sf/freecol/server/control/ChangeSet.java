@@ -809,7 +809,6 @@ public class ChangeSet {
          * @param first The <code>Player</code> changing stance.
          * @param stance The <code>Stance</code> to change to.
          * @param second The <code>Player</code> wrt with to change.
-         * @param war The war status.
          */
         StanceChange(See see, Player first, Stance stance, Player second) {
             super(see);

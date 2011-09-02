@@ -175,7 +175,7 @@ public class ServerAPI {
     /**
      * Helper to load a map.
      *
-     * @para queries Query strings.
+     * @param queries Query strings.
      * @return A map with null mappings for the query strings.
      */
     private HashMap<String, String> loadMap(String... queries) {
@@ -500,7 +500,7 @@ public class ServerAPI {
     /**
      * Server query-response for choosing a founding father.
      *
-     * @param foundingFather The <code>FoundingFather</code> to choose.
+     * @param father The <code>FoundingFather</code> to choose.
      * @return True if the server interaction succeeded.
      */
     public boolean chooseFoundingFather(FoundingFather father) {
@@ -967,7 +967,6 @@ public class ServerAPI {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
-     * @param results A <code>Map</code> to store special attribute results in.
      * @return An array of booleans for the buy/sell/gift status,
      *     or null if the server interaction failed.
      */

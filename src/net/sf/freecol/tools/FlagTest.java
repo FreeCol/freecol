@@ -42,7 +42,7 @@ public class FlagTest extends JFrame {
 
     static {
 	for (int[] bars : new int[][] {
-		 { 5, 4 }, { 5, 6 }, { 6, 5 }
+                { 5, 4 }, { 5, 6 }, { 6, 5 }, { 5, 5 }
 	     }) {
 	    int sum = bars[0] + bars[1];
 	    boolean even = true;

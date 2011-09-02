@@ -650,7 +650,7 @@ public class Colony extends Settlement implements Nameable {
      * Adds a <code>Unit</code> to an optional
      * <code>WorkLocation</code> in this Colony.
      *
-     * @param Unit The <code>Unit</code> to add.
+     * @param unit The <code>Unit</code> to add.
      * @param loc The <code>WorkLocation</code> to add to (if null,
      *     one is chosen.
      * @return True if the add succeeded.

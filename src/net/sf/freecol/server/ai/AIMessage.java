@@ -272,11 +272,6 @@ public class AIMessage {
 
 
     /**
-      * Claims a tile for a colony.
-      *
-      * @param conn The <code>Connection</code> to send on.
-
-    /**
      * Claims a tile for a colony.
      *
      * @param conn The <code>Connection</code> to send on.
