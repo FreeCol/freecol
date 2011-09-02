@@ -1004,6 +1004,38 @@ public class Colony extends Settlement implements Nameable {
         return owner.checkGold(1);
     }
 
+
+    /**
+     * Returns <code>true</code> if the number of enemy combat units
+     * on all tiles that belong to the colony exceeds the number of
+     * friendly combat units. At the moment, only the colony owner's
+     * own units are considered friendly, but that could be extended
+     * to include the units of allied players.
+     *
+     * TODO: if a colony is under siege, it should not be possible to
+     * put units outside the colony, unless those units are armed.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isUnderSiege() {
+        int friendlyUnits = 0;
+        int enemyUnits = 0;
+        for (ColonyTile colonyTile : colonyTiles) {
+            for (Unit unit : colonyTile.getWorkTile().getUnitList()) {
+                if (unit.getOwner() == getOwner()) {
+                    if (unit.isDefensiveUnit()) {
+                        friendlyUnits++;
+                    }
+                } else if (getOwner().atWarWith(unit.getOwner())) {
+                    if (unit.isOffensiveUnit()) {
+                        enemyUnits++;
+                    }
+                }
+            }
+        }
+        return enemyUnits > friendlyUnits;
+    }
+
     /**
      * Gets the buildings in this colony that could be burned by a raid.
      *

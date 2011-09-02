@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.server.model.ServerUnit;
@@ -70,7 +71,11 @@ public class ColonyTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.masterWeaver");
     private static final UnitType wagonTrainType
         = spec().getUnitType("model.unit.wagonTrain");
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
 
+    private static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
 
     public void testCurrentlyBuilding() {
         Game game = getGame();
@@ -179,7 +184,6 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
-        spec();
 
         colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
         colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
@@ -385,4 +389,42 @@ public class ColonyTest extends FreeColTestCase {
                      NoClaimReason.NATIVES,
                      dutch.canClaimForSettlementReason(nativeTile));
     }
+
+    public void testUnderSiege() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+        Colony colony = getStandardColony(5);
+        Tile tile = colony.getTile().getAdjacentTile(Direction.N);
+        Player iroquois = game.getPlayer("model.nation.iroquois");
+
+        assertFalse("No enemy units present.", colony.isUnderSiege());
+
+        Unit brave = new ServerUnit(game, tile, iroquois, braveType);
+        assertFalse("Not at war with the Iroquois.", colony.isUnderSiege());
+
+        // declare war
+        colony.getOwner().setStance(iroquois, Player.Stance.WAR);
+        iroquois.setStance(colony.getOwner(), Player.Stance.WAR);
+
+        assertTrue("At war with the Iroquois.", colony.isUnderSiege());
+
+        Unit soldier = new ServerUnit(game, colony.getTile(), colony.getOwner(),
+                                      freeColonistType, muskets);
+        assertFalse("Equal number of friendly and enemy combat units.",
+                    colony.isUnderSiege());
+
+        Unit brave2 = new ServerUnit(game, tile, iroquois, braveType);
+        assertTrue("Enemy combat units outnumber friendly combat units.",
+                   colony.isUnderSiege());
+
+        Unit colonist = new ServerUnit(game, colony.getTile(), colony.getOwner(),
+                                       freeColonistType);
+        assertTrue("Enemy combat units outnumber friendly combat units.",
+                   colony.isUnderSiege());
+
+        colonist.changeEquipment(muskets, 1);
+        assertFalse("Equal number of friendly and enemy combat units.",
+                    colony.isUnderSiege());
+    }
+
 }
