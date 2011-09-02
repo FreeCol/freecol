@@ -26,12 +26,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.server.control.ChangeSet;
 
 
 /**
  * Root class for sessions.
  */
-public class TransactionSession {
+public abstract class TransactionSession {
 
     private static final Logger logger = Logger.getLogger(TransactionSession.class.getName());
 
@@ -59,8 +60,11 @@ public class TransactionSession {
      * All transaction types must implement a completion action.  The
      * last thing they should do is call this to remove reference to
      * this transaction.
+     *
+     * @param cs A <code>ChangeSet</code> to update with changes that
+     *     occur when completing this session.
      */
-    public void complete() {
+    public void complete(ChangeSet cs) {
         allSessions.remove(this);
     }
     
@@ -95,9 +99,12 @@ public class TransactionSession {
     // Public interface
 
     /**
-     * Clear all transactions.  Useful at the start of turn.
+     * Complete all transactions.  Useful at the end of turn.
      */
-    public static void clearAll() {
+    public static void completeAll(ChangeSet cs) {
+        for (TransactionSession ts : allSessions.values()) {
+            ts.complete(cs);
+        }
         allSessions.clear();
     }
 

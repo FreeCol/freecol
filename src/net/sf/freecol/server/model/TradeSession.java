@@ -19,10 +19,12 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.control.ChangeSet;
 
 
 /**
@@ -58,8 +60,8 @@ public class TradeSession extends TransactionSession {
         canGift = true;            
     }
 
-    public void complete() {
-        super.complete();
+    public void complete(ChangeSet cs) {
+        super.complete(cs);
     }
 
     public int getMovesLeft() {

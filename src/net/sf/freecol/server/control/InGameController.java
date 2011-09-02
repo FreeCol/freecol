@@ -110,14 +110,15 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+import net.sf.freecol.server.model.DemandSession;
+import net.sf.freecol.server.model.DiplomacySession;
+import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.model.DiplomacySession;
-import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
 
@@ -1363,7 +1364,7 @@ public final class InGameController extends Controller {
             unit.setMovesLeft(session.getMovesLeft());
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         }
-        session.complete();
+        session.complete(cs);
 
         // Others can not see end of transaction.
         return cs.build(serverPlayer);
@@ -2441,6 +2442,7 @@ public final class InGameController extends Controller {
 
     /**
      * Deliver gift to settlement.
+     * Note that this includes both European and native gifts.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
      * @param unit The <code>Unit</code> that is delivering.
@@ -2453,10 +2455,10 @@ public final class InGameController extends Controller {
         TradeSession session
             = TransactionSession.lookup(TradeSession.class, unit, settlement);
         if (session == null) {
-            return DOMMessage.clientError("Trying to deliverGift without opening a transaction session");
+            return DOMMessage.clientError("Trying to deliver gift without opening a session");
         }
         if (!session.getGift()) {
-            return DOMMessage.clientError("Trying to deliver gift in a session where gift giving is not allowed.");
+            return DOMMessage.clientError("Trying to deliver gift in a session where gift giving is not allowed: " + unit + " " + settlement + " " + session);
         }
 
         ChangeSet cs = new ChangeSet();
@@ -2840,9 +2842,9 @@ public final class InGameController extends Controller {
     private Element acceptTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
                                 DiplomacySession session) {
-        session.complete();
-
         ChangeSet cs = new ChangeSet();
+        session.complete(cs);
+
         DiplomaticTrade agreement = session.getAgreement();
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         for (TradeItem tradeItem : agreement.getTradeItems()) {
@@ -2924,9 +2926,9 @@ public final class InGameController extends Controller {
     private Element rejectTrade(ServerPlayer serverPlayer, ServerPlayer other,
                                 Unit unit, Settlement settlement,
                                 DiplomacySession session) {
-        session.complete();
-
         ChangeSet cs = new ChangeSet();
+        session.complete(cs);
+
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
             new DiplomacyMessage(unit, settlement, session.getAgreement()));
@@ -3141,7 +3143,6 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                    new LootCargoMessage(winner, loserId, available));
         } else {
-            session.complete();
             for (Goods g : loot) {
                 if (!available.contains(g)) {
                     return DOMMessage.clientError("Invalid loot: "
@@ -3156,6 +3157,7 @@ public final class InGameController extends Controller {
             }
 
             // Others can see cargo capacity change.
+            session.complete(cs);
             cs.add(See.perhaps(), winner);
             sendToOthers(serverPlayer, cs);
         }
@@ -3350,52 +3352,73 @@ public final class InGameController extends Controller {
      * @param colony The <code>Colony</code> that is demanded of.
      * @param goods The <code>Goods</code> being demanded.
      * @param gold The amount of gold being demanded.
+     * @param result The result of the demand.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element indianDemand(ServerPlayer serverPlayer, Unit unit,
-                                Colony colony, Goods goods, int gold) {
-        ServerPlayer receiver = (ServerPlayer) colony.getOwner();
-        if (!receiver.isConnected()) {
-            return DOMMessage.clientError("No connection to colony owner");
-        }
-        boolean accepted;
-        ChangeSet cs = new ChangeSet();
-        cs.add(See.only(receiver), ChangePriority.CHANGE_NORMAL,
-               new IndianDemandMessage(unit, colony, goods, gold));
-        try {
-            Element reply = askElement(receiver, cs);
-            accepted = Boolean.valueOf(reply.getAttribute("accepted"))
-                .booleanValue();
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
-        }
-
-        cs = new ChangeSet();
+                                Colony colony, Goods goods, int gold,
+                                String result) {
+        ServerPlayer demander = (ServerPlayer) unit.getOwner();
+        ServerPlayer victim = (ServerPlayer) colony.getOwner();
+        DemandSession session = TransactionSession.lookup(DemandSession.class,
+            unit, colony);
         int difficulty = getGame().getSpecification()
             .getIntegerOption("model.option.nativeDemands").getValue();
-        if (accepted) {
+        ChangeSet cs = new ChangeSet();
+
+        if (session == null) { // Initial demand
+            if (serverPlayer != demander) {
+                return DOMMessage.clientError("Colony player can not demand");
+            }
+            if (!victim.isConnected()) {
+                return DOMMessage.clientError("No connection to colony owner");
+            }
+            session = new DemandSession(unit, colony);
+            session.setGoods(goods);
+            session.setGold(gold);
+            session.setTension((difficulty + 1) * 50);
+
+            cs.add(See.only(victim), ChangePriority.CHANGE_NORMAL,
+                new IndianDemandMessage(unit, colony, goods, gold));
+            sendElement(victim, cs);
+            logger.info(demander.getName() + " unit " + unit
+                + " demands " + goods + " goods and " + gold + " gold "
+                + " from " + colony.getName());
+            return null; // Do not block waiting for response.
+        }
+
+        // Reply to demand
+        if (serverPlayer != victim) {
+            return DOMMessage.clientError("Native player can not reply");
+        }
+        if (session.getGold() != gold || session.getGoods() != goods) {
+            return DOMMessage.clientError("Transaction mismatch, cheat?");
+        }
+        logger.info(demander.getName() + " unit " + unit
+            + " demand from colony " + colony.getName()
+            + " result: " + result);
+        if (Boolean.TRUE.toString().equals(result)) {
             if (goods != null) {
                 GoodsContainer colonyContainer = colony.getGoodsContainer();
                 colonyContainer.saveState();
                 GoodsContainer unitContainer = unit.getGoodsContainer();
                 unitContainer.saveState();
                 moveGoods(goods, unit);
-                cs.add(See.only(receiver), colonyContainer);
-                cs.add(See.only(serverPlayer), unitContainer);
-            } else {
-                receiver.modifyGold(-gold);
-                serverPlayer.modifyGold(gold);
-                cs.addPartial(See.only(receiver), receiver, "gold");
+                cs.add(See.only(victim), colonyContainer);
+                cs.add(See.only(demander), unitContainer);
             }
-            cs.add(See.only(null).perhaps(receiver),
-                   serverPlayer.modifyTension(receiver, -(5 - difficulty) * 50));
-        } else {
-            cs.add(See.only(null).perhaps(receiver),
-                   serverPlayer.modifyTension(receiver, (difficulty + 1) * 50));
+            if (gold > 0) {
+                victim.modifyGold(-gold);
+                demander.modifyGold(gold);
+                cs.addPartial(See.only(victim), victim, "gold");
+                cs.addPartial(See.only(demander), demander, "gold");
+            }
+            cs.add(See.only(null).perhaps(victim),
+                demander.modifyTension(victim, -(5 - difficulty) * 50));
+            session.setTension(-1); // Disarm the complete() routine.
         }
-
-        // Receiver certainly sees things happen.
-        sendToOthers(serverPlayer, cs);
+        session.complete(cs);
+        sendElement(victim, cs);
         return cs.build(serverPlayer);
     }
 

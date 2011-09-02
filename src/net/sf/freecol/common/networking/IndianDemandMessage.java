@@ -48,6 +48,8 @@ public class IndianDemandMessage extends DOMMessage {
     // The gold being demanded.
     private String goldString;
 
+    // The result of this demand: null => not decided yet
+    private String result;
 
     /**
      * Create a new <code>IndianDemandMessage</code> with the
@@ -64,6 +66,7 @@ public class IndianDemandMessage extends DOMMessage {
         this.colonyId = colony.getId();
         this.goods = goods;
         this.goldString = (gold == 0) ? null : Integer.toString(gold);
+        this.result = null;
     }
 
     /**
@@ -78,6 +81,7 @@ public class IndianDemandMessage extends DOMMessage {
         this.colonyId = element.getAttribute("colony");
         this.goldString = (!element.hasAttribute("gold")) ? null
             : element.getAttribute("gold");
+        this.result = element.getAttribute("result");
         this.goods = (!element.hasChildNodes()) ? null
             : new Goods(game,
                 DOMMessage.getChildElement(element,
@@ -117,6 +121,13 @@ public class IndianDemandMessage extends DOMMessage {
     }
 
     /**
+     * Client-side convenience function to set the result of this message.
+     */
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    /**
      * Handle a "indianDemand"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
@@ -129,16 +140,27 @@ public class IndianDemandMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = player.getGame();
 
         Unit unit;
-        try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+        if (result == null) { // Initial demand
+            try {
+                unit = server.getUnitSafely(unitId, serverPlayer);
+            } catch (Exception e) {
+                return DOMMessage.clientError(e.getMessage());
+            }
+           if (unit.getMovesLeft() <= 0) {
+                return DOMMessage.clientError("Unit has no moves left: "
+                    + unitId);
+            }
+        } else { // Reply from colony
+            if (game.getFreeColGameObject(unitId) instanceof Unit) {
+                unit = (Unit) game.getFreeColGameObject(unitId);
+            } else {
+                return DOMMessage.clientError("Not a unit: " + unitId);
+            }
         }
-        if (unit.getMovesLeft() <= 0) {
-            return DOMMessage.clientError("Unit has no moves left: " + unitId);
-        }
+
         Colony colony;
         try {
             Settlement settlement
@@ -170,9 +192,9 @@ public class IndianDemandMessage extends DOMMessage {
             return DOMMessage.clientError("Both goods and gold can not be empty");
         }
 
-        // Proceed to indianDemand.
+        // Proceed to demand.
         return server.getInGameController()
-            .indianDemand(serverPlayer, unit, colony, goods, gold);
+            .indianDemand(serverPlayer, unit, colony, goods, gold, result);
     }
 
     /**
@@ -181,14 +203,15 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("colony", colonyId);
-        if (goldString != null) result.setAttribute("gold", goldString);
+        Element ret = createNewRootElement(getXMLElementTagName());
+        ret.setAttribute("unit", unitId);
+        ret.setAttribute("colony", colonyId);
+        if (goldString != null) ret.setAttribute("gold", goldString);
+        if (result != null) ret.setAttribute("result", result);
         if (goods != null) {
-            result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+            ret.appendChild(goods.toXMLElement(null, ret.getOwnerDocument()));
         }
-        return result;
+        return ret;
     }
 
     /**

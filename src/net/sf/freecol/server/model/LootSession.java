@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.control.ChangeSet;
 
 
 /**
@@ -43,8 +44,8 @@ public class LootSession extends TransactionSession {
         capture = null;
     }
 
-    public void complete() {
-        super.complete();
+    public void complete(ChangeSet cs) {
+        super.complete(cs);
     }
 
     public List<Goods> getCapture() {

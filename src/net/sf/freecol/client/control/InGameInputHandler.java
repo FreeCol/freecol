@@ -781,7 +781,7 @@ public final class InGameInputHandler extends InputHandler {
         if (m != null) {
             player.addModelMessage(m);
         }
-        element.setAttribute("accepted", String.valueOf(accepted));
+        message.setResult(Boolean.toString(accepted));
         return element;
     }
 

@@ -221,7 +221,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        TransactionSession.clearAll();
+        TransactionSession.completeAll(cs);
         setTurn(getTurn().next());
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));

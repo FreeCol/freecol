@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.control.ChangeSet;
 
 
 /**
@@ -43,8 +44,8 @@ public class DiplomacySession extends TransactionSession {
         agreement = null;
     }
 
-    public void complete() {
-        super.complete();
+    public void complete(ChangeSet cs) {
+        super.complete(cs);
     }
 
     public DiplomaticTrade getAgreement() {
