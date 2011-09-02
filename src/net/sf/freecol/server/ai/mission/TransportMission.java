@@ -1530,7 +1530,7 @@ public class TransportMission extends Mission {
             } else if (target == null) {
                 sb.append("null");
             } else {
-                sb.append(target.getTile().getPosition());
+                sb.append(target.toString());
             }
             sb.append(")");
             sb.append("\n");
