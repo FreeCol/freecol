@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class SettlementTest extends FreeColTestCase {
@@ -112,5 +113,24 @@ public class SettlementTest extends FreeColTestCase {
         }
 
     }
+
+    public void testLineOfSight() {
+        Game game = getGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        Colony colony = getStandardColony();
+
+        assertEquals(2, colony.getLineOfSight());
+
+        BuildingType towerType = new BuildingType("tower", spec());
+        Modifier modifier = new Modifier("model.modifier.lineOfSightBonus", 2, Modifier.Type.ADDITIVE);
+        towerType.addModifier(modifier);
+        Building tower = new ServerBuilding(getGame(), colony, towerType);
+        colony.addBuilding(tower);
+
+        assertEquals(4, colony.getLineOfSight());
+
+    }
+
 
 }

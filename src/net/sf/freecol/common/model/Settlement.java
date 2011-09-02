@@ -243,7 +243,9 @@ abstract public class Settlement extends GoodsLocation
      * @see Player#canSee(Tile)
      */
     public int getLineOfSight() {
-        return getType().getVisibleRadius();
+        return (int) getFeatureContainer()
+            .applyModifier(getType().getVisibleRadius(),
+                           "model.modifier.lineOfSightBonus");
     }
 
 
