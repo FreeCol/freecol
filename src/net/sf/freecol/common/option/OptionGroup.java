@@ -292,8 +292,13 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             option = new AudioMixerOption(in);
         } else if (StringOption.getXMLElementTagName().equals(optionType)) {
             option = new StringOption(in);
+        } else if ("action".equals(optionType)) {
+            logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
+            // TODO: load FreeColActions from client options?
+            in.nextTag();
+            return;
         } else {
-            logger.finest("Parsing of " + optionType + " is not implemented yet");
+            logger.finest("Parsing of option type '" + optionType + "' is not implemented yet");
             in.nextTag();
             return;
         }
