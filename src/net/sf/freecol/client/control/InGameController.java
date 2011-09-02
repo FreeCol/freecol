@@ -540,10 +540,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void autosave_game () {
         Game game = freeColClient.getGame();
-        if (game == null) {
-           return;
-        }
-        Player player = game.getCurrentPlayer();
+        if (game == null) return;
 
         // unconditional save per round (fix file "last-turn")
         String autosave_text
@@ -571,12 +568,13 @@ public final class InGameController implements NetworkConstants {
         int turnNumber = game.getTurn().getNumber();
         if (savegamePeriod <= 1
             || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-            String playernation = player == null ? ""
+            Player player = game.getCurrentPlayer();
+            String playerNation = player == null ? ""
                 : Messages.message(player.getNation().getNameKey());
             String gid = Integer.toHexString(game.getUUID().hashCode());
             filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                + '-' + gid  + "_" + playernation  + "_"
-                + getSaveGameString(game.getTurn()) + ".fsg";
+                + '-' + gid  + "_" + playerNation
+                + "_" + getSaveGameString(game.getTurn()) + ".fsg";
             saveGameFile = new File(autosaveDir, filename);
             saveGame(saveGameFile);
         }

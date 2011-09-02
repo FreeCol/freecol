@@ -21,9 +21,11 @@ package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -430,10 +432,7 @@ public class AIMain extends FreeColObject
         throws XMLStreamException {
         super.writeChildren(out);
 
-        Iterator<AIObject> i = aiObjects.values().iterator();
-        while (i.hasNext()) {
-            AIObject aio = i.next();
-
+        for (AIObject aio : new ArrayList<AIObject>(aiObjects.values())) {
             if ((aio instanceof Wish) && !((Wish) aio).shouldBeStored()) {
                 continue;
             }
