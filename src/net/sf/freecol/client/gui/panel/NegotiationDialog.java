@@ -65,9 +65,11 @@ import net.sf.freecol.common.model.UnitTradeItem;
  */
 public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> implements ActionListener {
 
+    private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
+
     private static final String SEND = "send", ACCEPT = "accept", CANCEL = "cancel";
 
-    private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
+    private static final int HUGE_DEMAND = 100000;
 
     private DiplomaticTrade agreement;
 
@@ -164,8 +166,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         FreeColPanel.enterPressesWhenFocused(cancelButton);
 
         stance = new StanceTradeItemPanel(this, player, otherPlayer);
-        goldDemand = new GoldTradeItemPanel(this, otherPlayer, 0);
-        goldOffer = new GoldTradeItemPanel(this, player, 0);
+        goldDemand = new GoldTradeItemPanel(this, otherPlayer, HUGE_DEMAND);
+        goldOffer = new GoldTradeItemPanel(this, player,
+            ((player.getGold() == Player.GOLD_NOT_ACCOUNTED) ? HUGE_DEMAND
+                : player.getGold()));
         colonyDemand = new ColonyTradeItemPanel(this, otherPlayer);
         colonyOffer = new ColonyTradeItemPanel(this, player);
         /** TODO: UnitTrade
@@ -798,8 +802,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         }
 
         /**
-         * Analyzes an event and calls the right external methods to take care of
-         * the user's request.
+         * Analyzes an event and calls the right external methods to
+         * take care of the user's request.
          *
          * @param event The incoming action event
          */

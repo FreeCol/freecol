@@ -2513,18 +2513,14 @@ public final class InGameController implements NetworkConstants {
         while (!done) {
             ourAgreement = canvas.showNegotiationDialog(unit, settlement,
                 theirAgreement);
-            if (ourAgreement == null) {
-                if (theirAgreement != null) {
-                    // Inform of rejection of the old agreement
-                    theirAgreement.setStatus(TradeStatus.REJECT_TRADE);
-                    askServer().diplomacy(unit, settlement, theirAgreement);
-                }
-                break;
-            }
+            boolean reject = ourAgreement == null
+                || ourAgreement.getStatus() == TradeStatus.REJECT_TRADE;
+            if (theirAgreement == null && reject) break; // Cancelled.
 
-            // Send this acceptance or proposal to the other player
+            // Send this agreement to the other player.
             theirAgreement = askServer().diplomacy(unit, settlement,
                 ourAgreement);
+            if (reject) break;
 
             // What did they say?
             TradeStatus status
