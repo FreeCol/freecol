@@ -308,6 +308,15 @@ public final class Specification {
             applyDifficultyLevel(difficultyLevel);
         }
 
+        // Initialize the Turn class using GameOptions.
+        try {
+            Turn.setStartingYear(getInteger(GameOptions.STARTING_YEAR));
+            Turn.setSeasonYear(getInteger(GameOptions.SEASON_YEAR));
+            logger.info("Initialized turn.");
+        } catch(Exception e) {
+            logger.warning("Failed to set year options: " + e.toString());
+        }
+
         logger.info("Specification initialization complete. "
                     + allTypes.size() + " FreeColGameObjectTypes,\n"
                     + allOptions.size() + " Options, "

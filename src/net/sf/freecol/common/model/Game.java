@@ -137,15 +137,6 @@ public class Game extends FreeColGameObject {
     protected Game(Specification specification) {
         super(null);
         this.specification = specification;
-
-        // Initialize the Turn class using GameOptions.
-        try {
-            Turn.setStartingYear(specification.getInteger(GameOptions.STARTING_YEAR));
-            Turn.setSeasonYear(specification.getInteger(GameOptions.SEASON_YEAR));
-            logger.info("Initialized turn.");
-        } catch(Exception e) {
-            logger.warning("Failed to set year options: " + e.toString());
-        }
     }
 
     /**
