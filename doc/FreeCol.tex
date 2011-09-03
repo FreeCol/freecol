@@ -17,7 +17,7 @@
 \usepackage[
   colorlinks=true,
   hyperindex=true,
-  pdftitle={FreeCol Documentation, User Guide for Version v0.10.0},
+  pdftitle={FreeCol Documentation, User Guide for Version v0.10.2},
   pdfauthor={The FreeCol Team}
 ]{hyperref}
 \makeindex
@@ -41,27 +41,22 @@ the latest version at the
 
 \hypertarget{About FreeCol}{\section{About FreeCol}}
 
-The FreeCol team aims to create an Open Source version of
-Colonization (released under the
-\href{http://www.gnu.org/licenses/gpl.html}{GPL}). At
-first we'll try to make an exact clone of Colonization. The visuals
-will be brought up to date with more recent standards but will remain
-clean, simple and functional. Certain new 'features' will be
-implemented but the gameplay and the rules will be exactly the same as
-the original game. Examples of modern features are: an isometric map
-and multiplayer support.
+The FreeCol team aims to create an Open Source version of Colonization
+(released under the \href{http://www.gnu.org/licenses/gpl.html}{GPL}).
+However, FreeCol differs from the original game in two regards: it
+supports multiplayer games and uses an isometric map. At some point in
+the future, we might also add support for rectangular tiles similar to
+those used in the original game.
 
-This clone will be developed incrementally and result in
-\textbf{FreeCol 1.0.0 which will be an almost exact Colonization
-clone}. Incremental development basically means that we'll add
-features one at a time. This allows us to have a running program at
-all times and also to release an unfinished but working game once in a
-while.
+FreeCol 1.0 will implement all features and rules of the original game
+that we are aware of. Although we have not reached that goal yet, the
+game has been playable for several years now.
 
-Once FreeCol 1.0.0 is finished we'll start working towards FreeCol
-2.0.0. \textbf{FreeCol 2 will go beyond the original Colonization} and
-will have many new features, it will be an implementation of our (and
-our users') image of what Colonization 2 would have been.
+At the same time, we are adding features and optional rules not found
+in the original game. In particular, units, buildings, terrain types,
+goods and other game objects are far more configurable than they were
+in the original game. In fact, the game already includes two slightly
+different \hyperlink{About this manual}{rule sets}.
 
 
 \hypertarget{The Original Colonization}{\section{The Original Colonization}}
@@ -119,15 +114,15 @@ providing a strong governmental system.
 
 \hypertarget{About this manual}{\section{About this manual}}
 
-FreeCol is turning into a game engine that allows the implementation
-of many different games based on similar concepts. It is already
-possible to define different rule sets and to select one of them when
-starting a new game. At the moment, FreeCol ships with two rule sets
-accessible to the user: ``Classic'', which attempts to emulate the
-rules of the original game as far as possible, and ``FreeCol'', which
-mainly conforms to the rules of the original game, but differs in a
-few points. The ``FreeCol'' rule set introduces four additional
-European powers with new national advantages, for example.
+FreeCol is slowly turning into a game engine that allows the
+implementation of many different games based on similar concepts. It
+is already possible to define different rule sets and to select one of
+them when starting a new game. At the moment, FreeCol ships with two
+rule sets accessible to the user: ``Classic'', which attempts to
+emulate the rules of the original game as far as possible, and
+``FreeCol'', which mainly conforms to the rules of the original game,
+but differs in a few points. The ``FreeCol'' rule set introduces four
+additional European powers with new national advantages, for example.
 
 In this manual, we always talk about the ``Classic'' rule set unless
 we explicitly mention another rule set. Please note that most of the
