@@ -339,7 +339,7 @@ you have installed a modified copy of FreeCol's data files.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
 instead of full screen mode and set the window width and height. You
 will need this if your window manager or Java Virtual Machine do not
-(correctly support) FreeCol's full screen mode. If you use Linux and
+(correctly) support FreeCol's full screen mode. If you use Linux and
 Java 5, for example, you should set the window width to the width of
 your screen, but probably set the window height slightly lower than
 the height of your screen, in order to leave space for the menu bar,
@@ -390,9 +390,9 @@ interested in if you are a developer:
 \hypertarget{Main panel}{\subsubsection{Main panel}}
 
 If you start FreeCol without command line options, the game will first
-open a dialog that allows you to start a new game, to open a saved
-game, to open the map editor, to set various \hyperlink{client options}
-{options}, and to quit.
+open a dialog that allows you to continue a game already started, to
+start a new game, to open a saved game, to open the map editor, to set
+various \hyperlink{client options} {options}, and to quit.
 
 If you decide to start a new game, you will be presented with another
 dialog, which enables you to start a single-player game, to retrieve a
@@ -509,12 +509,12 @@ If you are running a public game server, then your firewall must also
 permit the clients to connect to the port of the game server.
 
 
-\hypertarget{game generator options}{\subsection{Map Generator Options}}
+\hypertarget{map generator options}{\subsection{Map Generator Options}}
 
-The \hypertarget{map generator options}{map generator options} allow
-you to import a map, and to set several parameters that influence the
-size and terrain of a randomly generated map. FreeCol includes several
-hand-made maps, which can be selected by clicking on the map icon.
+The map generator options allow you to import a map, and to set
+several parameters that influence the size and terrain of a randomly
+generated map. FreeCol includes several hand-made maps, which can be
+selected by clicking on the map icon.
 
 To import a map, either select one of the maps in the shortcut panel,
 enter the name of a file in the import field, or click on the browser
@@ -550,7 +550,7 @@ The colony tab allows you to enable custom houses to
 boycotted goods. This does not apply to carriers, however, and does
 not prevent further boycotts by the Crown. This feature of the
 original game is considered a bug by the FreeCol team and is therefore
-disabled by default.
+disabled by default in the FreeCol rule set.
 
 You can also allow experts to ``have connections'', which means that
 experts working in factory-level buildings will be able to produce a
