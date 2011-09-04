@@ -45,13 +45,42 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 /**
- * Represents a collection of messages in a particular locale. <p/>
+ * <p>Represents a collection of messages in a particular locale.</p>
  *
- * This class is NOT thread-safe. (CO: I cannot find any place that really has a
- * problem) <p/>
+ * <p>The individual messages are read from property files in the
+ * <code>data/strings</code> directory. The property files are called
+ * "FreeColMessages[_LANGUAGE[_COUNTRY[_VARIANT]]].properties", where
+ * LANGUAGE should be an ISO 639-2 or ISO 639-3 language code, COUNTRY
+ * should be an ISO 3166-2 country code, and VARIANT is an arbitrary
+ * string. The encoding of the property files is UTF-8. Since the Java
+ * Properties class is unable to handle UTF-8 directly, this class
+ * uses its own implementation.</p>
  *
- * Messages are put in the file "FreeColMessages.properties". This file is
- * presently located in the same directory as the source file of this class.
+ * <p>The individual messages may include variables, which must be
+ * delimited by percent characters (e.g. "%nation%"), and will be
+ * replaced when the message is formatted. Furthermore, the messages
+ * may include choice formats consisting of a tag followed by a colon
+ * (":"), a selector and one or several choices separated from the
+ * selector and each other by pipe characters ("|"). The entire choice
+ * format must be enclosed in double brackets ("{{" and "}}",
+ * respectively).</p>
+ *
+ * <p>Each choice must consist of a key and a value separated by an
+ * equals character ("="), unless it is a variable, in which case the
+ * variable must resolve to another choice format. The selector may
+ * also be a variable. If the selector is omitted, then one of the
+ * choices should use the key "default". Choice formats may be
+ * nested.</p>
+ *
+ * <pre>
+ *   key1=%colony% tuottaa tuotetta {{tag:acc|%goods%}}.
+ *   key2={{plural:%amount%|one=ruoka|other=ruokaa|default={{tag:|acc=viljaa|default=Vilja}}}}
+ *   key3={{tag:|acc=viljaa|default={{plural:%amount%|one=ruoka|other=ruokaa|default=Ruoka}}}}
+ * </pre>
+ *
+ * <p>This class is NOT thread-safe. (CO: I cannot find any place that
+ * really has a problem)</p>
+ *
  */
 public class Messages {
 
