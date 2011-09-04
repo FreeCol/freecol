@@ -656,7 +656,7 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the add succeeded.
      */
     public boolean addUnit(Unit unit, WorkLocation loc) {
-        if (!unit.isColonist()) return false;
+        if (!unit.hasAbility("model.ability.person")) return false;
         if (loc == null) loc = getWorkLocationFor(unit);
         for (WorkLocation w : getWorkLocations()) {
             if (w == loc && w.add(unit)) {
