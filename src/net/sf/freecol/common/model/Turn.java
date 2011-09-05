@@ -147,30 +147,22 @@ public class Turn {
     }
 
 
-    private static int getOffset(int turn) {
-        return turn - (seasonYear - startingYear - 1);
-    }
-
-
     /**
      * Gets the year the given turn is in.
-     * @return The calculated year based on the turn
-     *       number.
+     *
+     * @return The calculated year based on the turn number.
      */
     public static int getYear(int turn) {
-        int c = getOffset(turn);
-        if (c < 0) {
-            return startingYear + turn - 1;
-        } else {
-            return seasonYear + c/2 - 1;
-        }
+        int year = turn - 1 + startingYear;
+        return (year < seasonYear) ? year
+            : seasonYear + (year - seasonYear)/2;
     }
 
 
     /**
      * Gets the year this turn is in.
-     * @return The calculated year based on the turn
-     *       number.
+     *
+     * @return The calculated year based on the turn number.
      */
     public int getYear() {
         return getYear(turn);
@@ -198,18 +190,14 @@ public class Turn {
     /**
      * Return the Season of the given Turn number.
      *
-     * @param turn an <code>int</code> value
-     * @return a <code>Season</code> value
+     * @param turn The turn number to calculate from.
+     * @return The season corresponding to the turn number.
      */
     public static Season getSeason(int turn) {
-        int c = getOffset(turn);
-        if (c <= 1) {
-            return Season.YEAR;
-        } else if (c % 2 == 0) {
-            return Season.SPRING;
-        } else {
-            return Season.AUTUMN;
-        }
+        int year = turn - 1 + startingYear;
+        return (year < seasonYear) ? Season.YEAR
+            : (year % 2 == 0) ? Season.SPRING
+            : Season.AUTUMN;
     }
 
     /**
