@@ -87,7 +87,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -1858,7 +1857,7 @@ public final class GUI {
     private Image createLabel(Graphics2D g, TextSpecification[] textSpecs, Color backgroundColor) {
         int hPadding = 15;
         int vPadding = 10;
-        int linePadding = 2;
+        int linePadding = 8;
         int width = 0;
         int height = vPadding;
         int i;
