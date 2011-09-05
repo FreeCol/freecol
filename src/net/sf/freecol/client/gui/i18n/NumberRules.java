@@ -41,27 +41,72 @@ public class NumberRules {
 
     private static final Logger logger = Logger.getLogger(NumberRules.class.getName());
 
-    public static Number OTHER_NUMBER_RULE = new OtherNumberRule();
-    public static Number DUAL_NUMBER_RULE = new DualNumberRule();
-    public static Number PLURAL_NUMBER_RULE = new PluralNumberRule();
-    public static Number ZERO_ONE_NUMBER_RULE = new ZeroOneNumberRule();
+    /**
+     * A rule that always returns category "other".
+     */
+    public static final Number OTHER_NUMBER_RULE = new OtherNumberRule();
+
+    /**
+     * A rule that assigns 1 to category "one", 2 to category "two"
+     * and all other numbers to category "other".
+     */
+    public static final Number DUAL_NUMBER_RULE = new DualNumberRule();
+
+    /**
+     * A rule that assigns 1 to category "one" and all other numbers
+     * to category "other".
+     */
+    public static final Number PLURAL_NUMBER_RULE = new PluralNumberRule();
+
+    /**
+     * A rule that assigns 0 and 1 to category "one", and all other
+     * number to category "other".
+     */
+    public static final Number ZERO_ONE_NUMBER_RULE = new ZeroOneNumberRule();
+
 
     private static Map<String, Number> numberMap = new HashMap<String, Number>();
 
+
+    /**
+     * Creates a new <code>NumberRules</code> instance from the given
+     * input stream, which must contain an XML representation of the
+     * CLDR plural rules.
+     *
+     * @param in an <code>InputStream</code> value
+     */
     public NumberRules(InputStream in) {
         load(in);
     }
 
 
+    /**
+     * Returns a rule appropriate for the given language, or the
+     * OTHER_NUMBER_RULE if none has been defined.
+     *
+     * @param lang a <code>String</code> value
+     * @return a <code>Number</code> value
+     */
     public static Number getNumberForLanguage(String lang) {
-        return numberMap.get(lang);
+        Number number = numberMap.get(lang);
+        return number == null ? OTHER_NUMBER_RULE : number;
     }
 
+    /**
+     * Describe <code>isInitialized</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
     public static boolean isInitialized() {
         return !numberMap.isEmpty();
     }
 
 
+    /**
+     * Describe <code>load</code> method here.
+     *
+     * @param in an <code>InputStream</code> value
+     */
     public static void load(InputStream in) {
 
         try {
@@ -75,6 +120,12 @@ public class NumberRules {
         }
     }
 
+    /**
+     * Describe <code>readFromXML</code> method here.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     private static void readFromXML(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
@@ -93,6 +144,12 @@ public class NumberRules {
         }
     }
 
+    /**
+     * Describe <code>readChild</code> method here.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     private static void readChild(XMLStreamReader in)
         throws XMLStreamException {
 

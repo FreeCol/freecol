@@ -22,11 +22,14 @@ package net.sf.freecol.client.gui.i18n;
 public interface Selector {
 
     /**
-     * Return the index of the rule this input matches.
+     * Transform the given string selector into a replacement key for
+     * a choice format.
      *
-     * @param input a <code>String</code> value
+     * @param selector a <code>String</code> value
+     * @param template the <code>String</code> template that contains
+     * the selector (only used for error reporting)
      * @return a <code>String</code> value
      */
-    public String getKey(String input);
+    public String getKey(String selector, String template);
 
 }

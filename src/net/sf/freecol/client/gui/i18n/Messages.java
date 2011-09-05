@@ -95,11 +95,32 @@ public class Messages {
     private static Map<String, String> messageBundle =
         new HashMap<String, String>();
 
-    private static Number grammaticalNumber = NumberRules.OTHER_NUMBER_RULE;
+    /**
+     * A map with Selector values and the tag keys used in choice
+     * formats.
+     */
+    private static Map<String, Selector> tagMap =
+        new HashMap<String, Selector>();
 
 
+
+    /**
+     * Returns the Selector with the given tag.
+     *
+     * @param tag a <code>String</code> value
+     * @return a <code>Selector</code> value
+     */
+    private static Selector getSelector(String tag) {
+        return tagMap.get(tag.toLowerCase(Locale.US));
+    }
+
+    /**
+     * Set the grammatical number rule.
+     *
+     * @param number a <code>Number</code> value
+     */
     public static void setGrammaticalNumber(Number number) {
-        grammaticalNumber = number;
+        tagMap.put("plural", number);
     }
 
     /**
@@ -150,14 +171,11 @@ public class Messages {
                 }
             } else {
                 logger.warning("Could not find string directory: "
-                               + stringDirectory.getName());
+                               + stringDirectory.getPath());
             }
         }
 
-        Number number = NumberRules.getNumberForLanguage(language);
-        if (number != null) {
-            grammaticalNumber = number;
-        }
+        setGrammaticalNumber(NumberRules.getNumberForLanguage(language));
 
         for (String fileName : filenames) {
             File resourceFile = new File(getI18nDirectory(), fileName);
@@ -273,13 +291,17 @@ public class Messages {
                         continue;
                     } else {
                         selector = message(replacement);
-                        if ("plural".equalsIgnoreCase(tag)) {
-                            selector = parsePluralSelector(selector, input);
+                        Selector taggedSelector = getSelector(tag);
+                        if (taggedSelector != null) {
+                            selector = taggedSelector.getKey(selector, input);
                         }
                     }
                 }
-            } else if ("plural".equalsIgnoreCase(tag)) {
-                selector = parsePluralSelector(selector, input);
+            } else {
+                Selector taggedSelector = getSelector(tag);
+                if (taggedSelector != null) {
+                    selector = taggedSelector.getKey(selector, input);
+                }
             }
             int keyIndex = input.indexOf(selector, pipeIndex + 1);
             if (keyIndex < 0 || keyIndex > closeChoice) {
@@ -338,27 +360,6 @@ public class Messages {
         }
         result.append(input.substring(highWaterMark));
         return result.toString();
-    }
-
-    /**
-     * Return the number category of the given number as a String, or
-     * "other" if the first argument can not be parsed.
-     *
-     * @param selector the <code>String</code> representation of a
-     * number
-     * @param input the <code>String</code> template that contains the
-     * selector (only used for error reporting)
-     * @return a <code>String</code> value
-     * @see Number.Category
-     */
-    private static String parsePluralSelector(String selector, String input) {
-        String result = Number.Category.other.toString();
-        try {
-            result = grammaticalNumber.getKey(selector);
-        } catch(NumberFormatException e) {
-            logger.warning("Syntax error in string template '" + input + "'");
-        }
-        return result;
     }
 
     /**
