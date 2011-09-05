@@ -2610,18 +2610,14 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Can not clear unit speciality: "
                 + unit.getId());
         }
+
         // There can be some restrictions that may prevent the
-        // clearing of the speciality.  For example, teachers cannot
-        // not be cleared of their speciality.
-        Location oldLocation = unit.getLocation();
-        if (oldLocation instanceof UnitLocation) {
-            switch (((UnitLocation) oldLocation).getNoAddReason(unit)) {
-            case NONE: case ALREADY_PRESENT:
-                break;
-            default:
-                return DOMMessage.clientError("Cannot clear speciality,"
-                    + " location does not allow new unit type");
-            }
+        // clearing of the speciality.  AFAICT the only ATM is that a
+        // teacher can not lose its speciality, but this will need to
+        // be revisited if we invent a work location that requires a
+        // particular unit type.
+        if (unit.getStudent() != null) {
+            return DOMMessage.clientError("Can not clear speciality of a teacher.");
         }
 
         // Valid, change type.
