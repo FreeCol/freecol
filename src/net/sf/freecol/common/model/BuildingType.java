@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -29,9 +27,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 /**
- * Contains information on building types, like the number of upgrade levels a
- * given building type can have. The levels contain the information about the
- * name of the building in a given level and what is needed to build it.
+ * Encapsulates data common to all instances of a particular kind of
+ * {@link Building}, such as the number of workplaces, and the types
+ * of goods it produces and consumes.
  */
 public final class BuildingType extends BuildableType
     implements Comparable<BuildingType> {
@@ -50,20 +48,41 @@ public final class BuildingType extends BuildableType
     private BuildingType upgradesTo;
 
 
+    /**
+     * Creates a new <code>BuildingType</code> instance.
+     *
+     * @param id a <code>String</code> value
+     * @param specification a <code>Specification</code> value
+     */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
 
 
+    /**
+     * Returns the BuildingType this BuildingType upgrades from.
+     *
+     * @return a <code>BuildingType</code> value
+     */
     public BuildingType getUpgradesFrom() {
         return upgradesFrom;
     }
 
+    /**
+     * Returns the BuildingType this BuildingType upgrades to.
+     *
+     * @return a <code>BuildingType</code> value
+     */
     public BuildingType getUpgradesTo() {
         return upgradesTo;
     }
 
+    /**
+     * Returns the first level of this BuildingType.
+     *
+     * @return a <code>BuildingType</code> value
+     */
     public BuildingType getFirstLevel() {
         BuildingType buildingType = this;
         while (buildingType.getUpgradesFrom() != null) {
@@ -72,26 +91,59 @@ public final class BuildingType extends BuildableType
         return buildingType;
     }
 
+    /**
+     * Returns the number of workplaces, that is the maximum number of
+     * Units that can work in this BuildingType.
+     *
+     * @return an <code>int</code> value
+     */
     public int getWorkPlaces() {
         return workPlaces;
     }
 
+    /**
+     * Returns the production of a single Unit in this BuildingType
+     * before any modifiers are applied.
+     *
+     * @return an <code>int</code> value
+     */
     public int getBasicProduction() {
         return basicProduction;
     }
 
+    /**
+     * Returns the type of goods consumed by this BuildingType.
+     *
+     * @return an <code>GoodsType</code> value
+     */
     public GoodsType getConsumedGoodsType() {
         return consumes;
     }
 
+    /**
+     * Returns the type of goods produced by this BuildingType.
+     *
+     * @return an <code>GoodsType</code> value
+     */
     public GoodsType getProducedGoodsType() {
         return produces;
     }
 
+    /**
+     * Returns the level of this BuildingType.
+     *
+     * @return an <code>int</code> value
+     */
     public int getLevel() {
         return level;
     }
 
+    /**
+     * Returns the amount of gold necessary to maintain a Building of
+     * this type for one turn.
+     *
+     * @return an <code>int</code> value
+     */
     public int getUpkeep() {
         return upkeep;
     }
@@ -108,18 +160,43 @@ public final class BuildingType extends BuildableType
     }
 
 
+    /**
+     * Describe <code>getType</code> method here.
+     *
+     * @return a <code>FreeColGameObjectType</code> value
+     */
     public FreeColGameObjectType getType() {
         return this;
     }
 
+    /**
+     * Describe <code>getProductionModifier</code> method here.
+     *
+     * @return a <code>Modifier</code> value
+     */
     public Modifier getProductionModifier() {
         return productionModifier;
     }
 
+    /**
+     * Compares this BuildingType to another. BuildingTypes are sorted
+     * according to the order in which they are defined in the
+     * specification.
+     *
+     * @param other a <code>BuildingType</code> value
+     * @return an <code>int</code> value
+     */
     public int compareTo(BuildingType other) {
         return getIndex() - other.getIndex();
     }
 
+    /**
+     * Returns true if the given UnitType could be added to a Building
+     * of this type.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean canAdd(UnitType unitType) {
         return workPlaces > 0
             && unitType.hasSkill()
@@ -129,6 +206,8 @@ public final class BuildingType extends BuildableType
 
     /**
      * Is this building type automatically built in any colony?
+     *
+     * @return a <code>boolean</code> value
      */
     public boolean isAutomaticBuild() {
         return !needsGoodsToBuild() && getUpgradesFrom() == null;
