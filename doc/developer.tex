@@ -437,17 +437,31 @@ The following items can be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Rename the bug tracking group "Fixed (major.minor.x-branch)"/
-  "Fixed (Trunk)" to Fixed (FreeCol major.minor.number) and create a
-  replacement group "Fixed (major.minor.x)".
+\item Go to the page ``Tracker > Admin > Bugs > Add/Update Groups''
+  and rename the bug tracking group for the current development branch
+  to match the release, e.g. change ``Fixed (trunk)'' to ``Fixed
+  (FreeCol 0.10.2)'' if you have just released 0.10.2 from
+  trunk. Then, create a new group with the old name you have just
+  changed, e.g. ``Fixed (trunk)''.
 
-\item Rename the feature tracking group "Added (Trunk)"/"Added
-  (major.minor.x-branch)" to Added (FreeCol major.minor.number) and
-  create a replacement group "Added (major.minor.x)".
+\item Go to the page ``Tracker > Admin > Feature Requests > Add/Update
+  Groups'' and rename the feature request group for the current
+  development branch to match the release, e.g. change ``Added
+  (trunk)'' to ``Added (FreeCol 0.10.2)'' if you have just released
+  0.10.2 from trunk. Then, create a new group with the old name you
+  have just changed, e.g. ``Added (trunk)''.
 
-\item Change the links on "Tracker > Admin > Bugs/Feature... >
-  Preferences". Add redirects for "bugtracker/x.y.z" and
-  "featuretracker/x.y.z". Create a new group for "In x.y.z".
+\item Go to the page "Tracker > Admin > Bugs > Update preferences" and
+  edit the text under the heading ``Free form text for the "browse
+  artifacts" page''. Add a new link for the current release matching
+  the examples for older releases. Remove links to ancient releases if
+  the list is getting too long.
+
+\item Go to the page "Tracker > Admin > Feature Requests > Update
+  preferences" and edit the text under the heading ``Free form text
+  for the "browse artifacts" page''. Add a new link for the current
+  release matching the examples for older releases. Remove links to
+  ancient releases if the list is getting too long.
 
 \item Regenerate the documentation (with \verb+ant manual+) and
   JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
