@@ -147,15 +147,6 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);

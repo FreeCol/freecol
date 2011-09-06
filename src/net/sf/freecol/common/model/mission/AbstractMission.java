@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -162,6 +163,15 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
             && repeatCount > 0;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        toXML(out, getXMLElementTagName());
+    }
 
     /**
      * {@inheritDoc}
