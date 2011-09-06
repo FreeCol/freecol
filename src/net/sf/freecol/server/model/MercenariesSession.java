@@ -37,10 +37,10 @@ public class MercenariesSession extends TransactionSession {
     private static final Logger logger = Logger.getLogger(MercenariesSession.class.getName());
 
     /** The mercenaries on offer. */
-    List<AbstractUnit> mercenaries;
+    private List<AbstractUnit> mercenaries;
 
     /** The price the mercenaries are on offer for. */
-    int price;
+    private int price;
 
 
     public MercenariesSession(Monarch monarch, Player player) {

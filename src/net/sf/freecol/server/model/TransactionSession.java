@@ -42,6 +42,9 @@ public abstract class TransactionSession {
     protected static final Map<String, TransactionSession> allSessions
         = new HashMap<String, TransactionSession>();
 
+    /** Has this session been completed? */
+    private boolean completed;
+
 
     /**
      * Protected constructor, we only really instantiate specific types
@@ -53,6 +56,7 @@ public abstract class TransactionSession {
         if (allSessions.get(key) != null) {
             throw new IllegalArgumentException("Duplicate session: " + key);
         }
+        completed = false;
         allSessions.put(key, this);
     }
 
@@ -65,7 +69,7 @@ public abstract class TransactionSession {
      *     occur when completing this session.
      */
     public void complete(ChangeSet cs) {
-        allSessions.remove(this);
+        completed = true;
     }
     
     /**
@@ -103,7 +107,7 @@ public abstract class TransactionSession {
      */
     public static void completeAll(ChangeSet cs) {
         for (TransactionSession ts : allSessions.values()) {
-            ts.complete(cs);
+            if (!ts.completed) ts.complete(cs);
         }
         allSessions.clear();
     }

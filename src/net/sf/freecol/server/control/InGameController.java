@@ -65,7 +65,6 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
@@ -120,6 +119,7 @@ import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.server.model.TaxSession;
 import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
 
@@ -766,46 +766,58 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Performs a monarchs action.
-     * TODO: This function starts its own threads for actions that
-     * need user interaction (tax raise).  Protocol
-     * work will be needed to remove the threads.
+     * Performs a monarch action.
+     *
+     * Note that CHANGE_LATE is used so that these actions follow
+     * setting the current player, so that it is the players turn when
+     * they respond to a monarch action.
      *
      * @param serverPlayer The <code>ServerPlayer</code> being acted upon.
      * @param action The monarch action.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csMonarchAction(final ServerPlayer serverPlayer,
-                                 final MonarchAction action, ChangeSet cs) {
+    private void csMonarchAction(ServerPlayer serverPlayer,
+                                 MonarchAction action, ChangeSet cs) {
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
         String messageId = "model.monarch.action." + action.toString();
+        StringTemplate template;
 
         switch (action) {
         case NO_ACTION:
             break;
-        case RAISE_TAX_WAR:
-        case RAISE_TAX_ACT:
-            final int taxRaise = monarch.raiseTax(random);
-            final Goods goods = serverPlayer.getMostValuableGoods();
+        case RAISE_TAX_WAR: case RAISE_TAX_ACT:
+            int taxRaise = monarch.raiseTax(random);
+            Goods goods = serverPlayer.getMostValuableGoods();
             if (goods == null) {
                 logger.finest("Ignoring tax raise, no goods to boycott.");
                 break;
             }
-            new Thread(FreeCol.SERVER_THREAD + action.toString()
-                + " " + serverPlayer.getName()) {
-                public void run() {
-                    monarchRaiseTax(serverPlayer, taxRaise, goods, action);
-                }
-            }.start();
+            template = StringTemplate.template("model.monarch.action."
+                + action.toString())
+                .addStringTemplate("%goods%", goods.getType().getLabel(true))
+                .addAmount("%amount%", taxRaise);
+            if (action == MonarchAction.RAISE_TAX_WAR) {
+                template = template.add("%nation%", getNonPlayerNation());
+            } else if (action == MonarchAction.RAISE_TAX_ACT) {
+                template = template.addAmount("%number%", random.nextInt(6))
+                    .addName("%newWorld%", serverPlayer.getNewLandName());
+            }
+            MonarchActionMessage message
+                = new MonarchActionMessage(action, template);
+            message.setTax(taxRaise);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                message);
+            TaxSession taxSession = new TaxSession(monarch, serverPlayer);
+            taxSession.setTax(taxRaise);
+            taxSession.setGoods(goods);
             break;
-        case LOWER_TAX_WAR:
-        case LOWER_TAX_OTHER:
+        case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
             int taxLower = monarch.lowerTax(random);
             serverPlayer.csSetTax(taxLower, cs);
-            StringTemplate template = StringTemplate.template(messageId)
+            template = StringTemplate.template(messageId)
                 .addAmount("%difference%", oldTax - taxLower)
                 .addAmount("%newTax%", taxLower);
             if (action == MonarchAction.LOWER_TAX_WAR) {
@@ -813,8 +825,8 @@ public final class InGameController extends Controller {
             } else {
                 template = template.addAmount("%number%", random.nextInt(5));
             }
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   new MonarchActionMessage(action, template));
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new MonarchActionMessage(action, template));
             break;
         case WAIVE_TAX:
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
@@ -826,11 +838,11 @@ public final class InGameController extends Controller {
             if (refAdditions.isEmpty()) break;
             monarch.addToREF(refAdditions);
             cs.add(See.only(serverPlayer), monarch);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
-                    .addStringTemplate("%addition%",
-                        abstractUnitTemplate(", ", refAdditions))));
+                        .addStringTemplate("%addition%",
+                            abstractUnitTemplate(", ", refAdditions))));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
@@ -838,10 +850,10 @@ public final class InGameController extends Controller {
             Player enemy = Utils.getRandomMember(logger, "Choose enemy",
                 enemies, random);
             serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
-                    .addStringTemplate("%nation%", enemy.getNationName())));
+                        .addStringTemplate("%nation%", enemy.getNationName())));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
             boolean sea = action == MonarchAction.SUPPORT_SEA;
@@ -849,7 +861,7 @@ public final class InGameController extends Controller {
             if (support.isEmpty()) break;
             serverPlayer.createUnits(support);
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
                     StringTemplate.template(messageId)
                     .addStringTemplate("%addition%",
@@ -859,16 +871,16 @@ public final class InGameController extends Controller {
             List<AbstractUnit> mercenaries = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
             int mercPrice = serverPlayer.priceMercenaries(mercenaries);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
                     StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
                         .addAmount("%gold%", mercPrice)
                         .addStringTemplate("%mercenaries%",
                             abstractUnitTemplate(", ", mercenaries))));
-            MercenariesSession session = new MercenariesSession(monarch,
-                serverPlayer);
-            session.setMercenaries(mercenaries);
-            session.setPrice(mercPrice);
+            MercenariesSession mercenariesSession
+                = new MercenariesSession(monarch, serverPlayer);
+            mercenariesSession.setMercenaries(mercenaries);
+            mercenariesSession.setPrice(mercPrice);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
@@ -877,101 +889,23 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Raises a players tax rate.
+     * Handles a response to a tax raise.
      *
      * @param serverPlayer The <code>ServerPlayer</code> whose tax to raise.
-     * @param tax The new tax rate.
-     * @param goods The <code>Goods</code> to use in case of a tea party.
+     * @param accepted Did the player accept the tax raise.
+     * @return An element encapsulating a suitable update.
      */
-    private void monarchRaiseTax(ServerPlayer serverPlayer, int tax,
-                                 Goods goods, MonarchAction action) {
-        GoodsType goodsType = goods.getType();
-        Colony colony = (Colony) goods.getLocation();
+    public Element monarchRaiseTax(ServerPlayer serverPlayer,
+                                   boolean accepted) {
+        TaxSession session = TransactionSession.lookup(TaxSession.class,
+            serverPlayer.getMonarch(), serverPlayer);
+        if (session == null) {
+            return DOMMessage.clientError("Invalid tax reply.");
+        }
+        session.setAccepted(accepted);
         ChangeSet cs = new ChangeSet();
-        StringTemplate sTemplate =
-            StringTemplate.template("model.monarch.action." + action.toString())
-            .addStringTemplate("%goods%", goods.getType().getLabel(true))
-            .addAmount("%amount%", tax);
-        switch (action) {
-        case RAISE_TAX_WAR:
-            sTemplate = sTemplate.add("%nation%", getNonPlayerNation());
-            break;
-        case RAISE_TAX_ACT:
-            sTemplate = sTemplate.addAmount("%number%", random.nextInt(6))
-                .addName("%newWorld%", serverPlayer.getNewLandName());
-            break;
-        }
-        MonarchActionMessage message
-            = new MonarchActionMessage(action, sTemplate);
-        message.setTax(tax);
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-            message);
-        Element reply = askElement(serverPlayer, cs);
-        cs = new ChangeSet();
-        int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
-        boolean accepted = (reply == null
-            || reply.getAttribute("accepted") == null) ? false
-            : Boolean.parseBoolean(reply.getAttribute("accepted"));
-        if (accepted) {
-            serverPlayer.csSetTax(tax, cs);
-        } else if (colony.getGoodsCount(goodsType) < amount) {
-            // Player has removed the goods from the colony,
-            // so raise the tax anyway.
-            final int extraTax = 3;
-            serverPlayer.csSetTax(tax + extraTax, cs);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                new MonarchActionMessage(MonarchAction.FORCE_TAX,
-                    StringTemplate.template("model.monarch.action.FORCE_TAX")
-                    .addAmount("%amount%", tax + extraTax)));
-        } else { // Tea party
-            Specification spec = getGame().getSpecification();
-            colony.getGoodsContainer().saveState();
-            colony.removeGoods(goodsType, amount);
-
-            Market market = serverPlayer.getMarket();
-            market.setArrears(goodsType, market.getPaidForSale(goodsType)
-                * spec.getIntegerOption("model.option.arrearsFactor")
-                              .getValue());
-
-            Turn turn = getGame().getTurn();
-            List<Modifier> modifiers
-                = spec.getModifiers("model.modifier.colonyGoodsParty");
-            Modifier template;
-            if (modifiers != null && !modifiers.isEmpty()) {
-                template = modifiers.get(0);
-            } else {
-                // TODO: remove this backward compatibility hack for
-                // the < 0.10.x format.
-                template = new Modifier("model.modifier.colonyGoodsParty",
-                    Specification.COLONY_GOODS_PARTY_SOURCE,
-                    50, Modifier.Type.PERCENTAGE);
-                template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
-            }
-            colony.getFeatureContainer()
-                .addModifier(Modifier.makeTimedModifier("model.goods.bells",
-                        template, turn));
-
-            // Have to update the colony to pick up the feature container.
-            // Otherwise we could get away with just sending the goods
-            // container.  TODO: make the feature container updateable?
-            cs.add(See.only(serverPlayer), colony);
-            // cs.add(See.only(serverPlayer), colony.getGoodsContainer());
-            cs.add(See.only(serverPlayer), market.getMarketData(goodsType));
-
-            String messageId = goodsType.getId() + ".destroyed";
-            if (!Messages.containsKey(messageId)) {
-                messageId = (colony.isLandLocked())
-                    ? "model.monarch.colonyGoodsParty.landLocked"
-                    : "model.monarch.colonyGoodsParty.harbour";
-            }
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    messageId, serverPlayer)
-                    .addName("%colony%", colony.getName())
-                    .addName("%amount%", Integer.toString(amount))
-                    .add("%goods%", goodsType.getNameKey()));
-        }
-        sendElement(serverPlayer, cs);
+        session.complete(cs);
+        return cs.build(serverPlayer);
     }
 
     /**

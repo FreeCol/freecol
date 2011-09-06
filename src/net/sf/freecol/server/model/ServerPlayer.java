@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -78,9 +79,11 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.LootCargoMessage;
+import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.TransactionSession;
@@ -3199,6 +3202,81 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (Tile t : newTiles) {
             t.updatePlayerExploredTile(this, false);
             cs.add(See.only(this), t);
+        }
+    }
+
+    /**
+     * Raises the players tax rate, or handles a goods party.
+     *
+     * @param tax The new tax rate.
+     * @param goods The <code>Goods</code> to use in a goods party.
+     * @param accepted Whether the tax raise was accepted.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csRaiseTax(int tax, Goods goods, boolean accepted,
+                           ChangeSet cs) {
+        GoodsType goodsType = goods.getType();
+        Colony colony = (Colony) goods.getLocation();
+        int amount = Math.min(goods.getAmount(), GoodsContainer.CARGO_SIZE);
+
+        if (accepted) {
+            csSetTax(tax, cs);
+        } else if (colony.getGoodsCount(goodsType) < amount) {
+            // Player has removed the goods from the colony,
+            // so raise the tax anyway.
+            final int extraTax = 3;
+            csSetTax(tax + extraTax, cs);
+            cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
+                new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
+                    StringTemplate.template("model.monarch.action.FORCE_TAX")
+                    .addAmount("%amount%", tax + extraTax)));
+        } else { // Tea party
+            Specification spec = getGame().getSpecification();
+            colony.getGoodsContainer().saveState();
+            colony.removeGoods(goodsType, amount);
+
+            Market market = getMarket();
+            market.setArrears(goodsType, market.getPaidForSale(goodsType)
+                * spec.getIntegerOption("model.option.arrearsFactor")
+                .getValue());
+
+            Turn turn = getGame().getTurn();
+            List<Modifier> modifiers
+                = spec.getModifiers("model.modifier.colonyGoodsParty");
+            Modifier template;
+            if (modifiers != null && !modifiers.isEmpty()) {
+                template = modifiers.get(0);
+            } else {
+                // TODO: remove this backward compatibility hack for
+                // the < 0.10.x format.
+                template = new Modifier("model.modifier.colonyGoodsParty",
+                    Specification.COLONY_GOODS_PARTY_SOURCE,
+                    50, Modifier.Type.PERCENTAGE);
+                template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
+            }
+            colony.getFeatureContainer()
+                .addModifier(Modifier.makeTimedModifier("model.goods.bells",
+                        template, turn));
+
+            // Have to update the colony to pick up the feature container.
+            // Otherwise we could get away with just sending the goods
+            // container.  TODO: make the feature container updateable?
+            cs.add(See.only(this), colony);
+            // cs.add(See.only(serverPlayer), colony.getGoodsContainer());
+            cs.add(See.only(this), market.getMarketData(goodsType));
+
+            String messageId = goodsType.getId() + ".destroyed";
+            if (!Messages.containsKey(messageId)) {
+                messageId = (colony.isLandLocked())
+                    ? "model.monarch.colonyGoodsParty.landLocked"
+                    : "model.monarch.colonyGoodsParty.harbour";
+            }
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    messageId, this)
+                .addName("%colony%", colony.getName())
+                .addName("%amount%", Integer.toString(amount))
+                .add("%goods%", goodsType.getNameKey()));
         }
     }
 

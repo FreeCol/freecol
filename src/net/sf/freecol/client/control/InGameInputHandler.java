@@ -780,6 +780,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         if (m != null) {
             player.addModelMessage(m);
+            getFreeColClient().getInGameController().nextModelMessage();
         }
         message.setResult(Boolean.toString(accepted));
         return element;
@@ -834,18 +835,28 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element monarchAction(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
+        FreeColClient freeColClient = getFreeColClient();
         Game game = getGame();
-        Player player = freeColClient.getMyPlayer();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
-        final MonarchAction action = message.getAction();
-        boolean accept
-            = new ShowMonarchPanelSwingTask(action, message.getTemplate())
-                .confirm();
-        freeColClient.askServer().answerMonarch(action, accept);
+        MonarchAction action = message.getAction();
+        boolean accept = new ShowMonarchPanelSwingTask(action,
+            message.getTemplate()).confirm();
+
+        switch (action) { // Some actions require an answer.
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
+            freeColClient.askServer().answerMonarch(action, accept);
+            if (!accept) { // Flush goods party message
+                freeColClient.getInGameController().nextModelMessage();
+            }
+            break;
+        case OFFER_MERCENARIES:
+            freeColClient.askServer().answerMonarch(action, accept);
+            break;
+        default:
+            break;
+        }
         
         new UpdateMenuBarSwingTask().invokeLater();
-
         return null;
     }
 
@@ -1480,6 +1491,7 @@ public final class InGameInputHandler extends InputHandler {
                 .addName("%build_colony_key%", key)
                 .add("%build_colony_menu_item%", "buildColonyAction.name")
                 .add("%orders_menu_item%", "menuBar.orders"));
+            fcc.getInGameController().nextModelMessage();
         }
     }
 

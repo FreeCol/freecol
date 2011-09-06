@@ -154,11 +154,12 @@ public class MonarchActionMessage extends DOMMessage {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
         switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
+            return server.getInGameController()
+                .monarchRaiseTax(serverPlayer, accepted);
         case OFFER_MERCENARIES:
             return server.getInGameController()
                 .monarchOfferMercenaries(serverPlayer, accepted);
-        case RAISE_TAX_ACT: // TODO: allow this type
-        case RAISE_TAX_WAR: // TODO: allow this type
         default:
             return DOMMessage.clientError("Invalid reply to monarch action: "
                 + action);
