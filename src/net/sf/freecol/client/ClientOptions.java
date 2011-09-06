@@ -154,6 +154,11 @@ public class ClientOptions extends OptionGroup {
     public static final String UNIT_LAST_MOVE_DELAY = "model.option.unitLastMoveDelay";
 
     /**
+     * Pixmap setting to work around Java 2D graphics bug.
+     */
+    public static final String USE_PIXMAPS = "model.option.usePixmaps";
+
+    /**
      * Whether to display borders by default or not.
      */
     public static final String DISPLAY_BORDERS = "model.option.displayBorders";
@@ -753,6 +758,9 @@ public class ClientOptions extends OptionGroup {
         // Introduced: 0.10.1, remove when 0.9.x is obsolete
         addIntegerOption(COLONY_REPORT,
             "clientOptions.messages", 0);
+        // Introduced: 0.10.1, remove when 0.9.x is obsolete
+        addBooleanOption(USE_PIXMAPS,
+            "clientOptions.gui", true);
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

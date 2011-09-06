@@ -47,6 +47,8 @@
       <booleanOption id="model.option.displayBorders" defaultValue="false"/>
       <!-- Whether to have a delay on a unit's last move or not. -->
       <booleanOption id="model.option.unitLastMoveDelay" defaultValue="true"/>
+      <!-- Use pixmaps or not? -->
+      <booleanOption id="model.option.usePixmaps" defaultValue="true"/>
       <!-- Option for in tile text display -->
       <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>

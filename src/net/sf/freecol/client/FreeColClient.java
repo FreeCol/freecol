@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.AudioMixerOption;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
@@ -344,9 +345,9 @@ public final class FreeColClient {
                           final boolean sound,
                           final boolean showOpeningVideo,
                           final boolean loadGame) {
+        final ClientOptions opts = getClientOptions();
         // Prepare the sound system.
         if (sound) {
-            final ClientOptions opts = getClientOptions();
             final AudioMixerOption amo
                 = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
             final PercentageOption volume
@@ -387,6 +388,41 @@ public final class FreeColClient {
             Rectangle bounds = gd.getDefaultConfiguration().getBounds();
             innerWindowSize = new Dimension(bounds.width - bounds.x, bounds.height - bounds.y);
         }
+
+        // Work around a Java 2D bug that seems to be X11 specific.
+        // According to:
+        //   http://www.oracle.com/technetwork/java/javase/index-142560.html
+        //
+        //   ``The use of pixmaps typically results in better
+        //     performance. However, in certain cases, the opposite is true.''
+        //
+        // The standard workaround is to use -Dsun.java2d.pmoffscreen=false,
+        // but this is too hard for some users, so provide an option to
+        // do it easily.  However respect the initial value if present.
+        //
+        // Remove this if Java 2D is ever fixed.  DHYB.
+        //
+        final String pmoffscreen = "sun.java2d.pmoffscreen";
+        BooleanOption usePixmaps
+            = (BooleanOption) opts.getOption(ClientOptions.USE_PIXMAPS);
+        String pmoffscreenValue = System.getProperty(pmoffscreen);
+        if (pmoffscreenValue == null) {
+            System.setProperty(pmoffscreen, usePixmaps.getValue().toString());
+            logger.info(pmoffscreen + " using client option: "
+                + usePixmaps.getValue().toString());
+        } else {
+            usePixmaps.setValue(new Boolean(pmoffscreenValue));
+            logger.info(pmoffscreen + " overrides client option: "
+                + pmoffscreenValue);
+        }
+        usePixmaps.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    String newValue = e.getNewValue().toString();
+                    System.setProperty(pmoffscreen, newValue);
+                    logger.info("Set " + pmoffscreen + " to: " + newValue);
+                }
+            });
+
         gui = new GUI(this, innerWindowSize, imageLibrary);
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
