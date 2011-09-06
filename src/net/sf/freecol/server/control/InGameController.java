@@ -113,6 +113,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.DemandSession;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
+import net.sf.freecol.server.model.MercenariesSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
@@ -767,7 +768,7 @@ public final class InGameController extends Controller {
     /**
      * Performs a monarchs action.
      * TODO: This function starts its own threads for actions that
-     * need user interaction (tax raise, mercenary offer).  Protocol
+     * need user interaction (tax raise).  Protocol
      * work will be needed to remove the threads.
      *
      * @param serverPlayer The <code>ServerPlayer</code> being acted upon.
@@ -821,8 +822,7 @@ public final class InGameController extends Controller {
                     StringTemplate.template(messageId)));
             break;
         case ADD_TO_REF:
-            final List<AbstractUnit> refAdditions
-                = monarch.chooseForREF(random);
+            List<AbstractUnit> refAdditions = monarch.chooseForREF(random);
             if (refAdditions.isEmpty()) break;
             monarch.addToREF(refAdditions);
             cs.add(See.only(serverPlayer), monarch);
@@ -856,14 +856,19 @@ public final class InGameController extends Controller {
                         abstractUnitTemplate(", ", support))));
             break;
         case OFFER_MERCENARIES:
-            final List<AbstractUnit> mercenaries
-                = monarch.getMercenaries(random);
+            List<AbstractUnit> mercenaries = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
-            new Thread(FreeCol.SERVER_THREAD + action.toString()) {
-                public void run() {
-                    monarchOfferMercenaries(serverPlayer, mercenaries);
-                }
-            }.start();
+            int mercPrice = serverPlayer.priceMercenaries(mercenaries);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
+                    StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
+                        .addAmount("%gold%", mercPrice)
+                        .addStringTemplate("%mercenaries%",
+                            abstractUnitTemplate(", ", mercenaries))));
+            MercenariesSession session = new MercenariesSession(monarch,
+                serverPlayer);
+            session.setMercenaries(mercenaries);
+            session.setPrice(mercPrice);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
@@ -970,34 +975,27 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Offer a player some mercenaries.
+     * Handles the response to an offer to player of some mercenaries.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to offer to.
-     * @param mercenaries A list of <code>Unit</code>s to offer.
+     * @param accepted Whether the offer was accepted or not.
+     * @return An element encapsulating a suitable update.
      */
-    private void monarchOfferMercenaries(ServerPlayer serverPlayer,
-                                         List<AbstractUnit> mercenaries) {
+    public Element monarchOfferMercenaries(ServerPlayer serverPlayer,
+                                           boolean accepted) {
+        MercenariesSession session
+            = TransactionSession.lookup(MercenariesSession.class,
+                serverPlayer.getMonarch(), serverPlayer);
+        if (session == null) {
+            return DOMMessage.clientError("Invalid mercenary reply");
+        }
+
         ChangeSet cs = new ChangeSet();
-        int price = 0;
-        for (AbstractUnit au : mercenaries) {
-            price += serverPlayer.getPrice(au);
-        }
-        if (!serverPlayer.checkGold(price)) {
-            price = serverPlayer.getGold();
-        }
-        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-            new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
-                StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
-                .addAmount("%gold%", price)
-                .addStringTemplate("%mercenaries%",
-                    abstractUnitTemplate(", ", mercenaries))));
-        Element reply = askElement(serverPlayer, cs);
-        if (Boolean.valueOf(reply.getAttribute("accepted")).booleanValue()) {
-            cs = new ChangeSet();
+        if (accepted) {
+            int price = session.getPrice();
             if (serverPlayer.checkGold(price)) {
-                serverPlayer.createUnits(mercenaries);
-                cs.add(See.only(serverPlayer),
-                    serverPlayer.getEurope());
+                serverPlayer.createUnits(session.getMercenaries());
+                cs.add(See.only(serverPlayer), serverPlayer.getEurope());
                 serverPlayer.modifyGold(-price);
                 cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             } else {
@@ -1006,8 +1004,9 @@ public final class InGameController extends Controller {
                     new MonarchActionMessage(MonarchAction.DISPLEASURE,
                         StringTemplate.template("model.monarch.action.DISPLEASURE")));
             }
-            sendElement(serverPlayer, cs);
         }
+        session.complete(cs);
+        return cs.build(serverPlayer);
     }
 
     /**

@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -323,6 +324,20 @@ public class ServerAPI {
      */
     public boolean abandonColony(Colony colony) {
         return askHandling(new AbandonColonyMessage(colony),
+            null, null);
+    }
+
+    /**
+     * Server query-response to respond to a monarch offer.
+     *
+     * @param action The monarch action responded to.
+     * @param accept Accept or reject the offer.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean answerMonarch(MonarchAction action, boolean accept) {
+        return askHandling(new TrivialMessage("monarchAction",
+                "action", action.toString(),
+                "accepted", Boolean.toString(accept)),
             null, null);
     }
 

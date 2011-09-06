@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,6 +50,9 @@ public class MonarchActionMessage extends DOMMessage {
     // The tax rate, if appropriate.
     private String tax;
 
+    // Is the offer accepted?  Valid in replies from client.
+    private boolean accepted;
+
 
     /**
      * Create a new <code>MonarchActionMessage</code> with the given action.
@@ -59,6 +63,7 @@ public class MonarchActionMessage extends DOMMessage {
         this.action = action;
         this.template = template;
         this.tax = null;
+        this.accepted = false;
     }
 
     /**
@@ -71,13 +76,17 @@ public class MonarchActionMessage extends DOMMessage {
     public MonarchActionMessage(Game game, Element element) {
         this.action = Enum.valueOf(MonarchAction.class,
                                    element.getAttribute("action"));
-        NodeList children = element.getChildNodes();
-        if (children.getLength() != 1) {
-            throw new IllegalArgumentException("Child template expected");
-        }
-        this.template = StringTemplate.label(" ");
-        this.template.readFromXMLElement((Element) children.item(0));
         this.tax = element.getAttribute("tax");
+        this.accepted = (element.hasAttribute("accepted")) 
+            ? Boolean.valueOf(element.getAttribute("accepted")).booleanValue()
+            : false;
+        NodeList children = element.getChildNodes();
+        if (children.getLength() == 1) {
+            this.template = StringTemplate.label(" ");
+            this.template.readFromXMLElement((Element) children.item(0));
+        } else {
+            this.template = null;
+        }
     }
 
     /**
@@ -121,19 +130,39 @@ public class MonarchActionMessage extends DOMMessage {
     }
 
     /**
-     * Handle a "monarchAction"-message.
-     * This method is not needed as MonarchActionMessages are sent
-     * from server to client, and only returned with an annotation attached.
+     * Sets the acceptance state.
+     *
+     * @param accept The new acceptance state.
+     */
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
+
+    /**
+     * Handles a "monarchAction"-message.
+     * These are normally initiated by the server when the monarch takes
+     * action, but certain messages need a reply from the player.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return Null.
+     * @return An element handling the valid replies, or an error.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        return null;
+        Game game = player.getGame();
+        ServerPlayer serverPlayer = server.getPlayer(connection);
+        switch (action) {
+        case OFFER_MERCENARIES:
+            return server.getInGameController()
+                .monarchOfferMercenaries(serverPlayer, accepted);
+        case RAISE_TAX_ACT: // TODO: allow this type
+        case RAISE_TAX_WAR: // TODO: allow this type
+        default:
+            return DOMMessage.clientError("Invalid reply to monarch action: "
+                + action);
+        }
     }
 
     /**
@@ -145,7 +174,10 @@ public class MonarchActionMessage extends DOMMessage {
         Element result = createNewRootElement(getXMLElementTagName());
         Document doc = result.getOwnerDocument();
         result.setAttribute("action", action.toString());
-        if (tax != null) result.setAttribute("tax", tax);
+        if (tax != null) {
+            result.setAttribute("tax", tax);
+        }
+        result.setAttribute("accepted", Boolean.toString(accepted));
         result.appendChild(template.toXMLElement(null, doc));
         return result;
     }

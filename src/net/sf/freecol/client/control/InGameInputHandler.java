@@ -839,15 +839,14 @@ public final class InGameInputHandler extends InputHandler {
         Player player = freeColClient.getMyPlayer();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         final MonarchAction action = message.getAction();
-        final StringTemplate template = message.getTemplate();
-
-        boolean accept = new ShowMonarchPanelSwingTask(action, template)
-            .confirm();
-        element.setAttribute("accepted", String.valueOf(accept));
-
+        boolean accept
+            = new ShowMonarchPanelSwingTask(action, message.getTemplate())
+                .confirm();
+        freeColClient.askServer().answerMonarch(action, accept);
+        
         new UpdateMenuBarSwingTask().invokeLater();
 
-        return element;
+        return null;
     }
 
     /**

@@ -837,6 +837,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Calculates the price of a group of mercenaries for this player.
+     *
+     * @param mercenaries A list of mercenaries to price.
+     * @return The price.
+     */
+    public int priceMercenaries(List<AbstractUnit> mercenaries) {
+        int mercPrice = 0;
+        for (AbstractUnit au : mercenaries) {
+            mercPrice += getPrice(au);
+        }
+        if (!checkGold(mercPrice)) mercPrice = getGold();
+        return mercPrice;
+    }
+
+    /**
      * Makes the entire map visible.
      * Debug mode helper.
      */
