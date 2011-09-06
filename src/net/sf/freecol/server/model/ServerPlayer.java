@@ -1640,7 +1640,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             defenderUnit = (Unit) defender;
             defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
-            boolean bombard = attackerUnit.hasAbility("model.ability.bombard");
+            boolean bombard = attackerUnit.hasAbility(Ability.BOMBARD);
             cs.addAttribute(See.only(this), "sound",
                 (attackerUnit.isNaval()) ? "sound.attack.naval"
                 : (bombard) ? "sound.attack.artillery"

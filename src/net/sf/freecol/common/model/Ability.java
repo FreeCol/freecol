@@ -55,6 +55,12 @@ public final class Ability extends Feature {
         "model.ability.avoidExcessProduction";
 
     /**
+     * The ability to bombard other units, i.e. attack them from a
+     * distance without risking damage.
+     */
+    public static final String BOMBARD = "model.ability.bombard";
+
+    /**
      * The ability to be born in a Colony. Only Units with this
      * ability can be produced by a Colony.
      */

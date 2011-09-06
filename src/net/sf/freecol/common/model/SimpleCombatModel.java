@@ -57,9 +57,10 @@ public class SimpleCombatModel extends CombatModel {
         = "model.modifier.artilleryAgainstRaid";
     public static final String AMPHIBIOUS_ATTACK
         = "model.modifier.amphibiousAttack";
+    public static final String BOMBARD_BONUS
+        = "model.modifier.bombardBonus";
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
         = new Modifier("bogus", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
-
 
     public SimpleCombatModel() {}
 
@@ -109,7 +110,7 @@ public class SimpleCombatModel extends CombatModel {
             Settlement attackerSettlement = (Settlement) attacker;
             if (attackerSettlement.hasAbility("model.ability.bombardShips")) {
                 for (Unit unit : attackerSettlement.getTile().getUnitList()) {
-                    if (unit.hasAbility("model.ability.bombard")) {
+                    if (unit.hasAbility(Ability.BOMBARD)) {
                         result += unit.getType().getOffence();
                     }
                 }
@@ -249,14 +250,14 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, REF bombardment bonus
             result.addAll(attackerUnit
-                          .getModifierSet("model.modifier.bombardBonus"));
+                          .getModifierSet(BOMBARD_BONUS));
         } else if (combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             Tile tile = defenderUnit.getTile();
             if (tile != null) {
                 if (tile.getSettlement() != null) {
                     result.addAll(attackerUnit
-                                  .getModifierSet("model.modifier.bombardBonus"));
+                                  .getModifierSet(BOMBARD_BONUS));
                 } else {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
@@ -271,7 +272,7 @@ public class SimpleCombatModel extends CombatModel {
                     }
                     // Artillery in the open penalty, must be on a
                     // tile and not in a settlement.
-                    if (attackerUnit.hasAbility("model.ability.bombard")
+                    if (attackerUnit.hasAbility(Ability.BOMBARD)
                         && attackerUnit.getLocation() instanceof Tile
                         && attackerUnit.getSettlement() == null) {
                         result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
@@ -383,7 +384,7 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(tile.getType().getDefenceBonus());
                 }
                 // Artillery in the Open penalty
-                if (defenderUnit.hasAbility("model.ability.bombard")
+                if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && defenderUnit.getState() != Unit.UnitState.FORTIFIED) {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
@@ -391,7 +392,7 @@ public class SimpleCombatModel extends CombatModel {
                 result.addAll(tile.getSettlement()
                               .getModifierSet(Modifier.DEFENCE));
                 // Artillery defence bonus against an Indian raid
-                if (defenderUnit.hasAbility("model.ability.bombard")
+                if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && attackerUnit.getOwner().isIndian()) {
                     result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
                 }

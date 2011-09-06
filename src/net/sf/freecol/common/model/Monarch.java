@@ -491,7 +491,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             if (unitType.hasAbility("model.ability.supportUnit")) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                     navalTypes.add(unitType);
-                } else if (unitType.hasAbility("model.ability.bombard")) {
+                } else if (unitType.hasAbility(Ability.BOMBARD)) {
                     bombardTypes.add(unitType);
                 } else if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     mountedTypes.add(unitType);
