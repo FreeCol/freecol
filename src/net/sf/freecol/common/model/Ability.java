@@ -126,6 +126,11 @@ public final class Ability extends Feature {
     public static final String CARRY_TREASURE = "model.ability.carryTreasure";
 
     /**
+     * The ability of certain units to build TileImprovements faster.
+     */
+    public static final String EXPERT_PIONEER = "model.ability.expertPioneer";
+
+    /**
      * The ability of certain consumers (e.g. BuildQueues) to consume
      * a large amount of goods at once instead of turn by turn.
      */
@@ -153,8 +158,8 @@ public final class Ability extends Feature {
     public static final String NAVAL_UNIT = "model.ability.navalUnit";
 
     /**
-     * The ability of certain units (e.g. privateers) to plunder
-     * another player's units without causing war.
+     * The ability of certain units (e.g. privateers) to attack and
+     * plunder another player's units without causing war.
      */
     public static final String PIRACY = "model.ability.piracy";
 
