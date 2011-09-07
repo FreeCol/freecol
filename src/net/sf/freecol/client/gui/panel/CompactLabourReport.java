@@ -131,7 +131,7 @@ public final class CompactLabourReport extends ReportPanel {
 
     private ImageIcon getUnitIcon(UnitType unit) {
         Unit.Role role = Unit.Role.DEFAULT;
-        if (unit.hasAbility("model.ability.expertPioneer")) {
+        if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
             role = Unit.Role.PIONEER;
         } else if (unit.hasAbility("model.ability.expertMissionary")) {
             role = Unit.Role.MISSIONARY;

@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -385,7 +386,7 @@ public class LabourData {
                 experts.put(production, getUnitData(unitType));
             }
 
-            if (unitType.hasAbility("model.ability.expertPioneer")) {
+            if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
                 pioneer = getUnitData(unitType);
             } else if (unitType.hasAbility("model.ability.expertSoldier")) {
                 soldier = getUnitData(unitType);

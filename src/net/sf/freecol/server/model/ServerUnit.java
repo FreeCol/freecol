@@ -242,7 +242,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     setWorkLeft(-1);
                 } else {
                     // Otherwise do work
-                    int amount = (getType().hasAbility("model.ability.expertPioneer"))
+                    int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
                         ? 2 : 1;
                     int turns = ti.getTurnsToComplete();
                     if ((turns -= amount) < 0) turns = 0;
@@ -354,7 +354,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (deliver != null) { // Deliver goods if any
             int amount = tile.potential(deliver, getType())
                 * getWorkImprovement().getDeliverAmount();
-            if (getType().hasAbility("model.ability.expertPioneer")) {
+            if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
                 amount *= 2;
             }
             Settlement settlement = tile.getSettlement();

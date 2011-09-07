@@ -2846,7 +2846,7 @@ public class Unit extends FreeColGameObject
      */
     public int getWorkTurnsLeft() {
         return (state == UnitState.IMPROVING
-                && unitType.hasAbility("model.ability.expertPioneer"))
+                && unitType.hasAbility(Ability.EXPERT_PIONEER))
             ? (getWorkLeft() + 1) / 2
             : getWorkLeft();
     }

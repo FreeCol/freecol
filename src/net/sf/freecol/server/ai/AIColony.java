@@ -1222,7 +1222,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         for(Unit unit : colony.getUnitList()){
-            if(!unit.hasAbility("model.ability.expertPioneer")){
+            if(!unit.hasAbility(Ability.EXPERT_PIONEER)){
                 continue;
             }
             AIUnit aiu = getAIUnit(unit);

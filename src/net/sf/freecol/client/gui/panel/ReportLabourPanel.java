@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
@@ -51,7 +52,7 @@ import net.miginfocom.swing.MigLayout;
  * This panel displays the Labour Report.
  */
 public final class ReportLabourPanel extends ReportPanel implements ActionListener {
-    
+
     private TypeCountMap<UnitType> unitCount, unitAtSea, unitOnLand, unitInEurope;
     private Map<UnitType, Map<Colony, Integer>> unitLocations;
     private List<Colony> colonies;
@@ -122,19 +123,19 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         }
 
         reportPanel.setLayout(new MigLayout("wrap 9", "[]10[]10[]30[]10[]10[]30[]10[]10[]", ""));
-        
+
         for (UnitType unitType : colonists) {
             if(!unitType.isAvailableTo(getMyPlayer())) {
                 continue;
             }
-            
+
             Role role = Role.DEFAULT;
-            if (unitType.hasAbility("model.ability.expertPioneer")) {
+            if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
                 role = Role.PIONEER;
             } else if (unitType.hasAbility("model.ability.expertMissionary")) {
                 role = Role.MISSIONARY;
             }
-            
+
             int unitTypeCount = unitCount.getCount(unitType);
             if (unitTypeCount == 0) {
                 JLabel unitIcon = new JLabel(getLibrary().getUnitImageIcon(unitType, role, true, 0.8));
@@ -164,12 +165,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         detailPanel.setOpaque(false);
 
         Role role = Role.DEFAULT;
-        if (unitType.hasAbility("model.ability.expertPioneer")) {
+        if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
             role = Role.PIONEER;
         } else if (unitType.hasAbility("model.ability.expertMissionary")) {
             role = Role.MISSIONARY;
         }
-            
+
         // summary
         detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
         detailPanel.add(localizedLabel(unitType.getNameKey()));
@@ -203,7 +204,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
             detailPanel.add(onLandLabel);
             JLabel countLabel = new JLabel(String.valueOf(unitOnLand.getCount(unitType)));
-            detailPanel.add(countLabel); 
+            detailPanel.add(countLabel);
         }
         if (unitAtSea.getCount(unitType) > 0) {
             JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
@@ -221,7 +222,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     /**
      * This function analyzes an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     @Override

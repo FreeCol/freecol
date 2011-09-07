@@ -1315,7 +1315,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             //      - an expert pioneer, or
             //      - a non-expert unit and there are no other units assigned as pioneers
             boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
-                                || unit.hasAbility("model.ability.expertPioneer");
+                                || unit.hasAbility(Ability.EXPERT_PIONEER);
             boolean isExpert = unit.getSkillLevel() > 0;
             if ((isPioneer || (isPioneerReq && !isExpert)) && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
