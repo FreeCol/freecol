@@ -163,6 +163,17 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
             && repeatCount > 0;
     }
 
+    /**
+     * Returns true if this is a valid Mission for the given
+     * Unit. This method always returns false and needs to be
+     * overridden.
+     *
+     * @param unit an <code>Unit</code> value
+     * @return false
+     */
+    public static boolean isValidFor(Unit unit) {
+        return false;
+    }
 
     /**
      * {@inheritDoc}

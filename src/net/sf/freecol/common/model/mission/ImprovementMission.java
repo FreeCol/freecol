@@ -23,113 +23,98 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
 /**
- * The GoToMission causes a Unit to move towards its destination.
+ * The ImprovementMission causes a Unit to add a TileImprovement to a
+ * particular Tile.
  */
-public class GoToMission extends AbstractMission {
+public class ImprovementMission extends AbstractMission {
 
     /**
-     * The number of turns this mission has been blocked.
+     * The improvement of this Mission.
      */
-    private int blockedCount;
-
-    /**
-     * The destination of this Mission.
-     */
-    private Location destination;
+    private TileImprovement improvement;
 
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
      */
-    public GoToMission(Game game) {
+    public ImprovementMission(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
      * @param in a <code>XMLStreamReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public GoToMission(Game game, XMLStreamReader in) throws XMLStreamException {
+    public ImprovementMission(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
     }
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
      * @param e an <code>Element</code> value
      */
-    public GoToMission(Game game, Element e) {
+    public ImprovementMission(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
     }
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
      * @param id a <code>String</code> value
      */
-    public GoToMission(Game game, String id) {
+    public ImprovementMission(Game game, String id) {
         super(game, id);
     }
 
     /**
-     * Get the <code>Destination</code> value.
+     * Get the <code>Improvement</code> value.
      *
-     * @return an <code>Location</code> value
+     * @return an <code>TileImprovement</code> value
      */
-    public final Location getDestination() {
-        return destination;
+    public final TileImprovement getImprovement() {
+        return improvement;
     }
 
     /**
-     * Set the <code>Destination</code> value.
+     * Set the <code>Improvement</code> value.
      *
-     * @param newDestination The new Destination value.
+     * @param newImprovement The new Improvement value.
      */
-    public final void setDestination(final Location newDestination) {
-        this.destination = newDestination;
+    public final void setImprovement(final TileImprovement newImprovement) {
+        this.improvement = newImprovement;
     }
-
-    /**
-     * Get the <code>BlockedCount</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getBlockedCount() {
-        return blockedCount;
-    }
-
-    /**
-     * Set the <code>BlockedCount</code> value.
-     *
-     * @param newBlockedCount The new BlockedCount value.
-     */
-    public final void setBlockedCount(final int newBlockedCount) {
-        this.blockedCount = newBlockedCount;
-    }
-
 
     /**
      * {@inheritDoc}
      */
     public MissionState doMission() {
-        // TODO: do we need acess to the InGameController?
-        return MissionState.OK;
+        // TODO: get rid of magic numbers: either add a pioneerWork
+        // attribute to UnitType, or introduce an expertRole ability
+        // and add the work to the Role definition
+        int work = getUnit().hasAbility(Ability.EXPERT_PIONEER) ? 2 : 1;
+        setTurnCount(getTurnCount() - work);
+        getUnit().setMovesLeft(0);
+        return (getTurnCount() <= 0)
+            ? MissionState.COMPLETED : MissionState.OK;
     }
 
 
@@ -140,20 +125,25 @@ public class GoToMission extends AbstractMission {
      */
     public boolean isValid() {
         return super.isValid()
-            && destination != null
-            // TODO: check for disposed destinations
-            && destination.canAdd(getUnit());
+            && improvement != null
+            && improvement.isWorkerAllowed(getUnit());
     }
 
     /**
-     * Returns true if the given Unit has movement points. At the
-     * moment, this is true for all units.
+     * Returns true if the given Unit is allowed to build at least one
+     * TileImprovementType.
      *
      * @param unit an <code>Unit</code> value
      * @return false
      */
     public static boolean isValidFor(Unit unit) {
-        return unit.getInitialMovesLeft() > 0;
+        for (TileImprovementType type : unit.getGame().getSpecification()
+                 .getTileImprovementTypeList()) {
+            if (type.isWorkerAllowed(unit)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -162,8 +152,7 @@ public class GoToMission extends AbstractMission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("destination", destination.getId());
-        out.writeAttribute("blockedCount", Integer.toString(blockedCount));
+        out.writeAttribute("improvement", improvement.getId());
     }
 
 
@@ -173,17 +162,16 @@ public class GoToMission extends AbstractMission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        destination = newLocation(in.getAttributeValue(null, "destination"));
-        blockedCount = getAttribute(in, "blockedCount", 0);
+        improvement = getFreeColGameObject(in, "improvement", TileImprovement.class);
     }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "goToMission"
+     * @return "improvementMission"
      */
     public static String getXMLElementTagName() {
-        return "goToMission";
+        return "improvementMission";
     }
 
 
