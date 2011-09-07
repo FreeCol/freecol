@@ -38,7 +38,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -56,14 +55,12 @@ import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
-import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Location;
@@ -857,36 +854,25 @@ public final class InGameController implements NetworkConstants {
         Player player = unit.getOwner();
         Location loc = unit.getLocation();
         String route = unit.getTradeRoute().getName();
-        ModelMessage m;
+        String key = null;
+        int more = 0;
 
         if (toLoad < atStop) {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                "traderoute.loadImportLimited", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%location%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .add("%goods%", type.getNameKey())
-                .addName("%more%", Integer.toString(atStop - toLoad));
+            key = "traderoute.loadImportLimited";
+            more = atStop - toLoad;
         } else if (present > atStop && toLoad > atStop) {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                "traderoute.loadExportLimited", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%location%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .add("%goods%", type.getNameKey())
-                .addName("%more%", Integer.toString(present - atStop));
+            key = "traderoute.loadExportLimited";
+            more = present - atStop;
         } else {
-            m = new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                "traderoute.load", unit)
-                .addName("%route%", route)
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addStringTemplate("%location%", loc.getLocationNameFor(player))
-                .addName("%amount%", Integer.toString(amount))
-                .add("%goods%", type.getNameKey());
+            key = "traderoute.load";
         }
-        return m;
+        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key, unit)
+            .addName("%route%", route)
+            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addStringTemplate("%location%", loc.getLocationNameFor(player))
+            .addAmount("%amount%", amount)
+            .add("%goods%", type.getNameKey())
+            .addAmount("%more%", more);
     }
 
     /**
@@ -1527,7 +1513,7 @@ public final class InGameController implements NetworkConstants {
             StringTemplate template
                 = StringTemplate.template("traderoute.reassignRoute")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .add("%route%", unit.getTradeRoute().getName());
+                .addName("%route%", unit.getTradeRoute().getName());
             if (!canvas.showConfirmDialog(unit.getTile(), template,
                     "yes", "no")) return false;
         }
@@ -2869,7 +2855,7 @@ public final class InGameController implements NetworkConstants {
                 int percent = getSpecification()
                     .getInteger("model.option.treasureTransportFee");
                 template = StringTemplate.template("cashInTreasureTrain.pay")
-                    .addName("%fee%", Integer.toString(percent));
+                    .addAmount("%fee%", percent);
             }
             cash = canvas.showConfirmDialog(unit.getTile(), template,
                 "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
