@@ -243,7 +243,7 @@ public abstract class Mission extends AIObject {
                         newTile.getSettlement() == null) {
                     tension += 100 - combatModel.getDefencePower(unit, defender) * 2;
                 }
-                if (defender.hasAbility("model.ability.expertSoldier") &&
+                if (defender.hasAbility(Ability.EXPERT_SOLDIER) &&
                         !defender.isArmed()) {
                     tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
                 }

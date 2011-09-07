@@ -2348,7 +2348,7 @@ public final class GUI {
 
                                 Unit missionary = nativeSettlement.getMissionary();
                                 if (missionary != null) {
-                                    boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
                                     backgroundColor = lib.getColor(missionary.getOwner());
                                     backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
                                     rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
@@ -2571,7 +2571,7 @@ public final class GUI {
                     // Draw the mission chip if needed.
                     Unit missionary = indianSettlement.getMissionary();
                     if (missionary != null) {
-                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
+                        boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
                         Color mission = (expert ? Color.BLACK : Color.GRAY);
                         Color cross = lib.getColor(missionary.getOwner());
                         chip = createChip("\u271D", Color.BLACK, mission, cross);

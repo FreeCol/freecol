@@ -126,16 +126,31 @@ public final class Ability extends Feature {
     public static final String CARRY_TREASURE = "model.ability.carryTreasure";
 
     /**
-     * The ability of certain units to build TileImprovements faster.
-     */
-    public static final String EXPERT_PIONEER = "model.ability.expertPioneer";
-
-    /**
      * The ability of certain consumers (e.g. BuildQueues) to consume
      * a large amount of goods at once instead of turn by turn.
      */
     public static final String CONSUME_ALL_OR_NOTHING =
         "model.ability.consumeAllOrNothing";
+
+    /**
+     * The ability of certain units to work as missionaries more effectively.
+     */
+    public static final String EXPERT_MISSIONARY = "model.ability.expertMissionary";
+
+    /**
+     * The ability of certain units to build TileImprovements faster.
+     */
+    public static final String EXPERT_PIONEER = "model.ability.expertPioneer";
+
+    /**
+     * The ability of certain units to work as scouts more effectively.
+     */
+    public static final String EXPERT_SCOUT = "model.ability.expertScout";
+
+    /**
+     * The ability of certain units to work as soldiers more effectively.
+     */
+    public static final String EXPERT_SOLDIER = "model.ability.expertSoldier";
 
     /**
      * The somewhat controversial ability of expert units in factory

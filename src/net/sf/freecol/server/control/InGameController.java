@@ -1947,7 +1947,7 @@ public final class InGameController extends Controller {
                 // Do nothing if already spoken to.
                 result = "nothing";
             } else if (skill != null
-                       && skill.hasAbility("model.ability.expertScout")
+                       && skill.hasAbility(Ability.EXPERT_SCOUT)
                        && unit.getType().canBeUpgraded(skill,
                                                        ChangeType.NATIVES)) {
                 // If the scout can be taught to be an expert it will be.
@@ -1965,7 +1965,7 @@ public final class InGameController extends Controller {
                     radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
                     result = "tales";
                 } else {
-                    if (unit.hasAbility("model.ability.expertScout")) {
+                    if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                         gold = (gold * 11) / 10; // TODO: magic number
                     }
                     serverPlayer.modifyGold(gold);
@@ -2622,7 +2622,7 @@ public final class InGameController extends Controller {
                     nationType.generateSkillsForTile(tile));
             if (skill == null) { // Seasoned Scout
                 List<UnitType> scouts = getGame().getSpecification()
-                    .getUnitTypesWithAbility("model.ability.expertScout");
+                    .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
                 skill = Utils.getRandomMember(logger, "Choose scout",
                                               scouts, random);
             }
@@ -3637,7 +3637,7 @@ public final class InGameController extends Controller {
                 if (unit.isOffensiveUnit()) {
                     UnitType unitType = defaultType;
                     if (unit.getType().getOffence() > 0
-                        || unit.hasAbility("model.ability.expertSoldier")) {
+                        || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                         unitType = unit.getType();
                     }
                     EnumMap<Role, Integer> roleMap = unitHash.get(unitType);

@@ -295,7 +295,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         List<UnitType> units = new ArrayList<UnitType>();
         List<UnitType> skills = new ArrayList<UnitType>();
         for (UnitType u : getSpecification().getUnitTypeList()) {
-            if (u.getSkill() <= 0 || u.hasAbility("model.ability.expertSoldier")) {
+            if (u.getSkill() <= 0 || u.hasAbility(Ability.EXPERT_SOLDIER)) {
                 units.add(u);
             } else {
                 skills.add(u);

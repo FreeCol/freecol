@@ -388,11 +388,11 @@ public class LabourData {
 
             if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
                 pioneer = getUnitData(unitType);
-            } else if (unitType.hasAbility("model.ability.expertSoldier")) {
+            } else if (unitType.hasAbility(Ability.EXPERT_SOLDIER)) {
                 soldier = getUnitData(unitType);
-            } else if (unitType.hasAbility("model.ability.expertScout")) {
+            } else if (unitType.hasAbility(Ability.EXPERT_SCOUT)) {
                 scout = getUnitData(unitType);
-            } else if (unitType.hasAbility("model.ability.expertMissionary")) {
+            } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
                 missionary = getUnitData(unitType);
             }
         }

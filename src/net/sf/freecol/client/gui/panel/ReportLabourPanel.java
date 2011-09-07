@@ -132,7 +132,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             Role role = Role.DEFAULT;
             if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
                 role = Role.PIONEER;
-            } else if (unitType.hasAbility("model.ability.expertMissionary")) {
+            } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
                 role = Role.MISSIONARY;
             }
 
@@ -167,7 +167,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         Role role = Role.DEFAULT;
         if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
             role = Role.PIONEER;
-        } else if (unitType.hasAbility("model.ability.expertMissionary")) {
+        } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
             role = Role.MISSIONARY;
         }
 

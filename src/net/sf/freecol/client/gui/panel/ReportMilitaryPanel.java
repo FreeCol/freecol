@@ -129,7 +129,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) &&
                 !unitType.hasAbility(Ability.NAVAL_UNIT) &&
-                (unitType.hasAbility("model.ability.expertSoldier") ||
+                (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility("model.ability.canBeEquipped")) {
                     scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, scouts.getCount(unitType)));
@@ -204,7 +204,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             if (unit.isOffensiveUnit() && !unit.isNaval()) {
                 UnitType unitType = defaultType;
                 if (unit.getType().getOffence() > 0 ||
-                    unit.hasAbility("model.ability.expertSoldier")) {
+                    unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                     unitType = unit.getType();
                 }
                 switch(unit.getRole()) {

@@ -133,7 +133,7 @@ public final class CompactLabourReport extends ReportPanel {
         Unit.Role role = Unit.Role.DEFAULT;
         if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
             role = Unit.Role.PIONEER;
-        } else if (unit.hasAbility("model.ability.expertMissionary")) {
+        } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
             role = Unit.Role.MISSIONARY;
         }
 

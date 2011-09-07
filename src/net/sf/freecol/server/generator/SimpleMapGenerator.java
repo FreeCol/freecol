@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -794,7 +795,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                                         random, scaledSkills);
         if (skill == null) {
             // Seasoned Scout
-            List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
+            List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
             return unitList.get(random.nextInt(unitList.size()));
         } else {
             return skill;

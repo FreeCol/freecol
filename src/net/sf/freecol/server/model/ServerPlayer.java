@@ -1229,7 +1229,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (settlement.getMissionary() != null) {
                     Unit mission = settlement.getMissionary();
                     int missionAlarm = ALARM_MISSIONARY_PRESENT;
-                    if (mission.hasAbility("model.ability.expertMissionary")) {
+                    if (mission.hasAbility(Ability.EXPERT_MISSIONARY)) {
                         missionAlarm *= 2;
                     }
                     Player enemy = mission.getOwner();

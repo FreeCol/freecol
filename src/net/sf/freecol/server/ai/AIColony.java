@@ -1356,7 +1356,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 return;
             }
 
-            if(!unit.hasAbility("model.ability.expertSoldier")){
+            if(!unit.hasAbility(Ability.EXPERT_SOLDIER)){
                 continue;
             }
 
@@ -1369,7 +1369,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             // check for armed non-expert unit
             for(Unit outsideUnit : colony.getTile().getUnitList()){
                 if(outsideUnit.isArmed()
-                        && !outsideUnit.hasAbility("model.ability.expertSoldier")){
+                        && !outsideUnit.hasAbility(Ability.EXPERT_SOLDIER)){
                     unit.setLocation(colony.getTile());
                     break;
                 }

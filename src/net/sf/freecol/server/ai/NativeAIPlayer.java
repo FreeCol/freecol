@@ -835,7 +835,7 @@ public class NativeAIPlayer extends AIPlayer {
                 - combatModel.getDefencePower(defender, unit);
 
             if (!defender.isNaval()
-                && defender.hasAbility("model.ability.expertSoldier")
+                && defender.hasAbility(Ability.EXPERT_SOLDIER)
                 && !defender.isArmed()) {
                 value += 10 - def * 2 - turns * 25;
             }

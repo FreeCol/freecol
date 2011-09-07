@@ -188,7 +188,7 @@ public class LostCityRumour extends TileItem {
         boolean allowLearn = unit != null
             && !unit.getType().getUnitTypesLearntInLostCity().isEmpty();
         boolean isExpertScout = unit != null
-            && unit.hasAbility("model.ability.expertScout")
+            && unit.hasAbility(Ability.EXPERT_SCOUT)
             && unit.hasAbility("model.ability.scoutIndianSettlement");
         boolean hasDeSoto = unit != null
             && unit.getOwner().hasAbility("model.ability.rumoursAlwaysPositive");

@@ -556,7 +556,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (missionary != null && getSpecification()
                 .getBoolean("model.option.enhancedMissionaries")) {
                 // 10% bonus for missionary, 20% if expert
-                int bonus = (missionary.hasAbility("model.ability.expertMissionary")) ? 8
+                int bonus = (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) ? 8
                     : 9;
                 price = (price * bonus) / 10;
             }
@@ -779,7 +779,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         for(Unit unit : colony.getTile().getUnitList()){
             boolean isArmed = unit.isArmed();
             boolean isMounted = unit.isMounted();
-            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier");
+            boolean isExpertSoldier = unit.hasAbility(Ability.EXPERT_SOLDIER);
             if(isExpertSoldier){
                 if(isArmed){
                     colonyHasArmedUnits = true;
@@ -842,8 +842,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         comp = new Comparator<Unit>(){
             public int compare(Unit unit1, Unit unit2){
-                boolean isUnit1Expert = unit1.hasAbility("model.ability.expertSoldier");
-                boolean isUnit2Expert = unit2.hasAbility("model.ability.expertSoldier");
+                boolean isUnit1Expert = unit1.hasAbility(Ability.EXPERT_SOLDIER);
+                boolean isUnit2Expert = unit2.hasAbility(Ability.EXPERT_SOLDIER);
 
                 if(isUnit1Expert && !isUnit2Expert){
                     return -1;
@@ -896,7 +896,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // First process all units
         for(Unit unit : colony.getTile().getUnitList()){
             boolean isArmed = unit.isArmed();
-            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier"); 
+            boolean isExpertSoldier = unit.hasAbility(Ability.EXPERT_SOLDIER); 
             if(isExpertSoldier){
                 if(!isArmed){
                     unarmedExpertSoldiers.add(unit);
@@ -1089,7 +1089,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     // If we are not on the tile we are in the colony.
                     inColonyCount++;
                 }
-                if (u.hasAbility("model.ability.expertSoldier")) {
+                if (u.hasAbility(Ability.EXPERT_SOLDIER)) {
                     recruits.add(u);
                 } else if (u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     others.add(u);
@@ -1709,7 +1709,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 - combatModel.getDefencePower(defender, unit);
 
             if (!defender.isNaval()
-                && defender.hasAbility("model.ability.expertSoldier")
+                && defender.hasAbility(Ability.EXPERT_SOLDIER)
                 && !defender.isArmed()) {
                 value += 10 - def * 2 - turns * 25;
             }
