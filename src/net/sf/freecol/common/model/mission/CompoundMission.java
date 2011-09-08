@@ -41,7 +41,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * The individual missions this CompoundMission wraps.
      */
-    private List<AbstractMission> missions;
+    private List<Mission> missions;
 
     /**
      * The index of the current mission.
@@ -93,9 +93,9 @@ public class CompoundMission extends AbstractMission {
     /**
      * Get the <code>Missions</code> value.
      *
-     * @return a <code>List<AbstractMission></code> value
+     * @return a <code>List<Mission></code> value
      */
-    public final List<AbstractMission> getMissions() {
+    public final List<Mission> getMissions() {
         return missions;
     }
 
@@ -104,7 +104,7 @@ public class CompoundMission extends AbstractMission {
      *
      * @param newMissions The new Missions value.
      */
-    public final void setMissions(final List<AbstractMission> newMissions) {
+    public final void setMissions(final List<Mission> newMissions) {
         this.missions = newMissions;
     }
 
@@ -178,7 +178,7 @@ public class CompoundMission extends AbstractMission {
     protected void writeChildren(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeChildren(out);
-        for (AbstractMission mission : missions) {
+        for (Mission mission : missions) {
             mission.toXML(out);
         }
     }
