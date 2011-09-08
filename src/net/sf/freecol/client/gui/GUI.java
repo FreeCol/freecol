@@ -1857,7 +1857,7 @@ public final class GUI {
     private Image createLabel(Graphics2D g, TextSpecification[] textSpecs, Color backgroundColor) {
         int hPadding = 15;
         int vPadding = 10;
-        int linePadding = 8;
+        int linePadding = 2;
         int width = 0;
         int height = vPadding;
         int i;
@@ -1889,7 +1889,7 @@ public final class GUI {
         g2.setColor(getForegroundColor(backgroundColor));
         int offset = 0;
         for (i = 0; i < labels.length; i++) {
-            if (i > 0) offset += labels[i - 1].getAscent() + linePadding;
+            if (i > 0) offset += labels[i - 1].getAscent() + linePadding + vPadding/2;
             labels[i].draw(g2, (float) (width - labels[i].getBounds().getWidth())/2,
                            offset + labels[i].getAscent() + vPadding/2);
         }
