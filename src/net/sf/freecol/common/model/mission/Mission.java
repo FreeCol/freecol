@@ -19,7 +19,11 @@
 
 package net.sf.freecol.common.model.mission;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Unit;
+
 
 /**
  * The Mission interface describes some kind of order that can be
@@ -77,5 +81,15 @@ public interface Mission {
      * @return an <code>Unit</code> value
      */
     public Unit getUnit();
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException;
 
 }
