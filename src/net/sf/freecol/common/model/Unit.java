@@ -39,6 +39,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.mission.Mission;
+import net.sf.freecol.common.model.mission.MissionManager;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -225,9 +227,14 @@ public class Unit extends FreeColGameObject
 
     protected IndianSettlement indianSettlement = null; // only used by Brave and Convert
 
+    /**
+     * TODO: move this into GoToMission
+     */
     protected Location destination = null;
 
-    /** The trade route this unit has. */
+    /** The trade route this unit has.
+     * TODO: move this into some mission
+     */
     protected TradeRoute tradeRoute = null;
 
     /** Which stop in a trade route the unit is going to. */
@@ -239,6 +246,8 @@ public class Unit extends FreeColGameObject
     /**
      * What is being improved (to be used only for PIONEERs - where
      * they are working.
+     *
+     * TODO: move this into ImprovementMission
      */
     protected TileImprovement workImprovement;
 
@@ -248,6 +257,14 @@ public class Unit extends FreeColGameObject
     /** What type of goods this unit last earned experience producing. */
     private GoodsType experienceType;
 
+    /**
+     * The mission assigned to this Unit.
+     */
+    private Mission mission;
+
+    /**
+     * The amount of experience accumulated by this Unit.
+     */
     protected int experience = 0;
 
     protected int turnsOfTraining = 0;
@@ -379,6 +396,24 @@ public class Unit extends FreeColGameObject
      */
     public final UnitType getType() {
         return unitType;
+    }
+
+    /**
+     * Get the <code>Mission</code> value.
+     *
+     * @return a <code>Mission</code> value
+     */
+    public final Mission getMission() {
+        return mission;
+    }
+
+    /**
+     * Set the <code>Mission</code> value.
+     *
+     * @param newMission The new Mission value.
+     */
+    public final void setMission(final Mission newMission) {
+        this.mission = newMission;
     }
 
     /**
@@ -3364,6 +3399,10 @@ public class Unit extends FreeColGameObject
             workImprovement.toXML(out, player, showAll, toSavedGame);
         }
 
+        if (mission != null && full) {
+            mission.toXML(out);
+        }
+
         // Do not show enemy units hidden in a carrier:
         if (full) {
             unitsToXML(out, player, showAll, toSavedGame);
@@ -3515,6 +3554,8 @@ public class Unit extends FreeColGameObject
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
+            } else if (MissionManager.isMissionTag(in.getLocalName())) {
+                mission = MissionManager.getMission(getGame(), in);
             }
         }
 
