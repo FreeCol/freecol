@@ -193,23 +193,17 @@ public class CompoundMission extends AbstractMission {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         missions.clear();
+        Mission mission;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
-    }
-
-    /**
-     * Reads child mission.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if an error occurs
-     */
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String tag = in.getLocalName();
-        if (GoToMission.getXMLElementTagName().equals(tag)) {
-            missions.add(new GoToMission(getGame(), in));
+            mission = MissionManager.getMission(getGame(), in);
+            if (mission != null) {
+                missions.add(mission);
+            }
         }
     }
 
