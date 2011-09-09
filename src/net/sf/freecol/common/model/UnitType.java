@@ -34,61 +34,71 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 public final class UnitType extends BuildableType
     implements Comparable<UnitType>, Consumer {
 
+    /**
+     * The default offence value.
+     */
     public static final int DEFAULT_OFFENCE = 0;
+
+    /**
+     * The default offence value.
+     */
     public static final int DEFAULT_DEFENCE = 1;
 
     /**
-     * Describe offence here.
+     * The offence of this UnitType. Only Units with an offence value
+     * greater than zero can attack.
      */
     private int offence = DEFAULT_OFFENCE;
 
     /**
-     * Describe defence here.
+     * The defence of this UnitType.
      */
     private int defence = DEFAULT_DEFENCE;
 
     /**
-     * Describe space here.
+     * The capacity of this UnitType.
      */
     private int space = 0;
 
     /**
-     * Describe hitPoints here.
+     * The number of hit points this UnitType has. At the moment, this
+     * is only used for ships. All other UnitTypes are downgraded or
+     * destroyed if they lose a battle.
      */
     private int hitPoints = 0;
 
     /**
-     * Describe spaceTaken here.
+     * The space taken by this UnitType.
      */
     private int spaceTaken = 1;
 
     /**
-     * Describe skill here.
+     * The skill level of this UnitType.
      */
     private int skill = UNDEFINED;
 
     /**
-     * Describe price here.
+     * The price of this UnitType.
      */
     private int price = UNDEFINED;
 
     /**
-     * Describe movement here.
+     * The initial moves of this UnitType.
      */
     private int movement = 3;
 
     /**
-     * Describe lineOfSight here.
+     * The maximum distance of tiles this UnitType can observe.
      */
     private int lineOfSight = 1;
 
     /**
-     * Describe recruitProbability here.
+     * The probability of recruiting a Unit of this type in Europe.
      */
     private int recruitProbability = 0;
 
     /**
-     * Describe expertProduction here.
+     * The expert production of this UnitType.
      */
     private GoodsType expertProduction;
 
@@ -103,7 +113,8 @@ public final class UnitType extends BuildableType
     private int maximumExperience = 0;
 
     /**
-     * Describe maximumAttrition here.
+     * The maximum attrition this UnitType can accumulate without
+     * being destroyed.
      */
     private int maximumAttrition = INFINITY;
 
