@@ -56,21 +56,13 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
 
     /**
-     * Returns the Unit this mission was assigned to.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public final Unit getUnit() {
-        return unit;
-    }
-
-    /**
      * Creates a new <code>AbstractMission</code> instance.
      *
-     * @param game a <code>Game</code> value
+     * @param unit an <code>Unit</code> value
      */
-    public AbstractMission(Game game) {
-        super(game);
+    public AbstractMission(Unit unit) {
+        super(unit.getGame());
+        this.unit = unit;
     }
 
     /**
@@ -82,6 +74,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     public AbstractMission(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+        readFromXML(in);
     }
 
     /**
@@ -106,12 +99,12 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Set the <code>Unit</code> value.
+     * Returns the Unit this mission was assigned to.
      *
-     * @param newUnit The new Unit value.
+     * @return an <code>Unit</code> value
      */
-    public final void setUnit(final Unit newUnit) {
-        this.unit = newUnit;
+    public final Unit getUnit() {
+        return unit;
     }
 
     /**
@@ -164,6 +157,15 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
+     * Returns null. Override this method if necessary.
+     *
+     * @return null
+     */
+    public String getOccupationKey() {
+        return null;
+    }
+
+    /**
      * Returns true if this is a valid Mission for the given
      * Unit. This method always returns false and needs to be
      * overridden.
@@ -173,15 +175,6 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     public static boolean isValidFor(Unit unit) {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
     }
 
     /**

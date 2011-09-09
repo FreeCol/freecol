@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.mission.ImprovementMission;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -3478,7 +3479,8 @@ public final class InGameController extends Controller {
             tile.add(improvement);
         }
 
-        unit.setWorkImprovement(improvement);
+        //unit.setWorkImprovement(improvement);
+        unit.setMission(new ImprovementMission(unit, improvement));
         unit.setState(UnitState.IMPROVING);
 
         // Private update of the tile.

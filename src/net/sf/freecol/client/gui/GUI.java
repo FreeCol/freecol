@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.mission.Mission;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -1183,8 +1184,8 @@ public final class GUI {
                 else
                     occupationString = "model.unit.occupation.goingSomewhere";
             } else if (unit.getState() == Unit.UnitState.IMPROVING
-                       && unit.getWorkImprovement() != null) {
-                occupationString = unit.getWorkImprovement().getType().getId() + ".occupationString";
+                       && unit.getMission() != null) {
+                occupationString = unit.getMission().getOccupationKey();
             } else if (unit.getState() == Unit.UnitState.ACTIVE
                 && unit.getMovesLeft() == 0) {
                 if(unit.isUnderRepair())

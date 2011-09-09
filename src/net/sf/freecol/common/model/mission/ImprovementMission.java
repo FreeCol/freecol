@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -47,10 +48,21 @@ public class ImprovementMission extends AbstractMission {
     /**
      * Creates a new <code>ImprovementMission</code> instance.
      *
-     * @param game a <code>Game</code> value
+     * @param unit an <code>Unit</code> value
      */
-    public ImprovementMission(Game game) {
-        super(game);
+    public ImprovementMission(Unit unit) {
+        super(unit);
+    }
+
+    /**
+     * Creates a new <code>ImprovementMission</code> instance.
+     *
+     * @param unit an <code>Unit</code> value
+     * @param improvement a <code>TileImprovement</code> value
+     */
+    public ImprovementMission(Unit unit, TileImprovement improvement) {
+        super(unit);
+        this.improvement = improvement;
     }
 
     /**
@@ -107,16 +119,44 @@ public class ImprovementMission extends AbstractMission {
      * {@inheritDoc}
      */
     public MissionState doMission() {
-        // TODO: get rid of magic numbers: either add a pioneerWork
-        // attribute to UnitType, or introduce an expertRole ability
-        // and add the work to the Role definition
-        int work = getUnit().hasAbility(Ability.EXPERT_PIONEER) ? 2 : 1;
-        setTurnCount(getTurnCount() - work);
-        getUnit().setMovesLeft(0);
-        return (getTurnCount() <= 0)
-            ? MissionState.COMPLETED : MissionState.OK;
+        int turns = improvement.getTurnsToComplete();
+        if (turns == 0) {
+            getUnit().setState(Unit.UnitState.ACTIVE);
+            return MissionState.COMPLETED;
+        } else {
+            // TODO: get rid of magic numbers: either add a
+            // pioneerWork attribute to UnitType, or introduce an
+            // expertRole ability and add the work to the Role
+            // definition
+            turns -= getUnit().hasAbility(Ability.EXPERT_PIONEER) ? 2 : 1;
+            if (turns > 0) {
+                improvement.setTurnsToComplete(turns);
+                getUnit().setWorkLeft(turns);
+                return MissionState.OK;
+            } else {
+                improvement.setTurnsToComplete(0);
+                getUnit().setWorkLeft(0);
+                return MissionState.COMPLETED;
+            }
+        }
     }
 
+    /**
+     * Returns a StringTemplate that can be localized to something
+     * like "build a road".
+     *
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate getLabel() {
+        return StringTemplate.key(improvement.getId() + ".action");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getOccupationKey() {
+        return improvement.getType().getId() + ".occupationString";
+    }
 
     /**
      * Returns true if the mission is still valid.
@@ -144,6 +184,19 @@ public class ImprovementMission extends AbstractMission {
             }
         }
         return false;
+    }
+
+    public String toString() {
+        return "build " + improvement;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        toXML(out, getXMLElementTagName());
     }
 
     /**

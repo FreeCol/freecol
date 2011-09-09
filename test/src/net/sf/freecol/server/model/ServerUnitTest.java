@@ -156,6 +156,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
         assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
+        assertNull(hardyPioneer.getMission());
     }
 
     public void testColonyProfitFromEnhancement() {
@@ -289,10 +290,12 @@ public class ServerUnitTest extends FreeColTestCase {
         //assertEquals(0, hardyPioneer1.getMovesLeft());
         assertEquals(-1, hardyPioneer1.getWorkLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer1.getState());
+        assertNull(hardyPioneer1.getMission());
 
         //assertEquals(0, hardyPioneer2.getMovesLeft());
         assertEquals(-1, hardyPioneer2.getWorkLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer2.getState());
+        assertNull(hardyPioneer2.getMission());
 
         assertEquals(180, 20 * (hardyPioneer1.getEquipmentCount(toolsType)
                                 + hardyPioneer2.getEquipmentCount(toolsType)));
@@ -302,6 +305,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(4, hardyPioneer3.getWorkLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer3.getState());
         assertEquals(100, hardyPioneer3.getEquipmentCount(toolsType) * 20);
+        assertNotNull(hardyPioneer3.getMission());
 
         // Finish
         while (hardyPioneer3.getWorkLeft() > 0) {
@@ -313,6 +317,7 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(-1, hardyPioneer3.getWorkLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer3.getState());
         assertEquals(80, hardyPioneer3.getEquipmentCount(toolsType) * 20);
+        assertNull(hardyPioneer3.getMission());
     }
 
     public void testUnitGetsExperienceThroughWork() {

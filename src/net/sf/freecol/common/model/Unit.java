@@ -40,6 +40,8 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.mission.Mission;
+import net.sf.freecol.common.model.mission.AbstractMission;
+import net.sf.freecol.common.model.mission.ImprovementMission;
 import net.sf.freecol.common.model.mission.MissionManager;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -206,6 +208,7 @@ public class Unit extends FreeColGameObject
     /**
      * The number of turns until the work is finished, or '-1' if a
      * Unit can stay in its state forever.
+     * TODO: remove this as soon as there is a sailHighSeas mission
      */
     protected int workLeft;
 
@@ -242,14 +245,6 @@ public class Unit extends FreeColGameObject
 
     /** To be used only for type == TREASURE_TRAIN */
     protected int treasureAmount;
-
-    /**
-     * What is being improved (to be used only for PIONEERs - where
-     * they are working.
-     *
-     * TODO: move this into ImprovementMission
-     */
-    protected TileImprovement workImprovement;
 
     /** What type of goods this unit produces in its occupation. */
     protected GoodsType workType;
@@ -1068,25 +1063,6 @@ public class Unit extends FreeColGameObject
         if (type != null) {
             experienceType = type;
         }
-    }
-
-    /**
-     * Gets the TileImprovement that this pioneer is contributing to.
-     *
-     * @return The <code>TileImprovement</code> the pioneer is working on.
-     */
-    public TileImprovement getWorkImprovement() {
-        return workImprovement;
-    }
-
-    /**
-     * Sets the TileImprovement that this pioneer is contributing to.
-     *
-     * @param imp The new <code>TileImprovement</code> the pioneer is to
-     *     work on.
-     */
-    public void setWorkImprovement(TileImprovement imp) {
-        workImprovement = imp;
     }
 
     /**
@@ -2698,17 +2674,19 @@ public class Unit extends FreeColGameObject
     protected void setStateUnchecked(UnitState s) {
         // TODO: move to the server.
         // Cleanup the old UnitState, for example destroy the
-        // TileImprovment being built by a pioneer.
+        // TileImprovement being built by a pioneer.
 
         switch (state) {
         case IMPROVING:
-            if (getWorkLeft() > 0) {
-                if (!workImprovement.isComplete()
-                    && workImprovement.getTile() != null
-                    && workImprovement.getTile().getTileItemContainer() != null) {
-                    workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
+            if (getWorkLeft() > 0 && mission != null) {
+                TileImprovement improvement = ((ImprovementMission) mission)
+                    .getImprovement();
+                if (!improvement.isComplete()
+                    && improvement.getTile() != null
+                    && improvement.getTile().getTileItemContainer() != null) {
+                    improvement.getTile().getTileItemContainer().removeTileItem(improvement);
                 }
-                setWorkImprovement(null);
+                //setMission(null);
             }
             break;
         default:
@@ -2733,10 +2711,11 @@ public class Unit extends FreeColGameObject
             movesLeft = 0;
             break;
         case IMPROVING:
-            if (workImprovement == null) {
-                setWorkLeft(-1);
+            if (mission instanceof ImprovementMission) {
+                setWorkLeft(((ImprovementMission) mission)
+                            .getImprovement().getTurnsToComplete());
             } else {
-                setWorkLeft(workImprovement.getTurnsToComplete());
+                setWorkLeft(-1);
             }
             movesLeft = 0;
             break;
@@ -3395,10 +3374,6 @@ public class Unit extends FreeColGameObject
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
 
-        if (workImprovement != null) {
-            workImprovement.toXML(out, player, showAll, toSavedGame);
-        }
-
         if (mission != null && full) {
             mission.toXML(out);
         }
@@ -3521,7 +3496,7 @@ public class Unit extends FreeColGameObject
         units.clear();
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
-        setWorkImprovement(null);
+        setMission(null);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();
@@ -3553,9 +3528,17 @@ public class Unit extends FreeColGameObject
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
+                // TODO: remove 0.10.2 compatibility code
+                // setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
+                TileImprovement t = updateFreeColGameObject(in, TileImprovement.class);
+                mission = new ImprovementMission(this, t);
+                // end TODO
             } else if (MissionManager.isMissionTag(in.getLocalName())) {
-                mission = MissionManager.getMission(getGame(), in);
+                Class<? extends AbstractMission> missionClass
+                    = MissionManager.getMission(in.getLocalName());
+                if (missionClass != null) {
+                    mission = updateFreeColGameObject(in, missionClass);
+                }
             }
         }
 
