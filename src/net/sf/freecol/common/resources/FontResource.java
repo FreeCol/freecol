@@ -62,10 +62,14 @@ public class FontResource extends Resource {
             String name = resourceLocator.getSchemeSpecificPart();
             font = Font.decode(name.substring(SCHEME.length()));
         }
+
+        /** registerFont was only introduced in Java 1.6
         if (font != null) {
             GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .registerFont(font);
         }
+        */
+
         logger.info("Loaded font: "
                     + ((font==null) ? "(null)" : font.getFontName())
                     + " from: " + resourceLocator);
