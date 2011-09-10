@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.mission.Mission;
 import net.sf.freecol.common.model.mission.AbstractMission;
+import net.sf.freecol.common.model.mission.GoToMission;
 import net.sf.freecol.common.model.mission.ImprovementMission;
 import net.sf.freecol.common.model.mission.MissionManager;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -229,11 +230,6 @@ public class Unit extends FreeColGameObject
     protected Location location;
 
     protected IndianSettlement indianSettlement = null; // only used by Brave and Convert
-
-    /**
-     * TODO: move this into GoToMission
-     */
-    protected Location destination = null;
 
     /** The trade route this unit has.
      * TODO: move this into some mission
@@ -1071,16 +1067,11 @@ public class Unit extends FreeColGameObject
      * @return The destination of this unit.
      */
     public Location getDestination() {
-        return destination;
-    }
-
-    /**
-     * Sets the destination of this unit.
-     *
-     * @param newDestination The new destination of this unit.
-     */
-    public void setDestination(Location newDestination) {
-        this.destination = newDestination;
+        if (mission instanceof GoToMission) {
+            return ((GoToMission) mission).getDestination();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1134,11 +1125,7 @@ public class Unit extends FreeColGameObject
      * @see #findPath(Tile)
      */
     public PathNode findPath(Tile start, Tile end) {
-        Location dest = getDestination();
-        setDestination(end);
-        PathNode path = getGame().getMap().findPath(this, start, end);
-        setDestination(dest);
-        return path;
+        return getGame().getMap().findPath(this, start, end);
     }
 
     /**
@@ -1156,11 +1143,8 @@ public class Unit extends FreeColGameObject
 
         PathNode p;
         if (isOnCarrier()) {
-            Location dest = getDestination();
-            setDestination(end);
             final Unit carrier = (Unit) getLocation();
             p = getGame().getMap().findPath(this, start, end, carrier);
-            setDestination(dest);
         } else {
             p = findPath(start, end);
         }
@@ -1724,7 +1708,7 @@ public class Unit extends FreeColGameObject
      */
     public boolean couldMove() {
         return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
-            && destination == null
+            && getDestination() == null
             && tradeRoute == null
             && ((location instanceof Tile
                  && getMovesLeft() > 0)
@@ -2243,12 +2227,11 @@ public class Unit extends FreeColGameObject
             logger.warning("Unit " + getId() + " had no previous owner");
         }
 
+        mission = null;
+
         // Clear trade route and goto orders if changing owner.
         if (getTradeRoute() != null) {
             setTradeRoute(null);
-        }
-        if (getDestination() != null) {
-            setDestination(null);
         }
 
         // This need to be set right away
@@ -3366,9 +3349,6 @@ public class Unit extends FreeColGameObject
             }
         }
 
-        if (destination != null) {
-            out.writeAttribute("destination", destination.getId());
-        }
         if (tradeRoute != null) {
             out.writeAttribute("tradeRoute", tradeRoute.getId());
             out.writeAttribute("currentStop", String.valueOf(currentStop));
@@ -3452,7 +3432,13 @@ public class Unit extends FreeColGameObject
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
-        destination = newLocation(in.getAttributeValue(null, "destination"));
+        setMission(null);
+        // TODO: remove 0.10.2 compatibility code
+        Location destination = newLocation(in.getAttributeValue(null, "destination"));
+        if (destination != null) {
+            mission = new GoToMission(this, destination);
+        }
+        // end TODO
 
         currentStop = -1;
         tradeRoute = null;
@@ -3496,7 +3482,6 @@ public class Unit extends FreeColGameObject
         units.clear();
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
-        setMission(null);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();

@@ -180,6 +180,15 @@ public class CompoundMission extends AbstractMission {
     }
 
     /**
+     * Return the current mission.
+     *
+     * @return a <code>Mission</code> value
+     */
+    public Mission getCurrentMission() {
+        return missions.get(index);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player,

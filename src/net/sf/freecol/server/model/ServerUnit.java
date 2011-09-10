@@ -284,7 +284,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     return false;
                 }
                 ServerPlayer owner = (ServerPlayer) getOwner();
-                setDestination(null);
+                setMission(null);
                 cs.addMessage(See.only(owner),
                               new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                "model.unit.arriveInEurope",
@@ -294,12 +294,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.add(See.only(owner), europe, owner.getHighSeas());
             } else if (getDestination() == map) {
                 logger.info(toString() + " arrives in America");
-                setDestination(null);
+                setMission(null);
                 csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
                        random, cs);
             } else if (getDestination() instanceof Settlement) {
                 Settlement settlement = (Settlement) getDestination();
-                setDestination(null);
+                setMission(null);
                 PathNode path = map.findPathToEurope(this,
                     settlement.getTile(), CostDeciders.serverAvoidIllegal());
                 csMove(path.getLastNode().getTile(), random, cs);

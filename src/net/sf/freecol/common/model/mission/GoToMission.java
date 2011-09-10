@@ -135,16 +135,6 @@ public class GoToMission extends AbstractMission {
         this.blockedCount = newBlockedCount;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    public MissionState doMission() {
-        // TODO: do we need acess to the InGameController?
-        return MissionState.OK;
-    }
-
-
     /**
      * Returns a StringTemplate that can be localized to something
      * like "build a road".
@@ -160,6 +150,10 @@ public class GoToMission extends AbstractMission {
      */
     public String getOccupationKey() {
         return "gotoTileAction.accelerator";
+    }
+
+    public String toString() {
+        return "en route to " + destination;
     }
 
     /**

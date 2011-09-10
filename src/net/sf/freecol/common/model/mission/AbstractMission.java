@@ -99,6 +99,18 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
+     * Returns MissionState.OK and does nothing else. This is the
+     * default behaviour for missions that are carried out by the
+     * client, using the client's InGameController. Override this
+     * method for all missions that are carried out by the server
+     * instead.
+     */
+    public MissionState doMission() {
+        return MissionState.OK;
+    }
+
+
+    /**
      * Returns the Unit this mission was assigned to.
      *
      * @return an <code>Unit</code> value

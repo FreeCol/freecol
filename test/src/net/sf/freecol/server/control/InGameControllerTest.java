@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.mission.GoToMission;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -465,7 +466,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      galleon.getGoodsCount(), 1);
         assertFalse("Galleon should not be repairing",
                     galleon.isUnderRepair());
-        galleon.setDestination(tile3);
+        galleon.setMission(new GoToMission(galleon, tile3));
         assertEquals("Wrong destination for Galleon",
                      tile3, galleon.getDestination());
         galleon.getTile().setConnected(true);
