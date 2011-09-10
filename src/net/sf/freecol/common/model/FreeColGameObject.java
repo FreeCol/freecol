@@ -374,12 +374,6 @@ abstract public class FreeColGameObject extends FreeColObject {
                     return new HighSeas(game, locationString);
                 } else if (XMLElementTag.equals(Map.getXMLElementTagName())) {
                     return new Map(game, locationString);
-                } else if (XMLElementTag.equals("newWorld")) {
-                    // TODO: remove compatibility code before releasing 0.10.2
-                    return game.getMap() == null
-                        ? new Map(game, locationString)
-                        : game.getMap();
-                    // end TODO
                 } else {
                     logger.warning("Unknown type of Location: " + locationString);
                     return new Tile(game, locationString);
