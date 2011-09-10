@@ -1467,25 +1467,25 @@ identify the font. For this reason, you must obey the usual quoting
 rules. In particular, you must use the string {\tt \%20} instead of a
 space character in the font name.
 
-In order to use a TrueType font that is not available to the JVM, you
-must copy it to the fonts directory mentioned above and add it to the
-configuration file by adding a line like this:
+%% In order to use a TrueType font that is not available to the JVM, you
+%% must copy it to the fonts directory mentioned above and add it to the
+%% configuration file by adding a line like this:
 
-\begin{quote}
-{\tt MyFavouriteFont=resources/fonts/Chancery.ttf}
-\end{quote}
+%% \begin{quote}
+%% {\tt MyFavouriteFont=resources/fonts/Chancery.ttf}
+%% \end{quote}
 
-Then you could say:
+%% Then you could say:
 
-\begin{quote}
-{\tt NormalFont=urn:font:Black\%20Chancery-PLAIN-13}
-\end{quote}
+%% \begin{quote}
+%% {\tt NormalFont=urn:font:Black\%20Chancery-PLAIN-13}
+%% \end{quote}
 
-Instead of {\tt MyFavouriteFont}, you can any key you like, as long as
-it is not being used for anything else. This line will add your font
-to the list of fonts known to the JVM, and you can then use its name,
-which is, however, likely to differ from the file name. The file {\tt
-  Chancery.ttf}, for example, contains a font called ``Black Chancery''.
+%% Instead of {\tt MyFavouriteFont}, you can any key you like, as long as
+%% it is not being used for anything else. This line will add your font
+%% to the list of fonts known to the JVM, and you can then use its name,
+%% which is, however, likely to differ from the file name. The file {\tt
+%%   Chancery.ttf}, for example, contains a font called ``Black Chancery''.
 
 
 \hypertarget{The New World}{\chapter{The New World}}
