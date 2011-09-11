@@ -283,9 +283,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             for (Tile tile: getSurroundingTiles(NEAR_RADIUS)) {
                 nearSettlement = tile.getSettlement();
                 if (nearSettlement != null) {
+                    int x = getX() - tile.getX();
+                    int y = getY() - tile.getY();
+                    double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
+                    if (theta < 0) {
+                        theta += 2*Math.PI;
+                    }
+                    Direction direction = Direction.values()[(int) Math.floor(theta / (Math.PI/4))];
+
                     return StringTemplate.template("nameLocation")
                         .add("%name%", type.getNameKey())
                         .addStringTemplate("%location%", StringTemplate.template("nearLocation")
+                                           .add("%direction%", "direction." + direction.toString())
                                            .addName("%location%", nearSettlement.getName()));
                 }
             }
