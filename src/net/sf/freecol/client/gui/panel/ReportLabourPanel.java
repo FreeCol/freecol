@@ -21,13 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -37,24 +35,21 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
 
 import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Labour Report.
  */
-public final class ReportLabourPanel extends ReportPanel implements ActionListener {
+public final class ReportLabourPanel extends ReportPanel {
 
-    private TypeCountMap<UnitType> unitCount, unitAtSea, unitOnLand, unitInEurope;
-    private Map<UnitType, Map<Colony, Integer>> unitLocations;
+    private Map<UnitType, Map<Location, Integer>> data;
+    private TypeCountMap<UnitType> unitCount;
     private List<Colony> colonies;
 
     /**
@@ -70,45 +65,32 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     public void gatherData() {
 
-        // Count Units
+        data = new HashMap<UnitType, Map<Location, Integer>>();
         unitCount = new TypeCountMap<UnitType>();
-        unitAtSea = new TypeCountMap<UnitType>();
-        unitOnLand = new TypeCountMap<UnitType>();
-        unitInEurope = new TypeCountMap<UnitType>();
-        unitLocations = new HashMap<UnitType, Map<Colony, Integer>>();
-        for (UnitType type : getSpecification().getUnitTypeList()) {
-            unitLocations.put(type, new HashMap<Colony, Integer>());
-        }
 
-        Iterator<Unit> units = getMyPlayer().getUnitIterator();
-        while (units.hasNext()) {
-            Unit unit = units.next();
+        for (Unit unit : getMyPlayer().getUnits()) {
             UnitType type = unit.getType();
-            Location location = unit.getLocation();
-
             unitCount.incrementCount(type, 1);
-
-            if (location instanceof WorkLocation) {
-                incrementColonyCount(((WorkLocation) location).getColony(), type);
-            } else if (location instanceof Europe) {
-                unitInEurope.incrementCount(type, 1);
-            } else if (location instanceof Tile && ((Tile) location).getSettlement() != null) {
-                incrementColonyCount((Colony) ((Tile) location).getSettlement(), type);
-            } else if (location instanceof Unit) {
-                unitAtSea.incrementCount(type, 1);
-            } else {
-                unitOnLand.incrementCount(type, 1);
+            Map<Location, Integer> unitMap = data.get(type);
+            if (unitMap == null) {
+                unitMap = new HashMap<Location, Integer>();
+                data.put(type, unitMap);
             }
 
-        }
-    }
-
-    private void incrementColonyCount(Colony colony, UnitType type) {
-        Integer count = unitLocations.get(type).get(colony);
-        if (count == null) {
-            unitLocations.get(type).put(colony, new Integer(1));
-        } else {
-            unitLocations.get(type).put(colony, new Integer(count.intValue() + 1));
+            Location location = unit.getLocation();
+            if (location.getSettlement() != null) {
+                location = location.getSettlement();
+            } else if (unit.isInEurope()) {
+                location = getMyPlayer().getEurope();
+            } else if (location.getTile() != null) {
+                location = location.getTile();
+            }
+            Integer count = unitMap.get(location);
+            if (count == null) {
+                unitMap.put(location, 1);
+            } else {
+                unitMap.put(location, count + 1);
+            }
         }
     }
 
@@ -176,8 +158,9 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         detailPanel.add(localizedLabel(unitType.getNameKey()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;
+        Map<Location, Integer> unitLocations = data.get(unitType);
         for (Colony colony : colonies) {
-            if (unitLocations.get(unitType).get(colony) != null) {
+            if (unitLocations.get(colony) != null) {
                 String colonyName = colony.getName();
                 if (colony.canTrain(unitType)) {
                     canTrain = true;
@@ -186,31 +169,21 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 JButton colonyButton = getLinkButton(colonyName, null, colony.getId());
                 colonyButton.addActionListener(report);
                 detailPanel.add(colonyButton);
-                JLabel countLabel = new JLabel(unitLocations.get(unitType).get(colony).toString());
+                JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
                 countLabel.setForeground(LINK_COLOR);
                 detailPanel.add(countLabel);
             }
         }
-        if (unitInEurope.getCount(unitType) > 0) {
-            JButton europeButton = getLinkButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
-                                                 null, getMyPlayer().getEurope().getId());
-            europeButton.addActionListener(report);
-            detailPanel.add(europeButton);
-            JLabel countLabel = new JLabel(String.valueOf(unitInEurope.getCount(unitType)));
-            countLabel.setForeground(LINK_COLOR);
-            detailPanel.add(countLabel);
-        }
-        if (unitOnLand.getCount(unitType) > 0) {
-            JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
-            detailPanel.add(onLandLabel);
-            JLabel countLabel = new JLabel(String.valueOf(unitOnLand.getCount(unitType)));
-            detailPanel.add(countLabel);
-        }
-        if (unitAtSea.getCount(unitType) > 0) {
-            JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
-            detailPanel.add(atSeaLabel);
-            JLabel countLabel = new JLabel(String.valueOf(unitAtSea.getCount(unitType)));
-            detailPanel.add(countLabel);
+        for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
+            if (!(entry.getKey() instanceof Colony)) {
+                String locationName = Messages.message(entry.getKey().getLocationName());
+                JButton linkButton = getLinkButton(locationName, null, entry.getKey().getId());
+                linkButton.addActionListener(report);
+                detailPanel.add(linkButton);
+                JLabel countLabel = new JLabel(entry.getValue().toString());
+                countLabel.setForeground(LINK_COLOR);
+                detailPanel.add(countLabel);
+            }
         }
         if (canTrain) {
             detailPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
