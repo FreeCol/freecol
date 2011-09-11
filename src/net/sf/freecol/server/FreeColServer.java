@@ -67,7 +67,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.mission.GoToMission;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
@@ -788,7 +787,7 @@ public final class FreeColServer {
                 for (Player p : game.getPlayers()) {
                     if(!p.isIndian() && p.getEurope() != null) {
                         p.initializeHighSeas();
-
+                        
                         for (Unit u : p.getEurope().getUnitList()) {
                             // move units to high seas
                             //  use setLocation() so that units are removed from Europe,
@@ -797,11 +796,11 @@ public final class FreeColServer {
                             if (u.getState() == Unit.UnitState.TO_EUROPE) {
                                 logger.info("Found unit on way to europe: "+u.toString());
                                 u.setLocation(p.getHighSeas());
-                                u.setMission(new GoToMission(u, p.getEurope()));
+                                u.setDestination(p.getEurope());
                             } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
                                 logger.info("Found unit on way to new world: "+u.toString());
                                 u.setLocation(p.getHighSeas());
-                                u.setMission(new GoToMission(u, getGame().getMap()));
+                                u.setDestination(getGame().getMap());
                             }
                         }
                     }

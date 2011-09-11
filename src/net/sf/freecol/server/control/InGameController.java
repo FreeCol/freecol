@@ -64,8 +64,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.mission.GoToMission;
-import net.sf.freecol.common.model.mission.ImprovementMission;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -361,7 +359,7 @@ public final class InGameController extends Controller {
         // Send the navy on its way
         for (Unit u : navalUnits) {
             u.setWorkLeft(1);
-            u.setMission(new GoToMission(u, getGame().getMap()));
+            u.setDestination(getGame().getMap());
             u.setLocation(u.getOwner().getHighSeas());
         }
 
@@ -1591,13 +1589,13 @@ public final class InGameController extends Controller {
                     unit.setWorkLeft(unit.getSailTurns()
                         - unit.getWorkLeft() + 1);
                 }
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 cs.add(See.only(serverPlayer), unit, highSeas);
             } else if (unit.getTile() != null) {
                 Tile tile = unit.getTile();
                 unit.setEntryLocation(tile);
                 unit.setWorkLeft(unit.getSailTurns());
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);
                 cs.addDisappear(serverPlayer, tile, unit);
@@ -1618,12 +1616,12 @@ public final class InGameController extends Controller {
                     unit.setWorkLeft(unit.getSailTurns()
                         - unit.getWorkLeft() + 1);
                 }
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 cs.add(See.only(serverPlayer), unit, highSeas);
             } else if (unit.getLocation() instanceof Europe) {
                 Europe europe = (Europe) unit.getLocation();
                 unit.setWorkLeft(unit.getSailTurns());
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);
                 cs.add(See.only(serverPlayer), unit, europe, highSeas);
@@ -1638,12 +1636,12 @@ public final class InGameController extends Controller {
             } else if (unit.getLocation() == highSeas) {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 cs.add(See.only(serverPlayer), unit, highSeas);
             } else if (unit.getLocation() instanceof Europe) {
                 Europe europe = (Europe) unit.getLocation();
                 unit.setWorkLeft(unit.getSailTurns());
-                unit.setMission(new GoToMission(unit, destination));
+                unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);
                 cs.add(See.only(serverPlayer), unit, europe, highSeas);
@@ -2213,11 +2211,7 @@ public final class InGameController extends Controller {
     public Element setDestination(ServerPlayer serverPlayer, Unit unit,
                                   Location destination) {
         if (unit.getTradeRoute() != null) unit.setTradeRoute(null);
-        if (destination == null) {
-            unit.setMission(null);
-        } else {
-            unit.setMission(new GoToMission(unit, destination));
-        }
+        unit.setDestination(destination);
 
         // Others can not see a destination change.
         return new ChangeSet().add(See.only(serverPlayer), unit)
@@ -2253,7 +2247,7 @@ public final class InGameController extends Controller {
         // Could do just a partial update of currentStop if we did not
         // also need to set the unit destination.
         unit.setCurrentStop(next);
-        unit.setMission(new GoToMission(unit, stops.get(next).getLocation()));
+        unit.setDestination(stops.get(next).getLocation());
 
         // Others can not see a stop change.
         return new ChangeSet().add(See.only(serverPlayer), unit)
@@ -3484,8 +3478,7 @@ public final class InGameController extends Controller {
             tile.add(improvement);
         }
 
-        //unit.setWorkImprovement(improvement);
-        unit.setMission(new ImprovementMission(unit, improvement));
+        unit.setWorkImprovement(improvement);
         unit.setState(UnitState.IMPROVING);
 
         // Private update of the tile.
@@ -3570,7 +3563,7 @@ public final class InGameController extends Controller {
     public Element assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
                                     TradeRoute tradeRoute) {
         unit.setTradeRoute(tradeRoute);
-        unit.setMission(null);
+        unit.setDestination(null);
         if (tradeRoute != null) {
             List<Stop> stops = tradeRoute.getStops();
             int found = -1;
@@ -3582,7 +3575,7 @@ public final class InGameController extends Controller {
             }
             if (found < 0) found = 0;
             unit.setCurrentStop(found);
-            unit.setMission(new GoToMission(unit, stops.get(found).getLocation()));
+            unit.setDestination(stops.get(found).getLocation());
         }
 
         // Only visible to the player

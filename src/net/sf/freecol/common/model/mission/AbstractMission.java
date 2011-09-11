@@ -56,13 +56,21 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
 
     /**
+     * Returns the Unit this mission was assigned to.
+     *
+     * @return an <code>Unit</code> value
+     */
+    public final Unit getUnit() {
+        return unit;
+    }
+
+    /**
      * Creates a new <code>AbstractMission</code> instance.
      *
-     * @param unit an <code>Unit</code> value
+     * @param game a <code>Game</code> value
      */
-    public AbstractMission(Unit unit) {
-        super(unit.getGame());
-        this.unit = unit;
+    public AbstractMission(Game game) {
+        super(game);
     }
 
     /**
@@ -74,7 +82,6 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     public AbstractMission(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXML(in);
     }
 
     /**
@@ -99,24 +106,12 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Returns MissionState.OK and does nothing else. This is the
-     * default behaviour for missions that are carried out by the
-     * client, using the client's InGameController. Override this
-     * method for all missions that are carried out by the server
-     * instead.
-     */
-    public MissionState doMission() {
-        return MissionState.OK;
-    }
-
-
-    /**
-     * Returns the Unit this mission was assigned to.
+     * Set the <code>Unit</code> value.
      *
-     * @return an <code>Unit</code> value
+     * @param newUnit The new Unit value.
      */
-    public final Unit getUnit() {
-        return unit;
+    public final void setUnit(final Unit newUnit) {
+        this.unit = newUnit;
     }
 
     /**
@@ -169,15 +164,6 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Returns null. Override this method if necessary.
-     *
-     * @return null
-     */
-    public String getOccupationKey() {
-        return null;
-    }
-
-    /**
      * Returns true if this is a valid Mission for the given
      * Unit. This method always returns false and needs to be
      * overridden.
@@ -187,6 +173,15 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      */
     public static boolean isValidFor(Unit unit) {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        toXML(out, getXMLElementTagName());
     }
 
     /**

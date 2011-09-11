@@ -22,7 +22,6 @@ package net.sf.freecol.common.model.mission;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -75,23 +74,6 @@ public interface Mission {
      */
     public boolean isValid();
 
-    /**
-     * Returns a StringTemplate describing the Mission. The
-     * StringTemplate can be localized to produce something like
-     * "go to New Amsterdam", or "build a road".
-     *
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate getLabel();
-
-    /**
-     * Return a string to retrieve the localized occupation string,
-     * i.e. a single character indicating the Unit's current orders,
-     * or null if no abbreviation for the orders has been defined.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getOccupationKey();
 
     /**
      * Return the Unit this mission was assigned to.

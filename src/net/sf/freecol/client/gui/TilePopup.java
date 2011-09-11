@@ -414,9 +414,9 @@ public final class TilePopup extends JPopupMenu {
                 occ = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
             }
         } else if (unit.getState() == Unit.UnitState.IMPROVING
-                   && unit.getMission() != null) {
+                   && unit.getWorkImprovement() != null) {
             occ = StringTemplate.label(": ")
-                .add(unit.getMission().getOccupationKey())
+                .add(unit.getWorkImprovement().getType() + ".occupationString")
                 .add(Integer.toString(unit.getWorkTurnsLeft()));
         } else if (tradeRoute != null) {
             occ = StringTemplate.label(": ")

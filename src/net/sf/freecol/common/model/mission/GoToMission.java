@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -50,21 +49,10 @@ public class GoToMission extends AbstractMission {
     /**
      * Creates a new <code>GoToMission</code> instance.
      *
-     * @param unit a <code>Unit</code> value
+     * @param game a <code>Game</code> value
      */
-    public GoToMission(Unit unit) {
-        super(unit);
-    }
-
-    /**
-     * Creates a new <code>GoToMission</code> instance.
-     *
-     * @param unit a <code>Unit</code> value
-     * @param destination a <code>Location</code> value
-     */
-    public GoToMission(Unit unit, Location destination) {
-        super(unit);
-        this.destination = destination;
+    public GoToMission(Game game) {
+        super(game);
     }
 
     /**
@@ -135,26 +123,15 @@ public class GoToMission extends AbstractMission {
         this.blockedCount = newBlockedCount;
     }
 
-    /**
-     * Returns a StringTemplate that can be localized to something
-     * like "build a road".
-     *
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate getLabel() {
-        return StringTemplate.key("gotoAction.name");
-    }
 
     /**
      * {@inheritDoc}
      */
-    public String getOccupationKey() {
-        return "gotoTileAction.accelerator";
+    public MissionState doMission() {
+        // TODO: do we need acess to the InGameController?
+        return MissionState.OK;
     }
 
-    public String toString() {
-        return "en route to " + destination;
-    }
 
     /**
      * Returns true if the mission is still valid.
@@ -177,15 +154,6 @@ public class GoToMission extends AbstractMission {
      */
     public static boolean isValidFor(Unit unit) {
         return unit.getInitialMovesLeft() > 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
     }
 
     /**

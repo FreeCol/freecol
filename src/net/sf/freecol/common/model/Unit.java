@@ -39,11 +39,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.mission.Mission;
-import net.sf.freecol.common.model.mission.AbstractMission;
-import net.sf.freecol.common.model.mission.GoToMission;
-import net.sf.freecol.common.model.mission.ImprovementMission;
-import net.sf.freecol.common.model.mission.MissionManager;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -209,7 +204,6 @@ public class Unit extends FreeColGameObject
     /**
      * The number of turns until the work is finished, or '-1' if a
      * Unit can stay in its state forever.
-     * TODO: remove this as soon as there is a sailHighSeas mission
      */
     protected int workLeft;
 
@@ -231,9 +225,9 @@ public class Unit extends FreeColGameObject
 
     protected IndianSettlement indianSettlement = null; // only used by Brave and Convert
 
-    /** The trade route this unit has.
-     * TODO: move this into some mission
-     */
+    protected Location destination = null;
+
+    /** The trade route this unit has. */
     protected TradeRoute tradeRoute = null;
 
     /** Which stop in a trade route the unit is going to. */
@@ -242,20 +236,18 @@ public class Unit extends FreeColGameObject
     /** To be used only for type == TREASURE_TRAIN */
     protected int treasureAmount;
 
+    /**
+     * What is being improved (to be used only for PIONEERs - where
+     * they are working.
+     */
+    protected TileImprovement workImprovement;
+
     /** What type of goods this unit produces in its occupation. */
     protected GoodsType workType;
 
     /** What type of goods this unit last earned experience producing. */
     private GoodsType experienceType;
 
-    /**
-     * The mission assigned to this Unit.
-     */
-    private Mission mission;
-
-    /**
-     * The amount of experience accumulated by this Unit.
-     */
     protected int experience = 0;
 
     protected int turnsOfTraining = 0;
@@ -387,24 +379,6 @@ public class Unit extends FreeColGameObject
      */
     public final UnitType getType() {
         return unitType;
-    }
-
-    /**
-     * Get the <code>Mission</code> value.
-     *
-     * @return a <code>Mission</code> value
-     */
-    public final Mission getMission() {
-        return mission;
-    }
-
-    /**
-     * Set the <code>Mission</code> value.
-     *
-     * @param newMission The new Mission value.
-     */
-    public final void setMission(final Mission newMission) {
-        this.mission = newMission;
     }
 
     /**
@@ -1062,16 +1036,40 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Gets the TileImprovement that this pioneer is contributing to.
+     *
+     * @return The <code>TileImprovement</code> the pioneer is working on.
+     */
+    public TileImprovement getWorkImprovement() {
+        return workImprovement;
+    }
+
+    /**
+     * Sets the TileImprovement that this pioneer is contributing to.
+     *
+     * @param imp The new <code>TileImprovement</code> the pioneer is to
+     *     work on.
+     */
+    public void setWorkImprovement(TileImprovement imp) {
+        workImprovement = imp;
+    }
+
+    /**
      * Returns the destination of this unit.
      *
      * @return The destination of this unit.
      */
     public Location getDestination() {
-        if (mission instanceof GoToMission) {
-            return ((GoToMission) mission).getDestination();
-        } else {
-            return null;
-        }
+        return destination;
+    }
+
+    /**
+     * Sets the destination of this unit.
+     *
+     * @param newDestination The new destination of this unit.
+     */
+    public void setDestination(Location newDestination) {
+        this.destination = newDestination;
     }
 
     /**
@@ -1125,7 +1123,11 @@ public class Unit extends FreeColGameObject
      * @see #findPath(Tile)
      */
     public PathNode findPath(Tile start, Tile end) {
-        return getGame().getMap().findPath(this, start, end);
+        Location dest = getDestination();
+        setDestination(end);
+        PathNode path = getGame().getMap().findPath(this, start, end);
+        setDestination(dest);
+        return path;
     }
 
     /**
@@ -1143,8 +1145,11 @@ public class Unit extends FreeColGameObject
 
         PathNode p;
         if (isOnCarrier()) {
+            Location dest = getDestination();
+            setDestination(end);
             final Unit carrier = (Unit) getLocation();
             p = getGame().getMap().findPath(this, start, end, carrier);
+            setDestination(dest);
         } else {
             p = findPath(start, end);
         }
@@ -1708,7 +1713,7 @@ public class Unit extends FreeColGameObject
      */
     public boolean couldMove() {
         return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
-            && getDestination() == null
+            && destination == null
             && tradeRoute == null
             && ((location instanceof Tile
                  && getMovesLeft() > 0)
@@ -2227,11 +2232,12 @@ public class Unit extends FreeColGameObject
             logger.warning("Unit " + getId() + " had no previous owner");
         }
 
-        mission = null;
-
         // Clear trade route and goto orders if changing owner.
         if (getTradeRoute() != null) {
             setTradeRoute(null);
+        }
+        if (getDestination() != null) {
+            setDestination(null);
         }
 
         // This need to be set right away
@@ -2657,19 +2663,17 @@ public class Unit extends FreeColGameObject
     protected void setStateUnchecked(UnitState s) {
         // TODO: move to the server.
         // Cleanup the old UnitState, for example destroy the
-        // TileImprovement being built by a pioneer.
+        // TileImprovment being built by a pioneer.
 
         switch (state) {
         case IMPROVING:
-            if (getWorkLeft() > 0 && mission != null) {
-                TileImprovement improvement = ((ImprovementMission) mission)
-                    .getImprovement();
-                if (!improvement.isComplete()
-                    && improvement.getTile() != null
-                    && improvement.getTile().getTileItemContainer() != null) {
-                    improvement.getTile().getTileItemContainer().removeTileItem(improvement);
+            if (getWorkLeft() > 0) {
+                if (!workImprovement.isComplete()
+                    && workImprovement.getTile() != null
+                    && workImprovement.getTile().getTileItemContainer() != null) {
+                    workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
                 }
-                //setMission(null);
+                setWorkImprovement(null);
             }
             break;
         default:
@@ -2694,11 +2698,10 @@ public class Unit extends FreeColGameObject
             movesLeft = 0;
             break;
         case IMPROVING:
-            if (mission instanceof ImprovementMission) {
-                setWorkLeft(((ImprovementMission) mission)
-                            .getImprovement().getTurnsToComplete());
-            } else {
+            if (workImprovement == null) {
                 setWorkLeft(-1);
+            } else {
+                setWorkLeft(workImprovement.getTurnsToComplete());
             }
             movesLeft = 0;
             break;
@@ -3349,13 +3352,16 @@ public class Unit extends FreeColGameObject
             }
         }
 
+        if (destination != null) {
+            out.writeAttribute("destination", destination.getId());
+        }
         if (tradeRoute != null) {
             out.writeAttribute("tradeRoute", tradeRoute.getId());
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
 
-        if (mission != null && full) {
-            mission.toXML(out);
+        if (workImprovement != null) {
+            workImprovement.toXML(out, player, showAll, toSavedGame);
         }
 
         // Do not show enemy units hidden in a carrier:
@@ -3432,13 +3438,7 @@ public class Unit extends FreeColGameObject
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
-        setMission(null);
-        // TODO: remove 0.10.2 compatibility code
-        Location destination = newLocation(in.getAttributeValue(null, "destination"));
-        if (destination != null) {
-            mission = new GoToMission(this, destination);
-        }
-        // end TODO
+        destination = newLocation(in.getAttributeValue(null, "destination"));
 
         currentStop = -1;
         tradeRoute = null;
@@ -3482,6 +3482,7 @@ public class Unit extends FreeColGameObject
         units.clear();
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
+        setWorkImprovement(null);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();
@@ -3513,17 +3514,7 @@ public class Unit extends FreeColGameObject
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                // TODO: remove 0.10.2 compatibility code
-                // setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
-                TileImprovement t = updateFreeColGameObject(in, TileImprovement.class);
-                mission = new ImprovementMission(this, t);
-                // end TODO
-            } else if (MissionManager.isMissionTag(in.getLocalName())) {
-                Class<? extends AbstractMission> missionClass
-                    = MissionManager.getMission(in.getLocalName());
-                if (missionClass != null) {
-                    mission = updateFreeColGameObject(in, missionClass);
-                }
+                setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
             }
         }
 

@@ -29,7 +29,6 @@ import java.util.Set;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.mission.GoToMission;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -311,7 +310,7 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType);
-        colonist.setMission(new GoToMission(colonist, destinationTile));
+        colonist.setDestination(destinationTile);
 
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNull("No path should be available",path);
@@ -339,7 +338,7 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType);
-        colonist.setMission(new GoToMission(colonist, destinationTile));
+        colonist.setDestination(destinationTile);
 
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNull("No path should be available",path);
@@ -361,7 +360,7 @@ public class MapTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, unitTile, dutchPlayer, pioneerType);
         // unit is going somewhere else
         Tile unitDestination = map.getTile(3, 1);
-        unit.setMission(new GoToMission(unit, unitDestination));
+        unit.setDestination(unitDestination);
 
         // Execute
         CostDecider decider = CostDeciders.avoidSettlementsAndBlockingUnits();
@@ -393,10 +392,9 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType);
-        colonist.setMission(new GoToMission(colonist, destinationTile));
+        colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, null,
-                                     CostDeciders.avoidSettlementsAndBlockingUnits());
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, null, CostDeciders.avoidSettlementsAndBlockingUnits());
         assertNull("No path should be available",path);
     }
 
@@ -416,7 +414,7 @@ public class MapTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, unitTile, dutchPlayer,
                                        colonistType);
         Tile destinationTile = map.getTile(3,7);
-        colonist.setMission(new GoToMission(colonist, destinationTile));
+        colonist.setDestination(destinationTile);
 
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNotNull("A path should be available",path);

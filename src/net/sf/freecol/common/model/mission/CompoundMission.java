@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
@@ -54,10 +52,10 @@ public class CompoundMission extends AbstractMission {
     /**
      * Creates a new <code>CompoundMission</code> instance.
      *
-     * @param unit a <code>Unit</code> value
+     * @param game a <code>Game</code> value
      */
-    public CompoundMission(Unit unit) {
-        super(unit);
+    public CompoundMission(Game game) {
+        super(game);
     }
 
     /**
@@ -129,20 +127,6 @@ public class CompoundMission extends AbstractMission {
     }
 
     /**
-     * Returns a StringTemplate that includes the labels of all
-     * individual missions.
-     *
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate getLabel() {
-        StringTemplate result = StringTemplate.label(" / ");
-        for (Mission mission: missions) {
-            result.addStringTemplate(mission.getLabel());
-        }
-        return result;
-    }
-
-    /**
      * Returns true if the mission is valid.
      *
      * @return a <code>boolean</code> value
@@ -177,24 +161,6 @@ public class CompoundMission extends AbstractMission {
             }
         }
         return state;
-    }
-
-    /**
-     * Return the current mission.
-     *
-     * @return a <code>Mission</code> value
-     */
-    public Mission getCurrentMission() {
-        return missions.get(index);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -234,22 +200,11 @@ public class CompoundMission extends AbstractMission {
         missions.clear();
         Mission mission;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
-            if (MissionManager.isMissionTag(tag)) {
-                mission = updateFreeColGameObject(in, MissionManager.getMission(tag));
+            mission = MissionManager.getMission(getGame(), in);
+            if (mission != null) {
                 missions.add(mission);
             }
         }
     }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "compoundMission"
-     */
-    public static String getXMLElementTagName() {
-        return "compoundMission";
-    }
-
 
 }

@@ -2499,7 +2499,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Damage the ship and send it off for repair
         ship.getGoodsContainer().removeAll();
         ship.setHitpoints(1);
-        ship.setMission(null);
+        ship.setDestination(null);
         ship.setLocation(repair);
         ship.setState(Unit.UnitState.ACTIVE);
         ship.setMovesLeft(0);

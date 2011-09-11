@@ -47,7 +47,6 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.mission.ImprovementMission;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -234,10 +233,26 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         if (getWorkLeft() > 0) {
             unitDirty = true;
-            if (getMission() instanceof ImprovementMission) {
-                getMission().doMission();
-            } else {
+            switch (getState()) {
+            case IMPROVING:
+                // Has the improvement been completed already? Do nothing.
+                TileImprovement ti = getWorkImprovement();
+                if (ti.isComplete()) {
+                    setState(UnitState.ACTIVE);
+                    setWorkLeft(-1);
+                } else {
+                    // Otherwise do work
+                    int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
+                        ? 2 : 1;
+                    int turns = ti.getTurnsToComplete();
+                    if ((turns -= amount) < 0) turns = 0;
+                    ti.setTurnsToComplete(turns);
+                    setWorkLeft(turns);
+                }
+                break;
+            default:
                 setWorkLeft(getWorkLeft() - 1);
+                break;
             }
 
             if (loc instanceof HighSeas && getOwner().isREF()) {
@@ -284,7 +299,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     return false;
                 }
                 ServerPlayer owner = (ServerPlayer) getOwner();
-                setMission(null);
+                setDestination(null);
                 cs.addMessage(See.only(owner),
                               new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                "model.unit.arriveInEurope",
@@ -294,12 +309,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.add(See.only(owner), europe, owner.getHighSeas());
             } else if (getDestination() == map) {
                 logger.info(toString() + " arrives in America");
-                setMission(null);
+                setDestination(null);
                 csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
                        random, cs);
             } else if (getDestination() instanceof Settlement) {
                 Settlement settlement = (Settlement) getDestination();
-                setMission(null);
+                setDestination(null);
                 PathNode path = map.findPathToEurope(this,
                     settlement.getTile(), CostDeciders.serverAvoidIllegal());
                 csMove(path.getLastNode().getTile(), random, cs);
@@ -335,11 +350,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
-        ImprovementMission mission = (ImprovementMission) getMission();
-        GoodsType deliver = mission.getImprovement().getDeliverGoodsType();
+        GoodsType deliver = getWorkImprovement().getDeliverGoodsType();
         if (deliver != null) { // Deliver goods if any
             int amount = tile.potential(deliver, getType())
-                * mission.getImprovement().getDeliverAmount();
+                * getWorkImprovement().getDeliverAmount();
             if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
                 amount *= 2;
             }
@@ -369,7 +383,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Finish up
-        TileImprovement ti = mission.getImprovement();
+        TileImprovement ti = getWorkImprovement();
         TileType changeType = ti.getChange(tile.getType());
         if (changeType != null) {
             // Changes like clearing a forest need to be completed,
@@ -400,12 +414,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
         EquipmentType type = ti.getExpendedEquipmentType();
         changeEquipment(type, -ti.getExpendedAmount());
         for (Unit unit : tile.getUnitList()) {
-            if (unit.getMission() instanceof ImprovementMission
-                && ((ImprovementMission) unit.getMission())
-                .getImprovement().getType() == ti.getType()
+            if (unit.getWorkImprovement() != null
+                && unit.getWorkImprovement().getType() == ti.getType()
                 && unit.getState() == UnitState.IMPROVING) {
                 unit.setWorkLeft(-1);
-                unit.setMission(null);
+                unit.setWorkImprovement(null);
                 unit.setState(UnitState.ACTIVE);
                 unit.setMovesLeft(0);
             }
