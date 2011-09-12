@@ -35,8 +35,7 @@ import net.sf.freecol.common.model.UnitType;
 
 
 /**
- * Represents an option that can be either <i>true</i>
- * or <i>false</i>.
+ * Represents an option that can be an arbitrary string.
  */
 public class StringOption extends AbstractOption<String> {
 
@@ -45,24 +44,31 @@ public class StringOption extends AbstractOption<String> {
 
     public static final String NONE = "none";
 
+    /**
+     * In order to provide the UI with choices, lists with the IDs of
+     * game objects can be generated.
+     */
     public static enum Generate {
         UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS, BUILDINGS, FOUNDING_FATHERS
     }
 
+    /**
+     * The option value.
+     */
     private String value;
 
     /**
-     * Describe addNone here.
+     * Whether to add "none" to the list of choices to be generated.
      */
     private boolean addNone;
 
     /**
-     * Describe generateChoices here.
+     * Which choices to generate.
      */
     private Generate generateChoices;
 
     /**
-     * Describe choices here.
+     * A list of choices to provide to the UI.
      */
     private List<String> choices;
 
@@ -163,6 +169,13 @@ public class StringOption extends AbstractOption<String> {
         this.generateChoices = newGenerateChoices;
     }
 
+    /**
+     * Generate the choices to provide to the UI based on the
+     * generateChoices value.
+     *
+     * @param specification the Specification that defines the game
+     * objects whose IDs will be generated
+     */
     public void generateChoices(Specification specification) {
         if (generateChoices == null) {
             if (choices == null || choices.isEmpty()) {
