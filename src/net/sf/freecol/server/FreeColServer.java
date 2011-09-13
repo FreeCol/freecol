@@ -707,7 +707,7 @@ public final class FreeColServer {
             int savegameVersion = getSavegameVersion(xsr);
             logger.info("Found savegame version " + savegameVersion);
             singleplayer = FreeColObject.getAttribute(xsr, "singleplayer", true);
-            publicServer =  FreeColObject.getAttribute(xsr, "publicServer", false);
+            publicServer = FreeColObject.getAttribute(xsr, "publicServer", false);
 
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {
@@ -732,8 +732,7 @@ public final class FreeColServer {
                         xsr.nextTag();
                     }
                     if (savegameVersion < 11) {
-                        // version 11 is new in 0.10.0, remove this hack
-                        // in 0.11.0.
+                        // version 11 is new in 0.10.0
                         v11FixServerObjects(serverStrings, fis);
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
@@ -781,9 +780,7 @@ public final class FreeColServer {
             }
 
             if (savegameVersion < 12) {
-                // Moved to 12 when HighSeas introduced (post-0.10.1).
-                // Remove when 0.10.x save format/version==11 is no longer
-                // supported.
+                // version 12 introduced with HighSeas (post-0.10.1).
                 for (Player p : game.getPlayers()) {
                     if(!p.isIndian() && p.getEurope() != null) {
                         p.initializeHighSeas();
@@ -807,11 +804,12 @@ public final class FreeColServer {
                 }
             }
 
-            // TODO: remove compatibility code
+            // compatibility code
             for (Tile tile : game.getMap().getAllTiles()) {
                 TerrainGenerator.encodeStyle(tile);
             }
             // end compatibility code
+            
             Collections.sort(game.getPlayers(), Player.playerComparator);
             if (aiMain == null) {
                 aiMain = new AIMain(this);
@@ -873,7 +871,6 @@ public final class FreeColServer {
         // Add a default value for options new to each version
         // that are not part of the difficulty settings.
         // Annotate with save format version where introduced
-        // so we can remove this backward compatibility code in future.
         Specification spec = game.getSpecification();
 
         // Introduced: SAVEGAME_VERSION == 11
@@ -970,7 +967,6 @@ public final class FreeColServer {
      * added to serverObjects.  Evil hack here to scan the game for
      * objects in pre-v11 games that should now be in serverObjects,
      * and put them in.
-     * Remove this hack in 0.11.0, unless of course, we do it again.
      *
      * @param serverStrings A list of server object {type, id} pairs to add to.
      * @param fis The savegame to scan.

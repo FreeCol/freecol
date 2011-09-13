@@ -2229,7 +2229,7 @@ public class Unit extends FreeColGameObject
         if (oldOwner == owner) {
             return;
         } else if (oldOwner == null) {
-            logger.warning("Unit " + getId() + " had no previous owner");
+            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
         }
 
         // Clear trade route and goto orders if changing owner.
@@ -2248,7 +2248,7 @@ public class Unit extends FreeColGameObject
             unit.setOwner(owner);
         }
 
-        if(oldOwner != null){
+        if(oldOwner != null) {
             oldOwner.removeUnit(this);
             oldOwner.modifyScore(-getType().getScoreValue());
             // for speed optimizations
@@ -2257,10 +2257,12 @@ public class Unit extends FreeColGameObject
             }
         }
         owner.setUnit(this);
-        owner.modifyScore(getType().getScoreValue());
-
+        if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
+            owner.modifyScore(getType().getScoreValue());
+        }
+        
         // for speed optimizations
-        if(!isOnCarrier()){
+        if(!isOnCarrier()) {
             getOwner().setExplored(this);
         }
 
@@ -2333,8 +2335,8 @@ public class Unit extends FreeColGameObject
     	try {
             // FIXME: getNation() could fail, but getNationType() doesn't work as expected
             return getGame().getSpecification().getNation(ethnicity).getType().isIndian();
-            //          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
-            //          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
+//          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
+//          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
         } catch (Exception e) {
             return false;
         }
@@ -2580,12 +2582,9 @@ public class Unit extends FreeColGameObject
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
         }
-
-        //Check for role change for reseting the experience
-        // Soldier and Dragoon are compatible, no loss of experience
-        if(!role.isCompatibleWith(oldRole)){
-            experience = 0;
-        }
+        
+        // if there are roles that require experience to be reset, do it here
+        //  horses, tools and muskets are currently exempt
     }
 
     /**
@@ -2667,7 +2666,7 @@ public class Unit extends FreeColGameObject
 
         switch (state) {
         case IMPROVING:
-            if (getWorkLeft() > 0) {
+            if (workImprovement != null && getWorkLeft() > 0) {
                 if (!workImprovement.isComplete()
                     && workImprovement.getTile() != null
                     && workImprovement.getTile().getTileItemContainer() != null) {
@@ -3287,11 +3286,28 @@ public class Unit extends FreeColGameObject
             out.writeAttribute("owner", getGame().getUnknownEnemy().getId());
         } else {
             out.writeAttribute("owner", getOwner().getId());
-            if (nationality != null) {
-                out.writeAttribute("nationality", nationality);
-            } else if(hasAbility(Ability.BORN_IN_COLONY)
+            
+            // try *really* hard not to write out nationality and ethnicity for ships, wagons, cannons etc
+            // hopefully this can be simplified with a bit more effort
+            if (nationality != null && !isNaval() &&
+                        (hasAbility(Ability.BORN_IN_COLONY)
                       || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")) {
+                      || hasAbility("model.ability.foundColony")
+                      || hasAbility("model.ability.person")) &&
+                        (!hasAbility("model.ability.carryGoods")
+                      && !hasAbility("model.ability.carryUnits")
+                      && !hasAbility("model.ability.carryTreasure")
+                      && !hasAbility("model.ability.bombard"))) {
+                out.writeAttribute("nationality", nationality);
+            } else if(!isNaval() &&
+                        (hasAbility(Ability.BORN_IN_COLONY)
+                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                      || hasAbility("model.ability.foundColony")
+                      || hasAbility("model.ability.person")) &&
+                        (!hasAbility("model.ability.carryGoods")
+                      && !hasAbility("model.ability.carryUnits")
+                      && !hasAbility("model.ability.carryTreasure")
+                      && !hasAbility("model.ability.bombard"))) {
                 // 0.10.0 and earlier games have no model.ability.person,
                 // so instead we check several other abilities to exclude
                 // ships, artillery, wagons and treasure trains.
@@ -3299,11 +3315,25 @@ public class Unit extends FreeColGameObject
                 // as inheritance of model.ability.bornInColony is quite new.
                 out.writeAttribute("nationality", owner.getNationID());
             }
-            if (ethnicity != null) {
-                out.writeAttribute("ethnicity", ethnicity);
-            } else if(hasAbility(Ability.BORN_IN_COLONY)
+            if (ethnicity != null && !isNaval() &&
+                        (hasAbility(Ability.BORN_IN_COLONY)
                       || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")) {
+                      || hasAbility("model.ability.foundColony")
+                      || hasAbility("model.ability.person")) &&
+                        (!hasAbility("model.ability.carryGoods")
+                      && !hasAbility("model.ability.carryUnits")
+                      && !hasAbility("model.ability.carryTreasure")
+                      && !hasAbility("model.ability.bombard"))) {
+                out.writeAttribute("ethnicity", ethnicity);
+            } else if(!isNaval() &&
+                        (hasAbility(Ability.BORN_IN_COLONY)
+                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                      || hasAbility("model.ability.foundColony")
+                      || hasAbility("model.ability.person")) &&
+                        (!hasAbility("model.ability.carryGoods")
+                      && !hasAbility("model.ability.carryUnits")
+                      && !hasAbility("model.ability.carryTreasure")
+                      && !hasAbility("model.ability.bombard"))) {
                 // 0.10.0 and earlier games have no model.ability.person,
                 // so instead we check several other abilities to exclude
                 // ships, artillery, wagons and treasure trains.
@@ -3410,10 +3440,10 @@ public class Unit extends FreeColGameObject
         String ownerId = in.getAttributeValue(null, "owner");
         owner = (Player) getGame().getFreeColGameObject(ownerId);
         if (owner == null) owner = new Player(getGame(), ownerId);
-
+        
         nationality = in.getAttributeValue(null, "nationality");
         ethnicity = in.getAttributeValue(null, "ethnicity");
-
+        
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
         } else {
@@ -3457,7 +3487,7 @@ public class Unit extends FreeColGameObject
             experienceType = workType;
         }
 
-        // TODO: remove compatibility code once 0.9.x is obsolete
+        // compatibility code
         try {
             // this is likely to cause an exception, as the
             // specification might not define grain
@@ -3472,7 +3502,8 @@ public class Unit extends FreeColGameObject
         } catch (Exception e) {
             logger.log(Level.FINEST, "Failed to update food to grain.", e);
         }
-        // end TODO
+        // end compatibility code
+        
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
@@ -3505,7 +3536,7 @@ public class Unit extends FreeColGameObject
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));
                     equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), count);
                 } else {
-                    // TODO: remove support for old format
+                    // for backwards compatibility
                     int length = Integer.parseInt(xLength);
                     for (int index = 0; index < length; index++) {
                         String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
@@ -3515,10 +3546,13 @@ public class Unit extends FreeColGameObject
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
+            } else {
+                logger.warning("Found unknown child element '" + in.getLocalName() + "' of Unit " + getId() + ", skipping to next tag.");
+                in.nextTag();
             }
         }
 
-        // TODO: why do we add this random plausibility check?
+        // ensure all carriers have a goods container, just in case
         if (goodsContainer == null && getType().canCarryGoods()) {
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);

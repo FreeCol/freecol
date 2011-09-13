@@ -473,6 +473,7 @@ public class Game extends FreeColGameObject {
         for (Player player : getPlayers()) {
             if (player.getHighSeas() != null) {
                 player.getHighSeas().addDestination(map);
+                logger.warning("Adding " + map.getId() + " to " + player.getHighSeas().getId() + " of " + player.getId());
             }
         }
     }
@@ -1108,7 +1109,7 @@ public class Game extends FreeColGameObject {
             String tagName = in.getLocalName();
             logger.finest("Found tag " + tagName);
             if (tagName.equals("gameOptions") || tagName.equals("game-options")) {
-                // TODO: remove 0.9.x compatibility code
+                // 0.9.x compatibility code
                 gameOptions = new OptionGroup(in);
             } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
@@ -1130,14 +1131,12 @@ public class Game extends FreeColGameObject {
             } else if (tagName.equals(Map.getXMLElementTagName())) {
                 String mapId = in.getAttributeValue(null, ID_ATTRIBUTE);
                 map = (Map) getFreeColGameObject(mapId);
-                if (map != null) {
-                    map.readFromXML(in);
-                } else {
+                if (map == null) {
                     map = new Map(this, mapId);
-                    map.readFromXML(in);
                 }
+                map.readFromXML(in);
             } else if (tagName.equals(ModelMessage.getXMLElementTagName())) {
-                // 0.9.x save format compatibility.  Remove one day.
+                // 0.9.x compatibility code
                 ModelMessage m = new ModelMessage();
                 m.readFromXML(in);
                 // When this goes, remove getOwnerId().
@@ -1149,15 +1148,15 @@ public class Game extends FreeColGameObject {
             } else if (tagName.equals("citiesOfCibola")) {
                 // TODO: remove support for old format
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
-            } else if (CIBOLA_TAG.equals(tagName)) {
+            } else if (tagName.equals(CIBOLA_TAG)) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
             } else if (OptionGroup.getXMLElementTagName().equals(tagName)
                        || "difficultyLevel".equals(tagName)) {
-                // remove compatibility code after 0.10.0
+                // compatibility code
                 OptionGroup difficultyLevel = new OptionGroup(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
-                // TODO: remove 0.9.x compatibility code
+                // 0.9.x compatibility code
                 mapGeneratorOptions = new OptionGroup(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
                 Specification spec = new Specification();
@@ -1177,7 +1176,7 @@ public class Game extends FreeColGameObject {
                            "found instead: " + in.getLocalName());
         }
 
-        // TODO: remove compatibility code post 0.10.0
+        // compatibility code
         if (gameOptions != null) {
             addOldOptions(gameOptions);
         }
@@ -1188,7 +1187,7 @@ public class Game extends FreeColGameObject {
 
     }
 
-    // TODO: remove compatibility code post 0.10.0
+    // compatibility code
     private void addOldOptions(OptionGroup group) {
         Iterator<Option> iterator = group.iterator();
         while (iterator.hasNext()) {

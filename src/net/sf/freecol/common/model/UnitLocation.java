@@ -461,7 +461,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
                 units.add(unit);
             }
         } else {
-            logger.warning("Found unknown child element '" + in.getLocalName() + "'.");
+            logger.warning("Found unknown child element '" + in.getLocalName() + "' of UnitLocation " + getId() + ".");
             in.nextTag();
         }
     }

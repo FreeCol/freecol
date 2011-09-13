@@ -86,8 +86,14 @@ public class HighSeas extends UnitLocation {
      * @param destination a <code>Location</code> value
      */
     public void addDestination(Location destination) {
-        if (!destinations.contains(destination)) {
-            destinations.add(destination);
+        if (destination != null) {
+            if (!destinations.contains(destination)) {
+                destinations.add(destination);
+            } else {
+                logger.warning(getId() + " already included destination " + destination.getId());
+            }
+        } else {
+            logger.warning("Tried to add null destination to " + getId());
         }
     }
 
@@ -108,9 +114,8 @@ public class HighSeas extends UnitLocation {
         if (locatable instanceof Unit) {
             Unit unit = (Unit) locatable;
             return unit.isNaval();
-        } else {
-            return false;
         }
+        return false;
     }
 
 
@@ -139,10 +144,18 @@ public class HighSeas extends UnitLocation {
     protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
+        // 0.10.x compatibility code
+        if(getGame() != null && getGame().getMap() != null)
+            addDestination((Location) getGame().getMap());
+        // end compatibility code
         for (Location destination : destinations) {
-            out.writeStartElement("destination");
-            out.writeAttribute(ID_ATTRIBUTE, destination.getId());
-            out.writeEndElement();
+            if(destination != null) {
+                out.writeStartElement("destination");
+                out.writeAttribute(ID_ATTRIBUTE, destination.getId());
+                out.writeEndElement();
+            } else {
+                logger.warning("Tried to write out null destination from " + getId());
+            }
         }
     }
 
