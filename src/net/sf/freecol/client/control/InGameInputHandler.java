@@ -618,38 +618,36 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         Player player = getFreeColClient().getMyPlayer();
         DiplomacyMessage message = new DiplomacyMessage(game, element);
-        Unit unit = message.getUnit(game);
-        if (unit == null
-            && (unit = getUnitFromElement(game, element)) == null) {
-            logger.warning("Unit incorrectly omitted from diplomacy message.");
+        Unit unit = message.getUnit();
+        if (unit == null) {
+            logger.warning("Unit omitted from diplomacy message.");
             return null;
         }
-        Settlement settlement = message.getSettlement(game);
+        Settlement settlement = message.getSettlement();
+        if (settlement == null) {
+            logger.warning("Settlement omitted from diplomacy message.");
+            return null;
+        }
         Player other = (unit.getOwner() == player) ? settlement.getOwner()
             : unit.getOwner();
         String nation = Messages.message(other.getNationName());
-        DiplomaticTrade ourAgreement;
-        DiplomaticTrade theirAgreement = message.getAgreement();
+        DiplomaticTrade agreement = message.getAgreement();
 
-        switch (theirAgreement.getStatus()) {
+        switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
-            new ShowInformationMessageSwingTask(StringTemplate.template("negotiationDialog.offerAccepted")
-                                                .addName("%nation%", nation)).show();
+            new ShowInformationMessageSwingTask(StringTemplate
+                .template("negotiationDialog.offerAccepted")
+                    .addName("%nation%", nation)).show();
             break;
         case REJECT_TRADE:
-            new ShowInformationMessageSwingTask(StringTemplate.template("negotiationDialog.offerRejected")
-                                                .addName("%nation%", nation)).show();
+            new ShowInformationMessageSwingTask(StringTemplate
+                .template("negotiationDialog.offerRejected")
+                    .addName("%nation%", nation)).show();
             break;
         case PROPOSE_TRADE:
-            ourAgreement = new ShowNegotiationDialogSwingTask(unit, settlement,
-                                                              theirAgreement)
-                .select();
-            if (ourAgreement == null) {
-                theirAgreement.setStatus(TradeStatus.REJECT_TRADE);
-            } else {
-                message.setAgreement(ourAgreement);
-            }
-            return message.toXMLElement();
+            new DiplomacySwingTask(unit, settlement, agreement)
+                .invokeLater();
+            break;
         default:
             logger.warning("Bogus trade status");
             break;
@@ -1265,8 +1263,8 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Base class for Swing tasks that need to do a simple update without return
-     * value using the canvas.
+     * Base class for Swing tasks that need to do a simple update
+     * without return value, and use the canvas.
      */
     abstract class NoResultCanvasSwingTask extends SwingTask {
 
@@ -1282,6 +1280,10 @@ public final class InGameInputHandler extends InputHandler {
      * This task refreshes the entire canvas.
      */
     class RefreshCanvasSwingTask extends NoResultCanvasSwingTask {
+
+        private final boolean requestFocus;
+
+
         /**
          * Default constructor, simply refresh canvas.
          */
@@ -1295,19 +1297,16 @@ public final class InGameInputHandler extends InputHandler {
          * @param requestFocus True to request focus after refresh.
          */
         public RefreshCanvasSwingTask(boolean requestFocus) {
-            _requestFocus = requestFocus;
+            this.requestFocus = requestFocus;
         }
 
         protected void doWork(Canvas canvas) {
             canvas.refresh();
 
-            if (_requestFocus && !canvas.isShowingSubPanel()) {
+            if (requestFocus && !canvas.isShowingSubPanel()) {
                 canvas.requestFocusInWindow();
             }
         }
-
-
-        private final boolean _requestFocus;
     }
 
     /**
@@ -1372,12 +1371,49 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * This class displays a negotiation dialog and acts on the result.
+     */
+    class DiplomacySwingTask extends NoResultCanvasSwingTask {
+
+        private Unit unit;
+        private Settlement settlement;
+        private DiplomaticTrade proposal;
+
+
+        /**
+         * Constructor.
+         *
+         * @param unit The unit which is negotiating.
+         * @param settlement The settlement to negotiate with.
+         * @param proposal The proposal made by the unit owner.
+         */
+        public DiplomacySwingTask(Unit unit, Settlement settlement,
+                                  DiplomaticTrade proposal) {
+            this.unit = unit;
+            this.settlement = settlement;
+            this.proposal = proposal;
+        }
+
+        protected void doWork(Canvas canvas) {
+            DiplomaticTrade agreement
+                = canvas.showNegotiationDialog(unit, settlement, proposal);
+            if (agreement == null) {
+                agreement = proposal;
+                agreement.setStatus(TradeStatus.REJECT_TRADE);
+            }
+            getFreeColClient().askServer().diplomacy(unit, settlement,
+                                                     agreement);
+        }
+    }
+
+    /**
      * This class displays a dialog that lets the player pick a
      * Founding Father.
      */
     class FoundingFatherSwingTask extends NoResultCanvasSwingTask {
 
         private List<FoundingFather> choices;
+
 
         /**
          * Constructor.
@@ -1836,7 +1872,7 @@ public final class InGameInputHandler extends InputHandler {
          */
         public void show() {
             try {
-                invokeAndWait();
+                invokeSpecial();
             } catch (InvocationTargetException e) {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
@@ -1943,55 +1979,6 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
     }
-
-    /**
-     * This class displays a negotiation dialog.
-     */
-    class ShowNegotiationDialogSwingTask extends SwingTask {
-
-        /**
-         * Constructor.
-         *
-         * @param unit The unit which init the negotiation.
-         * @param settlement The settlement where the unit has made the proposal
-         * @param proposal The proposal made by unit's owner.
-         */
-        public ShowNegotiationDialogSwingTask(Unit unit, Settlement settlement, DiplomaticTrade proposal) {
-            this.unit = unit;
-            this.settlement = settlement;
-            this.proposal = proposal;
-        }
-
-        /**
-         * Show dialog and wait for selection.
-         *
-         * @return selection.
-         */
-        public DiplomaticTrade select() {
-            try {
-                Object result = invokeAndWait();
-                return (DiplomaticTrade) result;
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                } else {
-                    throw new RuntimeException(e.getCause());
-                }
-            }
-        }
-
-        protected Object doWork() {
-            return getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
-        }
-
-
-        private Unit unit;
-
-        private Settlement settlement;
-
-        private DiplomaticTrade proposal;
-    }
-
 
     /**
      * This class shows the monarch panel.

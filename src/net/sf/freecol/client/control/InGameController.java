@@ -2492,50 +2492,14 @@ public final class InGameController implements NetworkConstants {
         String nation = Messages.message(settlement.getOwner().getNationName());
         Player player = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
-        DiplomaticTrade ourAgreement = null;
-        DiplomaticTrade theirAgreement = null;
-        boolean done = false;
-
-        while (!done) {
-            ourAgreement = canvas.showNegotiationDialog(unit, settlement,
-                theirAgreement);
-            boolean reject = ourAgreement == null
-                || ourAgreement.getStatus() == TradeStatus.REJECT_TRADE;
-            if (theirAgreement == null && reject) break; // Cancelled.
-
+        DiplomaticTrade agreement
+            = canvas.showNegotiationDialog(unit, settlement, null);
+        if (agreement != null) {
             // Send this agreement to the other player.
-            theirAgreement = askServer().diplomacy(unit, settlement,
-                ourAgreement);
-            if (reject) break;
-
-            // What did they say?
-            TradeStatus status
-                = (theirAgreement == null) ? TradeStatus.REJECT_TRADE
-                : theirAgreement.getStatus();
-            switch (status) {
-            case ACCEPT_TRADE:
-                canvas.showInformationMessage(settlement,
-                    StringTemplate.template("negotiationDialog.offerAccepted")
-                    .addName("%nation%", nation));
-                // Colony and unit ownership could change!
-                player.invalidateCanSeeTiles();
-                done = true;
-                break;
-            case REJECT_TRADE:
-                canvas.showInformationMessage(settlement,
-                    StringTemplate.template("negotiationDialog.offerRejected")
-                    .add("%nation%", nation));
-                done = true;
-                break;
-            case PROPOSE_TRADE:
-                break; // Loop with this proposal
-            default:
-                logger.warning("Bogus trade status");
-                done = true;
-                break;
-            }
+            askServer().diplomacy(unit, settlement, agreement);
+        } else {
+            nextActiveUnit();
         }
-        nextActiveUnit();
     }
 
     /**

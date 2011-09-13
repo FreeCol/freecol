@@ -628,37 +628,12 @@ public class ServerAPI {
      * @param unit The <code>Unit</code> conducting the diplomacy.
      * @param settlement The <code>Settlement</code> to negotiate with.
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
-     * @return The agreement returned from the other party,
-     *     or null on failure.
+     * @return True if the server interaction succeeded.
      */
-    public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
-                                     DiplomaticTrade agreement) {
-        Game game = freeColClient.getGame();
-        DiplomacyMessage message = new DiplomacyMessage(unit, settlement,
-                                                        agreement);
-        Element reply = askExpecting(message, null, null);
-        if (reply == null) return null;
-
-        // The reply should contain diplomacy somewhere.  Hoick it out
-        // and return its agreement for interactive handling rather
-        // than processing it in the input handler.
-        Element diplomacy;
-        if (reply.getTagName().equals("diplomacy")) {
-            diplomacy = reply;
-            reply = null;
-        } else {
-            diplomacy = DOMMessage.getChildElement(reply, "diplomacy");
-            if (diplomacy != null) {
-                reply.removeChild(diplomacy);
-            }
-        }
-        // Process any residual updates.
-        if (reply != null) {
-            Connection conn = freeColClient.getClient().getConnection();
-            freeColClient.getInGameInputHandler().handle(conn, reply);
-        }
-        return (diplomacy == null) ? null
-            : new DiplomacyMessage(game, (Element) diplomacy).getAgreement();
+    public boolean diplomacy(Unit unit, Settlement settlement,
+                             DiplomaticTrade agreement) {
+        return askHandling(new DiplomacyMessage(unit, settlement, agreement),
+            null, null);
     }
 
     /**

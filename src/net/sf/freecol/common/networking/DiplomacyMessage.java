@@ -21,14 +21,16 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -39,14 +41,15 @@ import org.w3c.dom.NodeList;
 public class DiplomacyMessage extends DOMMessage {
 
     /**
-     * The id of the object doing the trading.
+     * The unit doing the trading.  Can not use just an id as the unit
+     * might be invisible to the settlement due to being aboard a carrier.
      */
-    private String unitId;
+    private Unit unit;
 
     /**
-     * The id of the settlement to negotiate with.
+     * The settlement to negotiate with.
      */
-    private String settlementId;
+    private Settlement settlement;
 
     /**
      * The trade to make.
@@ -63,8 +66,8 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public DiplomacyMessage(Unit unit, Settlement settlement,
                             DiplomaticTrade agreement) {
-        this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.unit = unit;
+        this.settlement = settlement;
         this.agreement = agreement;
     }
 
@@ -76,39 +79,43 @@ public class DiplomacyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
+        FreeColGameObject fcgo = game.getFreeColGameObject(element.getAttribute("settlement"));
+        this.settlement = (fcgo instanceof Settlement) ? (Settlement) fcgo
+            : null;
         NodeList nodes = element.getChildNodes();
         this.agreement = (nodes.getLength() < 1) ? null
             : new DiplomaticTrade(game, (Element) nodes.item(0));
+        if (nodes.getLength() < 2) {
+            this.unit = null;
+        } else {
+            Element unitElement = (Element) nodes.item(1);
+            String unitId = unitElement.getAttribute(FreeColObject.ID_ATTRIBUTE);
+            fcgo = game.getFreeColGameObject(unitId);
+            if (fcgo instanceof Unit) {
+                this.unit = (Unit) fcgo;
+            } else {
+                this.unit = new Unit(game, unitElement);
+            }
+        }
     }
 
     /**
      * Get the <code>Unit</code> which began this diplomatic exchange.
-     * This is a helper routine to be called in-client as it blindly
-     * trusts its field.
      *
-     * @param game The <code>Game</code> to find the unit in.
      * @return The unit, or null if none.
      */
-    public Unit getUnit(Game game) {
-        return (game.getFreeColGameObject(unitId) instanceof Unit)
-            ? (Unit) game.getFreeColGameObject(unitId)
-            : null;
+    public Unit getUnit() {
+        return unit;
     }
 
     /**
      * Get the <code>Settlement</code> at which a diplomatic exchange
-     * happens.  This is a helper routine to be called in-client as it
-     * blindly trusts all fields.
+     * happens.
      *
-     * @param game The <code>Game</code> to find the settlement in.
      * @return The settlement, or null if none.
      */
-    public Settlement getSettlement(Game game) {
-        return (game.getFreeColGameObject(settlementId) instanceof Settlement)
-            ? (Settlement) game.getFreeColGameObject(settlementId)
-            : null;
+    public Settlement getSettlement() {
+        return settlement;
     }
 
     /**
@@ -141,54 +148,59 @@ public class DiplomacyMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        Unit unit;
-        try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+        Unit unit = getUnit();
+        if (unit == null) {
+            return DOMMessage.clientError("Missing unit in diplomacy.");
+        } else if (unit.getTile() == null) {
+            return DOMMessage.clientError("Unit is not on the map: "
+                + unit.getId());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        }
-        Settlement settlement;
-        try {
-            settlement = server.getAdjacentSettlementSafely(settlementId, unit);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
-        }
-        if (!(settlement instanceof Colony)) {
+        Player unitPlayer = unit.getOwner();
+
+        Settlement settlement = getSettlement();
+        if (settlement == null) {
+            return DOMMessage.clientError("Missing settlement in diplomacy.");
+        } else if (!(settlement instanceof Colony)) {
             return DOMMessage.clientError("Settlement is not a colony: "
-                + settlementId);
-        }
-        MoveType type = unit.getMoveType(settlement.getTile());
-        if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
-            return DOMMessage.clientError("Unable to enter "
-                + settlement.getName() + ": " + type.whyIllegal());
-        }
-        if (agreement == null) {
-            return DOMMessage.clientError("DiplomaticTrade with null agreement.");
-        }
-        if (agreement.getSender() != serverPlayer) {
-            return DOMMessage.clientError("DiplomaticTrade received from player who is not the sender: "
-                + serverPlayer.getId());
-        }
-        ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
-        if (enemyPlayer == null) {
-            return DOMMessage.clientError("DiplomaticTrade recipient is null");
-        }
-        if (enemyPlayer == serverPlayer) {
-            return DOMMessage.clientError("DiplomaticTrade recipient matches sender: "
-                + serverPlayer.getId());
+                + settlement.getId());
+        } else if (!unit.getTile().isAdjacent(settlement.getTile())) {
+            return DOMMessage.clientError("Unit " + unit.getId()
+                + " is not adjacent to settlement " + settlement.getId());
         }
         Player settlementPlayer = settlement.getOwner();
-        if (settlementPlayer != (Player) enemyPlayer) {
-            return DOMMessage.clientError("DiplomaticTrade recipient: "
-                + enemyPlayer.getId()
-                + " does not match Settlement owner: " + settlementPlayer);
+
+        if (agreement == null) {
+            return DOMMessage.clientError("Null diplomatic agreement.");
         }
-        if (enemyPlayer == serverPlayer.getREFPlayer()) {
-            return DOMMessage.clientError("Player can not negotiate with the REF: "
+        Player senderPlayer = agreement.getSender();
+        Player recipientPlayer = agreement.getRecipient();
+        Player refPlayer = serverPlayer.getREFPlayer();
+        if (senderPlayer == null) {
+            return DOMMessage.clientError("Null sender in agreement.");
+        } else if (recipientPlayer == null) {
+            return DOMMessage.clientError("Null recipient in agreement.");
+        } else if (senderPlayer != (Player) serverPlayer
+            && recipientPlayer != (Player) serverPlayer) {
+            return DOMMessage.clientError("Server player not in agreement: "
                 + serverPlayer.getId());
+        } else if (senderPlayer == recipientPlayer) {
+            return DOMMessage.clientError("Auto-agreement detected: "
+                + senderPlayer.getId());
+        } else if (senderPlayer == refPlayer || recipientPlayer == refPlayer) {
+            return DOMMessage.clientError("The REF does not negotiate: "
+                + refPlayer.getId());
+        } else if (unitPlayer == senderPlayer
+            && settlementPlayer == recipientPlayer) {
+            ; // OK, initial or repeated proposal by unit player.
+            // Move type is checked in the controller as it has the sessions.
+        } else if (unitPlayer == recipientPlayer
+            && settlementPlayer == senderPlayer) {
+            ; // OK, counter proposal by settlement player.
+        } else {
+            return DOMMessage.clientError("Diplomatic agreement parties: "
+                + senderPlayer.getId() + " + " + recipientPlayer.getId()
+                + " are not the same as unit + settlement owner: "
+                + unitPlayer.getId() + " + " + settlementPlayer.getId());
         }
 
         // Valid, try to trade.
@@ -203,10 +215,10 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("settlement", settlementId);
-        result.appendChild(agreement.toXMLElement(null,
-                result.getOwnerDocument()));
+        Document doc = result.getOwnerDocument();
+        result.setAttribute("settlement", settlement.getId());
+        result.appendChild(agreement.toXMLElement(null, doc));
+        result.appendChild(unit.toXMLElement(null, doc));
         return result;
     }
 
