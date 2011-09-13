@@ -472,36 +472,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Send an element to a specific player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to update.
-     * @param cs A <code>ChangeSet</code> to build an <code>Element</code> with.
-     * @return An <code>Element</code> returned in response to the query.
-     */
-    private Element askElement(ServerPlayer serverPlayer, ChangeSet cs) {
-        return askElement(serverPlayer, cs.build(serverPlayer));
-    }
-
-    /**
-     * Ask for a reply from a specific player.
-     * Deprecated, please avoid if possible.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param element An <code>Element</code> containing a query.
-     * @return An <code>Element</code> returned in response to the query.
-     */
-    private Element askElement(ServerPlayer serverPlayer, Element element) {
-        if (element != null && serverPlayer.isConnected()) {
-            try {
-                return serverPlayer.getConnection().ask(element);
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Ask element failure", e);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Speaks to a chief in a native settlement, but only if it is as
      * a result of a scout actually asking to speak to the chief, or
      * for other settlement-contacting events such as missionary
