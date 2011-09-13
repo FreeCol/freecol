@@ -349,7 +349,7 @@ public class NativeAIPlayer extends AIPlayer {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (getAIRandom().nextInt(3 + haggling) <= 3) {
+                if (getAIRandom().nextInt(3 + haggling) < 3) {
                     sessionRegister.put(goldKey, new Integer(gold));
                     sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;
@@ -414,7 +414,7 @@ public class NativeAIPlayer extends AIPlayer {
             if (sessionRegister.containsKey(hagglingKey)) {
                 haggling = sessionRegister.get(hagglingKey).intValue();
             }
-            if (getAIRandom().nextInt(3 + haggling) <= 3) {
+            if (getAIRandom().nextInt(3 + haggling) < 3) {
                 sessionRegister.put(goldKey, new Integer(gold));
                 sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                 return gold;
