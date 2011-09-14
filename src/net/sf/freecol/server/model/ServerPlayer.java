@@ -660,19 +660,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if a new father should be chosen.
      */
     public boolean canRecruitFoundingFather() {
+        Specification spec = getGame().getSpecification();
         switch (getPlayerType()) {
         case COLONIAL:
             break;
         case REBEL: case INDEPENDENT:
-            if (!getSpecification()
-                .getBoolean("model.option.continueFoundingFatherRecruitment"))
-                return false;
+            if (!spec.getBoolean("model.option.continueFoundingFatherRecruitment")) return false;
             break;
         default:
             return false;
         }
         return canHaveFoundingFathers() && currentFather == null
-            && !getSettlements().isEmpty();
+            && !getSettlements().isEmpty()
+            && getFatherCount() < spec.getFoundingFathers().size();
     }
 
     /**
@@ -1152,14 +1152,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     ffs = getRandomFoundingFathers(random);
                     setOfferedFathers(ffs);
                 }
-                List<String> attributes = new ArrayList<String>();
-                for (FoundingFather ff : ffs) {
-                    attributes.add(ff.getType().toString());
-                    attributes.add(ff.getId());
+                if (!ffs.isEmpty()) {
+                    List<String> attributes = new ArrayList<String>();
+                    for (FoundingFather ff : ffs) {
+                        attributes.add(ff.getType().toString());
+                        attributes.add(ff.getId());
+                    }
+                    cs.addTrivial(See.only(this), "chooseFoundingFather",
+                        ChangeSet.ChangePriority.CHANGE_NORMAL,
+                        attributes.toArray(new String[0]));
                 }
-                cs.addTrivial(See.only(this), "chooseFoundingFather",
-                              ChangeSet.ChangePriority.CHANGE_NORMAL,
-                              attributes.toArray(new String[0]));
             }
 
         } else if (isIndian()) {
