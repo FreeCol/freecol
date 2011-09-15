@@ -1587,14 +1587,14 @@ public final class InGameController extends Controller {
                         - unit.getWorkLeft() + 1);
                 }
                 unit.setDestination(destination);
-                cs.add(See.only(serverPlayer), unit, highSeas);
+                cs.add(See.only(serverPlayer), highSeas);
             } else if (unit.getLocation() instanceof Europe) {
                 Europe europe = (Europe) unit.getLocation();
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);
-                cs.add(See.only(serverPlayer), unit, europe, highSeas);
+                cs.add(See.only(serverPlayer), europe, highSeas);
             } else {
                 invalid = true;
             }
@@ -1607,14 +1607,14 @@ public final class InGameController extends Controller {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
-                cs.add(See.only(serverPlayer), unit, highSeas);
+                cs.add(See.only(serverPlayer), highSeas);
             } else if (unit.getLocation() instanceof Europe) {
                 Europe europe = (Europe) unit.getLocation();
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
                 unit.setMovesLeft(0);
                 unit.setLocation(highSeas);
-                cs.add(See.only(serverPlayer), unit, europe, highSeas);
+                cs.add(See.only(serverPlayer), europe, highSeas);
             } else {
                 invalid = true;
             }

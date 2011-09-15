@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 import org.w3c.dom.Element;
 
@@ -260,7 +261,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
     public boolean add(Locatable locatable) {
         boolean result = super.add(locatable);
         if (result && locatable instanceof Unit) {
-            ((Unit) locatable).setState(Unit.UnitState.SENTRY);
+            Unit unit = (Unit) locatable;
+            unit.setState((unit.canCarryUnits()) ? UnitState.ACTIVE
+                : UnitState.SENTRY);
         }
         return result;
     }

@@ -491,11 +491,13 @@ public final class EuropePanel extends FreeColPanel {
                         belongs = unit.getDestination() == destination;
                     } else if (destination instanceof Map) {
                         belongs = unit.getDestination() == destination
-                            || (unit.getTile() != null
-                                && unit.getTile().getMap() == destination);
+                            || (unit.getDestination().getTile() != null
+                                && unit.getDestination().getTile().getMap()
+                                == destination);
                     } else {
                         logger.warning("Bogus DestinationPanel location: "
-                            + ((FreeColGameObject) destination));
+                            + ((FreeColGameObject) destination)
+                            + " for unit: " + unit);
                         belongs = false;
                     }
                     if (belongs) {
@@ -508,7 +510,8 @@ public final class EuropePanel extends FreeColPanel {
             }
 
             StringTemplate t = StringTemplate.template("sailingTo")
-                .addStringTemplate("%location%", destination.getLocationNameFor(getMyPlayer()));
+                .addStringTemplate("%location%",
+                    destination.getLocationNameFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
             revalidate();
         }
@@ -541,15 +544,15 @@ public final class EuropePanel extends FreeColPanel {
                 }
 
                 final ClientOptions co = getClientOptions();
-                boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
-                if (!autoload
+                if (!co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
                     && unit.isInEurope()
                     && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
                     && unit.getSpaceLeft() > 0) {
                     boolean leave = canvas.showConfirmDialog(null,
                         StringTemplate.template("europe.leaveColonists")
-                            .addStringTemplate("%newWorld%", destination.getLocationNameFor(unit.getOwner())),
+                            .addStringTemplate("%newWorld%",
+                                destination.getLocationNameFor(unit.getOwner())),
                         "yes", "no");
                     if (!leave) return null; // Colonists remain in Europe.
                 }
