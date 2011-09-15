@@ -88,9 +88,6 @@ public class AssignTradeRouteMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        }
         TradeRoute tradeRoute;
         if (tradeRouteId == null) {
             tradeRoute = null;
