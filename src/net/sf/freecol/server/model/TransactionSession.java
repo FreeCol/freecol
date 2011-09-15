@@ -104,11 +104,20 @@ public abstract class TransactionSession {
 
     /**
      * Complete all transactions.  Useful at the end of turn.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
      */
     public static void completeAll(ChangeSet cs) {
         for (TransactionSession ts : allSessions.values()) {
             if (!ts.completed) ts.complete(cs);
         }
+        clearAll();
+    }
+
+    /**
+     * Clear all transactions.
+     */
+    public static void clearAll() {
         allSessions.clear();
     }
 

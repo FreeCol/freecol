@@ -104,6 +104,7 @@ import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
+import net.sf.freecol.server.model.TransactionSession;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
@@ -336,6 +337,7 @@ public final class FreeColServer {
 
         updateMetaServer(true);
         startMetaServerUpdateThread();
+        TransactionSession.clearAll();
     }
 
     public Specification getSpecification() {
