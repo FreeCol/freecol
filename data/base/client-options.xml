@@ -22,7 +22,7 @@
 <clientOptions>
     <optionGroup id="clientOptions.gui" >
       <!-- Option for setting the language -->
-      <languageOption id="model.option.languageOption"/>
+      <languageOption id="model.option.languageOption" defaultValue="automatic" />
       <!-- Used by GUI, the number will be displayed when a group of goods are higher than this number. -->
       <integerOption id="model.option.guiMinNumberToDisplayGoodsCount" defaultValue="7" minimumValue="0" maximumValue="10"/>
       <!-- Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping. -->
@@ -169,7 +169,7 @@
       <integerOption id="model.option.highLevel" defaultValue="90" minimumValue="0" maximumValue="100"/>
     </optionGroup>
     <optionGroup id="clientOptions.audio">
-      <audioMixerOption id="model.option.audioMixer"/>
+      <audioMixerOption id="model.option.audioMixer" defaultValue="AUTO" />
       <percentageOption id="model.option.audioVolume" defaultValue="100" previewEnabled="true"/>
     </optionGroup>
     <optionGroup id="clientOptions.other" >

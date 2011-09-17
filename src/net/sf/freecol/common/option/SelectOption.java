@@ -114,47 +114,27 @@ public class SelectOption extends IntegerOption {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         localizedLabels = getAttribute(in, "localizedLabels", true);
-        final String value = in.getAttributeValue(null, VALUE_TAG);
+    }
 
-        if (id == null && getId().equals(NO_ID)) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                + "> tag : no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                    + "> tag : no value nor default value found.");
-        }
-
-        if (getId() == NO_ID) {
-            setId(id);
-        }
-        if (value != null) {
-            setValue(Integer.parseInt(value));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (in.getLocalName().equals(getXMLItemElementTagName())) {
+            String label = in.getAttributeValue(null, "label");
+            final String itemValue = in.getAttributeValue(null, VALUE_TAG);
+            itemValues.put(Integer.parseInt(itemValue), label);
+            in.nextTag();
         } else {
-            setValue(Integer.parseInt(defaultValue));
-        }
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(getXMLItemElementTagName())) {
-                String label = in.getAttributeValue(null, "label");
-                final String itemValue = in.getAttributeValue(null, VALUE_TAG);
-                itemValues.put(Integer.parseInt(itemValue), label);
-                in.nextTag();
-            } else {
-                throw new XMLStreamException("Unknown child \""
-                    + in.getLocalName() + "\" in a \""
-                    + getXMLElementTagName() + "\". ");
-            }
+            throw new XMLStreamException("Unknown child \""
+                                         + in.getLocalName() + "\" in a \""
+                                         + getXMLElementTagName() + "\". ");
         }
     }
 

@@ -777,8 +777,32 @@ public abstract class FreeColObject {
                                 Specification specification)
         throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            // do nothing
+            readChild(in, specification);
         }
+    }
+
+    /**
+     * Reads a single child object. This method does calls readChild
+     * with a null specification parameter.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if an error occurs
+     */
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        readChild(in, null);
+    }
+
+    /**
+     * Reads a single child object. This method does nothing. Override
+     * it if necessary.
+     *
+     * @param in The XML input stream.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if an error occurs
+     */
+    protected void readChild(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        // do nothing
     }
 
     /**

@@ -78,42 +78,15 @@ public class PercentageOption extends IntegerOption {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
+        super.readAttributes(in);
         final String previewEnabled = in.getAttributeValue(null, "previewEnabled");
-
-        if (id == null && getId().equals(NO_ID)) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                    + "> tag : no value nor default value found.");
-        }
-        if (previewEnabled != null && !previewEnabled.equals("true") && !previewEnabled.equals("false")) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                    + "> tag : previewEnabled should be true or false.");
-        }
-
-        if (getId() == NO_ID) {
-            setId(id);
-        }
-        if (value != null) {
-            setValue(Integer.parseInt(value));
-        } else {
-            setValue(Integer.parseInt(defaultValue));
-        }
-        if(previewEnabled != null) {
+        if (previewEnabled != null) {
             this.setPreviewEnabled(Boolean.parseBoolean(previewEnabled));
         }
-        in.nextTag();
     }
 
     /**

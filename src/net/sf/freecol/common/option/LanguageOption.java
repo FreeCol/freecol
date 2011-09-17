@@ -127,6 +127,20 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     }
 
     /**
+     * Sets the value of this Option from the given string
+     * representation. Both parameters must not be null at the same
+     * time.
+     *
+     * @param valueString the string representation of the value of
+     * this Option
+     * @param defaultValueString the string representation of the
+     * default value of this Option
+     */
+    protected void setValue(String valueString, String defaultValueString) {
+        setValue(languages.get((valueString != null) ? valueString : AUTO));
+    }
+
+    /**
      * Returns a list of the available languages.
      * @return The available languages in a human readable format.
      */
@@ -319,29 +333,12 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         findLanguages();
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        } else if(getId() == NO_ID) {
-            setId(id);
-        }
-
-        Language newValue = languages.get(in.getAttributeValue(null, VALUE_TAG));
-        if (newValue == null) {
-            newValue = languages.get(AUTO);
-        }
-        setValue(newValue);
-        in.nextTag();
+        super.readAttributes(in);
     }
 
     /**

@@ -116,6 +116,20 @@ public class StringOption extends AbstractOption<String> {
     }
 
     /**
+     * Sets the value of this Option from the given string
+     * representation. Both parameters must not be null at the same
+     * time.
+     *
+     * @param valueString the string representation of the value of
+     * this Option
+     * @param defaultValueString the string representation of the
+     * default value of this Option
+     */
+    protected void setValue(String valueString, String defaultValueString) {
+        setValue((valueString != null) ? valueString : defaultValueString);
+    }
+
+    /**
      * Get the <code>AddNone</code> value.
      *
      * @return a <code>boolean</code> value
@@ -282,48 +296,26 @@ public class StringOption extends AbstractOption<String> {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no value nor default value found.");
-        }
-
-        if(getId() == NO_ID) {
-            setId(id);
-        }
-        if(value != null) {
-            setValue(value);
-        } else {
-            setValue(defaultValue);
-        }
-
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         addNone = getAttribute(in, "addNone", false);
         String generate = in.getAttributeValue(null, "generate");
         if (generate != null) {
             generateChoices = Enum.valueOf(StringOption.Generate.class, generate);
         }
-
         choices = new ArrayList<String>();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if ("choice".equals(in.getLocalName())) {
-                choices.add(in.getAttributeValue(null, VALUE_TAG));
-                in.nextTag();
-            }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if ("choice".equals(in.getLocalName())) {
+            choices.add(in.getAttributeValue(null, VALUE_TAG));
+            in.nextTag();
         }
     }
 

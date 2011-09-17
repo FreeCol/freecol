@@ -122,6 +122,26 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     }
 
     /**
+     * Sets the value of this Option from the given string
+     * representation. Both parameters must not be null at the same
+     * time.
+     *
+     * @param valueString the string representation of the value of
+     * this Option
+     * @param defaultValueString the string representation of the
+     * default value of this Option
+     */
+    protected void setValue(String valueString, String defaultValueString) {
+        if (valueString != null) {
+            setValue(audioMixers.get(valueString));
+        } else if (defaultValueString != null) {
+            setValue(audioMixers.get(defaultValueString));
+        } else {
+            setValue(DEFAULT); // audioMixers.get(AUTO)); ** does it make a difference?
+        }
+    }
+
+    /**
      * Returns a list of the available audioMixers.
      * @return The available audioMixers in a human readable format.
      */
@@ -210,32 +230,11 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
-
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         findAudioMixers();
-
-        if (getId() == NO_ID) {
-            setId(id);
-        }
-
-        if (value != null) {
-            setValue(audioMixers.get(value));
-        } else if (defaultValue != null) {
-            setValue(audioMixers.get(defaultValue));
-        } else {
-            setValue(DEFAULT); // audioMixers.get(AUTO)); ** does it make a difference?
-        }
-        in.nextTag();
+        super.readAttributes(in);
     }
 
     /**

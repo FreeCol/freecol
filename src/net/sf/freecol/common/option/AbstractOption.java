@@ -20,6 +20,10 @@
 package net.sf.freecol.common.option;
 
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.FreeColObject;
 
@@ -105,7 +109,70 @@ abstract public class AbstractOption<T> extends FreeColObject
         }
     }
 
+    /**
+     * Returns the value of this Option.
+     *
+     * @return the value of this Option
+     */
     public abstract T getValue();
 
+    /**
+     * Sets the value of this Option.
+     *
+     * @param value the value of this Option
+     */
     public abstract void setValue(T value);
+
+    /**
+     * Sets the value of this Option from the given string
+     * representation. Both parameters must not be null at the same
+     * time. This method does nothing. Override it if the Option has a
+     * suitable string representation.
+     *
+     * @param valueString the string representation of the value of
+     * this Option
+     * @param defaultValueString the string representation of the
+     * default value of this Option
+     */
+    protected void setValue(String valueString, String defaultValueString) {
+        logger.warning("Unsupported method: setValue.");
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readAttributes(in);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String value = in.getAttributeValue(null, VALUE_TAG);
+
+        if (id == null && getId().equals(NO_ID)){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                                         + "> tag : no id attribute found.");
+        }
+        if (defaultValue == null && value == null) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                                         + "> tag : no value nor default value found.");
+        }
+
+        if (getId() == NO_ID) {
+            setId(id);
+        }
+        setValue(value, defaultValue);
+    }
+
+
 }

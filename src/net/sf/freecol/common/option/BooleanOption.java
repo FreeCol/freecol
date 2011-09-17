@@ -80,6 +80,19 @@ public class BooleanOption extends AbstractOption<Boolean> {
         isDefined = true;
     }
 
+    /**
+     * Sets the value of this Option from the given string
+     * representation. Both parameters must not be null at the same
+     * time.
+     *
+     * @param valueString the string representation of the value of
+     * this Option
+     * @param defaultValueString the string representation of the
+     * default value of this Option
+     */
+    protected void setValue(String valueString, String defaultValueString) {
+        setValue(Boolean.parseBoolean((valueString != null) ? valueString : defaultValueString));
+    }
 
     /**
      * This method writes an XML-representation of this object to
@@ -106,38 +119,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
         super.writeAttributes(out);
 
         out.writeAttribute(VALUE_TAG, Boolean.toString(value));
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
-        }
-
-        if(getId() == NO_ID) {
-            setId(id);
-        }
-        if(value != null) {
-            setValue(Boolean.parseBoolean(value));
-        } else {
-            setValue(Boolean.parseBoolean(defaultValue));
-        }
-        in.nextTag();
-
     }
 
     /**
