@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
@@ -122,8 +123,11 @@ public class EmbarkMessage extends DOMMessage {
                     && sourceLocation.getTile() == carrier.getTile())) {
                 direction = null;
             } else {
-                return DOMMessage.clientError("Unit: " + unitId
-                    + " and carrier: " + carrierId + " are not co-located.");
+                return DOMMessage.clientError("Unit " + unitId
+                    + " at " + ((FreeColGameObject) sourceLocation)
+                    + " and carrier " + carrierId
+                    + " at " + ((FreeColGameObject) carrier.getLocation())
+                    + " are not co-located.");
             }
         } else {
             // Units have to be on the map and have moves left if a

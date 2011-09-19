@@ -216,14 +216,13 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     }
 
     /**
-    * If the amount of goods is greater than the container can hold,
-    * then this method adjusts the amount to the maximum amount possible.
-    */
+     * If the amount of goods is greater than the container can hold,
+     * then this method adjusts the amount to the maximum amount possible.
+     */
     public void adjustAmount() {
         int maxAmount = location.getGoodsContainer().getGoodsCount(getType());
 
-        if (getAmount() > maxAmount)
-            setAmount(maxAmount);
+        if (getAmount() > maxAmount) setAmount(maxAmount);
     }
 
 

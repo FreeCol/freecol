@@ -2054,7 +2054,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             bestTransport.addToTransportList(t);
             logger.finest("Transport found for: " + t
-                          + " using: " + bestTransport);
+                          + " using: " + bestTransport
+                          + "  unit: " + bestTransport.getUnit());
 
             // See if any other transportables are present at the same
             // location and can fit.

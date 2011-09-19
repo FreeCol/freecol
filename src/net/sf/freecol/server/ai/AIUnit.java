@@ -68,9 +68,6 @@ public class AIUnit extends AIObject implements Transportable {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
-
-
-
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -471,6 +468,17 @@ public class AIUnit extends AIObject implements Transportable {
 
             in.nextTag();
         }
+    }
+
+    /**
+     * Returns a <code>String</code>-representation of this object.
+     *
+     * @return A <code>String</code> representing this object for
+     *     debugging purposes.
+     */
+    @Override
+    public String toString() {
+        return "AIUnit@" + hashCode() + "[ " + unit + " ]";
     }
 
     /**

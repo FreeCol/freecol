@@ -381,8 +381,8 @@ public class AIGoods extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return "AIGoods@" + hashCode() + ": " + goods
-            + " (" + transportPriority + ")";
+        return "AIGoods@" + hashCode() + "[ " + goods
+            + " /" + transportPriority + "]";
     }
 
     /**

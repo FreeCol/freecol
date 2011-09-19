@@ -86,6 +86,9 @@ public class LoadCargoMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+        if (goods.getLocation() == null) {
+            return DOMMessage.clientError("Goods with no location: " + goods);
+        }
 
         // Perform the load.
         return server.getInGameController()

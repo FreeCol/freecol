@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
@@ -166,27 +168,46 @@ public class TransportMission extends Mission {
      */
     private void updateTransportList() {
         Unit carrier = getUnit();
+        Player owner = carrier.getOwner();
 
-        Iterator<Unit> ui = carrier.getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
+        // Try to add units that happen to be on board.
+        for (Unit u : carrier.getUnitList()) {
             AIUnit aiUnit = getAIMain().getAIUnit(u);
-            if(aiUnit == null){
-                logger.warning("Could not find ai unit");
+            if (aiUnit == null) {
+                logger.warning("Could not find AI unit for: " + u);
                 continue;
             }
-            addToTransportList(aiUnit);
+            if (aiUnit.getTransportDestination() != null) {
+                addToTransportList(aiUnit);
+            } else if (carrier.isInEurope()
+                || (carrier.getTile() != null && carrier.getTile().isLand())) {
+                // Unit has no destination, drop it off if on land.
+                unitLeavesShip(aiUnit);
+            }
         }
 
-        // Remove items that are no longer on the transport list:
+        // Remove items that should no longer be transported:
+        // - next step is a null location
+        // - next step is disposed
+        // - next step is a captured settlement
         List<Transportable> ts = new ArrayList<Transportable>();
         for (Transportable t : new ArrayList<Transportable>(transportList)) {
             if (ts.contains(t) || isCarrying(t)) {
-                if (t.getTransportDestination() == null) {
+                Location dst = t.getTransportDestination();
+                if (dst == null
+                    || ((FreeColGameObject)dst).isDisposed()
+                    || ((dst instanceof Settlement)
+                        && ((Settlement)dst).getOwner() != null
+                        && ((Settlement)dst).getOwner() != owner)) {
                     removeFromTransportList(t);
                 }
             } else {
-                if (t.getTransportSource() == null) {
+                Location src = t.getTransportSource();
+                if (src == null
+                    || ((FreeColGameObject)src).isDisposed()
+                    || ((src instanceof Settlement)
+                        && ((Settlement)src).getOwner() != null
+                        && ((Settlement)src).getOwner() != owner)) {
                     removeFromTransportList(t);
                 }
             }
@@ -288,33 +309,26 @@ public class TransportMission extends Mission {
         Unit carrier = getUnit();
         if (newTransportable.getTransportLocatable() instanceof Unit
             && ((Unit) newTransportable.getTransportLocatable()).isCarrier()) {
-            throw new IllegalArgumentException("You cannot add a carrier to the transport list.");
+            throw new IllegalArgumentException("Can not add a carrier to a transport list.");
         }
         Location newSource = newTransportable.getTransportSource();
         Location newDestination = newTransportable.getTransportDestination();
 
         if (newDestination == null) {
-            if (newTransportable instanceof AIGoods) {
-                logger.warning("No destination for goods: " + newTransportable.getTransportLocatable().toString());
-                return;
-            } else {
-                logger.warning("No destination for: " + newTransportable.getTransportLocatable().toString());
-                return;
-            }
+            logger.warning("No destination for: "
+                + newTransportable.toString());
+            return;
         }
 
         if (newSource == null && !isCarrying(newTransportable)) {
-            logger.warning("No source for: " + newTransportable.getTransportLocatable().toString());
+            logger.warning("No source for: " + newTransportable.toString());
             return;
         }
 
-        if (isOnTransportList(newTransportable)) {
-            return;
-        }
+        if (isOnTransportList(newTransportable)) return;
 
         int bestSourceIndex = -1;
         if (!isCarrying(newTransportable)) {
-
             int distToSource;
             if (carrier.getLocation().getTile() == newSource.getTile()) {
                 distToSource = 0;
@@ -1093,8 +1107,12 @@ public class TransportMission extends Mission {
             return null;
         }
 
-        if (destination instanceof Europe) {
-            path = findPathToEurope(start.getTile());
+        if (destination.getTile() == null) {
+            if (destination instanceof Europe) {
+                path = findPathToEurope(start.getTile());
+            } else {
+                return null;
+            }
         } else if (locatable instanceof Unit && isCarrying(transportable)) {
             path = getGame().getMap().findPath((Unit) locatable, start.getTile(), destination.getTile(), carrier);
             if (path == null || path.getTransportDropNode().previous == null) {
@@ -1299,48 +1317,66 @@ public class TransportMission extends Mission {
      */
     private boolean loadCargoAtDestination(Connection connection) {
         Unit carrier = getUnit();
+        if (carrier.isAtSea()) return false;
 
         // TODO: Add code for rendez-vous.
 
         boolean transportListChanged = false;
-
         Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
             if (carrier.getSpaceLeft() == 0) break;
             Transportable t = tli.next();
-            if (isCarrying(t)) {
-                continue;
-            }
+            if (isCarrying(t)) continue; // To deliver, ignore.
+
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile() && !carrier.isAtSea()) {
-                    if (AIMessage.askEmbark(getAIUnit(), u)) {
+                if (u.isAtSea()) {
+                    continue;
+                } else if (carrier.getTile() == u.getTile()) {
+                    if (carrier.getTile() != null
+                        || (carrier.isInEurope() && u.isInEurope())) {
+                        // Drop the transportable from the transport
+                        // list without checking if embark succeeds or
+                        // not--- if it succeeds all is well, if it
+                        // fails it is likely to fail again for the
+                        // same unknown reason so we might as well
+                        // give up on it and do something else with
+                        // the carrier.  Similarly also for the goods
+                        // loads below.
+                        AIMessage.askEmbark(getAIUnit(), u);
                         tli.remove();
                         transportListChanged = true;
+                    } else {
+                        throw new IllegalStateException("Bogus"
+                            + " carrier at: " + carrier.getLocation()
+                            + " unit at: " + u.getLocation());
                     }
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile() && !carrier.isAtSea()) {
-                    if (carrier.getLocation() instanceof Europe) {
+                if (carrier.getTile() == ag.getGoods().getTile()) {
+                    if (carrier.getTile() != null) {
+                        AIMessage.askLoadCargo(getAIUnit(), ag.getGoods());
+                        tli.remove();
+                        transportListChanged = true;
+                    } else if (carrier.isInEurope()) {
                         GoodsType goodsType = ag.getGoods().getType();
                         int goodsAmount = ag.getGoods().getAmount();
-                        boolean success = AIMessage.askBuyGoods(getAIUnit(), goodsType, goodsAmount);
-                        if(success){
-                            tli.remove();
-                            transportListChanged = true;
-                            ag.setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
+                        if (AIMessage.askBuyGoods(getAIUnit(), goodsType,
+                                                  goodsAmount)) {
+                            ag.setGoods(new Goods(getGame(), carrier,
+                                                  goodsType, goodsAmount));
                         }
+                        tli.remove();
+                        transportListChanged = true;
                     } else {
-                        if (AIMessage.askLoadCargo(getAIUnit(), ag.getGoods())) {
-                            tli.remove();
-                            transportListChanged = true;
-                        }
+                        throw new IllegalStateException("Bogus carrier at: "
+                            + carrier.getLocation());
                     }
                 }
             } else {
-                logger.warning("Unknown Transportable.");
+                logger.warning("Unknown Transportable: " + t);
             }
         }
 
