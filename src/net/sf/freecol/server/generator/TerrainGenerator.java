@@ -346,9 +346,10 @@ public class TerrainGenerator {
      * Gets a random land tile type based on the given percentage.
      *
      * @param game the Game
-     * @param latitude The location of the tile relative to the north/south poles and equator,
-     *        0 is the mid-section of the map (equator)
-     *        90 is on the top/bottom of the map (poles).
+     * @param latitude The location of the tile relative to the north/south
+     *        poles and equator:
+     *          0 is the mid-section of the map (equator)
+     *          +/-90 is on the bottom/top of the map (poles).
      */
     private TileType getRandomLandTileType(Game game, int latitude) {
         // decode options
@@ -390,7 +391,8 @@ public class TerrainGenerator {
             equatorTemperature = 40;
         }
         int temperatureRange = equatorTemperature-poleTemperature;
-        int localeTemperature = poleTemperature + (90 - latitude) * temperatureRange/90;
+        int localeTemperature = poleTemperature + (90 - Math.abs(latitude))
+            * temperatureRange/90;
         int temperatureDeviation = 7; // +/- 7 degrees randomization
         localeTemperature += random.nextInt(temperatureDeviation*2)-temperatureDeviation;
         if (localeTemperature>40)
