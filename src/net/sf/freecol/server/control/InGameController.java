@@ -2199,7 +2199,11 @@ public final class InGameController extends Controller {
     public Element updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
         // Check if there is a valid current stop?
         int current = unit.validateCurrentStop();
-        if (current < 0) return null; // No valid stop.
+        if (current < 0) { // No valid stop
+            unit.setTradeRoute(null);
+            return new ChangeSet().add(See.only(serverPlayer), unit)
+                .build(serverPlayer);
+        }
 
         List<Stop> stops = unit.getTradeRoute().getStops();
         int next = current;
@@ -2217,7 +2221,6 @@ public final class InGameController extends Controller {
         // Could do just a partial update of currentStop if we did not
         // also need to set the unit destination.
         unit.setCurrentStop(next);
-        unit.setDestination(stops.get(next).getLocation());
 
         // Others can not see a stop change.
         return new ChangeSet().add(See.only(serverPlayer), unit)
@@ -3491,7 +3494,6 @@ public final class InGameController extends Controller {
             }
             if (found < 0) found = 0;
             unit.setCurrentStop(found);
-            unit.setDestination(stops.get(found).getLocation());
         }
 
         // Only visible to the player

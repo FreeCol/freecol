@@ -712,18 +712,17 @@ public final class InGameController implements NetworkConstants {
                                 loc.getLocationNameFor(player)));
                     }
                 }
-
-            } else { // Not at stop, give up if no moves left.
-                if (unit.getMovesLeft() <= 0
-                    || unit.getState() == UnitState.SKIPPED) {
-                    break;
-                }
+                continue; // Stop was updated, loop.
             }
 
-            // Find a path to the destination.  Skip if none.
-            Location destination = unit.getDestination();
-            if (destination == null
-                || unit.getTile() == destination.getTile()) continue;
+            // Not at stop, give up if no moves left.
+            if (unit.getMovesLeft() <= 0
+                || unit.getState() == UnitState.SKIPPED) {
+                break;
+            }
+
+            // Find a path to the stop.  Skip if none.
+            Location destination = stop.getLocation();
             PathNode path = (destination instanceof Europe)
                 ? unit.findPathToEurope()
                 : unit.findPath(destination.getTile());
