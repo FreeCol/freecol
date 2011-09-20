@@ -396,8 +396,12 @@ public class TransportMission extends Mission {
         }
         for (int i = Math.max(bestSourceIndex, 1); i < transportList.size() && bestDestinationDistance > 0; i++) {
             Transportable t1 = transportList.get(i - 1);
-            if (t1.getTransportSource().getTile() == newDestination.getTile()
-                || t1.getTransportDestination().getTile() == newDestination.getTile()) {
+            if ((t1.getTransportSource() != null
+                    && t1.getTransportSource().getTile()
+                    == newDestination.getTile())
+                || (t1.getTransportDestination() != null
+                    && t1.getTransportDestination().getTile()
+                    == newDestination.getTile())) {
                 bestDestinationIndex = i;
                 bestDestinationDistance = 0;
             }

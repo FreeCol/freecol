@@ -2026,6 +2026,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (TransportMission tm : availableMissions) {
                 int transportSpace = tm.getAvailableSpace(t);
                 if (transportSpace <= 0) continue;
+                if (t instanceof AIUnit && !tm.getUnit().canCarryUnits()) {
+                    continue;
+                }
 
                 if (t.getTransportSource().getTile()
                     == tm.getUnit().getTile()) {
