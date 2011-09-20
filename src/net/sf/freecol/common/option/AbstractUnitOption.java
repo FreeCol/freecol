@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -27,6 +29,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Specification.TypeSelector;
 
 /**
  * Represents an option where the valid choice is an AbstractUnit.
@@ -35,6 +40,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
+
+    private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
 
     private AbstractUnit value;
 
@@ -53,6 +60,16 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     private boolean selectRole = true;
 
+    /**
+     * Determines which unit types are valid for this Option if no
+     * choices are provided.
+     */
+    private TypeSelector validTypes = DEFAULT_SELECTOR;
+
+    /**
+     * A list of valid unit types for this Option.
+     */
+    private List<String> choices;
 
     /**
      * Creates a new <code>AbstractUnitOption</code>.
@@ -147,6 +164,69 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         selectRole = value;
     }
 
+    /**
+     * Returns the valid unit types for this option.
+     *
+     * @return the valid unit types for this option
+     */
+    public TypeSelector getValidTypes() {
+        return validTypes;
+    }
+
+    /**
+     * Set the valid unit types for this option.
+     *
+     * @param value the valid unit types for this option
+     */
+    public void setValidTypes(TypeSelector value) {
+        if (value == null
+            || value == TypeSelector.BUILDINGS
+            || value == TypeSelector.FOUNDING_FATHERS) {
+            validTypes = DEFAULT_SELECTOR;
+            logger.warning("Invalid type selector for AbstractUnit: " + value
+                           + ". Falling back to default selector: " + validTypes);
+        } else {
+            validTypes = value;
+        }
+    }
+
+    /**
+     * Get the <code>Choices</code> value.
+     *
+     * @return a <code>List<String></code> value
+     */
+    public final List<String> getChoices() {
+        return choices;
+    }
+
+    /**
+     * Set the <code>Choices</code> value.
+     *
+     * @param newChoices The new Choices value.
+     */
+    public final void setChoices(final List<String> newChoices) {
+        this.choices = newChoices;
+    }
+
+    /**
+     * Generate the choices to provide to the UI based on the
+     * validTypes value.
+     *
+     * @param specification the Specification that defines the game
+     * objects whose IDs will be generated
+     */
+    public void generateChoices(Specification specification) {
+        if (validTypes == null) {
+            if (choices == null || choices.isEmpty()) {
+                choices = new ArrayList<String>();
+                choices.add(value.getId());
+            }
+        } else {
+            for (FreeColGameObjectType object : specification.getTypes(validTypes)) {
+                choices.add(object.getId());
+            }
+        }
+    }
 
     /**
      * This method writes an XML-representation of this object to
@@ -164,7 +244,17 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         out.writeAttribute("minimumNumber", Integer.toString(minimumNumber));
         out.writeAttribute("maximumNumber", Integer.toString(maximumNumber));
         out.writeAttribute("selectRole", Boolean.toString(selectRole));
+        if (validTypes != null) {
+            out.writeAttribute("validTypes", validTypes.toString());
+        }
         value.toXML(out);
+        if (choices != null && !choices.isEmpty()) {
+            for (String choice : choices) {
+                out.writeStartElement("choice");
+                out.writeAttribute(VALUE_TAG, choice);
+                out.writeEndElement();
+            }
+        }
 
         out.writeEndElement();
     }
@@ -178,27 +268,28 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
 
         if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                                         + "> tag : no id attribute found.");
         }
 
         if (getId() == NO_ID) {
             setId(id);
         }
+
         minimumNumber = getAttribute(in, "minimumNumber", 1);
         maximumNumber = getAttribute(in, "maximumNumber", 1);
         selectRole = getAttribute(in, "selectRole", true);
+        setValidTypes(getAttribute(in, "validTypes", TypeSelector.class, DEFAULT_SELECTOR));
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (AbstractUnit.getXMLElementTagName().equals(in.getLocalName())) {
                 value = new AbstractUnit(in);
-                in.nextTag();
+            } else if ("choice".equals(in.getLocalName())) {
+                choices.add(in.getAttributeValue(null, VALUE_TAG));
             }
+            in.nextTag();
         }
 
     }

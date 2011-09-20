@@ -627,6 +627,30 @@ public abstract class FreeColObject {
      *
      * @param in a <code>XMLStreamReader</code> value
      * @param attributeName An attribute name
+     * @param defaultValue an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public <T extends Enum<T>> T getAttribute(XMLStreamReader in, String attributeName,
+                                              Class<T> returnType, T defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        T result = defaultValue;
+        if (attributeString != null) {
+            try {
+                result = Enum.valueOf(returnType, attributeString);
+            } catch(NumberFormatException e) {
+                logger.warning("Attribute '" + attributeName + "' should be a "
+                               + defaultValue.getClass().getName() + " value, not '"
+                               + attributeString + "'.");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Return an attribute value or the default value.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param attributeName An attribute name
      * @param defaultValue a <code>float</code> value
      * @return an <code>int</code> value
      */

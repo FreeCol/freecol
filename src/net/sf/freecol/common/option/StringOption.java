@@ -23,15 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Specification.TypeSelector;
 
 
 /**
@@ -43,14 +42,6 @@ public class StringOption extends AbstractOption<String> {
     private static Logger logger = Logger.getLogger(StringOption.class.getName());
 
     public static final String NONE = "none";
-
-    /**
-     * In order to provide the UI with choices, lists with the IDs of
-     * game objects can be generated.
-     */
-    public static enum Generate {
-        UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS, BUILDINGS, FOUNDING_FATHERS
-    }
 
     /**
      * The option value.
@@ -65,7 +56,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Which choices to generate.
      */
-    private Generate generateChoices;
+    private TypeSelector generateChoices;
 
     /**
      * A list of choices to provide to the UI.
@@ -170,7 +161,7 @@ public class StringOption extends AbstractOption<String> {
      *
      * @return a <code>Generate</code> value
      */
-    public final Generate getGenerateChoices() {
+    public final TypeSelector getGenerateChoices() {
         return generateChoices;
     }
 
@@ -179,7 +170,7 @@ public class StringOption extends AbstractOption<String> {
      *
      * @param newGenerateChoices The new GenerateChoices value.
      */
-    public final void setGenerateChoices(final Generate newGenerateChoices) {
+    public final void setGenerateChoices(final TypeSelector newGenerateChoices) {
         this.generateChoices = newGenerateChoices;
     }
 
@@ -197,39 +188,8 @@ public class StringOption extends AbstractOption<String> {
                 choices.add(getValue());
             }
         } else {
-            List<FreeColObject> objects = new ArrayList<FreeColObject>();
-            switch(generateChoices) {
-            case UNITS:
-                objects.addAll(specification.getUnitTypeList());
-                break;
-            case IMMIGRANTS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (unitType.isRecruitable()) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case NAVAL_UNITS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case LAND_UNITS:
-                for (UnitType unitType : specification.getUnitTypeList()) {
-                    if (!unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                        objects.add(unitType);
-                    }
-                }
-                break;
-            case BUILDINGS:
-                objects.addAll(specification.getBuildingTypeList());
-                break;
-            case FOUNDING_FATHERS:
-                objects.addAll(specification.getFoundingFathers());
-                break;
-            }
+            List<FreeColGameObjectType> objects =
+                specification.getTypes(generateChoices);
             choices = new ArrayList<String>(objects.size() + (addNone ? 1 : 0));
             if (addNone) {
                 choices.add(StringOption.NONE);
@@ -303,7 +263,7 @@ public class StringOption extends AbstractOption<String> {
         addNone = getAttribute(in, "addNone", false);
         String generate = in.getAttributeValue(null, "generate");
         if (generate != null) {
-            generateChoices = Enum.valueOf(StringOption.Generate.class, generate);
+            generateChoices = TypeSelector.valueOf(generate);
         }
         choices = new ArrayList<String>();
     }
