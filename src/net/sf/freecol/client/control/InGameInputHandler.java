@@ -336,33 +336,31 @@ public final class InGameInputHandler extends InputHandler {
         FreeColClient client = getFreeColClient();
         Game game = getGame();
         String unitId = element.getAttribute("unit");
-        if (unitId == null) {
-            logger.warning("Animation"
-                           + " for: " + client.getMyPlayer().getId()
-                           + " ommitted unitId");
-            return null;
+        Unit unit;
+        if (unitId == null
+            || ((unit = (Unit) game.getFreeColGameObjectSafely(unitId)) == null
+                && (unit = selectUnitFromElement(game, element, unitId)) == null)) {
+            throw new IllegalStateException("Animation"
+                + " for: " + client.getMyPlayer().getId()
+                + " missing unit:" + unitId);
         }
-        Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
-        if (unit == null
-            && (unit = selectUnitFromElement(game, element, unitId)) == null) {
-            logger.warning("Animation"
-                           + " for: " + client.getMyPlayer().getId()
-                           + " incorrectly omitted unit: " + unitId);
-            return null;
-        }
-        ClientOptions options = client.getClientOptions();
-        boolean ourUnit = unit.getOwner() == client.getMyPlayer();
-        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        if (!client.isHeadless() && options.getInteger(key) > 0) {
+
+        if (!client.isHeadless()
+            && Animations.getAnimationSpeed(client.getCanvas(), unit) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             String newTileId = element.getAttribute("newTile");
-            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
-            Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
-            if (newTile == null || oldTile == null) {
-                throw new IllegalStateException("animateMove unit: " + unitId
-                    + ((oldTile == null) ? ": null oldTile" : "")
-                    + ((newTile == null) ? ": null newTile" : ""));
+            Tile oldTile, newTile;
+            if (oldTileId == null
+                || (oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId)) == null) {
+                throw new IllegalStateException("Amimation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " missing oldTile: " + oldTileId);
+            }
+            if (newTileId == null
+                || (newTile = (Tile) game.getFreeColGameObjectSafely(newTileId)) == null) {
+                throw new IllegalStateException("Animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " missing newTile: " + newTileId);
             }
 
             // All is well, queue the animation.
@@ -371,11 +369,10 @@ public final class InGameInputHandler extends InputHandler {
                 new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
                                                      unit != lastAnimatedUnit)
                     .invokeSpecial();
-            } catch (Exception exception) {
-                logger.warning("UnitMoveAnimationCanvasSwingTask raised "
-                               + exception.toString());
+                lastAnimatedUnit = unit;
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "UnitMoveAnimation", e);
             }
-            lastAnimatedUnit = unit;
         }
         return null;
     }
@@ -443,14 +440,37 @@ public final class InGameInputHandler extends InputHandler {
      * @return an <code>Element</code> value
      */
     private Element setCurrentPlayer(Element element) {
-        Game game = getGame();
-        Player newPlayer = (Player) game
+        final FreeColClient fcc = getFreeColClient();
+        final Game game = getGame();
+        final Player player = fcc.getMyPlayer();
+        final Player newPlayer = (Player) game
             .getFreeColGameObject(element.getAttribute("player"));
-        Player player = getFreeColClient().getMyPlayer();
+        final boolean oldTurn = /*FreeCol.isInDebugMode() &&*/
+            player.equals(game.getCurrentPlayer());
+        final boolean newTurn = player.equals(newPlayer);
 
-        new SetCurrentPlayerSwingTask(newPlayer,
-            FreeCol.isInDebugMode() && player.equals(game.getCurrentPlayer()),
-            player.equals(newPlayer)).invokeLater();
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        if (oldTurn) fcc.getCanvas().closeMenus();
+
+                        fcc.getInGameController().setCurrentPlayer(newPlayer);
+
+                        if (newTurn) {
+                            fcc.getInGameController().nextActiveUnit(player
+                                .getEntryLocation().getTile());
+                        }
+
+                        fcc.getActionManager().update();
+                    }
+                });
+        } catch (InterruptedException e) {
+            // Ignore
+        } catch (InvocationTargetException e) {
+            // Ignore
+        }
+
+        new RefreshCanvasSwingTask(true).invokeLater();
         return null;
     }
 
@@ -1310,67 +1330,6 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * A task to set a new current player.
-     */
-    class SetCurrentPlayerSwingTask extends RefreshCanvasSwingTask {
-
-        private Player newPlayer;
-        private boolean oldTurn;
-        private boolean newTurn;
-
-        /**
-         * Task constructor.
-         *
-         * @param newPlayer The <code>Player</code> to set to be the
-         *     current player.
-         * @param oldTurn True if the client player is to be replaced as
-         *     current player.
-         * @param newTurn True if the client player is to become the
-         *     current player.
-         */
-        public SetCurrentPlayerSwingTask(Player newPlayer, boolean oldTurn,
-                                         boolean newTurn) {
-            super(true);
-            this.newPlayer = newPlayer;
-            this.oldTurn = oldTurn;
-            this.newTurn = newTurn;
-        }
-
-        @Override
-        public void doWork(Canvas canvas) {
-            super.doWork(canvas);
-            FreeColClient fcc = getFreeColClient();
-
-            // If our turn is ending, clean up all open popups.
-            if (oldTurn) canvas.closeMenus();
-
-            // Set the new player
-            fcc.getInGameController().setCurrentPlayer(newPlayer);
-
-            // If our turn is beginning, select a unit.
-            if (newTurn) {
-                if (FreeCol.isDebugRunComplete()
-                    && FreeCol.getDebugRunSaveName() != null) {
-                    try {
-                        fcc.getFreeColServer().saveGame(
-                            new File(".", FreeCol.getDebugRunSaveName()),
-                            fcc.getMyPlayer().getName(),
-                            fcc.getClientOptions());
-                    } catch (IOException e) {}
-                    fcc.quit();
-                }
-                List<Settlement> settlements = newPlayer.getSettlements();
-                Tile defTile = ((settlements.size() > 0)
-                                ? settlements.get(0).getTile()
-                                : newPlayer.getEntryLocation().getTile())
-                    .getSafeTile(null, null);
-                newPlayer.resetIterators();
-                fcc.getInGameController().nextActiveUnit(defTile);
-            }
-        }
-    }
-
-    /**
      * This class displays a negotiation dialog and acts on the result.
      */
     class DiplomacySwingTask extends NoResultCanvasSwingTask {
@@ -1589,36 +1548,24 @@ public final class InGameInputHandler extends InputHandler {
     class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
 
         private final Unit unit;
-
         private final Tile destinationTile;
-
         private final Tile sourceTile;
-
         private boolean focus;
 
 
         /**
-         * Constructor - Play the unit movement animation, always focusing on
+         * Constructor.
+         * Play the unit movement animation, optionally focusing on
          * the source tile.
          *
-         * @param unit The unit that is moving.
-         * @param sourceTile The Tile from which the unit is moving.
-         * @param destinationTile The Tile where the unit will be moving to.
-         */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile, Tile destinationTile) {
-            this(unit, sourceTile, destinationTile, true);
-        }
-
-        /**
-         * Constructor - Play the unit movement animation, optionally focusing
-         * on the source tile.
-         *
-         * @param unit The unit that is moving.
-         * @param sourceTile The Tile from which the unit is moving.
-         * @param destinationTile The Tile where the unit will be moving to.
+         * @param unit The <code>Unit</code> that is moving.
+         * @param sourceTile The <code>Tile</code> from which to move.
+         * @param destinationTile The <code>Tile</code> to move to.
          * @param focus Focus on the source tile before the animation.
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile, Tile destinationTile, boolean focus) {
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
+                                                Tile destinationTile,
+                                                boolean focus) {
             this.unit = unit;
             this.sourceTile = sourceTile;
             this.destinationTile = destinationTile;
