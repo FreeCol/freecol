@@ -797,6 +797,18 @@ public class ServerAPI {
     }
 
     /**
+     * Server query-response for asking for the server statistics.
+     *
+     * @return The server statistics.
+     */
+    public java.util.Map<String, String> getStatistics() {
+        HashMap<String, String> results = loadMap("*");
+        return (askExpecting(new TrivialMessage("getStatistics"),
+                "statistics", results) == null) ? null
+            : results;
+    }
+
+    /**
      * Server query-response for inciting the natives.
      *
      * @param unit The missionary <code>Unit</code>.
@@ -1155,15 +1167,12 @@ public class ServerAPI {
     }
 
     /**
-     * Server query-response for asking for the server statistics.
+     * Server query-response for starting to skip turns.
      *
-     * @return The server statistics.
+     * @return True if the server interaction succeeded.
      */
-    public java.util.Map<String, String> getStatistics() {
-        HashMap<String, String> results = loadMap("*");
-        return (askExpecting(new TrivialMessage("getStatistics"),
-                "statistics", results) == null) ? null
-            : results;
+    public boolean startSkipping() {
+        return send(new TrivialMessage("endTurn"));
     }
 
     /**

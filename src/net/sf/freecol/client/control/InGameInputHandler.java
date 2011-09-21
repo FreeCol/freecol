@@ -445,9 +445,20 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = fcc.getMyPlayer();
         final Player newPlayer = (Player) game
             .getFreeColGameObject(element.getAttribute("player"));
-        final boolean oldTurn = /*FreeCol.isInDebugMode() &&*/
-            player.equals(game.getCurrentPlayer());
+        final boolean oldTurn = FreeCol.isInDebugMode()
+            && player.equals(game.getCurrentPlayer());
         final boolean newTurn = player.equals(newPlayer);
+
+        if (FreeCol.isDebugRunComplete()
+            && FreeCol.getDebugRunSaveName() != null) {
+            try {
+                fcc.getFreeColServer().saveGame(new File(".",
+                        FreeCol.getDebugRunSaveName()),
+                    fcc.getMyPlayer().getName(),
+                    fcc.getClientOptions());
+            } catch (IOException e) {}
+            fcc.quit();
+        }
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -457,8 +468,14 @@ public final class InGameInputHandler extends InputHandler {
                         fcc.getInGameController().setCurrentPlayer(newPlayer);
 
                         if (newTurn) {
-                            fcc.getInGameController().nextActiveUnit(player
-                                .getEntryLocation().getTile());
+                            List<Settlement> settlements
+                                = newPlayer.getSettlements();
+                            Tile defTile = ((settlements.size() > 0)
+                                ? settlements.get(0).getTile()
+                                : newPlayer.getEntryLocation().getTile())
+                                .getSafeTile(null, null);
+                            newPlayer.resetIterators();
+                            fcc.getInGameController().nextActiveUnit(defTile);
                         }
 
                         fcc.getActionManager().update();
