@@ -369,13 +369,11 @@ public abstract class AIPlayer extends AIObject {
      */
     protected void doMissions() {
         logger.finest("Entering method doMissions");
-        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
-        while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = aiUnitsIterator.next();
-            if (aiUnit.hasMission() && aiUnit.getMission().isValid()
-                    && !(aiUnit.getUnit().isOnCarrier())) {
+        for (AIUnit au : getAIUnits()) {
+            if (au.hasMission() && au.getMission().isValid()
+                && !(au.getUnit().isOnCarrier())) {
                 try {
-                    aiUnit.doMission(getConnection());
+                    au.doMission(getConnection());
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "doMissions failed", e);
                 }

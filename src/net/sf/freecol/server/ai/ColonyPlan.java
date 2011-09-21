@@ -838,9 +838,7 @@ public class ColonyPlan {
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
 
-        Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-        while (wlpIterator.hasNext()) {
-            WorkLocationPlan wlp = wlpIterator.next();
+        for (WorkLocationPlan wlp : getWorkLocationPlans()) {
             amount += wlp.getProductionOf(goodsType);
         }
 
