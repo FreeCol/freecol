@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.FreeColObject;
  * followed by "name" or "shortDescription".
  */
 abstract public class AbstractOption<T> extends FreeColObject
-    implements Option {
+    implements Option<T> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
@@ -49,8 +49,6 @@ abstract public class AbstractOption<T> extends FreeColObject
     // XML file.
     protected boolean isDefined = false;
 
-    protected boolean previewEnabled = false;
-
 
     /**
      * Creates a new <code>AbstractOption</code>.
@@ -60,29 +58,6 @@ abstract public class AbstractOption<T> extends FreeColObject
      */
     public AbstractOption(String id) {
         setId(id);
-    }
-
-    /**
-     * Should this option be updated directly so that
-     * changes may be previewed?
-     *
-     * @return <code>true</code> if changes to this
-     *      option should be made directly (and reset
-     *      back later if the changes are not stored).
-     */
-    public boolean isPreviewEnabled() {
-        return previewEnabled;
-    }
-
-    /**
-     * Sets if this option should be updated directly.
-     *
-     * @param previewEnabled <code>true</code> if changes
-     *      to this option should be made directly (and
-     *      reset back later if the changes are not stored).
-     */
-    public void setPreviewEnabled(boolean previewEnabled) {
-        this.previewEnabled = previewEnabled;
     }
 
     /**

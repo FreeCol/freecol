@@ -222,28 +222,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
 
     /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        for (OptionUpdater optionUpdater : optionUpdaters) {
-            optionUpdater.rollback();
-        }
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        for (OptionUpdater optionUpdater : optionUpdaters) {
-            optionUpdater.unregister();
-        }
-    }
-
-    /**
      * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {

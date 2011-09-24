@@ -19,15 +19,11 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.IntegerOption;
@@ -38,7 +34,7 @@ import net.sf.freecol.common.option.IntegerOption;
  * net.sf.freecol.common.option.IntegerOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class IntegerOptionUI extends JSpinner implements OptionUpdater, PropertyChangeListener {
+public final class IntegerOptionUI extends JSpinner implements OptionUpdater  {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(IntegerOptionUI.class.getName());
@@ -73,18 +69,6 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
             int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
             setModel(new SpinnerNumberModel((int) option.getValue(), option.getMinimumValue(),
                                             option.getMaximumValue(), Math.max(1, stepSize)));
-            addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent e) {
-                        if (option.isPreviewEnabled()) {
-                            final int value = (Integer) getValue();
-                            if (option.getValue() != value) {
-                                option.setValue(value);
-                            }
-                        }
-                    }
-                });
-
-            option.addPropertyChangeListener(this);
         } else {
             int value = option.getValue();
             setModel(new SpinnerNumberModel(value, value, value, 1));
@@ -108,38 +92,6 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater, Pr
      */
     public void setLabel(final JLabel newLabel) {
         this.label = newLabel;
-    }
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        option.setValue(originalValue);
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        option.removePropertyChangeListener(this);
-    }
-
-    /**
-     * Updates this UI with the new data from the option.
-     * @param event The event.
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals("value")) {
-            final int value = (Integer) event.getNewValue();
-            if (value != ((Integer) getValue()).intValue()) {
-                setValue(event.getNewValue());
-                originalValue = value;
-            }
-        }
     }
 
     /**

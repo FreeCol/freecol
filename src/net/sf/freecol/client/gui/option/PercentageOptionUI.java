@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
@@ -31,8 +29,6 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.PercentageOption;
@@ -42,7 +38,7 @@ import net.sf.freecol.common.option.PercentageOption;
  * net.sf.freecol.common.option.PercentageOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class PercentageOptionUI extends JSlider implements OptionUpdater, PropertyChangeListener {
+public final class PercentageOptionUI extends JSlider implements OptionUpdater  {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PercentageOptionUI.class.getName());
@@ -89,51 +85,6 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater, 
         setEnabled(editable);
         setOpaque(false);
 
-        addChangeListener(new ChangeListener () {
-            public void stateChanged(ChangeEvent e) {
-                if (option.isPreviewEnabled()) {
-                    if (option.getValue() != getValue()) {
-                        option.setValue(getValue());
-                    }
-                }
-            }
-        });
-
-        option.addPropertyChangeListener(this);
-        setOpaque(false);
-    }
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        option.setValue(originalValue);
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        option.removePropertyChangeListener(this);
-    }
-
-    /**
-     * Updates this UI with the new data from the option.
-     *
-     * @param event The event.
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals("value")) {
-            final int value = ((Integer) event.getNewValue()).intValue();
-            if (value != getValue()) {
-                setValue(value);
-                originalValue = value;
-            }
-        }
     }
 
     /**

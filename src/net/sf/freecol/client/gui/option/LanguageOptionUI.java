@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
@@ -39,7 +35,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
  * net.sf.freecol.common.option.LanguageOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class LanguageOptionUI extends JComboBox implements OptionUpdater, PropertyChangeListener {
+public final class LanguageOptionUI extends JComboBox implements OptionUpdater  {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(LanguageOptionUI.class.getName());
@@ -69,18 +65,6 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
         reset();
 
         setEnabled(editable);
-        addActionListener(new ActionListener () {
-            public void actionPerformed(ActionEvent e) {
-                if (option.isPreviewEnabled()) {
-                    Language value = (Language) getSelectedItem();
-                    if (option.getValue() != value) {
-                        option.setValue(value);
-                    }
-                }
-            }
-        });
-
-        option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
@@ -100,38 +84,6 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater, 
      */
     public void setLabel(final JLabel newLabel) {
         this.label = newLabel;
-    }
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        option.setValue(originalValue);
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        option.removePropertyChangeListener(this);
-    }
-
-    /**
-     * Updates this UI with the new data from the option.
-     * @param event The event.
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals("value")) {
-            final Language value = (Language) event.getNewValue();
-            if (value != getSelectedItem()) {
-                setSelectedItem(value);
-                originalValue = value;
-            }
-        }
     }
 
     /**

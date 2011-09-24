@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  *
  * @see net.sf.freecol.common.model.GameOptions
  */
-public interface Option {
+public interface Option<T> {
 
     /**
     * Returns a textual representation of this object.
@@ -51,31 +51,12 @@ public interface Option {
     */
     public String getId();
 
-
     /**
-     * Should this option be updated directly so that
-     * changes may be previewes?
+     * Returns the value of this Option.
      *
-     * @return <code>true</code> if changes to this
-     *      option should be made directly (and reset
-     *      back later if the changes are not stored).
+     * @return the value of this Option
      */
-    public boolean isPreviewEnabled();
-
-    /**
-     * Adds a new <code>PropertyChangeListener</code> for monitoring state
-     * changes. Events are generated when variables are changed.
-     *
-     * @param pcl The <code>PropertyChangeListener</code> to be added.
-     */
-    public void addPropertyChangeListener(PropertyChangeListener pcl);
-
-    /**
-     * Remove the given <code>PropertyChangeListener</code>.
-     *
-     * @param pcl The <code>PropertyChangeListener</code> to be removed.
-     */
-    public void removePropertyChangeListener(PropertyChangeListener pcl);
+    public T getValue();
 
     /**
     * Makes an XML-representation of this object.

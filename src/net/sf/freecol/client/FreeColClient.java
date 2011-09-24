@@ -429,7 +429,7 @@ public final class FreeColClient {
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
         // Now that there is a canvas, prepare for language changes.
-        Option o = getClientOptions().getOption(ClientOptions.LANGUAGE);
+        LanguageOption o = (LanguageOption) getClientOptions().getOption(ClientOptions.LANGUAGE);
         if (o != null) {
             o.addPropertyChangeListener(new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent e) {

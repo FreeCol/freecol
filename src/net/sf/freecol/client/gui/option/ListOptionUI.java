@@ -26,8 +26,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -54,7 +52,7 @@ import net.sf.freecol.common.option.ListOptionSelector;
  * net.sf.freecol.common.option.ListOption}. In order to enable values
  * to be both seen and changed.
  */
-public final class ListOptionUI<T> extends JPanel implements OptionUpdater, PropertyChangeListener {
+public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ListOptionUI.class.getName());
@@ -145,18 +143,11 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
         });
 
         list.getModel().addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) {
-                if (option.isPreviewEnabled()) {
-                    if (!option.getValue().equals(getValue())) {
-                        option.setValue(getValue());
-                    }
-                }
-            }
+            public void contentsChanged(ListDataEvent e) {}
             public void intervalAdded(ListDataEvent e) {}
             public void intervalRemoved(ListDataEvent e) {}
         });
 
-        option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
@@ -220,44 +211,6 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
             list.add(o.object);
         }
         return list;
-    }
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        option.setValue(createNormalList(originalValue));
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        option.removePropertyChangeListener(this);
-    }
-
-    /**
-     * Updates this UI with the new data from the option.
-     *
-     * @param event The event.
-     */
-    @SuppressWarnings("unchecked")
-    public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals("value")) {
-            final List<T> value = (List<T>) event.getNewValue();
-            if (!value.equals(getValue())) {
-                listModel.clear();
-
-                for (Object o : createElementList(value)) {
-                    listModel.addElement(o);
-                }
-                originalValue = createElementList(value);
-            }
-        }
     }
 
     /**

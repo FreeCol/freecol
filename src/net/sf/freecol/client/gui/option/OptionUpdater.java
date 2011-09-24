@@ -41,17 +41,4 @@ public interface OptionUpdater {
      */
     public void reset();
 
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister();
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback();
 }

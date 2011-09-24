@@ -208,12 +208,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
             ui.updateOption();
-            ui.unregister();
             getCanvas().remove(this);
             setResponse(group);
         } else if (CANCEL.equals(command)) {
-            ui.rollback();
-            ui.unregister();
             getCanvas().remove(this);
             setResponse(null);
         } else if (RESET.equals(command)) {

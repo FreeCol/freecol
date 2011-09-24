@@ -61,35 +61,6 @@ public class PercentageOption extends IntegerOption {
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-
-        out.writeAttribute(VALUE_TAG, Integer.toString(getValue()));
-        out.writeAttribute("previewEnabled",
-            Boolean.toString(isPreviewEnabled()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-        final String previewEnabled = in.getAttributeValue(null, "previewEnabled");
-        if (previewEnabled != null) {
-            this.setPreviewEnabled(Boolean.parseBoolean(previewEnabled));
-        }
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "percentageOption".

@@ -19,10 +19,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -40,7 +36,7 @@ import net.sf.freecol.common.option.StringOption;
  * net.sf.freecol.common.option.StringOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class StringOptionUI extends JComboBox implements OptionUpdater, PropertyChangeListener {
+public final class StringOptionUI extends JComboBox implements OptionUpdater  {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StringOptionUI.class.getName());
@@ -73,18 +69,6 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
         setRenderer(new ChoiceRenderer());
 
         setEnabled(editable);
-        addActionListener(new ActionListener () {
-            public void actionPerformed(ActionEvent e) {
-                if (option.isPreviewEnabled()) {
-                    String value = (String) getSelectedItem();
-                    if (option.getValue().equals(value)) {
-                        option.setValue(value);
-                    }
-                }
-            }
-        });
-
-        option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
@@ -115,30 +99,6 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater, Pr
      */
     public void rollback() {
         option.setValue(originalValue);
-    }
-
-    /**
-     * Unregister <code>PropertyChangeListener</code>s.
-     */
-    public void unregister() {
-        option.removePropertyChangeListener(this);
-    }
-
-    /**
-     * Updates this UI with the new data from the option.
-     * @param event The event.
-     */
-    public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals("value")) {
-            final String value = (String) event.getNewValue();
-            if (value == null && option.addNone()) {
-                setSelectedIndex(0);
-                originalValue = null;
-            } else if (!value.equals(getSelectedItem())) {
-                setSelectedItem(value);
-                originalValue = value;
-            }
-        }
     }
 
     /**
