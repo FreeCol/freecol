@@ -491,7 +491,8 @@ public final class EuropePanel extends FreeColPanel {
                         belongs = unit.getDestination() == destination;
                     } else if (destination instanceof Map) {
                         belongs = unit.getDestination() == destination
-                            || (unit.getDestination().getTile() != null
+                            || (unit.getDestination() != null
+                                && unit.getDestination().getTile() != null
                                 && unit.getDestination().getTile().getMap()
                                 == destination);
                     } else {
