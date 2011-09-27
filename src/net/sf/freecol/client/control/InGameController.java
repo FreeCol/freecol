@@ -3670,6 +3670,10 @@ public final class InGameController implements NetworkConstants {
     public void endTurn() {
         if (!requireOurTurn()) return;
 
+        // Ensure end-turn mode sticks.
+        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
+
+        // Show the end turn dialog, or not.
         List<Unit> units = new ArrayList<Unit>();
         for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
             if (unit.couldMove()) {
@@ -3682,22 +3686,18 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
         }
+
         // Make sure all goto orders are complete before ending turn.
-        moveMode = MODE_END_TURN;
         if (!doExecuteGotoOrders()) return;
+
         doEndTurn();
     }
 
     /**
-     * Actually do the end turn operation.
+     * Really end the turn.
      */
     private void doEndTurn() {
-        // Ensure end-turn mode sticks.
-        if (moveMode < MODE_END_TURN) {
-            moveMode = MODE_END_TURN;
-        }
-
-        // Clear active unit if any
+        // Clear active unit if any.
         GUI gui = freeColClient.getGUI();
         gui.setActiveUnit(null);
 
@@ -3709,12 +3709,12 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        // Inform the server of end of turn
-        askServer().endTurn();
-
-        // Restart the selection cycle
+        // Restart the selection cycle.
         moveMode = MODE_NEXT_ACTIVE_UNIT;
         turnsPlayed++;
+
+        // Inform the server of end of turn.
+        askServer().endTurn();
     }
 
     /**
@@ -3824,9 +3824,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // No active units left.  Do the goto orders.
-        if (!doExecuteGotoOrders()) {
-            return;
-        }
+        if (!doExecuteGotoOrders()) return;
 
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
@@ -3834,11 +3832,11 @@ public final class InGameController implements NetworkConstants {
         gui.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
         if (moveMode >= MODE_END_TURN) {
-            doEndTurn();
+            endTurn();
         } else if (tile != null) {
             gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
-            doEndTurn();
+            endTurn();
         }
     }
 
