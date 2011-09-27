@@ -174,16 +174,16 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Returns true if a carrier unit is docked in Europe.
+     * Checks if there is a carrier unit with a specified minimum
+     * amount of space available docked in this European port.
      *
-     * @return a <code>boolean</code> value
+     * @param space The amount of space to require.
+     * @return True if there is a suitable unit present.
      * @see Unit#isCarrier
      */
-    public boolean hasCarrier() {
+    public boolean hasCarrierWithSpace(int space) {
         for (Unit u : getUnitList()) {
-            if (u.isCarrier()) {
-                return true;
-            }
+            if (u.isCarrier() && u.getSpaceLeft() >= space) return true;
         }
         return false;
     }

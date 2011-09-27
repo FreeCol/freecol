@@ -1709,16 +1709,28 @@ public class Unit extends FreeColGameObject
      * Returns true if this Unit could still be moved. This is used to
      * prevent an accidental end of turn order.
      *
-     * @return a <code>boolean</code> value
+     * @return True if this unit could still be moved by the player.
      */
     public boolean couldMove() {
-        return (state == UnitState.ACTIVE || state == UnitState.SKIPPED)
-            && destination == null
-            && tradeRoute == null
-            && ((location instanceof Tile
-                 && getMovesLeft() > 0)
-                || (location instanceof Europe
-                    && ((Europe) location).hasCarrier()));
+        switch (getState()) {
+        case ACTIVE: case SKIPPED:
+            return getMovesLeft() > 0
+                && destination == null // Can not reach next tile
+                && tradeRoute == null
+                && !isUnderRepair()
+                && !isAtSea()
+                && !(isInEurope() && isOnCarrier());            
+        case FORTIFIED: case FORTIFYING: case IN_COLONY: case IMPROVING: 
+        case TO_EUROPE: case TO_AMERICA:
+            break;
+        case SENTRY: // Can load a passenger in Europe?
+            return isInEurope()
+                && !isOnCarrier()
+                && getOwner().getEurope().hasCarrierWithSpace(getSpaceTaken());
+        default:
+            throw new IllegalStateException("Bogus state: " + getState());
+        }
+        return false;
     }
 
 
