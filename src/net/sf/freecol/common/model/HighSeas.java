@@ -144,10 +144,6 @@ public class HighSeas extends UnitLocation {
     protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
-        // 0.10.x compatibility code
-        if(getGame() != null && getGame().getMap() != null)
-            addDestination((Location) getGame().getMap());
-        // end compatibility code
         for (Location destination : destinations) {
             if(destination != null) {
                 out.writeStartElement("destination");
