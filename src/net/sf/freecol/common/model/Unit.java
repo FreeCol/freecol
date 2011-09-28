@@ -2595,8 +2595,11 @@ public class Unit extends FreeColGameObject
             setMovesLeft(0);
         }
         
-        // if there are roles that require experience to be reset, do it here
-        //  horses, tools and muskets are currently exempt
+        // Check for role change for reseting the experience.
+        // Soldier and Dragoon are compatible, no loss of experience.
+        if (!role.isCompatibleWith(oldRole)) {
+            experience = 0;
+        }
     }
 
     /**
