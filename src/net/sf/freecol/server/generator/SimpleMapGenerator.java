@@ -20,6 +20,7 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -127,19 +128,29 @@ public class SimpleMapGenerator implements MapGenerator {
             / 100;
     }
 
-    /* (non-Javadoc)
+    /**
+     * Creates a map given for a game.
+     *
+     * @param game The <code>Game</code> to use.
      * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
      * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
      */
     public void createMap(Game game) throws FreeColException {
-
         // Prepare imports:
         final File importFile = ((FileOption) getMapGeneratorOptions()
-                                 .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
+            .getOption(MapGeneratorOptions.IMPORT_FILE)).getValue();
         final Game importGame;
         if (importFile != null) {
-            logger.info("Importing file " + importFile.getPath());
-            importGame = loadSaveGame(importFile);
+            Game g = null;
+            try {
+                logger.info("Importing file " + importFile.getPath());
+                g = FreeColServer
+                    .readGame(new FreeColSavegameFile(importFile),
+                        game.getSpecification(), null);
+            } catch (IOException ioe) {
+                g = null;
+            }
+            importGame = g;
         } else {
             importGame = null;
         }
@@ -182,84 +193,6 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     public void createEmptyMap(Game game, boolean[][] landMap) {
         terrainGenerator.createMap(game, null, landMap);
-    }
-
-
-    /**
-     * Loads a <code>Game</code> from the given <code>File</code>.
-     *
-     * @param importFile The <code>File</code> to be loading the
-     *      <code>Game</code> from.
-     * @return The <code>Game</code>.
-     */
-    private Game loadSaveGame(File importFile) throws FreeColException {
-        /*
-         * TODO-LATER: We are using same method in FreeColServer.
-         *       Create a framework for loading games/maps.
-         */
-        XMLStream xs = null;
-        Game game = null;
-        try {
-            final FreeColSavegameFile fis = new FreeColSavegameFile(importFile);
-            xs = FreeColServer.createXMLStreamReader(fis);
-            final XMLStreamReader xsr = xs.getXMLStreamReader();
-            xsr.nextTag();
-
-            int savegameVersion = FreeColServer.getSavegameVersion(xsr);
-            logger.info("Found savegame version " + savegameVersion);
-
-            ArrayList<String> serverObjects = null;
-            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (xsr.getLocalName().equals("serverObjects")) {
-                    serverObjects = new ArrayList<String>();
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverObjects.add(xsr.getLocalName());
-                        serverObjects.add(xsr.getAttributeValue(null,
-                                FreeColObject.ID_ATTRIBUTE));
-                        xsr.nextTag();
-                    }
-                } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
-                    // Read the game model:
-                    Specification specification = null;
-                    if (savegameVersion < 9) { // @obsolete?
-                        logger.info("Compatibility code: providing fresh specification.");
-                        specification = new FreeColTcFile("freecol").getSpecification();
-                    }
-                    game = new ServerGame(null, xsr, serverObjects, specification);
-                    if (savegameVersion < 9) { // @obsolete?
-                        logger.info("Compatibility code: applying difficulty level.");
-                        // Apply the difficulty level
-                        if (game.getDifficultyLevel() == null) {
-                            logger.fine("Difficulty level is null");
-                            game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
-                        } else {
-                            logger.fine("Difficulty level is " + game.getDifficultyLevel().getId());
-                            //game.getSpecification().applyDifficultyLevel(game.getDifficultyLevel());
-                        }
-                    }
-                    game.setCurrentPlayer(null);
-                    game.checkIntegrity();
-                }
-            }
-        } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new FreeColException(e.toString());
-        } catch (FreeColException fe) {
-            StringWriter sw = new StringWriter();
-            fe.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new FreeColException(fe.toString());
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new FreeColException(e.toString());
-        } finally {
-            if (xs != null) xs.close();
-        }
-        return game;
     }
 
     public LandGenerator getLandGenerator() {

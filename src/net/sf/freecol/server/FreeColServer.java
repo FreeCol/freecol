@@ -42,6 +42,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -145,7 +146,7 @@ public final class FreeColServer {
     /**
      * The oldest save game format that can still be loaded.
      */
-    public static final int MINIMUM_SAVEGAME_VERSION = 1;
+    public static final int MINIMUM_SAVEGAME_VERSION = 10;
 
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
@@ -311,8 +312,8 @@ public final class FreeColServer {
      * @exception FreeColException if the savegame could not be loaded.
      * @exception NoRouteToServerException if an error occurs
      */
-    public FreeColServer(final FreeColSavegameFile savegame, int port, String name,
-                         Specification specification)
+    public FreeColServer(final FreeColSavegameFile savegame, int port,
+                         String name, Specification specification)
         throws IOException, FreeColException, NoRouteToServerException {
         this.port = port;
         this.name = name;
@@ -331,7 +332,7 @@ public final class FreeColServer {
             throw e;
         }
         try {
-            owner = loadGame(savegame, specification);
+            loadGame(savegame, specification);
         } catch (FreeColException e) {
             server.shutdown();
             throw e;
@@ -442,6 +443,15 @@ public final class FreeColServer {
     }
 
     /**
+     * Sets the <code>Game</code> that is being played.
+     *
+     * @param game The new <code>Game</code>.
+     */
+    public void setGame(ServerGame game) {
+        this.game = game;
+    }
+
+    /**
      * Sets the main AI-object.
      *
      * @param aiMain The main AI-object which is responsible for controlling,
@@ -500,14 +510,23 @@ public final class FreeColServer {
     }
 
     /**
-     * Get the server-private random number generator.
+     * Gets the server random number generator.
      *
-     * @return The server-private random number generator.
+     * @return The server random number generator.
      */
     public Random getServerRandom() {
         return random;
     }
 
+    /**
+     * Sets the server random number generator.
+     *
+     * @param random The new random number generator.
+     */
+    public void setServerRandom(Random random) {
+        this.random = random;
+    }
+        
     /**
      * Gets the <code>MapGenerator</code> this <code>FreeColServer</code> is
      * using when creating random maps.
@@ -557,12 +576,19 @@ public final class FreeColServer {
     /**
      * Gets the owner of the <code>Game</code>.
      *
-     * @return The owner of the game. THis is the player that has loaded the
-     *         game (if any).
-     * @see #loadGame
+     * @return The owner of the game.
      */
     public String getOwner() {
         return owner;
+    }
+
+    /**
+     * Sets the owner of the game.
+     *
+     * @param owner The new owner of the game.
+     */
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     /**
@@ -581,6 +607,15 @@ public final class FreeColServer {
      */
     public void setActiveUnit(Unit unit) {
         activeUnit = unit;
+    }
+
+    /**
+     * Sets the public server.
+     *
+     * @param publicServer The new public server flag.
+     */
+    public void setPublicServer(boolean publicServer) {
+        this.publicServer = publicServer;
     }
 
     /**
@@ -865,47 +900,56 @@ public final class FreeColServer {
      *                parser.
      * @exception FreeColException if the savegame contains incompatible data.
      */
-    public String loadGame(final FreeColSavegameFile fis) throws IOException, FreeColException {
+    public Game loadGame(final FreeColSavegameFile fis)
+        throws IOException, FreeColException {
         return loadGame(fis, null);
     }
 
     /**
-     * Loads a game.
+     * Reads just the game part from a save game.
+     * This routine exists apart from loadGame so that the map generator
+     * can load the predefined maps.
      *
-     * @param fis The file where the game data is located.
-     * @param specification a <code>Specification</code> value
-     * @return The username of the player saving the game.
-     * @exception IOException If a problem was encountered while trying to open,
-     *             read or close the file.
-     * @exception FreeColException if the savegame contains incompatible data.
+     * @param fis The stream to read from.
+     * @param specification The <code>Specification</code> to use in the game.
+     * @param server Use this (optional) server to load into.
+     * @return The game found in the stream.
+     * @exception FreeColException if the format is incompatible.
+     * @exception IOException if there is a problem reading the stream.
      */
-    public String loadGame(final FreeColSavegameFile fis, Specification specification)
+    public static ServerGame readGame(final FreeColSavegameFile fis,
+                                      Specification specification,
+                                      FreeColServer server)
         throws IOException, FreeColException {
-        boolean doNotLoadAI = false;
+        final int savegameVersion = getSavegameVersion(fis);
+        ArrayList<String> serverStrings = null;
         XMLStream xs = null;
         try {
+            ServerGame game = null;
+            String active = null;
             xs = createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
 
-            int savegameVersion = getSavegameVersion(xsr);
             logger.info("Found savegame version " + savegameVersion);
-            singleplayer = FreeColObject.getAttribute(xsr, "singleplayer", true);
-            publicServer = FreeColObject.getAttribute(xsr, "publicServer", false);
 
-            String randomState = xsr.getAttributeValue(null, "randomState");
-            if (randomState != null && randomState.length() > 0) {
-                try {
-                    random = restoreRandomState(randomState);
-                } catch (IOException e) {
-                    logger.warning("Failed to restore random state, ignoring!");
+            if (server != null) {
+                server.setSingleplayer(FreeColObject.getAttribute(xsr,
+                        "singleplayer", true));
+                server.setPublicServer(FreeColObject.getAttribute(xsr,
+                        "publicServer", false));
+                String randomState = xsr.getAttributeValue(null, "randomState");
+                if (randomState != null && randomState.length() > 0) {
+                    try {
+                        server.setServerRandom(restoreRandomState(randomState));
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failed to restore random state!", e);
+                    }
                 }
+                server.setOwner(xsr.getAttributeValue(null, "owner"));
+                active = xsr.getAttributeValue(null, "activeUnit");
             }
-            final String owner = xsr.getAttributeValue(null, "owner");
-            final String active = xsr.getAttributeValue(null, "activeUnit");
 
-            ArrayList<String> serverStrings = null;
-            aiMain = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
                     serverStrings = new ArrayList<String>();
@@ -921,169 +965,160 @@ public final class FreeColServer {
                     }
                     // end compatibility code
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
-                    // @obsolete?
-                    if (savegameVersion < 9 && specification == null) {
-                        logger.info("Compatibility code: providing fresh specification.");
-                        specification = new FreeColTcFile("freecol").getSpecification();
-                    }
-
                     // Read the game
-                    game = new ServerGame(null, xsr, serverStrings, specification);
-
-                    // @obsolete?
-                    if (savegameVersion < 9) {
-                        logger.info("Compatibility code: applying difficulty level.");
-                        // Apply the difficulty level
-                        OptionGroup level = game.getDifficultyLevel();
-                        if (level == null) {
-                            try {
-                                int levelIndex = game.getSpecification().getInteger("model.option.difficulty");
-                                level = game.getSpecification().getDifficultyLevels().get(levelIndex);
-                            } catch(Exception e) {
-                                // no such setting
-                                level = game.getSpecification().getDifficultyLevel("model.difficulty.medium");
-                            }
-                        }
-                        logger.fine("Difficulty level is " + level.getId());
-                        game.getSpecification().applyDifficultyLevel(level);
-                    }
-
+                    game = new ServerGame(null, xsr, serverStrings,
+                        specification);
                     game.setCurrentPlayer(null);
-                    gameState = GameState.IN_GAME;
-                    integrity = game.checkIntegrity();
+                    if (server != null) server.setGame(game);
                 } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
-                    if (doNotLoadAI) {
-                        aiMain = new AIMain(this);
-                        game.setFreeColGameObjectListener(aiMain);
-                        break;
-                    }
-                    // Read the AIObjects:
-                    aiMain = new AIMain(this, xsr);
-                    if (!aiMain.checkIntegrity()) {
-                        aiMain = new AIMain(this);
-                        logger.info("Replacing AIMain.");
-                    }
-                    game.setFreeColGameObjectListener(aiMain);
+                    if (server == null) break;
+                    server.setAIMain(new AIMain(server, xsr));
                 } else {
-                    throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                    throw new XMLStreamException("Unknown tag: "
+                        + xsr.getLocalName());
                 }
             }
 
-            // @compat 0.10.x
-            if (savegameVersion < 12) {
-                for (Player p : game.getPlayers()) {
-                    if(!p.isIndian() && p.getEurope() != null) {
-                        p.initializeHighSeas();
-                        
-                        for (Unit u : p.getEurope().getUnitList()) {
-                            // move units to high seas
-                            // use setLocation() so that units are
-                            // removed from Europe, and appear in
-                            // correct panes in the EuropePanel do not
-                            // set the UnitState, as this clears
-                            // workLeft
-                            if (u.getState() == Unit.UnitState.TO_EUROPE) {
-                                logger.info("Found unit on way to europe: "+u.toString());
-                                u.setLocation(p.getHighSeas());
-                                u.setDestination(p.getEurope());
-                            } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
-                                logger.info("Found unit on way to new world: "+u.toString());
-                                u.setLocation(p.getHighSeas());
-                                u.setDestination(getGame().getMap());
-                            }
-                        }
-                    }
+            if (server != null && active != null && game != null) {
+                // Now units are all present, set active unit.
+                FreeColGameObject fcgo = game.getFreeColGameObjectSafely(active);
+                if (fcgo instanceof Unit) {
+                    server.setActiveUnit((Unit) fcgo);
                 }
             }
-            // end compatibility code
-
-            // @compat 0.10.x
-            for (Tile tile : game.getMap().getAllTiles()) {
-                TerrainGenerator.encodeStyle(tile);
-            }
-            // end compatibility code
-            
-            Collections.sort(game.getPlayers(), Player.playerComparator);
-            if (aiMain == null) {
-                aiMain = new AIMain(this);
-                game.setFreeColGameObjectListener(aiMain);
-            }
-            // Connect the AI-players:
-            Iterator<Player> playerIterator = game.getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                ServerPlayer player = (ServerPlayer) playerIterator.next();
-                if (player.isAI()) {
-                    DummyConnection theConnection
-                        = new DummyConnection("Server-Server-" + player.getName(),
-                            getInGameInputHandler());
-                    DummyConnection aiConnection
-                        = new DummyConnection("Server-AI-" + player.getName(),
-                            new AIInGameInputHandler(this, player, aiMain));
-                    aiConnection.setOutgoingMessageHandler(theConnection);
-                    theConnection.setOutgoingMessageHandler(aiConnection);
-                    getServer().addDummyConnection(theConnection);
-                    player.setConnection(theConnection);
-                    player.setConnected(true);
-                }
-            }
-            xs.close();
-
-            fixGameOptions();
-
-            // @compat 0.9.x
-            if (savegameVersion < 11) {
-                for (Tile t : game.getMap().getAllTiles()) t.fixup09x();
-            }
-            // end compatibility code
-
-            // Now units are all present, set active unit.
-            setActiveUnit((active == null || game == null) ? null
-                          : (Unit) game.getFreeColGameObjectSafely(active));
-
-            // Later, we might want to modify loaded savegames:
-            return owner;
-        } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
-        } catch (FreeColException fe) {
-            StringWriter sw = new StringWriter();
-            fe.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw fe;
+            return game;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             throw new IOException(e.toString());
         } finally {
-            xs.close();
+            if (xs != null) xs.close();
         }
+    }
+
+    /**
+     * Loads a game.
+     *
+     * @param fis The file where the game data is located.
+     * @param specification a <code>Specification</code> value
+     * @return The new game.
+     * @exception FreeColException if the savegame contains incompatible data.
+     * @exception IOException if there is problem reading a stream.
+     */
+    public Game loadGame(final FreeColSavegameFile fis,
+                         Specification specification)
+        throws FreeColException, IOException {
+
+        ServerGame game = readGame(fis, specification, this);
+        gameState = GameState.IN_GAME;
+        integrity = game.checkIntegrity();
+
+        int savegameVersion = getSavegameVersion(fis);
+        // @compat 0.10.x
+        if (savegameVersion < 12) {
+            for (Player p : game.getPlayers()) {
+                if(!p.isIndian() && p.getEurope() != null) {
+                    p.initializeHighSeas();
+                    
+                    for (Unit u : p.getEurope().getUnitList()) {
+                        // move units to high seas use setLocation()
+                        // so that units are removed from Europe, and
+                        // appear in correct panes in the EuropePanel
+                        // do not set the UnitState, as this clears
+                        // workLeft
+                        if (u.getState() == Unit.UnitState.TO_EUROPE) {
+                            logger.info("Found unit on way to europe: "
+                                + u.toString());
+                            u.setLocation(p.getHighSeas());
+                            u.setDestination(p.getEurope());
+                        } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
+                            logger.info("Found unit on way to new world: "
+                                + u.toString());
+                            u.setLocation(p.getHighSeas());
+                            u.setDestination(getGame().getMap());
+                        }
+                    }
+                }
+            }
+
+            for (Tile tile : game.getMap().getAllTiles()) {
+                TerrainGenerator.encodeStyle(tile);
+            }
+        }
+        // end compatibility code
+        
+        // @compat 0.9.x, 0.10.x
+        fixGameOptions();
+        // end compatibility code
+
+        // @compat 0.9.x
+        if (savegameVersion < 11) {
+            for (Tile t : game.getMap().getAllTiles()) t.fixup09x();
+        }
+        // end compatibility code
+
+        // AI initialization.
+        AIMain aiMain = getAIMain();
+        if (!aiMain.checkIntegrity()) {
+            aiMain = new AIMain(this);
+            logger.info("Replacing AIMain.");
+        }
+        game.setFreeColGameObjectListener(aiMain);
+
+        Collections.sort(game.getPlayers(), Player.playerComparator);
+        for (Player player : game.getPlayers()) {
+            if (player.isAI()) {
+                ServerPlayer serverPlayer = (ServerPlayer) player;
+                DummyConnection theConnection
+                    = new DummyConnection("Server-Server-" + player.getName(),
+                        getInGameInputHandler());
+                DummyConnection aiConnection
+                    = new DummyConnection("Server-AI-" + player.getName(),
+                        new AIInGameInputHandler(this, serverPlayer, aiMain));
+                aiConnection.setOutgoingMessageHandler(theConnection);
+                theConnection.setOutgoingMessageHandler(aiConnection);
+                getServer().addDummyConnection(theConnection);
+                serverPlayer.setConnection(theConnection);
+                serverPlayer.setConnected(true);
+            }
+        }
+
+        return game;
     }
 
     /**
      * Gets the save game version from a saved game.
      *
-     * @param xsr A stream to read the game from.
+     * @param fis The saved game.
      * @return The saved game version.
      * @exception FreeColException if the version is incompatible.
      */
-    public static int getSavegameVersion(final XMLStreamReader xsr)
+    private static int getSavegameVersion(final FreeColSavegameFile fis)
         throws FreeColException {
-        final String version = xsr.getAttributeValue(null, "version");
-        int savegameVersion = 0;
+        XMLStream xs = null;
         try {
-            savegameVersion = Integer.parseInt(version);
-        } catch(Exception e) {
-            throw new FreeColException("incompatibleVersions");
-        }
-        if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-            throw new FreeColException("incompatibleVersions");
-        }
-        return savegameVersion;
-    }
+            xs = createXMLStreamReader(fis);
+            final XMLStreamReader xsr = xs.getXMLStreamReader();
+            xsr.nextTag();
 
+            final String version = xsr.getAttributeValue(null, "version");
+            int savegameVersion = 0;
+            try {
+                savegameVersion = Integer.parseInt(version);
+            } catch (Exception e) {
+                throw new FreeColException("incompatibleVersions");
+            }
+            if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
+                throw new FreeColException("incompatibleVersions");
+            }
+            return savegameVersion;
+        } catch (Exception e) {
+            throw new FreeColException(e.toString());
+        } finally {
+            if (xs != null) xs.close();
+        }
+    }
 
     // @compat 0.9.x, 0.10.x
     private void fixGameOptions() {
@@ -1584,7 +1619,7 @@ public final class FreeColServer {
      * @param random The <code>Random</code> to use.
      * @return A <code>String</code> encapsulating the object state.
      */
-    public synchronized String getRandomState(Random random) {
+    public static synchronized String getRandomState(Random random) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -1609,7 +1644,7 @@ public final class FreeColServer {
      * @return The restored <code>Random</code>.
      * @throws IOException if unable to restore state.
      */
-    public synchronized Random restoreRandomState(String state)
+    public static synchronized Random restoreRandomState(String state)
         throws IOException {
         byte[] bytes = new byte[state.length() / 2];
         int pos = 0;
