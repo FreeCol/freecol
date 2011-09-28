@@ -344,20 +344,20 @@ public abstract class Feature extends FreeColObject {
     protected void readAttributes(XMLStreamReader in,
                                   Specification specification)
         throws XMLStreamException {
-        // TODO: remove this backward compatibility for < 0.10.x games
+        // @compat 0.9.x
         if (in.getAttributeValue(null, ID_ATTRIBUTE_TAG) == null
             && "model.colony.colonyGoodsParty".equals(in.getAttributeValue(null, "source"))) {
             setId("model.modifier.colonyGoodsParty");
             setSource(specification.getType("model.source.colonyGoodsParty"));
+        // end compatibility code
         } else {
-            // This is the proper code
             super.readAttributes(in, specification);
             String sourceId = in.getAttributeValue(null, "source");
             if (sourceId == null) {
                 setSource(null);
-            } else if (sourceId.equals("model.monarch.colonyGoodsParty")) {
-                // TODO: remove this backward compatibility for < 0.10.x games.
+            } else if (sourceId.equals("model.monarch.colonyGoodsParty")) { // @compat 0.9.x
                 setSource(specification.getType("model.source.colonyGoodsParty"));
+            // end compatibility code
             } else if (specification != null) {
                 setSource(specification.getType(sourceId));
             }

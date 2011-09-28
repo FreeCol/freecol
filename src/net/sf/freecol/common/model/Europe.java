@@ -422,7 +422,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
         Specification spec = getSpecification();
 
-        // TODO: remove 0.10.0 compatibility code
+        // @compat 0.10.0
         if (featureContainer == null) {
             featureContainer = new FeatureContainer();
             featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
@@ -447,20 +447,20 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-            // TODO: remove 0.10.1 compatibility code
             Unit unit;
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                     unit = updateFreeColGameObject(in, Unit.class);
+                    // @compat 0.10.1
                     if (unit.getLocation() == null) {
                         // sometimes units in a Europe element have a missing
                         //  location. it should always be this Europe instance.
                         unit.setLocationNoUpdate(this);
                     }
+                    // end compatibility code
                     add(unit);
                 }
             }
-            // end TODO
         } else if (in.getLocalName().equals("unitPrice")) {
             String unitTypeId = in.getAttributeValue(null, "unitType");
             Integer price = new Integer(in.getAttributeValue(null, "price"));

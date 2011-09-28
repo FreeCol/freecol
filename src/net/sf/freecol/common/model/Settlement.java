@@ -569,18 +569,17 @@ abstract public class Settlement extends GoodsLocation
         tile = getFreeColGameObject(in, "tile", Tile.class);
         featureContainer = new FeatureContainer();
 
-        // TODO: remove 0.9.x compatibility code
+        // @compat 0.9.x
         String typeStr = in.getAttributeValue(null, "settlementType");
         SettlementType settlementType;
         if (typeStr == null) {
-            // must be old style
             String capital = in.getAttributeValue(null, "isCapital");
             settlementType = owner.getNationType()
                 .getSettlementType("true".equals(capital));
+        // end compatibility code
         } else {
             settlementType = owner.getNationType().getSettlementType(typeStr);
         }
-        // end compatibility code
         setType(settlementType);
     }
 

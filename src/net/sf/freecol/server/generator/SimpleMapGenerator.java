@@ -221,13 +221,12 @@ public class SimpleMapGenerator implements MapGenerator {
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
                     Specification specification = null;
-                    if (savegameVersion < 9) {
-                        // compatibility code
+                    if (savegameVersion < 9) { // @obsolete?
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
                     game = new ServerGame(null, xsr, serverObjects, specification);
-                    if (savegameVersion < 9) {
+                    if (savegameVersion < 9) { // @obsolete?
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
                         if (game.getDifficultyLevel() == null) {

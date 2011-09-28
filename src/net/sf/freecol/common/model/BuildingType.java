@@ -342,8 +342,9 @@ public final class BuildingType extends BuildableType
     }
 
     /**
-     * 0.9.x compatibility hack, called from the specification reader
-     * when it is finishing up.
+     * Compatibility hack, called from the specification reader when
+     * it is finishing up.
+     * @compat 0.9.x
      */
     public void fixup09x() {
         try {

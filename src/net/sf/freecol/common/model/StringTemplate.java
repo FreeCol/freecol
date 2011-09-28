@@ -503,7 +503,7 @@ public class StringTemplate extends FreeColObject {
     @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        // TODO: remove compatibility code
+        // @compat 0.10.x
         String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id == null) {
             id = in.getAttributeValue(null, ID_ATTRIBUTE);
@@ -542,11 +542,10 @@ public class StringTemplate extends FreeColObject {
                 StringTemplate replacement = new StringTemplate();
                 replacement.readFromXMLImpl(in);
                 replacements.add(replacement);
-            } else if ("data".equals(in.getLocalName())) {
-                // TODO: remove compatibility code for ModelMessage
+            } else if ("data".equals(in.getLocalName())) { // @compat 0.9.x
                 readOldFormat(readFromArrayElement("data", in, new String[0]));
                 // end compatibility code
-            } else if ("strings".equals(in.getLocalName())) {
+            } else if ("strings".equals(in.getLocalName())) { // @compat 0.9.x
                 // TODO: remove compatibility code for HistoryEvent
                 readOldFormat(readFromArrayElement("strings", in, new String[0]));
                 // end compatibility code
@@ -554,13 +553,14 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-    // TODO: remove compatibility code
+    // @compat 0.9.x
     private void readOldFormat(String[] data) {
         for (int index = 0; index < data.length; index += 2) {
             keys.add(data[index]);
             replacements.add(new StringTemplate(data[index + 1], TemplateType.NAME));
         }
     }
+    // end compatibility code
 
     /**
      * Returns the tag name of the root element representing this object.

@@ -3422,8 +3422,9 @@ public class Player extends FreeColGameObject implements Nameable {
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
 
-        // 0.9.x compatibility, no longer actually used
+        // @compat 0.9.x
         out.writeAttribute("numberOfSettlements", Integer.toString(getNumberOfSettlements()));
+        // end compatibility code
 
         if (showAll || toSavedGame || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));

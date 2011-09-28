@@ -372,8 +372,9 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * 0.9.x compatibility hack, called from the specification when it is
+     * Compatibility hack, called from the specification when it is
      * finishing up.
+     * @compat 0.9.x
      */
     public void fixup09x() {
         try {

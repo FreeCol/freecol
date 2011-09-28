@@ -494,10 +494,9 @@ public class AIMain extends FreeColObject
                             in.nextTag();
                         }
                     }
-                } else if (tagName.equals("colonialAIPlayer")) {
-                    // TODO: remove 0.10.1 compatibility code
+                } else if (tagName.equals("colonialAIPlayer")) { // @compat 0.10.1
                     new EuropeanAIPlayer(this, in);
-                    // end TODO
+                // end compatibility code
                 } else if (tagName.equals(AIColony.getXMLElementTagName())) {
                     new AIColony(this, in);
                 } else if (tagName.equals(AIGoods.getXMLElementTagName())) {

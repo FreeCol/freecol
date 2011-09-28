@@ -84,10 +84,10 @@ public class Unit extends FreeColGameObject
         SENTRY,
         IN_COLONY,
         IMPROVING,
-        // TODO: remove 0.10.0 compatibilty code
+        // @compat 0.10.0
         TO_EUROPE,
         TO_AMERICA,
-        // end TODO
+        // end compatibility code
         FORTIFYING,
         SKIPPED
     }
@@ -3502,7 +3502,7 @@ public class Unit extends FreeColGameObject
             experienceType = workType;
         }
 
-        // compatibility code
+        // @compat 0.9.x
         try {
             // this is likely to cause an exception, as the
             // specification might not define grain
@@ -3518,7 +3518,6 @@ public class Unit extends FreeColGameObject
             logger.log(Level.FINEST, "Failed to update food to grain.", e);
         }
         // end compatibility code
-        
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
@@ -3550,14 +3549,13 @@ public class Unit extends FreeColGameObject
                     String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));
                     equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), count);
-                } else {
-                    // for backwards compatibility
+                } else { // @compat 0.9.x
                     int length = Integer.parseInt(xLength);
                     for (int index = 0; index < length; index++) {
                         String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
                         equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), 1);
                     }
-                }
+                } // end compatibility code
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));

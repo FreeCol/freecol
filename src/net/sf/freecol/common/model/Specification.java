@@ -510,9 +510,9 @@ public final class Specification {
                 logger.warning(Id + " caused ClassCastException!");
                 throw(cce);
             }
-        } else if (allTypes.containsKey(mangle(Id))) {
-            // TODO: remove 0.9.x compatibility code
+        } else if (allTypes.containsKey(mangle(Id))) { // @compat 0.9.x
             return type.cast(allTypes.get(mangle(Id)));
+            // end compatibility code
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FreeColGameObjectType" + " with ID '" + Id + "'.");
         } else {
@@ -529,7 +529,7 @@ public final class Specification {
         }
     }
 
-    // TODO: remove compatibility code
+    // @compat 0.9.x
     private String mangle(String id) {
         int index = id.lastIndexOf('.');
         if (index == -1) {
@@ -539,6 +539,7 @@ public final class Specification {
                 + id.substring(index + 2);
         }
     }
+    // end compatibility code
 
     public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
         return getType(Id, FreeColGameObjectType.class);
@@ -1211,8 +1212,8 @@ public final class Specification {
             logger.finest("Found child named " + childName);
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
+                // @compat 0.9.x
                 if ("improvementaction-types".equals(childName)) {
-                    // TODO: remove compatibility code after 0.10.0
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         // skip children
                         while ("action".equals(xsr.getLocalName())) {
@@ -1222,6 +1223,7 @@ public final class Specification {
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
                 }
+                // end compatibility code
             } else {
                 reader.readChildren(xsr, this);
             }
@@ -1230,7 +1232,7 @@ public final class Specification {
             applyDifficultyLevel(difficultyLevel);
         }
 
-        // TODO: 0.9.x compatibility hack post-0.10
+        // @compat 0.9.x
         for (BuildingType bt : getBuildingTypeList()) {
             bt.fixup09x();
         }
@@ -1239,9 +1241,9 @@ public final class Specification {
                 ff.fixup09x();
             }
         }
-        // end TODO
+        // end compatibility code
 
-        // TODO: remove 0.10.1 compatibility code
+        // @compat 0.10.1
         String[] years = new String[] {
             "startingYear", "seasonYear", "mandatoryColonyYear",
             "lastYear", "lastColonialYear"
@@ -1255,7 +1257,7 @@ public final class Specification {
                 allOptions.put(id, option);
             }
         }
-        // end TODO
+        // end compatibility code
 
         initialized = true;
     }

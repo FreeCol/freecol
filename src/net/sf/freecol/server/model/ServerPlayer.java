@@ -3248,14 +3248,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Modifier template;
             if (modifiers != null && !modifiers.isEmpty()) {
                 template = modifiers.get(0);
-            } else {
-                // TODO: remove this backward compatibility hack for
-                // the < 0.10.x format.
+            } else { // @compat 0.9.x
                 template = new Modifier("model.modifier.colonyGoodsParty",
                     Specification.COLONY_GOODS_PARTY_SOURCE,
                     50, Modifier.Type.PERCENTAGE);
                 template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
-            }
+            } // end compatibility code
             colony.getFeatureContainer()
                 .addModifier(Modifier.makeTimedModifier("model.goods.bells",
                         template, turn));

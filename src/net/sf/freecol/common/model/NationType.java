@@ -84,7 +84,8 @@ public abstract class NationType extends FreeColGameObjectType {
                 return settlementType;
             }
         }
-        // TODO: remove 0.9.x compatibility code and throw exception instead
+        // @compat 0.9.x
+        // TODO: remove compatibility code and throw exception instead
         String id = "model.settlement." + getId().substring(getId().lastIndexOf(".") + 1)
             + (isCapital ? ".capital" : "");
         SettlementType type = new SettlementType(id, getSpecification());

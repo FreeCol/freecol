@@ -383,11 +383,9 @@ public class ClientOptions extends OptionGroup {
             if (s1.getEstablished().getNumber() > 0
                 && s2.getEstablished().getNumber() > 0) {
                 return s1.getEstablished().getNumber() - s2.getEstablished().getNumber();
-            } else {
-                // TODO: remove 0.9.x compatibility code
-                // ID should indicate age
+            } else { // @compat 0.9.x
                 return s1.getIntegerID().compareTo(s2.getIntegerID());
-            }
+            } // end compatibility code
         }
     };
 
@@ -746,19 +744,16 @@ public class ClientOptions extends OptionGroup {
      * can clean these up as they become standard.
      */
     public void fixClientOptions() {
-        // Introduced: 0.10.0, remove when 0.9.x is obsolete
+        // @compat 0.9.x
         addBooleanOption("model.option.guiShowDemands",
             "clientOptions.messages", true);
-        // Introduced: 0.10.0, remove when 0.9.x is obsolete
         addBooleanOption("model.option.guiShowGifts",
             "clientOptions.messages", true);
-        // Introduced: 0.10.0, remove when 0.9.x is obsolete
         addBooleanOption("model.option.guiShowGoodsMovement",
             "clientOptions.messages", true);
-        // Introduced: 0.10.1, remove when 0.9.x is obsolete
+        // @compat 0.10.1
         addIntegerOption(COLONY_REPORT,
             "clientOptions.messages", 0);
-        // Introduced: 0.10.1, remove when 0.9.x is obsolete
         addBooleanOption(USE_PIXMAPS,
             "clientOptions.gui", true);
     }

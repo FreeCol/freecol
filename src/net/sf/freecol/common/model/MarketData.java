@@ -462,10 +462,10 @@ public class MarketData extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         String goodsTypeStr = in.getAttributeValue(null, "goods-type");
-        if (goodsTypeStr == null) {
-            // TODO: backward compatibility, remove in 0.11.x
+        if (goodsTypeStr == null) { // @compat 0.9.x
             goodsTypeStr = in.getAttributeValue(null, ID_ATTRIBUTE);
             setDefaultId(getGame());
+            // end compatibility code
         } else {
             setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         }

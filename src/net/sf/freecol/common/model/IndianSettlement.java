@@ -1295,8 +1295,7 @@ public class IndianSettlement extends Settlement {
             in.nextTag();
             missionary = updateFreeColGameObject(in, Unit.class);
             in.nextTag();
-        } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
-            // TODO: remove 0.10.1 compatibility code
+        } else if (UNITS_TAG_NAME.equals(in.getLocalName())) { // @compat 0.10.1
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                     Unit unit = updateFreeColGameObject(in, Unit.class);
@@ -1307,7 +1306,7 @@ public class IndianSettlement extends Settlement {
                     add(unit);
                 }
             }
-            // end TODO
+            // end compatibility code
         } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
             Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
             if (unit.getOwner() != null && unit.getOwner() != owner) {

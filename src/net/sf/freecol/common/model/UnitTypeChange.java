@@ -235,8 +235,8 @@ public class UnitTypeChange extends FreeColObject {
             if (turnsToLearn > 0) {
                 changeTypes.put(ChangeType.EDUCATION, 100);
             }
+            // @compat 0.9.x
             for (ChangeType type : ChangeType.values()) {
-                // TODO: remove 0.9.x compatibility code
                 String value = in.getAttributeValue(null, tags.get(type));
                 if (value != null) {
                     if(value.equalsIgnoreCase("false")) {
@@ -248,8 +248,8 @@ public class UnitTypeChange extends FreeColObject {
                                 Math.min(100, new Integer(value))));
                     }
                 }
-                // end compatibility code
             }
+            // end compatibility code
         }
     }
 

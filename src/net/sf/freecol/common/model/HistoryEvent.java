@@ -198,7 +198,7 @@ public class HistoryEvent extends StringTemplate {
 
         turn = new Turn(Integer.parseInt(in.getAttributeValue(null, "turn")));
         String eventString = in.getAttributeValue(null, "eventType");
-        // TODO: remove compatibility code
+        // @compat 0.9.x
         if (eventString == null) {
             eventString = in.getAttributeValue(null, "type");
         }

@@ -1905,14 +1905,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             settlement = updateFreeColGameObject(in, Colony.class);
         } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
             settlement = updateFreeColGameObject(in, IndianSettlement.class);
-        } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-            // TODO: remove 0.10.1 compatibility code
+        } else if (in.getLocalName().equals(UNITS_TAG_NAME)) { // @compat 0.10.1
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                     add(updateFreeColGameObject(in, Unit.class));
                 }
             }
-            // end TODO
+            // end compatibility code
         } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
             tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
             if (tileItemContainer != null) {

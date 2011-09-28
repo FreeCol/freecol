@@ -2569,7 +2569,7 @@ public class Colony extends Settlement implements Nameable {
                 super.readChild(in);
             }
         }
-        // TODO: remove 0.9.x compatibility code
+        // @compat 0.9.x
         if (populationQueue.isEmpty()) {
             for (UnitType unitType : getSpecification().getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
                 GoodsType food = getSpecification().getGoodsType("model.goods.food");
@@ -2588,7 +2588,7 @@ public class Colony extends Settlement implements Nameable {
                 populationQueue.add(unitType);
             }
         }
-        // end TODO
+        // end compatibility code
     }
 
     /**

@@ -128,8 +128,17 @@ public final class FreeColServer {
     private static final int NUMBER_OF_HIGH_SCORES = 10;
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
+    /** Hex constant digits for get/restoreRandomState. */
+    private static final String HEX_DIGITS = "0123456789ABCDEF";
+
     /**
      * The save game format used for saving games.
+     *
+     * Version 10 was used in 0.9.x.
+     * Version 11 was new in 0.10.0.
+     * Version 12 was introduced with HighSeas post-0.10.1.
+     *
+     * Please add to this comment if you increase the version.
      */
     public static final int SAVEGAME_VERSION = 12;
 
@@ -190,13 +199,13 @@ public final class FreeColServer {
      */
     private List<HighScore> highScores = null;
 
-
     public static final Comparator<HighScore> highScoreComparator
         = new Comparator<HighScore>() {
         public int compare(HighScore score1, HighScore score2) {
             return score2.getScore() - score1.getScore();
         }
     };
+
 
     /**
      * Starts a new server in a specified mode and with a specified port.
@@ -243,7 +252,10 @@ public final class FreeColServer {
 
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification, advantages));
+        // @compat 0.9.x, 0.10.x
         fixGameOptions();
+        // end compatibility code
+
         mapGenerator = new SimpleMapGenerator(random, specification);
 
         try {
@@ -340,29 +352,160 @@ public final class FreeColServer {
         TransactionSession.clearAll();
     }
 
+    /**
+     * Sets the mode of the game: singleplayer/multiplayer.
+     *
+     * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
+     *            multiplayer (if <i>false</i>).
+     */
+    public void setSingleplayer(boolean singleplayer) {
+        this.singleplayer = singleplayer;
+    }
+
+    /**
+     * Checks if the user is playing in singleplayer mode.
+     *
+     * @return <i>true</i> if the user is playing in singleplayer mode,
+     *         <i>false</i> otherwise.
+     */
+    public boolean isSingleplayer() {
+        return singleplayer;
+    }
+
+    /**
+     * Gets the specification from the game run by this server.
+     *
+     * @return The specification from the game.
+     */
     public Specification getSpecification() {
         return game.getSpecification();
     }
 
     /**
-     * Starts the metaserver update thread if <code>publicServer == true</code>.
+     * Gets the <code>UserConnectionHandler</code>.
      *
-     * This update is really a "Hi! I am still here!"-message, since an
-     * additional update should be sent when a new player is added to/removed
-     * from this server etc.
+     * @return The <code>UserConnectionHandler</code> that is beeing used when
+     *         new client connect.
      */
-    public void startMetaServerUpdateThread() {
-        if (!publicServer) {
-            return;
+    public UserConnectionHandler getUserConnectionHandler() {
+        return userConnectionHandler;
+    }
+
+    /**
+     * Gets the <code>Controller</code>.
+     *
+     * @return The <code>Controller</code>.
+     */
+    public Controller getController() {
+        if (getGameState() == GameState.IN_GAME) {
+            return inGameController;
+        } else {
+            return preGameController;
         }
-        Timer t = new Timer(true);
-        t.scheduleAtFixedRate(new TimerTask() {
-                public void run() {
-                    try {
-                        updateMetaServer();
-                    } catch (NoRouteToServerException e) {}
-                }
-            }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
+    }
+
+    /**
+     * Gets the <code>PreGameInputHandler</code>.
+     *
+     * @return The <code>PreGameInputHandler</code>.
+     */
+    public PreGameInputHandler getPreGameInputHandler() {
+        return preGameInputHandler;
+    }
+
+    /**
+     * Gets the <code>InGameInputHandler</code>.
+     *
+     * @return The <code>InGameInputHandler</code>.
+     */
+    public InGameInputHandler getInGameInputHandler() {
+        return inGameInputHandler;
+    }
+
+    /**
+     * Gets the controller being used while the game is running.
+     *
+     * @return The controller from making a new turn etc.
+     */
+    public InGameController getInGameController() {
+        return inGameController;
+    }
+
+    /**
+     * Gets the <code>Game</code> that is being played.
+     *
+     * @return The <code>Game</code> which is the main class of the game-model
+     *         being used in this game.
+     */
+    public ServerGame getGame() {
+        return game;
+    }
+
+    /**
+     * Sets the main AI-object.
+     *
+     * @param aiMain The main AI-object which is responsible for controlling,
+     *            updating and saving the AI objects.
+     */
+    public void setAIMain(AIMain aiMain) {
+        this.aiMain = aiMain;
+    }
+
+    /**
+     * Gets the main AI-object.
+     *
+     * @return The main AI-object which is responsible for controlling, updating
+     *         and saving the AI objects.
+     */
+    public AIMain getAIMain() {
+        return aiMain;
+    }
+
+    /**
+     * Gets the current state of the game.
+     *
+     * @return One of: {@link GameState#STARTING_GAME}, {@link GameState#IN_GAME} and
+     *         {@link GameState#ENDING_GAME}.
+     */
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    /**
+     * Sets the current state of the game.
+     *
+     * @param state The new state to be set. One of: {@link GameState#STARTING_GAME},
+     *            {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
+     */
+    public void setGameState(GameState state) {
+        gameState = state;
+    }
+
+    /**
+     * Gets the network server responsible of handling the connections.
+     *
+     * @return The network server.
+     */
+    public Server getServer() {
+        return server;
+    }
+
+    /**
+     * Gets the integrity check result.
+     *
+     * @return The integrity check result.
+     */
+    public boolean getIntegrity() {
+        return integrity;
+    }
+
+    /**
+     * Get the server-private random number generator.
+     *
+     * @return The server-private random number generator.
+     */
+    public Random getServerRandom() {
+        return random;
     }
 
     /**
@@ -409,6 +552,56 @@ public final class FreeColServer {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Gets the owner of the <code>Game</code>.
+     *
+     * @return The owner of the game. THis is the player that has loaded the
+     *         game (if any).
+     * @see #loadGame
+     */
+    public String getOwner() {
+        return owner;
+    }
+
+    /**
+     * Gets the active unit specified in a saved game, if any.
+     *
+     * @return The active unit.
+     */
+    public Unit getActiveUnit() {
+        return activeUnit;
+    }
+
+    /**
+     * Gets the active unit specified in a saved game, if any.
+     *
+     * @param unit The active unit to save.
+     */
+    public void setActiveUnit(Unit unit) {
+        activeUnit = unit;
+    }
+
+    /**
+     * Starts the metaserver update thread if <code>publicServer == true</code>.
+     *
+     * This update is really a "Hi! I am still here!"-message, since an
+     * additional update should be sent when a new player is added to/removed
+     * from this server etc.
+     */
+    public void startMetaServerUpdateThread() {
+        if (!publicServer) {
+            return;
+        }
+        Timer t = new Timer(true);
+        t.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    try {
+                        updateMetaServer();
+                    } catch (NoRouteToServerException e) {}
+                }
+            }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
     }
 
     /**
@@ -538,17 +731,6 @@ public final class FreeColServer {
             }
         }
         return n;
-    }
-
-    /**
-     * Gets the owner of the <code>Game</code>.
-     *
-     * @return The owner of the game. THis is the player that has loaded the
-     *         game (if any).
-     * @see #loadGame
-     */
-    public String getOwner() {
-        return owner;
     }
 
     /**
@@ -733,17 +915,22 @@ public final class FreeColServer {
                                 FreeColObject.ID_ATTRIBUTE));
                         xsr.nextTag();
                     }
+                    // @compat 0.9.x
                     if (savegameVersion < 11) {
-                        // version 11 is new in 0.10.0
                         v11FixServerObjects(serverStrings, fis);
                     }
+                    // end compatibility code
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
-                    // Read the game model:
+                    // @obsolete?
                     if (savegameVersion < 9 && specification == null) {
                         logger.info("Compatibility code: providing fresh specification.");
                         specification = new FreeColTcFile("freecol").getSpecification();
                     }
+
+                    // Read the game
                     game = new ServerGame(null, xsr, serverStrings, specification);
+
+                    // @obsolete?
                     if (savegameVersion < 9) {
                         logger.info("Compatibility code: applying difficulty level.");
                         // Apply the difficulty level
@@ -760,6 +947,7 @@ public final class FreeColServer {
                         logger.fine("Difficulty level is " + level.getId());
                         game.getSpecification().applyDifficultyLevel(level);
                     }
+
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;
                     integrity = game.checkIntegrity();
@@ -781,17 +969,19 @@ public final class FreeColServer {
                 }
             }
 
+            // @compat 0.10.x
             if (savegameVersion < 12) {
-                // version 12 introduced with HighSeas (post-0.10.1).
                 for (Player p : game.getPlayers()) {
                     if(!p.isIndian() && p.getEurope() != null) {
                         p.initializeHighSeas();
                         
                         for (Unit u : p.getEurope().getUnitList()) {
                             // move units to high seas
-                            //  use setLocation() so that units are removed from Europe,
-                            //  and appear in correct panes in the EuropePanel
-                            //  do not set the UnitState, as this clears workLeft
+                            // use setLocation() so that units are
+                            // removed from Europe, and appear in
+                            // correct panes in the EuropePanel do not
+                            // set the UnitState, as this clears
+                            // workLeft
                             if (u.getState() == Unit.UnitState.TO_EUROPE) {
                                 logger.info("Found unit on way to europe: "+u.toString());
                                 u.setLocation(p.getHighSeas());
@@ -805,8 +995,9 @@ public final class FreeColServer {
                     }
                 }
             }
+            // end compatibility code
 
-            // compatibility code
+            // @compat 0.10.x
             for (Tile tile : game.getMap().getAllTiles()) {
                 TerrainGenerator.encodeStyle(tile);
             }
@@ -839,9 +1030,11 @@ public final class FreeColServer {
 
             fixGameOptions();
 
+            // @compat 0.9.x
             if (savegameVersion < 11) {
                 for (Tile t : game.getMap().getAllTiles()) t.fixup09x();
             }
+            // end compatibility code
 
             // Now units are all present, set active unit.
             setActiveUnit((active == null || game == null) ? null
@@ -869,12 +1062,37 @@ public final class FreeColServer {
         }
     }
 
+    /**
+     * Gets the save game version from a saved game.
+     *
+     * @param xsr A stream to read the game from.
+     * @return The saved game version.
+     * @exception FreeColException if the version is incompatible.
+     */
+    public static int getSavegameVersion(final XMLStreamReader xsr)
+        throws FreeColException {
+        final String version = xsr.getAttributeValue(null, "version");
+        int savegameVersion = 0;
+        try {
+            savegameVersion = Integer.parseInt(version);
+        } catch(Exception e) {
+            throw new FreeColException("incompatibleVersions");
+        }
+        if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
+            throw new FreeColException("incompatibleVersions");
+        }
+        return savegameVersion;
+    }
+
+
+    // @compat 0.9.x, 0.10.x
     private void fixGameOptions() {
         // Add a default value for options new to each version
         // that are not part of the difficulty settings.
         // Annotate with save format version where introduced
         Specification spec = game.getSpecification();
 
+        // @compat 0.9.x
         // Introduced: SAVEGAME_VERSION == 11
         addIntegerOption("model.option.monarchSupport", "", 2);
         // Introduced: SAVEGAME_VERSION == 11
@@ -892,6 +1110,8 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 11
         addBooleanOption("model.option.settlementActionsContactChief",
             "gameOptions.map", false);
+
+        // @compat 0.10.x
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption("model.option.enhancedMissionaries",
             "gameOptions.map", false);
@@ -948,20 +1168,7 @@ public final class FreeColServer {
             spec.addAbstractOption(op);
         }
     }
-
-    public static int getSavegameVersion(final XMLStreamReader xsr) throws FreeColException {
-        final String version = xsr.getAttributeValue(null, "version");
-        int savegameVersion = 0;
-        try {
-            savegameVersion = Integer.parseInt(version);
-        } catch(Exception e) {
-            throw new FreeColException("incompatibleVersions");
-        }
-        if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-            throw new FreeColException("incompatibleVersions");
-        }
-        return savegameVersion;
-    }
+    // end compatibility code
 
 
     /**
@@ -972,6 +1179,7 @@ public final class FreeColServer {
      *
      * @param serverStrings A list of server object {type, id} pairs to add to.
      * @param fis The savegame to scan.
+     * @compat 0.10.x
      */
     private static void v11FixServerObjects(List<String> serverStrings,
                                             final FreeColSavegameFile fis) {
@@ -1036,26 +1244,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Sets the mode of the game: singleplayer/multiplayer.
-     *
-     * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
-     *            multiplayer (if <i>false</i>).
-     */
-    public void setSingleplayer(boolean singleplayer) {
-        this.singleplayer = singleplayer;
-    }
-
-    /**
-     * Checks if the user is playing in singleplayer mode.
-     *
-     * @return <i>true</i> if the user is playing in singleplayer mode,
-     *         <i>false</i> otherwise.
-     */
-    public boolean isSingleplayer() {
-        return singleplayer;
-    }
-
-    /**
      * Makes the entire map visible for all players. Used only when debugging
      * (will be removed).
      */
@@ -1094,134 +1282,6 @@ public final class FreeColServer {
         }
         return null;
     }
-
-    /**
-     * Gets the <code>UserConnectionHandler</code>.
-     *
-     * @return The <code>UserConnectionHandler</code> that is beeing used when
-     *         new client connect.
-     */
-    public UserConnectionHandler getUserConnectionHandler() {
-        return userConnectionHandler;
-    }
-
-    /**
-     * Gets the <code>Controller</code>.
-     *
-     * @return The <code>Controller</code>.
-     */
-    public Controller getController() {
-        if (getGameState() == GameState.IN_GAME) {
-            return inGameController;
-        } else {
-            return preGameController;
-        }
-    }
-
-    /**
-     * Gets the <code>PreGameInputHandler</code>.
-     *
-     * @return The <code>PreGameInputHandler</code>.
-     */
-    public PreGameInputHandler getPreGameInputHandler() {
-        return preGameInputHandler;
-    }
-
-    /**
-     * Gets the <code>InGameInputHandler</code>.
-     *
-     * @return The <code>InGameInputHandler</code>.
-     */
-    public InGameInputHandler getInGameInputHandler() {
-        return inGameInputHandler;
-    }
-
-    /**
-     * Gets the controller being used while the game is running.
-     *
-     * @return The controller from making a new turn etc.
-     */
-    public InGameController getInGameController() {
-        return inGameController;
-    }
-
-    /**
-     * Gets the <code>Game</code> that is being played.
-     *
-     * @return The <code>Game</code> which is the main class of the game-model
-     *         being used in this game.
-     */
-    public ServerGame getGame() {
-        return game;
-    }
-
-    /**
-     * Sets the main AI-object.
-     *
-     * @param aiMain The main AI-object which is responsible for controlling,
-     *            updating and saving the AI objects.
-     */
-    public void setAIMain(AIMain aiMain) {
-        this.aiMain = aiMain;
-    }
-
-    /**
-     * Gets the main AI-object.
-     *
-     * @return The main AI-object which is responsible for controlling, updating
-     *         and saving the AI objects.
-     */
-    public AIMain getAIMain() {
-        return aiMain;
-    }
-
-    /**
-     * Gets the current state of the game.
-     *
-     * @return One of: {@link GameState#STARTING_GAME}, {@link GameState#IN_GAME} and
-     *         {@link GameState#ENDING_GAME}.
-     */
-    public GameState getGameState() {
-        return gameState;
-    }
-
-    /**
-     * Sets the current state of the game.
-     *
-     * @param state The new state to be set. One of: {@link GameState#STARTING_GAME},
-     *            {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
-     */
-    public void setGameState(GameState state) {
-        gameState = state;
-    }
-
-    /**
-     * Gets the network server responsible of handling the connections.
-     *
-     * @return The network server.
-     */
-    public Server getServer() {
-        return server;
-    }
-
-    /**
-     * Gets the integrity check result.
-     *
-     * @return The integrity check result.
-     */
-    public boolean getIntegrity() {
-        return integrity;
-    }
-
-    /**
-     * Get the server-private random number generator.
-     *
-     * @return The server-private random number generator.
-     */
-    public Random getServerRandom() {
-        return random;
-    }
-
 
     /**
      * Get a unit by ID, validating the ID as much as possible.  Designed for
@@ -1511,26 +1571,10 @@ public final class FreeColServer {
     }
 
 
-    /**
-     * Gets the active unit specified in a saved game, if any.
-     *
-     * @return The active unit.
-     */
-    public Unit getActiveUnit() {
-        return activeUnit;
+    public void shutdown() {
+        server.shutdown();
     }
 
-    /**
-     * Gets the active unit specified in a saved game, if any.
-     *
-     * @param unit The active unit to save.
-     */
-    public void setActiveUnit(Unit unit) {
-        activeUnit = unit;
-    }
-
-    /** Hex constant digits for get/restoreRandomState. */
-    private static final String HEX_DIGITS = "0123456789ABCDEF";
 
     /**
      * Get the internal state of a random number generator as a
@@ -1582,9 +1626,4 @@ public final class FreeColServer {
             throw new IOException("Failed to restore ServerRandom!");
         }
     }
-
-    public void shutdown() {
-        server.shutdown();
-    }
-
 }

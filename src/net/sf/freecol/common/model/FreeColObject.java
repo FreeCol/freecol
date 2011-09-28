@@ -770,9 +770,10 @@ public abstract class FreeColObject {
                                   Specification specification)
         throws XMLStreamException {
         String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        // TODO: get rid of compatibility code
+        // @compat 0.9.x
         if (newId == null) {
             setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        // end compatibility code
         } else {
             setId(newId);
         }

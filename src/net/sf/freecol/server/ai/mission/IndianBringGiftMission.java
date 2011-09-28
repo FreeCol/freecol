@@ -274,9 +274,9 @@ public class IndianBringGiftMission extends Mission {
         target = (targetString == null) ? null
             : (Colony) getGame().getFreeColGameObject(targetString);
         String completedString = in.getAttributeValue(null, "completed");
-        if (completedString == null) { // Remove compatibility code post 0.10.0
+        if (completedString == null) { // @compat 0.9.x
             completedString = in.getAttributeValue(null, "giftDelivered");
-        }
+        } // end compatibility code
         completed = Boolean.valueOf(completedString).booleanValue();
     }
 

@@ -1109,7 +1109,7 @@ public class Game extends FreeColGameObject {
             String tagName = in.getLocalName();
             logger.finest("Found tag " + tagName);
             if (tagName.equals("gameOptions") || tagName.equals("game-options")) {
-                // 0.9.x compatibility code
+                // @compat 0.9.x
                 gameOptions = new OptionGroup(in);
             } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
@@ -1136,7 +1136,7 @@ public class Game extends FreeColGameObject {
                 }
                 map.readFromXML(in);
             } else if (tagName.equals(ModelMessage.getXMLElementTagName())) {
-                // 0.9.x compatibility code
+                // @compat 0.9.x
                 ModelMessage m = new ModelMessage();
                 m.readFromXML(in);
                 // When this goes, remove getOwnerId().
@@ -1146,17 +1146,17 @@ public class Game extends FreeColGameObject {
                     player.addModelMessage(m);
                 }
             } else if (tagName.equals("citiesOfCibola")) {
-                // TODO: remove support for old format
+                // @compat 0.9.x
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
             } else if (tagName.equals(CIBOLA_TAG)) {
                 citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
             } else if (OptionGroup.getXMLElementTagName().equals(tagName)
                        || "difficultyLevel".equals(tagName)) {
-                // compatibility code
+                // @compat 0.9.x
                 OptionGroup difficultyLevel = new OptionGroup(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
-                // 0.9.x compatibility code
+                // @compat 0.9.x
                 mapGeneratorOptions = new OptionGroup(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
                 Specification spec = new Specification();
@@ -1176,7 +1176,7 @@ public class Game extends FreeColGameObject {
                            "found instead: " + in.getLocalName());
         }
 
-        // compatibility code
+        // @compat 0.9.x
         if (gameOptions != null) {
             addOldOptions(gameOptions);
         }
@@ -1184,10 +1184,9 @@ public class Game extends FreeColGameObject {
             addOldOptions(mapGeneratorOptions);
         }
         // end compatibility code
-
     }
 
-    // compatibility code
+    // @compat 0.9.x
     private void addOldOptions(OptionGroup group) {
         Iterator<Option> iterator = group.iterator();
         while (iterator.hasNext()) {
