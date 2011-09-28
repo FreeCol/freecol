@@ -19,13 +19,10 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.util.logging.Logger;
 
-import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.IntegerOption;
 
 
@@ -34,16 +31,9 @@ import net.sf.freecol.common.option.IntegerOption;
  * net.sf.freecol.common.option.IntegerOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class IntegerOptionUI extends JSpinner implements OptionUpdater  {
+public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(IntegerOptionUI.class.getName());
-
-
-    private final IntegerOption option;
-    private int originalValue;
-    private JLabel label;
-
+    private JSpinner spinner = new JSpinner();
 
     /**
      * Creates a new <code>IntegerOptionUI</code> for the given <code>IntegerOption</code>.
@@ -51,60 +41,41 @@ public final class IntegerOptionUI extends JSpinner implements OptionUpdater  {
      * @param editable boolean whether user can modify the setting
      */
     public IntegerOptionUI(final IntegerOption option, boolean editable) {
+        super(option, editable);
 
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        String text = (description != null) ? description : name;
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText(text);
-        setToolTipText(text);
-
-        setEnabled(editable);
-        setOpaque(false);
-
+        int value = option.getValue();
         if (editable) {
-            int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
-            setModel(new SpinnerNumberModel((int) option.getValue(), option.getMinimumValue(),
-                                            option.getMaximumValue(), Math.max(1, stepSize)));
+            int min = option.getMinimumValue();
+            int max = option.getMaximumValue();
+            int stepSize = Math.max(1, Math.min((max - min) / 10, 1000));
+            spinner.setModel(new SpinnerNumberModel(value, min, max, stepSize));
         } else {
-            int value = option.getValue();
-            setModel(new SpinnerNumberModel(value, value, value, 1));
+            spinner.setModel(new SpinnerNumberModel(value, value, value, 1));
         }
 
+        initialize();
     }
 
     /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
+     * {@inheritDoc}
      */
-    public JLabel getLabel() {
-        return label;
+    public JSpinner getComponent() {
+        return spinner;
     }
 
     /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
-     */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
-    }
-
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
-        option.setValue(((Integer) getValue()).intValue());
+        getOption().setValue((Integer) spinner.getValue());
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
-        setValue(option.getValue());
+        spinner.setValue(getOption().getValue());
     }
+
+
 }

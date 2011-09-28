@@ -19,11 +19,9 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.SelectOption;
@@ -34,13 +32,9 @@ import net.sf.freecol.common.option.SelectOption;
  * net.sf.freecol.common.option.SelectOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class SelectOptionUI extends JComboBox implements OptionUpdater  {
+public final class SelectOptionUI extends OptionUI<SelectOption>  {
 
-    private static final Logger logger = Logger.getLogger(SelectOptionUI.class.getName());
-
-    private final SelectOption option;
-    private int originalValue;
-    private JLabel label;
+    private JComboBox box = new JComboBox();
 
     /**
     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
@@ -49,15 +43,7 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater  {
     * @param editable boolean whether user can modify the setting
     */
     public SelectOptionUI(final SelectOption option, boolean editable) {
-
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        String text = (description != null) ? description : name;
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText(text);
+        super(option, editable);
 
         String[] strings = option.getItemValues().values().toArray(new String[0]);
         if (option.localizeLabels()) {
@@ -66,47 +52,31 @@ public final class SelectOptionUI extends JComboBox implements OptionUpdater  {
             }
         }
 
-        setModel(new DefaultComboBoxModel(strings));
-        if (option.getValue() < strings.length) {
-            setSelectedIndex(option.getValue());
-        } else {
-            // TODO: fix this. It happens only for the option "difficulty level"
-            logger.warning("SelectOption " + option.getId() + " has invalid value.");
-        }
+        box.setModel(new DefaultComboBoxModel(strings));
+        box.setSelectedIndex(option.getValue());
 
-        setEnabled(editable);
-        setOpaque(false);
+        initialize();
     }
 
     /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
-     */
-    public JLabel getLabel() {
-        return label;
-    }
-
-    /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
-     */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
-    }
-
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
-        option.setValue(getSelectedIndex());
+        getOption().setValue(box.getSelectedIndex());
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
-        setSelectedIndex(option.getValue());
+        box.setSelectedIndex(getOption().getValue());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JComboBox getComponent() {
+        return box;
+    }
+
 }

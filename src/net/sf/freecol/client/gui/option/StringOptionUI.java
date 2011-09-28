@@ -36,14 +36,9 @@ import net.sf.freecol.common.option.StringOption;
  * net.sf.freecol.common.option.StringOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class StringOptionUI extends JComboBox implements OptionUpdater  {
+public final class StringOptionUI extends OptionUI<StringOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(StringOptionUI.class.getName());
-
-    private final StringOption option;
-    private String originalValue;
-    private JLabel label;
+    private JComboBox box = new JComboBox();
 
     /**
     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
@@ -52,74 +47,45 @@ public final class StringOptionUI extends JComboBox implements OptionUpdater  {
     * @param editable boolean whether user can modify the setting
     */
     public StringOptionUI(final StringOption option, boolean editable) {
-
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        String text = (description != null) ? description : name;
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText(text);
+        super(option, editable);
 
         List<String> choices = option.getChoices();
 
-        setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
-        setSelectedItem(option.getValue());
-        setRenderer(new ChoiceRenderer());
+        box.setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
+        box.setSelectedItem(option.getValue());
+        box.setRenderer(new ChoiceRenderer());
 
-        setEnabled(editable);
-        setOpaque(false);
+        initialize();
     }
 
     /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
+     * {@inheritDoc}
      */
-    public JLabel getLabel() {
-        return label;
+    public JComboBox getComponent() {
+        return box;
     }
 
     /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
-     */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
-    }
-
-    /**
-     * Rollback to the original value.
-     *
-     * This method gets called so that changes made to options with
-     * {@link net.sf.freecol.common.option.Option#isPreviewEnabled()} is rolled back
-     * when an option dialoag has been cancelled.
-     */
-    public void rollback() {
-        option.setValue(originalValue);
-    }
-
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
-        if (getSelectedIndex() == 0 && option.addNone()) {
+        StringOption option = getOption();
+        if (box.getSelectedIndex() == 0 && option.addNone()) {
             option.setValue(StringOption.NONE);
         } else {
-            option.setValue((String) getSelectedItem());
+            option.setValue((String) box.getSelectedItem());
         }
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
+        StringOption option = getOption();
         if (option.getValue() == null && option.addNone()) {
-            setSelectedIndex(0);
+            box.setSelectedIndex(0);
         } else {
-            setSelectedItem(option.getValue());
+            box.setSelectedItem(option.getValue());
         }
     }
 

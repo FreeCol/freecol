@@ -19,13 +19,10 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
@@ -35,14 +32,9 @@ import net.sf.freecol.common.option.LanguageOption.Language;
  * net.sf.freecol.common.option.LanguageOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class LanguageOptionUI extends JComboBox implements OptionUpdater  {
+public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(LanguageOptionUI.class.getName());
-
-    private final LanguageOption option;
-    private Language originalValue;
-    private JLabel label;
+    JComboBox box = new JComboBox();
 
     /**
     * Creates a new <code>LanguageOptionUI</code> for the given <code>LanguageOption</code>.
@@ -50,53 +42,34 @@ public final class LanguageOptionUI extends JComboBox implements OptionUpdater  
     * @param editable boolean whether user can modify the setting
     */
     public LanguageOptionUI(final LanguageOption option, boolean editable) {
-
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText((description != null) ? description : name);
+        super(option, editable);
 
         Language[] languages = option.getOptions();
 
-        setModel(new DefaultComboBoxModel(languages));
-        reset();
+        box.setModel(new DefaultComboBoxModel(languages));
+        box.setSelectedItem(option.getValue());
 
-        setEnabled(editable);
-        setOpaque(false);
+        initialize();
     }
 
     /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
+     * {@inheritDoc}
      */
-    public JLabel getLabel() {
-        return label;
+    public JComboBox getComponent() {
+        return box;
     }
 
     /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
-     */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
-    }
-
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
-        option.setValue((Language) getSelectedItem());
+        getOption().setValue((Language) box.getSelectedItem());
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
-        setSelectedItem(option.getValue());
+        box.setSelectedItem(getOption().getValue());
     }
 }

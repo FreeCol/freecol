@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.option;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -42,14 +41,9 @@ import net.sf.freecol.common.option.AbstractUnitOption;
  * net.sf.freecol.common.option.AbstractUnitOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class AbstractUnitOptionUI extends JPanel implements OptionUpdater  {
+public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AbstractUnitOptionUI.class.getName());
-
-    private final AbstractUnitOption option;
-    private AbstractUnit originalValue;
-    private JLabel label;
+    private JPanel panel = new JPanel();
     private JComboBox typeBox;
     private JComboBox roleBox;
     private JSpinner spinner;
@@ -61,15 +55,7 @@ public final class AbstractUnitOptionUI extends JPanel implements OptionUpdater 
     * @param editable boolean whether user can modify the setting
     */
     public AbstractUnitOptionUI(final AbstractUnitOption option, boolean editable) {
-
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        String text = (description != null) ? description : name;
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText(text);
+        super(option, editable);
 
         List<String> choices = option.getChoices();
 
@@ -80,7 +66,7 @@ public final class AbstractUnitOptionUI extends JPanel implements OptionUpdater 
 
         typeBox.setEnabled(editable);
         typeBox.setOpaque(false);
-        add(typeBox);
+        panel.add(typeBox);
 
         if (option.getSelectRole()) {
             roleBox = new JComboBox();
@@ -90,7 +76,7 @@ public final class AbstractUnitOptionUI extends JPanel implements OptionUpdater 
 
             roleBox.setEnabled(editable);
             roleBox.setOpaque(false);
-            add(roleBox);
+            panel.add(roleBox);
         }
 
         if (editable && option.getMaximumValue() > option.getMinimumValue()) {
@@ -102,42 +88,33 @@ public final class AbstractUnitOptionUI extends JPanel implements OptionUpdater 
             int value = option.getValue().getNumber();
             spinner.setModel(new SpinnerNumberModel(value, value, value, 1));
         }
+        panel.add(spinner);
 
-        setOpaque(false);
+        initialize();
 
     }
 
     /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
+     * {@inheritDoc}
      */
-    public JLabel getLabel() {
-        return label;
-    }
-
-    /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
-     */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
+    public JPanel getComponent() {
+        return panel;
     }
 
     /**
      * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
-        option.setValue(new AbstractUnit((String) typeBox.getSelectedItem(),
-                                         (Role) roleBox.getSelectedItem(),
-                                         (Integer) spinner.getValue()));
+        getOption().setValue(new AbstractUnit((String) typeBox.getSelectedItem(),
+                                              (Role) roleBox.getSelectedItem(),
+                                              (Integer) spinner.getValue()));
     }
 
     /**
      * Reset with the value from the option.
      */
     public void reset() {
+        AbstractUnitOption option = getOption();
         typeBox.setSelectedItem(option.getValue().getId());
         roleBox.setSelectedItem(option.getValue().getRole());
         spinner.setValue(option.getValue().getNumber());

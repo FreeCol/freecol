@@ -19,18 +19,13 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.util.Hashtable;
-import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.PercentageOption;
 
 /**
@@ -38,13 +33,8 @@ import net.sf.freecol.common.option.PercentageOption;
  * net.sf.freecol.common.option.PercentageOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class PercentageOptionUI extends JSlider implements OptionUpdater  {
+public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(PercentageOptionUI.class.getName());
-
-    private final PercentageOption option;
-    private int originalValue;
 
     /**
      * Creates a new <code>PercentageOptionUI</code> for the given
@@ -54,50 +44,21 @@ public final class PercentageOptionUI extends JSlider implements OptionUpdater  
      * @param editable boolean whether user can modify the setting
      */
     public PercentageOptionUI(final PercentageOption option, boolean editable) {
+        super(option, editable);
 
-        this.option = option;
-        this.originalValue = option.getValue();
+        JSlider slider = getComponent();
 
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                   Messages.getName(option)));
-
-        setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
-        setOrientation(JSlider.HORIZONTAL);
+        slider.setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         labels.put(new Integer(0), new JLabel("0 %"));
         labels.put(new Integer(25), new JLabel("25 %"));
         labels.put(new Integer(50), new JLabel("50 %"));
         labels.put(new Integer(75), new JLabel("75 %"));
         labels.put(new Integer(100), new JLabel("100 %"));
-        setLabelTable(labels);
-        setValue(option.getValue());
-        setPaintLabels(true);
-        setMajorTickSpacing(5);
-        setExtent(0);
-        setPaintTicks(true);
-        setSnapToTicks(false);
-        setPreferredSize(new Dimension(500, 50));
-        setToolTipText((description != null) ? description : name);
-
-        setEnabled(editable);
-        setOpaque(false);
-
+        slider.setLabelTable(labels);
+        slider.setValue(option.getValue());
+        slider.setMajorTickSpacing(5);
+        slider.setSnapToTicks(false);
     }
 
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
-     */
-    public void updateOption() {
-        option.setValue(getValue());
-    }
-
-    /**
-     * Reset with the value from the option.
-     */
-    public void reset() {
-        setValue(option.getValue());
-    }
 }

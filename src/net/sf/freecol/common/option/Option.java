@@ -59,6 +59,13 @@ public interface Option<T> {
     public T getValue();
 
     /**
+     * Sets the value of this Option.
+     *
+     * @param value the value of this Option
+     */
+    public void setValue(T value);
+
+    /**
     * Makes an XML-representation of this object.
     *
     * @param document The document to use when creating new componenets.

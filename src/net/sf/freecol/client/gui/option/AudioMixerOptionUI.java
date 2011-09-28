@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.option;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.sound.sampled.Mixer;
 import javax.swing.DefaultComboBoxModel;
@@ -43,15 +42,11 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
  * net.sf.freecol.common.option.AudioMixerOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class AudioMixerOptionUI extends JPanel implements OptionUpdater  {
+public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AudioMixerOptionUI.class.getName());
+    JPanel panel = new JPanel();
 
     private final FreeColClient client = FreeColClient.get();
-    private final AudioMixerOption option;
-    private MixerWrapper originalValue;
-    private JLabel label;
     private JComboBox cbox;
     private JButton button1, button2;
     private JLabel currentMixerLabel;
@@ -64,8 +59,8 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater  {
                 client.playSound("sound.intro.general");
             } else if (e.getSource() == cbox) {
                 MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
-                if (option.getValue() != value) {
-                    option.setValue(value);
+                if (getOption().getValue() != value) {
+                    getOption().setValue(value);
                     updateMixerLabel();
                 }
             }
@@ -81,20 +76,19 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater  {
      * @param editable boolean whether user can modify the setting
      */
     public AudioMixerOptionUI(final AudioMixerOption option, boolean editable) {
-        super(new BorderLayout());
+        super(option, editable);
 
-        ((BorderLayout)this.getLayout()).setHgap(15);
-        this.option = option;
-        originalValue = option.getValue();
+        BorderLayout layout = new BorderLayout();
+        layout.setHgap(15);
+        panel.setLayout(layout);
+
         cbox = new JComboBox();
-        add(cbox, BorderLayout.WEST);
+        panel.add(cbox, BorderLayout.WEST);
 
         currentMixerLabel = new JLabel();
-        add(currentMixerLabel, BorderLayout.EAST);
+        panel.add(currentMixerLabel, BorderLayout.EAST);
         updateMixerLabel();
 
-        JPanel panel = new JPanel();
-        add(panel);
         button1 = new JButton(Messages.message("Test"));
         panel.add(button1);
         button1.addActionListener(aHandler);
@@ -103,19 +97,14 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater  {
         panel.add(button2);
         button2.addActionListener(aHandler);
 
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText((description != null) ? description : name);
-        cbox.add(label);
-
-        cbox.setModel(new DefaultComboBoxModel(option.getOptions()));
+        cbox.add(super.getLabel());
+        cbox.setModel(new DefaultComboBoxModel(getOption().getOptions()));
         reset();
 
         cbox.setEnabled(editable);
         cbox.addActionListener(aHandler);
 
-        setOpaque(false);
+        initialize();
     }
 
     private void updateMixerLabel() {
@@ -129,36 +118,37 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater  {
         currentMixerLabel.setText(Messages.message("Current") + ":  " + text);
     }
 
+
     /**
-     * Get the <code>Label</code> value.
+     * Returns <code>null</code>, since this OptionUI does not require
+     * an external label.
      *
-     * @return a <code>JLabel</code> value
+     * @return null
      */
-    public JLabel getLabel() {
-        return label;
+    @Override
+    public final JLabel getLabel() {
+        return null;
     }
 
     /**
-     * Set the <code>Label</code> value.
-     *
-     * @param newLabel The new Label value.
+     * {@inheritDoc}
      */
-    public void setLabel(final JLabel newLabel) {
-        this.label = newLabel;
+    public JPanel getComponent() {
+        return panel;
     }
 
     /**
      * Updates the value of the {@link
-     * net.sf.freecol.common.option.Option} this object keeps.
+     * net.sf.freecol.common.getOption().Option} this object keeps.
      */
     public void updateOption() {
-        option.setValue((MixerWrapper) cbox.getSelectedItem());
+        getOption().setValue((MixerWrapper) cbox.getSelectedItem());
     }
 
     /**
-     * Reset with the value from the option.
+     * Reset with the value from the getOption().
      */
     public void reset() {
-        cbox.setSelectedItem(option.getValue());
+        cbox.setSelectedItem(getOption().getValue());
     }
 }

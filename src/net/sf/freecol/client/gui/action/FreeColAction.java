@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
  * The super class of all actions in FreeCol. Subclasses of this object is
  * stored in an {@link ActionManager}.
  */
-public abstract class FreeColAction extends AbstractAction implements Option {
+public abstract class FreeColAction extends AbstractAction implements Option<FreeColAction> {
 
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
@@ -271,10 +271,20 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * Returns the action itself. TODO: at the moment, this is only
      * necessary in order to implement Option.
      *
-     * @return an <code>Object</code> value
+     * @return an <code>FreeColAction</code> value
      */
-    public Object getValue() {
+    public FreeColAction getValue() {
         return this;
+    }
+
+    /**
+     * Does nothing except log a warning. TODO: at the moment, this is
+     * only necessary in order to implement Option.
+     *
+     * @param value a <code>FreeColAction</code> value
+     */
+    public void setValue(FreeColAction value) {
+        logger.warning("Calling unsupported method setValue.");
     }
 
     /**

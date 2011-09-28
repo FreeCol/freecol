@@ -19,11 +19,9 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.BooleanOption;
 
 
@@ -32,13 +30,9 @@ import net.sf.freecol.common.option.BooleanOption;
  * net.sf.freecol.common.option.BooleanOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class BooleanOptionUI extends JCheckBox implements OptionUpdater  {
+public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(BooleanOptionUI.class.getName());
-
-    private final BooleanOption option;
-    private boolean originalValue;
+    private JCheckBox box = new JCheckBox();
 
 
     /**
@@ -48,39 +42,36 @@ public final class BooleanOptionUI extends JCheckBox implements OptionUpdater  {
     * @param editable boolean whether user can modify the setting
     */
     public BooleanOptionUI(final BooleanOption option, boolean editable) {
-
-        this.option = option;
-        this.originalValue = option.getValue();
-
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        setText(name);
-        setSelected(option.getValue());
-        setEnabled(editable);
-        setToolTipText((description != null) ? description : name);
-
-
+        super(option, editable);
+        initialize();
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
-     */
-    public void updateOption() {
-        option.setValue(isSelected());
-    }
-
-    /**
-     * Reset with the value from the option.
-     */
-    public void reset() {
-        setSelected(option.getValue());
-    }
-
-    /**
-     * Sets the value of this component.
+     * Sets the value of this UI's component.
      */
     public void setValue(boolean b) {
-        setSelected(b);
+        box.setSelected(b);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JCheckBox getComponent() {
+        return box;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateOption() {
+        getOption().setValue(box.isSelected());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void reset() {
+        box.setSelected(getOption().getValue());
     }
 
 }

@@ -19,12 +19,8 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.util.Hashtable;
-import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -38,14 +34,7 @@ import net.sf.freecol.common.option.RangeOption;
  * net.sf.freecol.common.option.RangeOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class RangeOptionUI extends JSlider implements OptionUpdater  {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(RangeOptionUI.class.getName());
-
-    private final RangeOption option;
-    private int originalValue;
-
+public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
 
     /**
      * Creates a new <code>RangeOptionUI</code> for the given
@@ -55,17 +44,12 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater  {
      * @param editable boolean whether user can modify the setting
      */
     public RangeOptionUI(final RangeOption option, boolean editable) {
+        super(option, editable);
 
-        this.option = option;
-        this.originalValue = option.getValue();
+        JSlider slider = getComponent();
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                   Messages.getName(option)));
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
+        slider.setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0, 0, option.getItemValues().size() - 1));
 
-        setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0, 0, option.getItemValues().size() - 1));
-        setOrientation(JSlider.HORIZONTAL);
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         int index = 0;
         for (String string : option.getItemValues().values()) {
@@ -77,31 +61,11 @@ public final class RangeOptionUI extends JSlider implements OptionUpdater  {
             index++;
         }
 
-        setLabelTable(labels);
-        setValue(option.getValueRank());
-        setPaintLabels(true);
-        setMajorTickSpacing(1);
-        setExtent(0);
-        setPaintTicks(true);
-        setSnapToTicks(true);
-        setPreferredSize(new Dimension(500, 50));
-        setToolTipText((description != null) ? description : name);
-
-        setEnabled(editable);
-        setOpaque(false);
+        slider.setLabelTable(labels);
+        slider.setValue(option.getValueRank());
+        slider.setMajorTickSpacing(1);
+        slider.setSnapToTicks(true);
     }
 
-    /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
-     */
-    public void updateOption() {
-        option.setValueRank(getValue());
-    }
 
-    /**
-     * Reset with the value from the option.
-     */
-    public void reset() {
-        setValue(option.getValueRank());
-    }
 }

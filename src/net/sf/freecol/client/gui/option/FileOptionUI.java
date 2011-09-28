@@ -20,14 +20,11 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -43,15 +40,10 @@ import net.sf.freecol.common.option.FileOption;
  * net.sf.freecol.common.option.FileOption}. In order to enable values
  * to be both seen and changed.
  */
-public final class FileOptionUI extends JPanel implements OptionUpdater  {
+public final class FileOptionUI extends OptionUI<FileOption>  {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FileOptionUI.class.getName());
-
-    private final FileOption option;
+    private JPanel panel = new JPanel();
     private final JTextField fileField;
-    private File originalValue;
-
 
     /**
     * Creates a new <code>FileOptionUI</code> for the given
@@ -61,22 +53,13 @@ public final class FileOptionUI extends JPanel implements OptionUpdater  {
     * @param editable boolean whether user can modify the setting
     */
     public FileOptionUI(final FileOption option, boolean editable) {
-        super(new FlowLayout(FlowLayout.LEFT));
+        super(option, editable);
 
-        this.option = option;
-        this.originalValue = option.getValue();
+        panel.add(getLabel());
 
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-        JLabel label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText((description != null) ? description : name);
-        add(label);
-
-        final String value = (option.getValue() != null)
-            ? option.getValue().getAbsolutePath()
-            : "";
-        fileField = new JTextField(value, 10);
-        add(fileField);
+        File file = option.getValue();
+        fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 10);
+        panel.add(fileField);
 
         JButton browse = new JButton(Messages.message("file.browse"));
         if (editable) {
@@ -98,7 +81,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater  {
                }
             });
         }
-        add(browse);
+        panel.add(browse);
 
         JButton remove = new JButton(Messages.message("option.remove"));
         if (editable) {
@@ -108,12 +91,13 @@ public final class FileOptionUI extends JPanel implements OptionUpdater  {
                }
             });
         }
-        add(remove);
+        panel.add(remove);
 
         browse.setEnabled(editable);
         remove.setEnabled(editable);
         fileField.setEnabled(false);
-        label.setLabelFor(fileField);
+        getLabel().setLabelFor(fileField);
+        /*
         fileField.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent arg0) {
                 editUpdate();
@@ -127,36 +111,45 @@ public final class FileOptionUI extends JPanel implements OptionUpdater  {
             private void editUpdate() {
             }
         });
+        */
 
-        setOpaque(false);
     }
 
     /**
-    * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
-    */
-    public void updateOption() {
-        if (fileField.getText().equals("")) {
-            option.setValue(null);
-        } else {
-            option.setValue(new File(fileField.getText()));
-        }
-    }
-
-    /**
-     * Reset with the value from the option.
-     */
-    public void reset() {
-        setValue(option.getValue());
-    }
-
-    /**
-     * Sets the value of this component.
+     * Sets the value of this UI's component.
      */
     public void setValue(File f) {
-        if (f != null) {
-            fileField.setText(f.getAbsolutePath());
-        } else {
+        if (f == null) {
             fileField.setText("");
+        } else {
+            fileField.setText(f.getAbsolutePath());
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JPanel getComponent() {
+        return panel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateOption() {
+        if (fileField.getText().equals("")) {
+            getOption().setValue(null);
+        } else {
+            getOption().setValue(new File(fileField.getText()));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void reset() {
+        File file = getOption().getValue();
+        fileField.setText((file == null) ? null : file.getAbsolutePath());
+    }
+
 }

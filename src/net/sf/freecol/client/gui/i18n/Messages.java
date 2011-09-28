@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.Option;
 
 /**
  * <p>Represents a collection of messages in a particular locale.</p>
@@ -91,6 +92,11 @@ public class Messages {
     public static final String FILE_PREFIX = "FreeColMessages";
 
     public static final String FILE_SUFFIX = ".properties";
+
+    private static final String[] DESCRIPTION_KEYS = new String[] {
+        ".description", ".shortDescription", ".name"
+    };
+
 
     private static Map<String, String> messageBundle =
         new HashMap<String, String>();
@@ -518,6 +524,25 @@ public class Messages {
     }
 
     public static String getShortDescription(FreeColObject object) {
+        return message(object.getId() + ".shortDescription");
+    }
+
+
+    public static String getName(Option object) {
+        return message(object.getId() + ".name");
+    }
+
+    public static String getDescription(Option object) {
+        for (String suffix : DESCRIPTION_KEYS) {
+            String key = object.getId() + suffix;
+            if (containsKey(key)) {
+                return message(key);
+            }
+        }
+        return object.getId();
+    }
+
+    public static String getShortDescription(Option object) {
         return message(object.getId() + ".shortDescription");
     }
 

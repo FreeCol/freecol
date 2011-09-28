@@ -135,12 +135,12 @@ abstract public class AbstractOption<T> extends FreeColObject
         final String value = in.getAttributeValue(null, VALUE_TAG);
 
         if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no id attribute found.");
+            throw new XMLStreamException("invalid " + in.getLocalName()
+                                         + ": no id attribute found.");
         }
         if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no value nor default value found.");
+            throw new XMLStreamException("invalid option " + id
+                                         + ": no value nor default value found.");
         }
 
         if (getId() == NO_ID) {

@@ -48,57 +48,45 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 /**
 * User interface for displaying/changing a keyboard accelerator for a <code>FreeColAction</code>.
 */
-public final class FreeColActionUI extends JPanel implements OptionUpdater, ActionListener {
+public final class FreeColActionUI extends OptionUI<FreeColAction> implements ActionListener {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FreeColActionUI.class.getName());
 
-    private final FreeColAction option;
-    private final OptionGroupUI optionGroupUI;
+    private OptionGroupUI optionGroupUI;
     private KeyStroke keyStroke;
     private JButton recordButton;
     private JButton removeButton;
     private BlinkingLabel bl;
+    private JPanel panel = new JPanel();
 
 
     /**
-    * Creates a new <code>FreeColActionUI</code> for the
-    * given <code>FreeColAction</code>.
-    *
-    * @param option The <code>FreeColAction</code> to make a user
-    *       interface for.
-    * @param optionGroupUI The group this <code>FreeColActionUI</code>
-    *       will be a part of.
-    */
-    public FreeColActionUI(FreeColAction option, OptionGroupUI optionGroupUI) {
-        super(new BorderLayout());
+     * Creates a new <code>FreeColActionUI</code> for the
+     * given <code>FreeColAction</code>.
+     *
+     * @param option The <code>FreeColAction</code> to make a user
+     *       interface for.
+     * @param editable boolean whether user can modify the setting
+     */
+    public FreeColActionUI(FreeColAction option, boolean editable) {
+        super(option, editable);
 
-        this.option = option;
         this.optionGroupUI = optionGroupUI;
         keyStroke = option.getAccelerator();
 
-        String name = option.getName();
-        String description = option.getShortDescription();
-        JLabel label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText((description != null) ? description : name);
-        add(label, BorderLayout.CENTER);
+        panel.add(getLabel());
 
-        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        p1.setOpaque(false);
         bl = new BlinkingLabel();
-        p1.add(bl);
+        panel.add(bl);
 
         recordButton = new JButton(getRecordImage());
         recordButton.addActionListener(this);
-        p1.add(recordButton);
+        panel.add(recordButton);
 
         removeButton = new JButton(getRemoveImage());
         removeButton.addActionListener(this);
-        p1.add(removeButton);
+        panel.add(removeButton);
 
-        add(p1, BorderLayout.EAST);
-
-        setOpaque(false);
+        initialize();
     }
 
     /**
@@ -165,25 +153,38 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     * @param k The <code>KeyStroke</code> to be removed.
     */
     public void removeKeyStroke(KeyStroke k) {
-        if (k != null && keyStroke != null && k.getKeyCode() == keyStroke.getKeyCode() && k.getModifiers() == keyStroke.getModifiers()) {
+        if (k != null && keyStroke != null
+            && k.getKeyCode() == keyStroke.getKeyCode()
+            && k.getModifiers() == keyStroke.getModifiers()) {
             keyStroke = null;
             bl.setText(" ");
         }
     }
 
+    public void setOptionGroupUI(OptionGroupUI ui) {
+        this.optionGroupUI = ui;
+    }
+
 
     /**
-    * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
-    */
-    public void updateOption() {
-        option.setAccelerator(keyStroke);
+     * {@inheritDoc}
+     */
+    public JPanel getComponent() {
+        return panel;
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
+     */
+    public void updateOption() {
+        getOption().setAccelerator(keyStroke);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void reset() {
-        keyStroke = option.getAccelerator();
+        keyStroke = getOption().getAccelerator();
         bl.setText(getHumanKeyStrokeText(keyStroke));
     }
 

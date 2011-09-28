@@ -35,20 +35,10 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.option.AudioMixerOption;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.FileOption;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.ListOption;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.option.RangeOption;
-import net.sf.freecol.common.option.SelectOption;
-import net.sf.freecol.common.option.StringOption;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -65,7 +55,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     private final List<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
 
-    private final HashMap<String, JComponent> optionUIs;
+    private final HashMap<String, OptionUI> optionUIs;
 
     private final JTabbedPane tb;
 
@@ -96,7 +86,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         northPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
         northPanel.setOpaque(false);
 
-        optionUIs = new HashMap<String, JComponent>();
+        optionUIs = new HashMap<String, OptionUI>();
 
         tb = new JTabbedPane(JTabbedPane.TOP);
         tb.setOpaque(false);
@@ -117,7 +107,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 scroll.getVerticalScrollBar().setUnitIncrement(16);
                 scroll.setBorder(BorderFactory.createEmptyBorder());
                 groupPanel.setBorder(BorderFactory.createEmptyBorder(H_GAP - 5, H_GAP, 0, H_GAP));
-                tb.addTab(Messages.getName(group), null, scroll, Messages.getShortDescription(group));
+                tb.addTab(Messages.getName((Option) group), null, scroll,
+                          Messages.getShortDescription((Option) group));
             } else {
                 addOptionUI(o, northPanel, editable);
             }
@@ -143,7 +134,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             Option o = iterator.next();
             if (o instanceof OptionGroup) {
                 OptionGroup subgroup = (OptionGroup) o;
-                panel.add(new JLabel(Messages.getName(subgroup)), "newline 20, span, split 2");
+                panel.add(new JLabel(Messages.getName((Option) subgroup)),
+                          "newline 20, span, split 2");
                 panel.add(new JSeparator(), "growx");
                 addOptionGroupUI(subgroup, panel, editable);
             } else {
@@ -153,69 +145,27 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     }
 
     private void addOptionUI(Option option, JPanel panel, boolean editable) {
-        JComponent ui = null;
-        String constraints = null;
-        JLabel label = null;
-        if (option instanceof BooleanOption) {
-            BooleanOptionUI c = new BooleanOptionUI((BooleanOption) option, editable);
-            constraints = c.getText().length() > 40 ? "newline, span" : "span 2";
-            ui = c;
-        } else if (option instanceof FileOption) {
-            final FileOptionUI iou = new FileOptionUI((FileOption) option, editable);
-            constraints = "newline, span";
-            ui = iou;
-        } else if (option instanceof PercentageOption) {
-            PercentageOptionUI c = new PercentageOptionUI((PercentageOption) option, editable);
-            constraints = "newline, span";
-            ui = c;
-        } else if (option instanceof ListOption<?>) {
-            @SuppressWarnings("unchecked")
-            ListOptionUI c = new ListOptionUI((ListOption) option, editable); 
-            ui = c;
-        } else if (option instanceof RangeOption) {
-            RangeOptionUI c = new RangeOptionUI((RangeOption) option, editable);
-            constraints = "newline, span";
-            ui = c;
-        } else if (option instanceof SelectOption) {
-            SelectOptionUI c = new SelectOptionUI((SelectOption) option, editable);
-            label = c.getLabel();
-            ui = c;
-        } else if (option instanceof IntegerOption) {
-            IntegerOptionUI c = new IntegerOptionUI((IntegerOption) option, editable);
-            label = c.getLabel();
-            ui = c;
-        } else if (option instanceof StringOption) {
-            final StringOptionUI soi = new StringOptionUI((StringOption) option, editable);
-            label = soi.getLabel();
-            ui = soi;
-        } else if (option instanceof LanguageOption) {
-            LanguageOptionUI c = new LanguageOptionUI((LanguageOption) option, editable);
-            label = c.getLabel();
-            ui = c;
-        } else if (option instanceof AudioMixerOption) {
-            AudioMixerOptionUI c = new AudioMixerOptionUI((AudioMixerOption) option, editable);
-            label = c.getLabel();
-            ui = c;
-        } else if (option instanceof FreeColAction) {
-            final FreeColActionUI fau = new FreeColActionUI((FreeColAction) option, this);
-            constraints = "newline, span";
-            ui = fau;
-        } else {
-            logger.warning("Unknown option: " + option.getId() + " (" + option.getClass() + ")");
-            return;
+        OptionUI ui = OptionUI.getOptionUI(option, editable);
+        if (ui == null) {
+            logger.warning("Unknown option type: " + option.toString());
+        } else if (ui instanceof FreeColActionUI) {
+            ((FreeColActionUI) ui).setOptionGroupUI(this);
         }
-        if (label != null) {
+        JLabel label = ui.getLabel();
+        if (label == null) {
+            panel.add(ui.getComponent(), "newline, span");
+        } else {
             if (label.getText().length() > 30) {
                 panel.add(label, "newline, span 3");
             } else {
                 panel.add(label);
             }
+            panel.add(ui.getComponent());
         }
-        panel.add(ui, constraints);
         if (editable) {
             optionUpdaters.add((OptionUpdater) ui);
         }
-        if (!option.getId().equals(IntegerOption.NO_ID)) {
+        if (!option.getId().equals(FreeColObject.NO_ID)) {
             optionUIs.put(option.getId(), ui);
         }
     }
@@ -230,7 +180,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         }
     }
 
-    public JComponent getOptionUI(String key) {
+    public OptionUI getOptionUI(String key) {
         return optionUIs.get(key);
     }
 

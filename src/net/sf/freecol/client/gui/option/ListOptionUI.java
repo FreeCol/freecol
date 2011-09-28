@@ -28,12 +28,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,22 +46,18 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
+import net.sf.freecol.common.option.Option;
 
 /**
  * This class provides visualization for a {@link
  * net.sf.freecol.common.option.ListOption}. In order to enable values
  * to be both seen and changed.
  */
-public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
+public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ListOptionUI.class.getName());
-
-    private final ListOption<T> option;
-
+    private JPanel panel = new JPanel();
     private final JList list;
     private final DefaultListModel listModel;
-    private List<ListOptionElement<T>> originalValue;
 
     private JButton addButton = new JButton(Messages.message("list.add"));
     private JButton removeButton = new JButton(Messages.message("list.remove"));
@@ -79,24 +75,20 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
      * @param editable boolean whether user can modify the setting
      */
     public ListOptionUI(final ListOption<T> option, boolean editable) {
+        super(option, editable);
 
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                   Messages.getName(option)));
-        this.option = option;
-        this.originalValue = createElementList(option.getValue());
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
+                                                         super.getLabel().getText()));
+
         this.listModel = new DefaultListModel();
         for (ListOptionElement<T> e : createElementList(option.getValue())) {
             this.listModel.addElement(e);
         }
 
-        String name = Messages.getName(option);
-        String description = Messages.getShortDescription(option);
-
         list = new JList(listModel);
         final JScrollPane sp = new JScrollPane(list);
-        list.setToolTipText((description != null) ? description : name);
         list.setEnabled(editable);
-        add(sp, BorderLayout.CENTER);
+        panel.add(sp, BorderLayout.CENTER);
 
         final JPanel buttonPanel = new JPanel(new GridLayout(4, 1));
         buttonPanel.setOpaque(false);
@@ -104,7 +96,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
         buttonPanel.add(removeButton);
         buttonPanel.add(upButton);
         buttonPanel.add(downButton);
-        add(buttonPanel, BorderLayout.EAST);
+        panel.add(buttonPanel, BorderLayout.EAST);
         sp.setPreferredSize(new Dimension(500, buttonPanel.getPreferredSize().height));
 
         addButton.addActionListener(new ActionListener() {
@@ -148,7 +140,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
             public void intervalRemoved(ListDataEvent e) {}
         });
 
-        setOpaque(false);
+        initialize();
     }
 
     private void showAddElementDialog() {
@@ -168,7 +160,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
         addElementDialog.setCancelComponent(cancelButton);
         addElementDialog.add(buttons, BorderLayout.SOUTH);
 
-        final JComboBox mods = new JComboBox(option.getListOptionSelector().getOptions().toArray());
+        final JComboBox mods = new JComboBox(getOption().getListOptionSelector().getOptions().toArray());
         addElementDialog.add(mods, BorderLayout.CENTER);
 
         addButton.addActionListener(new ActionListener() {
@@ -190,7 +182,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
         canvas.remove(addElementDialog);
 
         if (response != null) {
-            listModel.addElement(new ListOptionElement<T>(response, option.getListOptionSelector().toString(response)));
+            listModel.addElement(new ListOptionElement<T>(response, getOption().getListOptionSelector().toString(response)));
         }
     }
 
@@ -198,7 +190,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
         final List<ListOptionElement<T>> elementList = new ArrayList<ListOptionElement<T>>();
         for (T o : list) {
             if (o == null) continue;
-            final ListOptionSelector<T> los = option.getListOptionSelector();
+            final ListOptionSelector<T> los = getOption().getListOptionSelector();
             final ListOptionElement<T> e = new ListOptionElement<T>(o, los.toString(o));
             elementList.add(e);
         }
@@ -214,10 +206,28 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
+     * Returns <code>null</code>, since this OptionUI does not require
+     * an external label.
+     *
+     * @return null
+     */
+    @Override
+    public final JLabel getLabel() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JPanel getComponent() {
+        return panel;
+    }
+
+    /**
+     * Updates the value of the {@link net.sf.freecol.common.getOption().Option} this object keeps.
      */
     public void updateOption() {
-        option.setValue(getValue());
+        getOption().setValue(getValue());
     }
 
     @SuppressWarnings("unchecked")
@@ -230,11 +240,11 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater  {
     }
 
     /**
-     * Reset with the value from the option.
+     * Reset with the value from the Option.
      */
     public void reset() {
         listModel.clear();
-        for (Object o : createElementList(option.getValue())) {
+        for (Object o : createElementList(getOption().getValue())) {
             listModel.addElement(o);
         }
     }

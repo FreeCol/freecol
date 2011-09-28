@@ -59,7 +59,7 @@ public final class GameOptionsDialog extends OptionsDialog {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI().getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
 
             comp.setValue(false);
-            comp.setEnabled(false);
+            comp.getComponent().setEnabled(false);
         }
     }
 
