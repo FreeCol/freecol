@@ -39,7 +39,6 @@ import net.sf.freecol.common.model.FreeColObject;
 abstract public class AbstractOption<T> extends FreeColObject
     implements Option<T> {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
     private String optionGroup = "";

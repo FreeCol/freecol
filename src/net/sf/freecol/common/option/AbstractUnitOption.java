@@ -38,7 +38,6 @@ import net.sf.freecol.common.model.Specification.TypeSelector;
  */
 public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
 
     private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;

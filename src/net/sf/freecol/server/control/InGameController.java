@@ -2967,7 +2967,6 @@ public final class InGameController extends Controller {
      * @param loot The <code>Goods</code> to loot.
      * @return An <code>Element</code> encapsulating this action.
      */
-    @SuppressWarnings("unchecked")
     public Element lootCargo(ServerPlayer serverPlayer, Unit winner,
                              String loserId, List<Goods> loot) {
         LootSession session = TransactionSession.lookup(LootSession.class,

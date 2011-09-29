@@ -60,7 +60,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ImageLibrary {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
     public static final String UNIT_SELECT = "unitSelect.image",
