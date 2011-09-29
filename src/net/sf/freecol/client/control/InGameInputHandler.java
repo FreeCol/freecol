@@ -1128,25 +1128,25 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handle all the children of this element.
      *
-     * @param connection <code>Connection</code>
-     * @param element <code>Element</code>, the element (root element
-     *     in a DOM-parsed XML tree) that holds all the information.
-     * @return <code>Element</code>
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return An <code>Element</code> containing the response/s.
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
-        Element reply = null;
+        List<Element> results = new ArrayList<Element>();
+
         for (int i = 0; i < nodes.getLength(); i++) {
             try {
-                reply = handle(connection, (Element) nodes.item(i));
+                Element reply = handle(connection, (Element) nodes.item(i));
+                if (reply != null) results.add(reply);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Caught crash in multiple item " + i
                     + ", continuing.", e);
             }
         }
-        return reply;
+        return DOMMessage.collapseElements(results);
     }
-
 
     /**
      *

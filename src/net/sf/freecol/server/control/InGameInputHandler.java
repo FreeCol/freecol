@@ -19,6 +19,9 @@
 
 package net.sf.freecol.server.control;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Player;
@@ -46,6 +49,7 @@ import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
@@ -88,6 +92,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -544,6 +549,27 @@ public final class InGameInputHandler extends InputHandler
                                   Element element) {
                 return new WorkMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
+            }});
+
+        register("multiple",
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                NodeList nodes = element.getChildNodes();
+                List<Element> results = new ArrayList<Element>();
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    try {
+                        Element reply = super.handle(connection,
+                            (Element) nodes.item(i));
+                        if (reply != null) results.add(reply);
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "Crash in multiple, item " + i
+                            + ", continuing.", e);
+                    }
+                }
+                return DOMMessage.collapseElements(results);
             }});
 
         // NetworkRequestHandlers

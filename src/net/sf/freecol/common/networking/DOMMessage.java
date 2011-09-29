@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -189,6 +190,30 @@ public class DOMMessage {
      */
     public static Element createNewRootElement(String tagName) {
         return createNewDocument().createElement(tagName);
+    }
+
+    /**
+     * Collapses a list of elements into a "multiple" element
+     * with the original elements added as child nodes.
+     *
+     * @param elements A list of <code>Element</code>s to collapse.
+     * @return A new "multiple" element, or the singleton element of the list,
+     *     or null if the list is empty.
+     */
+    public static Element collapseElements(List<Element> elements) {
+        switch (elements.size()) {
+        case 0:
+            return null;
+        case 1:
+            return elements.get(0);
+        default:
+            break;
+        }
+        Document doc = DOMMessage.createNewDocument();
+        Element result = doc.createElement("multiple");
+        doc.appendChild(result);
+        for (Element e : elements) result.appendChild(e);
+        return result;
     }
 
     /**

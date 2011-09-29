@@ -451,16 +451,23 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     /**
      * Handle all the children of this element.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return An <code>Element</code> containing the response/s.
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
-        Element reply = null;
+        List<Element> results = new ArrayList<Element>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
-            reply = handle(connection, (Element) nodes.item(i));
+            try {
+                Element reply = handle(connection, (Element) nodes.item(i));
+                if (reply != null) results.add(reply);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Caught crash in multiple item " + i
+                    + ", continuing.", e);
+            }
         }
-        return reply;
+        return DOMMessage.collapseElements(results);
     }
 }
