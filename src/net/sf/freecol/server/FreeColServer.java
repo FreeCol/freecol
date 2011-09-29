@@ -135,8 +135,9 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      *
-     * Version 10 was used in 0.9.x.
-     * Version 11 was new in 0.10.0.
+     * Version 7-10 were used in 0.9.x.
+     * Version 11 made a lot of changes and was introduced for the 0.10.0
+     *     series.
      * Version 12 was introduced with HighSeas post-0.10.1.
      *
      * Please add to this comment if you increase the version.
@@ -145,8 +146,12 @@ public final class FreeColServer {
 
     /**
      * The oldest save game format that can still be loaded.
+     * The promise is that FreeCol 0.n.* can load 0.(n-1).* games.
+     *
+     * TODO: revisit the numbering scheme and save compatibility promise
+     * when 1.0 is released.
      */
-    public static final int MINIMUM_SAVEGAME_VERSION = 10;
+    public static final int MINIMUM_SAVEGAME_VERSION = 7;
 
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
