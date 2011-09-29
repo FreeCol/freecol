@@ -153,6 +153,12 @@ public final class FreeColServer {
      */
     public static final int MINIMUM_SAVEGAME_VERSION = 7;
 
+    /**
+     * The specification to use when loading old format games where
+     * a spec may not be readily available.
+     */
+    public static final String defaultSpec = "freecol";
+
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
 
@@ -970,11 +976,27 @@ public final class FreeColServer {
                     }
                     // end compatibility code
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                    // @compat 0.9.x
+                    if (savegameVersion < 9 && specification == null) {
+                        specification = new FreeColTcFile(defaultSpec)
+                            .getSpecification();
+                        logger.info("Reading old format game"
+                            + " (version: " + savegameVersion
+                            + "), using " + defaultSpec + " specification.");
+                    }
+                    // end compatibility code
                     // Read the game
                     game = new ServerGame(null, xsr, serverStrings,
                         specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
+                    // @compat 0.9.x
+                    if (savegameVersion < 9
+                        && game.getDifficultyLevel() == null) {
+                        game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+                        logger.info("Applying default difficulty of medium.");
+                    }
+                    // end compatibility code
                 } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
                     if (server == null) break;
                     server.setAIMain(new AIMain(server, xsr));
