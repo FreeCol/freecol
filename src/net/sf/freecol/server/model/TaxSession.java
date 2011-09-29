@@ -19,15 +19,11 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Monarch;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

@@ -21,8 +21,6 @@
 package net.sf.freecol.common.option;
 
 
-import java.beans.PropertyChangeListener;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;

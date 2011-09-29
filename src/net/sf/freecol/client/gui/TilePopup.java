@@ -57,7 +57,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.ai.AIColony;

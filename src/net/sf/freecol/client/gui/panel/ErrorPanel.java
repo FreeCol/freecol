@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -31,11 +30,10 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This is the panel that pops up when an error needs to be reported.

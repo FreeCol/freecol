@@ -72,7 +72,6 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerBuilding;
-import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 
 

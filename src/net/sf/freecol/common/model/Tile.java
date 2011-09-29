@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -40,7 +39,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 

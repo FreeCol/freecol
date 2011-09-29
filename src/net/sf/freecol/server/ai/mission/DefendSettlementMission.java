@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;

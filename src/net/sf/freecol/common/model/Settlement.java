@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -30,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 import org.w3c.dom.Element;

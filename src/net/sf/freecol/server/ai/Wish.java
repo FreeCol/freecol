@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 
 import org.w3c.dom.Element;

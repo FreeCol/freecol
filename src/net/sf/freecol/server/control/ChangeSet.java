@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;

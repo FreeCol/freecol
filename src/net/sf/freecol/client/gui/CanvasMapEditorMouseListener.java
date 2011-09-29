@@ -38,7 +38,6 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.client.gui.panel.RiverStylePanel;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;

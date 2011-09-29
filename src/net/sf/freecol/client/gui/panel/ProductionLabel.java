@@ -27,7 +27,6 @@ import java.awt.Image;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;

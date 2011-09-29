@@ -19,36 +19,20 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;

@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.option;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;

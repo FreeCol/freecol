@@ -19,10 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -31,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 import org.w3c.dom.Element;

@@ -20,15 +20,15 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Map.Direction;
 
 import org.w3c.dom.Element;
 

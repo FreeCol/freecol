@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,12 +34,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides visualization for an {@link

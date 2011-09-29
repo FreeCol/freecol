@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -39,18 +38,17 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerUnit;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This dialog is used to edit an Indian settlement (map editor only).

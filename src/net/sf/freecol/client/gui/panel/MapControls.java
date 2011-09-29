@@ -26,7 +26,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 
@@ -44,9 +43,9 @@ import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.resources.ResourceManager;
 
 

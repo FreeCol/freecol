@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Settlement;

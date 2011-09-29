@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +36,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;

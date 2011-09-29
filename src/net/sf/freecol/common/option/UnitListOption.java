@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.AbstractUnit;
-
 /**
  * Represents an option where the valid choice is a list of
  * AbstractUnits.

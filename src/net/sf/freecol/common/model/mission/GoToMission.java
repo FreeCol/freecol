@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;

@@ -30,7 +30,6 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -77,14 +76,11 @@ import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
-
-import org.w3c.dom.Element;
 
 /**
  * The main control class for the FreeCol client.  This class both

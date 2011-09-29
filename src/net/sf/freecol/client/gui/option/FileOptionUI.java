@@ -27,8 +27,6 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;

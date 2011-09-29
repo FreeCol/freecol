@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;

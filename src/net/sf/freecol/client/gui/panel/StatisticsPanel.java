@@ -21,8 +21,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,6 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.server.ai.AIMain;
 
 
 /**

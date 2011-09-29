@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;

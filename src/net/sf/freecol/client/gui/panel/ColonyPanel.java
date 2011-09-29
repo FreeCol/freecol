@@ -62,7 +62,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -78,20 +77,18 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import net.sf.freecol.common.model.UnitType;
 
 
 /**

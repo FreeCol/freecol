@@ -22,8 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.Set;
 
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 /**

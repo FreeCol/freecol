@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.server.model.ServerUnit;

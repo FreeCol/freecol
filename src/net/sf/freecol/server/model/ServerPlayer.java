@@ -22,16 +22,12 @@ package net.sf.freecol.server.model;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +53,6 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -85,8 +80,6 @@ import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
-import net.sf.freecol.server.model.LootSession;
-import net.sf.freecol.server.model.TransactionSession;
 
 
 /**
