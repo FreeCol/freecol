@@ -20,18 +20,16 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Rectangle;
-
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
+import javax.swing.JTextArea;
 import javax.swing.JToolTip;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.plaf.basic.BasicToolTipUI;
-import javax.swing.text.View;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 
@@ -44,45 +42,95 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
 
+    private CellRendererPane rendererPane;
+    private static JTextArea textArea;
+    private static Border textAreaBorder
+        = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    private static int maximumWidth = 300;
+
+
+    public static void initialize() {
+        String name = FreeColToolTipUI.class.getName();
+        UIManager.put("ToolTipUI", name);
+        UIManager.put(name, FreeColToolTipUI.class);
+    }
+
+    private FreeColToolTipUI() {
+        super();
+    }
 
     public static ComponentUI createUI(JComponent c) {
         return sharedInstance;
     }
 
+    public void installUI(JComponent c) {
+        super.installUI(c);
+        rendererPane = new CellRendererPane();
+        c.add(rendererPane);
+    }
+
+    public void uninstallUI(JComponent c) {
+        super.uninstallUI(c);
+        c.remove(rendererPane);
+        rendererPane = null;
+    }
+
+
+    /**
+     * Describe <code>setMaximumWidth</code> method here.
+     *
+     * @param width an <code>int</code> value
+     */
+    public static void setMaximumWidth(int width){
+        maximumWidth = width;
+    }
+
+    /**
+     * Describe <code>setInsets</code> method here.
+     *
+     * @param width an <code>int</code> value
+     */
+    public static void setInsets(int width){
+        textAreaBorder = BorderFactory.createEmptyBorder(width, width, width, width);
+    }
+
+
     public void paint(Graphics g, JComponent c) {
+        Dimension size = c.getSize();
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }
-
-        LAFUtilities.setProperties(g, c);
-
-        // Copied from "BasicToolTipUI":
-        Font font = c.getFont();
-        FontMetrics metrics = g.getFontMetrics(font);
-        Dimension size = c.getSize();
-
-        g.setColor(c.getForeground());
-        g.setFont(font);
-
-        String tipText = ((JToolTip)c).getTipText();
-        if (tipText == null) {
-            tipText = "";
-        }
-
-        Insets insets = c.getInsets();
-        Rectangle paintTextR = new Rectangle(
-            insets.left,
-            insets.top,
-            size.width - (insets.left + insets.right),
-            size.height - (insets.top + insets.bottom));
-
-        View v = (View) c.getClientProperty(BasicHTML.propertyKey);
-        if (v != null) {
-            v.paint(g, paintTextR);
-        } else {
-            g.drawString(tipText, paintTextR.x + 3,
-                                  paintTextR.y + metrics.getAscent());
-        }
+        rendererPane.paintComponent(g, textArea, c, 1, 1,
+                                    size.width - 1, size.height - 1, true);
     }
 
+    public Dimension getPreferredSize(JComponent c) {
+        String tipText = ((JToolTip)c).getTipText();
+        if (tipText == null){
+            return new Dimension(0,0);
+        }
+
+        textArea = new JTextArea(tipText);
+        textArea.setBorder(textAreaBorder);
+        textArea.setFont(UIManager.getFont("ToolTip"));
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(false);
+
+        rendererPane.removeAll();
+        rendererPane.add(textArea);
+
+        if (maximumWidth > 0 && maximumWidth < textArea.getPreferredSize().getWidth()) {
+            textArea.setLineWrap(true);
+            textArea.setSize(maximumWidth, textArea.getPreferredSize().height);
+        }
+        return textArea.getPreferredSize();
+    }
+
+    public Dimension getMinimumSize(JComponent c) {
+        return getPreferredSize(c);
+    }
+
+    public Dimension getMaximumSize(JComponent c) {
+        return getPreferredSize(c);
+    }
 }
