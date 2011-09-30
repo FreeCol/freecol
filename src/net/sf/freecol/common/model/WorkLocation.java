@@ -145,8 +145,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * {@inheritDoc}
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
-        return (locatable instanceof Unit
-            && ((Unit) locatable).hasAbility("model.ability.person"))
+        return (locatable instanceof Unit && ((Unit) locatable).isPerson())
             ? super.getNoAddReason(locatable)
             : NoAddReason.WRONG_TYPE;
     }

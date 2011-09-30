@@ -58,7 +58,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         UnitType colonist = spec.getUnitType("model.unit.freeColonist");
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
-        assertFalse(colonist.hasAbility("model.ability.bornInIndianSettlement"));
+        assertFalse(colonist.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
         assertTrue(colonist.isRecruitable());
         assertFalse(colonist.hasAbility(Ability.NAVAL_UNIT));
         assertFalse(colonist.hasAbility(Ability.CARRY_GOODS));
@@ -75,7 +75,7 @@ public final class SpecificationTest extends FreeColTestCase {
 
         UnitType brave = spec.getUnitType("model.unit.brave");
         //assertFalse(brave.hasAbility("model.ability.foundColony"));
-        assertTrue(brave.hasAbility("model.ability.bornInIndianSettlement"));
+        assertTrue(brave.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
         assertFalse(brave.isRecruitable());
         assertFalse(brave.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(brave.hasAbility(Ability.CARRY_GOODS));
@@ -179,25 +179,25 @@ public final class SpecificationTest extends FreeColTestCase {
         equipmentTypeStr = "model.equipment.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
-        expectAbilities.put("model.ability.bornInIndianSettlement", false);
+        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
-        expectAbilities.put("model.ability.bornInIndianSettlement", false);
+        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.horses";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
-        expectAbilities.put("model.ability.bornInIndianSettlement", true);
+        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
         expectAbilities.put("model.ability.canBeEquipped", true);
-        expectAbilities.put("model.ability.bornInIndianSettlement", true);
+        expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         // Verify

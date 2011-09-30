@@ -2207,6 +2207,29 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Checks if this unit is a person, that is not a ship or wagon.
+     * Surprisingly difficult without explicit enumeration because
+     * model.ability.person only arrived in 0.10.1.
+     *
+     * @return True if this unit is a person.
+     */
+    public boolean isPerson() {
+        return hasAbility("model.ability.person")
+            // @compat 0.10.0
+            || hasAbility(Ability.BORN_IN_COLONY)
+            || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+            || hasAbility("model.ability.foundColony")
+            // Nick also had:
+            //     && (!hasAbility("model.ability.carryGoods")
+            //         && !hasAbility("model.ability.carryUnits")
+            //         && !hasAbility("model.ability.carryTreasure")
+            //         && !hasAbility("model.ability.bombard"))
+            // ...but that should be unnecessary.
+            // end compatibility code
+            ;
+    } 
+
+    /**
      * Gets the owner of this Unit.
      *
      * @return The owner of this Unit.
@@ -2301,14 +2324,7 @@ public class Unit extends FreeColGameObject
      * @param newNationality The new nationality of this Unit.
      */
     public void setNationality(String newNationality) {
-        if (hasAbility(Ability.BORN_IN_COLONY)
-            || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-            || hasAbility("model.ability.foundColony")) {
-            // 0.10.0 and earlier games have no model.ability.person,
-            // so instead we check several other abilities to exclude
-            // ships, artillery, wagons and treasure trains.
-            // foundColony is for additional backwards compatibility,
-            // as inheritance of model.ability.bornInColony is quite new.
+        if (isPerson()) {
             nationality = newNationality;
         } else {
             throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
@@ -3299,68 +3315,14 @@ public class Unit extends FreeColGameObject
             out.writeAttribute("owner", getGame().getUnknownEnemy().getId());
         } else {
             out.writeAttribute("owner", getOwner().getId());
-            
-            // try *really* hard not to write out nationality and ethnicity for ships, wagons, cannons etc
-            // hopefully this can be simplified with a bit more effort
-            if (nationality != null && !isNaval() &&
-                        (hasAbility(Ability.BORN_IN_COLONY)
-                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")
-                      || hasAbility("model.ability.person")) &&
-                        (!hasAbility("model.ability.carryGoods")
-                      && !hasAbility("model.ability.carryUnits")
-                      && !hasAbility("model.ability.carryTreasure")
-                      && !hasAbility("model.ability.bombard"))) {
-                out.writeAttribute("nationality", nationality);
-            } else if(!isNaval() &&
-                        (hasAbility(Ability.BORN_IN_COLONY)
-                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")
-                      || hasAbility("model.ability.person")) &&
-                        (!hasAbility("model.ability.carryGoods")
-                      && !hasAbility("model.ability.carryUnits")
-                      && !hasAbility("model.ability.carryTreasure")
-                      && !hasAbility("model.ability.bombard"))) {
-                // 0.10.0 and earlier games have no model.ability.person,
-                // so instead we check several other abilities to exclude
-                // ships, artillery, wagons and treasure trains.
-                // foundColony is for additional backwards compatibility,
-                // as inheritance of model.ability.bornInColony is quite new.
-                out.writeAttribute("nationality", owner.getNationID());
-            }
-            if (ethnicity != null && !isNaval() &&
-                        (hasAbility(Ability.BORN_IN_COLONY)
-                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")
-                      || hasAbility("model.ability.person")) &&
-                        (!hasAbility("model.ability.carryGoods")
-                      && !hasAbility("model.ability.carryUnits")
-                      && !hasAbility("model.ability.carryTreasure")
-                      && !hasAbility("model.ability.bombard"))) {
-                out.writeAttribute("ethnicity", ethnicity);
-            } else if(!isNaval() &&
-                        (hasAbility(Ability.BORN_IN_COLONY)
-                      || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                      || hasAbility("model.ability.foundColony")
-                      || hasAbility("model.ability.person")) &&
-                        (!hasAbility("model.ability.carryGoods")
-                      && !hasAbility("model.ability.carryUnits")
-                      && !hasAbility("model.ability.carryTreasure")
-                      && !hasAbility("model.ability.bombard"))) {
-                // 0.10.0 and earlier games have no model.ability.person,
-                // so instead we check several other abilities to exclude
-                // ships, artillery, wagons and treasure trains.
-                // foundColony is for additional backwards compatibility,
-                // as inheritance of model.ability.bornInColony is quite new.
-                if(!hasAbility("model.ability.convert")) {
-                    out.writeAttribute("ethnicity", owner.getNationID());
-                } else if(indianSettlement != null
-                          && indianSettlement.getOwner() != null) {
-                    out.writeAttribute("ethnicity",
-                                       indianSettlement.getOwner().getNationID());
-                }
-                // do not compute the ethnicity of a convert with a null
-                // indianSettlement, that information is now unretrievable
+            if (isPerson()) {
+                // Do not write out nationality and ethnicity for non-persons.
+                out.writeAttribute("nationality",
+                    (nationality != null) ? nationality
+                    : getOwner().getNationID());
+                out.writeAttribute("ethnicity",
+                    (ethnicity != null) ? ethnicity
+                    : getOwner().getNationID());
             }
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));

@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -130,7 +131,7 @@ public class ServerIndianSettlement extends IndianSettlement
         GoodsType foodType = spec.getPrimaryFoodType();
         GoodsType rumType = spec.getGoodsType("model.goods.rum");
         List<UnitType> unitTypes
-            = spec.getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
+            = spec.getUnitTypesWithAbility(Ability.BORN_IN_INDIAN_SETTLEMENT);
         if (!unitTypes.isEmpty()
             && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
                 > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)
