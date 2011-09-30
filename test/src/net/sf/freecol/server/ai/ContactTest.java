@@ -77,7 +77,6 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
 
-        @SuppressWarnings("unused")
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setState(Unit.UnitState.FORTIFYING);
         colonist.setState(Unit.UnitState.FORTIFIED);

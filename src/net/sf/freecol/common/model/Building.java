@@ -644,7 +644,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 production = (int) unitType.getFeatureContainer()
                     .applyModifier(Math.max(1, production),
                         getGoodsOutputType().getId());
-                production = (int) unitType.getFeatureContainer()
+                unitType.getFeatureContainer();
+                production = (int) FeatureContainer
                     .applyModifiers(production, getGame().getTurn(),
                         getProductionModifiers());
             }

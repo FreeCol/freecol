@@ -398,7 +398,7 @@ public final class ConnectController {
             // Reload the client options saved with this game.
             try {
                 ClientOptions options = freeColClient.getClientOptions();
-                options.updateOptions(fis.getInputStream(fis.CLIENT_OPTIONS));
+                options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
                 options.fixClientOptions();
             } catch (FileNotFoundException e) {
                 // no client options, we don't care
