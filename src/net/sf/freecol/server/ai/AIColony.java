@@ -866,13 +866,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Collections.sort(workLocationPlans);
 
         // Remove all colonists from the colony:
-        Iterator<Unit> ui = colony.getUnitIterator();
-        while (ui.hasNext()) {
-            Unit unit = ui.next();
-            units.add(unit);
-            //don't set location to null, but to the tile of the colony this
-            //unit is being removed from!
-            unit.setLocation(colony.getTile());
+        for (Unit u : colony.getUnitList()) {
+            if (u.isPerson()) units.add(u);
+            // Do not set location to null, but to the tile of the
+            // colony this unit is being removed from!
+            u.setLocation(colony.getTile());
         }
 
         // Place the experts:
