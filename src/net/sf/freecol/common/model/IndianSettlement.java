@@ -1294,6 +1294,7 @@ public class IndianSettlement extends Settlement {
         } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
             in.nextTag();
             missionary = updateFreeColGameObject(in, Unit.class);
+            missionary.setLocationNoUpdate(this);
             in.nextTag();
         } else if (UNITS_TAG_NAME.equals(in.getLocalName())) { // @compat 0.10.1
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
