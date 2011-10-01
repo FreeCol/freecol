@@ -19,17 +19,19 @@
 
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.Graphics;
-import javax.swing.border.Border;
-import javax.swing.BorderFactory;
-import javax.swing.CellRendererPane;
+import java.awt.Graphics2D;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import javax.swing.JComponent;
-import javax.swing.JTextArea;
 import javax.swing.JToolTip;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 
@@ -42,18 +44,13 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
 
-    private CellRendererPane rendererPane;
-    private static JTextArea textArea;
-    private static Border textAreaBorder
-        = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    // TODO: find out why we can't use the FontRenderContext of the
+    // component. And should we use fractional metrics?
+    private static FontRenderContext frc = new FontRenderContext(null, true, false);
+
+    private static int margin = 5;
     private static int maximumWidth = 300;
 
-
-    public static void initialize() {
-        String name = FreeColToolTipUI.class.getName();
-        UIManager.put("ToolTipUI", name);
-        UIManager.put(name, FreeColToolTipUI.class);
-    }
 
     private FreeColToolTipUI() {
         super();
@@ -62,19 +59,6 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     public static ComponentUI createUI(JComponent c) {
         return sharedInstance;
     }
-
-    public void installUI(JComponent c) {
-        super.installUI(c);
-        rendererPane = new CellRendererPane();
-        c.add(rendererPane);
-    }
-
-    public void uninstallUI(JComponent c) {
-        super.uninstallUI(c);
-        c.remove(rendererPane);
-        rendererPane = null;
-    }
-
 
     /**
      * Describe <code>setMaximumWidth</code> method here.
@@ -85,45 +69,60 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         maximumWidth = width;
     }
 
-    /**
-     * Describe <code>setInsets</code> method here.
-     *
-     * @param width an <code>int</code> value
-     */
-    public static void setInsets(int width){
-        textAreaBorder = BorderFactory.createEmptyBorder(width, width, width, width);
-    }
-
-
     public void paint(Graphics g, JComponent c) {
         Dimension size = c.getSize();
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }
-        rendererPane.paintComponent(g, textArea, c, 1, 1,
-                                    size.width - 1, size.height - 1, true);
-    }
+
+        // TODO: find out why this is necessary
+        g.setColor(Color.BLACK);
+        Graphics2D graphics = (Graphics2D) g;
+        AttributedCharacterIterator styledText =
+            new AttributedString(((JToolTip) c).getTipText()).getIterator();
+
+        LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
+
+        float x = margin;
+        float y = margin;
+        while (measurer.getPosition() < styledText.getEndIndex()) {
+
+            TextLayout layout = measurer.nextLayout(maximumWidth);
+
+            y += (layout.getAscent());
+            float dx = layout.isLeftToRight() ?
+                0 : (maximumWidth - layout.getAdvance());
+
+            layout.draw(graphics, x + dx, y);
+            y += layout.getDescent() + layout.getLeading();
+        }
+
+
+     }
 
     public Dimension getPreferredSize(JComponent c) {
         String tipText = ((JToolTip)c).getTipText();
-        if (tipText == null){
-            return new Dimension(0,0);
+        if (tipText == null) {
+            return new Dimension(0, 0);
         }
 
-        textArea = new JTextArea(tipText);
-        textArea.setBorder(textAreaBorder);
-        textArea.setFont(UIManager.getFont("ToolTip"));
-        textArea.setWrapStyleWord(true);
-        textArea.setLineWrap(false);
+        AttributedCharacterIterator styledText =
+            new AttributedString(((JToolTip) c).getTipText()).getIterator();
+        LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
-        rendererPane.removeAll();
-        rendererPane.add(textArea);
+        float x = 0f;
+        float y = 0f;
+        while (measurer.getPosition() < styledText.getEndIndex()) {
 
-        if (maximumWidth > 0 && maximumWidth < textArea.getPreferredSize().getWidth()) {
-            textArea.setLineWrap(true);
-            textArea.setSize(maximumWidth, textArea.getPreferredSize().height);
+            TextLayout layout = measurer.nextLayout(maximumWidth);
+
+            x = Math.max(x, layout.getVisibleAdvance());
+            y += layout.getAscent() + layout.getDescent() + layout.getLeading();
+
         }
-        return textArea.getPreferredSize();
+        return new Dimension((int) (x + 2 * margin),
+                             (int) (y + 2 * margin));
+
     }
 
     public Dimension getMinimumSize(JComponent c) {
