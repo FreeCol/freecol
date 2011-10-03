@@ -38,7 +38,8 @@ public class ColopediaAction extends FreeColAction {
 
     public static enum PanelType {
         TERRAIN, RESOURCES, UNITS, GOODS,
-        SKILLS, BUILDINGS, FATHERS, NATIONS, NATION_TYPES
+        SKILLS, BUILDINGS, FATHERS, NATIONS,
+        NATION_TYPES, CONCEPTS
     }
 
     public static final int[] mnemonics = new int[] {
@@ -50,7 +51,8 @@ public class ColopediaAction extends FreeColAction {
         KeyEvent.VK_B,
         KeyEvent.VK_F,
         KeyEvent.VK_N,
-        KeyEvent.VK_A
+        KeyEvent.VK_A,
+        KeyEvent.VK_C
     };
 
 
