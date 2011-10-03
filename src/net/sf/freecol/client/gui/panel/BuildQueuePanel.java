@@ -60,6 +60,7 @@ import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.plaf.PanelUI;
 
+import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -1000,13 +1001,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
                     int index = source.locationToIndex(e.getPoint());
                     BuildableType type = (BuildableType) source.getModel().getElementAt(index);
-                    if (type instanceof BuildingType) {
-                        getCanvas().showPanel(new ColopediaPanel(getCanvas(),
-                                                                 ColopediaPanel.PanelType.BUILDINGS, type));
-                    } else if (type instanceof UnitType) {
-                        getCanvas().showPanel(new ColopediaPanel(getCanvas(),
-                                                                 ColopediaPanel.PanelType.UNITS, type));
-                    }
+                    getCanvas().showPanel(new ColopediaPanel(getCanvas(), type.getId()));
                 } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
                         DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
                         if (source.getSelectedIndex() == -1) {

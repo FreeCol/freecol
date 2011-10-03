@@ -608,8 +608,7 @@ public final class DragListener extends MouseAdapter {
                                        imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showPanel(new ColopediaPanel(canvas, ColopediaPanel.PanelType.GOODS,
-                                                        goods.getType()));
+                    canvas.showPanel(new ColopediaPanel(canvas, goods.getType().getId()));
                 }
             });
         menu.add(name);

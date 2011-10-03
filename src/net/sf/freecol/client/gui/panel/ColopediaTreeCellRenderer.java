@@ -26,7 +26,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -53,7 +52,7 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
 
-        if (leaf || nodeItem.getFreeColGameObjectType() instanceof BuildingType) {
+        if (nodeItem.getIcon() != null) {
             setIcon(nodeItem.getIcon());
         } else if (expanded) {
             setIcon(ResourceManager.getImageIcon("Colopedia.openSection.image"));

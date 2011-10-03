@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.action.ColopediaAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 
 /**
@@ -32,51 +31,25 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
  */
 class ColopediaTreeItem {
 
-    private PanelType panelType;
-    private FreeColGameObjectType objectType;
+    private ColopediaDetailPanel panelType;
+    private String id;
     private String text;
     private ImageIcon icon;
 
     /**
-     * The constructor that will add the items to this panel.
+     * The default constructor for a ColopediaTreeItem that
+     * corresponds to a leaf node.
      *
-     * @param panelType The panel type.
+     * @param panelType a <code>ColopediaDetailPanel</code> value
+     * @param id a <code>String</code> value
+     * @param text a <code>String</code> value
+     * @param icon an <code>ImageIcon</code> value
      */
-    ColopediaTreeItem(PanelType panelType) {
+    ColopediaTreeItem(ColopediaDetailPanel panelType, String id, String text, ImageIcon icon) {
         this.panelType = panelType;
-        this.text = Messages.message(ColopediaAction.id + panelType + ".name");
-    }
-    /**
-     * The constructor that will add the items to this panel.
-     *
-     * @param panelType The panel type.
-     * @param text The name of the item.
-     */
-    ColopediaTreeItem(PanelType panelType, String text) {
-        this.panelType = panelType;
-        this.text = text;
-    }
-
-    /**
-     * The constructor that will add the items to this panel.
-     *
-     * @param objectType The type represented by this item.
-     * @param text The name of the item.
-     * @param icon The icon of the item.
-     */
-    ColopediaTreeItem(FreeColGameObjectType objectType, String text, ImageIcon icon) {
-        this.objectType = objectType;
+        this.id = id;
         this.text = text;
         this.icon = icon;
-    }
-
-    /**
-     * Returns the type this item represents.
-     *
-     * @return the type this item represents.
-     */
-    public FreeColGameObjectType getFreeColGameObjectType() {
-        return objectType;
     }
 
     /**
@@ -84,8 +57,16 @@ class ColopediaTreeItem {
      *
      * @return the panel type this item belongs to.
      */
-    public PanelType getPanelType() {
+    public ColopediaDetailPanel getPanelType() {
         return panelType;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getText() {
+        return text;
     }
 
     /**

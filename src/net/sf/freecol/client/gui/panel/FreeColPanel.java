@@ -97,7 +97,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
 
     // The decimal format to use for Modifiers
-    private static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
+    protected static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
 
     /**
      * The canvas all panels belong to.

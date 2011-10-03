@@ -48,10 +48,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import net.sf.freecol.client.control.PreGameController;
+import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
@@ -114,13 +114,13 @@ public final class PlayersTable extends JTable {
 
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATIONS, null));
+                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATIONS.toString()));
                 }
             });
 
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATION_TYPES, null));
+                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATION_TYPES.toString()));
                 }
             });
 

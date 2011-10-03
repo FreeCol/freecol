@@ -179,12 +179,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
             } else if (object instanceof Tile) {
                 getCanvas().getGUI().setFocus(((Tile) object));
             } else if (object == null) {
-                try {
-                    FreeColGameObjectType type = getSpecification().getType(command);
-                    getCanvas().showPanel(new ColopediaPanel(getCanvas(), null, type));
-                } catch(Exception e) {
-                    // there is no such type, but we don't care
-                }
+                getCanvas().showPanel(new ColopediaPanel(getCanvas(), command));
             }
         }
     }

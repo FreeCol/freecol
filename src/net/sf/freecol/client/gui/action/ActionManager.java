@@ -23,8 +23,8 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
-import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -40,7 +40,6 @@ public class ActionManager extends OptionGroup {
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
     private FreeColClient freeColClient;
-
 
     /**
      * Creates a new <code>ActionManager</code>.
@@ -69,8 +68,8 @@ public class ActionManager extends OptionGroup {
         add(new ChangeWindowedModeAction(freeColClient));
         add(new ChatAction(freeColClient));
         add(new ClearOrdersAction(freeColClient));
-        for (PanelType type : PanelType.values()) {
-            add(new ColopediaAction(freeColClient, type));
+        for (PanelType panelType : PanelType.values()) {
+            add(new ColopediaAction(freeColClient, panelType));
         }
         add(new DebugAction(freeColClient));
         add(new DeclareIndependenceAction(freeColClient));
