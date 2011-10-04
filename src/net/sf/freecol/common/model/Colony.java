@@ -1472,8 +1472,7 @@ public class Colony extends Settlement implements Nameable {
                     return new Occupation(bestTile, bestWork);
                 } else {
                     for (GoodsType type : rawTypes) {
-                        Building building = getBuildingForProducing(type);
-                        if (building != null) {
+                        for (Building building : getBuildingsForProducing(type)) {
                             switch (building.getNoAddReason(unit)) {
                             case NONE: case ALREADY_PRESENT:
                                 return new Occupation(building, type);
@@ -1827,9 +1826,9 @@ public class Colony extends Settlement implements Nameable {
             }
         }
 
-        Building buildingForProducing = getBuildingForProducing(goodsType);
-        if (buildingForProducing != null) {
-            addInsufficientProductionMessage(result, productionCache.getProductionInfo(buildingForProducing));
+        for (Building b : getBuildingsForProducing(goodsType)) {
+            addInsufficientProductionMessage(result,
+                productionCache.getProductionInfo(b));
         }
         Building buildingForConsuming = getBuildingForConsuming(goodsType);
         if (buildingForConsuming != null

@@ -208,10 +208,13 @@ public final class ReportColonyPanel extends ReportPanel
                 int newValue = colony.getNetProductionOf(goodsType);
                 int stockValue = colony.getGoodsCount(goodsType);
                 if (newValue != 0 || stockValue > 0) {
-                    Building building = colony.getBuildingForProducing(goodsType);
+                    int maxProduction = 0;
+                    for (Building building : colony.getBuildingsForProducing(goodsType)) {
+                        maxProduction += building.getMaximumProduction();
+                    }
                     ProductionLabel productionLabel = new ProductionLabel(goodsType, newValue, getCanvas());
-                    if (building != null) {
-                        productionLabel.setMaximumProduction(building.getMaximumProduction());
+                    if (maxProduction > 0) {
+                        productionLabel.setMaximumProduction(maxProduction);
                     }
                     if (goodsType == horses) {
                         // horse images don't stack well

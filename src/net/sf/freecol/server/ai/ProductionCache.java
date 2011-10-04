@@ -141,10 +141,11 @@ public class ProductionCache {
                 }
             }
         } else {
-            Building building = colony.getBuildingForProducing(goodsType);
-            if (building != null && building.getType().getWorkPlaces() > 0) {
-                for (Unit unit : units) {
-                    result.add(new Entry(goodsType, building, unit));
+            for (Building building : colony.getBuildingsForProducing(goodsType)) {
+                if (building.getType().getWorkPlaces() > 0) {
+                    for (Unit unit : units) {
+                        result.add(new Entry(goodsType, building, unit));
+                    }
                 }
             }
         }
