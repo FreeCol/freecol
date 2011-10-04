@@ -209,10 +209,13 @@ public class DOMMessage {
         default:
             break;
         }
-        Document doc = DOMMessage.createNewDocument();
+        Element first = elements.remove(0);
+        Document doc = first.getOwnerDocument();
         Element result = doc.createElement("multiple");
-        doc.appendChild(result);
-        for (Element e : elements) result.appendChild(e);
+        result.appendChild(first);
+        for (Element e : elements) {
+            result.appendChild(doc.importNode(e, true));
+        }
         return result;
     }
 
