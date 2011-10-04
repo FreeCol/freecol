@@ -37,12 +37,14 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.ai.ColonyProfile.ProfileType;
 
 import org.w3c.dom.Document;
@@ -940,121 +942,123 @@ public class ColonyPlan {
     }
 
 
-    public void adjustProductionAndManufacture(){
-        List<GoodsType> rawMatList = new ArrayList<GoodsType>();
+    /**
+     * Checks if the production of required produced goods is falling
+     * behind the raw material production.
+     */
+    public void adjustProductionAndManufacture() {
+        List<GoodsType> goodsTypes = new ArrayList<GoodsType>();
 
-        final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType lumberType = colony.getSpecification().getGoodsType("model.goods.lumber");
-        final GoodsType oreType = colony.getSpecification().getGoodsType("model.goods.ore");
-
-        if(getBuildingReqGoods() == hammersType){
-            rawMatList.add(lumberType);
+        BuildableType current = colony.getCurrentlyBuilding();
+        if (current != null && colony.getProductionInfo(current) != null) {
+            for (AbstractGoods ag : colony.getProductionInfo(current)
+                     .getConsumption()) {
+                GoodsType type = ag.getType();
+                if (ag.getAmount() <= colony.getGoodsCount(type)) continue;
+                while (!type.isRawMaterial()) {
+                    GoodsType madeFrom = type.getRawMaterial();
+                    if (madeFrom == null) break;
+                    goodsTypes.add(type);
+                    type = madeFrom;
+                }
+                goodsTypes.add(type);
+            }
         }
-        rawMatList.add(oreType);
 
         if (primaryRawMaterial != null
-                && primaryRawMaterial != lumberType
-                && primaryRawMaterial != oreType
-                && !primaryRawMaterial.isFoodType()) {
-            rawMatList.add(primaryRawMaterial);
+            && !primaryRawMaterial.isFoodType()) {
+            goodsTypes.add(primaryRawMaterial);
         }
-
         if (secondaryRawMaterial != null
-                && secondaryRawMaterial != lumberType
-                && secondaryRawMaterial != oreType
-                && !secondaryRawMaterial.isFoodType()) {
-            rawMatList.add(secondaryRawMaterial);
+            && !secondaryRawMaterial.isFoodType()) {
+            goodsTypes.add(secondaryRawMaterial);
         }
 
-        for(GoodsType rawMat : rawMatList){
-            GoodsType producedGoods = rawMat.getProducedMaterial();
-            if(producedGoods == null){
-                continue;
+        for (GoodsType type : goodsTypes) {
+            GoodsType producedGoods = type.getProducedMaterial();
+            if (producedGoods != null) {
+                adjustProductionAndManufactureFor(type, producedGoods);
             }
-            adjustProductionAndManufactureFor(rawMat,producedGoods);
         }
     }
 
-    public void adjustProductionAndManufactureFor(GoodsType rawMat, GoodsType producedGoods){
-        Building factory = colony.getBuildingForProducing(producedGoods);
-        if(factory == null){
-            return;
-        }
+    /**
+     * Find units making the raw goods for a manufactured goods, and
+     * switch them to manufacturing.
+     *
+     * @param rawGoods The raw <code>GoodsType</code>.
+     * @param producedGoods The <code>GoodsType</code> produced from the
+     *     raw goods type.
+     */
+    private void adjustProductionAndManufactureFor(GoodsType rawGoods,
+                                                   GoodsType producedGoods) {
+        List<Building> factories
+            = colony.getBuildingsForProducing(producedGoods);
+        if (factories.isEmpty()) return;
 
+        // Collect producers of the raw goods.
         List<Unit> producers = new ArrayList<Unit>();
-        int stockRawMat = colony.getGoodsCount(rawMat);
-
-        for(ColonyTile t : colony.getColonyTiles()){
-            if(t.isColonyCenterTile()){
-                continue;
+        for (WorkLocation wl : colony.getWorkLocations()) {
+            for (Unit u : wl.getUnitList()) {
+                if (u.getWorkType() == rawGoods) producers.add(u);
             }
-            Unit u = t.getUnit();
-            if(u == null){
-                continue;
-            }
-            if(u.getWorkType() != rawMat){
-                continue;
-            }
-            producers.add(u);
         }
-
-        if(producers.size() == 0){
-            return;
-        }
-
-        // Creates comparator to order the list of producers by their production (ascending)
-        Comparator<Unit> comp = new Comparator<Unit>(){
-                public int compare(Unit u1, Unit u2){
+        if (producers.isEmpty()) return;
+        
+        // Sort the producers by their production (ascending).
+        Collections.sort(producers, new Comparator<Unit>() {
+                public int compare(Unit u1, Unit u2) {
                     GoodsType goodsType = u1.getWorkType();
-                    int prodU1 = ((ColonyTile) u1.getLocation()).getProductionOf(u1, goodsType);
-                    int prodU2 = ((ColonyTile) u2.getLocation()).getProductionOf(u2, goodsType);
-
-                    if(prodU1 > prodU2){
-                        return 1;
-                    }
-                    if(prodU1 < prodU2){
-                        return -1;
-                    }
-                    return 0;
+                    int p1 = ((ColonyTile) u1.getLocation())
+                        .getProductionOf(u1, goodsType);
+                    int p2 = ((ColonyTile) u2.getLocation())
+                        .getProductionOf(u2, goodsType);
+                    return (p1 > p2) ? 1 : (p1 < p2) ? -1 : 0;
                 }
-        };
-        Collections.sort(producers, comp);
+            });
 
-        // shift units gathering raw materials to production of manufactured goods
-        Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
-        while(iter.hasNext()){
-            // not enough stock of raw material and workers
-            if(stockRawMat < 50 && producers.size() < 2){
-                return;
-            }
+        // If raw goods levels are low and there is only one producer,
+        // let the stock accumulate.
+        int stockGoods = colony.getGoodsCount(rawGoods);
+        if (stockGoods < GoodsContainer.CARGO_SIZE/2
+            && producers.size() < 2) return;
 
-            if (factory.isFull()) return;
-            Unit u = iter.next();
-            // this particular unit cannot be added to this building
-            if(!factory.canAdd(u.getType())){
-                continue;
-            }
-
-            // get  the production values if the unit is shifted
-            int rawProd = colony.getNetProductionOf(rawMat)
-                - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
+        // Shift units gathering raw materials to production of
+        // manufactured goods.
+        Building factory = factories.remove(0);
+        for (Unit u : producers) {
+            // Get the production values if the unit is shifted.
+            // If the stock is low and raw production would drop below the
+            // manufactured production then we have gone too far.
+            int rawProd = colony.getNetProductionOf(rawGoods)
+                - ((WorkLocation)u.getLocation()).getProductionOf(u, rawGoods);
             int mfnProd = colony.getNetProductionOf(producedGoods)
                 + factory.getAdditionalProductionNextTurn(u);
-            if(stockRawMat < 50 && rawProd < mfnProd){
-                return;
+            if (stockGoods < GoodsContainer.CARGO_SIZE/2
+                && rawProd < mfnProd) return;
+
+            // Find a factory.
+            if (factory.isFull()) factory = null;
+            while (factory == null) {
+                if (factories.isEmpty()) return;
+                factory = factories.remove(0);
+                if (factory.isFull()) factory = null;
             }
 
-            u.setLocation(factory);
-            u.setWorkType(producedGoods);
-            producers.remove(u);
+            // Move the unit to the factory and set it to work.
+            // Finish if the factory fills up.
+            AIUnit au = aiMain.getAIUnit(u);
+            AIMessage.askWork(au, factory);
+            if (u.getWorkType() != producedGoods) {
+                AIMessage.askChangeWorkType(au, producedGoods);
+            }
         }
     }
 
-    public GoodsType getBuildingReqGoods(){
+    public GoodsType getBuildingReqGoods() {
         BuildableType currBuild = colony.getCurrentlyBuilding();
-        if(currBuild == null){
-            return null;
-        }
+        if (currBuild == null) return null;
+
         final GoodsType hammersType = colony.getSpecification().getGoodsType("model.goods.hammers");
         final GoodsType toolsType = colony.getSpecification().getGoodsType("model.goods.tools");
 

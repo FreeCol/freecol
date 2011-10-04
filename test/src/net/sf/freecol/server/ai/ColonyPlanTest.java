@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -280,39 +281,54 @@ public class ColonyPlanTest extends FreeColTestCase {
     /*
      * This test verifies adjustments to manufactured goods production
      */
-    public void testAdjustProductionAndManufacture(){
+    public void testAdjustProductionAndManufacture() {
         Map map = getTestMap(savannahType);
         Game game = ServerTestHelper.startServerGame(map);
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
-        final int fullStock = 100;
         Colony colony = getStandardColony(1);
+        game.setCurrentPlayer(colony.getOwner());
         Tile t = colony.getTile().getAdjacentTile(Direction.N);
-        Unit u = colony.getUnitList().get(0);
         ColonyTile colTile = colony.getColonyTile(t);
+        Building distillery = colony.getBuildingsForConsuming(sugarType)
+            .get(0);
 
+        // Put the unit to work producing sugar.
+        Unit u = colony.getUnitList().get(0);
         u.setLocation(colTile);
         u.setWorkType(sugarType);
 
-        ColonyPlan plan = new ColonyPlan(aiMain,colony);
+        // Check that the plan is to produce grain and sugar.
+        ColonyPlan plan = new ColonyPlan(aiMain, colony);
         plan.create();
+        assertEquals("Wrong primary raw material", grainType,
+            plan.getPrimaryRawMaterial());
+        assertEquals("Wrong secondary raw material", sugarType,
+            plan.getSecondaryRawMaterial());
 
-        assertEquals("Wrong primary raw material",grainType, plan.getPrimaryRawMaterial());
-        assertEquals("Wrong secondary raw material",sugarType, plan.getSecondaryRawMaterial());
-
-        assertEquals("Wrong number of units in colony tile", 1, colTile.getUnitCount());
-        assertEquals("Unit should be picking cotton", sugarType, u.getWorkType());
+        // Check that sugar production is underway and stable.
+        assertEquals("Wrong number of units in colony tile", 1,
+            colTile.getUnitCount());
+        assertEquals("Wrong number of units in distillery", 0,
+            distillery.getUnitCount());
+        assertEquals("Unit should be producing sugar", sugarType,
+            u.getWorkType());
         plan.adjustProductionAndManufacture();
-        assertEquals("Unit should not have been shifted", sugarType, u.getWorkType());
+        assertEquals("Unit should not have been shifted", colTile,
+            u.getLocation());
 
-        // Simulate that enough cotton have been gathered, re-adjust and re-check
-        colony.addGoods(sugarType, fullStock);
-        Building distillery = colony.getBuildingsForConsuming(sugarType).get(0);
-        assertEquals("Wrong number of units in waever house", 0, distillery.getUnitCount());
+        // Simulate that enough sugar has been gathered, re-adjust and
+        // check that the unit has moved to the distillery.
+        colony.addGoods(sugarType, GoodsContainer.CARGO_SIZE);
         plan.adjustProductionAndManufacture();
-        assertEquals("Wrong number of units in colony tile", 0, colTile.getUnitCount());
-        assertEquals("Unit should have been shifted", rumType, u.getWorkType());
-        assertEquals("Wrong number of units in waever house", 1, distillery.getUnitCount());
+        assertEquals("Wrong number of units in colony tile", 0,
+            colTile.getUnitCount());
+        assertEquals("Wrong number of units in distillery", 1,
+            distillery.getUnitCount());
+        assertEquals("Unit should be manufacturing rum", rumType,
+            u.getWorkType());
+        assertEquals("Unit should have been shifted", distillery,
+            u.getLocation());
     }
 
     public void testBestImprovements() throws Exception {
