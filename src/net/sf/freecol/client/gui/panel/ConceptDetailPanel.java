@@ -88,7 +88,7 @@ public class ConceptDetailPanel extends FreeColPanel
         header.setFont(smallHeaderFont);
         panel.add(header, "align center, wrap 20");
 
-        panel.add(getDefaultTextArea(Messages.message(id + ".description")));
+        panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));
 
     }
 
