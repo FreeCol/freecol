@@ -96,6 +96,12 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      */
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) {
+            panel.setLayout(new MigLayout("wrap 1"));
+            JLabel header = localizedLabel(id + ".name");
+            header.setFont(smallHeaderFont);
+            panel.add(header, "align center, wrap 20");
+
+            panel.add(getDefaultTextArea(Messages.message("colopedia.foundingFather.description"), 40));
             return;
         }
 
