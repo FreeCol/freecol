@@ -473,7 +473,6 @@ public class Game extends FreeColGameObject {
         for (Player player : getPlayers()) {
             if (player.getHighSeas() != null) {
                 player.getHighSeas().addDestination(map);
-                logger.warning("Adding " + map.getId() + " to " + player.getHighSeas().getId() + " of " + player.getId());
             }
         }
     }
