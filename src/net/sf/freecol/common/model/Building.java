@@ -621,9 +621,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return The production of the given type of goods.
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
-        return (unit == null || !contains(unit)
-            || getGoodsOutputType() != goodsType
-            || getGoodsOutputType() == null) ? 0
+        return (unit == null
+            || getGoodsOutputType() == null
+            || getGoodsOutputType() != goodsType) ? 0
             : getUnitProductivity(unit);
     }
 
