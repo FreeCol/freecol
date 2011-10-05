@@ -958,19 +958,21 @@ public class ColonyPlan {
                 while (!type.isRawMaterial()) {
                     GoodsType madeFrom = type.getRawMaterial();
                     if (madeFrom == null) break;
-                    goodsTypes.add(type);
+                    if (!goodsTypes.contains(type)) goodsTypes.add(0, type);
                     type = madeFrom;
                 }
-                goodsTypes.add(type);
+                if (!goodsTypes.contains(type)) goodsTypes.add(0, type);
             }
         }
 
         if (primaryRawMaterial != null
-            && !primaryRawMaterial.isFoodType()) {
+            && !primaryRawMaterial.isFoodType()
+            && !goodsTypes.contains(primaryRawMaterial)) {
             goodsTypes.add(primaryRawMaterial);
         }
         if (secondaryRawMaterial != null
-            && !secondaryRawMaterial.isFoodType()) {
+            && !secondaryRawMaterial.isFoodType()
+            && !goodsTypes.contains(secondaryRawMaterial)) {
             goodsTypes.add(secondaryRawMaterial);
         }
 
@@ -1035,7 +1037,7 @@ public class ColonyPlan {
             int mfnProd = colony.getNetProductionOf(producedGoods)
                 + factory.getAdditionalProductionNextTurn(u);
             if (stockGoods < GoodsContainer.CARGO_SIZE/2
-                && rawProd < mfnProd) return;
+                && rawProd < mfnProd) break;
 
             // Find a factory.
             if (factory.isFull()) factory = null;
@@ -1047,11 +1049,15 @@ public class ColonyPlan {
 
             // Move the unit to the factory and set it to work.
             // Finish if the factory fills up.
-            AIUnit au = aiMain.getAIUnit(u);
-            AIMessage.askWork(au, factory);
-            if (u.getWorkType() != producedGoods) {
-                AIMessage.askChangeWorkType(au, producedGoods);
-            }
+            u.setLocation(factory);
+            u.setWorkType(producedGoods);
+            /*
+              AIUnit au = aiMain.getAIUnit(u);
+              AIMessage.askWork(au, factory);
+              if (u.getWorkType() != producedGoods) {
+                  AIMessage.askChangeWorkType(au, producedGoods);
+              }
+            */
         }
     }
 
