@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,8 +32,14 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.FreeCol;
 
@@ -398,6 +405,26 @@ public class DOMMessage {
             }
         }
 
+        return null;
+    }
+
+    /**
+     * Convert an element to a string.
+     *
+     * @param element The <code>Element</code> to convert.
+     * @return A string representation of an element.
+     */
+    public static String elementToString(Element element) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xt = factory.newTransformer();
+            StringWriter sw = new StringWriter();
+            xt.transform(new DOMSource(element), new StreamResult(sw));
+            return sw.toString();
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "TransformerException", e);
+        }
         return null;
     }
 

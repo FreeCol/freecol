@@ -458,6 +458,10 @@ public final class InGameController extends Controller {
      */
     private void sendElement(ServerPlayer serverPlayer, Element element) {
         if (element != null && serverPlayer.isConnected()) {
+            if (FreeCol.isInDebugMode()) {
+                System.err.println("\nSERVER -> " + serverPlayer.getName()
+                    + ": " + DOMMessage.elementToString(element) + "\n");
+            }
             try {
                 serverPlayer.getConnection().sendAndWait(element);
             } catch (Exception e) {

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
+
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
@@ -93,6 +95,11 @@ public class AIMessage {
     private static boolean sendMessage(Connection connection,
                                        Element request) {
         try {
+            if (FreeCol.isInDebugMode()) {
+                System.err.println("\n" + connection.toString()
+                    + " -> SERVER: " + DOMMessage.elementToString(request)
+                    + "\n");
+            }
             Element reply = connection.ask(request);
             if (reply == null) {
                 return false;
