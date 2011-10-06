@@ -3044,23 +3044,19 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A goods object, or null.
      */
     public Goods getMostValuableGoods() {
+        if (!isEuropean()) return null;
+
         Goods goods = null;
-        if (!isEuropean()) {
-            return goods;
-        }
-        int value = 0;
+        int highValue = 0;
         for (Colony colony : getColonies()) {
-            List<Goods> colonyGoods = colony.getCompactGoods();
-            for (Goods currentGoods : colonyGoods) {
-                if (getArrears(currentGoods) == 0
-                    && hasTraded(currentGoods.getType())) {
-                    int amount = Math.min(currentGoods.getAmount(),
+            for (Goods g : colony.getCompactGoods()) {
+                if (getArrears(g.getType()) <= 0 && hasTraded(g.getType())) {
+                    int amount = Math.min(g.getAmount(),
                                           GoodsContainer.CARGO_SIZE);
-                    int goodsValue = market.getSalePrice(currentGoods.getType(),
-                                                         amount);
-                    if (goodsValue > value) {
-                        value = goodsValue;
-                        goods = currentGoods;
+                    int value = market.getSalePrice(g.getType(), amount);
+                    if (value > highValue) {
+                        highValue = value;
+                        goods = g;
                     }
                 }
             }

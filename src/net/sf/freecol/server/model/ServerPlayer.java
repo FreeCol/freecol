@@ -3216,24 +3216,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         if (accepted) {
             csSetTax(tax, cs);
+            logger.info("Accepted tax raise to: " + tax);
         } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
-            final int extraTax = 3;
+            final int extraTax = 3; // TODO, magic number
             csSetTax(tax + extraTax, cs);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
                     StringTemplate.template("model.monarch.action.FORCE_TAX")
                     .addAmount("%amount%", tax + extraTax)));
+            logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
             colony.removeGoods(goodsType, amount);
 
-            Market market = getMarket();
-            market.setArrears(goodsType, market.getPaidForSale(goodsType)
+            int arrears = market.getPaidForSale(goodsType)
                 * spec.getIntegerOption("model.option.arrearsFactor")
-                .getValue());
+                .getValue();
+            Market market = getMarket();
+            market.setArrears(goodsType, arrears);
 
             Turn turn = getGame().getTurn();
             List<Modifier> modifiers
@@ -3270,6 +3273,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addName("%colony%", colony.getName())
                 .addName("%amount%", Integer.toString(amount))
                 .add("%goods%", goodsType.getNameKey()));
+            logger.info("Goods party at " + colony.getName()
+                + " with: " + goods + " arrears: " + arrears);
         }
     }
 
