@@ -175,7 +175,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             p1.setBorder(new EmptyBorder(20, 20, 20, 20));
 
             // the image on the top/left
-            Image image = ResourceManager.getImage("FoundingFather." + type.toString().toLowerCase());
+            String key = FoundingFather.getTypeKey(type) + ".image";
+            Image image = ResourceManager.getImage(key);
             JLabel imageLabel;
             if (image != null) {
                 imageLabel = new JLabel(new ImageIcon(image));

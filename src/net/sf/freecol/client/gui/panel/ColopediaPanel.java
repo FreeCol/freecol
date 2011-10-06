@@ -171,6 +171,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (nodeItem.getPanelType() != null && nodeItem.getId() != null) {
             nodeItem.getPanelType().buildDetail(nodeItem.getId(), detailPanel);
         }
+        detailPanel.revalidate();
         detailPanel.repaint();
     }
 

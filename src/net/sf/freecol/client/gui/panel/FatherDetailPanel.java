@@ -95,17 +95,34 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            panel.setLayout(new MigLayout("wrap 1"));
+        try {
+            FoundingFather father = getSpecification().getFoundingFather(id);
+            buildDetail(father, panel);
+        } catch(IllegalArgumentException e) {
+            // this is not a founding father
+            panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
             JLabel header = localizedLabel(id + ".name");
             header.setFont(smallHeaderFont);
             panel.add(header, "align center, wrap 20");
-
-            panel.add(getDefaultTextArea(Messages.message("colopedia.foundingFather.description"), 40));
-            return;
+            if (getId().equals(id)) {
+                panel.add(getDefaultTextArea(Messages.message("colopedia.foundingFather.description"), 40));
+            } else {
+                Image image = ResourceManager.getImage(id + ".image");
+                if (image != null) {
+                    header.setText(Messages.message(id));
+                    panel.add(new JLabel(new ImageIcon(image)));
+                }
+            }
         }
+    }
 
-        FoundingFather father = getSpecification().getFoundingFather(id);
+    /**
+     * Builds the details panel for the given FoundingFather.
+     *
+     * @param father a FoundingFather
+     * @param panel the detail panel to build
+     */
+    public void buildDetail(FoundingFather father, JPanel panel) {
         panel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
         JLabel name = new JLabel(Messages.message(father.getNameKey())
