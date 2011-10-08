@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -70,7 +71,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             return;
         }
 
-        setLayout(new MigLayout("wrap 2"));
+        setLayout(new MigLayout("wrap 2, insets 10", "[]20[]"));
 
         JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
         header.setFont(mediumHeaderFont);
@@ -90,7 +91,16 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         if (!Messages.containsKey(noId)) noId = "close";
         cancelButton.setText(Messages.message(noId));
         if (haveOK) {
-            add(okButton, "newline 20, span, tag ok, split 2");
+            if (action == MonarchAction.RAISE_TAX_ACT
+                || action == MonarchAction.RAISE_TAX_WAR) {
+                add(okButton, "newline 20, span, tag ok, split 3");
+                JButton helpButton = new JButton(Messages.message("help"));
+                helpButton.setActionCommand(HELP);
+                helpButton.addActionListener(this);
+                add(helpButton, "tag help");
+            } else {
+                add(okButton, "newline 20, span, tag ok, split 2");
+            }
             add(cancelButton, "tag cancel");
         } else {
             add(cancelButton, "newline 20, span, tag cancel");
@@ -111,6 +121,8 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {
             setResponse(Boolean.FALSE);
+        } else if (HELP.equals(command)) {
+            getCanvas().showPanel(new ColopediaPanel(getCanvas(), "colopedia.concepts.taxes"));
         } else {
             logger.warning("Invalid action command: " + command);
         }

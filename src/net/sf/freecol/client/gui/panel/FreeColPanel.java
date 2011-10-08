@@ -91,6 +91,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
     protected static final String OK = "OK";
+    protected static final String HELP = "HELP";
 
     public static final Insets emptyMargin = new Insets(0,0,0,0);
 
@@ -149,8 +150,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     protected JButton okButton = new JButton(Messages.message("ok"));
 
-    protected static final String okCommand = "OK";
-
     protected static StyleContext styleContext = new StyleContext();
 
     static {
@@ -196,7 +195,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         addMouseListener(new MouseAdapter() {
         });
 
-        okButton.setActionCommand(okCommand);
+        okButton.setActionCommand(OK);
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
@@ -615,7 +614,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (command.equals(okCommand)) {
+        if (command.equals(OK)) {
             getCanvas().remove(this);
         }
     }
