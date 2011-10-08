@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -125,25 +126,32 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
     public void buildDetail(FoundingFather father, JPanel panel) {
         panel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(Messages.message(father.getNameKey())
-                                 + " (" + Messages.message(father.getTypeKey()) + ")");
-        name.setFont(smallHeaderFont);
-        panel.add(name, "span, align center, wrap 40");
+        String name = Messages.message(father.getNameKey());
+        String type = Messages.message(father.getTypeKey());
+        JLabel header = new JLabel(name + " (" + type + ")");
+        header.setFont(smallHeaderFont);
+        panel.add(header, "span, align center, wrap 40");
 
         Image image = getLibrary().getFoundingFatherImage(father);
 
-        JLabel imageLabel;
-        if (image != null) {
-            imageLabel = new JLabel(new ImageIcon(image));
-        } else {
-            imageLabel = new JLabel();
-        }
-        panel.add(imageLabel, "top");
+        panel.add(new JLabel(new ImageIcon(image)), "top");
 
-        String text = Messages.message(father.getDescriptionKey()) + "\n\n" + "["
-            + Messages.message(father.getId() + ".birthAndDeath") + "] "
-            + Messages.message(father.getId() + ".text");
-        JTextArea description = getDefaultTextArea(text, 20);
+        StringBuilder text = new StringBuilder();
+        text.append(Messages.message(father.getDescriptionKey()));
+        text.append("\n\n[");
+        text.append(Messages.message(father.getId() + ".birthAndDeath"));
+        text.append("] ");
+        text.append(Messages.message(father.getId() + ".text"));
+
+        Turn turn = getMyPlayer().getElectionTurn(name);
+        if (turn != null) {
+            text.append("\n\n");
+            text.append(Messages.message("report.continentalCongress.elected"));
+            text.append(" ");
+            text.append(Messages.message(turn.getLabel()));
+        }
+
+        JTextArea description = getDefaultTextArea(text.toString(), 20);
         panel.add(description, "top, growx");
     }
 
