@@ -569,7 +569,7 @@ public final class ReportColonyPanel extends ReportPanel
             }
         }
 
-        for (WorkLocation wl : colony.getWorkLocations()) {
+        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
             if (!wl.canBeWorked()) {
                 continue;
             } else if (wl.canTeach()) {

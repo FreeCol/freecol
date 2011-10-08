@@ -421,10 +421,8 @@ public class UnitTest extends FreeColTestCase {
         }
 
         found = false;
-        for(WorkLocation loc : colony.getWorkLocations()){
-            if(loc.getUnitList().contains(soldier)){
-                found = true;
-            }
+        for (WorkLocation loc : colony.getCurrentWorkLocations()) {
+            found |= loc.getUnitList().contains(soldier);
         }
         assertTrue("Soldier should be in a work location in the colony",found);
         ColonyTile workTile = soldier.getWorkTile();

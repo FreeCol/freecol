@@ -479,15 +479,48 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets a <code>List</code> of every {@link WorkLocation} in this
-     * <code>Colony</code>.
+     * Gets a list of every work location in this colony.
      *
-     * @return The <code>List</code>.
-     * @see WorkLocation
+     * @return The list of work locations.
      */
-    public List<WorkLocation> getWorkLocations() {
-        List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
-        result.addAll(buildingMap.values());
+    public List<WorkLocation> getAllWorkLocations() {
+        List<WorkLocation> result
+            = new ArrayList<WorkLocation>(buildingMap.values());
+        result.addAll(colonyTiles);
+        return result;
+    }
+
+    /**
+     * Gets a list of all freely available work locations
+     * in this colony.
+     *
+     * @return The list of available <code>WorkLocation</code>s.
+     */
+    public List<WorkLocation> getAvailableWorkLocations() {
+        List<WorkLocation> result
+            = new ArrayList<WorkLocation>(buildingMap.values());
+        for (ColonyTile ct : colonyTiles) {
+            Tile tile = ct.getWorkTile();
+            if (tile.getOwningSettlement() == this
+                || getOwner().canClaimForSettlement(tile)) {
+                result.add(ct);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets a list of all current work locations in this colony.
+     *
+     * @return The list of current <code>WorkLocation</code>s.
+     */
+    public List<WorkLocation> getCurrentWorkLocations() {
+        List<WorkLocation> result
+            = new ArrayList<WorkLocation>(buildingMap.values());
+        for (ColonyTile ct : colonyTiles) {
+            Tile tile = ct.getWorkTile();
+            if (tile.getOwningSettlement() == this) result.add(ct);
+        }
         return result;
     }
 
@@ -656,20 +689,19 @@ public class Colony extends Settlement implements Nameable {
      */
     public boolean addUnit(Unit unit, WorkLocation loc) {
         if (!unit.isPerson()) return false;
-        if (loc == null) loc = getWorkLocationFor(unit);
-        for (WorkLocation w : getWorkLocations()) {
-            if (w == loc && w.add(unit)) {
-                Player owner = unit.getOwner();
-                owner.modifyScore(unit.getType().getScoreValue());
-                updatePopulation(1);
-                unit.setState(Unit.UnitState.IN_COLONY);
-                if (owner.isAI()) {
-                    firePropertyChange(REARRANGE_WORKERS, true, false);
-                }
-                return true;
-            }
+        if (loc == null) {
+            loc = getWorkLocationFor(unit);
+            if (loc == null) return false;
         }
-        return false;
+        if (!loc.add(unit)) return false;
+        Player owner = unit.getOwner();
+        owner.modifyScore(unit.getType().getScoreValue());
+        updatePopulation(1);
+        unit.setState(Unit.UnitState.IN_COLONY);
+        if (owner.isAI()) {
+            firePropertyChange(REARRANGE_WORKERS, true, false);
+        }
+        return true;
     }
 
     /**
@@ -680,7 +712,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public boolean removeUnit(Unit unit) {
         Player owner = unit.getOwner();
-        for (WorkLocation w : getWorkLocations()) {
+        for (WorkLocation w : getCurrentWorkLocations()) {
             if (w.contains(unit) && w.remove(unit)) {
                 Unit teacher = unit.getTeacher();
                 if (teacher != null) {
@@ -788,7 +820,7 @@ public class Colony extends Settlement implements Nameable {
         if (unitCount != -1) {
             return unitCount;
         }
-        for (WorkLocation w : getWorkLocations()) {
+        for (WorkLocation w : getCurrentWorkLocations()) {
             count += w.getUnitCount();
         }
         return count;
@@ -801,7 +833,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public List<Unit> getUnitList() {
         ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : getWorkLocations()) {
+        for (WorkLocation wl : getCurrentWorkLocations()) {
             units.addAll(wl.getUnitList());
         }
         return units;
@@ -1403,7 +1435,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
-        for (WorkLocation workLocation : getWorkLocations()) {
+        for (WorkLocation workLocation : getCurrentWorkLocations()) {
             amount += workLocation.getProductionOf(goodsType);
         }
         return amount;
@@ -2157,7 +2189,7 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        for (WorkLocation workLocation : getWorkLocations()) {
+        for (WorkLocation workLocation : getCurrentWorkLocations()) {
             objects.addAll(((FreeColGameObject) workLocation).disposeList());
         }
         TileItemContainer container = getTile().getTileItemContainer();
@@ -2468,7 +2500,7 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
 
-            for (WorkLocation workLocation : getWorkLocations()) {
+            for (WorkLocation workLocation : getAllWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player,
                     showAll, toSavedGame);
             }

@@ -1000,7 +1000,7 @@ public class ColonyPlan {
 
         // Collect producers of the raw goods.
         List<Unit> producers = new ArrayList<Unit>();
-        for (WorkLocation wl : colony.getWorkLocations()) {
+        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
             for (Unit u : wl.getUnitList()) {
                 if (u.getWorkType() == rawGoods) producers.add(u);
             }

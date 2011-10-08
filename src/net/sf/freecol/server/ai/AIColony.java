@@ -399,7 +399,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // add raw materials for buildings
-        for (WorkLocation workLocation : colony.getWorkLocations()) {
+        for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
             if (workLocation instanceof Building) {
                 Building building = (Building) workLocation;
                 GoodsType inputType = building.getGoodsInputType();
@@ -955,7 +955,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int food = colony.getFoodProduction() - colony.getFoodConsumption();
         while (food < 0 && colony.getGoodsCount(foodType) + food * 3 < 0) {
             WorkLocation bestPick = null;
-            for (WorkLocation wl : colony.getWorkLocations()) {
+            for (WorkLocation wl : colony.getCurrentWorkLocations()) {
                 if (wl.getUnitCount() > 0) {
                     if (wl instanceof ColonyTile) {
                         ColonyTile ct = (ColonyTile) wl;
@@ -1029,7 +1029,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Move any workers not producing anything to a temporary location.
-        for (WorkLocation wl : colony.getWorkLocations()) {
+        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
             while (wl.getUnitCount() > 0 && wl instanceof Building
                    && !colony.isProductive(wl)) {
                 Iterator<Unit> unitIterator = wl.getUnitIterator();

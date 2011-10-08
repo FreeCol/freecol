@@ -305,7 +305,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public void relocateWorkers() {
         for (Unit unit : getUnitList()) {
-            for (WorkLocation wl : getColony().getWorkLocations()) {
+            for (WorkLocation wl : getColony().getCurrentWorkLocations()) {
                 if (wl != this && wl.canAdd(unit)) {
                     unit.setLocation(wl);
                     break;
