@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -47,6 +48,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
     private final List<FoundingFather> possibleFathers;
 
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -64,8 +66,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
         setFocusCycleRoot(false);
 
-        add(getDefaultHeader(Messages.message("foundingFatherDialog.nominate")));
-
         tb = new JTabbedPane(JTabbedPane.TOP);
 
         FatherDetailPanel details = new FatherDetailPanel(new ColopediaPanel(getCanvas()));
@@ -78,8 +78,17 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             tb.addTab(Messages.message(father.getTypeKey()), panel);
         }
         tb.setSelectedIndex(0);
+
+        JButton helpButton =
+            new JButton(getFreeColClient().getActionManager()
+                        .getFreeColAction("colopediaAction.FATHERS"));
+        helpButton.setText(Messages.message("help"));
+
+        add(getDefaultHeader(Messages.message("foundingFatherDialog.nominate")));
         add(tb, "width 100%");
-        add(okButton, "newline 20, tag ok");
+        add(okButton, "newline 20, split 2, tag ok");
+        add(helpButton, "tag help");
+
         setSize(tb.getPreferredSize());
     }
 
