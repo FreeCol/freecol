@@ -1767,6 +1767,25 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Returns the <code>Turn</code> during which the FoundingFather with
+     * the given name or nameKey was elected to the Continental Congress
+     *
+     * @param father a <code>String</code> value
+     * @return a <code>Turn</code> value
+     */
+    public Turn getElectionTurn(String father) {
+        if (!allFathers.isEmpty()) {
+            for (HistoryEvent event : history) {
+                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER
+                    && event.getReplacement("%father%").getId().equals(father)) {
+                    return event.getTurn();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Checks if this <code>Player</code> can move units to
      * <code>Europe</code>.
      *
