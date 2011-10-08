@@ -171,8 +171,11 @@ public class IntegerOption extends AbstractOption<Integer> {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        toXMLImpl(out, getXMLElementTagName());
+    }
+
+    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
+        out.writeStartElement(tag);
 
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute(VALUE_TAG, Integer.toString(value));

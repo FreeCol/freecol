@@ -43,10 +43,17 @@ public class PercentageOption extends IntegerOption {
      */
     public PercentageOption(XMLStreamReader in) throws XMLStreamException {
         super(in);
-        this.setMinimumValue(0);
-        this.setMaximumValue(100);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+        setMinimumValue(0);
+        setMaximumValue(100);
+    }
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -57,7 +64,7 @@ public class PercentageOption extends IntegerOption {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
+        super.toXMLImpl(out, getXMLElementTagName());
     }
 
     /**
