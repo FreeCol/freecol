@@ -112,6 +112,18 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     }
 
     /**
+     * Creates a new <code>ColopediaPanel</code> instance suitable
+     * only for the construction of ColopediaDetailPanels. TODO: find
+     * a more elegant solution.
+     *
+     * @param canvas a <code>Canvas</code> value
+     * @see ChooseFoundingFatherDialog
+     */
+    ColopediaPanel(Canvas canvas) {
+        super(canvas);
+    }
+
+    /**
      * Builds the JTree which represents the navigation menu and then returns it
      *
      * @return The navigation tree.
