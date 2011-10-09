@@ -362,8 +362,7 @@ public final class ReportColonyPanel extends ReportPanel
     private void updateColony(Colony colony) {
         final Specification spec = getSpecification();
         final GoodsType foodType = spec.getPrimaryFoodType();
-        final UnitType colonistType
-            = spec.getUnitType("model.unit.freeColonist");
+        final UnitType colonistType = spec.getDefaultUnitType();
         final ImageLibrary lib = getCanvas().getImageLibrary();
 
         // Assemble the fundamental facts about this colony
@@ -787,8 +786,7 @@ public final class ReportColonyPanel extends ReportPanel
             l.setEnabled(market == null || market.getArrears(g) <= 0);
             reportPanel.add(l);
         }
-        final UnitType colonistType
-            = getSpecification().getUnitType("model.unit.freeColonist");
+        final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
             = getCanvas().getImageLibrary().getUnitImageIcon(colonistType,
                 Role.DEFAULT, true, 0.333);

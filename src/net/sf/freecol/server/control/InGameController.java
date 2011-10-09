@@ -3543,7 +3543,7 @@ public final class InGameController extends Controller {
         Game game = getGame();
         Specification spec = game.getSpecification();
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        UnitType defaultType = spec.getUnitType("model.unit.freeColonist");
+        final UnitType defaultType = spec.getDefaultUnitType();
 
         if (serverPlayer.getMonarch() == null) {
             ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();

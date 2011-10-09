@@ -107,7 +107,7 @@ public final class TilePanel extends FreeColPanel {
 
         if (tileType != null) {
             // TODO: make this more generic
-            UnitType colonist = getSpecification().getUnitType("model.unit.freeColonist");
+            UnitType colonist = getSpecification().getDefaultUnitType();
 
             JLabel label = null;
             boolean first = true;

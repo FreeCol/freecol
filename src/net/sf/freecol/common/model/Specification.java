@@ -916,6 +916,18 @@ public final class Specification {
         return getType(id, UnitType.class);
     }
 
+    /**
+     * Gets the most vanilla unit type.
+     *
+     * Provides a type to use to make a neutral comparison of the
+     * productivity of work locations.
+     *
+     * @return The free colonist unit type.
+     */
+    public UnitType getDefaultUnitType() {
+        return getUnitType("model.unit.freeColonist");
+    }
+
     public UnitType getExpertForProducing(GoodsType goodsType) {
         return experts.get(goodsType);
     }

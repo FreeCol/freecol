@@ -140,7 +140,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 }
             }
         }
-        UnitType defaultType = getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType defaultType = getSpecification().getDefaultUnitType();
         dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, dragoons.getCount(defaultType)));
         soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, soldiers.getCount(defaultType)));
         scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, scouts.getCount(defaultType)));
@@ -199,7 +199,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             otherNames.add(Messages.message(player.getEurope().getNameKey()));
         }
 
-        UnitType defaultType = getSpecification().getUnitType("model.unit.freeColonist");
+        UnitType defaultType = getSpecification().getDefaultUnitType();
         for (Unit unit : player.getUnits()) {
             if (unit.isOffensiveUnit() && !unit.isNaval()) {
                 UnitType unitType = defaultType;
