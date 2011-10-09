@@ -1904,6 +1904,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
     </optionGroup>
     <optionGroup id="gameOptions">
