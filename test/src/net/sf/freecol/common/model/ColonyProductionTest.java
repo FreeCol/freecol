@@ -29,6 +29,32 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyProductionTest extends FreeColTestCase {
 
+    private static final BuildingType countryType
+        = spec().getBuildingType("model.building.country");
+    private static final BuildingType depotType
+        = spec().getBuildingType("model.building.depot");
+    private static final BuildingType townHallType
+        = spec().getBuildingType("model.building.townHall");
+
+    private static final GoodsType bellsType
+        = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothType
+        = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonType
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType crossesType
+        = spec().getGoodsType("model.goods.crosses");
+    private static final GoodsType foodType
+        = spec().getGoodsType("model.goods.food");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
+
+
     public void testProductionSoldier() {
 
         Game game = getStandardGame();
@@ -39,7 +65,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
+                tiles[x][y] = new Tile(game, plainsType, x, y);
             }
         }
 
@@ -56,7 +82,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
-        GoodsType foodType = spec().getGoodsType("model.goods.grain");
+        GoodsType foodType = grainType;
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);
 
@@ -104,7 +130,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
+                tiles[x][y] = new Tile(game, plainsType, x, y);
             }
         }
 
@@ -118,7 +144,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         game.setMap(map);
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-        GoodsType foodType = spec().getGoodsType("model.goods.grain");
+        GoodsType foodType = grainType;
         Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch, pioneerType);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
@@ -159,8 +185,6 @@ public class ColonyProductionTest extends FreeColTestCase {
     }
 
     public void testBellNetProduction(){
-    	GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-
     	Game game = getStandardGame();
 
     	game.setMap(getTestMap());
@@ -190,10 +214,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         game.setMap(getTestMap());
 
         Colony colony = getStandardColony(1);
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
-        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
-        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.country"));
+        Building pasture = colony.getBuilding(countryType);
         assertEquals(horsesType, pasture.getGoodsOutputType());
         assertEquals("Wrong warehouse capacity in colony",100,colony.getWarehouseCapacity());
 
@@ -242,11 +264,9 @@ public class ColonyProductionTest extends FreeColTestCase {
                        consumers.get(index) instanceof BuildQueue);
         }
 
-        BuildingType countryType = spec().getBuildingType("model.building.country");
         Building country = colony.getBuilding(countryType);
         assertTrue(consumers.contains(country));
 
-        BuildingType depotType = spec().getBuildingType("model.building.depot");
         Building depot = colony.getBuilding(depotType);
         assertTrue(consumers.contains(depot));
 
@@ -289,11 +309,6 @@ public class ColonyProductionTest extends FreeColTestCase {
 
 
     public void testProductionMap() {
-
-        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
-        GoodsType grainType = spec().getGoodsType("model.goods.grain");
-
         ProductionMap pm = new ProductionMap();
 
         pm.add(new AbstractGoods(cottonType, 33));
@@ -310,25 +325,15 @@ public class ColonyProductionTest extends FreeColTestCase {
         pm.remove(new AbstractGoods(foodType, 11));
         assertEquals(11, pm.get(grainType).getAmount());
         assertEquals(11, pm.get(foodType).getAmount());
-
     }
 
 
     public void testProduction() {
-
         Game game = getGame();
         game.setMap(getTestMap());
 
         Colony colony = getStandardColony(3);
         ColonyTile tile = colony.getColonyTile(colony.getTile());
-
-        GoodsType foodType = spec().getGoodsType("model.goods.food");
-        GoodsType grainType = spec().getGoodsType("model.goods.grain");
-        GoodsType clothType = spec().getGoodsType("model.goods.cloth");
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
-        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType crossesType = spec().getGoodsType("model.goods.crosses");
 
         assertEquals(0, colony.getGoodsCount(foodType));
 
@@ -436,4 +441,30 @@ public class ColonyProductionTest extends FreeColTestCase {
         */
     }
 
+    public void testGetPotentialProduction() {
+        Game game = getGame();
+        game.setMap(getTestMap());
+
+        Colony colony = getStandardColony(1);
+        ColonyTile colonyTile = colony.getColonyTile(colony.getTile());
+        assertNotNull(colonyTile);
+        assertEquals(plainsType, colony.getTile().getType());
+        Building townHall = colony.getBuilding(townHallType);
+        assertNotNull(townHall);
+        UnitType colonistType = spec().getDefaultUnitType();
+        assertNotNull(colonistType);
+
+        assertEquals("Zero potential production of cotton in town hall", 0,
+            townHall.getPotentialProduction(colonistType, cottonType));
+        assertEquals("Basic potential production of bells in town hall", 
+            (int) FeatureContainer.applyModifiers(townHallType.getBasicProduction(),
+                game.getTurn(), townHall.getProductionModifiers()),
+            townHall.getPotentialProduction(colonistType, bellsType));
+
+        assertEquals("Basic potential production of cotton in town hall",
+            plainsType.getProductionOf(cottonType, null),
+            colonyTile.getPotentialProduction(colonistType, cottonType));
+        assertEquals("Zero potential production of cotton in town hall", 0,
+            townHall.getPotentialProduction(colonistType, cottonType));
+    }
 }
