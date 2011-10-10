@@ -170,8 +170,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Checks if there is a carrier unit with a specified minimum
-     * amount of space available docked in this European port.
+     * Checks if there is a useable carrier unit with a specified
+     * minimum amount of space available docked in this European port.
      *
      * @param space The amount of space to require.
      * @return True if there is a suitable unit present.
@@ -179,7 +179,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      */
     public boolean hasCarrierWithSpace(int space) {
         for (Unit u : getUnitList()) {
-            if (u.isCarrier() && u.getSpaceLeft() >= space) return true;
+            if (u.isCarrier()
+                && !u.isUnderRepair()
+                && u.getSpaceLeft() >= space) return true;
         }
         return false;
     }
