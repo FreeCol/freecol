@@ -2444,7 +2444,6 @@ public class Colony extends Settlement implements Nameable {
 
     // Serialization
 
-
     /**
      * This method writes an XML-representation of this object to the given
      * stream. <br>
@@ -2469,16 +2468,13 @@ public class Colony extends Settlement implements Nameable {
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet;
 
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
-        // Add attributes:
-        super.writeAttributes(out);
 
+        super.writeAttributes(out);
         out.writeAttribute("established", Integer.toString(established.getNumber()));
-        if (full) {
+        if (showAll || toSavedGame || player == getOwner()) {
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
@@ -2487,6 +2483,30 @@ public class Colony extends Settlement implements Nameable {
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
+
+        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
+            if (pet.getColonyUnitCount() > 0) {
+                out.writeAttribute("unitCount",
+                    Integer.toString(pet.getColonyUnitCount()));
+            }
+            if (pet.getColonyStockadeKey() != null) {
+                out.writeAttribute("stockadeKey",
+                    pet.getColonyStockadeKey());
+            }
+        }
+
+        writeChildren(out, player, showAll, toSavedGame);
+
+        out.writeEndElement();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        if (showAll || toSavedGame || player == getOwner()) {
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
@@ -2501,8 +2521,7 @@ public class Colony extends Settlement implements Nameable {
             }
 
             for (WorkLocation workLocation : getAllWorkLocations()) {
-                ((FreeColGameObject) workLocation).toXML(out, player,
-                    showAll, toSavedGame);
+                workLocation.toXML(out, player, showAll, toSavedGame);
             }
             for (BuildableType item : buildQueue.getValues()) {
                 out.writeStartElement(BUILD_QUEUE_TAG);
@@ -2514,19 +2533,8 @@ public class Colony extends Settlement implements Nameable {
                 out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
                 out.writeEndElement();
             }
-        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            if (pet.getColonyUnitCount() > 0) {
-                out.writeAttribute("unitCount",
-                    Integer.toString(pet.getColonyUnitCount()));
-            }
-            if (pet.getColonyStockadeKey() != null) {
-                out.writeAttribute("stockadeKey",
-                    pet.getColonyStockadeKey());
-            }
+            super.writeChildren(out, player, showAll, toSavedGame);
         }
-        super.writeChildren(out);
-        // End element:
-        out.writeEndElement();
     }
 
     /**

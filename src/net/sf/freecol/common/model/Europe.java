@@ -386,7 +386,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        super.writeAttributes(out);
         for (int index = 0; index < recruitables.length; index++) {
             if (recruitables[index] != null) {
                 out.writeAttribute("recruit" + index, recruitables[index].getId());
@@ -403,7 +403,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
             out.writeEndElement();
         }
 
-        super.writeChildren(out);
+        super.writeChildren(out, player, showAll, toSavedGame);
 
         out.writeEndElement();
     }

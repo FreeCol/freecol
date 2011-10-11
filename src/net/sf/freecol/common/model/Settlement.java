@@ -551,6 +551,24 @@ abstract public class Settlement extends GoodsLocation
 
 
     /**
+     * Write the attributes of this object to a stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("name", getName());
+        out.writeAttribute("owner", owner.getId());
+        out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("settlementType", getType().getId());
+        // Not owner, it is subject to PlayerExploredTile handling.
+    }
+
+    /**
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
@@ -579,23 +597,5 @@ abstract public class Settlement extends GoodsLocation
             settlementType = owner.getNationType().getSettlementType(typeStr);
         }
         setType(settlementType);
-    }
-
-    /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("name", getName());
-        out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("settlementType", getType().getId());
-        // Not owner, it is subject to PlayerExploredTile handling.
     }
 }

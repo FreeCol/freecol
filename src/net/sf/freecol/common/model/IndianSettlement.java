@@ -1184,30 +1184,27 @@ public class IndianSettlement extends Settlement {
         writeChildren(out, player, showAll, toSavedGame);
 
         out.writeEndElement();
-
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
-
-        PlayerExploredTile pet = (player == null) ? null
-            : getTile().getPlayerExploredTile(player);
+        PlayerExploredTile pet;
 
         if (showAll || toSavedGame || player == getOwner()) {
-            Iterator<Player> playerIterator = spokenTo.iterator();
-            while (playerIterator.hasNext()) {
+            for (Player p : spokenTo) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
-                out.writeAttribute("player", playerIterator.next().getId());
+                out.writeAttribute("player", p.getId());
                 out.writeEndElement();
             }
             for (Entry<Player, Tension> entry : alarm.entrySet()) {
                 out.writeStartElement(ALARM_TAG_NAME);
                 out.writeAttribute("player", entry.getKey().getId());
-                out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
+                out.writeAttribute(VALUE_TAG,
+                    String.valueOf(entry.getValue().getValue()));
                 out.writeEndElement();
             }
             if (missionary != null) {
@@ -1220,7 +1217,9 @@ public class IndianSettlement extends Settlement {
                 out.writeAttribute(ID_ATTRIBUTE, unit.getId());
                 out.writeEndElement();
             }
-        } else if (pet != null) {
+            super.writeChildren(out, player, showAll, toSavedGame);
+
+        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             if (hasSpokenToChief(player)) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
                 out.writeAttribute("player", player.getId());

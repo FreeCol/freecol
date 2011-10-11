@@ -1695,7 +1695,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        super.writeAttributes(out);
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
         out.writeAttribute("style", Integer.toString(style));
@@ -1745,7 +1745,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        super.writeAttributes(out);
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
         out.writeAttribute("style", Integer.toString(style));

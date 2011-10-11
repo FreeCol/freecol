@@ -418,13 +418,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        writeChildren(out, null, true, true);
-    }
-
-    /**
      * Serialize the children of this UnitLocation, i.e. the Units
      * themselves.
      *
@@ -436,11 +429,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        if (!isEmpty()) {
-            for (Unit unit : getUnitList()) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-         }
+        for (Unit unit : units) {
+            unit.toXML(out, player, showAll, toSavedGame);
+        }
     }
 
     /**

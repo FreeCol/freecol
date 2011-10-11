@@ -758,17 +758,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
-        // Start element:
+        // Start
         out.writeStartElement(getXMLElementTagName());
 
-        // Add attributes:
+        // Attributes
         super.writeAttributes(out);
         out.writeAttribute("buildingType", buildingType.getId());
 
-        // Add child elements:
-        super.writeChildren(out);
+        // Children
+        super.writeChildren(out, player, showAll, toSavedGame);
 
-        // End element:
+        // End
         out.writeEndElement();
     }
 

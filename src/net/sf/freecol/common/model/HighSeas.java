@@ -125,23 +125,24 @@ public class HighSeas extends UnitLocation {
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
-        // Start element:
+        // Start
         out.writeStartElement(getXMLElementTagName());
 
-        // Add attributes:
-        writeAttributes(out);
+        // Attributes
+        super.writeAttributes(out);
 
-        // Add child elements:
-        writeChildren(out);
+        // Children
+        writeChildren(out, player, showAll, toSavedGame);
 
-        // End element:
+        // End
         out.writeEndElement();
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
         for (Location destination : destinations) {
@@ -185,7 +186,4 @@ public class HighSeas extends UnitLocation {
     public static String getXMLElementTagName() {
         return "highSeas";
     }
-
-
-
 }

@@ -305,12 +305,16 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
         goodsContainer.toXML(out, player, showAll, toSavedGame);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (GoodsContainer.getXMLElementTagName().equals(in.getLocalName())) {
             goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));

@@ -558,16 +558,17 @@ public class ColonyTile extends WorkLocation implements Ownable {
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start element:
+        // Start
         out.writeStartElement(getXMLElementTagName());
 
-        // Add attributes:
+        // Attributes
         super.writeAttributes(out);
         out.writeAttribute("workTile", workTile.getId());
 
-        super.writeChildren(out);
+        // Children
+        super.writeChildren(out, player, showAll, toSavedGame);
 
-        // End element:
+        // End
         out.writeEndElement();
     }
 
