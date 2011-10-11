@@ -217,7 +217,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             && targetPlayer != owner
             && (owner.getStance(targetPlayer) == Stance.WAR
                 || (owner.isIndian()
-                    && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.CONTENT) >= 0));
+                    && owner.getTension(targetPlayer).getLevel()
+                    .compareTo(Tension.Level.CONTENT) >= 0));
     }
 
 

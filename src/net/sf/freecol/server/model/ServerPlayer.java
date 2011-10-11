@@ -1240,7 +1240,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             .applyModifier(change,
                                            "model.modifier.nativeAlarmModifier",
                                            null, game.getTurn());
-                        settlement.modifyAlarm(player, change);
+                        ((ServerIndianSettlement)settlement).modifyAlarm(player,
+                            change);
                     }
                 }
             }
@@ -1857,10 +1858,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && natives != null
                     && defenderPlayer.isIndian();
                 if (ok) {
+                    burnedNativeCapital = settlement.isCapital();
                     csDestroySettlement(attackerUnit, natives, random, cs);
                     attackerTileDirty = defenderTileDirty = true;
                     moveAttacker = true;
-                    burnedNativeCapital = settlement.isCapital();
                     attackerTension -= Tension.TENSION_ADD_NORMAL;
                     if (!burnedNativeCapital) {
                         defenderTension += Tension.TENSION_ADD_MAJOR;
@@ -2008,17 +2009,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else if (defender.hasAbility(Ability.PIRACY)) {
             ; // do nothing
+        } else if (burnedNativeCapital) {
+            defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
+            cs.add(See.perhaps().always(this), defenderPlayer); // TODO: just the tension
+            csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
+            for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
+                if (is.hasContactedSettlement(this)) {
+                    is.getAlarm(this).setValue(Tension.SURRENDERED);
+                    // Only update attacker with settlements that have
+                    // been seen, as contact can occur with its members.
+                    if (is.getTile().isExploredBy(this)) {
+                        cs.add(See.perhaps().always(this), is);
+                    } else {
+                        cs.add(See.only(defenderPlayer), is);
+                    }
+                }
+            }
         } else if (isEuropean() && defenderPlayer.isEuropean()) {
             csChangeStance(Stance.WAR, defenderPlayer, true, cs);
-        } else if (burnedNativeCapital) {
-            csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
-            defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
-            cs.add(See.only(this), defenderPlayer); // TODO: just the tension
-            for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
-                is.makeContactSettlement(this);
-                is.getAlarm(this).setValue(Tension.SURRENDERED);
-                cs.add(See.only(this), is);
-            }
         } else { // At least one player is non-European
             if (isEuropean()) {
                 csChangeStance(Stance.WAR, defenderPlayer, true, cs);
@@ -2651,7 +2659,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%nation%", nativeNation)
             .addName("%settlement%", settlementName));
         if (capital) {
-            cs.addMessage(See.only(this),
+            cs.addMessage(See.only(attackerPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                     "indianSettlement.capitalBurned", attacker)
                 .addName("%name%", settlementName)

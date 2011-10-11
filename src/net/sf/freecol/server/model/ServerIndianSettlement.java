@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -182,6 +183,31 @@ public class ServerIndianSettlement extends IndianSettlement
         }
     }
 
+    /**
+     * Modifies the alarm level towards the given player due to an event
+     * at this settlement, and propagate the alarm upwards through the
+     * tribe.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return A list of settlements whose alarm level has changed.
+     */
+    public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
+        boolean change = makeContactSettlement(player);
+        change |= changeAlarm(player, addToAlarm);
+
+        // Propagate alarm upwards.  Capital has a greater impact.
+        List<FreeColGameObject> modified = owner.modifyTension(player,
+                ((isCapital()) ? addToAlarm : addToAlarm/2), this);
+        if (change && getTile().isExploredBy(player)) {
+            modified.add(this);
+        }
+        logger.finest("Alarm at " + getName()
+            + " toward " + player.getName()
+            + " modified by " + Integer.toString(addToAlarm)
+            + " now = " + Integer.toString(getAlarm(player).getValue()));
+        return modified;
+    }
 
     /**
      * Returns the tag name of the root element representing this object.

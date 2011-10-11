@@ -299,7 +299,7 @@ public class IndianSettlement extends Settlement {
      * @return True if the <code>Tension.Level</code> of the
      *     settlement alarm changes as a result of this change.
      */
-    private boolean changeAlarm(Player player, int amount) {
+    protected boolean changeAlarm(Player player, int amount) {
         Tension alarm = getAlarm(player);
         Level oldLevel = alarm.getLevel();
         alarm.modify(amount);
@@ -359,32 +359,6 @@ public class IndianSettlement extends Settlement {
          }
          return false;
      }
-
-    /**
-     * Modifies the alarm level towards the given player due to an event
-     * at this settlement, and propagate the alarm upwards through the
-     * tribe.
-     *
-     * @param player The <code>Player</code>.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return A list of settlements whose alarm level has changed.
-     */
-    public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
-        boolean change = makeContactSettlement(player);
-        change |= changeAlarm(player, addToAlarm);
-
-        // Propagate alarm upwards.  Capital has a greater impact.
-        List<FreeColGameObject> modified = owner.modifyTension(player,
-                ((isCapital()) ? addToAlarm : addToAlarm/2), this);
-        if (change) {
-            modified.add(this);
-        }
-        logger.finest("Alarm at " + getName()
-            + " toward " + player.getName()
-            + " modified by " + Integer.toString(addToAlarm)
-            + " now = " + Integer.toString(getAlarm(player).getValue()));
-        return modified;
-    }
 
     /**
      * Propagates a global change in tension down to a settlement.

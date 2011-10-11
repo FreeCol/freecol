@@ -1856,7 +1856,8 @@ public final class InGameController extends Controller {
         // Increase tension whether we paid or not.  Apply tension
         // directly to the settlement and let propagation work.
         cs.add(See.only(serverPlayer),
-            settlement.modifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL));
+            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
+                Tension.TENSION_ADD_NORMAL));
         settlement.setLastTribute(year);
         ModelMessage m;
         if (gold > 0) {
@@ -2078,7 +2079,8 @@ public final class InGameController extends Controller {
             settlement.changeMissionary(unit);
             settlement.setConvertProgress(0);
             List<FreeColGameObject> modifiedSettlements
-                = settlement.modifyAlarm(serverPlayer, ALARM_NEW_MISSIONARY);
+                = ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
+                    ALARM_NEW_MISSIONARY);
             modifiedSettlements.remove(settlement);
             if (!modifiedSettlements.isEmpty()) {
                 cs.add(See.only(serverPlayer), modifiedSettlements);
@@ -2275,7 +2277,8 @@ public final class InGameController extends Controller {
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
         cs.add(See.only(serverPlayer),
-            settlement.modifyAlarm(serverPlayer, -amount / 50));
+            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
+                -amount / 50));
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
@@ -2327,7 +2330,8 @@ public final class InGameController extends Controller {
         Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
         serverPlayer.modifyGold(amount);
-        cs.add(See.only(serverPlayer), settlement.modifyAlarm(serverPlayer,
+        cs.add(See.only(serverPlayer),
+            ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
                 -amount / 500));
         Tile tile = settlement.getTile();
         settlement.updateWantedGoods();
@@ -2371,12 +2375,12 @@ public final class InGameController extends Controller {
         moveGoods(goods, settlement);
         cs.add(See.perhaps(), unit);
         if (settlement instanceof IndianSettlement) {
-            IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            csSpeakToChief(serverPlayer, indianSettlement, false, cs);
+            IndianSettlement is = (IndianSettlement) settlement;
+            csSpeakToChief(serverPlayer, is, false, cs);
             cs.add(See.only(serverPlayer),
-                   indianSettlement.modifyAlarm(serverPlayer,
-                   -indianSettlement.getPriceToBuy(goods) / 50));
-            indianSettlement.updateWantedGoods();
+                ((ServerIndianSettlement)is).modifyAlarm(serverPlayer,
+                    -is.getPriceToBuy(goods) / 50));
+            is.updateWantedGoods();
             tile.updatePlayerExploredTile(serverPlayer, true);
             cs.add(See.only(serverPlayer), tile);
         }

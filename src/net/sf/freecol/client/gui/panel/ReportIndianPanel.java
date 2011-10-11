@@ -73,24 +73,16 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param opponent a <code>Player</code> value
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
-
-        // if we've spoken to any village chief, he has told us how many settlements comprise the nation
-        // FIXME: actually, the player is told this info when he tries to move a scout into the village, whether or not he speaks to the chief
-        List<IndianSettlement> nativeSettlements = opponent.getIndianSettlements();
-        String numSettlements = getController().getNationSummary(opponent).getNumberOfSettlements();
-        int totalNumberOfSettlements = numSettlements == null ? 0 : Integer.parseInt(numSettlements);
-        int numberOfSettlements = nativeSettlements.size();
-        boolean spokenToChief = false;
-        for (IndianSettlement settlement : nativeSettlements) {
-            if(settlement.hasSpokenToChief(player)) {
-                spokenToChief = true;
-                break;
-            }
-        }
-        if(spokenToChief)
-            numSettlements = "" + numberOfSettlements + " / " + totalNumberOfSettlements;
-        else numSettlements = "" + numberOfSettlements;
-        
+        List<IndianSettlement> nativeSettlements
+            = opponent.getIndianSettlements();
+        String numSettlements = getController().getNationSummary(opponent)
+            .getNumberOfSettlements();
+        int trueNumberOfSettlements = (numSettlements == null) ? 0
+            : Integer.parseInt(numSettlements);
+        int knownNumberOfSettlements = nativeSettlements.size();
+        numSettlements = (knownNumberOfSettlements > 0)
+            ? "" + knownNumberOfSettlements + " / " + trueNumberOfSettlements
+            : "" + knownNumberOfSettlements;
         
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
@@ -107,13 +99,13 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(new JLabel(Messages.message("report.indian.tribeTension")));
         reportPanel.add(localizedLabel("tension." + opponent.getTension(player).getKey()), "left, wrap 20");
 
-        if (numberOfSettlements > 0) {
+        if (knownNumberOfSettlements > 0) {
             reportPanel.add(localizedLabel("Settlement"), "newline 10");
             reportPanel.add(localizedLabel("mission"));
             reportPanel.add(localizedLabel("report.indian.tension"));
             reportPanel.add(localizedLabel("report.indian.skillTaught"));
             reportPanel.add(localizedLabel("report.indian.tradeInterests"));
-            List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(numberOfSettlements);
+            List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(knownNumberOfSettlements);
             for (IndianSettlement settlement : nativeSettlements) {
                 if (settlement.isCapital()) {
                     settlements.add(0, settlement);
