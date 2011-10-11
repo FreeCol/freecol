@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Represents an option where the valid choice is a list of
- * AbstractUnits, e.g. the size of the REF.
+ * AbstractUnits.
  *
  * TODO: can we derive this from ListOption?
  */
@@ -149,6 +149,7 @@ public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (AbstractUnitOption.getXMLElementTagName().equals(in.getLocalName())) {
                 value.add(new AbstractUnitOption(in));
+                in.nextTag();
             }
         }
 

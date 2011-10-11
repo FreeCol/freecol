@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -41,11 +40,11 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
     private JComboBox box = new JComboBox();
 
     /**
-     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
-     *
-     * @param option The <code>StringOption</code> to make a user interface for
-     * @param editable boolean whether user can modify the setting
-     */
+    * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
+    *
+    * @param option The <code>StringOption</code> to make a user interface for
+    * @param editable boolean whether user can modify the setting
+    */
     public StringOptionUI(final StringOption option, boolean editable) {
         super(option, editable);
 
@@ -56,10 +55,6 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
         box.setRenderer(new ChoiceRenderer());
 
         initialize();
-    }
-
-    public void setRenderer(ListCellRenderer renderer) {
-        box.setRenderer(renderer);
     }
 
     /**

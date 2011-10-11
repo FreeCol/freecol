@@ -172,8 +172,6 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
             return new AudioMixerOptionUI((AudioMixerOption) option, editable);
         } else if (option instanceof FreeColAction) {
             return new FreeColActionUI((FreeColAction) option, editable);
-        } else if (option instanceof UnitListOption) {
-            return new UnitListOptionUI((UnitListOption) option, editable);
         } else {
             return null;
         }

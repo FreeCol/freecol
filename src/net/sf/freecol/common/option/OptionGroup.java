@@ -292,8 +292,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             option = new AudioMixerOption(in);
         } else if (StringOption.getXMLElementTagName().equals(optionType)) {
             option = new StringOption(in);
-        } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitListOption(in);
         } else if ("action".equals(optionType)) {
             logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
             // TODO: load FreeColActions from client options?
