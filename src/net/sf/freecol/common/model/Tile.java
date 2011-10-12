@@ -399,25 +399,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Is the alternate unit a better defender than the current choice.
-     * Prefer if there is no current defender, or if the alternate unit
-     * provides greater defensive power and does not replace a defensive
-     * unit defender with a non-defensive unit.
-     *
-     * @param defender The current defender <code>Unit</code>.
-     * @param defenderPower Its defence power.
-     * @param other An alternate <code>Unit</code>.
-     * @param otherPower Its defence power.
-     * @return True if the other unit should be preferred.
-     */
-    private static boolean betterDefender(Unit defender, float defenderPower,
-                                          Unit other, float otherPower) {
-        return defender == null
-            || (otherPower > defenderPower
-                && !(defender.isDefensiveUnit() && !other.isDefensiveUnit()));
-    }
-
-    /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Tile</code>.
      * <p>If this tile has a settlement, the units inside the settlement
@@ -443,7 +424,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 // On ocean tiles, land units behave as ship cargo and
                 // cannot defend
                 power = cm.getDefencePower(attacker, u);
-                if (Tile.betterDefender(defender, defenderPower, u, power)) {
+                if (Unit.betterDefender(defender, defenderPower, u, power)) {
                     defender = u;
                     defenderPower = power;
                 }
@@ -467,7 +448,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             // thus u == null is valid.
             if (u != null) {
                 power = cm.getDefencePower(attacker, u);
-                if (Tile.betterDefender(defender, defenderPower, u, power)) {
+                if (Unit.betterDefender(defender, defenderPower, u, power)) {
                     defender = u;
                     defenderPower = power;
                 }

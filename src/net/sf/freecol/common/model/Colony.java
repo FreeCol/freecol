@@ -994,10 +994,12 @@ public class Colony extends Settlement implements Nameable {
         Unit defender = null;
         float defencePower = -1.0f;
         for (Unit nextUnit : unitList) {
-            float tmpPower = getGame().getCombatModel().getDefencePower(attacker, nextUnit);
-            if (tmpPower > defencePower || defender == null) {
+            float unitPower = getGame().getCombatModel()
+                .getDefencePower(attacker, nextUnit);
+            if (Unit.betterDefender(defender, defencePower,
+                    nextUnit, unitPower)) {
                 defender = nextUnit;
-                defencePower = tmpPower;
+                defencePower = unitPower;
             }
         }
         if (defender == null) {

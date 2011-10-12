@@ -2943,6 +2943,36 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Is an alternate unit a better defender than the current choice.
+     * Prefer if there is no current defender, or if the alternate
+     * unit is better armed, or provides greater defensive power and
+     * does not replace a defensive unit defender with a non-defensive
+     * unit.
+     *
+     * @param defender The current defender <code>Unit</code>.
+     * @param defenderPower Its defence power.
+     * @param other An alternate <code>Unit</code>.
+     * @param otherPower Its defence power.
+     * @return True if the other unit should be preferred.
+     */
+    public static boolean betterDefender(Unit defender, float defenderPower,
+                                         Unit other, float otherPower) {
+        if (defender == null) {
+            return true;
+        } else if (!defender.isArmed() && other.isArmed()) {
+            return true;
+        } else if (defender.isArmed() && !other.isArmed()) {
+            return false;
+        } else if (!defender.isDefensiveUnit() && other.isDefensiveUnit()) {
+            return true;
+        } else if (defender.isDefensiveUnit() && !other.isDefensiveUnit()) {
+            return false;
+        } else {
+            return defenderPower < otherPower;
+        }
+    }
+
+    /**
      * Checks if this unit is an undead.
      * @return return true if the unit is undead
      */

@@ -613,10 +613,12 @@ public class IndianSettlement extends Settlement {
         Unit defender = null;
         float defencePower = -1.0f;
         for (Unit nextUnit : getUnitList()) {
-            float tmpPower = attacker.getGame().getCombatModel().getDefencePower(attacker, nextUnit);
-            if (tmpPower > defencePower) {
+            float unitPower = attacker.getGame().getCombatModel()
+                .getDefencePower(attacker, nextUnit);
+            if (Unit.betterDefender(defender, defencePower,
+                    nextUnit, unitPower)) {
                 defender = nextUnit;
-                defencePower = tmpPower;
+                defencePower = unitPower;
             }
         }
         return defender;
