@@ -81,6 +81,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -1453,8 +1454,9 @@ public final class ColonyPanel extends FreeColPanel
             private void initializeAsCenterTile() {
 
                 setLayout(new GridLayout(2, 1));
-
-                for (AbstractGoods goods : colony.getProductionInfo(colonyTile).getProduction()) {
+                ProductionInfo info = colony.getProductionInfo(colonyTile);
+                if (info == null) return;
+                for (AbstractGoods goods : info.getProduction()) {
                     add(new ProductionLabel(goods, getCanvas()));
                 }
             }

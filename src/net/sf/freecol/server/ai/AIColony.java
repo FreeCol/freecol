@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TypeCountMap;
@@ -403,8 +404,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (workLocation instanceof Building) {
                 Building building = (Building) workLocation;
                 GoodsType inputType = building.getGoodsInputType();
+                ProductionInfo info = colony.getProductionInfo(building);
                 if (inputType != null
-                    && !colony.getProductionInfo(building).hasMaximumProduction()) {
+                    && info != null
+                    && !info.hasMaximumProduction()) {
                     // TODO: find better heuristics
                     requiredGoods.incrementCount(inputType, 100);
                 }

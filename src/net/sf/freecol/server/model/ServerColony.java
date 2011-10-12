@@ -160,8 +160,9 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Check for learning by experience
         for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            ProductionInfo productionInfo = getProductionInfo(workLocation);
             ((ServerModelObject) workLocation).csNewTurn(random, cs);
+            ProductionInfo productionInfo = getProductionInfo(workLocation);
+            if (productionInfo == null) continue;
             if (!workLocation.isEmpty()) {
                 for (AbstractGoods goods : productionInfo.getProduction()) {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
@@ -188,7 +189,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<BuildQueue> built = new ArrayList<BuildQueue>();
         for (BuildQueue queue
                  : new BuildQueue[] { buildQueue, populationQueue }) {
-            if (!getProductionInfo(queue).getConsumption().isEmpty()) {
+            ProductionInfo info = getProductionInfo(queue);
+            if (info == null) continue;
+            if (!info.getConsumption().isEmpty()) {
                 // Ready to build something.  TODO: OO!
                 BuildableType buildable = csNextBuildable(queue, random, cs);
                 if (buildable == null) {

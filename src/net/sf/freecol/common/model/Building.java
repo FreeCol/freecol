@@ -500,7 +500,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        List<AbstractGoods> production = getProductionInfo().getProduction();
+        ProductionInfo info = getProductionInfo();
+        if (info == null) return 0;
+        List<AbstractGoods> production = info.getProduction();
         if (production == null || production.isEmpty()) {
             return 0;
         } else {
@@ -515,7 +517,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      *         workers, when there is enough "input goods".
      */
     public int getMaximumProduction() {
-        List<AbstractGoods> production = getProductionInfo().getMaximumProduction();
+        ProductionInfo info = getProductionInfo();
+        if (info == null) return 0;
+        List<AbstractGoods> production = info.getMaximumProduction();
         if (production == null || production.isEmpty()) {
             return getProduction();
         } else {

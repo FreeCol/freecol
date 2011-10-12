@@ -37,6 +37,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.Settlement;
 
 import org.w3c.dom.Element;
 

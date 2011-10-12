@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -166,8 +167,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 missingExpertWarning.add(expert);
             }
             // not enough input
+            ProductionInfo info = building.getProductionInfo();
             if (goodsType != null
-                && !building.getProductionInfo().hasMaximumProduction()
+                && info != null
+                && !info.hasMaximumProduction()
                 && !productionWarning.contains(goodsType)) {
                 addProductionWarning(doc, colony, goodsType,
                     building.getGoodsInputType());

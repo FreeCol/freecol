@@ -71,7 +71,7 @@ public class BuildingToolTip extends JToolTip {
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();
-        if (info.getProduction().isEmpty()) {
+        if (info == null || info.getProduction().isEmpty()) {
             add(new JLabel(), "span");
         } else {
             AbstractGoods production = info.getProduction().get(0);

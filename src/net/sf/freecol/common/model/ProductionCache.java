@@ -126,15 +126,17 @@ public class ProductionCache {
             } else if (consumer instanceof BuildQueue) {
                 info = ((BuildQueue<?>) consumer).getProductionInfo(goods);
             }
-            production.add(info.getProduction());
-            production.remove(info.getConsumption());
-            for (AbstractGoods g : info.getProduction()) {
-                netProduction.incrementCount(g.getType().getStoredAs(), g.getAmount());
+            if (info != null) {
+                production.add(info.getProduction());
+                production.remove(info.getConsumption());
+                for (AbstractGoods g : info.getProduction()) {
+                    netProduction.incrementCount(g.getType().getStoredAs(), g.getAmount());
+                }
+                for (AbstractGoods g : info.getConsumption()) {
+                    netProduction.incrementCount(g.getType().getStoredAs(), -g.getAmount());
+                }
+                productionAndConsumption.put(consumer, info);
             }
-            for (AbstractGoods g : info.getConsumption()) {
-                netProduction.incrementCount(g.getType().getStoredAs(), -g.getAmount());
-            }
-            productionAndConsumption.put(consumer, info);
         }
         this.productionAndConsumption = productionAndConsumption;
         this.netProduction = netProduction;
