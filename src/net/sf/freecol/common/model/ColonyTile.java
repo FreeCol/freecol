@@ -515,6 +515,16 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public int getPotentialProduction(UnitType unitType, GoodsType goodsType) {
         int production = 0;
+        if (isColonyCenterTile()) {
+            TileType type = workTile.getType();
+            return (type.getPrimaryGoods() != null
+                && type.getPrimaryGoods().getType() == goodsType)
+                ? getPrimaryProduction().getAmount()
+                : (type.getSecondaryGoods() != null
+                    && type.getSecondaryGoods().getType() == goodsType)
+                ? getSecondaryProduction().getAmount()
+                : 0;
+        }
         if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
