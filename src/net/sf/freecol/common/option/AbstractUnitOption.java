@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Specification.TypeSelector;
+import net.sf.freecol.common.model.Unit.Role;
 
 /**
  * Represents an option where the valid choice is an AbstractUnit.
@@ -45,83 +46,53 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     private AbstractUnit value;
 
     /**
-     * The minimum number of units. Defaults to 1.
+     * An Option to determine the UnitType of the AbstractUnit.
      */
-    private int minimumNumber = 1;
+    private StringOption unitType;
 
     /**
-     * The maximum number of units. Defaults to 1.
+     * An Option to determine the Role of the AbstractUnit.
      */
-    private int maximumNumber = 1;
+    private StringOption role;
 
     /**
-     * Whether the Role of the Unit may be selected.
+     * An Option to determine the number of the AbstractUnit.
      */
-    private boolean selectRole = true;
-
-    /**
-     * Determines which unit types are valid for this Option if no
-     * choices are provided.
-     */
-    private TypeSelector validTypes = DEFAULT_SELECTOR;
-
-    /**
-     * A list of valid unit types for this Option.
-     */
-    private List<String> choices;
+    private IntegerOption number;
 
     /**
      * Creates a new <code>AbstractUnitOption</code>.
+     * Get the <code>UnitType</code> value.
      *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
+     * @return a <code>StringOption</code> value
      */
     public AbstractUnitOption(String id) {
         super(id);
     }
 
+
     /**
      * Creates a new  <code>AbstractUnitOption</code>.
+     *
      * @param in The <code>XMLStreamReader</code> containing the data.
      * @exception XMLStreamException if an error occurs
      */
     public AbstractUnitOption(XMLStreamReader in) throws XMLStreamException {
         super(NO_ID);
-        readFromXML(in);
+        readFromXMLImpl(in);
     }
 
-
-    /**
-    * Returns the minimum allowed value.
-    * @return The minimum value allowed by this option.
-    */
-    public int getMinimumValue() {
-        return minimumNumber;
+    public AbstractUnitOption clone() {
+        AbstractUnitOption result = new AbstractUnitOption(getId());
+        result.setValue(getValue().clone());
+        result.unitType = unitType.clone();
+        result.role = role.clone();
+        result.number = number.clone();
+        return result;
     }
 
-    /**
-     * Sets the minimum allowed value.
-     * @param minimumNumber The minimum value to set
-     */
-    public void setMinimumValue(int minimumNumber) {
-        this.minimumNumber = minimumNumber;
-    }
-
-    /**
-    * Returns the maximum allowed value.
-    * @return The maximum value allowed by this option.
-    */
-    public int getMaximumValue() {
-        return maximumNumber;
-    }
-
-    /**
-     * Sets the maximum allowed value.
-     * @param maximumNumber the maximum value to set
-     */
-    public void setMaximumValue(int maximumNumber) {
-        this.maximumNumber = maximumNumber;
-    }
 
     /**
      * Gets the current value of this <code>AbstractUnitOption</code>.
@@ -130,6 +101,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public AbstractUnit getValue() {
         return value;
     }
+
 
     /**
      * Sets the value of this <code>AbstractUnitOption</code>.
@@ -145,86 +117,70 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         isDefined = true;
     }
 
-    /**
-     * Returns whether the Role of the Unit may be selected.
+   /**
+     * Get the <code>UnitType</code> value.
      *
-     * @return whether to select the Role
+     * @return a <code>StringOption</code> value
      */
-    public boolean getSelectRole() {
-        return selectRole;
+    public final StringOption getUnitType() {
+        return unitType;
     }
 
     /**
-     * Sets whether the Role of the Unit may be selected.
+     * Set the <code>UnitType</code> value.
      *
-     * @param value the value of the selectRole attribute
+     * @param newUnitType The new UnitType value.
      */
-    public void setSelectRole(boolean value) {
-        selectRole = value;
+    public final void setUnitType(final StringOption newUnitType) {
+        this.unitType = newUnitType;
     }
 
     /**
-     * Returns the valid unit types for this option.
+     * Get the <code>Role</code> value.
      *
-     * @return the valid unit types for this option
+     * @return a <code>StringOption</code> value
      */
-    public TypeSelector getValidTypes() {
-        return validTypes;
+    public final StringOption getRole() {
+        return role;
     }
 
     /**
-     * Set the valid unit types for this option.
+     * Set the <code>Role</code> value.
      *
-     * @param value the valid unit types for this option
+     * @param newRole The new Role value.
      */
-    public void setValidTypes(TypeSelector value) {
-        if (value == null
-            || value == TypeSelector.BUILDINGS
-            || value == TypeSelector.FOUNDING_FATHERS) {
-            validTypes = DEFAULT_SELECTOR;
-            logger.warning("Invalid type selector for AbstractUnit: " + value
-                           + ". Falling back to default selector: " + validTypes);
-        } else {
-            validTypes = value;
-        }
+    public final void setRole(final StringOption newRole) {
+        this.role = newRole;
     }
 
     /**
-     * Get the <code>Choices</code> value.
+     * Get the <code>Number</code> value.
      *
-     * @return a <code>List<String></code> value
+     * @return an <code>IntegerOption</code> value
      */
-    public final List<String> getChoices() {
-        return choices;
+    public final IntegerOption getNumber() {
+        return number;
     }
 
     /**
-     * Set the <code>Choices</code> value.
+     * Set the <code>Number</code> value.
      *
-     * @param newChoices The new Choices value.
+     * @param newNumber The new Number value.
      */
-    public final void setChoices(final List<String> newChoices) {
-        this.choices = newChoices;
+    public final void setNumber(final IntegerOption newNumber) {
+        this.number = newNumber;
     }
 
     /**
      * Generate the choices to provide to the UI based on the
-     * validTypes value.
+     * generateChoices value.
      *
      * @param specification the Specification that defines the game
      * objects whose IDs will be generated
      */
     public void generateChoices(Specification specification) {
-        if (validTypes == null) {
-            if (choices == null || choices.isEmpty()) {
-                choices = new ArrayList<String>();
-                choices.add(value.getId());
-            }
-        } else {
-            for (FreeColGameObjectType object : specification.getTypes(validTypes)) {
-                choices.add(object.getId());
-            }
-        }
+        unitType.generateChoices(specification);
+        role.generateChoices(specification);
     }
 
     /**
@@ -238,22 +194,12 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("minimumNumber", Integer.toString(minimumNumber));
-        out.writeAttribute("maximumNumber", Integer.toString(maximumNumber));
-        out.writeAttribute("selectRole", Boolean.toString(selectRole));
-        if (validTypes != null) {
-            out.writeAttribute("validTypes", validTypes.toString());
-        }
-        value.toXML(out);
-        if (choices != null && !choices.isEmpty()) {
-            for (String choice : choices) {
-                out.writeStartElement("choice");
-                out.writeAttribute(VALUE_TAG, choice);
-                out.writeEndElement();
-            }
-        }
+
+        // TODO: we REALLY, REALLY need to clean up serialization!
+        unitType.toXML(out, "unitType");
+        role.toXML(out, "role");
+        number.toXMLImpl(out, "number");
 
         out.writeEndElement();
     }
@@ -266,7 +212,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
 
         if (id == null && getId().equals(NO_ID)){
             throw new XMLStreamException("invalid <" + getXMLElementTagName()
@@ -277,20 +223,20 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
             setId(id);
         }
 
-        minimumNumber = getAttribute(in, "minimumNumber", 1);
-        maximumNumber = getAttribute(in, "maximumNumber", 1);
-        selectRole = getAttribute(in, "selectRole", true);
-        setValidTypes(getAttribute(in, "validTypes", TypeSelector.class, DEFAULT_SELECTOR));
-
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (AbstractUnit.getXMLElementTagName().equals(in.getLocalName())) {
-                value = new AbstractUnit(in);
-            } else if ("choice".equals(in.getLocalName())) {
-                choices.add(in.getAttributeValue(null, VALUE_TAG));
+            String tag = in.getLocalName();
+            if ("number".equals(tag)) {
+                number = new IntegerOption(id + ".number");
+                number.readFromXMLImpl(in);
+            } else if ("unitType".equals(tag)) {
+                unitType = new StringOption(id + ".unitType");
+                unitType.readFromXMLImpl(in);
+            } else if ("role".equals(tag)) {
+                role = new StringOption(id + ".role");
+                role.readFromXMLImpl(in);
             }
-            in.nextTag();
         }
-
+        setValue(new AbstractUnit(unitType.getValue(), Role.valueOf(role.getValue()), number.getValue()));
     }
 
     /**

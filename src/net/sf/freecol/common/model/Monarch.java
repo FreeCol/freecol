@@ -32,6 +32,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.option.AbstractUnitOption;
+import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 
@@ -119,22 +121,23 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.name = name;
 
         Specification spec = getSpecification();
-        int number = spec.getIntegerOption("model.option.refStrength")
-            .getValue() + 3;
-
-        for (UnitType unitType : spec.getUnitTypeList()) {
+        List<AbstractUnitOption> ref =
+            ((UnitListOption) spec.getOption("model.option.refSize")).getValue();
+        for (AbstractUnitOption unitOption : ref) {
+            AbstractUnit unit = unitOption.getValue();
+            UnitType unitType = unit.getUnitType(spec);
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                    navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                } else if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    landUnits.add(new AbstractUnit(unitType, Role.SOLDIER, number));
-                    landUnits.add(new AbstractUnit(unitType, Role.DRAGOON, number));
+                    navalUnits.add(unit);
                 } else {
-                    landUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
+                    landUnits.add(unit);
                 }
+            } else {
+                logger.warning("Found REF unit lacking ability \"model.ability.refUnit\": "
+                               + unit.toString());
             }
         }
-        updateSpaceAndCapacity();
+        //updateSpaceAndCapacity();
     }
 
     /**

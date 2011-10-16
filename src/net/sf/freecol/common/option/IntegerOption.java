@@ -58,6 +58,15 @@ public class IntegerOption extends AbstractOption<Integer> {
         readFromXML(in);
     }
 
+    public IntegerOption clone() {
+        IntegerOption result = new IntegerOption(getId());
+        result.value = value;
+        result.minimumValue = minimumValue;
+        result.maximumValue = maximumValue;
+        result.isDefined = true;
+        return result;
+    }
+
 
     /**
     * Returns the minimum allowed value.

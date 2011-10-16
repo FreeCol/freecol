@@ -597,15 +597,16 @@ public class Messages {
     }
 
 
-     /**
+    /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
      *
      * @param someType an <code>UnitType</code> value
      * @param someRole a <code>Role</code> value
+     * @param count an <code>int</code> value
      * @return The given unit type as a String
      */
-    public static String getLabel(UnitType someType, Unit.Role someRole) {
+    public static String getLabel(UnitType someType, Unit.Role someRole, int count) {
         String key = someRole.toString().toLowerCase();
         if (someRole == Unit.Role.DEFAULT) {
             key = "name";
@@ -615,6 +616,7 @@ public class Messages {
             return message(messageID);
         } else {
             return message(StringTemplate.template("model.unit." + key + ".name")
+                           .addAmount("%number%", count)
                            .addName("%unit%", someType));
         }
     }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.option;
 
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -40,6 +41,33 @@ public class OptionTest extends FreeColTestCase {
         assertFalse(spec().getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
         assertFalse(spec().getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
         assertTrue(spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).getValue());
+    }
+
+    public void testCloneIntegerOption() {
+        IntegerOption money = spec().getIntegerOption("model.option.startingMoney");
+        IntegerOption money2 = money.clone();
+
+        assertFalse(money == money2);
+        assertEquals(money.getId(), money2.getId());
+        assertEquals(money.getValue(), money2.getValue());
+        assertEquals(money.getMinimumValue(), money2.getMinimumValue());
+        assertEquals(money.getMaximumValue(), money2.getMaximumValue());
+
+        money2.setValue(money.getValue() + 23);
+        assertEquals((int) (money.getValue() + 23), (int) money2.getValue());
+
+    }
+
+    public void testUnitListOption() {
+
+        UnitListOption refOption = (UnitListOption) spec().getOption("model.option.refSize");
+
+        for (AbstractUnitOption unitOption : refOption.getValue()) {
+            AbstractUnit unit = unitOption.getValue();
+            assertTrue(unit.getNumber() > 0);
+            assertTrue(unit.getNumber() < Integer.MAX_VALUE);
+        }
+
     }
 
 

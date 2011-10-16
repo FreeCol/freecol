@@ -1681,7 +1681,6 @@
         <integerOption id="model.option.lowerCapIncrease" value="0"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100"/>
         <integerOption id="model.option.monarchMeddling" value="0"/>
-        <integerOption id="model.option.refStrength" value="0"/>
         <integerOption id="model.option.taxAdjustment" value="0"/>
         <integerOption id="model.option.mercenaryPrice" value="50"/>
         <integerOption id="model.option.maximumTax" value="50"/>
@@ -1704,6 +1703,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="15" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="5" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="2" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="2" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
       <optionGroup id="model.difficulty.easy">
         <integerOption id="model.option.startingMoney" value="300"/>
@@ -1719,7 +1740,6 @@
         <integerOption id="model.option.recruitPriceIncrease" value="30"/>
         <integerOption id="model.option.lowerCapIncrease" value="0"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.refStrength" value="2"/>
         <integerOption id="model.option.monarchMeddling" value="1"/>
         <integerOption id="model.option.taxAdjustment" value="1"/>
         <integerOption id="model.option.mercenaryPrice" value="60"/>
@@ -1742,6 +1762,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="23" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="10" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="8" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="5" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
       <optionGroup id="model.difficulty.medium">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1757,7 +1799,6 @@
         <integerOption id="model.option.recruitPriceIncrease" value="40"/>
         <integerOption id="model.option.lowerCapIncrease" value="0"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.refStrength" value="4"/>
         <integerOption id="model.option.monarchMeddling" value="2"/>
         <integerOption id="model.option.taxAdjustment" value="2"/>
         <integerOption id="model.option.mercenaryPrice" value="65"/>
@@ -1779,6 +1820,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="31" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="15" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="14" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="8" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
       <optionGroup id="model.difficulty.hard">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1794,7 +1857,6 @@
         <integerOption id="model.option.recruitPriceIncrease" value="30"/>
         <integerOption id="model.option.lowerCapIncrease" value="0"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.refStrength" value="6"/>
         <integerOption id="model.option.monarchMeddling" value="3"/>
         <integerOption id="model.option.taxAdjustment" value="3"/>
         <integerOption id="model.option.mercenaryPrice" value="70"/>
@@ -1815,6 +1877,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="39" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="20" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="20" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="11" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
       <optionGroup id="model.difficulty.veryHard">
         <integerOption id="model.option.startingMoney" value="0"/>
@@ -1830,7 +1914,6 @@
         <integerOption id="model.option.recruitPriceIncrease" value="30"/>
         <integerOption id="model.option.lowerCapIncrease" value="0"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.refStrength" value="8"/>
         <integerOption id="model.option.monarchMeddling" value="4"/>
         <integerOption id="model.option.taxAdjustment" value="4"/>
         <integerOption id="model.option.mercenaryPrice" value="75"/>
@@ -1851,6 +1934,28 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="SOLDIER" />
+            <number value="47" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" />
+            <role value="DRAGOON" />
+            <number value="25" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" />
+            <role value="DEFAULT" />
+            <number value="26" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" />
+            <role value="DEFAULT" />
+            <number value="14" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
       <optionGroup id="model.difficulty.custom">
         <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
@@ -1866,7 +1971,6 @@
         <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
-        <integerOption id="model.option.refStrength" value="8" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
         <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
         <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
@@ -1904,6 +2008,34 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption id="model.option.refSize">
+          <unitOption id="model.option.refSize.soldiers">
+            <unitType value="model.unit.kingsRegular" generate="UNITS" />
+            <role value="SOLDIER">
+              <choice value="SOLDIER" />
+              <choice value="DRAGOON" />
+            </role>
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.dragoons">
+            <unitType value="model.unit.kingsRegular" generate="UNITS" />
+            <role value="DRAGOON" >
+              <choice value="SOLDIER" />
+              <choice value="DRAGOON" />
+            </role>
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.artillery">
+            <unitType value="model.unit.artillery" generate="UNITS" />
+            <role value="DEFAULT" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+          <unitOption id="model.option.refSize.menOfWar">
+            <unitType value="model.unit.manOWar" generate="UNITS" />
+            <role value="DEFAULT" />
+            <number value="20" minimumValue="0" maximumValue="999" />
+          </unitOption>
+        </unitListOption>
       </optionGroup>
     </optionGroup>
     <optionGroup id="gameOptions">

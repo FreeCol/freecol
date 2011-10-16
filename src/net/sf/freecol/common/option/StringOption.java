@@ -83,6 +83,16 @@ public class StringOption extends AbstractOption<String> {
         readFromXMLImpl(in);
     }
 
+    public StringOption clone() {
+        StringOption result = new StringOption(getId());
+        result.value = value;
+        result.addNone = addNone;
+        result.generateChoices = generateChoices;
+        result.choices = new ArrayList<String>(choices);
+        result.isDefined = true;
+        return result;
+    }
+
     /**
      * Gets the current value of this <code>StringOption</code>.
      * @return The value.

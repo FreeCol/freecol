@@ -59,6 +59,10 @@ public class AbstractUnit extends FreeColObject {
         this(unitType.getId(), someRole, someNumber);
     }
 
+    public AbstractUnit clone() {
+        return new AbstractUnit(getId(), getRole(), getNumber());
+    }
+
     /**
      * Creates a new <code>AbstractUnit</code> instance.
      *
