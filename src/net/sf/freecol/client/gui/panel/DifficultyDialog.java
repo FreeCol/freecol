@@ -135,6 +135,11 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     }
 
     @Override
+    public boolean isEditable() {
+        return super.isEditable() && CUSTOM_LEVEL.equals(getGroup().getId());
+    }
+
+    @Override
     public String getOptionGroupId() {
         return CUSTOM_LEVEL;
     }
