@@ -125,7 +125,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             panel.add(getGoodsButton(type.getProducedMaterial()), "span");
         } else if (type.getStoredAs() != type) {
             panel.add(getGoodsButton(type.getStoredAs()), "span");
-        } else if (!type.isBuildingMaterial()) {
+        } else {
             panel.add(localizedLabel("nothing"), "span");
         }
 
@@ -197,6 +197,11 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                     }
                 }
             }
+        }
+
+        if (type.getBreedingNumber() < type.INFINITY) {
+            panel.add(localizedLabel("colopedia.goods.breedingNumber"), "newline 20");
+            panel.add(new JLabel(Integer.toString(type.getBreedingNumber())));
         }
 
         panel.add(localizedLabel("colopedia.goods.description"), "newline 20");
