@@ -21,10 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.client.gui.action.ColopediaAction;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.FreeColGameObjectType;
-
 /**
  * TreeCellItems are used to represent the name and icon of a node in
  * the Colopedia's tree.

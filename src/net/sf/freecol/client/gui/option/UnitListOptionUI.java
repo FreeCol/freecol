@@ -34,7 +34,6 @@ import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -50,7 +49,6 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.UnitListOption;
 

@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.option;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -29,7 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Specification.TypeSelector;
 import net.sf.freecol.common.model.Unit.Role;
