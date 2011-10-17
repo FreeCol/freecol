@@ -615,6 +615,7 @@
         <xs:element ref="audioMixerOption"/>
         <xs:element ref="percentageOption"/>
         <xs:element ref="optionGroup"/>
+        <xs:element ref="unitListOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
@@ -658,6 +659,89 @@
   <xs:element name="languageOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:element name="unitOption">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="unitType"/>
+        <xs:element ref="role"/>
+        <xs:element name="number">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="defaultValue" type="xs:int"/>
+            <xs:attribute name="minimumValue" type="xs:int"/>
+            <xs:attribute name="maximumValue" type="xs:int"/>
+            <xs:attribute name="value" type="xs:int"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unitType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="generate">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="UNITS" />
+            <xs:enumeration value="IMMIGRANTS" />
+            <xs:enumeration value="LAND_UNITS" />
+            <xs:enumeration value="NAVAL_UNITS" />
+            <xs:enumeration value="BUILDINGS" />
+            <xs:enumeration value="FOUNDING_FATHERS" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="role">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value">
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="DEFAULT"/>
+                  <xs:enumeration value="PIONEER"/>
+                  <xs:enumeration value="MISSIONARY"/>
+                  <xs:enumeration value="SOLDIER"/>
+                  <xs:enumeration value="SCOUT"/>
+                  <xs:enumeration value="DRAGOON"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unitListOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="unitOption"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="maximumNumber" type="xs:int"/>
     </xs:complexType>
   </xs:element>
 
