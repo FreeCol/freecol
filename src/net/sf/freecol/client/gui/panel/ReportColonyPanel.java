@@ -389,21 +389,8 @@ public final class ReportColonyPanel extends ReportPanel
                 : (Settlement.FOOD_PER_COLONIST
                     - colony.getGoodsCount(foodType)) / newFood + 1;
         }
-        int pop = colony.getUnitCount();
-        int grow, bonus = colony.getProductionBonus();
-        if (bonus < 0) {
-            int i;
-            for (i = 1; i < pop; i++) {
-                if (colony.governmentChange(pop - i) == 1) break;
-            }
-            grow = -i;
-        } else {
-            int i;
-            for (i = 1; i < pop; i++) {
-                if (colony.governmentChange(pop + i) == -1) break;
-            }
-            grow = i - 1;
-        }
+        int grow = colony.getPreferredSizeChange();
+        int bonus = colony.getProductionBonus();
 
         // Field: A button for the colony.
         // Colour: bonus in {-2,2} => {alarm, warn, plain, export, good}

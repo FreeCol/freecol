@@ -2035,6 +2035,33 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Gets the number of units that would be good to add/remove from this
+     * colony.  That is the number of extra units that can be added without
+     * damaging the production bonus, or the number of units to remove to
+     * improve it.
+     *
+     * @return The number of units to add to the colony, or if negative
+     *      the negation of the number of units to remove.
+     */
+    public int getPreferredSizeChange() {
+        int i, limit, pop = getUnitCount();
+        if (productionBonus < 0) {
+            limit = pop;
+            for (i = 1; i < limit; i++) {
+                if (governmentChange(pop - i) == 1) break;
+            }
+            return -i;
+        } else {
+            limit = getSpecification()
+                .getIntegerOption("model.option.badGovernmentLimit").getValue();
+            for (i = 1; i < limit; i++) {
+                if (governmentChange(pop + i) == -1) break;
+            }
+            return i - 1;
+        }
+    }
+
+    /**
      * Propagates a global change in tension down to a settlement.
      * No-op for European colonies.
      *
