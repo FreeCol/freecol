@@ -906,9 +906,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         }
                     }
                     if (bestUnit != null
-                        && wlp.getWorkLocation().canAdd(bestUnit)
-                        && AIMessage.askWork(getAIUnit(bestUnit), wlp.getWorkLocation())) {
-                        AIMessage.askChangeWorkType(getAIUnit(bestUnit), wlp.getGoodsType());
+                        && wlp.getWorkLocation().canAdd(bestUnit)) {
+                        bestUnit.setLocation(wlp.getWorkLocation());
+                        bestUnit.setWorkType(wlp.getGoodsType());
                         units.remove(bestUnit);
                         workLocationPlans.remove(wlp);
                         workerAdded = true;
@@ -941,9 +941,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                             }
                         }
                         if (bestUnit != null
-                            && wlp.getWorkLocation().canAdd(bestUnit)
-                            && AIMessage.askWork(getAIUnit(bestUnit), wlp.getWorkLocation())) {
-                            AIMessage.askChangeWorkType(getAIUnit(bestUnit), wlp.getGoodsType());
+                            && wlp.getWorkLocation().canAdd(bestUnit)) {
+                            bestUnit.setLocation(wlp.getWorkLocation());
+                            bestUnit.setWorkType(wlp.getGoodsType());
                             units.remove(bestUnit);
                             workLocationPlans.remove(wlp);
                             workerAdded = true;
@@ -1002,7 +1002,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 ColonyTile ct = (ColonyTile) bestPick;
                 Unit u = ct.getUnit();
                 if (ct.getProductionOf(u, foodType) > 1) {
-                    AIMessage.askChangeWorkType(getAIUnit(u), foodType);
+                    u.setWorkType(foodType);
                 } else {
                     u.setLocation(colony.getTile());
                     AIUnit au = getAIUnit(u);
@@ -1057,11 +1057,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     type = foodType;
                 }
                 if (w != null) {
-                    if (AIMessage.askWork(getAIUnit(bestPick), w)
-                        && bestPick.getLocation() == w) {
-                        AIMessage.askChangeWorkType(getAIUnit(bestPick), type);
-                        break;
-                    }
+                    bestPick.setLocation(w);
+                    bestPick.setWorkType(type);
+                    break;
                 } else {
                     bestPick.setLocation(colony.getTile());
                 }
@@ -1103,11 +1101,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                 if (working){
                                     unit.setLocation(colony.getTile());
                                 }
-                                if (AIMessage.askWork(getAIUnit(unit), bestTile)) {
-                                    AIMessage.askChangeWorkType(getAIUnit(unit), goodsType2);
-                                    best = production2;
-                                    working = true;
-                                }
+                                unit.setLocation(bestTile);
+                                unit.setWorkType(goodsType2);
+                                best = production2;
+                                working = true;
                             }
                         }
                         if (!working){
@@ -1151,11 +1148,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
                 if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
 
-                    if (AIMessage.askWork(getAIUnit(bestUnit), wlp.getWorkLocation())) {
-                        AIMessage.askChangeWorkType(getAIUnit(bestUnit), wlp.getGoodsType());
-                        units.remove(bestUnit);
-                        workLocationPlans.remove(wlp);
-                    }
+                    bestUnit.setLocation(wlp.getWorkLocation());
+                    bestUnit.setWorkType(wlp.getGoodsType());
+                    units.remove(bestUnit);
+                    workLocationPlans.remove(wlp);
                 }
             }
         }
@@ -1200,8 +1196,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 Unit u = colony.getTile().getFirstUnit();
                 GoodsType bells = colony.getSpecification()
                     .getGoodsType("model.goods.bells");
-                AIMessage.askWork(getAIUnit(u),
-                                  colony.getBuildingForProducing(bells));
+                u.setLocation(colony.getBuildingForProducing(bells));
+                u.setWorkType(bells);
                 getAIUnit(u).setMission(null);
             } else {
                 throw new IllegalStateException("Colony " + colony.getName()
@@ -1470,8 +1466,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             }
 
-            if (bestWorkPlan != null && AIMessage.askWork(getAIUnit(unit), bestWorkPlan.getWorkLocation())) {
-                AIMessage.askChangeWorkType(getAIUnit(unit), bestWorkPlan.getGoodsType());
+            if (bestWorkPlan != null) {
+                unit.setLocation(bestWorkPlan.getWorkLocation());
+                unit.setWorkType(bestWorkPlan.getGoodsType());
                 workLocationPlans.remove(bestWorkPlan);
                 units.remove(unit);
             }
