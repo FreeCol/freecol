@@ -95,12 +95,16 @@ public class AIMessage {
     private static boolean sendMessage(Connection connection,
                                        Element request) {
         try {
-            if (FreeCol.isInDebugMode()) {
-                System.err.println("\n" + connection.toString()
-                    + " -> SERVER: " + DOMMessage.elementToString(request)
-                    + "\n");
+            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+                System.err.println(connection.getName() + ": -> "
+                    + DOMMessage.elementToString(request) + "\n");
             }
             Element reply = connection.ask(request);
+            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+                System.err.println(connection.getName() + ": <- "
+                    + ((reply == null) ? "(null)" 
+                        : DOMMessage.elementToString(reply)) + "\n");
+            }
             if (reply == null) {
                 return false;
             } else if ("error".equals(reply.getTagName())) {

@@ -456,18 +456,25 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param element An <code>Element</code> containing the update.
      */
-    private void sendElement(ServerPlayer serverPlayer, Element element) {
-        if (element != null && serverPlayer.isConnected()) {
-            if (FreeCol.isInDebugMode()) {
-                System.err.println("\nSERVER -> " + serverPlayer.getName()
-                    + ": " + DOMMessage.elementToString(element) + "\n");
-            }
-            try {
-                serverPlayer.getConnection().sendAndWait(element);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Send element failure", e);
-            }
+    private Element sendElement(ServerPlayer serverPlayer, Element element) {
+        if (element == null || !serverPlayer.isConnected()) return null;
+        String name = serverPlayer.getName();
+        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+            System.err.println("SERVER: -> " + name + ": "
+                + DOMMessage.elementToString(element) + "\n");
         }
+        try {
+            element = serverPlayer.getConnection().ask(element);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Send element failure", e);
+            return null;
+        }
+        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+            System.err.println("SERVER: <- " + name + ": "
+                + ((element == null) ? "(null)"
+                    : DOMMessage.elementToString(element)) + "\n");
+        }
+        return element;
     }
 
     /**

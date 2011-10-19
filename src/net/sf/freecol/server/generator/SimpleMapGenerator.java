@@ -832,7 +832,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
 
-            if (FreeCol.isInFullDebugMode()) {
+            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL) {
                 createDebugUnits(map, player, startTile);
             }
         }

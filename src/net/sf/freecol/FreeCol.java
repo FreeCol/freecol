@@ -100,9 +100,10 @@ public final class FreeCol {
     private static boolean standAloneServer = false;
     private static boolean publicServer = true;
 
-    private static final int DEBUG_OFF = 0;
-    private static final int DEBUG_LIMITED = 1;
-    private static final int DEBUG_FULL = 2;
+    public static final int DEBUG_OFF = 0;
+    public static final int DEBUG_LIMITED = 1;
+    public static final int DEBUG_FULL = 2;
+    public static final int DEBUG_FULL_COMMS = 3;
     private static int debugLevel = DEBUG_OFF;
     private static int debugRunTurns = -1;
     private static String debugRunSave = null;
@@ -726,7 +727,7 @@ public final class FreeCol {
                 try {
                     debugLevel = Integer.parseInt(line.getOptionValue("debug"));
                     debugLevel = Math.min(Math.max(debugLevel, DEBUG_OFF),
-                                          DEBUG_FULL);
+                                          DEBUG_FULL_COMMS);
                 } catch (NumberFormatException e) {
                     debugLevel = DEBUG_FULL;
                 }
@@ -839,14 +840,12 @@ public final class FreeCol {
     }
 
     /**
-     * Checks if the program is in the full debug mode, rather than
-     * the limited version which does not initialize a player colony.
+     * Gets the debug level.
      *
-     * @return <code>true</code> if the program is in the higher level
-     *       mode and <code>false</code> otherwise.
+     * @return The debug level.
      */
-    public static boolean isInFullDebugMode() {
-        return debugLevel > DEBUG_LIMITED;
+    public static int getDebugLevel() {
+        return debugLevel;
     }
 
     /**
