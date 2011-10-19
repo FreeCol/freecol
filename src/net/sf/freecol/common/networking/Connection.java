@@ -74,18 +74,19 @@ public class Connection {
 
     private int currentQuestionID = -1;
 
-    private String threadName;
+    private String name = null;
 
 
     /**
-     * Dead constructor, for DummyConnection purposes.
+     * Trivial constructor for DummyConnection to use.
      */
-    protected Connection() {
+    protected Connection(String name) {
         out = null;
         in = null;
         socket = null;
         thread = null;
         xmlTransformer = null;
+        this.name = name;
     }
 
     /**
@@ -98,8 +99,9 @@ public class Connection {
      *            received.
      * @throws IOException
      */
-    public Connection(String host, int port, MessageHandler messageHandler, String threadName) throws IOException {
-        this(createSocket(host, port), messageHandler, threadName);
+    public Connection(String host, int port, MessageHandler messageHandler,
+                      String name) throws IOException {
+        this(createSocket(host, port), messageHandler, name);
     }
 
     /**
@@ -111,10 +113,11 @@ public class Connection {
      *            received.
      * @throws IOException
      */
-    public Connection(Socket socket, MessageHandler messageHandler, String threadName) throws IOException {
+    public Connection(Socket socket, MessageHandler messageHandler,
+                      String name) throws IOException {
         this.messageHandler = messageHandler;
         this.socket = socket;
-        this.threadName = threadName;
+        this.name = name;
 
         out = socket.getOutputStream();
         in = socket.getInputStream();
@@ -130,7 +133,7 @@ public class Connection {
         }
         xmlTransformer = myTransformer;
 
-        thread = new ReceivingThread(this, in, threadName);
+        thread = new ReceivingThread(this, in, name);
         thread.start();
     }
 
@@ -140,6 +143,15 @@ public class Connection {
         socket.connect(addr, TIMEOUT);
 
         return socket;
+    }
+
+    /**
+     * Gets the connection name.
+     *
+     * @return The connection name.
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -529,7 +541,7 @@ public class Connection {
                         }
                     }
                 };
-                t.setName(threadName+"MessageHandler:" + t.getName());
+                t.setName(name + "MessageHandler:" + t.getName());
                 t.start();
             }
         } catch (Exception e) {

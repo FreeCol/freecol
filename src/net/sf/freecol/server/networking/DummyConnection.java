@@ -39,23 +39,15 @@ public final class DummyConnection extends Connection {
 
     private DummyConnection otherConnection;
 
-    /**
-     * Name for dummy connection, makes it possible to identify a specific
-     * instance.
-     */
-    private final String _name;
-
 
     /**
      * Sets up a dummy connection using the specified {@link MessageHandler}s.
      *
-     * @param name The name that identifies the connection.
      * @param incomingMessageHandler The MessageHandler to call for each message
      *            received.
      */
     public DummyConnection(String name, MessageHandler incomingMessageHandler) {
-        super();
-        _name = name;
+        super(name);
         setMessageHandler(incomingMessageHandler);
     }
 
@@ -152,6 +144,6 @@ public final class DummyConnection extends Connection {
      * @return string for debugging.
      */
     public String toString() {
-        return "DummyConnection[" + _name + "]";
+        return "DummyConnection[" + getName() + "]";
     }
 }
