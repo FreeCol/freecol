@@ -1200,7 +1200,13 @@ public final class FreeColServer {
             op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
-            spec.getOptionGroup(gr).add(op);
+            if ("".equals(gr)) {
+                for (OptionGroup level : spec.getDifficultyLevels()) {
+                    level.add(op);
+                }
+            } else {
+                spec.getOptionGroup(gr).add(op);
+            }
         }
     }
 
@@ -1211,7 +1217,13 @@ public final class FreeColServer {
             op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
-            spec.getOptionGroup(gr).add(op);
+            if ("".equals(gr)) {
+                for (OptionGroup level : spec.getDifficultyLevels()) {
+                    level.add(op);
+                }
+            } else {
+                spec.getOptionGroup(gr).add(op);
+            }
         }
     }
 
@@ -1222,6 +1234,13 @@ public final class FreeColServer {
             op.setGroup(gr);
             op.setValue(defaultValue);
             spec.addAbstractOption(op);
+            if ("".equals(gr)) {
+                for (OptionGroup level : spec.getDifficultyLevels()) {
+                    level.add(op);
+                }
+            } else {
+                spec.getOptionGroup(gr).add(op);
+            }
         }
     }
     // end compatibility code
