@@ -30,6 +30,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -44,7 +46,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * This panel displays the Colopedia.
  */
-public final class ColopediaPanel extends FreeColPanel implements TreeSelectionListener {
+public final class ColopediaPanel extends FreeColPanel
+    implements HyperlinkListener, TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
@@ -218,5 +221,17 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
     }
 
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        HyperlinkEvent.EventType type = e.getEventType();
+        if (type == HyperlinkEvent.EventType.ACTIVATED) {
+            String[] path = e.getURL().getPath().split("/");
+            if ("id".equals(path[1])) {
+                select(path[2]);
+            } else if ("action".equals(path[1])) {
+                getFreeColClient().getActionManager().getFreeColAction(path[2])
+                    .actionPerformed(null);
+            }
+        }
+    }
 
 }

@@ -19,9 +19,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
@@ -37,8 +47,20 @@ public class ConceptDetailPanel extends FreeColPanel
 
     private static final String[] concepts = new String[] {
         "taxes",
-        "efficiency"
+        "efficiency",
+        "independence"
     };
+
+    private static final Comparator<DefaultMutableTreeNode> nodeComparator
+        = new Comparator<DefaultMutableTreeNode>() {
+        public int compare(DefaultMutableTreeNode node1, DefaultMutableTreeNode node2) {
+            return ((ColopediaTreeItem) node1.getUserObject()).getText()
+            .compareTo(((ColopediaTreeItem) node2.getUserObject()).getText());
+        }
+    };
+
+    private ColopediaPanel colopediaPanel;
+
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
@@ -47,6 +69,7 @@ public class ConceptDetailPanel extends FreeColPanel
      */
     public ConceptDetailPanel(ColopediaPanel colopediaPanel) {
         super(colopediaPanel.getCanvas());
+        this.colopediaPanel = colopediaPanel;
     }
 
     public String getName() {
@@ -63,11 +86,16 @@ public class ConceptDetailPanel extends FreeColPanel
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, getName(), null));
+        List<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.message(nodeId + ".name");
-            node.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this, nodeId, nodeName, null)));
+            nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this, nodeId, nodeName, null)));
         }
+        Collections.sort(nodes, nodeComparator);
+        for (DefaultMutableTreeNode n : nodes) {
+            node.add(n);
+        };
         root.add(node);
     }
 
@@ -82,13 +110,39 @@ public class ConceptDetailPanel extends FreeColPanel
             return;
         }
 
-        panel.setLayout(new MigLayout("wrap 1"));
+        panel.setLayout(new MigLayout("wrap 1, center"));
 
         JLabel header = localizedLabel(id + ".name");
         header.setFont(smallHeaderFont);
         panel.add(header, "align center, wrap 20");
 
-        panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));
+        //panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));
+        JEditorPane editorPane = new JEditorPane("text/html", Messages.message(id + ".description")) {
+
+            @Override
+            public void paintComponent(Graphics g) {
+                Graphics2D graphics2d = (Graphics2D) g;
+                graphics2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                                            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                /*
+                graphics2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+                                            RenderingHints.VALUE_RENDER_QUALITY);
+                graphics2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                                            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+                */
+
+                super.paintComponent(graphics2d);
+            }
+        };
+
+        editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
+                                     Boolean.TRUE);
+        editorPane.setFont(panel.getFont());
+        editorPane.setOpaque(false);
+        editorPane.setEditable(false);
+        editorPane.addHyperlinkListener(colopediaPanel);
+
+        panel.add(editorPane, "width 95%");
 
     }
 
