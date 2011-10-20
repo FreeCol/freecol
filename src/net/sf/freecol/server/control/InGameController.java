@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -91,6 +92,7 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -434,7 +436,7 @@ public final class InGameController extends Controller {
     private void sendToList(List<ServerPlayer> serverPlayers, Element element) {
         if (element != null) {
             for (ServerPlayer s : serverPlayers) {
-                sendElement(s, element);
+                askElement(s, element);
             }
         }
     }
@@ -446,7 +448,7 @@ public final class InGameController extends Controller {
      * @param cs A <code>ChangeSet</code> to build an <code>Element</code> with.
      */
     private void sendElement(ServerPlayer serverPlayer, ChangeSet cs) {
-        sendElement(serverPlayer, cs.build(serverPlayer));
+        askElement(serverPlayer, cs.build(serverPlayer));
     }
 
     /**
@@ -454,27 +456,21 @@ public final class InGameController extends Controller {
      * Deprecated, please avoid if possible.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to update.
-     * @param element An <code>Element</code> containing the update.
+     * @param request An <code>Element</code> containing the update.
      */
-    private Element sendElement(ServerPlayer serverPlayer, Element element) {
-        if (element == null || !serverPlayer.isConnected()) return null;
-        String name = serverPlayer.getName();
-        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-            System.err.println("SERVER: -> " + name + ": "
-                + DOMMessage.elementToString(element) + "\n");
-        }
+    private Element askElement(ServerPlayer serverPlayer, Element request) {
+        Connection connection = serverPlayer.getConnection();
+        if (request == null || connection == null) return null;
+
+        Element reply;
         try {
-            element = serverPlayer.getConnection().ask(element);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Send element failure", e);
-            return null;
+            reply = connection.askDumping(request);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send \""
+                + request.getTagName() + "\"-message.", e);
+            reply = null;
         }
-        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-            System.err.println("SERVER: <- " + name + ": "
-                + ((element == null) ? "(null)"
-                    : DOMMessage.elementToString(element)) + "\n");
-        }
-        return element;
+        return reply;
     }
 
     /**

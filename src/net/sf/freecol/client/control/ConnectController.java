@@ -236,7 +236,9 @@ public final class ConnectController {
         }
 
         try {
-            client = new Client(host, port, freeColClient.getPreGameInputHandler());
+            client = new Client(host, port,
+                                freeColClient.getPreGameInputHandler(),
+                                FreeCol.CLIENT_THREAD + username);
         } catch (ConnectException e) {
             canvas.errorMessage("server.couldNotConnect");
             return false;
@@ -607,7 +609,7 @@ public final class ConnectController {
         ArrayList<String> items = new ArrayList<String>();
         Element element = DOMMessage.createNewRootElement("getVacantPlayers");
         try {
-            Element reply = mc.ask(element);
+            Element reply = mc.askDumping(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
@@ -653,7 +655,7 @@ public final class ConnectController {
 
         try {
             Element gslElement = DOMMessage.createNewRootElement("getServerList");
-            Element reply = mc.ask(gslElement);
+            Element reply = mc.askDumping(gslElement);
             if (reply == null) {
                 logger.warning("The meta-server did not return a list.");
                 canvas.errorMessage("metaServer.communicationError");

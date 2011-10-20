@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -151,22 +152,18 @@ public class ServerAPI {
      */
     private Element askExpecting(DOMMessage message, String tag,
                                  HashMap<String, String> results) {
-        // Send the element, return null on failure or null return.
-        Client client = freeColClient.getClient();
-        Element element = message.toXMLElement();
-        Element reply = null;
+        Element request = message.toXMLElement();
+        Element reply;
         try {
-            reply = client.ask(element);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not send " + element, e);
-            return null;
-        }
-        if (reply == null) {
-            logger.warning("Received null reply to " + element);
-            return null;
+            reply = freeColClient.getClient().getConnection()
+                .askDumping(request);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send \""
+                + request.getTagName() + "\"-message.", e);
+            reply = null;
         }
 
-        // Process explicit errors.
+        if (reply == null) return null;
         if ("error".equals(reply.getTagName())) {
             String messageId = reply.getAttribute("messageID");
             String messageText = reply.getAttribute("message");
@@ -185,7 +182,7 @@ public class ServerAPI {
                                + "/" + ((messageText != null)
                                    ? messageText : ""));
                 freeColClient.getInGameInputHandler()
-                    .handle(client.getConnection(), reply);
+                    .handle(freeColClient.getClient().getConnection(), reply);
             }
             return null;
         }

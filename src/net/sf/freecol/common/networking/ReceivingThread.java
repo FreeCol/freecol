@@ -193,32 +193,11 @@ final class ReceivingThread extends Thread {
             }
         }
 
-        final boolean dumpTraffic = FreeCol.isInDebugMode()
-            || getRealLevel(logger) == Level.FINEST;
-        final int LOOK_AHEAD = (dumpTraffic) ? 500000 : 500;
-        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD*2);
+        final int LOOK_AHEAD = 500;
+        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         in.enable();
         bis.mark(LOOK_AHEAD);
-        if (!shouldRun()) {
-            return;
-        }
-
-        // START DEBUG-LINES:
-        if (dumpTraffic) {
-            byte[] buf = new byte[LOOK_AHEAD];
-            int r = bis.read(buf, 0, LOOK_AHEAD);
-            if (r > 0) {
-                System.out.print(new String(buf, 0, r));
-                if (buf[LOOK_AHEAD - 1] != 0) {
-                    System.out.println("...");
-                } else {
-                    System.out.println();
-                }
-                System.out.println();
-            }
-            bis.reset();
-        }
-        // END DEBUG
+        if (!shouldRun()) return;
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         xmlIn = xif.createXMLStreamReader(bis);

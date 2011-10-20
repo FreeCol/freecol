@@ -684,7 +684,7 @@ public final class FreeColServer {
             element.setAttribute("isGameStarted", Boolean.toString(gameState != GameState.STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
             element.setAttribute("gameState", Integer.toString(getGameState().ordinal()));
-            Element reply = mc.ask(element);
+            Element reply = mc.askDumping(element);
             if (reply != null && reply.getTagName().equals("noRouteToServer")) {
                 throw new NoRouteToServerException();
             }

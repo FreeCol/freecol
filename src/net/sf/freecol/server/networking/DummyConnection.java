@@ -80,20 +80,21 @@ public final class DummyConnection extends Connection {
     /**
      * Sends a message to the other peer and returns the reply.
      *
-     * @param element The question for the other peer.
+     * @param request The question for the other peer.
      * @return The reply from the other peer.
      * @throws IOException If an error occur while sending the message.
      * @see #send
      * @see #sendAndWait
      */
-    public Element ask(Element element) throws IOException {
-        Element theResult = null;
+    public Element ask(Element request) throws IOException {
+        Element reply;
         try {
-            theResult = outgoingMessageHandler.handle(getOtherConnection(), element);
+            reply = outgoingMessageHandler.handle(getOtherConnection(),
+                request);
         } catch (FreeColException e) {
+            reply = null;
         }
-
-        return theResult;
+        return reply;
     }
 
     /**

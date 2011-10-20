@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
-
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
@@ -94,35 +92,27 @@ public class AIMessage {
      */
     private static boolean sendMessage(Connection connection,
                                        Element request) {
+        Element reply;
         try {
-            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-                System.err.println(connection.getName() + ": -> "
-                    + DOMMessage.elementToString(request) + "\n");
-            }
-            Element reply = connection.ask(request);
-            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-                System.err.println(connection.getName() + ": <- "
-                    + ((reply == null) ? "(null)" 
-                        : DOMMessage.elementToString(reply)) + "\n");
-            }
-            if (reply == null) {
-                return false;
-            } else if ("error".equals(reply.getTagName())) {
-                String msgID = reply.getAttribute("messageID");
-                String msg = reply.getAttribute("message");
-                String logMessage = "AIMessage." + request.getTagName()
-                    + " error,"
-                    + " messageID: " + ((msgID == null) ? "(null)" : msgID)
-                    + " message: " + ((msg == null) ? "(null)" : msg);
-                logger.warning(logMessage);
-                return false;
-            }
-            return true;
+            reply = connection.askDumping(request);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send \""
-                       + request.getTagName() + "\"-message!", e);
+                + request.getTagName() + "\"-message.", e);
+            reply = null;
         }
-        return false;
+        
+        if (reply == null) return false;
+        if ("error".equals(reply.getTagName())) {
+            String msgID = reply.getAttribute("messageID");
+            String msg = reply.getAttribute("message");
+            String logMessage = "AIMessage." + request.getTagName()
+                + " error,"
+                + " messageID: " + ((msgID == null) ? "(null)" : msgID)
+                + " message: " + ((msg == null) ? "(null)" : msg);
+            logger.warning(logMessage);
+            return false;
+        }
+        return true;
     }
 
     /**

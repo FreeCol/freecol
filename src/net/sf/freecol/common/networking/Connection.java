@@ -40,6 +40,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.FreeCol;
+
 import org.w3c.dom.Element;
 
 /**
@@ -587,6 +589,49 @@ public class Connection {
      */
     public Socket getSocket() {
         return socket;
+    }
+
+
+    /**
+     * Dumping version of ask().
+     * Dumps to System.err with a faked-XML prefix so the whole line can
+     * be fed to an XML-pretty printer if required.
+     *
+     * @param request The <code>Element</code> to send.
+     * @return The reply element.
+     * @exception Throws IOException if ask() fails.
+     */
+    public Element askDumping(Element request) throws IOException {
+        boolean dump = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
+        if (dump) {
+            try {
+                System.err.println("<" + getName() + "-request>"
+                    + DOMMessage.elementToString(request) + "\n");
+            } catch (Exception e) {}
+        }
+
+        Element reply;
+        if (dump) {
+            try {
+                reply = ask(request);
+                try {
+                    System.err.println("<" + getName() + "-reply>"
+                        + ((reply == null) ? ""
+                            : DOMMessage.elementToString(reply))
+                        + "\n");
+                } catch (Exception x) {}
+            } catch (IOException e) {
+                try {
+                    System.err.println("<" + getName() + "-reply><exception "
+                        + e.getMessage() + "\n");
+                } catch (Exception x) {}
+                throw e;
+            }
+        } else {
+            reply = ask(request);
+        }
+
+        return reply;
     }
 
     /**
