@@ -165,6 +165,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = fountainOfYouth(element);
             } else if (type.equals("lootCargo")) {
                 reply = lootCargo(element);
+            } else if (type.equals("closeMenus")) {
+                reply = closeMenus();
             } else if (type.equals("multiple")) {
                 reply = multiple(connection, element);
             } else {
@@ -443,9 +445,9 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = fcc.getMyPlayer();
         final Player newPlayer = (Player) game
             .getFreeColGameObject(element.getAttribute("player"));
-        final boolean oldTurn = FreeCol.isInDebugMode()
-            && player.equals(game.getCurrentPlayer());
         final boolean newTurn = player.equals(newPlayer);
+        if (FreeCol.isInDebugMode()
+            && player.equals(game.getCurrentPlayer())) closeMenus();
 
         if (FreeCol.isDebugRunComplete()
             && FreeCol.getDebugRunSaveName() != null) {
@@ -461,8 +463,6 @@ public final class InGameInputHandler extends InputHandler {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
-                        if (oldTurn) fcc.getCanvas().closeMenus();
-
                         fcc.getInGameController().setCurrentPlayer(newPlayer);
 
                         if (newTurn) {
@@ -1120,6 +1120,21 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || goods == null) return null;
         new LootCargoSwingTask(unit, message.getDefenderId(), goods)
             .invokeLater();
+        return null;
+    }
+
+    /**
+     * Trivial handler to allow the server to signal to the client
+     * that an offer that caused a popup (for example, a native demand
+     * or diplomacy proposal) has not been answered quickly enough and
+     * that the offering player has assumed this player has
+     * refused-by-inaction, and therefore, the popup needs to be
+     * closed.
+     *
+     * @return Null.
+     */
+    public Element closeMenus() {
+        getFreeColClient().getCanvas().closeMenus();
         return null;
     }
 

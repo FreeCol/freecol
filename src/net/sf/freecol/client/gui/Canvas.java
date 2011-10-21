@@ -538,13 +538,6 @@ public final class Canvas extends JDesktopPane {
                 if (c instanceof FreeColPanel) {
                     ((FreeColPanel) c).notifyClose();
                 }
-                if (c instanceof ReportTurnPanel) {
-                    try {
-                        throw new IllegalStateException();
-                    } catch (IllegalStateException e) {
-                        logger.log(Level.WARNING, "Probably BR#3206298", e);
-                    }
-                }
             }
             frame.dispose();
         }
