@@ -143,7 +143,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         text.append("] ");
         text.append(Messages.message(father.getId() + ".text"));
 
-        Turn turn = getMyPlayer().getElectionTurn(name);
+        Turn turn = getElectionTurns().get(name);
         if (turn != null) {
             text.append("\n\n");
             text.append(Messages.message("report.continentalCongress.elected"));

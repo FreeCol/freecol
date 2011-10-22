@@ -40,8 +40,10 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -74,10 +76,12 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -377,6 +381,26 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public Player getMyPlayer() {
         return canvas.getFreeColClient().getMyPlayer();
     }
+
+    /**
+     * Returns the <code>Turn</code>s during which a Player's
+     * FoundingFathers were elected to the Continental Congress
+     *
+     * @return a <code>Turn</code> value
+     */
+    public Map<String, Turn> getElectionTurns() {
+        Map<String, Turn> result = new HashMap<String, Turn>();
+        if (!getMyPlayer().getFathers().isEmpty()) {
+            for (HistoryEvent event : getMyPlayer().getHistory()) {
+                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
+                    result.put(event.getReplacement("%father%").getId(), event.getTurn());
+                }
+            }
+        }
+        return result;
+    }
+
+
 
     /**
      * Checks if this panel is editable

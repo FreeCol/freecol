@@ -101,6 +101,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
                         scrollPane, null);
         }
+        Map<String, Turn> electionTurns = getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
             String name = Messages.message(father.getNameKey());
             JPanel panel = panels.get(father.getType());
@@ -108,7 +109,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             Turn turn = null;
             if (player.hasFather(father)) {
                 image = getLibrary().getFoundingFatherImage(father);
-                turn = player.getElectionTurn(name);
+                turn = electionTurns.get(name);
             } else {
                 image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);
             }

@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
-import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
@@ -1764,25 +1763,6 @@ public class Player extends FreeColGameObject implements Nameable {
             .getIntegerOption("model.option.foundingFatherFactor").getValue();
         int count = getFatherCount();
         return ((count + 1) * (count + 2) - 1) * base + count;
-    }
-
-    /**
-     * Returns the <code>Turn</code> during which the FoundingFather with
-     * the given name or nameKey was elected to the Continental Congress
-     *
-     * @param father a <code>String</code> value
-     * @return a <code>Turn</code> value
-     */
-    public Turn getElectionTurn(String father) {
-        if (!allFathers.isEmpty()) {
-            for (HistoryEvent event : history) {
-                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER
-                    && event.getReplacement("%father%").getId().equals(father)) {
-                    return event.getTurn();
-                }
-            }
-        }
-        return null;
     }
 
     /**
