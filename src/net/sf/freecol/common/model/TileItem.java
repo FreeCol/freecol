@@ -22,9 +22,6 @@ package net.sf.freecol.common.model;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.w3c.dom.Element;
-
-
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */
@@ -50,7 +47,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     }
 
     /**
-     * Initiates a new <code>TileItem</code> from an <code>Element</code>.
+     * Initiates a new <code>TileItem</code> from an XML stream.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param in The input stream containing the XML.
@@ -62,22 +59,10 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     }
 
     /**
-     * Initiates a new <code>TileItem</code> from an <code>Element</code>.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public TileItem(Game game, Element e) {
-        super(game, e);
-    }
-
-    /**
      * Initiates a new <code>TileItem</code>
      * with the given ID. The object should later be
      * initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.

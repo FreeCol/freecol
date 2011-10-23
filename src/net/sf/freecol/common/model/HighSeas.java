@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
 
 
 public class HighSeas extends UnitLocation {
@@ -50,11 +49,6 @@ public class HighSeas extends UnitLocation {
     public HighSeas(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
-    }
-
-    public HighSeas(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     public HighSeas(Game game, String id) {

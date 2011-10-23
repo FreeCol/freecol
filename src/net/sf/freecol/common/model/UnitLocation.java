@@ -29,8 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
 /**
  * The <code>UnitLocation</code> is a place where a <code>Unit</code>
  * can be put. The UnitLocation can not store any other Locatables,
@@ -125,17 +123,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public UnitLocation(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-    }
-
-    /**
-     * Creates a new <code>UnitLocation</code> instance.
-     *
-     * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public UnitLocation(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

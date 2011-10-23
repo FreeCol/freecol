@@ -37,8 +37,6 @@ import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 
-import org.w3c.dom.Element;
-
 
 /**
  * This class implements the player's monarch, whose functions prior
@@ -155,24 +153,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Initiates a new <code>Monarch</code> from an <code>Element</code>
-     * and registers this <code>Monarch</code> at the specified game.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public Monarch(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
-    }
-
-    /**
      * Initiates a new <code>Monarch</code>
      * with the given ID. The object should later be
      * initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.

@@ -40,8 +40,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a single tile on the <code>Map</code>.
@@ -160,27 +158,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> this <code>Tile</code> should be
-     *            created in.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Tile(Game game, Element e) {
-        super(game, e);
-
-        if (!isViewShared()) {
-            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
-        }
-
-        readFromXMLElement(e);
-    }
-
-    /**
      * Initiates a new <code>Tile</code> with the given ID. The object should
      * later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.

@@ -26,9 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
-
 /**
  * Represents a locatable goods of a specified type and quantity.
  */
@@ -75,11 +72,6 @@ public class Resource extends TileItem {
     public Resource(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
-    }
-
-    public Resource(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

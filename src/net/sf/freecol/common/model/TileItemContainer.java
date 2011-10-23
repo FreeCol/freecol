@@ -35,8 +35,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.PlayerExploredTile;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Contains <code>TileItem</code>s and can be used by a {@link Tile}
@@ -86,7 +84,7 @@ public class TileItemContainer extends FreeColGameObject {
 
 
     /**
-     * Initiates a new <code>TileItemContainer</code> from an <code>Element</code>.
+     * Initiates a new <code>TileItemContainer</code> from an XML stream.
      *
      * @param game The <code>Game</code> in which this <code>TileItemContainer</code>
      *       belong.
@@ -105,27 +103,6 @@ public class TileItemContainer extends FreeColGameObject {
 
         this.tile = tile;
         readFromXML(in);
-    }
-
-    /**
-     * Initiates a new <code>TileItemContainer</code> from an <code>Element</code>.
-     *
-     * @param game The <code>Game</code> in which this <code>TileItemContainer</code>
-     *       belong.
-     * @param tile The <code>Tile</code> using this <code>TileItemContainer</code>
-     *       for storing it's TileItem.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public TileItemContainer(Game game, Tile tile, Element e) {
-        super(game, e);
-
-        if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
-        }
-
-        this.tile = tile;
-        readFromXMLElement(e);
     }
 
     // ------------------------------------------------------------ checking/retrieval functions

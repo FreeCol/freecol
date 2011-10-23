@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
 
 /**
  * This class contains the last sale a player has made, by Settlement
@@ -43,16 +41,6 @@ public final class LastSale extends FreeColObject {
      * Empty constructor for Player.
      */
     public LastSale() {
-    }
-
-    /**
-     * Read a new <code>LastSale</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public LastSale(Game game, Element e) {
-        readFromXMLElement(e);
     }
 
     /**

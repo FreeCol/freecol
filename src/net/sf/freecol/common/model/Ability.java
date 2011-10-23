@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The <code>Ability</code> class encapsulates a bonus or penalty
@@ -229,15 +227,6 @@ public final class Ability extends Feature {
         this.value = template.value;
     }
 
-
-    /**
-     * Creates a new <code>Ability</code> instance.
-     *
-     * @param element an <code>Element</code> value
-     */
-    public Ability(Element element) {
-        readFromXMLElement(element);
-    }
 
     /**
      * Creates a new <code>Ability</code> instance.

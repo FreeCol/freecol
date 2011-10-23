@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
 /**
  * The <code>WorkLocation</code> is a place in a {@link Colony} where
  * <code>Units</code> can work. The unit capacity of a WorkLocation is
@@ -69,18 +67,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public WorkLocation(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-    }
-
-    /**
-     * Initiates a new <code>WorkLocation</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public WorkLocation(Game game, Element e) {
-        super(game, e);
-
-        readFromXMLElement(e);
     }
 
     /**

@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Element;
-
 /**
  * The <code>GoodsLocation</code> is a place where {@link Unit}s and
  * {@link Goods} can be put. The GoodsLocation can not store any other
@@ -70,17 +68,6 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public GoodsLocation(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-    }
-
-    /**
-     * Creates a new <code>GoodsLocation</code> instance.
-     *
-     * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public GoodsLocation(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

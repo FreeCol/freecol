@@ -27,8 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Direction;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a tile improvement, such as a river or road.
@@ -95,11 +93,6 @@ public class TileImprovement extends TileItem implements Named {
     public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
-    }
-
-    public TileImprovement(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

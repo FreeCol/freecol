@@ -40,8 +40,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Settlement;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a colony. A colony contains {@link Building}s and
@@ -189,21 +187,9 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Initiates a new <code>Colony</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Colony(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
-    }
-
-    /**
      * Initiates a new <code>Colony</code> with the given ID. The object
      * should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.

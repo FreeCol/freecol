@@ -134,20 +134,6 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Instantiates a new <code>MarketData</code> from an
-     * XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public MarketData(Game game, Element e) {
-        super(game, e);
-
-        readFromXMLElement(e);
-    }
-
-    /**
      * Instantiates a new <code>MarketData</code> with the given
      * ID. The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or

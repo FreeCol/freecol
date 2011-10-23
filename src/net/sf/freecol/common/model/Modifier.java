@@ -27,8 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Turn;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
@@ -129,15 +127,6 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
             setIncrement(template.getIncrement(), template.getIncrementType(),
                          template.getFirstTurn(), template.getLastTurn());
         }
-    }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param element an <code>Element</code> value
-     */
-    public Modifier(Element element) {
-        readFromXMLElement(element);
     }
 
     /**

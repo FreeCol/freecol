@@ -37,8 +37,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Tension.Level;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents an Indian settlement.
@@ -177,23 +175,10 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Initiates a new <code>IndianSettlement</code> from an <code>Element</code>.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public IndianSettlement(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
-    }
-
-    /**
      * Initiates a new <code>IndianSettlement</code>
      * with the given ID. The object should later be
      * initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.

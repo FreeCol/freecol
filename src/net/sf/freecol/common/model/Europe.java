@@ -30,9 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit.UnitState;
 
-import org.w3c.dom.Element;
-
-
 /**
  * Represents Europe in the game. Each <code>Player</code> has it's
  * own <code>Europe</code>.
@@ -113,18 +110,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
         super(game, in);
 
         readFromXML(in);
-    }
-
-    /**
-     * Initializes this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Europe(Game game, Element e) {
-        super(game, e);
-
-        readFromXMLElement(e);
     }
 
     /**

@@ -33,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.util.RandomChoice;
 
-import org.w3c.dom.Element;
 
 
 /**
@@ -105,17 +104,6 @@ public class LostCityRumour extends TileItem {
     public LostCityRumour(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
-    }
-
-    /**
-     * Creates a new <code>LostCityRumour</code> instance.
-     *
-     * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public LostCityRumour(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

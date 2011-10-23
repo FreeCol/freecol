@@ -99,19 +99,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Initiates a new <code>Market</code> from an
-     * XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public Market(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
-    }
-
-    /**
      * Initiates a new <code>Market</code> with the given ID.
      * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -123,7 +110,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public Market(Game game, String id) {
         super(game, id);
     }
-    
+
     /**
      * Describe <code>putMarketData</code> method here.
      *
@@ -235,7 +222,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Add (or remove) some goods to this market.
-     * 
+     *
      * @param goodsType The <code>GoodsType</code> to add.
      * @param amount The amount of goods.
      */
@@ -486,16 +473,16 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -511,7 +498,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("owner", owner.getId());
-        
+
         if (player == owner || showAll || toSavedGame) {
             for (MarketData data : marketData.values()) {
                 data.toXML(out, player, showAll, toSavedGame);

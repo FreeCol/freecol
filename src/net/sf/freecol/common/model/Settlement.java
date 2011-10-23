@@ -31,8 +31,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The super class of all settlements on the map (that is colonies and
@@ -104,17 +102,6 @@ abstract public class Settlement extends GoodsLocation
      */
     public Settlement(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-    }
-
-    /**
-     * Initiates a new <code>Settlement</code> from an <code>Element</code>.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param e An XML-element that will be used to initialize
-     *      this object.
-     */
-    public Settlement(Game game, Element e) {
-        super(game, e);
     }
 
     /**
