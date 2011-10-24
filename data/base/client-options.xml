@@ -171,6 +171,7 @@
     <optionGroup id="clientOptions.audio">
       <audioMixerOption id="model.option.audioMixer" defaultValue="AUTO" />
       <percentageOption id="model.option.audioVolume" defaultValue="100" previewEnabled="true"/>
+      <booleanOption id="model.option.audioAlerts" defaultValue="false"/>
     </optionGroup>
     <optionGroup id="clientOptions.other" >
       <!-- Option for autoload emigrants on sailing to america. -->

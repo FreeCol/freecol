@@ -200,6 +200,8 @@ public class ClientOptions extends OptionGroup {
 
     public static final String AUDIO_VOLUME = "model.option.audioVolume";
 
+    public static final String AUDIO_ALERTS = "model.option.audioAlerts";
+
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
      *

@@ -36,7 +36,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -1460,7 +1459,7 @@ public final class Canvas extends JDesktopPane {
      *         the dialog.
      */
     public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
-        PopupPosition popupPosition = getPopupPosition(tile);
+    	PopupPosition popupPosition = getPopupPosition(tile);
         showSubPanel(freeColDialog, popupPosition);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
@@ -1546,6 +1545,12 @@ public final class Canvas extends JDesktopPane {
                     .invoke(displayObject);
             } catch (Exception e) { /* Ignore failure */ }
         }
+
+        // plays an alert sound on each information message if the option for it is turned on
+        if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
+            FreeColClient.get().playSound("sound.event.alertSound");
+        }
+
         showFreeColPanel(new InformationDialog(this, text, icon), tile);
     }
 

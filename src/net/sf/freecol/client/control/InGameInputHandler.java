@@ -505,6 +505,13 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning("Bad turn in newTurn: " + turnString);
         }
         Turn currTurn = game.getTurn();
+
+        // plays an alert sound on each new turn if the option for it is turned on
+        if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
+            FreeColClient.get().playSound("sound.event.alertSound");
+        }
+
+
         if (currTurn.isFirstSeasonTurn()) {
             new ShowInformationMessageSwingTask(StringTemplate.key("twoTurnsPerYear")).invokeLater();
         }
@@ -888,7 +895,7 @@ public final class InGameInputHandler extends InputHandler {
         default:
             break;
         }
-        
+
         new UpdateMenuBarSwingTask().invokeLater();
         return null;
     }
