@@ -44,8 +44,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -164,8 +165,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + serverPlayer + " caught error handling "
-                    + element.getTagName(), e);
+            logger.log(Level.WARNING, "AI input handler for " + serverPlayer
+                + " caught error handling " + element.getTagName(), e);
         }
         return reply;
     }
@@ -306,23 +307,21 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return The original message with the acceptance state set if querying
+     *     the colony player (result == null), or null if reporting the final
+     *     result to the native player (result != null).
      */
     private Element indianDemand(DummyConnection connection, Element element) {
-        Game game = freeColServer.getGame();
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
-        int gold = 0;
-        Goods goods = null;
-        Element goodsElement = DOMMessage.getChildElement(element, Goods.getXMLElementTagName());
-        if (goodsElement == null) {
-            gold = Integer.parseInt(element.getAttribute("gold"));
-        } else {
-            goods = new Goods(game, goodsElement);
-        }
-        boolean accept = ((EuropeanAIPlayer) getAIPlayer())
-            .acceptIndianDemand(unit, colony, goods, gold);
-        element.setAttribute("accepted", String.valueOf(accept));
-        return element;
+        Game game = aiMain.getGame();
+        IndianDemandMessage message = new IndianDemandMessage(game, element);
+        boolean accept = getAIPlayer()
+            .indianDemand(message.getUnit(game), message.getColony(game),
+                message.getGoods(), message.getGold());
+        message.setResult(accept);
+        logger.finest("AI handling native demand by " + message.getUnit(game)
+            + " at " + message.getColony(game).getName()
+            + " result: " + accept);
+        return message.toXMLElement();
     }
 
     /**
@@ -331,10 +330,9 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
-     * @return Either the original message with "accept" set, or null on rejection.
+     * @return The original message with the acceptance state set.
      */
     private Element diplomaticTrade(DummyConnection connection, Element element) {
-        // TODO: make an informed decision
         DiplomacyMessage message
             = new DiplomacyMessage(freeColServer.getGame(), element);
         DiplomaticTrade agreement = message.getAgreement();

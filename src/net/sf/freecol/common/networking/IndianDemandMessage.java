@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when natives are making demands of a colony.
+ * The message sent to resolve natives making demands of a colony.
  */
 public class IndianDemandMessage extends DOMMessage {
 
@@ -49,7 +49,8 @@ public class IndianDemandMessage extends DOMMessage {
     private String goldString;
 
     // The result of this demand: null => not decided yet
-    private String result;
+    private String resultString;
+
 
     /**
      * Create a new <code>IndianDemandMessage</code> with the
@@ -60,13 +61,12 @@ public class IndianDemandMessage extends DOMMessage {
      * @param goods The <code>Goods</code> being demanded.
      * @param gold The gold being demanded.
      */
-    public IndianDemandMessage(Unit unit, Colony colony, Goods goods,
-                               int gold) {
+    public IndianDemandMessage(Unit unit, Colony colony, Goods goods, int gold) {
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
         this.goods = goods;
         this.goldString = (gold == 0) ? null : Integer.toString(gold);
-        this.result = null;
+        this.resultString = null;
     }
 
     /**
@@ -81,7 +81,7 @@ public class IndianDemandMessage extends DOMMessage {
         this.colonyId = element.getAttribute("colony");
         this.goldString = (!element.hasAttribute("gold")) ? null
             : element.getAttribute("gold");
-        this.result = element.getAttribute("result");
+        this.resultString = element.getAttribute("result");
         this.goods = (!element.hasChildNodes()) ? null
             : new Goods(game,
                 DOMMessage.getChildElement(element,
@@ -122,9 +122,20 @@ public class IndianDemandMessage extends DOMMessage {
 
     /**
      * Client-side convenience function to set the result of this message.
+     *
+     * @return The result of this demand.
      */
-    public void setResult(String result) {
-        this.result = result;
+    public boolean getResult() {
+        return Boolean.valueOf(resultString);
+    }
+
+    /**
+     * Client-side convenience function to set the result of this message.
+     *
+     * @param result The new result of this demand.
+     */
+    public void setResult(boolean result) {
+        this.resultString = Boolean.toString(result);
     }
 
     /**
@@ -143,7 +154,7 @@ public class IndianDemandMessage extends DOMMessage {
         Game game = player.getGame();
 
         Unit unit;
-        if (result == null) { // Initial demand
+        if (resultString == null) { // Initial demand
             try {
                 unit = server.getUnitSafely(unitId, serverPlayer);
             } catch (Exception e) {
@@ -173,10 +184,11 @@ public class IndianDemandMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         int gold = 0;
         if (goods != null) {
             if (goods.getLocation() != colony) {
-                return DOMMessage.clientError("Demand of goods that are not in colony: "
+                return DOMMessage.clientError("Goods are not in colony: "
                     + colonyId);
             }
         } else if (goldString != null) {
@@ -189,12 +201,12 @@ public class IndianDemandMessage extends DOMMessage {
                 return DOMMessage.clientError("Bad gold: " + goldString);
             }
         } else {
-            return DOMMessage.clientError("Both goods and gold can not be empty");
+            return DOMMessage.clientError("Goods+gold can not both be empty");
         }
 
         // Proceed to demand.
         return server.getInGameController()
-            .indianDemand(serverPlayer, unit, colony, goods, gold, result);
+            .indianDemand(serverPlayer, unit, colony, goods, gold);
     }
 
     /**
@@ -207,7 +219,7 @@ public class IndianDemandMessage extends DOMMessage {
         ret.setAttribute("unit", unitId);
         ret.setAttribute("colony", colonyId);
         if (goldString != null) ret.setAttribute("gold", goldString);
-        if (result != null) ret.setAttribute("result", result);
+        if (resultString != null) ret.setAttribute("result", resultString);
         if (goods != null) {
             ret.appendChild(goods.toXMLElement(null, ret.getOwnerDocument()));
         }

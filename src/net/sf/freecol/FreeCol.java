@@ -74,6 +74,8 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
     public static final int     DEFAULT_PORT = 3541;
+    public static final int     DEFAULT_TIMEOUT = 60; // 1 minute
+    public static final int     TIMEOUT_MIN = 10; // 10s
 
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
@@ -144,6 +146,8 @@ public final class FreeCol {
     private static Dimension windowSize;
 
     private static long freeColSeed = 0L;
+
+    private static int freeColTimeout = -1;
 
 
     private FreeCol() {
@@ -627,6 +631,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.seed"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("timeout")
+                          .withDescription(Messages.message("cli.timeout"))
+                          .withArgName(Messages.message("cli.arg.timeout"))
+                          .hasArg()
+                          .create());
 
         try {
             // parse the command line arguments
@@ -787,6 +796,20 @@ public final class FreeCol {
                     System.err.println("Ignoring bad seed: " + seedStr);
                 }
             }
+            if (line.hasOption("timeout")) {
+                String timeoutStr = line.getOptionValue("timeout");
+                int result;
+                try {
+                    result = Integer.parseInt(timeoutStr);
+                } catch (NumberFormatException nfe) {
+                    result = -1;
+                }
+                if (result < TIMEOUT_MIN) {
+                    System.err.println("Ignoring bad timeout: " + timeoutStr);
+                } else {
+                    freeColTimeout = result;
+                }
+            }
         } catch (ParseException e) {
             System.err.println("\n" + e.getMessage() + "\n");
             printUsage();
@@ -906,6 +929,21 @@ public final class FreeCol {
      */
     public static void incrementFreeColSeed() {
         freeColSeed++;
+    }
+
+    /**
+     * Gets the timeout.
+     * Use the command line specified one if any, otherwise default
+     * to `infinite' in single player and the DEFAULT_TIMEOUT for
+     * multiplayer.
+     *
+     * @param singleplayer True if this is a single player game.
+     * @return A suitable timeout value.
+     */
+    public static int getFreeColTimeout(boolean single) {
+        return (freeColTimeout >= TIMEOUT_MIN) ? freeColTimeout
+            : (single) ? Integer.MAX_VALUE
+            : DEFAULT_TIMEOUT;
     }
 
     private static void startServer() {

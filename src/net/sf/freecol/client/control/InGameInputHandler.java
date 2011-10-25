@@ -819,8 +819,8 @@ public final class InGameInputHandler extends InputHandler {
             player.addModelMessage(m);
             getFreeColClient().getInGameController().nextModelMessage();
         }
-        message.setResult(Boolean.toString(accepted));
-        return element;
+        message.setResult(accepted);
+        return message.toXMLElement();
     }
 
     /**

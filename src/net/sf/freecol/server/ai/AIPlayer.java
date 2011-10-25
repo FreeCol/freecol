@@ -264,6 +264,22 @@ public abstract class AIPlayer extends AIObject {
     public abstract void startWorking();
 
     /**
+     * Resolves a native demand.
+     * One of goods/gold is significant.
+     * Overridden by the European player.
+     *
+     * @param unit The native <code>Unit</code> making the demand.
+     * @param colony The <code>Colony</code> being demanded of.
+     * @param goods The <code>Goods</code> demanded (may be null).
+     * @param gold The gold demanded (invalid if goods non-null).
+     * @return The response of the player.
+     */
+    public boolean indianDemand(Unit unit, Colony colony,
+                                Goods goods, int gold) {
+        return false;
+    }
+
+    /**
      * Returns an <code>Iterator</code> for all the wishes. The items are
      * sorted by the {@link Wish#getValue value}, with the item having the
      * highest value appearing first in the <code>Iterator</code>.
@@ -276,8 +292,8 @@ public abstract class AIPlayer extends AIObject {
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
 
     /**
-     * Called after another <code>Player</code> sends a <code>trade</code> message
-     *
+     * Called after another <code>Player</code> sends a
+     * <code>trade</code> message
      *
      * @param goods The goods which we are going to offer
      */
@@ -310,7 +326,6 @@ public abstract class AIPlayer extends AIObject {
      *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
     public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
-
 
     /**
      * Determines the stances towards each player.

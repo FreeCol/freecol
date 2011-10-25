@@ -82,6 +82,38 @@ public class AIMessage {
     private static final Logger logger = Logger.getLogger(AIMessage.class.getName());
 
     /**
+     * Ask the server a question.
+     *
+     * @param connection The <code>Connection</code> to use
+     *     when communicating with the server.
+     * @param request The <code>Element</code> to send.
+     * @return The reply element.
+     */
+    private static Element askMessage(Connection connection,
+                                      Element request) {
+        Element reply;
+        try {
+            reply = connection.askDumping(request);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send \""
+                + request.getTagName() + "\"-message.", e);
+            return null;
+        }
+        
+        if (reply != null && "error".equals(reply.getTagName())) {
+            String msgID = reply.getAttribute("messageID");
+            String msg = reply.getAttribute("message");
+            String logMessage = "AIMessage." + request.getTagName()
+                + " error,"
+                + " messageID: " + ((msgID == null) ? "(null)" : msgID)
+                + " message: " + ((msg == null) ? "(null)" : msg);
+            logger.warning(logMessage);
+            return null;
+        }
+        return reply;
+    }
+
+    /**
      * Sends a DOMMessage to the server.
      *
      * @param connection The <code>Connection</code> to use
@@ -92,27 +124,7 @@ public class AIMessage {
      */
     private static boolean sendMessage(Connection connection,
                                        Element request) {
-        Element reply;
-        try {
-            reply = connection.askDumping(request);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send \""
-                + request.getTagName() + "\"-message.", e);
-            reply = null;
-        }
-        
-        if (reply == null) return false;
-        if ("error".equals(reply.getTagName())) {
-            String msgID = reply.getAttribute("messageID");
-            String msg = reply.getAttribute("message");
-            String logMessage = "AIMessage." + request.getTagName()
-                + " error,"
-                + " messageID: " + ((msgID == null) ? "(null)" : msgID)
-                + " message: " + ((msg == null) ? "(null)" : msg);
-            logger.warning(logMessage);
-            return false;
-        }
-        return true;
+        return askMessage(connection, request) != null;
     }
 
     /**
@@ -420,13 +432,17 @@ public class AIMessage {
      * @param colony The <code>Colony</code> to demand of.
      * @param goods The <code>Goods</code> to demand.
      * @param gold The amount of gold to demand.
-     * @return True if the message was sent, and a non-error reply returned.
+     * @return True if the message was sent, a non-error reply returned, and
+     *     the demand was accepted.
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           Goods goods, int gold) {
-        return sendMessage(aiUnit.getConnection(),
-                           new IndianDemandMessage(aiUnit.getUnit(), colony,
-                                                   goods, gold));
+        Element reply = askMessage(aiUnit.getConnection(),
+            new IndianDemandMessage(aiUnit.getUnit(), colony,
+                goods, gold).toXMLElement());
+        IndianDemandMessage message
+            = new IndianDemandMessage(colony.getGame(), reply);
+        return (message == null) ? false : message.getResult();
     }
 
 

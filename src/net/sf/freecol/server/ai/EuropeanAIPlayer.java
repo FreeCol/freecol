@@ -411,21 +411,17 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Decides whether to accept an Indian demand, or not.
      *
-     * @param unit The unit making demands.
-     * @param colony The colony where demands are being made.
-     * @param goods The goods demanded.
+     * @param unit The <code>Unit</code> making demands.
+     * @param colony The <code>Colony</code> where demands are being made.
+     * @param goods The <code>Goods</code> demanded.
      * @param gold The amount of gold demanded.
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         indian demand and <code>false</code> otherwise.
+     * @return True if this player accepts the demand.
      */
-    public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
+    public boolean indianDemand(Unit unit, Colony colony,
+                                Goods goods, int gold) {
         // TODO: make a better choice, check whether the colony is
         // well defended
-        if (strategy == AIStrategy.CONQUEST) {
-            return false;
-        } else {
-            return true;
-        }
+        return strategy != AIStrategy.CONQUEST;
     }
 
     /**

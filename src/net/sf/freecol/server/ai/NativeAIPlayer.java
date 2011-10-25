@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,6 +37,7 @@ import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
@@ -44,6 +46,8 @@ import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -240,10 +244,9 @@ public class NativeAIPlayer extends AIPlayer {
         return (value>=0)&&validOffer;
     }
 
-
     /**
-     * Called after another <code>Player</code> sends a <code>trade</code> message
-     *
+     * Called after another <code>Player</code> sends a
+     * <code>trade</code> message.
      *
      * @param goods The goods which we are going to offer
      */

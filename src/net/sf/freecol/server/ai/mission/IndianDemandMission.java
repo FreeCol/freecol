@@ -57,6 +57,9 @@ public class IndianDemandMission extends Mission {
     /** Whether this mission has been completed or not. */
     private boolean completed;
 
+    /** Whether the demand has been made or not. */
+    private boolean demanded;
+
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -108,34 +111,32 @@ public class IndianDemandMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        if (!isValid()) {
-            return;
-        }
+        if (!isValid()) return;
+        Unit unit = getUnit();
 
         if (hasTribute()) {
-            if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
+            if (unit.getTile() != unit.getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
-                Direction r = moveTowards(getUnit().getIndianSettlement().getTile());
+                Direction r = moveTowards(unit.getIndianSettlement().getTile());
                 if (r == null || !moveButDontAttack(r)) return;
             } else {
                 // Unload the goods
-                GoodsContainer container = getUnit().getGoodsContainer();
-                IndianSettlement is = getUnit().getIndianSettlement();
+                GoodsContainer container = unit.getGoodsContainer();
+                IndianSettlement is = unit.getIndianSettlement();
                 for (Goods goods : container.getCompactGoods()) {
                     Goods tribute = container.removeGoods(goods.getType());
                     is.addGoods(tribute);
                 }
-                logger.info("IndianDemand for " + getUnit().getId()
+                logger.info("IndianDemand by " + unit
                             + " complete, tribute unloaded at " + is.getName());
                 completed = true;
             }
         } else {
             // Move to the target's colony and demand
-            Unit unit = getUnit();
-            Direction r = moveTowards(target.getTile());
-            if (r != null
-                && unit.getTile().getNeighbourOrNull(r) == target.getTile()
+            moveTowards(target.getTile());
+            if (unit.getTile().isAdjacent(target.getTile())
                 && unit.getMovesLeft() > 0) {
+                if (demanded) return; // doMission can be called multiple times
                 // We have arrived.
                 Player enemy = target.getOwner();
                 Goods goods = selectGoods(target);
@@ -151,31 +152,36 @@ public class IndianDemandMission extends Mission {
                     gold = enemy.getGold() / 20;
                     if (gold == 0) gold = enemy.getGold();
                 }
-                AIMessage.askIndianDemand(getAIUnit(), target, goods, gold);
-
-                int unitTension = (unit.getIndianSettlement() == null) ? 0
-                    : unit.getIndianSettlement().getAlarm(enemy).getValue();
-                unitTension = Math.max(unitTension,
-                        unit.getOwner().getTension(enemy).getValue());
-                boolean accepted = (goods != null
-                    && unit.getGoodsContainer().getGoodsCount(goods.getType())
-                                    > oldGoods)
-                    || (gold > 0 && unit.getOwner().checkGold(oldGold+1));
-                if (accepted) {
-                    String tribute = (goods != null) ? goods.toString()
-                        : (Integer.toString(gold) + " gold");
-                    logger.info("IndianDemand for " + getUnit().getId()
-                                + " accepted, tribute " + tribute);
-                } else {
-                    logger.info("IndianDemand for " + getUnit().getId()
-                                + " complete/refused at " + target.getName());
-                    // If not content and we didn't get what we
-                    // wanted then attack.
-                    if (unitTension >= Tension.Level.CONTENT.getLimit()) {
-                        AIMessage.askAttack(getAIUnit(), r);
-                    }
-                    completed = true;
+                demanded = true;
+                AIUnit au = getAIUnit();
+                boolean accepted = AIMessage.askIndianDemand(au, target,
+                                                             goods, gold);
+                // Drop the mission if there is no tribute to return
+                // to the home settlement.
+                Mission mission = au.getMission();
+                if (mission instanceof IndianDemandMission
+                    && !((IndianDemandMission)mission).hasTribute()) {
+                    au.setMission(null);
                 }
+                if (accepted) {
+                    logger.info("Indian demand by " + unit
+                        + " accepted at " + target.getName()
+                        + " tribute: " + ((goods != null) ? goods.toString()
+                            : (Integer.toString(gold) + " gold")));
+                } else { // If the demand was rejected and not content, attack.
+                    int unitTension = (unit.getIndianSettlement() == null) ? 0
+                        : unit.getIndianSettlement().getAlarm(enemy).getValue();
+                    int tension = Math.max(unitTension,
+                        unit.getOwner().getTension(enemy).getValue());
+                    if (tension >= Tension.Level.CONTENT.getLimit()) {
+                        Direction d = getGame().getMap()
+                            .getDirection(unit.getTile(), target.getTile());
+                        if (d != null) AIMessage.askAttack(au, d);
+                    }
+                    logger.info("Indian demand by " + unit
+                        + " refused at " + target.getName());
+                }
+                return;
             }
         }
 
@@ -351,6 +357,7 @@ public class IndianDemandMission extends Mission {
             out.writeAttribute("target", target.getId());
         }
         out.writeAttribute("completed", Boolean.toString(completed));
+        out.writeAttribute("demanded", Boolean.toString(demanded));
     }
 
     /**
@@ -368,6 +375,9 @@ public class IndianDemandMission extends Mission {
             : (Colony) getGame().getFreeColGameObject(targetString);
         String completedString = in.getAttributeValue(null, "completed");
         completed = Boolean.valueOf(completedString).booleanValue();
+        String demandedString = in.getAttributeValue(null, "demanded");
+        demanded = (demandedString == null) ? false
+            : Boolean.valueOf(demandedString).booleanValue();
     }
 
     /**

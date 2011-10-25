@@ -32,6 +32,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,7 +114,6 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
-import net.sf.freecol.server.model.DemandSession;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.MercenariesSession;
@@ -444,6 +445,38 @@ public final class InGameController extends Controller {
             = new DOMMessageCallable(serverPlayer.getConnection(), getGame(),
                                      message, handler);
         return executor.submit(callable);
+    }
+
+    /**
+     * Asks a question of a player with a timeout.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param question The <code>DOMMessage</code> question.
+     * @return The response to the question, or null if none.
+     */
+    private DOMMessage askTimeout(ServerPlayer serverPlayer,
+                                  DOMMessage request) {
+        Future<DOMMessage> future = askFuture(serverPlayer, request,
+            new DOMMessageHandler() {
+                public DOMMessage handle(DOMMessage message) {
+                    return message;
+                }
+            });
+        DOMMessage reply;
+        try {
+            boolean single = getFreeColServer().isSingleplayer();
+            reply = future.get(FreeCol.getFreeColTimeout(single),
+                               TimeUnit.SECONDS);
+        } catch (TimeoutException te) {
+            sendElement(serverPlayer,
+                new ChangeSet().addTrivial(See.only(serverPlayer),
+                    "closeMenus", ChangePriority.CHANGE_NORMAL));
+            reply = null;
+        } catch (Exception e) {
+            reply = null;
+            logger.log(Level.WARNING, "Exception completing future", e);
+        }
+        return reply;
     }
 
         
@@ -3304,52 +3337,29 @@ public final class InGameController extends Controller {
      * @param colony The <code>Colony</code> that is demanded of.
      * @param goods The <code>Goods</code> being demanded.
      * @param gold The amount of gold being demanded.
-     * @param result The result of the demand.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element indianDemand(ServerPlayer serverPlayer, Unit unit,
-                                Colony colony, Goods goods, int gold,
-                                String result) {
-        ServerPlayer demander = (ServerPlayer) unit.getOwner();
+    public Element indianDemand(final ServerPlayer serverPlayer, Unit unit,
+                                Colony colony, Goods goods, int gold) {
         ServerPlayer victim = (ServerPlayer) colony.getOwner();
-        DemandSession session = TransactionSession.lookup(DemandSession.class,
-            unit, colony);
         int difficulty = getGame().getSpecification()
             .getIntegerOption("model.option.nativeDemands").getValue();
         ChangeSet cs = new ChangeSet();
 
-        if (session == null) { // Initial demand
-            if (serverPlayer != demander) {
-                return DOMMessage.clientError("Colony player can not demand");
-            }
-            if (!victim.isConnected()) {
-                return DOMMessage.clientError("No connection to colony owner");
-            }
-            session = new DemandSession(unit, colony);
-            session.setGoods(goods);
-            session.setGold(gold);
-            session.setTension((difficulty + 1) * 50);
+        DOMMessage reply = askTimeout(victim,
+            new IndianDemandMessage(unit, colony, goods, gold));
+        boolean result = (reply instanceof IndianDemandMessage)
+            ? ((IndianDemandMessage)reply).getResult()
+            : false;
+        logger.info(serverPlayer.getName() + " unit " + unit
+            + " demands " + goods + " goods and " + gold + " gold "
+            + " from " + colony.getName() + " accepted: " + result);
 
-            cs.add(See.only(victim), ChangePriority.CHANGE_NORMAL,
-                new IndianDemandMessage(unit, colony, goods, gold));
-            sendElement(victim, cs);
-            logger.info(demander.getName() + " unit " + unit
-                + " demands " + goods + " goods and " + gold + " gold "
-                + " from " + colony.getName());
-            return null; // Do not block waiting for response.
-        }
-
-        // Reply to demand
-        if (serverPlayer != victim) {
-            return DOMMessage.clientError("Native player can not reply");
-        }
-        if (session.getGold() != gold || session.getGoods() != goods) {
-            return DOMMessage.clientError("Transaction mismatch, cheat?");
-        }
-        logger.info(demander.getName() + " unit " + unit
-            + " demand from colony " + colony.getName()
-            + " result: " + result);
-        if (Boolean.TRUE.toString().equals(result)) {
+        IndianDemandMessage message = new IndianDemandMessage(unit, colony,
+                                                              goods, gold);
+        message.setResult(result);
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL, message);
+        if (result) {
             if (goods != null) {
                 GoodsContainer colonyContainer = colony.getGoodsContainer();
                 colonyContainer.saveState();
@@ -3357,20 +3367,19 @@ public final class InGameController extends Controller {
                 unitContainer.saveState();
                 moveGoods(goods, unit);
                 cs.add(See.only(victim), colonyContainer);
-                cs.add(See.only(demander), unitContainer);
+                //cs.add(See.only(serverPlayer), unitContainer);
             }
             if (gold > 0) {
                 victim.modifyGold(-gold);
-                demander.modifyGold(gold);
+                serverPlayer.modifyGold(gold);
                 cs.addPartial(See.only(victim), victim, "gold");
-                cs.addPartial(See.only(demander), demander, "gold");
+                //cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             }
             cs.add(See.only(null).perhaps(victim),
-                demander.modifyTension(victim, -(5 - difficulty) * 50));
-            session.setTension(-1); // Disarm the complete() routine.
+                serverPlayer.modifyTension(victim, -(5 - difficulty) * 50));
         }
-        session.complete(cs);
-        sendElement(victim, cs);
+
+        sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
