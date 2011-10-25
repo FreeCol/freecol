@@ -50,11 +50,6 @@ public class FreeColGameObjectType extends FreeColObject {
     private boolean abstractType;
 
     /**
-     * Describe specification here.
-     */
-    private Specification specification = null;
-
-    /**
      * Describe featureContainer here.
      */
     private FeatureContainer featureContainer;
@@ -74,27 +69,8 @@ public class FreeColGameObjectType extends FreeColObject {
 
     public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
-        this.specification = specification;
+        setSpecification(specification);
         featureContainer = new FeatureContainer();
-    }
-
-    /**
-     * Get the <code>Specification</code> value.
-     *
-     * @return a <code>Specification</code> value
-     */
-    @Override
-    public final Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Set the <code>Specification</code> value.
-     *
-     * @param newSpecification The new Specification value.
-     */
-    public final void setSpecification(final Specification newSpecification) {
-        this.specification = newSpecification;
     }
 
     /**
@@ -307,12 +283,12 @@ public class FreeColGameObjectType extends FreeColObject {
                 featureContainer.removeAbilities(id);
                 in.nextTag();
             } else {
-                Ability ability = new Ability(in, specification);
+                Ability ability = new Ability(in, getSpecification());
                 if (ability.getSource() == null) {
                     ability.setSource(this);
                 }
                 addAbility(ability); // Ability close the element
-                specification.addAbility(ability);
+                getSpecification().addAbility(ability);
             }
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             if (getAttribute(in, "delete", false)) {
@@ -320,7 +296,7 @@ public class FreeColGameObjectType extends FreeColObject {
                 featureContainer.removeModifiers(id);
                 in.nextTag();
             } else {
-                Modifier modifier = new Modifier(in, specification);
+                Modifier modifier = new Modifier(in, getSpecification());
                 if (modifier.getSource() == null) {
                     modifier.setSource(this);
                 }
@@ -328,7 +304,7 @@ public class FreeColGameObjectType extends FreeColObject {
                     modifier.setIndex(getModifierIndex(modifier));
                 }
                 addModifier(modifier); // Modifier close the element
-                specification.addModifier(modifier);
+                getSpecification().addModifier(modifier);
             }
         } else {
             logger.warning("Parsing of " + childName

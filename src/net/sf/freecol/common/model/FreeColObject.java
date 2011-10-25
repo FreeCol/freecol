@@ -96,6 +96,11 @@ public abstract class FreeColObject {
      */
     private String id;
 
+    /**
+     * The <code>specification</code> this object uses. May be null.
+     */
+    private Specification specification;
+
     private PropertyChangeSupport pcs = null;
 
     /**
@@ -122,7 +127,17 @@ public abstract class FreeColObject {
      * @return a <code>Specification</code> value
      */
     public Specification getSpecification() {
-        return null;
+        return specification;
+    }
+
+    /**
+     * Sets the specification for this object. This method should only
+     * ever be used by the object's constructor.
+     *
+     * @param specification a <code>Specification</code> value
+     */
+    protected void setSpecification(Specification specification) {
+        this.specification = specification;
     }
 
     /**
