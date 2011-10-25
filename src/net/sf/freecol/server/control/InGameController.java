@@ -28,6 +28,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,6 +103,7 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
@@ -148,7 +153,14 @@ public final class InGameController extends Controller {
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
 
+    // A service to run the futures.
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
+    // Futures that need to be cleaned up at end of the current player turn.
+    private final List<Future<DOMMessage>> outstandingFutures
+        = new ArrayList<Future<DOMMessage>>();
+
+ 
     /**
      * The constructor to use.
      * 
@@ -366,6 +378,74 @@ public final class InGameController extends Controller {
 
     // Client-server communication utilities
 
+    // A handler interface to pass to askFuture().
+    // This will change from DOMMessage to Message when DOM goes away.
+    private interface DOMMessageHandler {
+        public DOMMessage handle(DOMMessage message);
+    };
+
+    private class DOMMessageCallable implements Callable<DOMMessage> {
+
+        private Connection connection;
+        private Game game;
+        private DOMMessage message;
+        private DOMMessageHandler handler;
+        
+
+        public DOMMessageCallable(Connection connection, Game game,
+                                  DOMMessage message,
+                                  DOMMessageHandler handler) {
+            this.connection = connection;
+            this.game = game;
+            this.message = message;
+            this.handler = handler;
+        }
+        
+        public DOMMessage call() {
+            Element reply;
+            try {
+                reply = connection.askDumping(message.toXMLElement());
+            } catch (IOException e) {
+                return null;
+            }
+            if (reply == null) return null;
+            String tag = reply.getTagName();
+            tag = "net.sf.freecol.common.networking." 
+                + tag.substring(0, 1).toUpperCase() + tag.substring(1)
+                + "Message";
+            Class[] types = new Class[] { Game.class, Element.class };
+            Object[] params = new Object[] { game, reply };
+            DOMMessage message;
+            try {
+                message = (DOMMessage)Introspector.instantiate(tag, types,
+                                                               params);
+            } catch (IllegalArgumentException e) {
+                logger.log(Level.WARNING, "Instantiation fail", e);
+                message = null;
+            }
+            return (message == null) ? null : handler.handle(message);
+        }
+    };
+
+    /**
+     * Asks a question of a player in a Future.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param question The <code>DOMMessage</code> question.
+     * @param handler The <code>DOMMessageHandler</code> handler to process
+     *     the reply with.
+     * @return A future encapsulating the result.
+     */
+    private Future<DOMMessage> askFuture(ServerPlayer serverPlayer,
+                                         DOMMessage message,
+                                         DOMMessageHandler handler) {
+        Callable<DOMMessage> callable
+            = new DOMMessageCallable(serverPlayer.getConnection(), getGame(),
+                                     message, handler);
+        return executor.submit(callable);
+    }
+
+        
     /**
      * Get a list of all server players, optionally excluding supplied ones.
      *
@@ -552,6 +632,12 @@ public final class InGameController extends Controller {
             if (!human) {
                 game.setCurrentPlayer(null);
                 return null;
+            }
+
+            // Clean up futures from the current player.
+            while (!outstandingFutures.isEmpty()) {
+                Future<DOMMessage> future = outstandingFutures.remove(0);
+                future.cancel(true);
             }
 
             // Check for new turn

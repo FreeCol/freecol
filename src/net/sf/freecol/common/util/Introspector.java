@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -305,5 +306,46 @@ public class Introspector {
                                                    + e.toString());
             }
         }
+    }
+
+
+    /**
+     * Constructs a new instance of an object of a class specified by name,
+     * with supplied parameters.
+     *
+     * @param tag The name of the class to instantiate.
+     * @param types The argument types of the constructor to call.
+     * @param params The parameters to call the constructor with.
+     * @return The new object instance.
+     * @exception IllegalArgumentException wraps all exceptional conditions.
+     */
+    public static Object instantiate(String tag, Class[] types, Object[] params)
+        throws IllegalArgumentException {
+        Class<?> messageClass;
+        try {
+            messageClass = Class.forName(tag);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to find class " + tag
+                + ": " + e.toString());
+        }
+        Constructor<?> constructor;
+        try {
+            constructor = messageClass.getDeclaredConstructor(types);
+        } catch (Exception e) {
+            String p = "Unable to find constructor " + tag + "(";
+            for (int i = 0; i < types.length; i++) {
+                p += " " + types[i].toString();
+            }
+            p += " ): ";
+            throw new IllegalArgumentException(p + e.toString());
+        }
+        Object instance;
+        try {
+            instance = constructor.newInstance(params);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to construct " + tag
+                + ": " + e.toString());
+        }
+        return instance;
     }
 }

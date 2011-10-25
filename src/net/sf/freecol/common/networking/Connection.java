@@ -44,6 +44,7 @@ import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 
+
 /**
  * A network connection. Responsible for both sending and receiving network
  * messages.
@@ -144,6 +145,16 @@ public class Connection {
         SocketAddress addr = new InetSocketAddress(host, port);
         socket.connect(addr, TIMEOUT);
 
+        return socket;
+    }
+
+    /**
+     * Gets the socket.
+     *
+     * @return The <code>Socket</code> used while communicating with the other
+     *         peer.
+     */
+    public Socket getSocket() {
         return socket;
     }
 
@@ -580,17 +591,6 @@ public class Connection {
      * StringWriter sw = new StringWriter(); e.printStackTrace(new
      * PrintWriter(sw)); logger.warning(sw.toString()); } }
      */
-
-    /**
-     * Gets the socket.
-     *
-     * @return The <code>Socket</code> used while communicating with the other
-     *         peer.
-     */
-    public Socket getSocket() {
-        return socket;
-    }
-
 
     /**
      * Dumping version of ask().
