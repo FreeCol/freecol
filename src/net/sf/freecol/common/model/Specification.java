@@ -338,16 +338,16 @@ public final class Specification {
     }
 
     private interface ChildReader {
-        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException;
+        public void readChildren(XMLStreamReader xsr) throws XMLStreamException;
     }
 
     private class ModifierReader implements ChildReader {
 
-        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                Modifier modifier = new Modifier(xsr, specification);
-                specification.addModifier(modifier);
-                specification.specialModifiers.add(modifier);
+                Modifier modifier = new Modifier(xsr, Specification.this);
+                Specification.this.addModifier(modifier);
+                Specification.this.specialModifiers.add(modifier);
             }
         }
     }
@@ -364,7 +364,7 @@ public final class Specification {
             this.type = type;
         }
 
-        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if ("delete".equals(xsr.getLocalName())) {
                     String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
@@ -387,7 +387,7 @@ public final class Specification {
 
     private class OptionReader implements ChildReader {
 
-        public void readChildren(XMLStreamReader xsr, Specification specification) throws XMLStreamException {
+        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String optionType = xsr.getLocalName();
                 String recursiveString = xsr.getAttributeValue(null, "recursive");
@@ -401,7 +401,7 @@ public final class Specification {
                     } else {
                         group.readFromXML(xsr);
                     }
-                    specification.addOptionGroup(group, recursive);
+                    Specification.this.addOptionGroup(group, recursive);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");
                     xsr.nextTag();
@@ -516,7 +516,8 @@ public final class Specification {
                 logger.warning(Id + " caused ClassCastException!");
                 throw(cce);
             }
-        } else if (allTypes.containsKey(mangle(Id))) { // @compat 0.9.x
+        } else if (allTypes.containsKey(mangle(Id))) {
+            // @compat 0.9.x
             return type.cast(allTypes.get(mangle(Id)));
             // end compatibility code
         } else if (initialized) {
@@ -1243,7 +1244,7 @@ public final class Specification {
                 }
                 // end compatibility code
             } else {
-                reader.readChildren(xsr, this);
+                reader.readChildren(xsr);
             }
         }
         if (difficultyLevel != null) {
