@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -433,6 +434,18 @@ public abstract class AIPlayer extends AIObject {
         // Otherwise, attack.
         return true;
     }
+
+    /**
+     * Selects the most useful founding father offered.
+     * Overridden by EuropeanAIPlayers.
+     *
+     * @param ffs The founding fathers on offer.
+     * @return The founding father selected.
+     */
+    public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
+        return null;
+    }
+
 
     /**
      * Writes this object to an XML stream.

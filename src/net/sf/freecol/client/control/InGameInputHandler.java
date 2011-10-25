@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -628,22 +629,18 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chooseFoundingFather(Element element) {
-        final List<FoundingFather> ffs = new ArrayList<FoundingFather>();
-        for (FoundingFatherType type : FoundingFatherType.values()) {
-            String id = element.getAttribute(type.toString());
-            if (id != null && !id.equals("")) {
-                FoundingFather father = getGame().getSpecification()
-                    .getFoundingFather(id);
-                if (father == null) {
-                    logger.warning("Bogus " + type + " father: " + id);
-                } else {
-                    ffs.add(father);
-                }
-            }
+        ChooseFoundingFatherMessage message
+            = new ChooseFoundingFatherMessage(getGame(), element);
+        List<FoundingFather> ffs = message.getFathers();
+        Canvas canvas = getFreeColClient().getCanvas();
+        ChooseFoundingFatherDialog dialog
+            = new ChooseFoundingFatherDialog(canvas, ffs);
+        FoundingFather ff = canvas.showFreeColDialog(dialog);
+        if (ff != null) {
+            message.setResult(ff);
+            getFreeColClient().getMyPlayer().setCurrentFather(ff);
         }
-
-        new FoundingFatherSwingTask(ffs).invokeLater();
-        return null;
+        return message.toXMLElement();
     }
 
     /**
@@ -1399,36 +1396,6 @@ public final class InGameInputHandler extends InputHandler {
             }
             getFreeColClient().askServer().diplomacy(unit, settlement,
                                                      agreement);
-        }
-    }
-
-    /**
-     * This class displays a dialog that lets the player pick a
-     * Founding Father.
-     */
-    class FoundingFatherSwingTask extends NoResultCanvasSwingTask {
-
-        private List<FoundingFather> choices;
-
-
-        /**
-         * Constructor.
-         *
-         * @param choices The possible founding fathers.
-         */
-        public FoundingFatherSwingTask(List<FoundingFather> choices) {
-            this.choices = choices;
-        }
-
-        protected void doWork(Canvas canvas) {
-            ChooseFoundingFatherDialog dialog
-                = new ChooseFoundingFatherDialog(canvas, choices);
-            FoundingFather ff = canvas.showFreeColDialog(dialog);
-            if (ff != null) {
-                FreeColClient freeColClient = getFreeColClient();
-                freeColClient.getMyPlayer().setCurrentFather(ff);
-                freeColClient.askServer().chooseFoundingFather(ff);
-            }
         }
     }
 

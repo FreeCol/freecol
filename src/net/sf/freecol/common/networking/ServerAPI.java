@@ -443,17 +443,6 @@ public class ServerAPI {
     }
 
     /**
-     * Server query-response for choosing a founding father.
-     *
-     * @param father The <code>FoundingFather</code> to choose.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean chooseFoundingFather(FoundingFather father) {
-        return send(new TrivialMessage("chooseFoundingFather",
-                "foundingFather", father.getId()));
-    }
-
-    /**
      * Server query-response to claim a piece of land.
      *
      * @param tile The land to claim.

@@ -335,7 +335,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // TODO: improve choice
         int age = getGame().getTurn().getAge();
         FoundingFather bestFather = null;
-        int bestWeight = -1;
+        int bestWeight = Integer.MIN_VALUE;
         for (FoundingFather father : foundingFathers) {
             if (father == null) continue;
 
@@ -344,7 +344,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             // early alleviates the complexity problem of handling all
             // TransportMissions correctly somewhat.
             if (father.hasAbility("model.ability.buildCustomHouse")) {
-                return father;
+                bestFather = father;
+                break;
             }
 
             int weight = father.getWeight(age);

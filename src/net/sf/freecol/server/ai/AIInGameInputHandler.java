@@ -40,8 +40,10 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -239,40 +241,21 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     }
 
     /**
-     *
      * Handles a "chooseFoundingFather"-message.
+     * Only meaningful for AIPlayer types that implement selectFoundingFather.
      *
-     *
-     *
-     * @param connection The connectio the message was received on.
-     *
+     * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
-     *
-     * holds all the information.
-     *
+     *     holds all the information.
      */
-    private Element chooseFoundingFather(DummyConnection connection, Element element) {
-        final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
-        for (FoundingFatherType type : FoundingFatherType.values()) {
-            String id = element.getAttribute(type.toString());
-            if (id != null && id != "") {
-                FoundingFather father = aiMain.getGame().getSpecification()
-                    .getFoundingFather(id);
-                if (father == null) {
-                    logger.warning("Bogus " + type.toString()
-                                   + " father: " + id);
-                } else {
-                    possibleFoundingFathers.add(father);
-                }
-            }
-        }
-
-        FoundingFather foundingFather = ((EuropeanAIPlayer) getAIPlayer())
-            .selectFoundingFather(possibleFoundingFathers);
-        if (foundingFather != null) {
-            AIMessage.askChooseFoundingFather(connection, foundingFather);
-        }
-        return null;
+    private Element chooseFoundingFather(final DummyConnection connection,
+                                         Element element) {
+        ChooseFoundingFatherMessage message
+            = new ChooseFoundingFatherMessage(aiMain.getGame(), element);
+        AIPlayer aiPlayer = getAIPlayer();
+        FoundingFather ff = aiPlayer.selectFoundingFather(message.getFathers());
+        if (ff != null) message.setResult(ff);
+        return message.toXMLElement();
     }
 
     /**

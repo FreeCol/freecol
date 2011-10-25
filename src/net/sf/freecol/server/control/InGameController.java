@@ -96,6 +96,7 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -706,6 +707,9 @@ public final class InGameController extends Controller {
                 }
             }
             player.csStartTurn(random, cs);
+            Future<DOMMessage> future = nextFoundingFather(player);
+            if (future != null) outstandingFutures.add(future);
+
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,
                           "player", player.getId());
@@ -746,6 +750,41 @@ public final class InGameController extends Controller {
                 sendElement(serverPlayer, cs);
             }
         }
+    }
+
+    /**
+     * Queries a player to choose their next founding father in a future.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @return A <code>Future</code> to encapsulate the query.
+     */
+    private Future<DOMMessage> nextFoundingFather(final ServerPlayer serverPlayer) {
+        if (!serverPlayer.canRecruitFoundingFather()) return null;
+        if (serverPlayer.getOfferedFathers().isEmpty()) {
+            serverPlayer.setOfferedFathers(serverPlayer
+                .getRandomFoundingFathers(random));
+        }
+        final List<FoundingFather> ffs = serverPlayer.getOfferedFathers();
+        return (ffs.isEmpty()) ? null
+            : askFuture(serverPlayer, new ChooseFoundingFatherMessage(ffs),
+                new DOMMessageHandler() {
+                    public DOMMessage handle(DOMMessage request) {
+                        ChooseFoundingFatherMessage message
+                            = (ChooseFoundingFatherMessage)request;
+                        FoundingFather ff = message.getResult();
+                        if (ff == null) {
+                            logger.warning("No founding father selected");
+                        } else if (!ffs.contains(ff)) {
+                            logger.warning("Invalid founding father: "
+                                + ff.getId());
+                        } else {
+                            serverPlayer.setCurrentFather(ff);
+                            serverPlayer.clearOfferedFathers();
+                            logger.info("Selected founding father: " + ff);
+                        }
+                        return null;
+                    }
+                });
     }
 
     /**
@@ -1066,32 +1105,6 @@ public final class InGameController extends Controller {
             reply = endTurn((ServerPlayer) game.getCurrentPlayer());
         }
         return reply;
-    }
-
-
-    /**
-     * Choose a founding father from the current offered fathers.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is choosing.
-     * @param id The id of the <code>FoundingFather</code> to pick.
-     * @return An <code>Element</code> encapsulating this action.
-     */
-    public Element chooseFoundingFather(ServerPlayer serverPlayer, String id) {
-        FoundingFather father = getGame().getSpecification()
-            .getFoundingFather(id);
-        if (father == null) {
-            return DOMMessage.clientError("Not a founding father: " + id);
-        } else if (serverPlayer.getCurrentFather() != null) {
-            return DOMMessage.clientError("Already recruiting: "
-                + serverPlayer.getCurrentFather().getId());
-        } else if (!serverPlayer.getOfferedFathers().contains(father)) {
-            return DOMMessage.clientError("Not an offered father: " + id);
-        } else {
-            serverPlayer.setCurrentFather(father);
-            serverPlayer.setOfferedFathers(new ArrayList<FoundingFather>());
-            logger.info("Selected founding father: " + father.getId());
-        }
-        return null;
     }
 
 

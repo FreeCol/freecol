@@ -213,15 +213,6 @@ public final class InGameInputHandler extends InputHandler
                 return new ChangeWorkTypeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register("chooseFoundingFather",
-                 new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return freeColServer.getInGameController()
-                    .chooseFoundingFather(freeColServer.getPlayer(connection),
-                        element.getAttribute("foundingFather"));
-            }});
         register(ClaimLandMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler() {
             @Override

@@ -258,20 +258,6 @@ public class AIMessage {
 
 
     /**
-     * Choose a new founding father.
-     *
-     * @param conn The <code>Connection</code> to send on.
-     * @param ff The <code>FoundingFather</code> to choose.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askChooseFoundingFather(Connection conn,
-                                                  FoundingFather ff) {
-        return sendTrivial(conn, "chooseFoundingFather",
-            "foundingFather", ff.getId());
-    }
-
-
-    /**
      * Claims a tile for a colony.
      *
      * @param conn The <code>Connection</code> to send on.

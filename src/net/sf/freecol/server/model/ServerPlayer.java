@@ -675,7 +675,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random A pseudo-random number source.
      * @return A list of FoundingFathers.
      */
-    private List<FoundingFather> getRandomFoundingFathers(Random random) {
+    public List<FoundingFather> getRandomFoundingFathers(Random random) {
         // Build weighted random choice for each father type
         Specification spec = getGame().getSpecification();
         int age = getGame().getTurn().getAge();
@@ -1138,23 +1138,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (father != null) {
                 csAddFoundingFather(father, random, cs);
                 clearOfferedFathers();
-            }
-            if (canRecruitFoundingFather()) {
-                List<FoundingFather> ffs = getOfferedFathers();
-                if (ffs.isEmpty()) {
-                    ffs = getRandomFoundingFathers(random);
-                    setOfferedFathers(ffs);
-                }
-                if (!ffs.isEmpty()) {
-                    List<String> attributes = new ArrayList<String>();
-                    for (FoundingFather ff : ffs) {
-                        attributes.add(ff.getType().toString());
-                        attributes.add(ff.getId());
-                    }
-                    cs.addTrivial(See.only(this), "chooseFoundingFather",
-                        ChangeSet.ChangePriority.CHANGE_NORMAL,
-                        attributes.toArray(new String[0]));
-                }
             }
 
         } else if (isIndian()) {
