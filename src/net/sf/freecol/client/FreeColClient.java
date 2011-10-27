@@ -23,24 +23,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -51,13 +40,10 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.FullScreenFrame;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.WindowedFrame;
 import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
@@ -68,15 +54,9 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
-import net.sf.freecol.common.option.AudioMixerOption;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.LanguageOption.Language;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
@@ -112,19 +92,10 @@ public final class FreeColClient {
 
     private ServerAPI serverAPI;
 
-
-    // GUI:
-    private GraphicsDevice gd;
-
-    private JFrame frame;
-
-    private Canvas canvas;
-
+    
     private GUI gui;
 
-    private ImageLibrary imageLibrary;
 
-    private SoundPlayer soundPlayer;
 
     // Networking:
     /**
@@ -151,7 +122,6 @@ public final class FreeColClient {
     /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
 
-    private boolean windowed;
 
     private boolean mapEditor;
 
@@ -170,8 +140,6 @@ public final class FreeColClient {
      * approved login to a server.
      */
     private boolean loggedIn = false;
-
-    private Rectangle windowBounds;
 
     /**
      * Describe headless here.
@@ -194,6 +162,9 @@ public final class FreeColClient {
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
+        
+        
+        gui = new GUI(this);
 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
@@ -217,28 +188,10 @@ public final class FreeColClient {
 
         mapEditor = false;
 
-        // Display the splash screen.
-        JWindow splash = null;
-        if (splashFilename != null) {
-            try {
-                Image im = Toolkit.getDefaultToolkit()
-                    .getImage(splashFilename);
-                splash = new JWindow();
-                splash.getContentPane().add(new JLabel(new ImageIcon(im)));
-                splash.pack();
-                Point center = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment().getCenterPoint();
-                splash.setLocation(center.x - splash.getWidth() / 2,
-                                   center.y - splash.getHeight() / 2);
-                splash.setVisible(true);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Splash fail", e);
-                splash = null;
-            }
-        }
+        gui.displaySpashScreen(splashFilename);
 
         // Determine the window size.
-        windowed = size != null;
+        setWindowed(size != null);
         if (size != null && size.width < 0) {
             Rectangle bounds = GraphicsEnvironment
                 .getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -255,7 +208,6 @@ public final class FreeColClient {
         inGameController = new InGameController(this);
         inGameInputHandler = new InGameInputHandler(this);
         mapEditorController = new MapEditorController(this);
-        imageLibrary = new ImageLibrary();
         actionManager = new ActionManager(this);
         worker = new Worker();
         worker.start();
@@ -302,14 +254,13 @@ public final class FreeColClient {
         }
 
         // Start the GUI.
-        if (splash != null) {
-            splash.setVisible(false);
-            splash.dispose();
-        }
+        
+        gui.hideSplashScreen();
+
         final Dimension windowSize = size;
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    startGUI(windowSize, sound, showOpeningVideo,
+                    gui.startGUI(windowSize, sound, showOpeningVideo,
                         savedGame != null);
                 }
             });
@@ -334,128 +285,7 @@ public final class FreeColClient {
         return instance;
     }
 
-    /**
-     * Starts the GUI by creating and displaying the GUI-objects.
-     */
-    private void startGUI(Dimension innerWindowSize,
-                          final boolean sound,
-                          final boolean showOpeningVideo,
-                          final boolean loadGame) {
-        final ClientOptions opts = getClientOptions();
-        // Prepare the sound system.
-        if (sound) {
-            final AudioMixerOption amo
-                = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
-            final PercentageOption volume
-                = (PercentageOption) opts.getOption(ClientOptions.AUDIO_VOLUME);
-            try {
-                soundPlayer = new SoundPlayer(amo, volume);
-            } catch (Exception e) {
-                // #3168279 reports an undocumented NPE thrown by
-                // AudioSystem.getMixer(null).  Workaround this and other
-                // such failures by just disabling sound.
-                soundPlayer = null;
-                logger.log(Level.WARNING, "Sound disabled", e);
-            }
-        } else {
-            soundPlayer = null;
-        }
-
-        if (GraphicsEnvironment.isHeadless()) {
-            logger.info("It seems that the GraphicsEnvironment is headless!");
-        }
-        gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (!windowed) {
-            if (!gd.isFullScreenSupported()) {
-                String fullscreenNotSupported =
-                   "\nIt seems that full screen mode is not fully supported for this" +
-                   "\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience" +
-                   "any graphical problems while running FreeCol.";
-                logger.info(fullscreenNotSupported);
-                System.out.println(fullscreenNotSupported);
-                /*
-                 * We might want this behavior later: logger.warning("It seems
-                 * that full screen mode is not supported for this
-                 * GraphicsDevice! Using windowed mode instead."); windowed =
-                 * true; setWindowed(true); frame = new
-                 * WindowedFrame(size);
-                 */
-            }
-            Rectangle bounds = gd.getDefaultConfiguration().getBounds();
-            innerWindowSize = new Dimension(bounds.width - bounds.x, bounds.height - bounds.y);
-        }
-
-        // Work around a Java 2D bug that seems to be X11 specific.
-        // According to:
-        //   http://www.oracle.com/technetwork/java/javase/index-142560.html
-        //
-        //   ``The use of pixmaps typically results in better
-        //     performance. However, in certain cases, the opposite is true.''
-        //
-        // The standard workaround is to use -Dsun.java2d.pmoffscreen=false,
-        // but this is too hard for some users, so provide an option to
-        // do it easily.  However respect the initial value if present.
-        //
-        // Remove this if Java 2D is ever fixed.  DHYB.
-        //
-        final String pmoffscreen = "sun.java2d.pmoffscreen";
-        BooleanOption usePixmaps
-            = (BooleanOption) opts.getOption(ClientOptions.USE_PIXMAPS);
-        String pmoffscreenValue = System.getProperty(pmoffscreen);
-        if (pmoffscreenValue == null) {
-            System.setProperty(pmoffscreen, usePixmaps.getValue().toString());
-            logger.info(pmoffscreen + " using client option: "
-                + usePixmaps.getValue().toString());
-        } else {
-            usePixmaps.setValue(new Boolean(pmoffscreenValue));
-            logger.info(pmoffscreen + " overrides client option: "
-                + pmoffscreenValue);
-        }
-        usePixmaps.addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent e) {
-                    String newValue = e.getNewValue().toString();
-                    System.setProperty(pmoffscreen, newValue);
-                    logger.info("Set " + pmoffscreen + " to: " + newValue);
-                }
-            });
-
-        gui = new GUI(this, innerWindowSize, imageLibrary);
-        canvas = new Canvas(this, innerWindowSize, gui);
-        changeWindowedMode(windowed);
-        frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
-
-        // Now that there is a canvas, prepare for language changes.
-        LanguageOption o = (LanguageOption) getClientOptions().getOption(ClientOptions.LANGUAGE);
-        if (o != null) {
-            o.addPropertyChangeListener(new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent e) {
-                        if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                            canvas.showInformationMessage("autodetectLanguageSelected");
-                        } else {
-                            Locale l = ((Language) e.getNewValue()).getLocale();
-                            Messages.setMessageBundle(l);
-                            canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
-                                .addName("%language%", l.getDisplayName()));
-                        }
-                    }
-                });
-        }
-
-        // run opening video or main panel
-        if (showOpeningVideo && !loadGame) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    canvas.showOpeningVideoPanel();
-                }
-            });
-        } else {
-            if (!loadGame) {
-                canvas.showMainPanel();
-            }
-            playSound("sound.intro.general");
-        }
-        gui.startCursorBlinking();
-    }
+ 
 
     /**
      * Get the <code>Headless</code> value.
@@ -499,7 +329,7 @@ public final class FreeColClient {
      * @return a <code>JFrame</code> value
      */
     public JFrame getFrame() {
-        return frame;
+        return gui.getFrame();
     }
 
     /**
@@ -507,49 +337,10 @@ public final class FreeColClient {
      *
      */
     public void updateMenuBar() {
-        if (frame != null && frame.getJMenuBar() != null) {
-            ((FreeColMenuBar) frame.getJMenuBar()).update();
-        }
+        gui.updateMenuBar();
     }
 
-    /**
-     * Change the windowed mode.
-     * @param windowed Use <code>true</code> for windowed mode
-     *      and <code>false</code> for fullscreen mode.
-     */
-    public void changeWindowedMode(boolean windowed) {
-        JMenuBar menuBar = null;
-        if (frame != null) {
-            menuBar = frame.getJMenuBar();
-            if (frame instanceof WindowedFrame) {
-                windowBounds = frame.getBounds();
-            }
-            frame.setVisible(false);
-            frame.dispose();
-        }
-        this.windowed = windowed;
-        if (windowed) {
-            frame = new WindowedFrame();
-        } else {
-            frame = new FullScreenFrame(gd);
-        }
-        frame.setJMenuBar(menuBar);
-        if (frame instanceof WindowedFrame) {
-            ((WindowedFrame) frame).setCanvas(canvas);
-            frame.getContentPane().add(canvas);
-            if (windowBounds != null) {
-                frame.setBounds(windowBounds);
-            } else {
-                frame.pack();
-            }
-        } else if (frame instanceof FullScreenFrame) {
-            ((FullScreenFrame) frame).setCanvas(canvas);
-            frame.getContentPane().add(canvas);
-        }
-        gui.forceReposition();
-        canvas.updateSizes();
-        frame.setVisible(true);
-    }
+  
 
     /**
      * Checks if the application is displayed in a window.
@@ -559,7 +350,7 @@ public final class FreeColClient {
      * @see #changeWindowedMode
      */
     public boolean isWindowed() {
-        return windowed;
+        return gui.isWindowed();
     }
 
     public void setMapEditor(boolean mapEditor) {
@@ -576,7 +367,7 @@ public final class FreeColClient {
      * @return The <code>ImageLibrary</code>.
      */
     public ImageLibrary getImageLibrary() {
-        return imageLibrary;
+        return gui.getImageLibrary();
     }
 
     /**
@@ -724,7 +515,7 @@ public final class FreeColClient {
      * @return The <code>Canvas</code>.
      */
     public Canvas getCanvas() {
-        return canvas;
+        return gui.getCanvas();
     }
 
     /**
@@ -733,8 +524,8 @@ public final class FreeColClient {
      *
      * @return The <code>GUI</code>.
      */
-    public GUI getGUI() {
-        return gui;
+    public MapViewer getMapViewer() {
+        return gui.getMapViewer();
     }
 
     private void exitActions () {
@@ -771,9 +562,9 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().quitGame(isSingleplayer());
         exitActions();
-        if (!windowed) {
+        if (!isWindowed()) {
             try {
-                gd.setFullScreenWindow(null);
+                getGd().setFullScreenWindow(null);
             } catch(Exception e) {
                 // this can fail, but who cares?
                 // we are quitting anyway
@@ -918,7 +709,7 @@ public final class FreeColClient {
 
     public SoundPlayer getSoundPlayer ()
     {
-        return soundPlayer;
+        return gui.getSoundPlayer();
     }
 
     /**
@@ -927,18 +718,7 @@ public final class FreeColClient {
      * @param sound The sound resource to play or <b>null</b>
      */
     public void playSound(String sound) {
-        if (canPlaySound()) {
-            if (sound == null) {
-               soundPlayer.stop();
-            } else {
-               File file = ResourceManager.getAudio(sound);
-               if (file != null) {
-                   soundPlayer.playOnce(file);
-               }
-               logger.finest(((file == null) ? "Could not load" : "Playing")
-                             + " sound: " + sound);
-            }
-        }
+        gui.playSound(sound);
     }
 
     /**
@@ -946,7 +726,7 @@ public final class FreeColClient {
      * @return boolean <b>true</b> if and only if client sound player has an instance
      */
     public boolean canPlaySound() {
-        return soundPlayer != null;
+        return gui.canPlaySound();
     }
 
     /**
@@ -991,7 +771,7 @@ public final class FreeColClient {
             if (active != null) {
                 active.getOwner().resetIterators();
                 active.getOwner().setNextActiveUnit(active);
-                getGUI().setActiveUnit(active);
+                getMapViewer().setActiveUnit(active);
             }
         }
     }
@@ -1025,5 +805,17 @@ public final class FreeColClient {
         freeColServer.getInGameController().setSkippedTurns(turns);
         getCanvas().closeMenus();
         askServer().startSkipping();
+    }
+
+    public GraphicsDevice getGd() {
+        return gui.getGd();
+    }
+
+    public void setWindowed(boolean windowed) {
+        gui.setWindowed(windowed);
+    }
+
+    public GUI getGUI() {
+        return gui;
     }
 }

@@ -298,7 +298,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
 
-    private final GUI gui;
+    private final MapViewer gui;
 
     private final ServerListPanel serverListPanel;
 
@@ -311,7 +311,7 @@ public final class Canvas extends JDesktopPane {
      * ColonyPanel and other panels. It should not be scaled along
      * with the default GUI.
      */
-    private final GUI colonyTileGUI;
+    private final MapViewer colonyTileGUI;
 
     private boolean clientOptionsDialogShowing = false;
 
@@ -331,11 +331,11 @@ public final class Canvas extends JDesktopPane {
      * @param size The bounds of this <code>Canvas</code>.
      * @param gui The object responsible of drawing the map onto this component.
      */
-    public Canvas(FreeColClient client, Dimension size, GUI gui) {
+    public Canvas(FreeColClient client, Dimension size, MapViewer gui) {
         this.freeColClient = client;
         this.gui = gui;
 
-        colonyTileGUI = new GUI(client, size, freeColClient.getImageLibrary());
+        colonyTileGUI = new MapViewer(client, size, freeColClient.getImageLibrary());
 
         initialSize = size;
 
@@ -658,7 +658,7 @@ public final class Canvas extends JDesktopPane {
         return freeColClient;
     }
 
-    public GUI getColonyTileGUI() {
+    public MapViewer getColonyTileGUI() {
         return colonyTileGUI;
     }
 
@@ -667,7 +667,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @return The <code>GUI</code>.
      */
-    public GUI getGUI() {
+    public MapViewer getGUI() {
         return gui;
     }
 
@@ -847,11 +847,11 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Paints this component. This method will use {@link GUI#display} to draw
+     * Paints this component. This method will use {@link MapViewer#display} to draw
      * the map/background on this component.
      *
      * @param g The Graphics context in which to draw this component.
-     * @see GUI#display
+     * @see MapViewer#display
      */
     @Override
     public void paintComponent(Graphics g) {

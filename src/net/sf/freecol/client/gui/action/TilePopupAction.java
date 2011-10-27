@@ -22,7 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 
 /**
  * An action for displaying a Tile Popup.
@@ -46,9 +46,9 @@ public class TilePopupAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        GUI gui = getFreeColClient().getGUI();
-        getFreeColClient().getCanvas().showTilePopup(gui.getSelectedTile(),
-                                                 gui.getCursor().getCanvasX(),
-                                                 gui.getCursor().getCanvasY());
+        MapViewer mapViewer = getFreeColClient().getMapViewer();
+        getFreeColClient().getCanvas().showTilePopup(mapViewer.getSelectedTile(),
+                                                 mapViewer.getCursor().getCanvasX(),
+                                                 mapViewer.getCursor().getCanvasY());
     }
 }

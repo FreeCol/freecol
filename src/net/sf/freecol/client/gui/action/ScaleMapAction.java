@@ -234,7 +234,7 @@ public class ScaleMapAction extends FreeColAction {
             t.getTileItemContainer().updateRiver();
         }*/
 
-        freeColClient.getGUI().setSelectedTile(map.getTile(0, 0), false);
+        freeColClient.getMapViewer().setSelectedTile(map.getTile(0, 0), false);
         freeColClient.getCanvas().refresh();
     }
 }

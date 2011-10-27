@@ -29,7 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.common.model.GameOptions;
@@ -203,7 +203,7 @@ public final class PreGameController {
      */
     public void startGame() {
         Canvas canvas = freeColClient.getCanvas();
-        GUI gui = freeColClient.getGUI();
+        MapViewer gui = freeColClient.getMapViewer();
 
         for (Player player : freeColClient.getGame().getPlayers()) {
             addPlayerResources(player.getNationID());

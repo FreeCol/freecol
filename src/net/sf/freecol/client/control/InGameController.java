@@ -38,7 +38,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
@@ -286,7 +286,7 @@ public final class InGameController implements NetworkConstants {
         boolean result = false;
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
-            server.setActiveUnit(freeColClient.getGUI().getActiveUnit());
+            server.setActiveUnit(freeColClient.getMapViewer().getActiveUnit());
             server.saveGame(file, freeColClient.getMyPlayer().getName(),
                 freeColClient.getClientOptions());
             lastSaveGameFile = file;
@@ -1049,8 +1049,8 @@ public final class InGameController implements NetworkConstants {
     public boolean moveToDestination(Unit unit) {
         if (!requireOurTurn()) return false;
         if (unit.getTradeRoute() != null) return moveTradeRoute(unit);
-        GUI gui = freeColClient.getGUI();
-        gui.setActiveUnit(unit);
+        MapViewer mapViewer = freeColClient.getMapViewer();
+        mapViewer.setActiveUnit(unit);
         Player player = freeColClient.getMyPlayer();
 
         Location destination;
@@ -1104,7 +1104,7 @@ public final class InGameController implements NetworkConstants {
                     if (!checkCashInTreasureTrain(unit)
                         && unit.getMovesLeft() > 0
                         && unit.getState() != UnitState.SKIPPED) {
-                        freeColClient.getGUI().setActiveUnit(unit);
+                        freeColClient.getMapViewer().setActiveUnit(unit);
                         return true;
                     }
                 }
@@ -1120,7 +1120,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        Unit unit = freeColClient.getGUI().getActiveUnit();
+        Unit unit = freeColClient.getMapViewer().getActiveUnit();
         if (unit != null && requireOurTurn()) {
             clearGotoOrders(unit);
             move(unit, direction);
@@ -1273,8 +1273,8 @@ public final class InGameController implements NetworkConstants {
 
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
-        GUI gui = freeColClient.getGUI();
-        Unit unit = gui.getActiveUnit();
+        MapViewer mapViewer = freeColClient.getMapViewer();
+        Unit unit = mapViewer.getActiveUnit();
         if (unit == null) {
             return;
         } else if (!unit.canBuildColony()) {
@@ -1336,8 +1336,8 @@ public final class InGameController implements NetworkConstants {
             && tile.getSettlement() != null) {
             player.invalidateCanSeeTiles();
             freeColClient.playSound("sound.event.buildingComplete");
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile, false);
+            mapViewer.setActiveUnit(null);
+            mapViewer.setSelectedTile(tile, false);
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
@@ -1479,9 +1479,9 @@ public final class InGameController implements NetworkConstants {
         if (askServer().abandonColony(colony)
             && tile.getSettlement() == null) {
             player.invalidateCanSeeTiles();
-            GUI gui = freeColClient.getGUI();
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile, false);
+            MapViewer mapViewer = freeColClient.getMapViewer();
+            mapViewer.setActiveUnit(null);
+            mapViewer.setSelectedTile(tile, false);
         }
     }
 
@@ -1846,8 +1846,8 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
-                GUI gui = freeColClient.getGUI();
-                if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
+                MapViewer mapViewer = freeColClient.getMapViewer();
+                if (!mapViewer.onScreen(tile)) mapViewer.setSelectedTile(tile, false);
             }
         }
     }
@@ -2161,7 +2161,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().embark(unit, carrier, direction)
             && unit.getLocation() == carrier) {
             if (carrier.getMovesLeft() > 0) {
-                freeColClient.getGUI().setActiveUnit(carrier);
+                freeColClient.getMapViewer().setActiveUnit(carrier);
             } else {
                 nextActiveUnit();
             }
@@ -2585,7 +2585,7 @@ public final class InGameController implements NetworkConstants {
 
         askServer().closeTransactionSession(unit, settlement);
         if (unit.getMovesLeft() > 0) { // May have been restored if no trade
-            freeColClient.getGUI().setActiveUnit(unit);
+            freeColClient.getMapViewer().setActiveUnit(unit);
         } else {
             nextActiveUnit();
         }
@@ -3179,8 +3179,8 @@ public final class InGameController implements NetworkConstants {
     public void disbandActiveUnit() {
         if (!requireOurTurn()) return;
 
-        GUI gui = freeColClient.getGUI();
-        Unit unit = gui.getActiveUnit();
+        MapViewer mapViewer = freeColClient.getMapViewer();
+        Unit unit = mapViewer.getActiveUnit();
         if (unit == null) return;
         Canvas canvas = freeColClient.getCanvas();
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
@@ -3697,8 +3697,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void doEndTurn() {
         // Clear active unit if any.
-        GUI gui = freeColClient.getGUI();
-        gui.setActiveUnit(null);
+        MapViewer mapViewer = freeColClient.getMapViewer();
+        mapViewer.setActiveUnit(null);
 
         // Unskip all skipped, some may have been faked in-client.
         // Server-side skipped units are set active in csNewTurn.
@@ -3739,10 +3739,10 @@ public final class InGameController implements NetworkConstants {
         boolean result = true;
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        GUI gui = freeColClient.getGUI();
+        MapViewer mapViewer = freeColClient.getMapViewer();
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
-            gui.setActiveUnit(unit);
+            mapViewer.setActiveUnit(unit);
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
@@ -3755,7 +3755,7 @@ public final class InGameController implements NetworkConstants {
             if (moveToDestination(unit)) result = false;
             nextModelMessage();
         }
-        gui.setActiveUnit(null);
+        mapViewer.setActiveUnit(null);
         return result;
     }
 
@@ -3764,7 +3764,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void waitActiveUnit() {
         Canvas canvas = freeColClient.getCanvas();
-        GUI gui = canvas.getGUI();
+        MapViewer gui = canvas.getGUI();
         gui.setActiveUnit(null);
         nextActiveUnit();
     }
@@ -3773,7 +3773,7 @@ public final class InGameController implements NetworkConstants {
      * Skip a unit.
      */
     public void skipActiveUnit() {
-        changeState(freeColClient.getGUI().getActiveUnit(), UnitState.SKIPPED);
+        changeState(freeColClient.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
     }
 
     /**
@@ -3811,7 +3811,7 @@ public final class InGameController implements NetworkConstants {
 
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
-        GUI gui = canvas.getGUI();
+        MapViewer gui = canvas.getGUI();
         Unit unit = gui.getActiveUnit();
         if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {

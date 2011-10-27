@@ -56,7 +56,7 @@ public class ImprovementAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            Unit selectedUnit = getFreeColClient().getGUI().getActiveUnit();
+            Unit selectedUnit = getFreeColClient().getMapViewer().getActiveUnit();
             Tile tile = selectedUnit.getTile();
             return selectedUnit.checkSetState(Unit.UnitState.IMPROVING)
                 && improvement.isTileAllowed(tile)
@@ -72,7 +72,7 @@ public class ImprovementAction extends UnitAction {
      */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController()
-            .changeWorkImprovementType(getFreeColClient().getGUI().getActiveUnit(),
+            .changeWorkImprovementType(getFreeColClient().getMapViewer().getActiveUnit(),
                                        improvement);
         getFreeColClient().getInGameController().nextActiveUnit();
     }

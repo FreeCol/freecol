@@ -292,12 +292,12 @@ public final class ConnectController {
                         if (activeUnitId != null) {
                             freeColClient.setActiveUnit(activeUnitId);
                         } else {
-                            freeColClient.getGUI().setSelectedTile(entryTile, false);
+                            freeColClient.getMapViewer().setSelectedTile(entryTile, false);
                         }
                     } else {
-                        freeColClient.getGUI().setSelectedTile(entryTile, false);
+                        freeColClient.getMapViewer().setSelectedTile(entryTile, false);
                     }
-                    freeColClient.getGUI().setSelectedTile(thisPlayer
+                    freeColClient.getMapViewer().setSelectedTile(thisPlayer
                         .getEntryLocation().getTile(), false);
                 }
             } else if (in.getLocalName().equals("error")) {

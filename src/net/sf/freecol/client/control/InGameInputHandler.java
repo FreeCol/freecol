@@ -33,7 +33,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
@@ -267,7 +267,7 @@ public final class InGameInputHandler extends InputHandler {
                     player.divertModelMessages(fcgo, divert);
                 }
                 // Deselect the object if it is the current active unit.
-                GUI gui = getFreeColClient().getCanvas().getGUI();
+                MapViewer gui = getFreeColClient().getCanvas().getGUI();
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
@@ -1580,7 +1580,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            GUI gui = canvas.getGUI();
+            MapViewer gui = canvas.getGUI();
             if (focus || !gui.onScreen(sourceTile)) {
                 gui.setFocusImmediately(sourceTile);
             }
@@ -1634,7 +1634,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            GUI gui = canvas.getGUI();
+            MapViewer gui = canvas.getGUI();
             if (focus || !gui.onScreen(unit.getTile())) {
                 gui.setFocusImmediately(unit.getTile());
             }

@@ -23,7 +23,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -53,7 +53,7 @@ public class GotoTileAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getFreeColClient().getGUI().getActiveUnit().getTile() != null;
+            && getFreeColClient().getMapViewer().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -61,26 +61,26 @@ public class GotoTileAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        GUI gui = getFreeColClient().getGUI();
-        Unit unit = gui.getActiveUnit();
+        MapViewer mapViewer = getFreeColClient().getMapViewer();
+        Unit unit = mapViewer.getActiveUnit();
 
         // Action should be disabled if there is no active unit, but make sure
         if (unit != null) {
             // Enter "goto mode" if not already activated; otherwise cancel it
-            if (gui.isGotoStarted()) {
-                gui.stopGoto();
+            if (mapViewer.isGotoStarted()) {
+                mapViewer.stopGoto();
             } else {
-                gui.startGoto();
+                mapViewer.startGoto();
 
                 // Draw the path to the current mouse position, if the
                 // mouse is over the screen; see also
                 // CanvaseMouseMotionListener
                 Point pt = getFreeColClient().getCanvas().getMousePosition();
                 if (pt != null) {
-                    Tile tile = gui.convertToMapTile(pt.x, pt.y);
+                    Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
                     if (tile != null && unit.getTile() != tile) {
                         PathNode dragPath = unit.findPath(tile);
-                        gui.setGotoPath(dragPath);
+                        mapViewer.setGotoPath(dragPath);
                     }
                 }
             }

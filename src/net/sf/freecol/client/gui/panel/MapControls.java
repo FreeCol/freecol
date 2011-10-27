@@ -32,7 +32,7 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
@@ -268,15 +268,15 @@ public final class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
-        GUI gui = freeColClient.getGUI();
-        int viewMode = gui.getViewMode().getView();
+        MapViewer mapViewer = freeColClient.getMapViewer();
+        int viewMode = mapViewer.getViewMode().getView();
         switch (viewMode) {
         case ViewMode.MOVE_UNITS_MODE:
-            infoPanel.update(gui.getActiveUnit());
+            infoPanel.update(mapViewer.getActiveUnit());
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            if (gui.getSelectedTile() != null) {
-                Tile selectedTile = gui.getSelectedTile();
+            if (mapViewer.getSelectedTile() != null) {
+                Tile selectedTile = mapViewer.getSelectedTile();
                 if (infoPanel.getTile() != selectedTile) {
                     infoPanel.update(selectedTile);
                 }

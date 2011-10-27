@@ -54,7 +54,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     private final Canvas canvas;
 
-    private final GUI gui;
+    private final MapViewer gui;
 
     private ScrollThread scrollThread;
 
@@ -71,7 +71,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(Canvas canvas, GUI g) {
+    public CanvasMapEditorMouseListener(Canvas canvas, MapViewer g) {
         this.canvas = canvas;
         gui = g;
         scrollThread = null;
@@ -392,7 +392,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      */
     private class ScrollThread extends Thread {
 
-        private final GUI gui;
+        private final MapViewer gui;
 
         private Direction direction;
 
@@ -404,7 +404,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
          *
          * @param g The GUI that holds information such as screen resolution.
          */
-        public ScrollThread(GUI g) {
+        public ScrollThread(MapViewer g) {
             super(FreeCol.CLIENT_THREAD+"Mouse scroller");
             gui = g;
             cont = true;

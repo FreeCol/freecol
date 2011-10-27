@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -54,9 +54,9 @@ public class LoadAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            GUI gui = getFreeColClient().getGUI();
-            if (gui != null) {
-                Unit unit = getFreeColClient().getGUI().getActiveUnit();
+            MapViewer mapViewer = getFreeColClient().getMapViewer();
+            if (mapViewer != null) {
+                Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
                 return (unit != null && unit.isCarrier()
                         && unit.getGoodsCount() > 0
                         && unit.getColony() != null);
@@ -70,7 +70,7 @@ public class LoadAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
         if (unit != null) {
             Colony colony = unit.getColony();
             if (colony != null) {

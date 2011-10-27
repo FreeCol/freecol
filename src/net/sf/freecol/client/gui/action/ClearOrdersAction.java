@@ -45,6 +45,6 @@ public class ClearOrdersAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().clearOrders(getFreeColClient().getGUI().getActiveUnit());
+        getFreeColClient().getInGameController().clearOrders(getFreeColClient().getMapViewer().getActiveUnit());
     }
 }

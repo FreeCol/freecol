@@ -83,7 +83,7 @@ public final class TilePopup extends JPopupMenu {
 
     private final Canvas canvas;
     private final FreeColClient freeColClient;
-    private final GUI gui;
+    private final MapViewer gui;
 
     private boolean hasAnItem = false;
 
@@ -97,7 +97,7 @@ public final class TilePopup extends JPopupMenu {
      * @param gui An object with methods used for making the popup.
      */
     public TilePopup(final Tile tile, final FreeColClient freeColClient,
-                     final Canvas canvas, final GUI gui) {
+                     final Canvas canvas, final MapViewer gui) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));

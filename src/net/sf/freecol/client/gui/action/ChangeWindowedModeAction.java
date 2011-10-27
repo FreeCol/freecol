@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -30,6 +31,7 @@ import net.sf.freecol.client.FreeColClient;
 public class ChangeWindowedModeAction extends SelectableAction {
 
     public static final String id = "changeWindowedModeAction";
+    private GUI guiFacade;
 
 
     /**
@@ -39,6 +41,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     ChangeWindowedModeAction(FreeColClient freeColClient) {
         super(freeColClient, id, "NO_ID");
+        guiFacade = freeColClient.getGUI();
     }
 
     /**
@@ -46,7 +49,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public void update() {
-        selected = !getFreeColClient().isWindowed();
+        selected = !guiFacade.isWindowed();
     }
 
     /**
@@ -54,7 +57,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
-        return !getFreeColClient().isWindowed();
+        return !guiFacade.isWindowed();
     }
 
     /**
@@ -64,6 +67,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().changeWindowedMode(!getFreeColClient().isWindowed());
+        guiFacade.changeWindowedMode(!guiFacade.isWindowed());
     }
 }

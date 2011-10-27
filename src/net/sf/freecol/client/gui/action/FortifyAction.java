@@ -51,7 +51,7 @@ public class FortifyAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getFreeColClient().getGUI().getActiveUnit()
+            && getFreeColClient().getMapViewer().getActiveUnit()
             .checkSetState(Unit.UnitState.FORTIFYING);
     }
 
@@ -62,7 +62,7 @@ public class FortifyAction extends UnitAction {
      */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController()
-            .changeState(getFreeColClient().getGUI().getActiveUnit(),
+            .changeState(getFreeColClient().getMapViewer().getActiveUnit(),
                 Unit.UnitState.FORTIFYING);
     }
 }

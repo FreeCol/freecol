@@ -47,7 +47,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
     private final Canvas canvas;
 
-    private final GUI gui;
+    private final MapViewer gui;
 
     private final Map map;
 
@@ -67,7 +67,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param m The Map that is currently being drawn on the Canvas (by the
      *            GUI).
      */
-    public CanvasMouseMotionListener(Canvas canvas, GUI g, Map m) {
+    public CanvasMouseMotionListener(Canvas canvas, MapViewer g, Map m) {
         this.canvas = canvas;
         gui = g;
         map = m;
@@ -221,7 +221,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         private final Map map;
 
-        private final GUI gui;
+        private final MapViewer gui;
 
         private Direction direction;
 
@@ -234,7 +234,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
          * @param m The Map that needs to be scrolled.
          * @param g The GUI that holds information such as screen resolution.
          */
-        public ScrollThread(Map m, GUI g) {
+        public ScrollThread(Map m, MapViewer g) {
             super(FreeCol.CLIENT_THREAD+"Mouse scroller");
             map = m;
             gui = g;

@@ -25,7 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
@@ -63,7 +63,7 @@ public final class UnitImageAnimation {
      * Do the animation.
      */
     public void animate() {
-        final GUI gui = canvas.getGUI();
+        final MapViewer gui = canvas.getGUI();
         if (gui.getTilePosition(unit.getTile()) == null) {
             return;
         }

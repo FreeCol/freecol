@@ -61,7 +61,7 @@ public class GotoAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
         if (unit != null) {
             getFreeColClient().getInGameController().selectDestination(unit);
         }

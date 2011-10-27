@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -69,7 +69,7 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final GUI gui = canvas.getGUI();
+        final MapViewer gui = canvas.getGUI();
         final int movementSpeed = Animations.getAnimationSpeed(canvas, unit);
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);

@@ -51,7 +51,7 @@ public class UnloadAction extends MapboardAction {
      *
      * @param freeColClient The main controller object for the client.
      * @param unit an <code>Unit</code> value
-     * @see net.sf.freecol.client.gui.GUI#getActiveUnit()
+     * @see net.sf.freecol.client.gui.MapViewer#getActiveUnit()
      */
     public UnloadAction(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, id);
@@ -60,8 +60,8 @@ public class UnloadAction extends MapboardAction {
 
     private Unit getUnit() {
         return (unit != null) ? unit
-            : (getFreeColClient().getGUI() == null) ? null
-            : getFreeColClient().getGUI().getActiveUnit();
+            : (getFreeColClient().getMapViewer() == null) ? null
+            : getFreeColClient().getMapViewer().getActiveUnit();
     }
 
     /**

@@ -65,7 +65,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -713,7 +713,7 @@ public final class ColonyPanel extends FreeColPanel
                     getController().nextActiveUnit();
                 }
             }
-            getFreeColClient().getGUI().restartBlinking();
+            getFreeColClient().getMapViewer().restartBlinking();
         }
     }
 
@@ -1357,7 +1357,7 @@ public final class ColonyPanel extends FreeColPanel
 
         @Override
         public void paintComponent(Graphics g) {
-            GUI colonyTileGUI = getCanvas().getColonyTileGUI();
+            MapViewer colonyTileGUI = getCanvas().getColonyTileGUI();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());

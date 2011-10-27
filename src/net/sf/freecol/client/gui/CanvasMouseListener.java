@@ -44,7 +44,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private final Canvas canvas;
 
-    private final GUI gui;
+    private final MapViewer gui;
 
     private final int doubleClickDelay = 200; // Milliseconds
     private Timer doubleClickTimer = new Timer(doubleClickDelay,this);
@@ -57,7 +57,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      */
-    public CanvasMouseListener(Canvas canvas, GUI g) {
+    public CanvasMouseListener(Canvas canvas, MapViewer g) {
         this.canvas = canvas;
         gui = g;
     }

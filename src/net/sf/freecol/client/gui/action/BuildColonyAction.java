@@ -53,7 +53,7 @@ public class BuildColonyAction extends UnitAction {
         if (!super.shouldBeEnabled()) {
             return false;
         }
-        Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
+        Unit selectedOne = getFreeColClient().getMapViewer().getActiveUnit();
         return selectedOne != null && selectedOne.getTile() != null
             && (selectedOne.canBuildColony()
                 || (selectedOne.getTile().getColony() != null

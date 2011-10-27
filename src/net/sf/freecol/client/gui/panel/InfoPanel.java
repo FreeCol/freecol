@@ -35,7 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.action.EndTurnAction;
@@ -111,10 +111,10 @@ public final class InfoPanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
            @Override
            public void mousePressed(MouseEvent e) {
-              GUI gui = getFreeColClient().getGUI();
-              Unit activeUnit = gui.getActiveUnit();
+              MapViewer mapViewer = getFreeColClient().getMapViewer();
+              Unit activeUnit = mapViewer.getActiveUnit();
               if (activeUnit != null && activeUnit.getTile() != null) {
-                  gui.setFocus(activeUnit.getTile());
+                  mapViewer.setFocus(activeUnit.getTile());
               }
           }
             });
@@ -199,7 +199,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = getFreeColClient().getGUI().getViewMode().getView();
+        int viewMode = getFreeColClient().getMapViewer().getViewMode().getView();
         if (!getFreeColClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);
@@ -275,7 +275,7 @@ public final class InfoPanel extends FreeColPanel {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                getFreeColClient().getGUI()
+                getFreeColClient().getMapViewer()
                     .displayTerrain(image.createGraphics(), tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
@@ -435,7 +435,7 @@ public final class InfoPanel extends FreeColPanel {
             int width = getFontMetrics(getFont()).stringWidth(labelString);
             if (width > 150 ) {
                 getCanvas().getGUI();
-                int index = GUI.getBreakingPoint(labelString);
+                int index = MapViewer.getBreakingPoint(labelString);
                 if (index > 0) {
                     add(new JLabel(labelString.substring(0, index)));
                     add(new JLabel(labelString.substring(index + 1)));

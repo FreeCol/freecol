@@ -32,16 +32,16 @@ public class ViewMode {
 
     public static final int VIEW_TERRAIN_MODE = 1;
 
-    private static final Logger logger = Logger.getLogger(GUI.class.getName());
+    private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
 
     private int currentMode;
 
     private Unit savedActiveUnit;
 
-    private GUI gui;
+    private MapViewer gui;
 
 
-    public ViewMode(GUI gui) {
+    public ViewMode(MapViewer gui) {
         this.gui = gui;
     }
 

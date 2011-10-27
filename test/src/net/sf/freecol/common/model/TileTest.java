@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -560,12 +560,12 @@ public class TileTest extends FreeColTestCase {
     }
 
     public void testZIndex() {
-        assertTrue(GUI.OVERLAY_INDEX < GUI.FOREST_INDEX);
-        assertTrue(GUI.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
+        assertTrue(MapViewer.OVERLAY_INDEX < MapViewer.FOREST_INDEX);
+        assertTrue(MapViewer.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
         assertTrue(TileItem.RESOURCE_ZINDEX < TileItem.RUMOUR_ZINDEX);
         assertTrue(plow.getZIndex() < river.getZIndex());
         assertTrue(river.getZIndex() < road.getZIndex());
-        assertTrue(GUI.FOREST_INDEX < road.getZIndex());
+        assertTrue(MapViewer.FOREST_INDEX < road.getZIndex());
         assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
     }
 

@@ -43,7 +43,7 @@ public abstract class UnitAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null;
+        return super.shouldBeEnabled() && getFreeColClient().getMapViewer().getActiveUnit() != null;
     }
 
 }

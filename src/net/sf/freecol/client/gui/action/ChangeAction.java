@@ -26,7 +26,7 @@ import java.util.Iterator;
 
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -65,9 +65,9 @@ public class ChangeAction extends UnitAction {
     public void update() {
         super.update();
 
-        GUI gui = getFreeColClient().getGUI();
-        if (gui != null) {
-            Unit unit = gui.getActiveUnit();
+        MapViewer mapViewer = getFreeColClient().getMapViewer();
+        if (mapViewer != null) {
+            Unit unit = mapViewer.getActiveUnit();
             if (unit != null && unit.getTile() != null) {
                 if (unit.getColony() != null) {
                     putValue(NAME, Messages.message("changeAction.enterColony.name"));
@@ -88,7 +88,7 @@ public class ChangeAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getFreeColClient().getGUI().getActiveUnit().getTile() != null;
+            && getFreeColClient().getMapViewer().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -96,13 +96,13 @@ public class ChangeAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
             getFreeColClient().getCanvas().showColonyPanel(tile.getColony());
         } else if (unit.isOnCarrier()) {
-            getFreeColClient().getGUI().setActiveUnit(((Unit) unit.getLocation()));
+            getFreeColClient().getMapViewer().setActiveUnit(((Unit) unit.getLocation()));
         } else {
             Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
@@ -113,7 +113,7 @@ public class ChangeAction extends UnitAction {
                 } else if (activeUnitFound
                     && u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    getFreeColClient().getGUI().setActiveUnit(u);
+                    getFreeColClient().getMapViewer().setActiveUnit(u);
                     return;
                 }
             }
@@ -124,7 +124,7 @@ public class ChangeAction extends UnitAction {
                     return;
                 } else if (u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    getFreeColClient().getGUI().setActiveUnit(u);
+                    getFreeColClient().getMapViewer().setActiveUnit(u);
                     return;
                 }
             }

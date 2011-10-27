@@ -34,7 +34,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
@@ -105,7 +105,7 @@ public final class MapEditorController {
             freeColClient.playSound(null);
 
             final Canvas canvas = freeColClient.getCanvas();
-            final GUI gui = freeColClient.getGUI();
+            final MapViewer gui = freeColClient.getMapViewer();
 
             canvas.closeMainPanel();
             canvas.closeMenus();
@@ -189,7 +189,7 @@ public final class MapEditorController {
                 game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
             }
             mapGenerator.createMap(game);
-            freeColClient.getGUI().setFocus(game.getMap().getTile(1,1));
+            freeColClient.getMapViewer().setFocus(game.getMap().getTile(1,1));
             freeColClient.getActionManager().update();
             canvas.refresh();
         } catch (FreeColException e) {
@@ -315,7 +315,7 @@ public final class MapEditorController {
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();
-                            freeColClient.getGUI().setFocus(freeColClient.getGame().getMap().getTile(1,1));
+                            freeColClient.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(1,1));
                             freeColClient.getActionManager().update();
                             canvas.refresh();
                         }
