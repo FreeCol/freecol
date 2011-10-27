@@ -44,6 +44,13 @@ public class GUI {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
+    
+
+    /**
+     * The space not being used in windowed mode.
+     */
+    private static final int DEFAULT_WINDOW_SPACE = 100;
+    
 
     private FreeColClient freeColClient;
 
@@ -334,5 +341,29 @@ public class GUI {
         }
     }
 
+    public void quit() {
+        if (!isWindowed()) {
+            try {
+                gd.setFullScreenWindow(null);
+            } catch(Exception e) {
+                // this can fail, but who cares?
+                // we are quitting anyway
+                System.exit(1);
+            }
+        }
+    }
+    
+
+    public Dimension determineWindowSize() {
+        
+        Rectangle bounds = GraphicsEnvironment
+            .getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
+                             bounds.height - DEFAULT_WINDOW_SPACE);
+        logger.info("Window size is " + size.getWidth()
+            + " x " + size.getHeight());
+        return size;
+    }
+    
     
 }

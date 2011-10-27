@@ -21,9 +21,6 @@ package net.sf.freecol.client;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,10 +69,6 @@ public final class FreeColClient {
 
     private static FreeColClient instance;
 
-    /**
-     * The space not being used in windowed mode.
-     */
-    private static final int DEFAULT_WINDOW_SPACE = 100;
 
     // Control:
     private ConnectController connectController;
@@ -193,12 +186,7 @@ public final class FreeColClient {
         // Determine the window size.
         setWindowed(size != null);
         if (size != null && size.width < 0) {
-            Rectangle bounds = GraphicsEnvironment
-                .getLocalGraphicsEnvironment().getMaximumWindowBounds();
-            size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
-                                 bounds.height - DEFAULT_WINDOW_SPACE);
-            logger.info("Window size is " + size.getWidth()
-                + " x " + size.getHeight());
+            size = gui.determineWindowSize();
         }
 
         // Control
@@ -278,6 +266,7 @@ public final class FreeColClient {
         if (instance == null) instance = this;
     }
 
+
     /**
      * Gets the quasi-singleton instance.
      */
@@ -340,18 +329,6 @@ public final class FreeColClient {
         gui.updateMenuBar();
     }
 
-  
-
-    /**
-     * Checks if the application is displayed in a window.
-     * @return <code>true</code> if the application is currently
-     *      displayed in a frame, and <code>false</code> if
-     *      currently in fullscreen mode.
-     * @see #changeWindowedMode
-     */
-    public boolean isWindowed() {
-        return gui.isWindowed();
-    }
 
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;
@@ -562,15 +539,7 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().quitGame(isSingleplayer());
         exitActions();
-        if (!isWindowed()) {
-            try {
-                getGd().setFullScreenWindow(null);
-            } catch(Exception e) {
-                // this can fail, but who cares?
-                // we are quitting anyway
-                System.exit(1);
-            }
-        }
+        gui.quit();
         System.exit(0);
     }
 
@@ -807,9 +776,6 @@ public final class FreeColClient {
         askServer().startSkipping();
     }
 
-    public GraphicsDevice getGd() {
-        return gui.getGd();
-    }
 
     public void setWindowed(boolean windowed) {
         gui.setWindowed(windowed);
