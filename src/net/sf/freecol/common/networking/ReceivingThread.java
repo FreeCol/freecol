@@ -32,7 +32,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Element;
