@@ -63,7 +63,7 @@ public final class UnitImageAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer gui = canvas.getGUI();
+        final MapViewer gui = canvas.getMapViewer();
         if (gui.getTilePosition(unit.getTile()) == null) {
             return;
         }
@@ -94,6 +94,6 @@ public final class UnitImageAnimation {
     }
     
     protected Rectangle getDirtyAnimationArea() {
-        return canvas.getGUI().getTileBounds(currentLocation.getTile());
+        return canvas.getMapViewer().getTileBounds(currentLocation.getTile());
     }
 }

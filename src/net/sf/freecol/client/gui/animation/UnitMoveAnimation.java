@@ -69,7 +69,7 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer gui = canvas.getGUI();
+        final MapViewer gui = canvas.getMapViewer();
         final int movementSpeed = Animations.getAnimationSpeed(canvas, unit);
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);

@@ -706,10 +706,10 @@ public final class ColonyPanel extends FreeColPanel
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
-                Unit activeUnit = canvas.getGUI().getActiveUnit();
+                Unit activeUnit = canvas.getMapViewer().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                     || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    canvas.getGUI().setActiveUnit(null);
+                    canvas.getMapViewer().setActiveUnit(null);
                     getController().nextActiveUnit();
                 }
             }

@@ -267,7 +267,7 @@ public final class InGameInputHandler extends InputHandler {
                     player.divertModelMessages(fcgo, divert);
                 }
                 // Deselect the object if it is the current active unit.
-                MapViewer gui = getFreeColClient().getCanvas().getGUI();
+                MapViewer gui = getFreeColClient().getCanvas().getMapViewer();
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
@@ -1580,7 +1580,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer gui = canvas.getGUI();
+            MapViewer gui = canvas.getMapViewer();
             if (focus || !gui.onScreen(sourceTile)) {
                 gui.setFocusImmediately(sourceTile);
             }
@@ -1634,7 +1634,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer gui = canvas.getGUI();
+            MapViewer gui = canvas.getMapViewer();
             if (focus || !gui.onScreen(unit.getTile())) {
                 gui.setFocusImmediately(unit.getTile());
             }

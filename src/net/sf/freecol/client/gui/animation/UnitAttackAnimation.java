@@ -64,7 +64,7 @@ final class UnitAttackAnimation {
      */
     private SimpleZippedAnimation getAnimation(Canvas canvas, Unit unit,
                                                Direction direction) {
-        float scale = canvas.getGUI().getMapScale();
+        float scale = canvas.getMapViewer().getMapScale();
         String roleStr = (unit.getRole() == Role.DEFAULT) ? ""
             : "." + unit.getRole().getId();
         String startStr = unit.getType().getId() + roleStr + ".attack.";

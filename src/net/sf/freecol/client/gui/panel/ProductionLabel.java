@@ -472,7 +472,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                     number = number + "/" + String.valueOf(maximumProduction);
                 }
                 Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-                stringImage = getCanvas().getGUI().createStringImage(getCanvas().getGraphics(),
+                stringImage = getCanvas().getMapViewer().createStringImage(getCanvas().getGraphics(),
                                                                      number, getForeground(), font);
             }
         }

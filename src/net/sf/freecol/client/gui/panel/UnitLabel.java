@@ -268,7 +268,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                    getParent() instanceof EuropePanel.InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
-            g.drawImage(parent.getGUI().getOccupationIndicatorImage(g, unit), 0, 0, null);
+            g.drawImage(parent.getMapViewer().getOccupationIndicatorImage(g, unit), 0, 0, null);
 
             if (unit.isUnderRepair()) {
                 String underRepair = Messages.message(StringTemplate.template("underRepair")
@@ -276,9 +276,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = ResourceManager.getFont("NormalFont", 14f);
-                Image repairImage1 = parent.getGUI()
+                Image repairImage1 = parent.getMapViewer()
                     .createStringImage((Graphics2D)g, underRepair1, Color.RED, font);
-                Image repairImage2 = parent.getGUI()
+                Image repairImage2 = parent.getMapViewer()
                     .createStringImage((Graphics2D)g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
@@ -344,7 +344,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             break;
         case ACTIVATE_UNIT:
             inGameController.changeState(unit, Unit.UnitState.ACTIVE);
-            parent.getGUI().setActiveUnit(unit);
+            parent.getMapViewer().setActiveUnit(unit);
             break;
         case FORTIFY:
             inGameController.changeState(unit, Unit.UnitState.FORTIFYING);

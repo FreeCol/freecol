@@ -3764,7 +3764,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void waitActiveUnit() {
         Canvas canvas = freeColClient.getCanvas();
-        MapViewer gui = canvas.getGUI();
+        MapViewer gui = canvas.getMapViewer();
         gui.setActiveUnit(null);
         nextActiveUnit();
     }
@@ -3811,7 +3811,7 @@ public final class InGameController implements NetworkConstants {
 
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
-        MapViewer gui = canvas.getGUI();
+        MapViewer gui = canvas.getMapViewer();
         Unit unit = gui.getActiveUnit();
         if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {

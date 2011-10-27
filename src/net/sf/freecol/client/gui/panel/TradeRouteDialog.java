@@ -195,7 +195,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
-        Unit unit = getCanvas().getGUI().getActiveUnit();
+        Unit unit = getCanvas().getMapViewer().getActiveUnit();
         TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
         if (unit != null && route != null) {
             switch (action) {

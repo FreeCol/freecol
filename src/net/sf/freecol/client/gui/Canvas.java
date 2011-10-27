@@ -667,7 +667,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @return The <code>GUI</code>.
      */
-    public MapViewer getGUI() {
+    public MapViewer getMapViewer() {
         return gui;
     }
 
@@ -962,7 +962,7 @@ public final class Canvas extends JDesktopPane {
 
         // change to default view mode
         // Must be done before removing jMenuBar to prevent exception (crash)
-        getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
+        getMapViewer().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         for (Component c : getComponents()) {
             remove(c, false);
@@ -2226,7 +2226,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showTilePopup(Tile tile, int x, int y) {
         if (tile != null) {
-            TilePopup tp = new TilePopup(tile, freeColClient, this, getGUI());
+            TilePopup tp = new TilePopup(tile, freeColClient, this, getMapViewer());
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
