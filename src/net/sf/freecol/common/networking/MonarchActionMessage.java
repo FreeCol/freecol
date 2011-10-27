@@ -46,7 +46,7 @@ public class MonarchActionMessage extends DOMMessage {
     private String tax;
 
     // Is the offer accepted?  Valid in replies from client.
-    private boolean accepted;
+    private String resultString;
 
 
     /**
@@ -58,7 +58,7 @@ public class MonarchActionMessage extends DOMMessage {
         this.action = action;
         this.template = template;
         this.tax = null;
-        this.accepted = false;
+        this.resultString = null;
     }
 
     /**
@@ -72,9 +72,7 @@ public class MonarchActionMessage extends DOMMessage {
         this.action = Enum.valueOf(MonarchAction.class,
                                    element.getAttribute("action"));
         this.tax = element.getAttribute("tax");
-        this.accepted = (element.hasAttribute("accepted")) 
-            ? Boolean.valueOf(element.getAttribute("accepted")).booleanValue()
-            : false;
+        this.resultString = element.getAttribute("result");
         NodeList children = element.getChildNodes();
         if (children.getLength() == 1) {
             this.template = StringTemplate.label(" ");
@@ -125,40 +123,35 @@ public class MonarchActionMessage extends DOMMessage {
     }
 
     /**
-     * Sets the acceptance state.
+     * Gets the result.
      *
-     * @param accept The new acceptance state.
+     * @return The result.
      */
-    public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+    public boolean getResult() {
+        return Boolean.valueOf(resultString);
+    }
+
+    /**
+     * Sets the result.
+     *
+     * @param accept The new result.
+     */
+    public void setResult(boolean accepted) {
+        this.resultString = Boolean.toString(accepted);
     }
 
     /**
      * Handles a "monarchAction"-message.
-     * These are normally initiated by the server when the monarch takes
-     * action, but certain messages need a reply from the player.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return An element handling the valid replies, or an error.
+     * @return Null.  This should not be called.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = player.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
-        switch (action) {
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            return server.getInGameController()
-                .monarchRaiseTax(serverPlayer, accepted);
-        case OFFER_MERCENARIES:
-            return server.getInGameController()
-                .monarchOfferMercenaries(serverPlayer, accepted);
-        default:
-            return DOMMessage.clientError("Invalid reply to monarch action: "
-                + action);
-        }
+        return null;
     }
 
     /**
@@ -173,7 +166,9 @@ public class MonarchActionMessage extends DOMMessage {
         if (tax != null) {
             result.setAttribute("tax", tax);
         }
-        result.setAttribute("accepted", Boolean.toString(accepted));
+        if (resultString != null) {
+            result.setAttribute("result", resultString);
+        }
         result.appendChild(template.toXMLElement(null, doc));
         return result;
     }

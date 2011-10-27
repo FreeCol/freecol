@@ -3287,6 +3287,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
     }
 
+    /**
+     * Adds mercenaries that the player has accepted.
+     *
+     * @param mercs A list of mercenaries.
+     * @param price The price to be charged for them.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csAddMercenaries(List<AbstractUnit> mercs, int price,
+                                 ChangeSet cs) {
+        if (checkGold(price)) {
+            createUnits(mercs);
+            cs.add(See.only(this), getEurope());
+            modifyGold(-price);
+            cs.addPartial(See.only(this), this, "gold");
+        } else {
+            getMonarch().setDispleasure(true);
+            cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
+                new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
+                    StringTemplate.template("model.monarch.action.DISPLEASURE")));
+        }
+    }
 
     /**
      * Check for a special contact panel for a nation.  If not found,

@@ -328,6 +328,27 @@ public abstract class AIPlayer extends AIObject {
     public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
 
     /**
+     * Decides to accept a tax raise or not.
+     * Overridden by the European player.
+     *
+     * @param tax The tax raise.
+     * @return True if the raise is accepted.
+     */
+    public boolean acceptTax(int tax) {
+        return false;
+    }
+
+    /**
+     * Decides to accept an offer of mercenaries or not.
+     * Overridden by the European player.
+     *
+     * @return True if the mercenaries are accepted.
+     */
+    public boolean acceptMercenaries() {
+        return false;
+    }
+
+    /**
      * Determines the stances towards each player.
      * That is: should we declare war?
      * TODO: something better, that includes peacemaking.

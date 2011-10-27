@@ -46,6 +46,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
@@ -265,27 +266,22 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      *
      */
     private Element monarchAction(DummyConnection connection, Element element) {
-        MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
-        boolean accept = false;
+        Game game = aiMain.getGame();
+        MonarchActionMessage message = new MonarchActionMessage(game, element);
+        MonarchAction action = message.getAction();
+        boolean accept;
+
         switch (action) {
-        case RAISE_TAX_WAR:
-        case RAISE_TAX_ACT:
-            int tax;
-            try {
-                tax = Integer.parseInt(element.getAttribute("amount"));
-                accept = ((EuropeanAIPlayer) getAIPlayer()).acceptTax(tax);
-            } catch (Exception e) {
-                tax = -1;
-                accept = false;
-            }
-            element.setAttribute("accepted", String.valueOf(accept));
+        case RAISE_TAX_WAR: case RAISE_TAX_ACT:
+            accept = getAIPlayer().acceptTax(message.getTax());
+            message.setResult(accept);
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
 
         case OFFER_MERCENARIES:
-            accept = ((EuropeanAIPlayer) getAIPlayer()).acceptMercenaryOffer();
-            element.setAttribute("accepted", String.valueOf(accept));
+            accept = getAIPlayer().acceptMercenaries();
+            message.setResult(accept);
             logger.finest("AI player monarch action " + action
                           + " = " + accept);
             break;
@@ -295,7 +291,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             return null;
         }
 
-        return element;
+        return message.toXMLElement();
     }
 
     /**

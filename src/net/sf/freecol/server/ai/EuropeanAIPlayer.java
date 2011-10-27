@@ -425,19 +425,15 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Decides whether to accept a mercenary offer, or not.
+     * Decides to accept an offer of mercenaries or not.
+     * TODO: make a better choice.
      *
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         offer and <code>false</code> otherwise.
+     * @return True if the mercenaries are accepted.
      */
-    public boolean acceptMercenaryOffer() {
-        // TODO: make a better choice
-        if (strategy == AIStrategy.CONQUEST || getPlayer().isAtWar()) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean acceptMercenaries() {
+        return strategy == AIStrategy.CONQUEST || getPlayer().isAtWar();
     }
+
 
     public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
         boolean validOffer = true;

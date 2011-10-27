@@ -877,23 +877,20 @@ public final class InGameInputHandler extends InputHandler {
         MonarchAction action = message.getAction();
         boolean accept = new ShowMonarchPanelSwingTask(action,
             message.getTemplate()).confirm();
+        message.setResult(accept);
 
-        switch (action) { // Some actions require an answer.
-        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            freeColClient.askServer().answerMonarch(action, accept);
-            if (!accept) { // Flush goods party message
-                freeColClient.getInGameController().nextModelMessage();
-            }
-            break;
-        case OFFER_MERCENARIES:
-            freeColClient.askServer().answerMonarch(action, accept);
+        Element reply; // Some actions require an answer.
+        switch (action) {
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR: case OFFER_MERCENARIES:
+            reply = message.toXMLElement();
             break;
         default:
+            reply = null;
             break;
         }
 
         new UpdateMenuBarSwingTask().invokeLater();
-        return null;
+        return reply;
     }
 
     /**
@@ -995,7 +992,9 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     public Element addObject(Element element) {
+        FreeColClient fcc = getFreeColClient();
         Game game = getGame();
+        boolean displayMessage = false;
         Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -1027,12 +1026,17 @@ public final class InGameInputHandler extends InputHandler {
                 ModelMessage m = new ModelMessage();
                 m.readFromXMLElement(e);
                 player.addModelMessage(m);
+                displayMessage = true;
             } else if (tag == TradeRoute.getXMLElementTagName()) {
                 TradeRoute t = new TradeRoute(game, e);
                 player.getTradeRoutes().add(t);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }
+        }
+        if (displayMessage
+            && fcc.getMyPlayer().equals(game.getCurrentPlayer())) {
+            fcc.getInGameController().nextModelMessage();
         }
         return null;
     }

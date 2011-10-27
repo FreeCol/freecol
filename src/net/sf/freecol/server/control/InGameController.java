@@ -116,14 +116,12 @@ import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
-import net.sf.freecol.server.model.MercenariesSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.model.TaxSession;
 import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
 
@@ -154,13 +152,6 @@ public final class InGameController extends Controller {
     private int debugOnlyAITurns = 0;
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
-
-    // A service to run the futures.
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-
-    // Futures that need to be cleaned up at end of the current player turn.
-    private final List<Future<DOMMessage>> outstandingFutures
-        = new ArrayList<Future<DOMMessage>>();
 
  
     /**
@@ -429,6 +420,9 @@ public final class InGameController extends Controller {
         }
     };
 
+    // A service to run the futures.
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
     /**
      * Asks a question of a player in a Future.
      *
@@ -439,12 +433,58 @@ public final class InGameController extends Controller {
      * @return A future encapsulating the result.
      */
     private Future<DOMMessage> askFuture(ServerPlayer serverPlayer,
-                                         DOMMessage message,
+                                         DOMMessage question,
                                          DOMMessageHandler handler) {
         Callable<DOMMessage> callable
             = new DOMMessageCallable(serverPlayer.getConnection(), getGame(),
-                                     message, handler);
+                                     question, handler);
         return executor.submit(callable);
+    }
+
+    // A place to stash queries that need to be resolved at some point.
+    private static final List<FutureQuery> outstandingQueries
+        = new ArrayList<FutureQuery>();
+
+    // Trivial way to associate a future with a runnable to resolve it.
+    private class FutureQuery {
+
+        public Future<DOMMessage> future;
+        public Runnable runnable;
+
+        public FutureQuery(Future<DOMMessage> future, Runnable runnable) {
+            this.future = future;
+            this.runnable = runnable;
+            outstandingQueries.add(this);
+        }
+    };
+
+    /**
+     * Resolves and clears any outstanding queries.
+     */
+    public void resolveOutstandingQueries() {
+        FutureQuery fq;
+        while (!outstandingQueries.isEmpty()) {
+            fq = outstandingQueries.remove(0);
+            if (!fq.future.isDone()) {
+                if (fq.runnable != null) fq.runnable.run();
+                fq.future.cancel(true);
+            }
+        }
+    }
+
+    /**
+     * Asks a question that must be answered this turn.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param question The <code>DOMMessage</code> question.
+     * @param handler The <code>DOMMessageHandler</code> handler to process
+     *     the reply with.
+     * @param runnable An optional <code>Runnable</code> to run if the
+     *     question was not answered.
+     */
+    private void askThisTurn(ServerPlayer serverPlayer, DOMMessage message,
+                             DOMMessageHandler handler, Runnable runnable) {
+        new FutureQuery(askFuture(serverPlayer, message, handler), runnable);
     }
 
     /**
@@ -478,7 +518,7 @@ public final class InGameController extends Controller {
         }
         return reply;
     }
-
+        
         
     /**
      * Get a list of all server players, optionally excluding supplied ones.
@@ -669,10 +709,7 @@ public final class InGameController extends Controller {
             }
 
             // Clean up futures from the current player.
-            while (!outstandingFutures.isEmpty()) {
-                Future<DOMMessage> future = outstandingFutures.remove(0);
-                future.cancel(true);
-            }
+            resolveOutstandingQueries();
 
             // Check for new turn
             ChangeSet cs = new ChangeSet();
@@ -740,8 +777,7 @@ public final class InGameController extends Controller {
                 }
             }
             player.csStartTurn(random, cs);
-            Future<DOMMessage> future = nextFoundingFather(player);
-            if (future != null) outstandingFutures.add(future);
+            nextFoundingFather(player);
 
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,
@@ -791,33 +827,33 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
      * @return A <code>Future</code> to encapsulate the query.
      */
-    private Future<DOMMessage> nextFoundingFather(final ServerPlayer serverPlayer) {
-        if (!serverPlayer.canRecruitFoundingFather()) return null;
+    private void nextFoundingFather(final ServerPlayer serverPlayer) {
+        if (!serverPlayer.canRecruitFoundingFather()) return;
         if (serverPlayer.getOfferedFathers().isEmpty()) {
             serverPlayer.setOfferedFathers(serverPlayer
                 .getRandomFoundingFathers(random));
         }
         final List<FoundingFather> ffs = serverPlayer.getOfferedFathers();
-        return (ffs.isEmpty()) ? null
-            : askFuture(serverPlayer, new ChooseFoundingFatherMessage(ffs),
-                new DOMMessageHandler() {
-                    public DOMMessage handle(DOMMessage request) {
-                        ChooseFoundingFatherMessage message
-                            = (ChooseFoundingFatherMessage)request;
-                        FoundingFather ff = message.getResult();
-                        if (ff == null) {
-                            logger.warning("No founding father selected");
-                        } else if (!ffs.contains(ff)) {
-                            logger.warning("Invalid founding father: "
-                                + ff.getId());
-                        } else {
-                            serverPlayer.setCurrentFather(ff);
-                            serverPlayer.clearOfferedFathers();
-                            logger.info("Selected founding father: " + ff);
-                        }
-                        return null;
+        if (ffs.isEmpty()) return;
+        askThisTurn(serverPlayer, new ChooseFoundingFatherMessage(ffs),
+            new DOMMessageHandler() {
+                public DOMMessage handle(DOMMessage request) {
+                    ChooseFoundingFatherMessage message
+                        = (ChooseFoundingFatherMessage)request;
+                    FoundingFather ff = message.getResult();
+                    if (ff == null) {
+                        logger.warning("No founding father selected");
+                    } else if (!ffs.contains(ff)) {
+                        logger.warning("Invalid founding father: "
+                            + ff.getId());
+                    } else {
+                        serverPlayer.setCurrentFather(ff);
+                        serverPlayer.clearOfferedFathers();
+                        logger.info("Selected founding father: " + ff);
                     }
-                });
+                    return null;
+                }
+            }, null);
     }
 
     /**
@@ -896,6 +932,21 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Resolves a tax raise.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> whose tax is rising.
+     * @param taxRaise The amount of tax raise.
+     * @param goods The <code>Goods</code> for a goods party.
+     * @param result Whether the tax was accepted or not.
+     */
+    private void raiseTax(ServerPlayer serverPlayer, int taxRaise, Goods goods,
+                          boolean result) {
+        ChangeSet cs = new ChangeSet();
+        serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
+        sendElement(serverPlayer, cs);
+    }
+
+    /**
      * Performs a monarch action.
      *
      * Note that CHANGE_LATE is used so that these actions follow
@@ -906,20 +957,22 @@ public final class InGameController extends Controller {
      * @param action The monarch action.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csMonarchAction(ServerPlayer serverPlayer,
+    private void csMonarchAction(final ServerPlayer serverPlayer,
                                  MonarchAction action, ChangeSet cs) {
+        final Game game = getGame();
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
         String messageId = "model.monarch.action." + action.toString();
         StringTemplate template;
+        MonarchActionMessage message;
 
         switch (action) {
         case NO_ACTION:
             break;
         case RAISE_TAX_WAR: case RAISE_TAX_ACT:
-            int taxRaise = monarch.raiseTax(random);
-            Goods goods = serverPlayer.getMostValuableGoods();
+            final int taxRaise = monarch.raiseTax(random);
+            final Goods goods = serverPlayer.getMostValuableGoods();
             if (goods == null) {
                 logger.finest("Ignoring tax raise, no goods to boycott.");
                 break;
@@ -934,14 +987,24 @@ public final class InGameController extends Controller {
                 template = template.addAmount("%number%", random.nextInt(6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
-            MonarchActionMessage message
-                = new MonarchActionMessage(action, template);
+            message = new MonarchActionMessage(action, template);
             message.setTax(taxRaise);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                message);
-            TaxSession taxSession = new TaxSession(monarch, serverPlayer);
-            taxSession.setTax(taxRaise);
-            taxSession.setGoods(goods);
+            askThisTurn(serverPlayer, message,
+                new DOMMessageHandler() {
+                    public DOMMessage handle(DOMMessage message) {
+                        boolean result
+                            = (message instanceof MonarchActionMessage)
+                                ? ((MonarchActionMessage)message).getResult()
+                                : false;
+                        raiseTax(serverPlayer, taxRaise, goods, result);
+                        return null;
+                    }
+                },
+                new Runnable() {
+                    public void run() {
+                        raiseTax(serverPlayer, taxRaise, goods, false);
+                    }
+                });
             break;
         case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             int oldTax = serverPlayer.getTax();
@@ -998,79 +1061,36 @@ public final class InGameController extends Controller {
                         abstractUnitTemplate(", ", support))));
             break;
         case OFFER_MERCENARIES:
-            List<AbstractUnit> mercenaries = monarch.getMercenaries(random);
+            final List<AbstractUnit> mercenaries
+                = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
-            int mercPrice = serverPlayer.priceMercenaries(mercenaries);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
-                    StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
-                        .addAmount("%gold%", mercPrice)
-                        .addStringTemplate("%mercenaries%",
-                            abstractUnitTemplate(", ", mercenaries))));
-            MercenariesSession mercenariesSession
-                = new MercenariesSession(monarch, serverPlayer);
-            mercenariesSession.setMercenaries(mercenaries);
-            mercenariesSession.setPrice(mercPrice);
+            final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
+            message = new MonarchActionMessage(MonarchAction.OFFER_MERCENARIES,
+                StringTemplate.template("model.monarch.action.OFFER_MERCENARIES")
+                    .addAmount("%gold%", mercPrice)
+                    .addStringTemplate("%mercenaries%",
+                        abstractUnitTemplate(", ", mercenaries)));
+            askThisTurn(serverPlayer, message,
+                new DOMMessageHandler() {
+                    public DOMMessage handle(DOMMessage message) {
+                        boolean result
+                            = (message instanceof MonarchActionMessage)
+                                ? ((MonarchActionMessage)message).getResult()
+                                : false;
+                        if (result) {
+                            ChangeSet cs = new ChangeSet();
+                            serverPlayer.csAddMercenaries(mercenaries,
+                                                          mercPrice, cs);
+                            sendElement(serverPlayer, cs);
+                        }
+                        return null;
+                    }
+                }, null);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
             break;
         }
-    }
-
-    /**
-     * Handles a response to a tax raise.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> whose tax to raise.
-     * @param accepted Did the player accept the tax raise.
-     * @return An element encapsulating a suitable update.
-     */
-    public Element monarchRaiseTax(ServerPlayer serverPlayer,
-                                   boolean accepted) {
-        TaxSession session = TransactionSession.lookup(TaxSession.class,
-            serverPlayer.getMonarch(), serverPlayer);
-        if (session == null) {
-            return DOMMessage.clientError("Invalid tax reply.");
-        }
-        session.setAccepted(accepted);
-        ChangeSet cs = new ChangeSet();
-        session.complete(cs);
-        return cs.build(serverPlayer);
-    }
-
-    /**
-     * Handles the response to an offer to player of some mercenaries.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to offer to.
-     * @param accepted Whether the offer was accepted or not.
-     * @return An element encapsulating a suitable update.
-     */
-    public Element monarchOfferMercenaries(ServerPlayer serverPlayer,
-                                           boolean accepted) {
-        MercenariesSession session
-            = TransactionSession.lookup(MercenariesSession.class,
-                serverPlayer.getMonarch(), serverPlayer);
-        if (session == null) {
-            return DOMMessage.clientError("Invalid mercenary reply");
-        }
-
-        ChangeSet cs = new ChangeSet();
-        if (accepted) {
-            int price = session.getPrice();
-            if (serverPlayer.checkGold(price)) {
-                serverPlayer.createUnits(session.getMercenaries());
-                cs.add(See.only(serverPlayer), serverPlayer.getEurope());
-                serverPlayer.modifyGold(-price);
-                cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-            } else {
-                serverPlayer.getMonarch().setDispleasure(true);
-                cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                    new MonarchActionMessage(MonarchAction.DISPLEASURE,
-                        StringTemplate.template("model.monarch.action.DISPLEASURE")));
-            }
-        }
-        session.complete(cs);
-        return cs.build(serverPlayer);
     }
 
     /**
