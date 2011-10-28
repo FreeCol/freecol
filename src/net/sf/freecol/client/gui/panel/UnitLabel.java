@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -331,9 +332,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
             inGameController.changeWorkType(unit, goodsType);
             // Move unit to best producing ColonyTile
             ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, false, goodsType);
-            if (bestTile != null && bestTile != unit.getLocation()) {
-                inGameController.work(unit, bestTile);
-            }
+            if (bestTile == null
+                || (unit.getLocation() instanceof WorkLocation
+                    && (((WorkLocation)unit.getLocation())
+                        .getProductionOf(unit, goodsType)
+                        > bestTile.getProductionOf(unit, goodsType)))) break;
+            inGameController.work(unit, bestTile);
             break;
         case WORK_BUILDING:
             BuildingType buildingType = parent.getSpecification().getBuildingType(arg);
