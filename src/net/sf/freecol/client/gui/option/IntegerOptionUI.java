@@ -47,6 +47,11 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
         if (editable) {
             int min = option.getMinimumValue();
             int max = option.getMaximumValue();
+            if (min > max) {
+                int tmp = min;
+                min = max;
+                max = tmp;
+            }
             int stepSize = Math.max(1, Math.min((max - min) / 10, 1000));
             spinner.setModel(new SpinnerNumberModel(value, min, max, stepSize));
         } else {
