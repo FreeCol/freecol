@@ -3669,9 +3669,6 @@ public final class InGameController implements NetworkConstants {
     public void endTurn() {
         if (!requireOurTurn()) return;
 
-        // Ensure end-turn mode sticks.
-        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
-
         // Show the end turn dialog, or not.
         List<Unit> units = new ArrayList<Unit>();
         for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
@@ -3685,6 +3682,9 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
         }
+
+        // Ensure end-turn mode sticks.
+        if (moveMode < MODE_END_TURN) moveMode = MODE_END_TURN;
 
         // Make sure all goto orders are complete before ending turn.
         if (!doExecuteGotoOrders()) return;
