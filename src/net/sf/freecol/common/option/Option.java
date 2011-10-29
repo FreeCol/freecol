@@ -25,8 +25,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -62,21 +60,6 @@ public interface Option<T> {
      * @param value the value of this Option
      */
     public void setValue(T value);
-
-    /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Option".
-    */
-    public Element toXMLElement(Document document);
-
-
-    /**
-    * Initializes this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Option".
-    */
-    public void readFromXMLElement(Element element);
 
     /**
      * Initializes this object from an XML-representation of this object.
