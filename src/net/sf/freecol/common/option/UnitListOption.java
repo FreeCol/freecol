@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
+
 /**
  * Represents an option where the valid choice is a list of
  * AbstractUnits, e.g. the size of the REF.
@@ -57,15 +59,14 @@ public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
     }
 
     /**
-     * Creates a new  <code>UnitListOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     * Creates a new <code>UnitListOption</code>.
+     *
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public UnitListOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXML(in);
+    public UnitListOption(Specification specification) {
+        super(specification);
     }
-
 
     /**
      * Returns the maximum allowed value.
@@ -140,15 +141,18 @@ public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
                                          + "> tag : no id attribute found.");
         }
 
-        if (getId() == NO_ID) {
+        if (getId() == null || getId() == NO_ID) {
             setId(id);
         }
 
         maximumNumber = getAttribute(in, "maximumNumber", 1);
 
+        value.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (AbstractUnitOption.getXMLElementTagName().equals(in.getLocalName())) {
-                value.add(new AbstractUnitOption(in));
+                AbstractUnitOption option = new AbstractUnitOption(getSpecification());
+                option.readFromXML(in);
+                value.add(option);
             }
         }
 

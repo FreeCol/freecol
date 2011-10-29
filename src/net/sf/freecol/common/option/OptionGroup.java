@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -53,14 +54,12 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         super(id);
     }
 
-    /**
-     * Creates a new  <code>OptionGroup</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
-     */
-    public OptionGroup(XMLStreamReader in) throws XMLStreamException {
-        this(NO_ID);
-        readFromXML(in);
+    public OptionGroup(Specification specification) {
+        super(specification);
+    }
+
+    public OptionGroup(String id, Specification specification) {
+        super(id, specification);
     }
 
     /**
@@ -273,27 +272,27 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         String optionType = in.getLocalName();
         AbstractOption option = null;
         if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-            option = new OptionGroup(in);
+            option = new OptionGroup(getSpecification());
         } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
-            option = new IntegerOption(in);
+            option = new IntegerOption(getSpecification());
         } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
-            option = new BooleanOption(in);
+            option = new BooleanOption(getSpecification());
         } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
-            option = new RangeOption(in);
+            option = new RangeOption(getSpecification());
         } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
-            option = new SelectOption(in);
+            option = new SelectOption(getSpecification());
         } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
-            option = new LanguageOption(in);
+            option = new LanguageOption(getSpecification());
         } else if (FileOption.getXMLElementTagName().equals(optionType)) {
-            option = new FileOption(in);
+            option = new FileOption(getSpecification());
         } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-            option = new PercentageOption(in);
+            option = new PercentageOption(getSpecification());
         } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-            option = new AudioMixerOption(in);
+            option = new AudioMixerOption(getSpecification());
         } else if (StringOption.getXMLElementTagName().equals(optionType)) {
-            option = new StringOption(in);
+            option = new StringOption(getSpecification());
         } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitListOption(in);
+            option = new UnitListOption(getSpecification());
         } else if ("action".equals(optionType)) {
             logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
             // TODO: load FreeColActions from client options?
@@ -304,6 +303,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             in.nextTag();
             return;
         }
+        option.readFromXML(in);
         add(option);
         option.setGroup(this.getId());
     }

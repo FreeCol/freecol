@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -85,17 +86,17 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     private Language value;
 
     /**
-     * Creates a new  <code>IntegerOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     * Creates a new <code>LanguageOption</code>.
+     *
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public LanguageOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-         if (languages.size() == 0) {
-             prepareLanguages();
-         }
-         readFromXML(in);
-     }
+    public LanguageOption(Specification specification) {
+        super(specification);
+        if (languages.size() == 0) {
+            prepareLanguages();
+        }
+    }
 
     private void prepareLanguages() {
         for (String[] pair : languageNamesHelper) {

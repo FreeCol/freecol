@@ -252,7 +252,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
             // TODO: read into group rather than specification
-            getSpecification().getOptionGroup(getOptionGroupId()).setValue(new OptionGroup(xsr));
+            OptionGroup group = new OptionGroup(getSpecification());
+            group.readFromXML(xsr);
+            getSpecification().getOptionGroup(getOptionGroupId()).setValue(group);
             in.close();
             logger.info("Loaded custom options from file " + file.getPath());
         } catch(Exception e) {

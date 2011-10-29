@@ -1109,7 +1109,8 @@ public class Game extends FreeColGameObject {
             logger.finest("Found tag " + tagName);
             if (tagName.equals("gameOptions") || tagName.equals("game-options")) {
                 // @compat 0.9.x
-                gameOptions = new OptionGroup(in);
+                gameOptions = new OptionGroup(specification);
+                gameOptions.readFromXML(in);
             } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
                     nationOptions = new NationOptions(specification, Advantages.SELECTABLE);
@@ -1153,10 +1154,12 @@ public class Game extends FreeColGameObject {
             } else if (OptionGroup.getXMLElementTagName().equals(tagName)
                        || "difficultyLevel".equals(tagName)) {
                 // @compat 0.9.x
-                OptionGroup difficultyLevel = new OptionGroup(in);
+                OptionGroup difficultyLevel = new OptionGroup(specification);
+                difficultyLevel.readFromXML(in);
             } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
                 // @compat 0.9.x
-                mapGeneratorOptions = new OptionGroup(in);
+                mapGeneratorOptions = new OptionGroup(specification);
+                mapGeneratorOptions.readFromXML(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
                 Specification spec = new Specification();
                 spec.readFromXMLImpl(in);

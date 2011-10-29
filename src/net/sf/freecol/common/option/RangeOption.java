@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option where the valid choice is an integer and the
@@ -49,11 +50,11 @@ public class RangeOption extends SelectOption {
     /**
      * Creates a new <code>RangeOption</code>.
      *
-     * @param in The <code>XMSStreamReader</code> to read the data from
-     * @exception XMLStreamException if an error occurs
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public RangeOption(XMLStreamReader in) throws XMLStreamException {
-        super(in);
+    public RangeOption(Specification specification) {
+        super(specification);
     }
 
     /**

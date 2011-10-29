@@ -71,14 +71,13 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
 
     /**
-     * Creates a new  <code>AbstractUnitOption</code>.
+     * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public AbstractUnitOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXMLImpl(in);
+    public AbstractUnitOption(Specification specification) {
+        super(specification);
     }
 
     public AbstractUnitOption clone() {
@@ -201,6 +200,10 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         out.writeEndElement();
     }
 
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLImpl(in);
+    }
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -216,7 +219,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
                                          + "> tag : no id attribute found.");
         }
 
-        if (getId() == NO_ID) {
+        if (getId() == null || getId() == NO_ID) {
             setId(id);
         }
 

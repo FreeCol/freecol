@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option that can be either <i>true</i>
@@ -49,12 +50,12 @@ public class BooleanOption extends AbstractOption<Boolean> {
 
     /**
      * Creates a new <code>BooleanOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     *
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public BooleanOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXML(in);
+    public BooleanOption(Specification specification) {
+        super(specification);
     }
 
     /**

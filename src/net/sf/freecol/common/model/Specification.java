@@ -396,11 +396,10 @@ public final class Specification {
                     String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
                     OptionGroup group = allOptionGroups.get(id);
                     if (group == null) {
-                        group = new OptionGroup(xsr);
+                        group = new OptionGroup(id, Specification.this);
                         allOptionGroups.put(id, group);
-                    } else {
-                        group.readFromXML(xsr);
                     }
+                    group.readFromXML(xsr);
                     Specification.this.addOptionGroup(group, recursive);
                 } else {
                     logger.finest("Parsing of " + optionType + " is not implemented yet");

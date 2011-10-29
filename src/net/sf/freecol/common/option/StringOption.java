@@ -75,12 +75,12 @@ public class StringOption extends AbstractOption<String> {
 
     /**
      * Creates a new <code>StringOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     *
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public StringOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXMLImpl(in);
+    public StringOption(Specification specification) {
+        super(specification);
     }
 
     public StringOption clone() {

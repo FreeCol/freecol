@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
+
 
 /**
  * Represents an option where the valid choice is an integer.
@@ -49,13 +51,13 @@ public class IntegerOption extends AbstractOption<Integer> {
     }
 
     /**
-     * Creates a new  <code>IntegerOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     * Creates a new <code>IntegerOption</code>.
+     *
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public IntegerOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXML(in);
+    public IntegerOption(Specification specification) {
+        super(specification);
     }
 
     public IntegerOption clone() {

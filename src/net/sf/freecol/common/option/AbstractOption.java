@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -56,7 +57,32 @@ abstract public class AbstractOption<T> extends FreeColObject
      *            should be found in an {@link OptionGroup}.
      */
     public AbstractOption(String id) {
+        this(id, null);
+    }
+
+    /**
+     * Creates a new <code>AbstractOption</code>.
+     *
+     * @param specification The specification this Option refers
+     *     to. This may be null, since only some options need access
+     *     to the specification.
+     */
+    public AbstractOption(Specification specification) {
+        this(null, specification);
+    }
+
+    /**
+     * Creates a new <code>AbstractOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the
+     *     object should be found in an {@link OptionGroup}.
+     * @param specification The specification this Option refers
+     *     to. This may be null, since only some options need access
+     *     to the specification.
+     */
+    public AbstractOption(String id, Specification specification) {
         setId(id);
+        setSpecification(specification);
     }
 
     /**
@@ -142,7 +168,7 @@ abstract public class AbstractOption<T> extends FreeColObject
                                          + ": no value nor default value found.");
         }
 
-        if (getId() == NO_ID) {
+        if (getId() == null || getId() == NO_ID) {
             setId(id);
         }
         setValue(value, defaultValue);

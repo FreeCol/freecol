@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option for specifying a <code>File</code>.
@@ -39,14 +40,13 @@ public class FileOption extends AbstractOption<File> {
 
 
     /**
-     * Creates a new <code>IntegerOption</code>.
+     * Creates a new <code>FileOption</code>.
      *
-     * @param in The <code>XMLStreamReader</code> containing the data.
-     * @exception XMLStreamException if an error occurs
+     * @param specification The specification this option belongs
+     *     to. May be null.
      */
-    public FileOption(XMLStreamReader in) throws XMLStreamException {
-        super(NO_ID);
-        readFromXML(in);
+    public FileOption(Specification specification) {
+        super(specification);
     }
 
     /**
@@ -116,7 +116,7 @@ public class FileOption extends AbstractOption<File> {
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
 
-        if(getId() == NO_ID) {
+        if (getId() == null || getId() == NO_ID) {
             setId(id);
         }
         if (in.getAttributeValue(null, VALUE_TAG) != null && !in.getAttributeValue(null, VALUE_TAG).equals("")) {
