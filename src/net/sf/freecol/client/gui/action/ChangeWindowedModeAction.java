@@ -57,7 +57,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
-        return !guiFacade.isWindowed();
+        return !(guiFacade == null || guiFacade.isWindowed());
     }
 
     /**
