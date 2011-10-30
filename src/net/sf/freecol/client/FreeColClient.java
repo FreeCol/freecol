@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
+
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -191,11 +191,11 @@ public final class FreeColClient {
 
         // Control
         connectController = new ConnectController(this);
-        preGameController = new PreGameController(this);
+        preGameController = new PreGameController(this, gui);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameController = new InGameController(this, gui);
         inGameInputHandler = new InGameInputHandler(this, gui);
-        mapEditorController = new MapEditorController(this);
+        mapEditorController = new MapEditorController(this, gui);
         actionManager = new ActionManager(this);
         worker = new Worker();
         worker.start();
@@ -312,14 +312,6 @@ public final class FreeColClient {
         return true;
     }
 
-    /**
-     * Describe <code>getFrame</code> method here.
-     *
-     * @return a <code>JFrame</code> value
-     */
-    public JFrame getFrame() {
-        return gui.getFrame();
-    }
 
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;

@@ -355,7 +355,7 @@ public final class Canvas extends JDesktopPane {
         europePanel = new EuropePanel(this);
         statusPanel = new StatusPanel(this);
         chatPanel = new ChatPanel(this);
-        clientOptionsDialog = new ClientOptionsDialog(this);
+        clientOptionsDialog = new ClientOptionsDialog(gui, this);
         loadingSavegameDialog = new LoadingSavegameDialog(this);
 
         setFocusable(true);
@@ -1688,7 +1688,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showMainPanel() {
         closeMenus();
-        freeColClient.getFrame().setJMenuBar(null);
+       gui.getFrame().setJMenuBar(null);
         mainPanel = new MainPanel(this);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();

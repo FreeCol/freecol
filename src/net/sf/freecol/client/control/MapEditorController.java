@@ -34,6 +34,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -50,7 +51,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
-
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
@@ -77,12 +77,16 @@ public final class MapEditorController {
     private MapTransform currentMapTransform = null;
 
 
+    private GUI gui;
+
+
     /**
      * Creates a new <code>MapEditorController</code>.
      * @param freeColClient The main controller.
      */
-    public MapEditorController(FreeColClient freeColClient) {
+    public MapEditorController(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
     }
 
 
@@ -105,21 +109,21 @@ public final class MapEditorController {
             freeColClient.playSound(null);
 
             final Canvas canvas = freeColClient.getCanvas();
-            final MapViewer gui = freeColClient.getMapViewer();
+            final MapViewer mapViewer = freeColClient.getMapViewer();
 
             canvas.closeMainPanel();
             canvas.closeMenus();
             freeColClient.setInGame(true);
 
             // We may need to reset the zoom value to the default value
-            gui.scaleMap(2f);
+            mapViewer.scaleMap(2f);
 
-            freeColClient.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
+            gui.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
             JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
             f.setLocation(f.getX(), 50);
 
             canvas.repaint();
-            CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(canvas, gui);
+            CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(canvas, mapViewer);
             canvas.addMouseListener(listener);
             canvas.addMouseMotionListener(listener);
         } catch (NoRouteToServerException e) {

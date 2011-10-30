@@ -29,6 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -60,12 +61,15 @@ public final class PreGameController {
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
     * The constructor to use.
     * @param freeColClient The main controller.
     */
-    public PreGameController(FreeColClient freeColClient) {
+    public PreGameController(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
     }
 
     /**
@@ -203,7 +207,7 @@ public final class PreGameController {
      */
     public void startGame() {
         Canvas canvas = freeColClient.getCanvas();
-        MapViewer gui = freeColClient.getMapViewer();
+        MapViewer mapViewer = freeColClient.getMapViewer();
 
         for (Player player : freeColClient.getGame().getPlayers()) {
             addPlayerResources(player.getNationID());
@@ -224,18 +228,18 @@ public final class PreGameController {
 
         if (!freeColClient.isHeadless()) {
             freeColClient.setInGame(true);
-            freeColClient.getFrame()
+            gui.getFrame()
                 .setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
         InGameController igc = freeColClient.getInGameController();
-        gui.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
+        mapViewer.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
         if (freeColClient.getGame().getCurrentPlayer() == myPlayer) {
             igc.nextActiveUnit();
         }
 
-        canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,
+        canvas.addMouseListener(new CanvasMouseListener(canvas, mapViewer));
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, mapViewer,
                  freeColClient.getGame().getMap()));
 
         if (FreeCol.isInDebugMode() && FreeCol.getDebugRunTurns() > 0) {
