@@ -89,8 +89,6 @@ public final class InGameInputHandler extends InputHandler {
 
     private Unit lastAnimatedUnit = null;
 
-    private GUI gui;
-
 
     /**
      * The constructor to use.
@@ -98,8 +96,7 @@ public final class InGameInputHandler extends InputHandler {
      * @param freeColClient The main controller.
      */
     public InGameInputHandler(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient);
-        this.gui = gui;
+        super(freeColClient, gui);
     }
 
     /**
@@ -1103,7 +1100,7 @@ public final class InGameInputHandler extends InputHandler {
         if (n > 0) {
             // Without Brewster, the migrants have already been selected
             // and were updated to the European docks by the server.
-            final Canvas canvas = getFreeColClient().getCanvas();
+            final Canvas canvas = gui.getCanvas();
             final int m = n;
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -1145,7 +1142,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     public Element closeMenus() {
-        getFreeColClient().getCanvas().closeMenus();
+        gui.getCanvas().closeMenus();
         return null;
     }
 
@@ -1330,7 +1327,7 @@ public final class InGameInputHandler extends InputHandler {
     abstract class NoResultCanvasSwingTask extends SwingTask {
 
         protected Object doWork() {
-            doWork(getFreeColClient().getCanvas());
+            doWork(gui.getCanvas());
             return null;
         }
 
@@ -1748,7 +1745,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
+            Canvas canvas = gui.getCanvas();
             boolean choice = canvas.showConfirmDialog(tile, text, okText,
                 cancelText);
             return Boolean.valueOf(choice);
@@ -1814,7 +1811,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
+            Canvas canvas = gui.getCanvas();
             String choice = canvas.showInputDialog(tile, text, defaultValue,
                 okText, cancelText, rejectEmpty);
             return choice;
@@ -1856,7 +1853,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            getFreeColClient().getCanvas().showModelMessages(_modelMessage);
+            gui.getCanvas().showModelMessages(_modelMessage);
             return null;
         }
 
@@ -1882,7 +1879,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
+            Canvas canvas = gui.getCanvas();
             canvas.showInformationMessage(null, message);
             return null;
         }
@@ -1906,7 +1903,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            getFreeColClient().getCanvas().errorMessage(_messageId, _message);
+            gui.getCanvas().errorMessage(_messageId, _message);
             return null;
         }
 
@@ -1979,7 +1976,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
+            Canvas canvas = gui.getCanvas();
             boolean choice = canvas.showFreeColDialog(new MonarchPanel(canvas,
                     action, replace));
             return Boolean.valueOf(choice);

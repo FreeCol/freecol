@@ -610,7 +610,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void displayChatMessage(Player sender, String message, boolean privateChat) {
         mapViewer.addMessage(new GUIMessage(sender.getName() + ": " + message,
-                                      getImageLibrary().getColor(sender)));
+                                      gui.getImageLibrary().getColor(sender)));
     }
 
     /**
@@ -682,7 +682,7 @@ public final class Canvas extends JDesktopPane {
      * @return The appropriate ImageIcon.
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
-        ImageLibrary imageLibrary = getImageLibrary();
+        ImageLibrary imageLibrary = gui.getImageLibrary();
         Image image = null;
         if (display == null) {
             return new ImageIcon();

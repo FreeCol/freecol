@@ -207,7 +207,7 @@ public final class PreGameController {
      */
     public void startGame() {
         Canvas canvas = gui.getCanvas();
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
 
         for (Player player : freeColClient.getGame().getPlayers()) {
             addPlayerResources(player.getNationID());

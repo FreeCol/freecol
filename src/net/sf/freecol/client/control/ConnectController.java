@@ -23,8 +23,8 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.ConnectException;
@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
@@ -76,12 +77,15 @@ public final class ConnectController {
 
     private final FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
      * Creates a new <code>ConnectController</code>.
      * @param freeColClient The main controller.
      */
-    public ConnectController(FreeColClient freeColClient) {
+    public ConnectController(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
     }
 
 
@@ -103,7 +107,7 @@ public final class ConnectController {
 
         if (freeColClient.getFreeColServer() != null &&
             freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (freeColClient.getCanvas().showConfirmDialog("stopServer.text",
+            if (gui.getCanvas().showConfirmDialog("stopServer.text",
                                                             "stopServer.yes",
                                                             "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -116,10 +120,10 @@ public final class ConnectController {
             FreeColServer freeColServer = new FreeColServer(specification, publicServer, false, port, null, advantages);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
-            freeColClient.getCanvas().errorMessage("server.noRouteToServer");
+            gui.getCanvas().errorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotStart");
+            gui.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
 
@@ -147,7 +151,7 @@ public final class ConnectController {
 
         if (freeColClient.getFreeColServer() != null
             && freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (freeColClient.getCanvas().showConfirmDialog("stopServer.text",
+            if (gui.getCanvas().showConfirmDialog("stopServer.text",
                                                             "stopServer.yes",
                                                             "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -168,7 +172,7 @@ public final class ConnectController {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
             return;
         } catch (IOException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotStart");
+            gui.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
 
@@ -176,7 +180,7 @@ public final class ConnectController {
 
         if (login(username, "127.0.0.1", port)) {
             freeColClient.getPreGameController().setReady(true);
-            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
+            gui.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
                                                          true);
 
         }
@@ -191,7 +195,7 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     */
     public void joinMultiplayerGame(String username, String host, int port) {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) {
@@ -228,7 +232,7 @@ public final class ConnectController {
      */
     public boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         freeColClient.setMapEditor(false);
 
         if (client != null) {
@@ -292,12 +296,12 @@ public final class ConnectController {
                         if (activeUnitId != null) {
                             freeColClient.setActiveUnit(activeUnitId);
                         } else {
-                            freeColClient.getMapViewer().setSelectedTile(entryTile, false);
+                            gui.getMapViewer().setSelectedTile(entryTile, false);
                         }
                     } else {
-                        freeColClient.getMapViewer().setSelectedTile(entryTile, false);
+                        gui.getMapViewer().setSelectedTile(entryTile, false);
                     }
-                    freeColClient.getMapViewer().setSelectedTile(thisPlayer
+                    gui.getMapViewer().setSelectedTile(thisPlayer
                         .getEntryLocation().getTile(), false);
                 }
             } else if (in.getLocalName().equals("error")) {
@@ -336,7 +340,7 @@ public final class ConnectController {
         final String host = freeColClient.getClient().getHost();
         final int port = freeColClient.getClient().getPort();
 
-        freeColClient.getCanvas().removeInGameComponents();
+        gui.getCanvas().removeInGameComponents();
         logout(true);
         login(username, host, port);
         freeColClient.getInGameController().nextModelMessage();
@@ -348,7 +352,7 @@ public final class ConnectController {
     * and loads the game.
     */
     public void loadGame() {
-        File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
         if (file != null) {
             //FreeCol.setSaveDirectory(file.getParentFile());
             loadGame(file);
@@ -361,7 +365,7 @@ public final class ConnectController {
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final File theFile = file;
 
         freeColClient.setMapEditor(false);
@@ -443,7 +447,7 @@ public final class ConnectController {
         }
 
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
+            if (gui.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
             } else {
                 return;
@@ -472,32 +476,32 @@ public final class ConnectController {
                 } catch (NoRouteToServerException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
+                            gui.getCanvas().closeMainPanel();
+                            gui.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
                 } catch (FileNotFoundException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
+                            gui.getCanvas().closeMainPanel();
+                            gui.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
+                            gui.getCanvas().closeMainPanel();
+                            gui.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
                 } catch (FreeColException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            freeColClient.getCanvas().closeMainPanel();
-                            freeColClient.getCanvas().showMainPanel();
+                            gui.getCanvas().closeMainPanel();
+                            gui.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
@@ -642,7 +646,7 @@ public final class ConnectController {
     * @return A list of {@link ServerInfo} objects.
     */
     public ArrayList<ServerInfo> getServerList() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
 
         Connection mc;
         try {

@@ -23,6 +23,7 @@ package net.sf.freecol.client.control;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -40,12 +41,17 @@ public abstract class InputHandler implements MessageHandler {
 
     private final FreeColClient freeColClient;
 
+
+
+    protected GUI gui;
+
     /**
     * The constructor to use.
     * @param freeColClient The main freecol client object.
     */
-    public InputHandler(FreeColClient freeColClient) {
+    public InputHandler(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
     }
 
 
@@ -88,11 +94,11 @@ public abstract class InputHandler implements MessageHandler {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (freeColClient.getCanvas().containsInGameComponents()) {
+                if (gui.getCanvas().containsInGameComponents()) {
                     if (freeColClient.getFreeColServer() == null) {
-                        freeColClient.getCanvas().returnToTitle();
+                        gui.getCanvas().returnToTitle();
                     } else {
-                        freeColClient.getCanvas().removeInGameComponents();
+                        gui.getCanvas().removeInGameComponents();
                     }
                 }
             }

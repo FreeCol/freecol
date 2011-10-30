@@ -108,8 +108,8 @@ public final class MapEditorController {
             freeColClient.setMyPlayer(null);
             freeColClient.playSound(null);
 
-            final Canvas canvas = freeColClient.getCanvas();
-            final MapViewer mapViewer = freeColClient.getMapViewer();
+            final Canvas canvas = gui.getCanvas();
+            final MapViewer mapViewer = gui.getMapViewer();
 
             canvas.closeMainPanel();
             canvas.closeMenus();
@@ -119,7 +119,7 @@ public final class MapEditorController {
             mapViewer.scaleMap(2f);
 
             gui.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
-            JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
+            JInternalFrame f = gui.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
             f.setLocation(f.getX(), 50);
 
             canvas.repaint();
@@ -127,10 +127,10 @@ public final class MapEditorController {
             canvas.addMouseListener(listener);
             canvas.addMouseMotionListener(listener);
         } catch (NoRouteToServerException e) {
-            freeColClient.getCanvas().errorMessage("server.noRouteToServer");
+            gui.getCanvas().errorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotStart");
+            gui.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
     }
@@ -178,7 +178,7 @@ public final class MapEditorController {
      * @see MapGeneratorOptions
      */
     public void newMap() {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final Game game = freeColClient.getGame();
         final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
 
@@ -193,7 +193,7 @@ public final class MapEditorController {
                 game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
             }
             mapGenerator.createMap(game);
-            freeColClient.getMapViewer().setFocus(game.getMap().getTile(1,1));
+            gui.getMapViewer().setFocus(game.getMap().getTile(1,1));
             freeColClient.getActionManager().update();
             canvas.refresh();
         } catch (FreeColException e) {
@@ -207,7 +207,7 @@ public final class MapEditorController {
      * and saves the game.
      */
     public void saveGame() {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         String fileName = "my_map.fsg";
         final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
         if (file != null) {
@@ -220,7 +220,7 @@ public final class MapEditorController {
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
 
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
@@ -270,7 +270,7 @@ public final class MapEditorController {
      * game.
      */
     public void loadGame() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
 
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
 
@@ -291,7 +291,7 @@ public final class MapEditorController {
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final File theFile = file;
 
         freeColClient.setMapEditor(true);
@@ -319,7 +319,7 @@ public final class MapEditorController {
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();
-                            freeColClient.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(1,1));
+                            gui.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(1,1));
                             freeColClient.getActionManager().update();
                             canvas.refresh();
                         }
@@ -346,8 +346,8 @@ public final class MapEditorController {
     {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                freeColClient.getCanvas().closeMainPanel();
-                freeColClient.getCanvas().showMainPanel();
+                gui.getCanvas().closeMainPanel();
+                gui.getCanvas().showMainPanel();
                 freeColClient.playSound("sound.intro.general");
             }
         });

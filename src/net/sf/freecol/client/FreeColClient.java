@@ -189,9 +189,9 @@ public final class FreeColClient {
         }
 
         // Control
-        connectController = new ConnectController(this);
+        connectController = new ConnectController(this, gui);
         preGameController = new PreGameController(this, gui);
-        preGameInputHandler = new PreGameInputHandler(this);
+        preGameInputHandler = new PreGameInputHandler(this, gui);
         inGameController = new InGameController(this, gui);
         inGameInputHandler = new InGameInputHandler(this, gui);
         mapEditorController = new MapEditorController(this, gui);
@@ -702,7 +702,7 @@ public final class FreeColClient {
             if (active != null) {
                 active.getOwner().resetIterators();
                 active.getOwner().setNextActiveUnit(active);
-                getMapViewer().setActiveUnit(active);
+                gui.getMapViewer().setActiveUnit(active);
             }
         }
     }

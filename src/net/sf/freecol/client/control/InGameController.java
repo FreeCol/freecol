@@ -229,7 +229,7 @@ public final class InGameController implements NetworkConstants {
      * @return boolean <b>true</b> if and only if a game was loaded
      */
     public boolean quickReload () {
-       Canvas canvas = freeColClient.getCanvas();
+       Canvas canvas = gui.getCanvas();
        Game game = freeColClient.getGame();
        if (game != null) {
           String gid = Integer.toHexString(game.getUUID().hashCode());
@@ -258,7 +258,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the game was saved.
      */
     public boolean saveGame() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Game game = freeColClient.getGame();
         String gid = Integer.toHexString(game.getUUID().hashCode());
@@ -285,12 +285,12 @@ public final class InGameController implements NetworkConstants {
      * @return True if the game was saved.
      */
     public boolean saveGame(final File file) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         FreeColServer server = freeColClient.getFreeColServer();
         boolean result = false;
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
-            server.setActiveUnit(freeColClient.getMapViewer().getActiveUnit());
+            server.setActiveUnit(gui.getMapViewer().getActiveUnit());
             server.saveGame(file, freeColClient.getMyPlayer().getName(),
                 freeColClient.getClientOptions());
             lastSaveGameFile = file;
@@ -308,7 +308,7 @@ public final class InGameController implements NetworkConstants {
      * loads the game.
      */
     public void loadGame() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
@@ -355,7 +355,7 @@ public final class InGameController implements NetworkConstants {
     private boolean requireOurTurn() {
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            gui.getCanvas().showInformationMessage("notYourTurn");
             return false;
         }
         return true;
@@ -604,7 +604,7 @@ public final class InGameController implements NetworkConstants {
            if (player.checkEmigrate()) {
                 if (player.hasAbility("model.ability.selectRecruit")
                     && player.getEurope().recruitablesDiffer()) {
-                    Canvas canvas = freeColClient.getCanvas();
+                    Canvas canvas = gui.getCanvas();
                     int index = canvas.showEmigrationPanel(false);
                     emigrate(player, index + 1);
                 } else {
@@ -931,7 +931,7 @@ public final class InGameController implements NetworkConstants {
                 // Unloading here will overflow the colony warehouse
                 // (can not be Europe!).  Decide whether to unload the
                 // whole cargo or not.
-                Canvas canvas = freeColClient.getCanvas();
+                Canvas canvas = gui.getCanvas();
                 String locName = colony.getName();
                 String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
@@ -1053,7 +1053,7 @@ public final class InGameController implements NetworkConstants {
     public boolean moveToDestination(Unit unit) {
         if (!requireOurTurn()) return false;
         if (unit.getTradeRoute() != null) return moveTradeRoute(unit);
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         mapViewer.setActiveUnit(unit);
         Player player = freeColClient.getMyPlayer();
 
@@ -1081,7 +1081,7 @@ public final class InGameController implements NetworkConstants {
             // No path, give up.
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
-                freeColClient.getCanvas().showInformationMessage(unit,
+                gui.getCanvas().showInformationMessage(unit,
                     StringTemplate.template("selectDestination.failed")
                     .addStringTemplate("%destination%", dest));
                 break;
@@ -1108,7 +1108,7 @@ public final class InGameController implements NetworkConstants {
                     if (!checkCashInTreasureTrain(unit)
                         && unit.getMovesLeft() > 0
                         && unit.getState() != UnitState.SKIPPED) {
-                        freeColClient.getMapViewer().setActiveUnit(unit);
+                        gui.getMapViewer().setActiveUnit(unit);
                         return true;
                     }
                 }
@@ -1124,7 +1124,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        Unit unit = freeColClient.getMapViewer().getActiveUnit();
+        Unit unit = gui.getMapViewer().getActiveUnit();
         if (unit != null && requireOurTurn()) {
             clearGotoOrders(unit);
             move(unit, direction);
@@ -1138,7 +1138,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Location destination = canvas.showSelectDestinationDialog(unit);
         if (destination == null) return; // user aborted
 
@@ -1172,7 +1172,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void declareIndependence() {
         if (!requireOurTurn()) return;
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
 
         // Check for adequate support.
@@ -1232,7 +1232,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         String name = null;
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
@@ -1272,12 +1272,12 @@ public final class InGameController implements NetworkConstants {
      */
     public void buildColony() {
         if (!requireOurTurn()) return;
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
 
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         Unit unit = mapViewer.getActiveUnit();
         if (unit == null) {
             return;
@@ -1459,7 +1459,7 @@ public final class InGameController implements NetworkConstants {
         if (messages.isEmpty()) return true;
         ModelMessage[] modelMessages
             = messages.toArray(new ModelMessage[messages.size()]);
-        return freeColClient.getCanvas().showConfirmDialog(unit.getTile(),
+        return gui.getCanvas().showConfirmDialog(unit.getTile(),
             modelMessages, "buildColony.yes", "buildColony.no");
     }
 
@@ -1483,7 +1483,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().abandonColony(colony)
             && tile.getSettlement() == null) {
             player.invalidateCanSeeTiles();
-            MapViewer mapViewer = freeColClient.getMapViewer();
+            MapViewer mapViewer = gui.getMapViewer();
             mapViewer.setActiveUnit(null);
             mapViewer.setSelectedTile(tile, false);
         }
@@ -1511,7 +1511,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean setDestination(Unit unit, Location destination) {
         if (unit.getTradeRoute() != null) {
-            Canvas canvas = freeColClient.getCanvas();
+            Canvas canvas = gui.getCanvas();
             StringTemplate template
                 = StringTemplate.template("traderoute.reassignRoute")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
@@ -1534,7 +1534,7 @@ public final class InGameController implements NetworkConstants {
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().emigrate(slot)) {
             europeWas.fireChanges();
-            freeColClient.getCanvas().updateGoldLabel();
+            gui.getCanvas().updateGoldLabel();
         }
     }
 
@@ -1548,7 +1548,7 @@ public final class InGameController implements NetworkConstants {
 
         Player player = freeColClient.getMyPlayer();
         if (!player.checkGold(player.getRecruitPrice())) {
-            freeColClient.getCanvas().errorMessage("notEnoughGold");
+            gui.getCanvas().errorMessage("notEnoughGold");
             return;
         }
 
@@ -1648,7 +1648,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveDirection(Unit unit, Direction direction,
                                   boolean interactive) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Location destination = unit.getDestination();
 
         // Consider all the move types
@@ -1820,7 +1820,7 @@ public final class InGameController implements NetworkConstants {
         unitWas.fireChanges();
 
         // Handle special cases
-        final Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         final Tile tile = unit.getTile();
 
@@ -1850,7 +1850,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
-                MapViewer mapViewer = freeColClient.getMapViewer();
+                MapViewer mapViewer = gui.getMapViewer();
                 if (!mapViewer.onScreen(tile)) mapViewer.setSelectedTile(tile, false);
             }
         }
@@ -1870,7 +1870,7 @@ public final class InGameController implements NetworkConstants {
         // between coastal and high sea.  Otherwise just move.
         Tile oldTile = unit.getTile();
         Tile newTile = oldTile.getNeighbourOrNull(direction);
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         if ((newTile == null
              || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope()))
             && canvas.showConfirmDialog(oldTile,
@@ -1964,7 +1964,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveExplore(Unit unit, Direction direction) {
         // Confirm exploration.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
         if (canvas.showConfirmDialog(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"),
@@ -1988,7 +1988,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to attack.
      */
     private void moveAttack(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         clearGotoOrders(unit);
 
         // Extra option with native settlement
@@ -2026,7 +2026,7 @@ public final class InGameController implements NetworkConstants {
     private void moveTribute(Unit unit, Direction direction) {
         if (askServer().demandTribute(unit, direction)) {
             // Assume tribute paid
-            freeColClient.getCanvas().updateGoldLabel();
+            gui.getCanvas().updateGoldLabel();
             nextActiveUnit();
         }
     }
@@ -2066,7 +2066,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Confirm attack given current stance
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         String messageID = null;
         switch (attacker.getOwner().getStance(enemy)) {
         case WAR:
@@ -2103,7 +2103,7 @@ public final class InGameController implements NetworkConstants {
             // Don't tell the player how a settlement is defended!
             FreeColGameObject defender = (settlement != null) ? settlement
                 : tile.getDefendingUnit(attacker);
-            Canvas canvas = freeColClient.getCanvas();
+            Canvas canvas = gui.getCanvas();
             return canvas.showPreCombatDialog(attacker, defender, tile);
         }
         return true;
@@ -2116,7 +2116,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to attack.
      */
     private void attack(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Unit defender = unit.getTile().getNeighbourOrNull(direction)
             .getDefendingUnit(unit);
         if (askServer().attack(unit, direction)) {
@@ -2136,7 +2136,7 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
 
         // Choose which carrier to embark upon.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
@@ -2165,7 +2165,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().embark(unit, carrier, direction)
             && unit.getLocation() == carrier) {
             if (carrier.getMovesLeft() > 0) {
-                freeColClient.getMapViewer().setActiveUnit(carrier);
+                gui.getMapViewer().setActiveUnit(carrier);
             } else {
                 nextActiveUnit();
             }
@@ -2204,7 +2204,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Pick units the user wants to disembark.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         while (disembarkable.size() > 0) {
             if (disembarkable.size() == 1) {
                 if (canvas.showConfirmDialog("disembark.text", "yes", "no")) {
@@ -2265,7 +2265,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         IndianSettlement settlement
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
@@ -2306,7 +2306,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveScoutIndianSettlement(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement settlement = tile.getIndianSettlement();
@@ -2371,7 +2371,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveUseMissionary(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         IndianSettlement settlement
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         Unit missionary = settlement.getMissionary();
@@ -2449,7 +2449,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the foreign colony lies.
      */
     private void moveScoutColony(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         clearGotoOrders(unit);
@@ -2493,7 +2493,7 @@ public final class InGameController implements NetworkConstants {
 
         String nation = Messages.message(settlement.getOwner().getNationName());
         Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         DiplomaticTrade agreement
             = canvas.showNegotiationDialog(unit, settlement, null);
         if (agreement != null) {
@@ -2552,7 +2552,7 @@ public final class InGameController implements NetworkConstants {
      * @see Settlement
      */
     private void moveTradeIndianSettlement(Unit unit, Direction direction) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         boolean[] results;
         boolean done = false;
@@ -2589,7 +2589,7 @@ public final class InGameController implements NetworkConstants {
 
         askServer().closeTransactionSession(unit, settlement);
         if (unit.getMovesLeft() > 0) { // May have been restored if no trade
-            freeColClient.getMapViewer().setActiveUnit(unit);
+            gui.getMapViewer().setActiveUnit(unit);
         } else {
             nextActiveUnit();
         }
@@ -2602,7 +2602,7 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
 
@@ -2662,7 +2662,7 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptSellToSettlement(Unit unit, Settlement settlement) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
@@ -2717,7 +2717,7 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Goods goods = canvas.showSimpleChoiceDialog(unit.getTile(),
             "gift.text", "cancel", unit.getGoodsList());
         if (goods != null) {
@@ -2758,7 +2758,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean claimTile(Player player, Tile tile, Colony colony,
                               int price, int offer) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player owner = tile.getOwner();
         if (price < 0) return false; // not for sale
         if (price > 0) { // for sale by natives
@@ -2806,7 +2806,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Cash in or not?
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         boolean cash;
         Tile tile = unit.getTile();
         Europe europe = unit.getOwner().getEurope();
@@ -3011,7 +3011,7 @@ public final class InGameController implements NetworkConstants {
             // Goods left here must be dumped.
             if (unit.getGoodsCount() > 0) {
                 List<Goods> goodsList
-                    = freeColClient.getCanvas().showDumpCargoDialog(unit);
+                    = gui.getCanvas().showDumpCargoDialog(unit);
                 if (goodsList != null) {
                     for (Goods goods : goodsList) {
                         unloadCargo(goods, true);
@@ -3034,7 +3034,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return false;
 
         // Sanity checks.  Should not happen!
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         if (type == null) {
             throw new NullPointerException("Goods type must not be null.");
@@ -3128,7 +3128,7 @@ public final class InGameController implements NetworkConstants {
             for (TransactionListener l : market.getTransactionListener()) {
                 l.logSale(type, amount, price, tax);
             }
-            freeColClient.getCanvas().updateGoldLabel();
+            gui.getCanvas().updateGoldLabel();
             return true;
         }
 
@@ -3145,7 +3145,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         // Check this makes sense and confirm.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         UnitType oldType = unit.getType();
         UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
                                                  unit.getOwner());
@@ -3183,10 +3183,10 @@ public final class InGameController implements NetworkConstants {
     public void disbandActiveUnit() {
         if (!requireOurTurn()) return;
 
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         Unit unit = mapViewer.getActiveUnit();
         if (unit == null) return;
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
         if (!canvas.showConfirmDialog(tile,
                 StringTemplate.key("disbandUnit.text"),
@@ -3248,7 +3248,7 @@ public final class InGameController implements NetworkConstants {
                 oldAmount, newAmount);
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
-            freeColClient.getCanvas().updateGoldLabel();
+            gui.getCanvas().updateGoldLabel();
         }
     }
 
@@ -3265,7 +3265,7 @@ public final class InGameController implements NetworkConstants {
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             if (tile.hasLostCityRumour()) {
-                freeColClient.getCanvas()
+                gui.getCanvas()
                     .showInformationMessage("tileHasRumour");
                 return;
             }
@@ -3382,7 +3382,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         if (askServer().changeState(unit, state)) {
             if (!canvas.isShowingSubPanel()
                 && (unit.getMovesLeft() == 0
@@ -3408,7 +3408,7 @@ public final class InGameController implements NetworkConstants {
 
         // Ask the user for confirmation, as this is a classic mistake.
         // Cancelling a pioneer terrain improvement is a waste of many turns.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         if (unit.getState() == UnitState.IMPROVING
             && !canvas.showConfirmDialog(unit.getTile(),
                 StringTemplate.template("model.unit.confirmCancelWork")
@@ -3470,7 +3470,7 @@ public final class InGameController implements NetworkConstants {
     public void trainUnitInEurope(UnitType unitType) {
         if (!requireOurTurn()) return;
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
@@ -3494,7 +3494,7 @@ public final class InGameController implements NetworkConstants {
     public void payForBuilding(Colony colony) {
         if (!requireOurTurn()) return;
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         if (!colony.canPayToFinishBuilding()) {
             canvas.errorMessage("notEnoughGold");
             return;
@@ -3534,7 +3534,7 @@ public final class InGameController implements NetworkConstants {
     public boolean payArrears(GoodsType type) {
         if (!requireOurTurn()) return false;
 
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
@@ -3609,7 +3609,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         TradeRoute oldRoute = unit.getTradeRoute();
         TradeRoute route = canvas.showTradeRouteDialog(unit);
         if (route == null) return; // Cancelled
@@ -3681,7 +3681,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
         if (units.size() > 0) {
-            Canvas canvas = freeColClient.getCanvas();
+            Canvas canvas = gui.getCanvas();
             if (!canvas.showFreeColDialog(new EndTurnDialog(canvas, units))) {
                 return;
             }
@@ -3701,7 +3701,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void doEndTurn() {
         // Clear active unit if any.
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         mapViewer.setActiveUnit(null);
 
         // Unskip all skipped, some may have been faked in-client.
@@ -3741,9 +3741,9 @@ public final class InGameController implements NetworkConstants {
 
         // Process all units.
         boolean result = true;
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        MapViewer mapViewer = freeColClient.getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             mapViewer.setActiveUnit(unit);
@@ -3767,7 +3767,7 @@ public final class InGameController implements NetworkConstants {
      * Tell a unit to wait.
      */
     public void waitActiveUnit() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         MapViewer gui = canvas.getMapViewer();
         gui.setActiveUnit(null);
         nextActiveUnit();
@@ -3777,7 +3777,7 @@ public final class InGameController implements NetworkConstants {
      * Skip a unit.
      */
     public void skipActiveUnit() {
-        changeState(freeColClient.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
+        changeState(gui.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
     }
 
     /**
@@ -3800,7 +3800,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         // Always flush outstanding messages first.
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         nextModelMessage();
         //if (canvas.isShowingSubPanel()) {
         //    canvas.getShowingSubPanel().requestFocus();
@@ -3940,7 +3940,7 @@ public final class InGameController implements NetworkConstants {
 
         if (messages.size() > 0) {
             final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
-            final Canvas canvas = freeColClient.getCanvas();
+            final Canvas canvas = gui.getCanvas();
             Runnable uiTask = new Runnable() {
                     public void run() {
                         if (endOfTurn) {
