@@ -108,7 +108,7 @@ public class GUI {
         if (windowed) {
             this.frame = new WindowedFrame();
         } else {
-            this.frame = new FullScreenFrame(getGd());
+            this.frame = new FullScreenFrame(gd);
         }
         frame.setJMenuBar(menuBar);
         if (frame instanceof WindowedFrame) {
@@ -162,10 +162,6 @@ public class GUI {
 
     public Canvas getCanvas() {
         return canvas;
-    }
-
-    public GraphicsDevice getGd() {
-        return gd;
     }
 
     public ImageLibrary getImageLibrary() {
@@ -228,11 +224,32 @@ public class GUI {
         }
     }
     
+    public void resetMenuBar() {
+        JMenuBar menuBar = frame.getJMenuBar();
+        if (menuBar != null) {
+            ((FreeColMenuBar) menuBar).reset();
+        }
+    }
+
+    public void setupInGameMenuBar() {
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
+    }
+    
+
+    public void setupMapEditorMenuBar() {
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
+    }
+    
+    public void setupMenuBarToNull() {
+        frame.setJMenuBar(null);
+    }
+    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
 
+    
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -265,7 +282,7 @@ public class GUI {
         }
         this.gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (!isWindowed()) {
-            if (!getGd().isFullScreenSupported()) {
+            if (!gd.isFullScreenSupported()) {
                 String fullscreenNotSupported =
                    "\nIt seems that full screen mode is not fully supported for this" +
                    "\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience" +
@@ -280,7 +297,7 @@ public class GUI {
                  * WindowedFrame(size);
                  */
             }
-            Rectangle bounds = getGd().getDefaultConfiguration().getBounds();
+            Rectangle bounds = gd.getDefaultConfiguration().getBounds();
             innerWindowSize = new Dimension(bounds.width - bounds.x, bounds.height - bounds.y);
         }
 
@@ -355,7 +372,6 @@ public class GUI {
         }
         getMapViewer().startCursorBlinking();
     }
-    
 
     /**
      * Updates the label displaying the current amount of gold.
@@ -363,30 +379,10 @@ public class GUI {
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-    
+
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
-        }
-    }
-    
-    public void setupMapEditorMenuBar() {
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
-    }
-
-    
-    public void setupInGameMenuBar() {
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
-    }
-
-    public void setupMenuBarToNull() {
-        frame.setJMenuBar(null);
-    }
-
-    public void resetMenuBar() {
-        JMenuBar menuBar = frame.getJMenuBar();
-        if (menuBar != null) {
-            ((FreeColMenuBar) menuBar).reset();
         }
     }
     
