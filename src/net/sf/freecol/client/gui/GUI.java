@@ -25,6 +25,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
+import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
@@ -161,10 +162,6 @@ public class GUI {
 
     public Canvas getCanvas() {
         return canvas;
-    }
-    
-    public JFrame getFrame() {
-        return frame; 
     }
 
     public GraphicsDevice getGd() {
@@ -378,6 +375,20 @@ public class GUI {
     }
 
     
+    public void setupInGameMenuBar() {
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
+    }
+
+    public void setupMenuBarToNull() {
+        frame.setJMenuBar(null);
+    }
+
+    public void resetMenuBar() {
+        JMenuBar menuBar = frame.getJMenuBar();
+        if (menuBar != null) {
+            ((FreeColMenuBar) menuBar).reset();
+        }
+    }
     
     
 }

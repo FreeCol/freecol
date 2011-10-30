@@ -1688,7 +1688,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showMainPanel() {
         closeMenus();
-       gui.getFrame().setJMenuBar(null);
+        gui.setupMenuBarToNull();
         mainPanel = new MainPanel(this);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();

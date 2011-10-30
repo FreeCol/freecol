@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
-import javax.swing.JMenuBar;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -82,11 +81,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
             try {
                 getGroup().save(file);
                 getFreeColClient().getActionManager().update();
-                JMenuBar menuBar = gui.getFrame().getJMenuBar();
-                if (menuBar != null) {
-                    ((FreeColMenuBar) menuBar).reset();
-                }
-
+                gui.resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 MapControlsAction mca = (MapControlsAction) getFreeColClient()
                     .getActionManager().getFreeColAction(MapControlsAction.id);
