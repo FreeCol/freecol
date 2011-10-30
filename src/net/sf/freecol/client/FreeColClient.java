@@ -676,7 +676,7 @@ public final class FreeColClient {
         return client;
     }
 
-    public SoundPlayer getSoundPlayer ()
+    public SoundPlayer getSoundPlayer()
     {
         return gui.getSoundPlayer();
     }
@@ -690,13 +690,6 @@ public final class FreeColClient {
         gui.playSound(sound);
     }
 
-    /**
-     * Verifies if the client can play sounds.
-     * @return boolean <b>true</b> if and only if client sound player has an instance
-     */
-    public boolean canPlaySound() {
-        return gui.canPlaySound();
-    }
 
     /**
      * Returns <i>true</i> if this client is logged in to a server or
