@@ -193,8 +193,8 @@ public final class FreeColClient {
         connectController = new ConnectController(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
-        inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
+        inGameController = new InGameController(this, gui);
+        inGameInputHandler = new InGameInputHandler(this, gui);
         mapEditorController = new MapEditorController(this);
         actionManager = new ActionManager(this);
         worker = new Worker();
@@ -320,15 +320,6 @@ public final class FreeColClient {
     public JFrame getFrame() {
         return gui.getFrame();
     }
-
-    /**
-     * Describe <code>updateMenuBar</code> method here.
-     *
-     */
-    public void updateMenuBar() {
-        gui.updateMenuBar();
-    }
-
 
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;

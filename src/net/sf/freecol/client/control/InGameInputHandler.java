@@ -33,6 +33,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -88,14 +89,17 @@ public final class InGameInputHandler extends InputHandler {
 
     private Unit lastAnimatedUnit = null;
 
+    private GUI gui;
+
 
     /**
      * The constructor to use.
      *
      * @param freeColClient The main controller.
      */
-    public InGameInputHandler(FreeColClient freeColClient) {
+    public InGameInputHandler(FreeColClient freeColClient, GUI gui) {
         super(freeColClient);
+        this.gui = gui;
     }
 
     /**
@@ -1682,7 +1686,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
         protected void doWork(Canvas canvas) {
-            getFreeColClient().updateMenuBar();
+            gui.updateMenuBar();
         }
     }
 

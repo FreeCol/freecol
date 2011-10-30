@@ -38,6 +38,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -134,14 +135,17 @@ public final class InGameController implements NetworkConstants {
     private HashMap<String, Integer> messagesToIgnore
         = new HashMap<String, Integer>();
 
+    private GUI gui;
+
 
     /**
      * The constructor to use.
      *
      * @param freeColClient The main controller.
      */
-    public InGameController(FreeColClient freeColClient) {
+    public InGameController(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
 // TODO: fetch value of lastSaveGameFile from a persistent client value
 //        lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
     }
@@ -332,7 +336,7 @@ public final class InGameController implements NetworkConstants {
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
         logger.info("Debug mode set to " + debug);
-        freeColClient.updateMenuBar();
+        gui.updateMenuBar();
     }
 
     /**
@@ -1567,7 +1571,7 @@ public final class InGameController implements NetworkConstants {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     freeColClient.getActionManager().update();
-                    freeColClient.updateMenuBar();
+                    gui.updateMenuBar();
                 }
             });
     }

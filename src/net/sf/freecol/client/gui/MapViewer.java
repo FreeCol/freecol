@@ -348,6 +348,7 @@ public final class MapViewer {
     private Stroke borderStroke = new BasicStroke(4);
 
     private Stroke gridStroke = new BasicStroke(1);
+    private GUI gui;
 
     /**
     * The constructor to use.
@@ -356,8 +357,9 @@ public final class MapViewer {
     * @param size The size of the GUI (= the entire screen if the app is displayed in full-screen).
     * @param lib The library of images needed to display certain things visually.
     */
-    public MapViewer(FreeColClient freeColClient, Dimension size, ImageLibrary lib) {
+    public MapViewer(FreeColClient freeColClient, GUI gui, Dimension size, ImageLibrary lib) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.size = size;
 
         setImageLibrary(lib);
@@ -1485,7 +1487,7 @@ public final class MapViewer {
             }
         } else {
             freeColClient.getActionManager().update();
-            freeColClient.updateMenuBar();
+            gui.updateMenuBar();
             redrawMapControls();
         }
         return ret;
@@ -1623,7 +1625,7 @@ public final class MapViewer {
         }
 
         freeColClient.getActionManager().update();
-        freeColClient.updateMenuBar();
+        gui.updateMenuBar();
 
         redrawMapControls();
 

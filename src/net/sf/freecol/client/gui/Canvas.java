@@ -339,7 +339,7 @@ public final class Canvas extends JDesktopPane {
         this.gui = gui;
         this.mapViewer = mapViewer;
 
-        colonyTileGUI = new MapViewer(client, size, gui.getImageLibrary());
+        colonyTileGUI = new MapViewer(client, gui, size, gui.getImageLibrary());
 
         initialSize = size;
 
@@ -427,7 +427,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         if (update) {
-            freeColClient.updateMenuBar();
+            gui.updateMenuBar();
             freeColClient.getActionManager().update();
         }
     }
@@ -936,7 +936,7 @@ public final class Canvas extends JDesktopPane {
 
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
-            freeColClient.updateMenuBar();
+            gui.updateMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();

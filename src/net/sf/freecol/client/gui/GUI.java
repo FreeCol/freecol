@@ -126,10 +126,42 @@ public class GUI {
         getFrame().setVisible(true);
     }
 
+    public Dimension determineWindowSize() {
+        
+        Rectangle bounds = GraphicsEnvironment
+            .getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
+                             bounds.height - DEFAULT_WINDOW_SPACE);
+        logger.info("Window size is " + size.getWidth()
+            + " x " + size.getHeight());
+        return size;
+    }
+
+    public void displaySpashScreen(final String splashFilename) {
+        splash = null;
+        if (splashFilename != null) {
+            try {
+                Image im = Toolkit.getDefaultToolkit()
+                    .getImage(splashFilename);
+                splash = new JWindow();
+                splash.getContentPane().add(new JLabel(new ImageIcon(im)));
+                splash.pack();
+                Point center = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment().getCenterPoint();
+                splash.setLocation(center.x - splash.getWidth() / 2,
+                                   center.y - splash.getHeight() / 2);
+                splash.setVisible(true);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Splash fail", e);
+                splash = null;
+            }
+        }
+    }
+
     public Canvas getCanvas() {
         return canvas;
     }
-
+    
     public JFrame getFrame() {
         return frame; 
     }
@@ -137,13 +169,13 @@ public class GUI {
     public GraphicsDevice getGd() {
         return gd;
     }
-    
-    public MapViewer getMapViewer() {
-        return mapViewer;
-    }
 
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
+    }
+
+    public MapViewer getMapViewer() {
+        return mapViewer;
     }
 
     public SoundPlayer getSoundPlayer() {
@@ -154,6 +186,14 @@ public class GUI {
         return windowBounds;
     }
 
+    public void hideSplashScreen() {
+        if (splash != null) {
+            splash.setVisible(false);
+            splash.dispose();
+        }
+    }
+    
+    
     public boolean isWindowed() {
         return windowed;
     }
@@ -177,13 +217,24 @@ public class GUI {
             }
         }
     }
-
+    
+    public void quit() {
+        if (!isWindowed()) {
+            try {
+                gd.setFullScreenWindow(null);
+            } catch(Exception e) {
+                // this can fail, but who cares?
+                // we are quitting anyway
+                System.exit(1);
+            }
+        }
+    }
+    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
-    
-    
+
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -269,7 +320,7 @@ public class GUI {
                 }
             });
 
-        this.mapViewer = new MapViewer(freeColClient, innerWindowSize, getImageLibrary());
+        this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, getImageLibrary());
         this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
         changeWindowedMode(isWindowed());
         getFrame().setIconImage(ResourceManager.getImage("FrameIcon.image"));
@@ -306,63 +357,12 @@ public class GUI {
         }
         getMapViewer().startCursorBlinking();
     }
+    
 
     public void updateMenuBar() {
         if (getFrame() != null && getFrame().getJMenuBar() != null) {
             ((FreeColMenuBar) getFrame().getJMenuBar()).update();
         }
-    }
-    
-    public void displaySpashScreen(final String splashFilename) {
-        splash = null;
-        if (splashFilename != null) {
-            try {
-                Image im = Toolkit.getDefaultToolkit()
-                    .getImage(splashFilename);
-                splash = new JWindow();
-                splash.getContentPane().add(new JLabel(new ImageIcon(im)));
-                splash.pack();
-                Point center = GraphicsEnvironment
-                    .getLocalGraphicsEnvironment().getCenterPoint();
-                splash.setLocation(center.x - splash.getWidth() / 2,
-                                   center.y - splash.getHeight() / 2);
-                splash.setVisible(true);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Splash fail", e);
-                splash = null;
-            }
-        }
-    }
-    
-    public void hideSplashScreen() {
-        if (splash != null) {
-            splash.setVisible(false);
-            splash.dispose();
-        }
-    }
-
-    public void quit() {
-        if (!isWindowed()) {
-            try {
-                gd.setFullScreenWindow(null);
-            } catch(Exception e) {
-                // this can fail, but who cares?
-                // we are quitting anyway
-                System.exit(1);
-            }
-        }
-    }
-    
-
-    public Dimension determineWindowSize() {
-        
-        Rectangle bounds = GraphicsEnvironment
-            .getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
-                             bounds.height - DEFAULT_WINDOW_SPACE);
-        logger.info("Window size is " + size.getWidth()
-            + " x " + size.getHeight());
-        return size;
     }
     
     
