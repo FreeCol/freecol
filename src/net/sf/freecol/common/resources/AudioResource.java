@@ -22,8 +22,8 @@ package net.sf.freecol.common.resources;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioInputStream;
@@ -54,18 +54,30 @@ public class AudioResource extends Resource {
      */
     AudioResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
-        URL url = resourceLocator.toURL();
-        File f = new File(url.getFile());
+        File f = new File(resourceLocator);
+        BufferedInputStream bis = null;
+        AudioInputStream ais = null;
         try {
-            BufferedInputStream bis = new BufferedInputStream( new FileInputStream(f) );
+            bis = new BufferedInputStream( new FileInputStream(f) );
             bis.mark(1000); bis.skip(1); bis.reset();
-            AudioInputStream ais = AudioSystem.getAudioInputStream( bis );
+            ais = AudioSystem.getAudioInputStream(bis);
             this.file = f;
-            ais.close();
         } catch (Exception e) {
-            logger.warning( "Not an audio file: " + url.getFile() + "\r\nProblem: " + e );
+            logger.warning( "Not an audio file: " + f.getPath() + "\r\nProblem: " + e );
             e.printStackTrace();
             this.file = null;
+        } finally {
+            // close input stream
+            try {
+                if (ais != null) {
+                    ais.close();
+                } else if (bis != null) {
+                    bis.close();
+                }
+            } catch (IOException e) {
+                // unable to close stream => ignore
+                e.printStackTrace();
+            }
         }
     }
 
