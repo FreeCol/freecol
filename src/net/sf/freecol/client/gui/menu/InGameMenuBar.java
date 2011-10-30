@@ -54,8 +54,6 @@ public class InGameMenuBar extends FreeColMenuBar {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
     
-    private GUI gui;
-
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
@@ -82,8 +80,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         // MenuBar use freeColClient, too. But so what.
         // Move those to another class too. :)
 
-        super(f);
-        this.gui = gui;
+        super(f, gui);
 
         reset();
     }

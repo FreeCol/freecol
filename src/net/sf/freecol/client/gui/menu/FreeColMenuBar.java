@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -31,6 +32,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -54,6 +56,8 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     protected ActionManager am;
 
+    protected GUI gui;
+
 
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
@@ -61,7 +65,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      *
      * @param f The main controller.
      */
-    protected FreeColMenuBar(FreeColClient f) {
+    protected FreeColMenuBar(FreeColClient f, GUI gui) {
 
         // TODO: FreeColClient should not have to be passed in to this class.
         // This is only a menu bar, it doesn't need
@@ -85,6 +89,8 @@ public abstract class FreeColMenuBar extends JMenuBar {
         setOpaque(false);
 
         this.freeColClient = f;
+        
+        this.gui = gui;
 
         this.am = f.getActionManager();
 

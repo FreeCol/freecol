@@ -31,6 +31,7 @@ import javax.swing.JMenuItem;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
@@ -73,8 +74,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
      *
      * @param freeColClient The main controller.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient) {
-        super(freeColClient);
+    public MapEditorMenuBar(final FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         reset();
     }
@@ -115,7 +116,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
                     FileOption fileOption = (FileOption) options.getOption(MapGeneratorOptions.IMPORT_FILE);
                     fileOption.setValue(saveGameFile);
                     freeColClient.getMapEditorController().saveGame(saveGameFile);
-                    freeColClient.getCanvas().newGame();
+                    gui.getCanvas().newGame();
                 }
             });
         menu.add(playItem);

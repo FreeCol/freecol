@@ -38,7 +38,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
@@ -117,8 +116,8 @@ public final class MapEditorController {
 
             // We may need to reset the zoom value to the default value
             mapViewer.scaleMap(2f);
-
-            gui.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
+            
+            gui.setupMapEditorMenuBar();
             JInternalFrame f = gui.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
             f.setLocation(f.getX(), 50);
 

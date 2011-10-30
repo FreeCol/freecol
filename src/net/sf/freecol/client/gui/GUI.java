@@ -25,6 +25,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
+import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -371,6 +372,12 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
+    
+    public void setupMapEditorMenuBar() {
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
+    }
+
+    
     
     
 }
