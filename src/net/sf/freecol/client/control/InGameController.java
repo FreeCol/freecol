@@ -614,7 +614,7 @@ public final class InGameController implements NetworkConstants {
 
            // GUI management.
            if (!freeColClient.isSingleplayer()) {
-               freeColClient.playSound("sound.anthem." + player.getNationID());
+               gui.playSound("sound.anthem." + player.getNationID());
            }
            displayModelMessages(true, true);
         }
@@ -1339,7 +1339,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().buildColony(name, unit)
             && tile.getSettlement() != null) {
             player.invalidateCanSeeTiles();
-            freeColClient.playSound("sound.event.buildingComplete");
+            gui.playSound("sound.event.buildingComplete");
             mapViewer.setActiveUnit(null);
             mapViewer.setSelectedTile(tile, false);
 
@@ -1534,7 +1534,7 @@ public final class InGameController implements NetworkConstants {
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().emigrate(slot)) {
             europeWas.fireChanges();
-            gui.getCanvas().updateGoldLabel();
+            gui.updateGoldLabel();
         }
     }
 
@@ -1691,7 +1691,7 @@ public final class InGameController implements NetworkConstants {
 
         case MOVE_NO_ACCESS_BEACHED:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessBeached")
@@ -1700,7 +1700,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_CONTACT:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessContact")
@@ -1709,7 +1709,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_GOODS:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessGoods")
@@ -1720,13 +1720,13 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_LAND:
             if (!moveDisembark(unit, direction)) {
                 if (interactive) {
-                    freeColClient.playSound("sound.event.illegalMove");
+                    gui.playSound("sound.event.illegalMove");
                 }
             }
             return false;
         case MOVE_NO_ACCESS_SETTLEMENT:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSettlement")
@@ -1736,7 +1736,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_SKILL:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSkill")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
@@ -1744,7 +1744,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_TRADE:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessTrade")
@@ -1753,7 +1753,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_WAR:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWar")
@@ -1762,7 +1762,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ACCESS_WATER:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
@@ -1770,7 +1770,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case MOVE_NO_ATTACK_MARINE:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 canvas.showInformationMessage(unit,
                     StringTemplate.template("move.noAttackWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
@@ -1783,7 +1783,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         default:
             if (interactive) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
             }
             return false;
         }
@@ -1900,18 +1900,18 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalArgumentException("moveTo null argument");
         } else if (destination instanceof Europe) {
             if (unit.isInEurope()) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 return;
             }
         } else if (destination instanceof Map) {
             if (unit.getTile() != null
                 && unit.getTile().getMap() == destination) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 return;
             }
         } else if (destination instanceof Settlement) {
             if (unit.getTile() != null) {
-                freeColClient.playSound("sound.event.illegalMove");
+                gui.playSound("sound.event.illegalMove");
                 return;
             }
         }
@@ -1946,7 +1946,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         if (!unit.canMoveToEurope()) {
-            freeColClient.playSound("sound.event.illegalMove");
+            gui.playSound("sound.event.illegalMove");
             return;
         }
 
@@ -2026,7 +2026,7 @@ public final class InGameController implements NetworkConstants {
     private void moveTribute(Unit unit, Direction direction) {
         if (askServer().demandTribute(unit, direction)) {
             // Assume tribute paid
-            gui.getCanvas().updateGoldLabel();
+            gui.updateGoldLabel();
             nextActiveUnit();
         }
     }
@@ -2342,7 +2342,7 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage(settlement,
                     "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
-                canvas.updateGoldLabel();
+                gui.updateGoldLabel();
                 canvas.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.speakBeads")
                     .addAmount("%amount%", player.getGold() - oldGold));
@@ -2388,7 +2388,7 @@ public final class InGameController implements NetworkConstants {
         case ESTABLISH_MISSION:
             if (askServer().missionary(unit, direction, false)) {
                 if (settlement.getMissionary() == unit) {
-                    freeColClient.playSound("sound.event.missionEstablished");
+                    gui.playSound("sound.event.missionEstablished");
                 }
                 nextActiveUnit();
             }
@@ -2396,7 +2396,7 @@ public final class InGameController implements NetworkConstants {
         case DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction, true)) {
                 if (settlement.getMissionary() == unit) {
-                    freeColClient.playSound("sound.event.missionEstablished");
+                    gui.playSound("sound.event.missionEstablished");
                 }
                 nextModelMessage();
                 nextActiveUnit();
@@ -2427,7 +2427,7 @@ public final class InGameController implements NetworkConstants {
                         .addAmount("%amount%", gold),
                         "yes", "no")) {
                     if (askServer().incite(unit, direction, enemy, gold) >= 0) {
-                        canvas.updateGoldLabel();
+                        gui.updateGoldLabel();
                     }
                 }
                 nextActiveUnit();
@@ -2642,7 +2642,7 @@ public final class InGameController implements NetworkConstants {
                 case BUY: // Accept price, make purchase
                     if (askServer().buyFromSettlement(unit,
                             settlement, goods, gold)) {
-                        canvas.updateGoldLabel(); // Assume success
+                        gui.updateGoldLabel(); // Assume success
                     }
                     return;
                 case HAGGLE: // Try to negotiate a lower price
@@ -2693,7 +2693,7 @@ public final class InGameController implements NetworkConstants {
                 case SELL: // Accepted price, make the sale
                     if (askServer().sellToSettlement(unit,
                             settlement, goods, gold)) {
-                        canvas.updateGoldLabel(); // Assume success
+                        gui.updateGoldLabel(); // Assume success
                     }
                     return;
                 case HAGGLE: // Ask for more money
@@ -2786,7 +2786,7 @@ public final class InGameController implements NetworkConstants {
         // Ask the server
         if (askServer().claimLand(tile, colony, price)
             && tile.getOwner() == player) {
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
             return true;
         }
         return false;
@@ -2831,9 +2831,9 @@ public final class InGameController implements NetworkConstants {
         UnitWas unitWas = new UnitWas(unit);
         if (cash && askServer().cashInTreasureTrain(unit)
             && unit.isDisposed()) {
-            freeColClient.playSound("sound.event.cashInTreasureTrain");
+            gui.playSound("sound.event.cashInTreasureTrain");
             unitWas.fireChanges();
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
             nextActiveUnit(tile);
             return true;
         }
@@ -2874,7 +2874,7 @@ public final class InGameController implements NetworkConstants {
         UnitWas unitWas = new UnitWas(unit);
         if (askServer().embark(unit, carrier, null)
             && unit.getLocation() == carrier) {
-            freeColClient.playSound("sound.event.loadCargo");
+            gui.playSound("sound.event.loadCargo");
             unitWas.fireChanges();
             nextActiveUnit();
             return true;
@@ -2936,7 +2936,7 @@ public final class InGameController implements NetworkConstants {
 
         // Try to load.
         if (loadGoods(goods, carrier)) {
-            freeColClient.playSound("sound.event.loadCargo");
+            gui.playSound("sound.event.loadCargo");
         }
     }
 
@@ -3073,12 +3073,12 @@ public final class InGameController implements NetworkConstants {
         UnitWas unitWas = new UnitWas(carrier);
         if (askServer().buyGoods(carrier, type, toBuy)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            freeColClient.playSound("sound.event.loadCargo");
+            gui.playSound("sound.event.loadCargo");
             unitWas.fireChanges();
             for (TransactionListener l : market.getTransactionListener()) {
                 l.logPurchase(type, toBuy, price);
             }
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
             return true;
         }
 
@@ -3123,12 +3123,12 @@ public final class InGameController implements NetworkConstants {
         UnitWas unitWas = new UnitWas(carrier);
         if (askServer().sellGoods(goods, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            freeColClient.playSound("sound.event.sellCargo");
+            gui.playSound("sound.event.sellCargo");
             unitWas.fireChanges();
             for (TransactionListener l : market.getTransactionListener()) {
                 l.logSale(type, amount, price, tax);
             }
-            gui.getCanvas().updateGoldLabel();
+            gui.updateGoldLabel();
             return true;
         }
 
@@ -3248,7 +3248,7 @@ public final class InGameController implements NetworkConstants {
                 oldAmount, newAmount);
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
-            gui.getCanvas().updateGoldLabel();
+            gui.updateGoldLabel();
         }
     }
 
@@ -3480,7 +3480,7 @@ public final class InGameController implements NetworkConstants {
 
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().trainUnitInEurope(unitType)) {
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
             europeWas.fireChanges();
         }
     }
@@ -3511,7 +3511,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().payForBuilding(colony)
             && colony.getPriceForBuilding() == 0) {
             colonyWas.fireChanges();
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
         }
     }
 
@@ -3549,7 +3549,7 @@ public final class InGameController implements NetworkConstants {
                 "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type)) {
-            canvas.updateGoldLabel();
+            gui.updateGoldLabel();
             return true;
         }
         return false;

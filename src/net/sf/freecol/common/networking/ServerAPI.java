@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -72,6 +73,8 @@ public class ServerAPI {
 
     private FreeColClient freeColClient; // cached client reference
 
+    private GUI gui;
+
 
     /**
      * Creates a new <code>ServerAPI</code>.
@@ -79,8 +82,9 @@ public class ServerAPI {
      * @param freeColClient The <code>FreeColClient</code> that is
      *     communicating with a server.
      */
-    public ServerAPI(FreeColClient freeColClient) {
+    public ServerAPI(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
     }
 
 
@@ -190,7 +194,7 @@ public class ServerAPI {
             // Do the standard processing.
             String sound = reply.getAttribute("sound");
             if (sound != null && !sound.isEmpty()) {
-                freeColClient.playSound(sound);
+                gui.playSound(sound);
             }
             // Look for special attributes
             if (results != null) {
@@ -218,7 +222,7 @@ public class ServerAPI {
             + " to message " + message;
         logger.warning(complaint);
         if (FreeCol.isInDebugMode()) {
-            freeColClient.getCanvas().errorMessage(null, complaint);
+            gui.getCanvas().errorMessage(null, complaint);
         }
         return null;
     }

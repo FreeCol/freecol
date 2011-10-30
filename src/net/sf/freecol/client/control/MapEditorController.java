@@ -106,7 +106,7 @@ public final class MapEditorController {
             freeColClient.setFreeColServer(freeColServer);
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
-            freeColClient.playSound(null);
+            gui.playSound(null);
 
             final Canvas canvas = gui.getCanvas();
             final MapViewer mapViewer = gui.getMapViewer();
@@ -348,7 +348,7 @@ public final class MapEditorController {
             public void run() {
                 gui.getCanvas().closeMainPanel();
                 gui.getCanvas().showMainPanel();
-                freeColClient.playSound("sound.intro.general");
+                gui.playSound("sound.intro.general");
             }
         });
     }

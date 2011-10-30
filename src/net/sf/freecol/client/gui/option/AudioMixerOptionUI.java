@@ -54,9 +54,9 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     private ActionListener aHandler = new ActionListener () {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == button1) {
-                client.playSound("sound.event.buildingComplete");
+                client.getGUI().playSound("sound.event.buildingComplete");
             } else if (e.getSource() == button2) {
-                client.playSound("sound.intro.general");
+                client.getGUI().playSound("sound.intro.general");
             } else if (e.getSource() == cbox) {
                 MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
                 if (getOption().getValue() != value) {

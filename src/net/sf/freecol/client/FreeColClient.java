@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -651,16 +650,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Plays some sound. Parameter == null stops playing a sound.
-     *
-     * @param sound The sound resource to play or <b>null</b>
-     */
-    public void playSound(String sound) {
-        gui.playSound(sound);
-    }
-
-
-    /**
      * Returns <i>true</i> if this client is logged in to a server or
      * <i>false</i> otherwise.
      *
@@ -687,7 +676,7 @@ public final class FreeColClient {
      * @return A ServerAPI.
      */
     public ServerAPI askServer() {
-        if (serverAPI == null) serverAPI = new ServerAPI(this);
+        if (serverAPI == null) serverAPI = new ServerAPI(this, gui);
         return serverAPI;
     }
 

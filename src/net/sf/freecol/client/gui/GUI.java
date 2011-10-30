@@ -359,6 +359,13 @@ public class GUI {
     }
     
 
+    /**
+     * Updates the label displaying the current amount of gold.
+     */
+    public void updateGoldLabel() {
+        frame.getJMenuBar().repaint();
+    }
+    
     public void updateMenuBar() {
         if (getFrame() != null && getFrame().getJMenuBar() != null) {
             ((FreeColMenuBar) getFrame().getJMenuBar()).update();

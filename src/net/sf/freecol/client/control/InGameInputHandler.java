@@ -509,7 +509,7 @@ public final class InGameInputHandler extends InputHandler {
 
         // plays an alert sound on each new turn if the option for it is turned on
         if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
-            FreeColClient.get().playSound("sound.event.alertSound");
+            gui.playSound("sound.event.alertSound");
         }
 
 
@@ -933,7 +933,7 @@ public final class InGameInputHandler extends InputHandler {
         logger.info("Stance transition: " + old.toString()
             + " -> " + stance.toString());
         if (player == first && old == Stance.UNCONTACTED) {
-            freeColClient.playSound("sound.event.meet."
+            gui.playSound("sound.event.meet."
                 + second.getNationID());
         }
         return null;

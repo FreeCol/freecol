@@ -220,8 +220,8 @@ public final class PreGameController {
             canvas.closeMainPanel();
             canvas.closeMenus();
             canvas.closeStatusPanel();
-            freeColClient.playSound(null); // Stop the long introduction sound
-            freeColClient.playSound("sound.intro." + myPlayer.getNationID());
+            gui.playSound(null); // Stop the long introduction sound
+            gui.playSound("sound.intro." + myPlayer.getNationID());
         }
         freeColClient.getClient()
             .setMessageHandler(freeColClient.getInGameInputHandler());

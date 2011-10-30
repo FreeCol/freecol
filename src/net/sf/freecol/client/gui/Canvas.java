@@ -2230,7 +2230,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showTilePopup(Tile tile, int x, int y) {
         if (tile != null) {
-            TilePopup tp = new TilePopup(tile, freeColClient, this, getMapViewer());
+            TilePopup tp = new TilePopup(tile, freeColClient, gui, this, getMapViewer());
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
@@ -2295,12 +2295,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel.updateGameOptions();
     }
 
-    /**
-     * Updates the label displaying the current amount of gold.
-     */
-    public void updateGoldLabel() {
-        gui.getFrame().getJMenuBar().repaint();
-    }
 
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();

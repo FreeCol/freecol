@@ -83,7 +83,8 @@ public final class TilePopup extends JPopupMenu {
 
     private final Canvas canvas;
     private final FreeColClient freeColClient;
-    private final MapViewer gui;
+    private final GUI gui;
+    private final MapViewer mapViewer;
 
     private boolean hasAnItem = false;
 
@@ -94,10 +95,10 @@ public final class TilePopup extends JPopupMenu {
      *       The popup menu also appears near this <code>Tile</code>.
      * @param freeColClient The main controller object for the client.
      * @param canvas The component containing the map.
-     * @param gui An object with methods used for making the popup.
+     * @param mapViewer An object with methods used for making the popup.
      */
-    public TilePopup(final Tile tile, final FreeColClient freeColClient,
-                     final Canvas canvas, final MapViewer gui) {
+    public TilePopup(final Tile tile, final FreeColClient freeColClient, final GUI gui,
+                     final Canvas canvas, final MapViewer mapViewer) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
@@ -105,9 +106,10 @@ public final class TilePopup extends JPopupMenu {
         this.canvas = canvas;
         this.freeColClient = freeColClient;
         this.gui = gui;
+        this.mapViewer = mapViewer;
 
         final Player player = freeColClient.getMyPlayer();
-        final Unit activeUnit = gui.getActiveUnit();
+        final Unit activeUnit = mapViewer.getActiveUnit();
         if (activeUnit != null) {
             Tile unitTile = activeUnit.getTile();
             JMenuItem gotoMenuItem = null;
@@ -149,7 +151,7 @@ public final class TilePopup extends JPopupMenu {
 
                             //if unit did not move, we should show the goto path
                             if(activeUnit.getTile() == currTile){
-                            	gui.updateGotoPathForActiveUnit();
+                            	mapViewer.updateGotoPathForActiveUnit();
                             }
                         }
                     });
@@ -227,7 +229,7 @@ public final class TilePopup extends JPopupMenu {
                             freeColClient.getInGameController().clearOrders(unit);
                             lastUnit = unit;
                         }
-                        gui.setActiveUnit(lastUnit);
+                        mapViewer.setActiveUnit(lastUnit);
                     }
                 });
             add(activateAllItem);
@@ -435,7 +437,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    gui.setActiveUnit(unit);
+                    mapViewer.setActiveUnit(unit);
                 }
             });
         int lineCount = 1;
@@ -563,7 +565,7 @@ public final class TilePopup extends JPopupMenu {
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
         }
 
-        RumourType rumourChoice = freeColClient.getCanvas()
+        RumourType rumourChoice = gui.getCanvas()
             .showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
                               rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
@@ -586,7 +588,7 @@ public final class TilePopup extends JPopupMenu {
             uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString()
                                                               + ".name"), t));
         }
-        UnitType unitChoice = freeColClient.getCanvas()
+        UnitType unitChoice = gui.getCanvas()
             .showChoiceDialog(null, "Select Unit Type", "Cancel", uts);
         if (unitChoice == null) return;
 
@@ -601,7 +603,7 @@ public final class TilePopup extends JPopupMenu {
         Unit unit = new Unit(freeColClient.getGame(),
                 serverUnit.toXMLElement(DOMMessage.createNewDocument()));
         tile.add(unit);
-        gui.setActiveUnit(unit);
+        mapViewer.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
         canvas.refresh();
     }
