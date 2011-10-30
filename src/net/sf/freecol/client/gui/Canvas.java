@@ -288,6 +288,8 @@ public final class Canvas extends JDesktopPane {
 
     private final FreeColClient freeColClient;
 
+    private GUI gui;
+
     private MainPanel mainPanel;
 
     private final StartGamePanel startGamePanel;
@@ -298,7 +300,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
 
-    private final MapViewer gui;
+    private final MapViewer mapViewer;
 
     private final ServerListPanel serverListPanel;
 
@@ -324,18 +326,20 @@ public final class Canvas extends JDesktopPane {
 
     private Dimension initialSize = null;
 
+
     /**
      * The constructor to use.
      *
      * @param client main control class.
      * @param size The bounds of this <code>Canvas</code>.
-     * @param gui The object responsible of drawing the map onto this component.
+     * @param mapViewer The object responsible of drawing the map onto this component.
      */
-    public Canvas(FreeColClient client, Dimension size, MapViewer gui) {
+    public Canvas(FreeColClient client, GUI gui, Dimension size, MapViewer mapViewer) {
         this.freeColClient = client;
         this.gui = gui;
+        this.mapViewer = mapViewer;
 
-        colonyTileGUI = new MapViewer(client, size, freeColClient.getImageLibrary());
+        colonyTileGUI = new MapViewer(client, size, gui.getImageLibrary());
 
         initialSize = size;
 
@@ -605,7 +609,7 @@ public final class Canvas extends JDesktopPane {
      * @see GUIMessage
      */
     public void displayChatMessage(Player sender, String message, boolean privateChat) {
-        gui.addMessage(new GUIMessage(sender.getName() + ": " + message,
+        mapViewer.addMessage(new GUIMessage(sender.getName() + ": " + message,
                                       getImageLibrary().getColor(sender)));
     }
 
@@ -668,7 +672,7 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>GUI</code>.
      */
     public MapViewer getMapViewer() {
-        return gui;
+        return mapViewer;
     }
 
     /**
@@ -857,7 +861,7 @@ public final class Canvas extends JDesktopPane {
     public void paintComponent(Graphics g) {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
-        gui.display(g2d);
+        mapViewer.display(g2d);
     }
 
     /**
@@ -874,7 +878,7 @@ public final class Canvas extends JDesktopPane {
      * Refreshes this Canvas visually.
      */
     public void refresh() {
-        gui.forceReposition();
+        mapViewer.forceReposition();
         repaint(0, 0, getWidth(), getHeight());
     }
 
@@ -890,7 +894,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void refreshTile(Tile t) {
         if (t.getX() >= 0 && t.getY() >= 0) {
-            repaint(gui.getTileBounds(t));
+            repaint(mapViewer.getTileBounds(t));
         }
     }
 
@@ -1007,7 +1011,7 @@ public final class Canvas extends JDesktopPane {
         removeInGameComponents();
 
         showMainPanel();
-        freeColClient.playSound("sound.intro.general");
+        gui.playSound("sound.intro.general");
         repaint();
     }
 
@@ -1208,11 +1212,11 @@ public final class Canvas extends JDesktopPane {
      * @param t a <code>Tile</code> value
      */
     public void showColonyPanel(Tile t) {
-        if (gui.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
+        if (mapViewer.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
             if (t != null && t.getColony() != null
                 && t.getColony().getOwner().equals(freeColClient.getMyPlayer())) {
-                gui.setFocus(t);
-                gui.stopBlinking();
+                mapViewer.setFocus(t);
+                mapViewer.stopBlinking();
                 showColonyPanel(t.getColony());
             }
         }
@@ -1548,7 +1552,7 @@ public final class Canvas extends JDesktopPane {
 
         // plays an alert sound on each information message if the option for it is turned on
         if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
-            FreeColClient.get().playSound("sound.event.alertSound");
+            gui.playSound("sound.event.alertSound");
         }
 
         showFreeColPanel(new InformationDialog(this, text, icon), tile);
@@ -1843,7 +1847,7 @@ public final class Canvas extends JDesktopPane {
                 vp.stop();
                 Canvas.this.remove(vp);
                 showMainPanel();
-                freeColClient.playSound("sound.intro.general");
+                gui.playSound("sound.intro.general");
             }
         }
 
@@ -2319,8 +2323,8 @@ public final class Canvas extends JDesktopPane {
                 mc.addToComponent(this);
                 mapControls = mc;
             }
-            gui.setSize(getSize());
-            gui.forceReposition();
+            mapViewer.setSize(getSize());
+            mapViewer.forceReposition();
             oldSize = getSize();
         }
     }
@@ -2479,7 +2483,7 @@ public final class Canvas extends JDesktopPane {
      */
     private PopupPosition getPopupPosition(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
-        int where = gui.setOffsetFocus(tile);
+        int where = mapViewer.setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;

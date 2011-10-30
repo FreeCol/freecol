@@ -270,7 +270,7 @@ public class GUI {
             });
 
         this.mapViewer = new MapViewer(freeColClient, innerWindowSize, getImageLibrary());
-        this.canvas = new Canvas(freeColClient, innerWindowSize, mapViewer);
+        this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
         changeWindowedMode(isWindowed());
         getFrame().setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
