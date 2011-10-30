@@ -387,7 +387,7 @@ public final class MapViewer {
         }
         messages.add(message);
 
-        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+        gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
@@ -980,7 +980,7 @@ public final class MapViewer {
             } else {
                 Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
                 if (bgImage != null) {
-                    g.drawImage(bgImage, 0, 0, freeColClient.getCanvas());
+                    g.drawImage(bgImage, 0, 0, gui.getCanvas());
 
                     // Show version on initial screen
                     String versionStr = "v. " + FreeCol.getVersion();
@@ -1431,7 +1431,7 @@ public final class MapViewer {
             logger.warning("Failed to retrieve scaled image library.");
         }
         forceReposition();
-        freeColClient.getCanvas().refresh();
+        gui.getCanvas().refresh();
     }
 
 
@@ -1450,7 +1450,7 @@ public final class MapViewer {
         boolean ret = false;
 
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+            gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
             return ret;
         }
 
@@ -1505,7 +1505,7 @@ public final class MapViewer {
         this.focus = focus;
 
         forceReposition();
-        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+        gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
 
@@ -1520,7 +1520,7 @@ public final class MapViewer {
         this.focus = focus;
 
         forceReposition();
-        freeColClient.getCanvas().paintImmediately(0, 0, getWidth(), getHeight());
+        gui.getCanvas().paintImmediately(0, 0, getWidth(), getHeight());
     }
 
 
@@ -1532,7 +1532,7 @@ public final class MapViewer {
     public void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
 
-        freeColClient.getCanvas().refresh();
+        gui.getCanvas().refresh();
     }
 
 
@@ -1601,7 +1601,7 @@ public final class MapViewer {
             if (noActiveUnitIsAt(selectedTile)) {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
                     Settlement s = selectedTile.getSettlement();
-                    freeColClient.getCanvas().showSettlement(s);
+                    gui.getCanvas().showSettlement(s);
                     return ret;
                 }
 
@@ -1636,11 +1636,11 @@ public final class MapViewer {
             ret = true;
         } else {
             if (oldTile != null) {
-                freeColClient.getCanvas().refreshTile(oldTile);
+                gui.getCanvas().refreshTile(oldTile);
             }
 
             if (selectedTile != null) {
-                freeColClient.getCanvas().refreshTile(selectedTile);
+                gui.getCanvas().refreshTile(selectedTile);
             }
         }
         return ret;
@@ -1671,7 +1671,7 @@ public final class MapViewer {
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     Tile tile = getActiveUnit().getTile();
                     if (isTileVisible(tile)) {
-                        freeColClient.getCanvas().refreshTile(tile);
+                        gui.getCanvas().refreshTile(tile);
                     }
                 }
             }
@@ -1687,7 +1687,7 @@ public final class MapViewer {
     */
     public void startGoto() {
         gotoStarted = true;
-        freeColClient.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
+        gui.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
         setGotoPath(null);
     }
 
@@ -1705,7 +1705,7 @@ public final class MapViewer {
      * Stops any ongoing goto operation on the mapboard.
      */
     public void stopGoto() {
-        freeColClient.getCanvas().setCursor(null);
+        gui.getCanvas().setCursor(null);
         setGotoPath(null);
         updateGotoPathForActiveUnit();
         gotoStarted = false;
@@ -2394,7 +2394,7 @@ public final class MapViewer {
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
          */
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
 
         if (!freeColClient.isMapEditor()
             && freeColClient.getGame() != null
@@ -2890,7 +2890,7 @@ public final class MapViewer {
             unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
                     getTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            freeColClient.getCanvas().add(unitLabel, UNIT_LABEL_LAYER, false);
+            gui.getCanvas().add(unitLabel, UNIT_LABEL_LAYER, false);
         } else {
             i++;
         }
@@ -3336,12 +3336,12 @@ public final class MapViewer {
 
     private void redrawMapControls() {
         int x = 0, y = 0;
-        MapControls mapControls = freeColClient.getCanvas().getMapControls();
+        MapControls mapControls = gui.getCanvas().getMapControls();
         if (mapControls != null) {
             x = getWidth() - mapControls.getInfoPanelWidth();
             y = getHeight() - mapControls.getInfoPanelHeight();
         }
-        freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
+        gui.getCanvas().repaint(x, y, getWidth(), getHeight());
     }
 
 
@@ -3358,7 +3358,7 @@ public final class MapViewer {
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
-            freeColClient.getCanvas().remove(unitsOutForAnimationLabels.remove(unit), false);
+            gui.getCanvas().remove(unitsOutForAnimationLabels.remove(unit), false);
         } else {
             i--;
             unitsOutForAnimation.put(unit, i);

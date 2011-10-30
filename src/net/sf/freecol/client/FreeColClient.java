@@ -748,7 +748,7 @@ public final class FreeColClient {
     public void skipTurns(int turns) {
         if (freeColServer == null) return;
         freeColServer.getInGameController().setSkippedTurns(turns);
-        getCanvas().closeMenus();
+        gui.getCanvas().closeMenus();
         askServer().startSkipping();
     }
 

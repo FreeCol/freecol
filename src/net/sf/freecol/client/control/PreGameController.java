@@ -135,7 +135,7 @@ public final class PreGameController {
     * if all players are ready to start the game.
     */
     public void requestLaunch() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
 
         if (!freeColClient.getGame().isAllPlayersReadyToLaunch()) {
             canvas.errorMessage("server.notAllReady");
@@ -206,7 +206,7 @@ public final class PreGameController {
      * Starts the game.
      */
     public void startGame() {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         MapViewer mapViewer = freeColClient.getMapViewer();
 
         for (Player player : freeColClient.getGame().getPlayers()) {

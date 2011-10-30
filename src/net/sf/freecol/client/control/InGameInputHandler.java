@@ -271,11 +271,11 @@ public final class InGameInputHandler extends InputHandler {
                     player.divertModelMessages(fcgo, divert);
                 }
                 // Deselect the object if it is the current active unit.
-                MapViewer gui = getFreeColClient().getCanvas().getMapViewer();
+                MapViewer mapViewer = gui.getMapViewer();
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
-                    if (u == gui.getActiveUnit()) gui.setActiveUnit(null);
+                    if (u == mapViewer.getActiveUnit()) mapViewer.setActiveUnit(null);
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
                 }
@@ -350,7 +350,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (!client.isHeadless()
-            && Animations.getAnimationSpeed(client.getCanvas(), unit) > 0) {
+            && Animations.getAnimationSpeed(gui.getCanvas(), unit) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             String newTileId = element.getAttribute("newTile");
             Tile oldTile, newTile;
@@ -585,7 +585,7 @@ public final class InGameInputHandler extends InputHandler {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Canvas canvas = getFreeColClient().getCanvas();
+                Canvas canvas = gui.getCanvas();
                 canvas.displayChatMessage(chatMessage.getPlayer(),
                                           chatMessage.getMessage(),
                                           chatMessage.isPrivate());
@@ -635,7 +635,7 @@ public final class InGameInputHandler extends InputHandler {
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(getGame(), element);
         List<FoundingFather> ffs = message.getFathers();
-        Canvas canvas = getFreeColClient().getCanvas();
+        Canvas canvas = gui.getCanvas();
         ChooseFoundingFatherDialog dialog
             = new ChooseFoundingFatherDialog(canvas, ffs);
         FoundingFather ff = canvas.showFreeColDialog(dialog);
