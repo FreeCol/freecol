@@ -94,13 +94,13 @@ public class GUI {
      */
     public void changeWindowedMode(boolean windowed) {
         JMenuBar menuBar = null;
-        if (getFrame() != null) {
-            menuBar = getFrame().getJMenuBar();
-            if (getFrame() instanceof WindowedFrame) {
-                this.windowBounds = getFrame().getBounds();
+        if (frame != null) {
+            menuBar = frame.getJMenuBar();
+            if (frame instanceof WindowedFrame) {
+                this.windowBounds = frame.getBounds();
             }
-            getFrame().setVisible(false);
-            getFrame().dispose();
+            frame.setVisible(false);
+            frame.dispose();
         }
         setWindowed(windowed);
         if (windowed) {
@@ -108,22 +108,22 @@ public class GUI {
         } else {
             this.frame = new FullScreenFrame(getGd());
         }
-        getFrame().setJMenuBar(menuBar);
-        if (getFrame() instanceof WindowedFrame) {
-            ((WindowedFrame) getFrame()).setCanvas(getCanvas());
-            getFrame().getContentPane().add(getCanvas());
+        frame.setJMenuBar(menuBar);
+        if (frame instanceof WindowedFrame) {
+            ((WindowedFrame) frame).setCanvas(getCanvas());
+            frame.getContentPane().add(getCanvas());
             if (getWindowBounds() != null) {
-                getFrame().setBounds(getWindowBounds());
+                frame.setBounds(getWindowBounds());
             } else {
-                getFrame().pack();
+                frame.pack();
             }
-        } else if (getFrame() instanceof FullScreenFrame) {
-            ((FullScreenFrame) getFrame()).setCanvas(getCanvas());
-            getFrame().getContentPane().add(getCanvas());
+        } else if (frame instanceof FullScreenFrame) {
+            ((FullScreenFrame) frame).setCanvas(getCanvas());
+            frame.getContentPane().add(getCanvas());
         }
-        getMapViewer().forceReposition();
-        getCanvas().updateSizes();
-        getFrame().setVisible(true);
+        mapViewer.forceReposition();
+        canvas.updateSizes();
+        frame.setVisible(true);
     }
 
     public Dimension determineWindowSize() {
@@ -323,7 +323,7 @@ public class GUI {
         this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, getImageLibrary());
         this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
         changeWindowedMode(isWindowed());
-        getFrame().setIconImage(ResourceManager.getImage("FrameIcon.image"));
+        frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption) freeColClient.getClientOptions().getOption(ClientOptions.LANGUAGE);
@@ -367,8 +367,8 @@ public class GUI {
     }
     
     public void updateMenuBar() {
-        if (getFrame() != null && getFrame().getJMenuBar() != null) {
-            ((FreeColMenuBar) getFrame().getJMenuBar()).update();
+        if (frame != null && frame.getJMenuBar() != null) {
+            ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
     
