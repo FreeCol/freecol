@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -37,19 +38,20 @@ public class MiniMapZoomInAction extends MapboardAction {
     /**
      * Creates a new <code>MiniMapZoomInAction</code>.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    MiniMapZoomInAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    MiniMapZoomInAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui,id);
         addImageIcons("zoom_in");
     }
 
     /**
      * Creates a new <code>MiniMapZoomInAction</code>.
      * @param freeColClient The main controller object for the client.
-     * @param secondary a <code>boolean</code> value
+     * @param b a <code>boolean</code> value
      */
-    MiniMapZoomInAction(FreeColClient freeColClient, boolean secondary) {
-        super(freeColClient, id + ".secondary");
+    MiniMapZoomInAction(FreeColClient freeColClient, GUI gui, boolean b) {
+        super(freeColClient, gui, id + ".secondary");
         addImageIcons("zoom_in");
     }
 

@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for disbanding the active unit.
@@ -35,9 +36,10 @@ public class DisbandUnitAction extends UnitAction {
      * Creates a new <code>DisbandUnitAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    DisbandUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    DisbandUnitAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         addImageIcons("disband");
     }
 

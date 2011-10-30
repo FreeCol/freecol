@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for centering the view on the active unit.
@@ -34,9 +35,10 @@ public class CenterAction extends UnitAction {
      * Creates a new <code>CenterAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    CenterAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    CenterAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

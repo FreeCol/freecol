@@ -25,8 +25,9 @@ import java.awt.event.KeyEvent;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * Display text over tiles.
@@ -56,8 +57,8 @@ public class DisplayTileTextAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      * @param type a <code>DisplayText</code> value
      */
-    DisplayTileTextAction(FreeColClient freeColClient, DisplayText type) {
-        super(freeColClient, id + type, ClientOptions.DISPLAY_TILE_TEXT);
+    DisplayTileTextAction(FreeColClient freeColClient, GUI gui, DisplayText type) {
+        super(freeColClient, gui, id + type, ClientOptions.DISPLAY_TILE_TEXT);
         display = type;
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
                                               KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));

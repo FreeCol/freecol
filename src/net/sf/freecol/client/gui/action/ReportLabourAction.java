@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 
@@ -40,9 +41,10 @@ public class ReportLabourAction extends FreeColAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ReportLabourAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ReportLabourAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

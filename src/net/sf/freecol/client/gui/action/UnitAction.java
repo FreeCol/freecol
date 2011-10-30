@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,8 +33,8 @@ public abstract class UnitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client
      * @param id The id of this action
      */
-    protected UnitAction(FreeColClient freeColClient, String id) {
-        super(freeColClient, id);
+    protected UnitAction(FreeColClient freeColClient, GUI gui, String id) {
+        super(freeColClient, gui, id);
     }
 
     /**

@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
@@ -49,9 +50,10 @@ public class ChangeAction extends UnitAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ChangeAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ChangeAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         update();
     }
 

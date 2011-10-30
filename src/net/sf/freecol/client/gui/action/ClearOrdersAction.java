@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for clearing the active unit's orders.
@@ -34,9 +35,10 @@ public class ClearOrdersAction extends UnitAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ClearOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ClearOrdersAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

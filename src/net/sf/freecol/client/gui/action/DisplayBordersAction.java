@@ -25,6 +25,7 @@ import javax.swing.JCheckBoxMenuItem;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action to toggle the display of national borders.
@@ -38,9 +39,10 @@ public class DisplayBordersAction extends SelectableAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    DisplayBordersAction(FreeColClient freeColClient) {
-        super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
+    DisplayBordersAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id, ClientOptions.DISPLAY_BORDERS);
     }
 
     /**

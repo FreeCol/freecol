@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -37,9 +38,10 @@ public class ReportTurnAction extends FreeColAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ReportTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ReportTurnAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui,id);
     }
 
     /**

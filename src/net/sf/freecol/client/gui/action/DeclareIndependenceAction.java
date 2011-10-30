@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 
@@ -37,9 +38,10 @@ public class DeclareIndependenceAction extends MapboardAction {
      * Creates a new <code>DeclareIndependenceAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    DeclareIndependenceAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    DeclareIndependenceAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

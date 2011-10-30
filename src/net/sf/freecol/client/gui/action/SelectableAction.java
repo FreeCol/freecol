@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.action;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 
@@ -43,8 +44,8 @@ public abstract class SelectableAction extends MapboardAction {
      * @param id a <code>String</code> value
      * @param optionId the id of a boolean client option
      */
-    protected SelectableAction(FreeColClient freeColClient, String id, String optionId) {
-        super(freeColClient, id);
+    protected SelectableAction(FreeColClient freeColClient, GUI gui, String id, String optionId) {
+        super(freeColClient, gui, id);
         this.optionId = optionId;
         setSelected(shouldBeSelected());
     }

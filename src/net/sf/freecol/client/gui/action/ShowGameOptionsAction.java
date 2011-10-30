@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 
 /**
@@ -36,9 +37,10 @@ public class ShowGameOptionsAction extends FreeColAction {
      * Creates a new <code>ShowGameOptionsAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ShowGameOptionsAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ShowGameOptionsAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

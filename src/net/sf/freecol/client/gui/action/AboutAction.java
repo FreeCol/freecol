@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 
 /**
@@ -38,8 +39,8 @@ public class AboutAction extends FreeColAction {
      *
      * @param freeColClient The main controller object for the client.
      */
-    AboutAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    AboutAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         putValue(NAME, "FreeCol " + FreeCol.getRevision());
     }
 

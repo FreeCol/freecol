@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for renameing the active unit.
@@ -35,9 +36,10 @@ public class RenameAction extends UnitAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    RenameAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    RenameAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

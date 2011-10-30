@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 
 /**
@@ -38,9 +39,10 @@ public class FindSettlementAction extends MapboardAction {
      * Creates a new <code>FindSettlementAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    FindSettlementAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    FindSettlementAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

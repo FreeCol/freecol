@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 
 
@@ -61,8 +62,8 @@ public class ColopediaAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param panelId a <code>String</code> value
      */
-    ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
-        super(freeColClient, id + panelType);
+    ColopediaAction(FreeColClient freeColClient, GUI gui, PanelType panelType) {
+        super(freeColClient, gui, id + panelType);
         setMnemonic(mnemonics[panelType.ordinal()]);
     }
 

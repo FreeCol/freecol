@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 
 /**
@@ -35,9 +36,10 @@ public class TilePopupAction extends MapboardAction {
      * Creates a new <code>TilePopupAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    TilePopupAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    TilePopupAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

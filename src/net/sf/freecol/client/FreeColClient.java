@@ -194,7 +194,7 @@ public final class FreeColClient {
         inGameController = new InGameController(this, gui);
         inGameInputHandler = new InGameInputHandler(this, gui);
         mapEditorController = new MapEditorController(this, gui);
-        actionManager = new ActionManager(this);
+        actionManager = new ActionManager(this, gui);
         worker = new Worker();
         worker.start();
 

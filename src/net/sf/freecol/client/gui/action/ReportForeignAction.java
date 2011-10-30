@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 
 /**
@@ -37,9 +38,10 @@ public class ReportForeignAction extends FreeColAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ReportForeignAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ReportForeignAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

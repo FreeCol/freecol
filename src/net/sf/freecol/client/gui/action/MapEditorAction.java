@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for starting the Map Editor.
@@ -36,9 +37,10 @@ public class MapEditorAction extends FreeColAction {
      * Creates a new <code>MapEditorAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    MapEditorAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    MapEditorAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for reconnecting to the server.
@@ -35,9 +36,10 @@ public class ReconnectAction extends FreeColAction {
      * Creates a new <code>DeclareIndependenceAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ReconnectAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ReconnectAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

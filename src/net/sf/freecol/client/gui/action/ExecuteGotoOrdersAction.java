@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -37,9 +38,10 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * Creates a new <code>ExecuteGotoOrdersAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ExecuteGotoOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ExecuteGotoOrdersAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

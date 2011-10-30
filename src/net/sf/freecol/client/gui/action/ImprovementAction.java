@@ -21,8 +21,8 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
@@ -41,8 +41,8 @@ public class ImprovementAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param improvement <code>TileImprovementType</code> ??
      */
-    public ImprovementAction(FreeColClient freeColClient, TileImprovementType improvement) {
-        super(freeColClient, improvement.getShortId() + "Action");
+    public ImprovementAction(FreeColClient freeColClient, GUI gui, TileImprovementType improvement) {
+        super(freeColClient, gui, improvement.getShortId() + "Action");
         this.improvement = improvement;
         addImageIcons(improvement.getShortId());
     }

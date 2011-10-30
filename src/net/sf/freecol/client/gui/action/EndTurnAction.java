@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for ending the turn.
@@ -40,9 +41,10 @@ public class EndTurnAction extends MapboardAction {
      * Creates a new <code>EndTurnAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    EndTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    EndTurnAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 

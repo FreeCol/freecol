@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 
 
@@ -38,9 +39,10 @@ public class ReportIndianAction extends FreeColAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ReportIndianAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ReportIndianAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

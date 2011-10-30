@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for saving the game.
@@ -36,9 +37,10 @@ public class SaveAction extends FreeColAction {
      * Creates a new <code>SaveAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    SaveAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    SaveAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

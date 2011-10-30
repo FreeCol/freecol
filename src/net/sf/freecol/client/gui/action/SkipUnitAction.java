@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for skipping the active unit.
@@ -36,9 +37,10 @@ public class SkipUnitAction extends UnitAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    SkipUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    SkipUnitAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui,id);
         addImageIcons("done");
     }
 

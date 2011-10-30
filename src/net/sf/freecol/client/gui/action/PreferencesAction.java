@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for editing user preferences.
@@ -36,9 +37,10 @@ public class PreferencesAction extends FreeColAction {
      * Creates a new <code>DeclareIndependenceAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    PreferencesAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    PreferencesAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

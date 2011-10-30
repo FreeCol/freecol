@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for prompting the user to save before quitting the game.
@@ -36,9 +37,10 @@ public class SaveAndQuitAction extends FreeColAction {
      * Creates a new <code>SaveAndQuitAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    SaveAndQuitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    SaveAndQuitAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

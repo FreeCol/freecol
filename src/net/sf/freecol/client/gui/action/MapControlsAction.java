@@ -25,6 +25,7 @@ import javax.swing.AbstractButton;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
 
 /**
@@ -43,9 +44,10 @@ public class MapControlsAction extends SelectableAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    MapControlsAction(FreeColClient freeColClient) {
-        super(freeColClient, id, ClientOptions.DISPLAY_MAP_CONTROLS);
+    MapControlsAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id, ClientOptions.DISPLAY_MAP_CONTROLS);
     }
 
     /**

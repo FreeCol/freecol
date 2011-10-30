@@ -31,17 +31,15 @@ import net.sf.freecol.client.gui.GUI;
 public class ChangeWindowedModeAction extends SelectableAction {
 
     public static final String id = "changeWindowedModeAction";
-    private GUI guiFacade;
-
 
     /**
      * Creates a new <code>ChangeWindowedModeAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ChangeWindowedModeAction(FreeColClient freeColClient) {
-        super(freeColClient, id, "NO_ID");
-        guiFacade = freeColClient.getGUI();
+    ChangeWindowedModeAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id, "NO_ID");
     }
 
     /**
@@ -49,7 +47,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public void update() {
-        selected = !guiFacade.isWindowed();
+        selected = !gui.isWindowed();
     }
 
     /**
@@ -57,7 +55,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
-        return !(guiFacade == null || guiFacade.isWindowed());
+        return !(gui == null || gui.isWindowed());
     }
 
     /**
@@ -67,6 +65,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        guiFacade.changeWindowedMode(!guiFacade.isWindowed());
+        gui.changeWindowedMode(!gui.isWindowed());
     }
 }

@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for loading a game or map.
@@ -36,9 +37,10 @@ public class OpenAction extends FreeColAction {
      * Creates a new <code>OpenAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    OpenAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    OpenAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

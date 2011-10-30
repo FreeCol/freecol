@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for quitting the game.
@@ -36,9 +37,10 @@ public class QuitAction extends FreeColAction {
      * Creates a new <code>QuitAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    QuitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    QuitAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

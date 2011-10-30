@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * Returns to the <code>MainPanel</code>.
@@ -38,9 +39,10 @@ public class ShowMainAction extends FreeColAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ShowMainAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ShowMainAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

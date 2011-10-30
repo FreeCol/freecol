@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -41,9 +42,10 @@ public class LoadAction extends MapboardAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    public LoadAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    public LoadAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

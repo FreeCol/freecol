@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for ordering the active unit to wait for further orders.
@@ -36,9 +37,10 @@ public class WaitAction extends UnitAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    WaitAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    WaitAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         addImageIcons("wait");
     }
 

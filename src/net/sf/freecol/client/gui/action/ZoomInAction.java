@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for zooming in on the main map.
@@ -37,9 +38,10 @@ public class ZoomInAction extends FreeColAction {
      * Creates a new <code>ZoomInAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ZoomInAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ZoomInAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

@@ -21,9 +21,10 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ViewMode;
+import net.sf.freecol.common.model.Map.Direction;
 
 /**
  * An action for chosing the next unit as the active unit.
@@ -40,8 +41,8 @@ public class MoveAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      * @param direction a <code>Direction</code> value
      */
-    MoveAction(FreeColClient freeColClient, Direction direction) {
-        super(freeColClient, id + direction);
+    MoveAction(FreeColClient freeColClient, GUI gui, Direction direction) {
+        super(freeColClient, gui, id + direction);
         this.direction = direction;
     }
 
@@ -52,8 +53,8 @@ public class MoveAction extends MapboardAction {
      * @param direction a <code>Direction</code> value
      * @param secondary a <code>boolean</code> value
      */
-    MoveAction(FreeColClient freeColClient, Direction direction, boolean secondary) {
-        super(freeColClient, id + direction + ".secondary");
+    MoveAction(FreeColClient freeColClient, GUI gui, Direction direction, boolean secondary) {
+        super(freeColClient, gui, id + direction + ".secondary");
         this.direction = direction;
     }
 

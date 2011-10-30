@@ -24,6 +24,7 @@ import java.io.File;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
@@ -38,9 +39,10 @@ public class ContinueAction extends FreeColAction {
      * Creates a new <code>ContinueAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ContinueAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ContinueAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         
         // interim solution to be replaced! redirect to identical NAME text
         putValue(NAME, Messages.message("victory.continue"));

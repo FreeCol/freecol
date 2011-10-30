@@ -26,6 +26,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * Switch debug mode on.
@@ -38,9 +39,10 @@ public class DebugAction extends FreeColAction {
      * Creates a new <code>DebugAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    DebugAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    DebugAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK));
     }
 

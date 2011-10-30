@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -40,9 +41,10 @@ public class NewEmptyMapAction extends MapboardAction {
      * Creates this action
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    NewEmptyMapAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    NewEmptyMapAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

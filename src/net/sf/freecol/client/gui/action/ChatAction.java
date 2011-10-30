@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for initiating chatting.
@@ -38,8 +39,8 @@ public class ChatAction extends FreeColAction {
      *
      * @param freeColClient The main controller object for the client.
      */
-    ChatAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ChatAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

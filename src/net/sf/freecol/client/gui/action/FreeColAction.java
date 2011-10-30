@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -58,6 +59,8 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
 
     private int orderButtonImageCount = 0;
 
+    protected GUI gui;
+
 
     /**
      * Creates a new <code>FreeColAction</code>.
@@ -65,10 +68,12 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @param freeColClient The main controller object for the client.
      * @param id a <code>String</code> value
      */
-    protected FreeColAction(FreeColClient freeColClient, String id) {
+    protected FreeColAction(FreeColClient freeColClient, GUI gui, String id) {
         super(Messages.message(id + ".name"));
 
         this.freeColClient = freeColClient;
+        
+        this.gui = gui;
 
         putValue(ACTION_ID, id);
 

@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
@@ -49,9 +50,10 @@ public class DetermineHighSeasAction extends FreeColAction {
      * Creates a new <code>DetermineHighSeasAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    DetermineHighSeasAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    DetermineHighSeasAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

@@ -24,6 +24,7 @@ package net.sf.freecol.client.gui.action;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -40,8 +41,8 @@ public abstract class MapboardAction extends FreeColAction {
      * @param freeColClient The main controller object for the client
      * @param id a <code>String</code> value
      */
-    protected MapboardAction(FreeColClient freeColClient, String id) {
-        super(freeColClient, id);
+    protected MapboardAction(FreeColClient freeColClient, GUI gui, String id) {
+        super(freeColClient, gui, id);
     }
 
     /**

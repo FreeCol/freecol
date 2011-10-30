@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 
 /**
@@ -37,9 +38,10 @@ public class ShowMapGeneratorOptionsAction extends FreeColAction {
      * Creates a new <code>ShowMapGeneratorOptionsAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    ShowMapGeneratorOptionsAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    ShowMapGeneratorOptionsAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**

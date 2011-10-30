@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -36,9 +37,10 @@ public class SentryAction extends UnitAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    public SentryAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    public SentryAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
         addImageIcons("sentry");
     }
 

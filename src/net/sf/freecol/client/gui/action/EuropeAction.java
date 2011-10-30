@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 /**
  * An action for displaying the
@@ -36,9 +37,10 @@ public class EuropeAction extends MapboardAction {
      * Creates a new <code>EuropeAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui 
      */
-    EuropeAction(FreeColClient freeColClient) {
-        super(freeColClient, id);
+    EuropeAction(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, id);
     }
 
     /**
