@@ -75,7 +75,7 @@ public class NewEmptyMapAction extends MapboardAction {
         MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
         mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);
 
-        freeColClient.getMapViewer().setFocus(game.getMap().getTile(1,1));
+        gui.getMapViewer().setFocus(game.getMap().getTile(1,1));
         freeColClient.getActionManager().update();
         canvas.refresh();
     }

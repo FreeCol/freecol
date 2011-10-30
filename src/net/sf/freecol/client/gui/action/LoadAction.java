@@ -56,9 +56,9 @@ public class LoadAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            MapViewer mapViewer = getFreeColClient().getMapViewer();
+            MapViewer mapViewer = gui.getMapViewer();
             if (mapViewer != null) {
-                Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
+                Unit unit = gui.getMapViewer().getActiveUnit();
                 return (unit != null && unit.isCarrier()
                         && unit.getGoodsCount() > 0
                         && unit.getColony() != null);
@@ -72,7 +72,7 @@ public class LoadAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
+        Unit unit = gui.getMapViewer().getActiveUnit();
         if (unit != null) {
             Colony colony = unit.getColony();
             if (colony != null) {

@@ -65,6 +65,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -158,14 +159,18 @@ public final class ColonyPanel extends FreeColPanel
     private JButton setGoodsButton = (FreeCol.isInDebugMode())
         ? new JButton("Set Goods") : null;
 
+    private GUI gui;
+
 
     /**
      * The constructor for the panel.
      *
      * @param parent The parent of this panel
      */
-    public ColonyPanel(final Canvas parent, Colony colony) {
+    public ColonyPanel(GUI gui, final Canvas parent, Colony colony) {
         super(parent);
+        
+        this.gui = gui;
 
         setFocusCycleRoot(true);
 
@@ -706,14 +711,14 @@ public final class ColonyPanel extends FreeColPanel
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
-                Unit activeUnit = canvas.getMapViewer().getActiveUnit();
+                Unit activeUnit = gui.getMapViewer().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                     || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    canvas.getMapViewer().setActiveUnit(null);
+                    gui.getMapViewer().setActiveUnit(null);
                     getController().nextActiveUnit();
                 }
             }
-            getFreeColClient().getMapViewer().restartBlinking();
+            gui.getMapViewer().restartBlinking();
         }
     }
 

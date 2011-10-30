@@ -227,7 +227,7 @@ public final class MapEditorController {
             public void run() {
                 try {
                     // create thumbnail
-                    MiniMap miniMap = new MiniMap(freeColClient);
+                    MiniMap miniMap = new MiniMap(freeColClient, gui);
                     miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
                     int width = freeColClient.getGame().getMap().getWidth()
                         * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;

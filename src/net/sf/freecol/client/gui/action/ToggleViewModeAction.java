@@ -52,6 +52,6 @@ public class ToggleViewModeAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getMapViewer().getViewMode().toggleViewMode();
+        gui.getMapViewer().getViewMode().toggleViewMode();
     }
 }

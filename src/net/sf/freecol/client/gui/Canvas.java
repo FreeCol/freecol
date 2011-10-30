@@ -1201,7 +1201,7 @@ public final class Canvas extends JDesktopPane {
     public ColonyPanel showColonyPanel(Colony colony) {
         ColonyPanel panel = getColonyPanel(colony);
         if (panel != null) return panel;
-        panel = new ColonyPanel(this, colony);
+        panel = new ColonyPanel(gui, this, colony);
         showSubPanel(panel, getPopupPosition(colony.getTile()));
         return panel;
     }

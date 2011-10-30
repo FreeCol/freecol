@@ -39,6 +39,7 @@ import javax.swing.event.MouseInputListener;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
@@ -93,13 +94,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     private int adjustX = 0, adjustY = 0;
 
+    private GUI gui;
+
     /**
      * The constructor that will initialize this component.
      *
      * @param freeColClient The main controller object for the client
      */
-    public MiniMap(FreeColClient freeColClient) {
+    public MiniMap(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         backgroundColor = Color.BLACK;
 
         tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
@@ -257,7 +261,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         final Graphics2D g = (Graphics2D) graphics;
         final AffineTransform originTransform = g.getTransform();
         final Map map = freeColClient.getGame().getMap();
-        final ImageLibrary library = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary library = gui.getImageLibrary();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
@@ -268,7 +272,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         g.setColor(ResourceManager.getColor("miniMapBackground.color"));
         g.fillRect(0, 0, width, height);
 
-        if (freeColClient.getMapViewer() == null || freeColClient.getMapViewer().getFocus() == null) {
+        if (gui.getMapViewer() == null || gui.getMapViewer().getFocus() == null) {
             return;
         }
 
@@ -278,8 +282,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int ySize = (height / tileSize) * 4;
 
         /* Center the mini map correctly based on the map's focus */
-        firstColumn = freeColClient.getMapViewer().getFocus().getX() - (xSize / 2);
-        firstRow = freeColClient.getMapViewer().getFocus().getY() - (ySize / 2);
+        firstColumn = gui.getMapViewer().getFocus().getX() - (xSize / 2);
+        firstRow = gui.getMapViewer().getFocus().getY() - (ySize / 2);
 
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
@@ -380,8 +384,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * x/yTiles are the number of tiles that fit on the large map */
         if (getParent() != null) {
             TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
-            int miniRectX = (freeColClient.getMapViewer().getFocus().getX() - firstColumn) * tileSize;
-            int miniRectY = (freeColClient.getMapViewer().getFocus().getY() - firstRow) * tileSize / 4;
+            int miniRectX = (gui.getMapViewer().getFocus().getX() - firstColumn) * tileSize;
+            int miniRectY = (gui.getMapViewer().getFocus().getY() - firstRow) * tileSize / 4;
             int miniRectWidth = (getParent().getWidth() / library.getTerrainImageWidth(tileType) + 1) * tileSize;
             int miniRectHeight = (getParent().getHeight() / library.getTerrainImageHeight(tileType) + 1) * tileSize / 2;
             if (miniRectX + miniRectWidth / 2 > width) {
@@ -424,7 +428,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int tileX = ((x - adjustX) / tileSize) + firstColumn;
         int tileY = ((y - adjustY) / tileSize * 4) + firstRow;
 
-        freeColClient.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
+        gui.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
     }
 
     private void focus(MouseEvent e) {

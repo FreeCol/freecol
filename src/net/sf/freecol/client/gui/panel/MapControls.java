@@ -32,7 +32,7 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
@@ -67,23 +67,27 @@ public final class MapControls {
     private final UnitButton[]     unitButton;
     private final JLabel compassRose;
 
+    private GUI gui;
+
     private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
     /**
      * The basic constructor.
      * @param freeColClient The main controller object for the client
+     * @param gui 
      */
-    public MapControls(final FreeColClient freeColClient) {
+    public MapControls(final FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
 
         //
         // Create GUI Objects
         //
 
-        infoPanel = new InfoPanel(freeColClient);
-        miniMap = new MiniMap(freeColClient);
+        infoPanel = new InfoPanel(freeColClient, gui);
+        miniMap = new MiniMap(freeColClient, gui);
         compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
-
+ 
         final ActionManager am = freeColClient.getActionManager();
 
         List<UnitButton> ubList = new ArrayList<UnitButton>();
@@ -268,15 +272,14 @@ public final class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
-        MapViewer mapViewer = freeColClient.getMapViewer();
-        int viewMode = mapViewer.getViewMode().getView();
+        int viewMode = gui.getMapViewer().getViewMode().getView();
         switch (viewMode) {
         case ViewMode.MOVE_UNITS_MODE:
-            infoPanel.update(mapViewer.getActiveUnit());
+            infoPanel.update(gui.getMapViewer().getActiveUnit());
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            if (mapViewer.getSelectedTile() != null) {
-                Tile selectedTile = mapViewer.getSelectedTile();
+            if (gui.getMapViewer().getSelectedTile() != null) {
+                Tile selectedTile = gui.getMapViewer().getSelectedTile();
                 if (infoPanel.getTile() != selectedTile) {
                     infoPanel.update(selectedTile);
                 }

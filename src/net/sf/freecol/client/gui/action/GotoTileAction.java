@@ -55,7 +55,7 @@ public class GotoTileAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getFreeColClient().getMapViewer().getActiveUnit().getTile() != null;
+            && gui.getMapViewer().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -63,7 +63,7 @@ public class GotoTileAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        MapViewer mapViewer = getFreeColClient().getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         Unit unit = mapViewer.getActiveUnit();
 
         // Action should be disabled if there is no active unit, but make sure

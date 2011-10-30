@@ -40,6 +40,7 @@ import javax.swing.SwingConstants;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -124,14 +125,18 @@ public final class ReportColonyPanel extends ReportPanel
     private Color cExport;
     private Color cGood;
 
+    private GUI gui;
+
 
     /**
      * The constructor that will add the items to this panel.
+     * @param gui 
      *
      * @param parent The parent of this panel.
      */
-    public ReportColonyPanel(Canvas parent) {
+    public ReportColonyPanel(GUI gui, Canvas parent) {
         super(parent, Messages.message("reportColonyAction.name"));
+        this.gui = gui;
         colonies = getSortedColonies();
 
         try {
@@ -309,7 +314,7 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    panel = new ColonyPanel(canvas, (Colony) fcgo);
+                    panel = new ColonyPanel(gui, canvas, (Colony) fcgo);
                 }
             }
             if (panel != null) {

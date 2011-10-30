@@ -67,7 +67,7 @@ public class ChangeAction extends UnitAction {
     public void update() {
         super.update();
 
-        MapViewer mapViewer = getFreeColClient().getMapViewer();
+        MapViewer mapViewer = gui.getMapViewer();
         if (mapViewer != null) {
             Unit unit = mapViewer.getActiveUnit();
             if (unit != null && unit.getTile() != null) {
@@ -90,7 +90,7 @@ public class ChangeAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getFreeColClient().getMapViewer().getActiveUnit().getTile() != null;
+            && gui.getMapViewer().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -98,13 +98,13 @@ public class ChangeAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getFreeColClient().getMapViewer().getActiveUnit();
+        Unit unit = gui.getMapViewer().getActiveUnit();
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
             gui.getCanvas().showColonyPanel(tile.getColony());
         } else if (unit.isOnCarrier()) {
-            getFreeColClient().getMapViewer().setActiveUnit(((Unit) unit.getLocation()));
+            gui.getMapViewer().setActiveUnit(((Unit) unit.getLocation()));
         } else {
             Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
@@ -115,7 +115,7 @@ public class ChangeAction extends UnitAction {
                 } else if (activeUnitFound
                     && u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    getFreeColClient().getMapViewer().setActiveUnit(u);
+                    gui.getMapViewer().setActiveUnit(u);
                     return;
                 }
             }
@@ -126,7 +126,7 @@ public class ChangeAction extends UnitAction {
                     return;
                 } else if (u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    getFreeColClient().getMapViewer().setActiveUnit(u);
+                    gui.getMapViewer().setActiveUnit(u);
                     return;
                 }
             }

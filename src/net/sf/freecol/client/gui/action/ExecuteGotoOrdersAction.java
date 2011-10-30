@@ -50,9 +50,8 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        FreeColClient fcc = getFreeColClient();
-        Unit active = fcc.getMapViewer().getActiveUnit();
-        fcc.getInGameController().executeGotoOrders();
-        fcc.getMapViewer().setActiveUnit(active);
+        Unit active = gui.getMapViewer().getActiveUnit();
+        getFreeColClient().getInGameController().executeGotoOrders();
+        gui.getMapViewer().setActiveUnit(active);
     }
 }

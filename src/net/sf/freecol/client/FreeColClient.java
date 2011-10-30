@@ -37,7 +37,6 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -466,16 +465,6 @@ public final class FreeColClient {
      */
     public Canvas getCanvas() {
         return gui.getCanvas();
-    }
-
-    /**
-     * Gets the <code>GUI</code> that is being used to draw the map on the
-     * {@link Canvas}.
-     *
-     * @return The <code>GUI</code>.
-     */
-    public MapViewer getMapViewer() {
-        return gui.getMapViewer();
     }
 
     private void exitActions () {

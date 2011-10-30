@@ -47,6 +47,6 @@ public class CenterAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getMapViewer().centerActiveUnit();
+        gui.getMapViewer().centerActiveUnit();
     }
 }

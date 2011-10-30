@@ -83,7 +83,7 @@ public class MapControlsAction extends SelectableAction {
     private void showMapControls(boolean value) {
         if (value && getFreeColClient().isInGame()) {
             if (mapControls == null) {
-                mapControls = new MapControls(getFreeColClient());
+                mapControls = new MapControls(getFreeColClient(), gui);
             }
             mapControls.update();
         }

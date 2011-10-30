@@ -61,7 +61,7 @@ public class ZoomInAction extends FreeColAction {
         if (canvas == null || !canvas.isMapboardActionsEnabled())
         	return false;
 
-        float oldScaling = getFreeColClient().getMapViewer().getMapScale();
+        float oldScaling = gui.getMapViewer().getMapScale();
 
         return oldScaling < 1.0;
     }
@@ -72,7 +72,7 @@ public class ZoomInAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getMapViewer().scaleMap(1/4f);
+        gui.getMapViewer().scaleMap(1/4f);
         update();
         freeColClient.getActionManager().getFreeColAction(ZoomOutAction.id).update();
     }

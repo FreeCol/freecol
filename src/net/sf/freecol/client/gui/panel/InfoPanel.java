@@ -34,11 +34,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.ViewMode;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.action.EndTurnAction;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
@@ -49,8 +52,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This is the panel that shows more details about the currently selected unit
@@ -66,7 +67,7 @@ public final class InfoPanel extends FreeColPanel {
 
     public static final int PANEL_HEIGHT = 128;
 
-    private final EndTurnPanel endTurnPanel = new EndTurnPanel();
+    private final EndTurnPanel endTurnPanel; 
 
     private final UnitInfoPanel unitInfoPanel;
 
@@ -74,14 +75,19 @@ public final class InfoPanel extends FreeColPanel {
 
     private final JPanel mapEditorPanel;
 
+    private GUI gui;
+
 
     /**
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The main controller object for the client.
      */
-    public InfoPanel(final FreeColClient freeColClient) {
-        super(freeColClient.getCanvas());
+    public InfoPanel(final FreeColClient freeColClient, final GUI gui) {
+        super(gui.getCanvas());
+        this.gui = gui;
+        
+        this.endTurnPanel = new EndTurnPanel(gui);
 
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
@@ -111,7 +117,7 @@ public final class InfoPanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
            @Override
            public void mousePressed(MouseEvent e) {
-              MapViewer mapViewer = getFreeColClient().getMapViewer();
+              MapViewer mapViewer = gui.getMapViewer();
               Unit activeUnit = mapViewer.getActiveUnit();
               if (activeUnit != null && activeUnit.getTile() != null) {
                   mapViewer.setFocus(activeUnit.getTile());
@@ -199,7 +205,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = getFreeColClient().getMapViewer().getViewMode().getView();
+        int viewMode = gui.getMapViewer().getViewMode().getView();
         if (!getFreeColClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);
@@ -275,7 +281,7 @@ public final class InfoPanel extends FreeColPanel {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                getFreeColClient().getMapViewer()
+                gui.getMapViewer()
                     .displayTerrain(image.createGraphics(), tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
@@ -428,13 +434,13 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class EndTurnPanel extends JPanel {
 
-        public EndTurnPanel() {
+        public EndTurnPanel(GUI gui) {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
             String labelString = Messages.message("infoPanel.endTurnPanel.text");
             int width = getFontMetrics(getFont()).stringWidth(labelString);
             if (width > 150 ) {
-                getCanvas().getMapViewer();
+                gui.getMapViewer();
                 int index = MapViewer.getBreakingPoint(labelString);
                 if (index > 0) {
                     add(new JLabel(labelString.substring(0, index)));
