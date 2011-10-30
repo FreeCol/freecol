@@ -29,9 +29,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.option.UnitTypeOption;
 
 
 /**
@@ -43,7 +45,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
 
     private JPanel panel = new JPanel();
     private IntegerOptionUI numberUI;
-    private StringOptionUI typeUI;
+    private UnitTypeOptionUI typeUI;
     private StringOptionUI roleUI;
 
     /**
@@ -58,7 +60,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
         panel.setLayout(new MigLayout());
 
         IntegerOption numberOption = option.getNumber();
-        StringOption typeOption = option.getUnitType();
+        UnitTypeOption typeOption = option.getUnitType();
         StringOption roleOption = option.getRole();
 
         boolean numberEditable = editable
@@ -69,7 +71,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
-        typeUI = new StringOptionUI(typeOption, typeEditable);
+        typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
         typeUI.getComponent().setToolTipText(Messages.message("model.unit.type"));
         panel.add(typeUI.getComponent(), "width 35%");
 
@@ -98,10 +100,10 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
         typeUI.updateOption();
         roleUI.updateOption();
         numberUI.updateOption();
-        String id = typeUI.getOption().getValue();
+        UnitType type = typeUI.getOption().getValue();
         Role role = Role.valueOf(roleUI.getOption().getValue());
         int number = numberUI.getOption().getValue();
-        getOption().setValue(new AbstractUnit(id, role, number));
+        getOption().setValue(new AbstractUnit(type, role, number));
     }
 
     /**

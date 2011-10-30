@@ -73,6 +73,26 @@ public class FileOption extends AbstractOption<File> {
         isDefined = true;
     }
 
+    protected void setValue(String valueString, String defaultValueString) {
+        if (valueString != null) {
+            value = new File(valueString);
+        } else if (defaultValueString != null) {
+            value = new File(defaultValueString);
+        } else {
+            value = null;
+        }
+    }
+
+    /**
+     * Returns whether <code>null</code> is an acceptable value for
+     * this Option. This method always returns <code>true</code>.
+     *
+     * @return true
+     */
+    public boolean isNullValueOK() {
+        return true;
+    }
+
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -101,28 +121,6 @@ public class FileOption extends AbstractOption<File> {
         if (value != null) {
             out.writeAttribute(VALUE_TAG, value.getAbsolutePath());
         }
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
-        }
-
-        if (getId() == null || getId() == NO_ID) {
-            setId(id);
-        }
-        if (in.getAttributeValue(null, VALUE_TAG) != null && !in.getAttributeValue(null, VALUE_TAG).equals("")) {
-            setValue(new File(in.getAttributeValue(null, VALUE_TAG)));
-        }
-        in.nextTag();
     }
 
     /**

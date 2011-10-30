@@ -337,7 +337,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         findLanguages();
         super.readAttributes(in);
     }

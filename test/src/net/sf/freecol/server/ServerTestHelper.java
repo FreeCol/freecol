@@ -135,6 +135,7 @@ public final class ServerTestHelper {
         try {
             serv.saveGame(file, "user", null);
         } catch (IOException e) {
+            e.printStackTrace();
             fail(e.toString());
         }
         assertTrue(file.exists());

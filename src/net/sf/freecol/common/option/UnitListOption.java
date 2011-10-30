@@ -34,19 +34,29 @@ import net.sf.freecol.common.model.Specification;
  * Represents an option where the valid choice is a list of
  * AbstractUnits, e.g. the size of the REF.
  *
- * TODO: can we derive this from ListOption?
+ * TODO: can we derive this from ListOption? More precisely, implement
+ * AbstractOption<List<T extends AbstractOption>> and wrap Mod in Option.
  */
 public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
 
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(UnitListOption.class.getName());
 
+    /**
+     * A list of AbstractUnitOptions.
+     */
     private List<AbstractUnitOption> value = new ArrayList<AbstractUnitOption>();
+
+    /**
+     * The AbstractUnitOption used to generate new values.
+     */
+    private AbstractUnitOption template;
 
     /**
      * The maximum number of list entries. Defaults to Integer.MAX_VALUE.
      */
     private int maximumNumber = Integer.MAX_VALUE;
+
 
     /**
      * Creates a new <code>UnitListOption</code>.
@@ -106,6 +116,24 @@ public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
         isDefined = true;
     }
 
+    public AbstractUnitOption getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(AbstractUnitOption template) {
+        this.template = template;
+    }
+
+    /**
+     * Returns whether <code>null</code> is an acceptable value for
+     * this Option. This method always returns <code>true</code>.
+     *
+     * @return true
+     */
+    public boolean isNullValueOK() {
+        return true;
+    }
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -134,28 +162,23 @@ public class UnitListOption extends AbstractOption<List<AbstractUnitOption>> {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no id attribute found.");
-        }
-
-        if (getId() == null || getId() == NO_ID) {
-            setId(id);
-        }
-
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         maximumNumber = getAttribute(in, "maximumNumber", 1);
 
         value.clear();
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (AbstractUnitOption.getXMLElementTagName().equals(in.getLocalName())) {
                 AbstractUnitOption option = new AbstractUnitOption(getSpecification());
                 option.readFromXML(in);
                 value.add(option);
+            } else if ("template".equals(in.getLocalName())) {
+                in.nextTag();
+                template = new AbstractUnitOption(getSpecification());
+                template.readFromXML(in);
+                in.nextTag();
             }
         }
-
     }
 
     /**

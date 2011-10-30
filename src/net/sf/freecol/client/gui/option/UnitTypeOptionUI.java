@@ -28,38 +28,35 @@ import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
-import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.UnitTypeOption;
 
 
 /**
  * This class provides visualization for an {@link
- * net.sf.freecol.common.option.StringOption}. In order to enable
+ * net.sf.freecol.common.option.UnitTypeOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class StringOptionUI extends OptionUI<StringOption>  {
+public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
 
     private JComboBox box = new JComboBox();
 
     /**
-     * Creates a new <code>StringOptionUI</code> for the given <code>StringOption</code>.
+     * Creates a new <code>UnitTypeOptionUI</code> for the given <code>UnitTypeOption</code>.
      *
-     * @param option The <code>StringOption</code> to make a user interface for
+     * @param option The <code>UnitTypeOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public StringOptionUI(final StringOption option, boolean editable) {
+    public UnitTypeOptionUI(final UnitTypeOption option, boolean editable) {
         super(option, editable);
 
-        List<String> choices = option.getChoices();
+        List<UnitType> choices = option.getChoices();
 
-        box.setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
+        box.setModel(new DefaultComboBoxModel(choices.toArray(new UnitType[choices.size()])));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new ChoiceRenderer());
 
         initialize();
-    }
-
-    public void setRenderer(ListCellRenderer renderer) {
-        box.setRenderer(renderer);
     }
 
     /**
@@ -73,7 +70,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        getOption().setValue((String) box.getSelectedItem());
+        getOption().setValue((UnitType) box.getSelectedItem());
     }
 
     /**
@@ -87,7 +84,11 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message((String) value + ".name"));
+            if (value == null) {
+                label.setText(Messages.message("none"));
+            } else {
+                label.setText(Messages.getName((UnitType) value));
+            }
         }
     }
 }

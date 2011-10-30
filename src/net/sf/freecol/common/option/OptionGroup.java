@@ -291,6 +291,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             option = new AudioMixerOption(getSpecification());
         } else if (StringOption.getXMLElementTagName().equals(optionType)) {
             option = new StringOption(getSpecification());
+        } else if (UnitTypeOption.getXMLElementTagName().equals(optionType)) {
+            option = new UnitTypeOption(getSpecification());
         } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
             option = new UnitListOption(getSpecification());
         } else if ("action".equals(optionType)) {
@@ -345,9 +347,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     @SuppressWarnings("unchecked")
     public void setValue(OptionGroup value) {
         for (Option other : value.getOptions()) {
-            if (other instanceof AbstractOption) {
-                AbstractOption mine = (AbstractOption) getOption(other.getId());
-                mine.setValue(((AbstractOption) other).getValue());
+            Option mine = getOption(other.getId());
+            // could be null if using custom.xml generated from an
+            // older version of the specification, for example
+            if (mine != null) {
+                mine.setValue(other.getValue());
             }
         }
     }

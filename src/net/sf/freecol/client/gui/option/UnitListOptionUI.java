@@ -110,7 +110,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
             public void actionPerformed(ActionEvent e) {
                 AbstractUnitOption oldValue = (AbstractUnitOption) list.getSelectedValue();
                 if (oldValue == null) {
-                    oldValue = getOption().getValue().get(0);
+                    oldValue = getOption().getTemplate();
                 }
                 AbstractUnitOption value = oldValue.clone();
                 if (showEditDialog(value)) {

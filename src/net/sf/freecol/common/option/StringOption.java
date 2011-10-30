@@ -27,10 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Specification.TypeSelector;
 
 
 /**
@@ -41,22 +38,10 @@ public class StringOption extends AbstractOption<String> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(StringOption.class.getName());
 
-    public static final String NONE = "none";
-
     /**
      * The option value.
      */
     private String value;
-
-    /**
-     * Whether to add "none" to the list of choices to be generated.
-     */
-    private boolean addNone;
-
-    /**
-     * Which choices to generate.
-     */
-    private TypeSelector generateChoices;
 
     /**
      * A list of choices to provide to the UI.
@@ -83,11 +68,21 @@ public class StringOption extends AbstractOption<String> {
         super(specification);
     }
 
+    /**
+     * Creates a new <code>StringOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object
+     *     should be found in an {@link OptionGroup}.
+     * @param specification The specification this option belongs
+     *     to. May be null.
+     */
+    public StringOption(String id, Specification specification) {
+        super(id, specification);
+    }
+
     public StringOption clone() {
         StringOption result = new StringOption(getId());
         result.value = value;
-        result.addNone = addNone;
-        result.generateChoices = generateChoices;
         result.choices = new ArrayList<String>(choices);
         result.isDefined = true;
         return result;
@@ -131,24 +126,6 @@ public class StringOption extends AbstractOption<String> {
     }
 
     /**
-     * Get the <code>AddNone</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean addNone() {
-        return addNone;
-    }
-
-    /**
-     * Set the <code>AddNone</code> value.
-     *
-     * @param newAddNone The new AddNone value.
-     */
-    public final void setAddNone(final boolean newAddNone) {
-        this.addNone = newAddNone;
-    }
-
-    /**
      * Get the <code>Choices</code> value.
      *
      * @return a <code>List<String></code> value
@@ -165,51 +142,6 @@ public class StringOption extends AbstractOption<String> {
     public final void setChoices(final List<String> newChoices) {
         this.choices = newChoices;
     }
-
-    /**
-     * Get the <code>GenerateChoices</code> value.
-     *
-     * @return a <code>Generate</code> value
-     */
-    public final TypeSelector getGenerateChoices() {
-        return generateChoices;
-    }
-
-    /**
-     * Set the <code>GenerateChoices</code> value.
-     *
-     * @param newGenerateChoices The new GenerateChoices value.
-     */
-    public final void setGenerateChoices(final TypeSelector newGenerateChoices) {
-        this.generateChoices = newGenerateChoices;
-    }
-
-    /**
-     * Generate the choices to provide to the UI based on the
-     * generateChoices value.
-     *
-     * @param specification the Specification that defines the game
-     * objects whose IDs will be generated
-     */
-    public void generateChoices(Specification specification) {
-        if (generateChoices == null) {
-            if (choices == null || choices.isEmpty()) {
-                choices = new ArrayList<String>();
-                choices.add(getValue());
-            }
-        } else {
-            List<FreeColGameObjectType> objects =
-                specification.getTypes(generateChoices);
-            choices = new ArrayList<String>(objects.size() + (addNone ? 1 : 0));
-            if (addNone) {
-                choices.add(StringOption.NONE);
-            }
-            for (FreeColObject object : objects) {
-                choices.add(object.getId());
-            }
-        }
-    }
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -236,12 +168,6 @@ public class StringOption extends AbstractOption<String> {
         super.writeAttributes(out);
 
         out.writeAttribute(VALUE_TAG, value);
-        if (generateChoices != null) {
-            out.writeAttribute("generate", generateChoices.toString());
-        }
-        if (addNone) {
-            out.writeAttribute("addNone", Boolean.toString(addNone));
-        }
     }
 
     /**
@@ -270,11 +196,6 @@ public class StringOption extends AbstractOption<String> {
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        addNone = getAttribute(in, "addNone", false);
-        String generate = in.getAttributeValue(null, "generate");
-        if (generate != null) {
-            generateChoices = TypeSelector.valueOf(generate);
-        }
         choices = new ArrayList<String>();
     }
 

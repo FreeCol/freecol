@@ -139,6 +139,26 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     /**
+     * Returns whether <code>null</code> is an acceptable value for
+     * this Option. This method always returns <code>false</code>.
+     * Override it where necessary.
+     *
+     * @return false
+     */
+    public boolean isNullValueOK() {
+        return false;
+    }
+
+    /**
+     * Generate the choices to provide to the UI. This method does
+     * nothing. Override it if the Option needs to determine its
+     * choices dynamically.
+     */
+    public void generateChoices() {
+        // do nothing
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
@@ -155,22 +175,15 @@ abstract public class AbstractOption<T> extends FreeColObject
      * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        setId(getAttribute(in, ID_ATTRIBUTE_TAG, getId()));
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
         final String value = in.getAttributeValue(null, VALUE_TAG);
 
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid " + in.getLocalName()
-                                         + ": no id attribute found.");
-        }
-        if (defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid option " + id
+        if (!isNullValueOK() && defaultValue == null && value == null) {
+            throw new XMLStreamException("invalid option " + getId()
                                          + ": no value nor default value found.");
         }
 
-        if (getId() == null || getId() == NO_ID) {
-            setId(id);
-        }
         setValue(value, defaultValue);
     }
 

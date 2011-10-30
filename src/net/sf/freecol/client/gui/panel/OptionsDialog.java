@@ -258,6 +258,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             in.close();
             logger.info("Loaded custom options from file " + file.getPath());
         } catch(Exception e) {
+            e.printStackTrace();
             logger.warning("Failed to load OptionGroup with ID " + getOptionGroupId()
                            + " from " + file.getName() + ": " + e.toString());
         }

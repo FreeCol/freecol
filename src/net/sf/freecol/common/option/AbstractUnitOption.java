@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -28,8 +30,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Specification.TypeSelector;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
 
 /**
  * Represents an option where the valid choice is an AbstractUnit.
@@ -45,7 +47,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * An Option to determine the UnitType of the AbstractUnit.
      */
-    private StringOption unitType;
+    private UnitTypeOption unitType;
 
     /**
      * An Option to determine the Role of the AbstractUnit.
@@ -80,9 +82,17 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         super(specification);
     }
 
+    public AbstractUnitOption(String id, Specification specification) {
+        super(id, specification);
+    }
+
     public AbstractUnitOption clone() {
-        AbstractUnitOption result = new AbstractUnitOption(getId());
-        result.setValue(getValue().clone());
+        AbstractUnitOption result = new AbstractUnitOption(getId(), getSpecification());
+        if (getValue() == null) {
+            result.setValue(null);
+        } else {
+            result.setValue(getValue().clone());
+        }
         result.unitType = unitType.clone();
         result.role = role.clone();
         result.number = number.clone();
@@ -107,7 +117,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         final AbstractUnit oldValue = this.value;
         this.value = value;
 
-        if (!value.equals(oldValue) && isDefined) {
+        if (!((value == null && oldValue == null)
+              || value.equals(oldValue)) && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;
@@ -116,9 +127,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
    /**
      * Get the <code>UnitType</code> value.
      *
-     * @return a <code>StringOption</code> value
+     * @return a <code>UnitTypeOption</code> value
      */
-    public final StringOption getUnitType() {
+    public final UnitTypeOption getUnitType() {
         return unitType;
     }
 
@@ -127,7 +138,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      *
      * @param newUnitType The new UnitType value.
      */
-    public final void setUnitType(final StringOption newUnitType) {
+    public final void setUnitType(final UnitTypeOption newUnitType) {
         this.unitType = newUnitType;
     }
 
@@ -170,13 +181,24 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Generate the choices to provide to the UI based on the
      * generateChoices value.
-     *
-     * @param specification the Specification that defines the game
-     * objects whose IDs will be generated
      */
-    public void generateChoices(Specification specification) {
-        unitType.generateChoices(specification);
-        role.generateChoices(specification);
+    public void generateChoices() {
+        unitType.generateChoices();
+        List<String> roles = new ArrayList<String>();
+        for (Role r : Role.values()) {
+            roles.add(r.getId());
+        }
+        role.setChoices(roles);
+    }
+
+    /**
+     * Returns whether <code>null</code> is an acceptable value for
+     * this Option. This method always returns <code>true</code>.
+     *
+     * @return true
+     */
+    public boolean isNullValueOK() {
+        return true;
     }
 
     /**
@@ -201,42 +223,25 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-
-        if (id == null && getId().equals(NO_ID)){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName()
-                                         + "> tag : no id attribute found.");
-        }
-
-        if (getId() == null || getId() == NO_ID) {
-            setId(id);
-        }
-
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
             if ("number".equals(tag)) {
-                number = new IntegerOption(id + ".number");
+                number = new IntegerOption(getId() + ".number", getSpecification());
                 number.readFromXMLImpl(in);
             } else if ("unitType".equals(tag)) {
-                unitType = new StringOption(id + ".unitType");
+                unitType = new UnitTypeOption(getId() + ".unitType", getSpecification());
                 unitType.readFromXMLImpl(in);
             } else if ("role".equals(tag)) {
-                role = new StringOption(id + ".role");
+                role = new StringOption(getId() + ".role", getSpecification());
                 role.readFromXMLImpl(in);
             }
         }
-        setValue(new AbstractUnit(unitType.getValue(), Role.valueOf(role.getValue()), number.getValue()));
+        if (unitType.getValue() != null) {
+            setValue(new AbstractUnit(unitType.getValue(), Role.valueOf(role.getValue()), number.getValue()));
+        } else {
+            setValue(null);
+        }
     }
 
     /**
@@ -247,4 +252,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public static String getXMLElementTagName() {
         return "unitOption";
     }
+
+    public String toString() {
+        return getId() + " <" + value.toString() + ">";
+    }
+
 }

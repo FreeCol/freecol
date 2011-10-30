@@ -31,7 +31,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
 
@@ -78,17 +80,30 @@ public class ServerEurope extends Europe implements ServerModelObject {
         ServerPlayer player = (ServerPlayer) getOwner();
         List<RandomChoice<UnitType>> recruits
             = player.generateRecruitablesList();
-        for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
-            String optionId = "model.option.recruitable.slot" + index;
-            if (spec.hasOption(optionId)) {
-                String unitTypeId = spec.getStringOption(optionId).getValue();
-                if (!StringOption.NONE.equals(unitTypeId)) {
-                    setRecruitable(index, spec.getUnitType(unitTypeId));
-                    continue;
-                }
+        if (spec.hasOption("model.option.immigrants")) {
+            List<AbstractUnitOption> immigrants =
+                ((UnitListOption) spec.getOption("model.option.immigrants")).getValue();
+            for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
+                UnitType immigrant = (index < immigrants.size())
+                    ? immigrants.get(index).getUnitType().getValue()
+                    : RandomChoice.getWeightedRandom(null, null, random, recruits);
+                setRecruitable(index, immigrant);
             }
-            setRecruitable(index,
-                RandomChoice.getWeightedRandom(null, null, random, recruits));
+        } else {
+            // @compat 0.10.3
+            for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
+                String optionId = "model.option.recruitable.slot" + index;
+                if (spec.hasOption(optionId)) {
+                    String unitTypeId = spec.getStringOption(optionId).getValue();
+                    if (unitTypeId != null) {
+                        setRecruitable(index, spec.getUnitType(unitTypeId));
+                        continue;
+                    }
+                }
+                setRecruitable(index,
+                               RandomChoice.getWeightedRandom(null, null, random, recruits));
+            }
+            // end compatibility code
         }
     }
 

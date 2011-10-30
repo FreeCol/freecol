@@ -1693,9 +1693,6 @@
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="veryHigh" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
-        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
-        <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
-        <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
         <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="8"/>
@@ -1703,6 +1700,23 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption  id="model.option.immigrants">
+          <unitOption id="model.option.immigrants.1">
+            <unitType value="model.unit.masterCarpenter"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+          <unitOption id="model.option.immigrants.2">
+            <unitType value="model.unit.expertFarmer"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+          <unitOption id="model.option.immigrants.3">
+            <unitType value="model.unit.seasonedScout"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+        </unitListOption>
         <unitListOption id="model.option.refSize">
           <unitOption id="model.option.refSize.soldiers">
             <unitType value="model.unit.kingsRegular" />
@@ -1753,8 +1767,6 @@
         <booleanOption id="model.option.expertStartingUnits" value="true" />
         <stringOption  id="model.option.tileProduction" value="high" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
-        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
-        <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
         <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="8"/>
@@ -1762,6 +1774,18 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption  id="model.option.immigrants">
+          <unitOption id="model.option.immigrants.1">
+            <unitType value="model.unit.masterCarpenter"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+          <unitOption id="model.option.immigrants.2">
+            <unitType value="model.unit.expertFarmer"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+        </unitListOption>
         <unitListOption id="model.option.refSize">
           <unitOption id="model.option.refSize.soldiers">
             <unitType value="model.unit.kingsRegular" />
@@ -1812,7 +1836,6 @@
         <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="medium" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
-        <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
         <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="8"/>
@@ -1820,6 +1843,13 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption  id="model.option.immigrants">
+          <unitOption id="model.option.immigrants.1">
+            <unitType value="model.unit.masterCarpenter"/>
+            <role value="DEFAULT" />
+            <number value="1"/>
+          </unitOption>
+        </unitListOption>
         <unitListOption id="model.option.refSize">
           <unitOption id="model.option.refSize.soldiers">
             <unitType value="model.unit.kingsRegular" />
@@ -1998,9 +2028,6 @@
           <choice value="model.option.buildOnNativeLand.firstAndUncontacted" />
           <choice value="model.option.buildOnNativeLand.never" />
         </stringOption>
-        <stringOption  id="model.option.recruitable.slot0" value="none" addNone="true" generate="IMMIGRANTS" />
-        <stringOption  id="model.option.recruitable.slot1" value="none" addNone="true" generate="IMMIGRANTS" />
-        <stringOption  id="model.option.recruitable.slot2" value="none" addNone="true" generate="IMMIGRANTS" />
         <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="8"/>
@@ -2008,14 +2035,35 @@
           <rangeValue label="large" value="6"/>
           <rangeValue label="veryLarge" value="5"/>
         </rangeOption>
+        <unitListOption  id="model.option.immigrants" maximumNumber="3">
+          <template>
+            <unitOption id="model.option.immigrants.template">
+              <unitType value="model.unit.freeColonist" generate="IMMIGRANTS" />
+              <role value="DEFAULT" >
+                <choice value="DEFAULT" />
+              </role>
+              <number value="1" minimumValue="1" maximumValue="1" />
+            </unitOption>
+          </template>
+        </unitListOption>
         <unitListOption id="model.option.refSize">
+          <template>
+            <unitOption id="model.option.refSize.template">
+              <unitType value="model.unit.kingsRegular" generate="UNITS" />
+              <role value="SOLDIER">
+                <choice value="SOLDIER" />
+                <choice value="DRAGOON" />
+              </role>
+              <number value="20" minimumValue="0" maximumValue="999" />
+            </unitOption>
+          </template>
           <unitOption id="model.option.refSize.soldiers">
             <unitType value="model.unit.kingsRegular" generate="UNITS" />
             <role value="SOLDIER">
               <choice value="SOLDIER" />
               <choice value="DRAGOON" />
             </role>
-            <number value="20" minimumValue="0" maximumValue="999" />
+            <number value="60" minimumValue="0" maximumValue="999" />
           </unitOption>
           <unitOption id="model.option.refSize.dragoons">
             <unitType value="model.unit.kingsRegular" generate="UNITS" />
@@ -2023,12 +2071,12 @@
               <choice value="SOLDIER" />
               <choice value="DRAGOON" />
             </role>
-            <number value="20" minimumValue="0" maximumValue="999" />
+            <number value="30" minimumValue="0" maximumValue="999" />
           </unitOption>
           <unitOption id="model.option.refSize.artillery">
             <unitType value="model.unit.artillery" generate="UNITS" />
             <role value="DEFAULT" />
-            <number value="20" minimumValue="0" maximumValue="999" />
+            <number value="30" minimumValue="0" maximumValue="999" />
           </unitOption>
           <unitOption id="model.option.refSize.menOfWar">
             <unitType value="model.unit.manOWar" generate="UNITS" />

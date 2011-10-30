@@ -60,6 +60,18 @@ public class IntegerOption extends AbstractOption<Integer> {
         super(specification);
     }
 
+    /**
+     * Creates a new <code>IntegerOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object
+     *     should be found in an {@link OptionGroup}.
+     * @param specification The specification this option belongs
+     *     to. May be null.
+     */
+    public IntegerOption(String id, Specification specification) {
+        super(id, specification);
+    }
+
     public IntegerOption clone() {
         IntegerOption result = new IntegerOption(getId());
         result.value = value;

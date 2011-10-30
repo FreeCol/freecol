@@ -58,13 +58,6 @@ import net.sf.freecol.common.option.UnitListOption;
  */
 public final class Specification {
 
-    /**
-     * TODO: replace with Predicates.
-     */
-    public static enum TypeSelector {
-        UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS, BUILDINGS, FOUNDING_FATHERS
-    }
-
     public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE =
         new FreeColGameObjectType("model.source.movementPenalty");
     public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
@@ -302,19 +295,10 @@ public final class Specification {
             }
         }
 
-        for (Option group : getOptionGroup("difficultyLevels").getOptions()) {
-            if (group instanceof OptionGroup) {
-                OptionGroup difficultyLevel = (OptionGroup) group;
-                for (Option option : difficultyLevel.getOptions()) {
-                    if (option instanceof StringOption) {
-                        ((StringOption) option).generateChoices(this);
-                    } else if (option instanceof UnitListOption) {
-                        for (AbstractUnitOption o : ((UnitListOption) option).getValue()) {
-                            o.generateChoices(this);
-                        }
-                    }
-                }
-            }
+        // now that specification is complete, dynamically generate
+        // option choices
+        for (AbstractOption option : allOptions.values()) {
+            option.generateChoices();
         }
 
         if (difficultyLevel != null) {
@@ -570,50 +554,6 @@ public final class Specification {
                     }
                 }
             }
-        }
-        return result;
-    }
-
-    /**
-     * Returns a List of FreeColGameObjectTypes matching the given
-     * selector. TODO: use Predicates instead of enum.
-     *
-     * @param selector a TypeSelector value
-     * @return a List of matching FreeColGameObjectTypes
-     */
-    public List<FreeColGameObjectType> getTypes(TypeSelector selector) {
-        List<FreeColGameObjectType> result = new ArrayList<FreeColGameObjectType>();
-        switch(selector) {
-        case UNITS:
-            result.addAll(unitTypeList);
-            break;
-        case IMMIGRANTS:
-            for (UnitType unitType : unitTypeList) {
-                if (unitType.isRecruitable()) {
-                    result.add(unitType);
-                }
-            }
-            break;
-        case NAVAL_UNITS:
-            for (UnitType unitType : unitTypeList) {
-                if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                    result.add(unitType);
-                }
-            }
-            break;
-        case LAND_UNITS:
-            for (UnitType unitType : unitTypeList) {
-                if (!unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                    result.add(unitType);
-                }
-            }
-            break;
-        case BUILDINGS:
-            result.addAll(buildingTypeList);
-            break;
-        case FOUNDING_FATHERS:
-            result.addAll(foundingFathers);
-            break;
         }
         return result;
     }
