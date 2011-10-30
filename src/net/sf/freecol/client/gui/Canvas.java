@@ -1814,7 +1814,7 @@ public final class Canvas extends JDesktopPane {
     public void showOpeningVideoPanel() {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !getFreeColClient().canPlaySound();
+        boolean muteAudio = !gui.canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
         addCentered(vp, MAIN_LAYER);
         vp.play();
@@ -2299,7 +2299,7 @@ public final class Canvas extends JDesktopPane {
      * Updates the label displaying the current amount of gold.
      */
     public void updateGoldLabel() {
-        getFreeColClient().getFrame().getJMenuBar().repaint();
+        gui.getFrame().getJMenuBar().repaint();
     }
 
     public void updateMapGeneratorOptions() {
