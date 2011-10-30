@@ -1903,7 +1903,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            gui.getCanvas().errorMessage(_messageId, _message);
+            gui.errorMessage(_messageId, _message);
             return null;
         }
 

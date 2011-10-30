@@ -236,7 +236,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     && e.getValue() != NationState.NOT_AVAILABLE) n++;
             }
             if (n == 0) {
-                getCanvas().errorMessage("victory.noEuropeans");
+                gui.errorMessage("victory.noEuropeans");
                 return false;
             }
         }

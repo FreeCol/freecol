@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -155,7 +154,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         } else {
            game.getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)).readFromXMLElement(playerElement);
         }
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -174,7 +173,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Player player = new Player(game, playerElement);
 
         getFreeColClient().getGame().removePlayer(player);
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -192,7 +191,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         OptionGroup gameOptions = game.getSpecification().getOptionGroup("gameOptions");
         gameOptions.readFromXMLElement(mgoElement);
 
-        gui.getCanvas().updateGameOptions();
+        gui.updateGameOptions();
 
         return null;
     }
@@ -207,7 +206,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Element mgoElement = (Element) element.getElementsByTagName(MapGeneratorOptions.getXMLElementTagName()).item(0);
         getFreeColClient().getGame().getMapGeneratorOptions().readFromXMLElement(mgoElement);
 
-        gui.getCanvas().updateMapGeneratorOptions();
+        gui.updateMapGeneratorOptions();
 
         return null;
     }
@@ -221,8 +220,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
      */
     private Element chat(Element element)  {
         ChatMessage chatMessage = new ChatMessage(getGame(), element);
-        Canvas canvas = gui.getCanvas();
-        canvas.displayChat(chatMessage.getPlayer().getName(),
+        gui.displayChat(chatMessage.getPlayer().getName(),
                                                chatMessage.getMessage(),
                                                chatMessage.isPrivate());
         return null;
@@ -242,7 +240,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         boolean ready = Boolean.valueOf(element.getAttribute("value")).booleanValue();
 
         player.setReady(ready);
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -261,7 +259,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Nation nation = getGame().getSpecification().getNation(element.getAttribute("value"));
 
         player.setNation(nation);
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -280,7 +278,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         NationType nationType = getGame().getSpecification().getNationType(element.getAttribute("value"));
 
         player.setNationType(nationType);
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -296,7 +294,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
         NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
         getFreeColClient().getGame().getNationOptions().setNationState(nation, state);
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
@@ -379,12 +377,10 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     *                holds all the information.
     */
     private Element error(Element element)  {
-        Canvas canvas = gui.getCanvas();
-
         if (element.hasAttribute("messageID")) {
-            canvas.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));
+            gui.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));
         } else {
-            canvas.errorMessage(null, element.getAttribute("message"));
+            gui.errorMessage(null, element.getAttribute("message"));
         }
 
         return null;

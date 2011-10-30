@@ -459,7 +459,7 @@ public class DebugMenu extends JMenu {
             new JMenuItem(Messages.message("menuBar.debug.displayErrorMessage"));
         errorMessage.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.errorMessage(ERROR_MESSAGE);
+                    gui.errorMessage(ERROR_MESSAGE);
                 }
             });
         panelMenu.add(errorMessage);

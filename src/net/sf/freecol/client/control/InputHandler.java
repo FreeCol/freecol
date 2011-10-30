@@ -37,11 +37,7 @@ public abstract class InputHandler implements MessageHandler {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
 
-
-
     private final FreeColClient freeColClient;
-
-
 
     protected GUI gui;
 

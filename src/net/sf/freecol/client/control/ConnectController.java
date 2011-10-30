@@ -120,10 +120,10 @@ public final class ConnectController {
             FreeColServer freeColServer = new FreeColServer(specification, publicServer, false, port, null, advantages);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
-            gui.getCanvas().errorMessage("server.noRouteToServer");
+            gui.errorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            gui.getCanvas().errorMessage("server.couldNotStart");
+            gui.errorMessage("server.couldNotStart");
             return;
         }
 
@@ -172,7 +172,7 @@ public final class ConnectController {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
             return;
         } catch (IOException e) {
-            gui.getCanvas().errorMessage("server.couldNotStart");
+            gui.errorMessage("server.couldNotStart");
             return;
         }
 
@@ -232,7 +232,6 @@ public final class ConnectController {
      */
     public boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
-        Canvas canvas = gui.getCanvas();
         freeColClient.setMapEditor(false);
 
         if (client != null) {
@@ -244,10 +243,10 @@ public final class ConnectController {
                                 freeColClient.getPreGameInputHandler(),
                                 FreeCol.CLIENT_THREAD + username);
         } catch (ConnectException e) {
-            canvas.errorMessage("server.couldNotConnect");
+            gui.errorMessage("server.couldNotConnect");
             return false;
         } catch (IOException e) {
-            canvas.errorMessage("server.couldNotConnect");
+            gui.errorMessage("server.couldNotConnect");
             return false;
         }
 
@@ -305,7 +304,7 @@ public final class ConnectController {
                         .getEntryLocation().getTile(), false);
                 }
             } else if (in.getLocalName().equals("error")) {
-                canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
+                gui.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
 
                 c.endTransmission(in);
                 return false;
@@ -318,7 +317,7 @@ public final class ConnectController {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
-            canvas.errorMessage(null, "Could not send XML to the server.");
+            gui.errorMessage(null, "Could not send XML to the server.");
             try {
                 c.endTransmission(in);
             } catch (IOException ie) {
@@ -377,7 +376,7 @@ public final class ConnectController {
             }
             public void run() {
                 canvas.closeMenus();
-                canvas.errorMessage( message );
+                gui.errorMessage( message );
             }
         }
 
@@ -646,14 +645,12 @@ public final class ConnectController {
     * @return A list of {@link ServerInfo} objects.
     */
     public ArrayList<ServerInfo> getServerList() {
-        Canvas canvas = gui.getCanvas();
-
         Connection mc;
         try {
             mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.CLIENT_THREAD);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
-            canvas.errorMessage("metaServer.couldNotConnect");
+            gui.errorMessage("metaServer.couldNotConnect");
             return null;
         }
 
@@ -662,7 +659,7 @@ public final class ConnectController {
             Element reply = mc.askDumping(gslElement);
             if (reply == null) {
                 logger.warning("The meta-server did not return a list.");
-                canvas.errorMessage("metaServer.communicationError");
+                gui.errorMessage("metaServer.communicationError");
                 return null;
             } else {
                 ArrayList<ServerInfo> items = new ArrayList<ServerInfo>();
@@ -674,7 +671,7 @@ public final class ConnectController {
             }
         } catch (IOException e) {
             logger.warning("Network error while communicating with the meta-server.");
-            canvas.errorMessage("metaServer.communicationError");
+            gui.errorMessage("metaServer.communicationError");
             return null;
         } finally {
             try {

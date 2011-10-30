@@ -975,7 +975,7 @@ public final class ColonyPanel extends FreeColPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getCanvas().errorMessage("noAddReason."
+                    gui.errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
@@ -1595,7 +1595,7 @@ public final class ColonyPanel extends FreeColPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        canvas.errorMessage("noClaimReason."
+                        gui.errorMessage("noClaimReason."
                             + claim.toString().toLowerCase(Locale.US));
                         return false;
                     }
@@ -1608,7 +1608,7 @@ public final class ColonyPanel extends FreeColPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    canvas.errorMessage("noAddReason."
+                    gui.errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }

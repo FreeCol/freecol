@@ -137,7 +137,7 @@ public final class PreGameController {
         Canvas canvas = gui.getCanvas();
 
         if (!freeColClient.getGame().isAllPlayersReadyToLaunch()) {
-            canvas.errorMessage("server.notAllReady");
+            gui.errorMessage("server.notAllReady");
             return;
         }
 

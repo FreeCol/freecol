@@ -129,7 +129,7 @@ public class ScaleMapAction extends FreeColAction {
                     }
                     inputDialog.setResponse(new MapSize(width, height));
                 } catch (NumberFormatException nfe) {
-                    canvas.errorMessage("integerAboveZero");
+                    gui.errorMessage("integerAboveZero");
                 }
             }
         };

@@ -297,7 +297,7 @@ public final class InGameController implements NetworkConstants {
             canvas.closeStatusPanel();
             result = true;
         } catch (IOException e) {
-            canvas.errorMessage("couldNotSaveGame");
+            gui.errorMessage("couldNotSaveGame");
         }
         canvas.requestFocusInWindow();
         return result;
@@ -312,7 +312,7 @@ public final class InGameController implements NetworkConstants {
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
-            canvas.errorMessage("fileNotFound");
+            gui.errorMessage("fileNotFound");
             return;
         }
         if (!canvas.showConfirmDialog("stopCurrentGame.text",
@@ -1548,7 +1548,7 @@ public final class InGameController implements NetworkConstants {
 
         Player player = freeColClient.getMyPlayer();
         if (!player.checkGold(player.getRecruitPrice())) {
-            gui.getCanvas().errorMessage("notEnoughGold");
+            gui.errorMessage("notEnoughGold");
             return;
         }
 
@@ -3034,7 +3034,6 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return false;
 
         // Sanity checks.  Should not happen!
-        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         if (type == null) {
             throw new NullPointerException("Goods type must not be null.");
@@ -3063,7 +3062,7 @@ public final class InGameController implements NetworkConstants {
         // Check that the purchase is funded.
         Market market = player.getMarket();
         if (!player.checkGold(market.getBidPrice(type, toBuy))) {
-            canvas.errorMessage("notEnoughGold");
+            gui.errorMessage("notEnoughGold");
             return false;
         }
 
@@ -3470,11 +3469,10 @@ public final class InGameController implements NetworkConstants {
     public void trainUnitInEurope(UnitType unitType) {
         if (!requireOurTurn()) return;
 
-        Canvas canvas = gui.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            canvas.errorMessage("notEnoughGold");
+            gui.errorMessage("notEnoughGold");
             return;
         }
 
@@ -3496,7 +3494,7 @@ public final class InGameController implements NetworkConstants {
 
         Canvas canvas = gui.getCanvas();
         if (!colony.canPayToFinishBuilding()) {
-            canvas.errorMessage("notEnoughGold");
+            gui.errorMessage("notEnoughGold");
             return;
         }
         int price = colony.getPriceForBuilding();

@@ -126,10 +126,10 @@ public final class MapEditorController {
             canvas.addMouseListener(listener);
             canvas.addMouseMotionListener(listener);
         } catch (NoRouteToServerException e) {
-            gui.getCanvas().errorMessage("server.noRouteToServer");
+            gui.errorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            gui.getCanvas().errorMessage("server.couldNotStart");
+            gui.errorMessage("server.couldNotStart");
             return;
         }
     }
@@ -197,7 +197,7 @@ public final class MapEditorController {
             canvas.refresh();
         } catch (FreeColException e) {
             canvas.closeMenus();
-            canvas.errorMessage( e.getMessage() );
+            gui.errorMessage( e.getMessage() );
         }
     }
 
@@ -255,7 +255,7 @@ public final class MapEditorController {
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            canvas.errorMessage("couldNotSaveGame");
+                            gui.errorMessage("couldNotSaveGame");
                         }
                     });
                 }
@@ -278,7 +278,7 @@ public final class MapEditorController {
         }
 
         if (!file.isFile()) {
-            canvas.errorMessage("fileNotFound");
+            gui.errorMessage("fileNotFound");
             return;
         }
 
@@ -302,7 +302,7 @@ public final class MapEditorController {
             }
             public void run() {
                 canvas.closeMenus();
-                canvas.errorMessage( message );
+                gui.errorMessage( message );
             }
         }
 

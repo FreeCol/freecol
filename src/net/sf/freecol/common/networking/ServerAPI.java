@@ -222,7 +222,7 @@ public class ServerAPI {
             + " to message " + message;
         logger.warning(complaint);
         if (FreeCol.isInDebugMode()) {
-            gui.getCanvas().errorMessage(null, complaint);
+            gui.errorMessage(null, complaint);
         }
         return null;
     }

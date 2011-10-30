@@ -50,6 +50,7 @@ import javax.swing.filechooser.FileFilter;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -373,7 +374,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
 
-    public static FreeColDialog<Dimension> createMapSizeDialog(final Canvas canvas) {
+    public static FreeColDialog<Dimension> createMapSizeDialog(final GUI gui, final Canvas canvas) {
 
         final int defaultHeight = 100;
         final int defaultWidth = 40;
@@ -400,7 +401,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                         }
                         mapSizeDialog.setResponse(new Dimension(width, height));
                     } catch (NumberFormatException nfe) {
-                        canvas.errorMessage("integerAboveZero");
+                        gui.errorMessage("integerAboveZero");
                     }
                 }
             });

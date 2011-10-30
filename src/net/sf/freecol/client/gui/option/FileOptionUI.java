@@ -72,7 +72,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
                    }
 
                    if (!file.isFile()) {
-                       canvas.errorMessage("fileNotFound");
+                       gui.errorMessage("fileNotFound");
                        return;
                    }
 

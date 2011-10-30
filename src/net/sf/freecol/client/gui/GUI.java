@@ -139,6 +139,11 @@ public class GUI {
         return size;
     }
 
+    public void displayChat(String senderNme, String message, boolean privateChat) {
+        canvas.displayChat(senderNme, message, privateChat);
+    
+    }
+
     public void displaySpashScreen(final String splashFilename) {
         splash = null;
         if (splashFilename != null) {
@@ -160,6 +165,15 @@ public class GUI {
         }
     }
 
+    public void errorMessage(String messageId) {
+        canvas.errorMessage(messageId);
+    }
+
+    public void errorMessage(String messageID, String message) {
+        canvas.errorMessage(messageID, message);
+        
+    }
+
     public Canvas getCanvas() {
         return canvas;
     }
@@ -171,7 +185,8 @@ public class GUI {
     public MapViewer getMapViewer() {
         return mapViewer;
     }
-
+    
+    
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
@@ -179,14 +194,13 @@ public class GUI {
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
-
+    
     public void hideSplashScreen() {
         if (splash != null) {
             splash.setVisible(false);
             splash.dispose();
         }
     }
-    
     
     public boolean isWindowed() {
         return windowed;
@@ -212,6 +226,7 @@ public class GUI {
         }
     }
     
+
     public void quit() {
         if (!isWindowed()) {
             try {
@@ -224,6 +239,10 @@ public class GUI {
         }
     }
     
+    public void refreshPlayersTable() {
+        canvas.refreshPlayersTable();
+    }
+    
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
@@ -231,15 +250,15 @@ public class GUI {
         }
     }
 
+    
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
-    
 
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-    
+
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
@@ -248,7 +267,6 @@ public class GUI {
         this.windowed = windowed;
         
     }
-
     
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
@@ -373,11 +391,20 @@ public class GUI {
         getMapViewer().startCursorBlinking();
     }
 
+    public void updateGameOptions() {
+        canvas.updateGameOptions();
+    }
+    
     /**
      * Updates the label displaying the current amount of gold.
      */
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
+    }
+    
+    
+    public void updateMapGeneratorOptions() {
+        canvas.updateMapGeneratorOptions();
     }
 
     public void updateMenuBar() {
@@ -385,6 +412,6 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-    
+
     
 }

@@ -52,6 +52,7 @@ import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.Colony;
@@ -104,14 +105,18 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final JLabel destinationLabel = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
 
+    private GUI gui;
+
 
     /**
      * The constructor that will add the items to this panel.
      *
      * @param parent The parent of this panel.
      */
-    public TradeRouteInputDialog(final Canvas parent, TradeRoute newRoute) {
+    public TradeRouteInputDialog(GUI gui, final Canvas parent, TradeRoute newRoute) {
         super(parent);
+        
+        this.gui = gui;
 
         originalRoute = newRoute;
 
@@ -261,7 +266,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         for (TradeRoute route : player.getTradeRoutes()) {
             if (route.getId().equals(originalRoute.getId())) continue;
             if (route.getName().equals(tradeRouteName.getText())) {
-                getCanvas().errorMessage("traderouteDialog.duplicateName");
+                gui.errorMessage("traderouteDialog.duplicateName");
                 return false;
             }
         }

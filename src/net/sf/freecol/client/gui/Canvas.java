@@ -523,6 +523,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Quits the application. This method uses {@link #showConfirmDialog} in
+     * order to get a "Are you sure"-confirmation from the user.
+     */
+    public void askToQuit() {
+        if (showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+            freeColClient.quit();
+        }
+    }
+
+    /**
      * Closes the {@link MainPanel}.
      */
     public void closeMainPanel() {
@@ -653,13 +663,23 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Returns the freeColClient.
+     * Gets any currently displayed colony panel for the specified colony.
      *
-     * @return The <code>freeColClient</code> associated with this
-     *         <code>Canvas</code>.
+     * @param colony The <code>Colony</code> to check.
+     * @return A currently displayed colony panel, or null if not found.
      */
-    public FreeColClient getFreeColClient() {
-        return freeColClient;
+    public ColonyPanel getColonyPanel(Colony colony) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame) c1).getContentPane().getComponents()) {
+                    if (c2 instanceof ColonyPanel
+                        && ((ColonyPanel) c2).getColony() == colony) {
+                        return (ColonyPanel) c2;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public MapViewer getColonyTileGUI() {
@@ -667,12 +687,13 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Returns this <code>Canvas</code>'s <code>GUI</code>.
+     * Returns the freeColClient.
      *
-     * @return The <code>GUI</code>.
+     * @return The <code>freeColClient</code> associated with this
+     *         <code>Canvas</code>.
      */
-    public MapViewer getMapViewer() {
-        return mapViewer;
+    public FreeColClient getFreeColClient() {
+        return freeColClient;
     }
 
     /**
@@ -732,10 +753,10 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     public ImageLibrary getImageLibrary() {
         return gui.getImageLibrary();
     }
-
 
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
@@ -755,6 +776,15 @@ public final class Canvas extends JDesktopPane {
         return mapControls;
     }
 
+    /**
+     * Returns this <code>Canvas</code>'s <code>GUI</code>.
+     *
+     * @return The <code>GUI</code>.
+     */
+    public MapViewer getMapViewer() {
+        return mapViewer;
+    }
+
     @Override
     public Dimension getMinimumSize() {
         return new Dimension(640, 480);
@@ -764,6 +794,7 @@ public final class Canvas extends JDesktopPane {
     public Dimension getPreferredSize() {
         return initialSize;
     }
+
 
     /**
      * The any panel this <code>Canvas</code> is displaying.
@@ -794,7 +825,6 @@ public final class Canvas extends JDesktopPane {
     public Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
     }
-
 
     /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
@@ -862,16 +892,6 @@ public final class Canvas extends JDesktopPane {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         mapViewer.display(g2d);
-    }
-
-    /**
-     * Quits the application. This method uses {@link #showConfirmDialog} in
-     * order to get a "Are you sure"-confirmation from the user.
-     */
-    public void askToQuit() {
-        if (showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
-            freeColClient.quit();
-        }
     }
 
     /**
@@ -991,15 +1011,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the high scores panel.
-     *
-     * @param messageId An optional message to add to the high scores panel.
-     */
-    public void showHighScoresPanel(String messageId) {
-        showPanel(new ReportHighScoresPanel(this, messageId), false);
-    }
-
-    /**
      * Closes all panels, changes the background and shows the main menu.
      */
     public void returnToTitle() {
@@ -1071,6 +1082,42 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays the panel for negotiating a purchase from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is buying.
+     * @param settlement The <code>Settlement</code> to buy from.
+     * @param goods The <code>Goods</code> to buy.
+     * @param gold The current negotiated price.
+     * @param canBuy True if buy is a valid option.
+     * @return The chosen action, buy, haggle, or cancel.
+     */
+    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
+                                   Goods goods, int gold, boolean canBuy) {
+        StringTemplate goodsTemplate
+            = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", goods.getType().getNameKey())
+            .addAmount("%amount%", goods.getAmount());
+        StringTemplate nation = settlement.getOwner().getNationName();
+        List<ChoiceItem<BuyAction>> choices
+            = new ArrayList<ChoiceItem<BuyAction>>();
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.takeOffer"),
+                BuyAction.BUY, canBuy));
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.moreGold"),
+                BuyAction.HAGGLE));
+        BuyAction result = showChoiceDialog(unit.getTile(),
+                Messages.message(StringTemplate.template("buy.text")
+                                 .addStringTemplate("%nation%", nation)
+                                 .addStringTemplate("%goods%", goodsTemplate)
+                                 .addAmount("%gold%", gold)),
+                Messages.message("buyProposition.cancel"),
+                choices);
+        return (result == null) ? BuyAction.CANCEL : result;
+    }
+
+
+    /**
      * Displays the <code>LootCargoDialog</code>.
      *
      * @param winner The <code>Unit</code> that is looting.
@@ -1081,7 +1128,6 @@ public final class Canvas extends JDesktopPane {
         CaptureGoodsDialog dialog = new CaptureGoodsDialog(this, winner, loot);
         return showFreeColDialog(dialog, winner.getTile());
     }
-
 
     /**
      * Displays the <code>ChatPanel</code>.
@@ -1166,26 +1212,6 @@ public final class Canvas extends JDesktopPane {
         clientOptionsDialogShowing = false;
         freeColClient.getActionManager().update();
         return group;
-    }
-
-    /**
-     * Gets any currently displayed colony panel for the specified colony.
-     *
-     * @param colony The <code>Colony</code> to check.
-     * @return A currently displayed colony panel, or null if not found.
-     */
-    public ColonyPanel getColonyPanel(Colony colony) {
-        for (Component c1 : getComponents()) {
-            if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame) c1).getContentPane().getComponents()) {
-                    if (c2 instanceof ColonyPanel
-                        && ((ColonyPanel) c2).getColony() == colony) {
-                        return (ColonyPanel) c2;
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -1424,26 +1450,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given panel.
-     *
-     * @param panel The panel to be displayed
-     */
-    public void showFreeColPanel(FreeColPanel panel) {
-        showFreeColPanel(panel, null);
-    }
-
-    /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A <code>Tile</code> to make visible (not under the panel!)
-     */
-    public void showFreeColPanel(FreeColPanel panel, Tile tile) {
-        showSubPanel(panel, (tile == null) ? PopupPosition.CENTERED
-            : getPopupPosition(tile));
-    }
-
-    /**
      * Displays the given dialog.
      *
      * @param freeColDialog The dialog to be displayed
@@ -1468,6 +1474,35 @@ public final class Canvas extends JDesktopPane {
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         return response;
+    }
+
+    /**
+     * Displays the given panel.
+     *
+     * @param panel The panel to be displayed
+     */
+    public void showFreeColPanel(FreeColPanel panel) {
+        showFreeColPanel(panel, null);
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the panel!)
+     */
+    public void showFreeColPanel(FreeColPanel panel, Tile tile) {
+        showSubPanel(panel, (tile == null) ? PopupPosition.CENTERED
+            : getPopupPosition(tile));
+    }
+
+    /**
+     * Displays the high scores panel.
+     *
+     * @param messageId An optional message to add to the high scores panel.
+     */
+    public void showHighScoresPanel(String messageId) {
+        showPanel(new ReportHighScoresPanel(this, messageId), false);
     }
 
     /**
@@ -1515,6 +1550,9 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? TradeAction.CANCEL : result;
     }
 
+
+    // A variety of special purpose panels/dialogs follow
+
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1524,9 +1562,6 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -1692,32 +1727,6 @@ public final class Canvas extends JDesktopPane {
         mainPanel = new MainPanel(this);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
-    }
-
-    /**
-     * Filters out and displays the EventPanel messages.
-     *
-     * @param messages The list of <code>ModelMessage</code> to filter.
-     * @return The list of messages without any EventPanel messages.
-     */
-    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
-        final String eventMatch = "EventPanel.";
-        List<ModelMessage> normal = new ArrayList<ModelMessage>();
-        for (int i = 0; i < messages.length; i++) {
-            String id = messages[i].getId();
-            if (id.startsWith(eventMatch)) {
-                id = id.substring(eventMatch.length());
-                final EventType e = EventType.valueOf(id);
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            showEventPanel(e);
-                        }
-                    });
-            } else {
-                normal.add(messages[i]);
-            }
-        }
-        return normal;
     }
 
     /**
@@ -2050,41 +2059,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the panel for negotiating a purchase from a settlement.
-     *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param settlement The <code>Settlement</code> to buy from.
-     * @param goods The <code>Goods</code> to buy.
-     * @param gold The current negotiated price.
-     * @param canBuy True if buy is a valid option.
-     * @return The chosen action, buy, haggle, or cancel.
-     */
-    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-                                   Goods goods, int gold, boolean canBuy) {
-        StringTemplate goodsTemplate
-            = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", goods.getType().getNameKey())
-            .addAmount("%amount%", goods.getAmount());
-        StringTemplate nation = settlement.getOwner().getNationName();
-        List<ChoiceItem<BuyAction>> choices
-            = new ArrayList<ChoiceItem<BuyAction>>();
-        choices.add(new ChoiceItem<BuyAction>(
-                Messages.message("buy.takeOffer"),
-                BuyAction.BUY, canBuy));
-        choices.add(new ChoiceItem<BuyAction>(
-                Messages.message("buy.moreGold"),
-                BuyAction.HAGGLE));
-        BuyAction result = showChoiceDialog(unit.getTile(),
-                Messages.message(StringTemplate.template("buy.text")
-                                 .addStringTemplate("%nation%", nation)
-                                 .addStringTemplate("%goods%", goodsTemplate)
-                                 .addAmount("%gold%", gold)),
-                Messages.message("buyProposition.cancel"),
-                choices);
-        return (result == null) ? BuyAction.CANCEL : result;
-    }
-
-    /**
      * Displays the panel for negotiating a sale to a settlement.
      *
      * @param unit The <code>Unit</code> that is selling.
@@ -2136,6 +2110,20 @@ public final class Canvas extends JDesktopPane {
 
         serverListPanel.initialize(username, serverList);
         showSubPanel(serverListPanel);
+    }
+
+    public void showSettlement(Settlement s) {
+        if (s instanceof Colony) {
+            if (s.getOwner().equals(freeColClient.getMyPlayer())) {
+                showColonyPanel((Colony) s);
+            } else if (FreeCol.isInDebugMode()) {
+                debugForeignColony(s);
+            }
+        } else if (s instanceof IndianSettlement) {
+            showIndianSettlementPanel((IndianSettlement) s);
+        } else {
+            throw new IllegalStateException("Bogus settlement");
+        }
     }
 
     /**
@@ -2246,7 +2234,7 @@ public final class Canvas extends JDesktopPane {
      * @return A trade route, or null.
      */
     public TradeRoute showTradeRouteDialog(Unit unit) {
-        return showFreeColDialog(new TradeRouteDialog(this, unit.getTradeRoute()),
+        return showFreeColDialog(new TradeRouteDialog(gui, this, unit.getTradeRoute()),
                                  unit.getTile());
     }
 
@@ -2452,6 +2440,32 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Filters out and displays the EventPanel messages.
+     *
+     * @param messages The list of <code>ModelMessage</code> to filter.
+     * @return The list of messages without any EventPanel messages.
+     */
+    private List<ModelMessage> filterEventPanels(ModelMessage[] messages) {
+        final String eventMatch = "EventPanel.";
+        List<ModelMessage> normal = new ArrayList<ModelMessage>();
+        for (int i = 0; i < messages.length; i++) {
+            String id = messages[i].getId();
+            if (id.startsWith(eventMatch)) {
+                id = id.substring(eventMatch.length());
+                final EventType e = EventType.valueOf(id);
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            showEventPanel(e);
+                        }
+                    });
+            } else {
+                normal.add(messages[i]);
+            }
+        }
+        return normal;
+    }
+
+    /**
      * Gets the internal frame for the given component.
      *
      * @param c The component.
@@ -2492,18 +2506,6 @@ public final class Canvas extends JDesktopPane {
             requestFocus();
         }
     }
-
-    public void showSettlement(Settlement s) {
-        if (s instanceof Colony) {
-            if (s.getOwner().equals(freeColClient.getMyPlayer())) {
-                showColonyPanel((Colony) s);
-            } else if (FreeCol.isInDebugMode()) {
-                debugForeignColony(s);
-            }
-        } else if (s instanceof IndianSettlement) {
-            showIndianSettlementPanel((IndianSettlement) s);
-        } else {
-            throw new IllegalStateException("Bogus settlement");
-        }
-    }
+    
+    
 }

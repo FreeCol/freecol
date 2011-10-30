@@ -131,7 +131,7 @@ public class DetermineHighSeasAction extends FreeColAction {
                     }
                     inputDialog.setResponse(new Parameters(d, m));
                 } catch (NumberFormatException nfe) {
-                    canvas.errorMessage("integerAboveZero");
+                    gui.errorMessage("integerAboveZero");
                 }
             }
         };
