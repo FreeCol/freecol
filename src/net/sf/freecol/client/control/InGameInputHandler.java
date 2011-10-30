@@ -508,7 +508,7 @@ public final class InGameInputHandler extends InputHandler {
         Turn currTurn = game.getTurn();
 
         // plays an alert sound on each new turn if the option for it is turned on
-        if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
+        if (getFreeColClient().getClientOptions().getBoolean("model.option.audioAlerts")) {
             gui.playSound("sound.event.alertSound");
         }
 

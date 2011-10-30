@@ -1551,7 +1551,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         // plays an alert sound on each information message if the option for it is turned on
-        if (FreeColClient.get().getClientOptions().getBoolean("model.option.audioAlerts")) {
+        if (freeColClient.getClientOptions().getBoolean("model.option.audioAlerts")) {
             gui.playSound("sound.event.alertSound");
         }
 
