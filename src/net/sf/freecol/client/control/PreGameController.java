@@ -229,7 +229,7 @@ public final class PreGameController {
         if (!freeColClient.isHeadless()) {
             freeColClient.setInGame(true);
             gui.getFrame()
-                .setJMenuBar(new InGameMenuBar(freeColClient));
+                .setJMenuBar(new InGameMenuBar(freeColClient, gui));
         }
 
         InGameController igc = freeColClient.getInGameController();

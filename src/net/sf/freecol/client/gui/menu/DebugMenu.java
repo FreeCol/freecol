@@ -41,6 +41,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceDialog;
@@ -83,19 +84,23 @@ public class DebugMenu extends JMenu {
 
     private final MapViewer mapViewer;
 
+    private GUI gui;
+
     private static final String ERROR_MESSAGE =
         "This is a long error message, indicating that some error has occurred. " +
         "This is a long error message, indicating that some error has occurred. " +
         "This is a long error message, indicating that some error has occurred.";
 
 
-    public DebugMenu(FreeColClient fcc) {
+    public DebugMenu(FreeColClient fcc, GUI gui) {
         super(Messages.message("menuBar.debug"));
 
         this.freeColClient = fcc;
+        
+        this.gui = gui;
 
-        mapViewer = freeColClient.getMapViewer();
-        canvas = freeColClient.getCanvas();
+        mapViewer = gui.getMapViewer();
+        canvas = gui.getCanvas();
 
         buildDebugMenu();
     }

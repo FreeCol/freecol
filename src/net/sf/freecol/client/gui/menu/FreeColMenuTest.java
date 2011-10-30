@@ -48,7 +48,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
 
         FreeColClient client = new FreeColClient(null, null, true, null, true, null);
         //Create the menu bar.
-        menuBar = new InGameMenuBar(client);
+        menuBar = new InGameMenuBar(client, client.getGUI());
         client.getActionManager().update();
         ((FreeColMenuBar)menuBar).update();
 

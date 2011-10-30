@@ -31,6 +31,7 @@ import javax.swing.JMenu;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -52,14 +53,17 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
+    
+    private GUI gui;
 
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
      *
      * @param f The main controller.
+     * @param gui 
      */
-    public InGameMenuBar(FreeColClient f) {
+    public InGameMenuBar(FreeColClient f, GUI gui) {
 
         // TODO: FreeColClient should not have to be passed in to this class.
         // This is only a menu bar, it doesn't need
@@ -79,6 +83,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         // Move those to another class too. :)
 
         super(f);
+        this.gui = gui;
 
         reset();
     }
@@ -98,7 +103,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         // --> Debug
         if (FreeCol.isInDebugMode()) {
-            add(new DebugMenu(freeColClient));
+            add(new DebugMenu(freeColClient, gui));
         }
 
         update();
