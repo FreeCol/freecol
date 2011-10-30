@@ -50,6 +50,6 @@ public class ReportRequirementsAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportRequirementsPanel(freeColClient.getCanvas()));
+        gui.getCanvas().showPanel(new ReportRequirementsPanel(gui.getCanvas()));
     }
 }

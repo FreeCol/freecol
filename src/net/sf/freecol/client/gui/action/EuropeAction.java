@@ -61,6 +61,6 @@ public class EuropeAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().showEuropePanel();
+        gui.getCanvas().showEuropePanel();
     }
 }

@@ -49,7 +49,7 @@ public class ShowDifficultyAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         canvas.showPanel(new DifficultyDialog(canvas, freeColClient.getGame().getDifficultyLevel()));
     }
 }

@@ -50,6 +50,6 @@ public class ReportForeignAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportForeignAffairPanel(freeColClient.getCanvas()));
+        gui.getCanvas().showPanel(new ReportForeignAffairPanel(gui.getCanvas()));
     }
 }

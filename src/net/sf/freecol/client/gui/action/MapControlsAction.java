@@ -90,12 +90,12 @@ public class MapControlsAction extends SelectableAction {
         if (mapControls != null) {
             if (value) {
                 if (!mapControls.isShowing()) {
-                    mapControls.addToComponent(getFreeColClient().getCanvas());
+                    mapControls.addToComponent(gui.getCanvas());
                 }
                 mapControls.update();
             } else {
                 if (mapControls.isShowing()) {
-                    mapControls.removeFromComponent(getFreeColClient().getCanvas());
+                    mapControls.removeFromComponent(gui.getCanvas());
                 }
             }
         }

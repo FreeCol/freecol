@@ -47,6 +47,6 @@ public class ReportHighScoresAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showHighScoresPanel(null);
+        gui.getCanvas().showHighScoresPanel(null);
     }
 }

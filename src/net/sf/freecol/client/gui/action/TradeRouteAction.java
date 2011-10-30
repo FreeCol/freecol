@@ -48,7 +48,7 @@ public class TradeRouteAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = getFreeColClient().getCanvas();
+        Canvas canvas = gui.getCanvas();
         canvas.showFreeColDialog(new TradeRouteDialog(canvas, null));
     }
 }

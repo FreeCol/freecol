@@ -50,7 +50,7 @@ public class NewAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            freeColClient.getCanvas().newGame();
+            gui.getCanvas().newGame();
         } else {
             freeColClient.getMapEditorController().newMap();
         }

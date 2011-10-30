@@ -58,7 +58,7 @@ public class SaveAction extends FreeColAction {
         if (!freeColClient.canSaveCurrentGame()) {
             return false;
         }
-        return !freeColClient.getCanvas().isShowingSubPanel();
+        return !gui.getCanvas().isShowingSubPanel();
     }
 
     /**

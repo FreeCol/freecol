@@ -50,6 +50,6 @@ public class ReportReligionAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportReligiousPanel(freeColClient.getCanvas()));
+        gui.getCanvas().showPanel(new ReportReligiousPanel(gui.getCanvas()));
     }
 }

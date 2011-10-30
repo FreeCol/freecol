@@ -77,7 +77,7 @@ public class GotoTileAction extends UnitAction {
                 // Draw the path to the current mouse position, if the
                 // mouse is over the screen; see also
                 // CanvaseMouseMotionListener
-                Point pt = getFreeColClient().getCanvas().getMousePosition();
+                Point pt = gui.getCanvas().getMousePosition();
                 if (pt != null) {
                     Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
                     if (tile != null && unit.getTile() != tile) {

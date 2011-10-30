@@ -54,7 +54,7 @@ public class GotoAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && !getFreeColClient().getCanvas().isShowingSubPanel();
+            && !gui.getCanvas().isShowingSubPanel();
     }
 
     /**

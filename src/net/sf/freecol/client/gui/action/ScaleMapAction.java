@@ -98,7 +98,7 @@ public class ScaleMapAction extends FreeColAction {
         final Game game = freeColClient.getGame();
         final Map oldMap = game.getMap();
 
-        final Canvas canvas = getFreeColClient().getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final String okText = Messages.message("ok");
         final String cancelText = Messages.message("cancel");
         final String widthText = Messages.message("width");
@@ -237,6 +237,6 @@ public class ScaleMapAction extends FreeColAction {
         }*/
 
         freeColClient.getMapViewer().setSelectedTile(map.getTile(0, 0), false);
-        freeColClient.getCanvas().refresh();
+        gui.getCanvas().refresh();
     }
 }

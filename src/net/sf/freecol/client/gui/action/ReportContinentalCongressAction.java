@@ -50,6 +50,6 @@ public class ReportContinentalCongressAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportContinentalCongressPanel(freeColClient.getCanvas()));
+        gui.getCanvas().showPanel(new ReportContinentalCongressPanel(gui.getCanvas()));
     }
 }

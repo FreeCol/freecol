@@ -173,8 +173,8 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      *         cases.
      */
     protected boolean shouldBeEnabled() {
-        return freeColClient.getCanvas() != null
-                && !freeColClient.getCanvas().isClientOptionsDialogShowing();
+        return gui.getCanvas() != null
+                && !gui.getCanvas().isClientOptionsDialogShowing();
     }
 
     /**

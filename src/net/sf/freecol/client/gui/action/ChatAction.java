@@ -52,8 +52,8 @@ public class ChatAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && !getFreeColClient().isSingleplayer()
-            && getFreeColClient().getCanvas() != null
-            && (!getFreeColClient().getCanvas().isShowingSubPanel() || getFreeColClient().getGame() != null
+            && gui.getCanvas() != null
+            && (!gui.getCanvas().isShowingSubPanel() || getFreeColClient().getGame() != null
                 && getFreeColClient().getGame().getCurrentPlayer() != getFreeColClient().getMyPlayer());
     }
 
@@ -63,6 +63,6 @@ public class ChatAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().showChatPanel();
+        gui.getCanvas().showChatPanel();
     }
 }

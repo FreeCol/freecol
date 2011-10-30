@@ -102,7 +102,7 @@ public class ChangeAction extends UnitAction {
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
-            getFreeColClient().getCanvas().showColonyPanel(tile.getColony());
+            gui.getCanvas().showColonyPanel(tile.getColony());
         } else if (unit.isOnCarrier()) {
             getFreeColClient().getMapViewer().setActiveUnit(((Unit) unit.getLocation()));
         } else {

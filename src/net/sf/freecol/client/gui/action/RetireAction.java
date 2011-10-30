@@ -60,6 +60,6 @@ public class RetireAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().retire();
+        gui.getCanvas().retire();
     }
 }

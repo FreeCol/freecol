@@ -53,8 +53,8 @@ public abstract class MapboardAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled()  
-            && getFreeColClient().getCanvas() != null
-            && getFreeColClient().getCanvas().isMapboardActionsEnabled()
+            && gui.getCanvas() != null
+            && gui.getCanvas().isMapboardActionsEnabled()
             && (getFreeColClient().getGame() == null
                 || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer());
     }

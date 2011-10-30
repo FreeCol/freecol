@@ -50,7 +50,7 @@ public class AboutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = gui.getCanvas();
         canvas.showPanel(new AboutPanel(canvas));
     }
 }

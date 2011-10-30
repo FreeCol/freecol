@@ -100,7 +100,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         final int DEFAULT_distToLandFromHighSeas = 4;
         final int DEFAULT_maxDistanceToEdge = 12;
 
-        final Canvas canvas = getFreeColClient().getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final String okText = Messages.message("ok");
         final String cancelText = Messages.message("cancel");
         final String dText = Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas");
