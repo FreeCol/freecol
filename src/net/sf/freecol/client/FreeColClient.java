@@ -39,7 +39,6 @@ import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
@@ -321,14 +320,6 @@ public final class FreeColClient {
         return mapEditor;
     }
 
-    /**
-     * Gets the <code>ImageLibrary</code>.
-     *
-     * @return The <code>ImageLibrary</code>.
-     */
-    public ImageLibrary getImageLibrary() {
-        return gui.getImageLibrary();
-    }
 
     /**
      * Gets the object responsible for keeping and updating the actions.
@@ -657,11 +648,6 @@ public final class FreeColClient {
      */
     public Client getClient() {
         return client;
-    }
-
-    public SoundPlayer getSoundPlayer()
-    {
-        return gui.getSoundPlayer();
     }
 
     /**

@@ -257,7 +257,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         final Graphics2D g = (Graphics2D) graphics;
         final AffineTransform originTransform = g.getTransform();
         final Map map = freeColClient.getGame().getMap();
-        final ImageLibrary library = freeColClient.getImageLibrary();
+        final ImageLibrary library = freeColClient.getGUI().getImageLibrary();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);

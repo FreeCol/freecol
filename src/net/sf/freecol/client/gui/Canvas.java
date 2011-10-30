@@ -733,7 +733,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public ImageLibrary getImageLibrary() {
-        return freeColClient.getImageLibrary();
+        return gui.getImageLibrary();
     }
 
 

@@ -108,7 +108,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
     private void updateMixerLabel() {
-        SoundPlayer soundPlayer = FreeColClient.get().getSoundPlayer();
+        SoundPlayer soundPlayer = client.getGUI().getSoundPlayer();
         Mixer mixer;
         String text = (soundPlayer == null)
             ? Messages.message("nothing")

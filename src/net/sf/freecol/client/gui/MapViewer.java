@@ -1423,9 +1423,9 @@ public final class MapViewer {
         float newScale = lib.getScalingFactor() + delta;
         try {
             if (newScale >= 1f) {
-                setImageLibrary(freeColClient.getImageLibrary());
+                setImageLibrary(gui.getImageLibrary());
             } else {
-                setImageLibrary(freeColClient.getImageLibrary().getScaledImageLibrary(newScale));
+                setImageLibrary(gui.getImageLibrary().getScaledImageLibrary(newScale));
             }
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");

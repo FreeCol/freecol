@@ -84,9 +84,9 @@ public class WorkProductionPanel extends FreeColPanel {
             add(localizedLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
             TileType tileType = colonyTile.getWorkTile().getType();
-            int width = canvas.getFreeColClient().getImageLibrary()
+            int width = canvas.getFreeColClient().getGUI().getImageLibrary()
                 .getTerrainImageWidth(tileType);
-            int height = canvas.getFreeColClient().getImageLibrary()
+            int height = canvas.getFreeColClient().getGUI().getImageLibrary()
                 .getTerrainImageHeight(tileType);
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             canvas.getMapViewer().displayColonyTile((Graphics2D) image.getGraphics(),
