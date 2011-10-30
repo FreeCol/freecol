@@ -42,8 +42,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -83,8 +83,8 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
      * @param option
      * @param editable boolean whether user can modify the setting
      */
-    public UnitListOptionUI(final UnitListOption option, boolean editable) {
-        super(option, editable);
+    public UnitListOptionUI(final GUI gui, final UnitListOption option, boolean editable) {
+        super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          super.getLabel().getText()));
@@ -113,7 +113,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
                     oldValue = getOption().getTemplate();
                 }
                 AbstractUnitOption value = oldValue.clone();
-                if (showEditDialog(value)) {
+                if (showEditDialog(gui, value)) {
                     model.addElement(value);
                     list.setSelectedValue(value, true);
                     list.repaint();
@@ -124,7 +124,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
             public void actionPerformed(ActionEvent e) {
                 Object object = list.getSelectedValue();
                 if (object != null) {
-                    if (showEditDialog((AbstractUnitOption) object)) {
+                    if (showEditDialog(gui, (AbstractUnitOption) object)) {
                         list.repaint();
                     }
                 }
@@ -163,9 +163,9 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
         initialize();
     }
 
-    private boolean showEditDialog(AbstractUnitOption option) {
-        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
-        final EditDialog editDialog = new EditDialog(canvas, option);
+    private boolean showEditDialog(GUI gui, AbstractUnitOption option) {
+        final Canvas canvas = gui.getCanvas();
+        final EditDialog editDialog = new EditDialog(gui, canvas, option);
         return canvas.showFreeColDialog(editDialog);
     }
 
@@ -173,10 +173,10 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
 
         private AbstractUnitOptionUI ui;
 
-        public EditDialog(Canvas canvas, AbstractUnitOption option) {
+        public EditDialog(GUI gui, Canvas canvas, AbstractUnitOption option) {
             super(canvas);
             setLayout(new MigLayout());
-            ui = new AbstractUnitOptionUI(option, true);
+            ui = new AbstractUnitOptionUI(gui, option, true);
             add(ui.getComponent());
             add(okButton, "newline, split 2, tag ok");
             add(cancelButton, "tag cancel");

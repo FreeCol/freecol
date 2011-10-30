@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.option;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
@@ -41,8 +42,8 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     * @param option The <code>LanguageOption</code> to make a user interface for.
     * @param editable boolean whether user can modify the setting
     */
-    public LanguageOptionUI(final LanguageOption option, boolean editable) {
-        super(option, editable);
+    public LanguageOptionUI(GUI gui, final LanguageOption option, boolean editable) {
+        super(gui, option, editable);
 
         Language[] languages = option.getOptions();
 

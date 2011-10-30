@@ -37,14 +37,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Dialog for changing the options of an {@link OptionGroup}.
@@ -66,6 +66,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private List<JButton> buttons = new ArrayList<JButton>();
 
+    protected GUI gui;
+
     protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
             public boolean accept(File file) {
@@ -83,8 +85,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param parent <code>Canvas</code> The parent of this panel
      * @param editable boolean
      */
-    public OptionsDialog(Canvas parent, boolean editable) {
+    public OptionsDialog(GUI gui, Canvas parent, boolean editable) {
         super(parent);
+        this.gui = gui;
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
 
@@ -122,7 +125,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(group, isEditable());
+        ui = new OptionGroupUI(gui, group, isEditable());
         optionPanel = new JPanel() {
             @Override
             public String getUIClassID() {
@@ -175,7 +178,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        ui = new OptionGroupUI(group, isEditable());
+        ui = new OptionGroupUI(gui, group, isEditable());
         optionPanel.add(ui);
         revalidate();
         repaint();

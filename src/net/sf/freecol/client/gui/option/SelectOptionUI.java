@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.option;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -42,8 +43,8 @@ public final class SelectOptionUI extends OptionUI<SelectOption>  {
     * @param option The <code>SelectOption</code> to make a user interface for
     * @param editable boolean whether user can modify the setting
     */
-    public SelectOptionUI(final SelectOption option, boolean editable) {
-        super(option, editable);
+    public SelectOptionUI(GUI gui, final SelectOption option, boolean editable) {
+        super(gui, option, editable);
 
         String[] strings = option.getItemValues().values().toArray(new String[0]);
         if (option.localizeLabels()) {

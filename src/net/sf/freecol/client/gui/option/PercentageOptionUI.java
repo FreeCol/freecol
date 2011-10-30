@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.PercentageOption;
 
 /**
@@ -43,8 +44,8 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
      * @param option The <code>PercentageOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public PercentageOptionUI(final PercentageOption option, boolean editable) {
-        super(option, editable);
+    public PercentageOptionUI(GUI gui, final PercentageOption option, boolean editable) {
+        super(gui, option, editable);
 
         JSlider slider = getComponent();
 

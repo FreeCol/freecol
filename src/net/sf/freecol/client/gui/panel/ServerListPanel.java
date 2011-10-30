@@ -34,13 +34,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -62,7 +62,8 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     private JButton connect;
 
-
+    private GUI gui;
+    
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -70,8 +71,9 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * @param connectController The controller responsible for creating new
      *            connections.
      */
-    public ServerListPanel(Canvas parent, ConnectController connectController) {
+    public ServerListPanel(GUI gui, Canvas parent, ConnectController connectController) {
         super(parent);
+        this.gui = gui;
         this.connectController = connectController;
 
         JButton cancel = new JButton("Cancel");
@@ -189,7 +191,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                 break;
             case CANCEL:
                 getCanvas().remove(this);
-                getCanvas().showPanel(new NewPanel(getCanvas()));
+                getCanvas().showPanel(new NewPanel(gui, getCanvas()));
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

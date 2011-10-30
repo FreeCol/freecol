@@ -40,8 +40,9 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.freecol.FreeCol;
+
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.option.ListOption;
@@ -73,8 +74,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
      *            for.
      * @param editable boolean whether user can modify the setting
      */
-    public ListOptionUI(final ListOption<T> option, boolean editable) {
-        super(option, editable);
+    public ListOptionUI(GUI gui, final ListOption<T> option, boolean editable) {
+        super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          super.getLabel().getText()));
@@ -143,7 +144,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
     }
 
     private void showAddElementDialog() {
-        final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+        final Canvas canvas = gui.getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
         final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(canvas) {
             @Override

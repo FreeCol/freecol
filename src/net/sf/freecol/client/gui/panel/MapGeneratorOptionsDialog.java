@@ -31,11 +31,12 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JScrollPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
@@ -67,8 +68,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      * @param editable whether the options may be edited
      * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
-        super(parent, editable);
+    public MapGeneratorOptionsDialog(GUI gui, Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+        super(gui, parent, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

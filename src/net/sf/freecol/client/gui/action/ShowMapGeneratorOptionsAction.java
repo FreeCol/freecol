@@ -52,6 +52,6 @@ public class ShowMapGeneratorOptionsAction extends FreeColAction {
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = gui.getCanvas();
         OptionGroup mgo = freeColClient.getGame().getMapGeneratorOptions();
-        canvas.showFreeColDialog(new MapGeneratorOptionsDialog(canvas, mgo, false, false));
+        canvas.showFreeColDialog(new MapGeneratorOptionsDialog(gui, canvas, mgo, false, false));
     }
 }

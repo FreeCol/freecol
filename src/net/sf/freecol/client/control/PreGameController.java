@@ -32,7 +32,6 @@ import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;

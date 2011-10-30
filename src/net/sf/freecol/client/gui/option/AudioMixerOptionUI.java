@@ -30,7 +30,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -46,7 +46,6 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
     JPanel panel = new JPanel();
 
-    private final FreeColClient client = FreeColClient.get();
     private JComboBox cbox;
     private JButton button1, button2;
     private JLabel currentMixerLabel;
@@ -54,9 +53,9 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     private ActionListener aHandler = new ActionListener () {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == button1) {
-                client.getGUI().playSound("sound.event.buildingComplete");
+                gui.playSound("sound.event.buildingComplete");
             } else if (e.getSource() == button2) {
-                client.getGUI().playSound("sound.intro.general");
+                gui.playSound("sound.intro.general");
             } else if (e.getSource() == cbox) {
                 MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
                 if (getOption().getValue() != value) {
@@ -75,8 +74,8 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      *      interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public AudioMixerOptionUI(final AudioMixerOption option, boolean editable) {
-        super(option, editable);
+    public AudioMixerOptionUI(GUI gui, final AudioMixerOption option, boolean editable) {
+        super(gui, option, editable);
 
         BorderLayout layout = new BorderLayout();
         layout.setHgap(15);
@@ -108,7 +107,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
     private void updateMixerLabel() {
-        SoundPlayer soundPlayer = client.getGUI().getSoundPlayer();
+        SoundPlayer soundPlayer = gui.getSoundPlayer();
         Mixer mixer;
         String text = (soundPlayer == null)
             ? Messages.message("nothing")

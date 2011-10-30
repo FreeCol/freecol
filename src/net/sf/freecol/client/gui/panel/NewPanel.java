@@ -39,6 +39,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
@@ -115,6 +116,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * The specification to use for the new game.
      */
     private Specification specification;
+    private GUI gui;
 
 
     /**
@@ -122,8 +124,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      *
      * @param parent The parent of this panel.
      */
-    public NewPanel(Canvas parent) {
-        this(parent, null);
+    public NewPanel(GUI gui, Canvas parent) {
+        this(gui, parent, null);
     }
 
     /**
@@ -132,8 +134,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * @param parent The parent of this panel.
      * @param specification a <code>Specification</code> value, may be null
      */
-    public NewPanel(Canvas parent, Specification specification) {
+    public NewPanel(GUI gui, Canvas parent, Specification specification) {
         super(parent);
+        this.gui = gui;
         this.specification = specification;
         this.connectController = getFreeColClient().getConnectController();
 
@@ -285,7 +288,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 switch(action) {
                 case SINGLE:
                     OptionGroup level = getCanvas()
-                        .showFreeColDialog(new DifficultyDialog(getCanvas(), getSpecification()));
+                        .showFreeColDialog(new DifficultyDialog(gui, getCanvas(), getSpecification()));
                     Advantages advantages;
                     if (level != null) {
                         getSpecification().applyDifficultyLevel(level);
@@ -306,7 +309,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
                         level = getCanvas()
-                            .showFreeColDialog(new DifficultyDialog(getCanvas(), getSpecification()));
+                            .showFreeColDialog(new DifficultyDialog(gui, getCanvas(), getSpecification()));
                         getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
                         connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),

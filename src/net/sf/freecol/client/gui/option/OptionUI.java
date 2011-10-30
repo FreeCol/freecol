@@ -23,9 +23,21 @@ package net.sf.freecol.client.gui.option;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.option.*;
+import net.sf.freecol.common.option.AudioMixerOption;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.ListOption;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.PercentageOption;
+import net.sf.freecol.common.option.RangeOption;
+import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.option.UnitListOption;
 
 /**
  * This class provides common methods for various Option UIs.
@@ -47,13 +59,16 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      */
     private T option;
 
+    protected final GUI gui;
+
     /**
      * Constructor.
      *
      * @param option the Option
      * @param editable whether the Option should be editable
      */
-    public OptionUI(T option, boolean editable) {
+    public OptionUI(GUI gui, T option, boolean editable) {
+        this.gui = gui;
         this.option = option;
         this.editable = editable;
 
@@ -149,31 +164,31 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
 
     @SuppressWarnings("unchecked")
-    public static OptionUI getOptionUI(Option option, boolean editable) {
+    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
         if (option instanceof BooleanOption) {
-            return new BooleanOptionUI((BooleanOption) option, editable);
+            return new BooleanOptionUI(gui, (BooleanOption) option, editable);
         } else if (option instanceof FileOption) {
-            return new FileOptionUI((FileOption) option, editable);
+            return new FileOptionUI(gui, (FileOption) option, editable);
         } else if (option instanceof PercentageOption) {
-            return new PercentageOptionUI((PercentageOption) option, editable);
+            return new PercentageOptionUI(gui, (PercentageOption) option, editable);
         } else if (option instanceof ListOption<?>) {
-            return new ListOptionUI((ListOption) option, editable);
+            return new ListOptionUI(gui, (ListOption) option, editable);
         } else if (option instanceof RangeOption) {
-            return new RangeOptionUI((RangeOption) option, editable);
+            return new RangeOptionUI(gui, (RangeOption) option, editable);
         } else if (option instanceof SelectOption) {
-            return new SelectOptionUI((SelectOption) option, editable);
+            return new SelectOptionUI(gui, (SelectOption) option, editable);
         } else if (option instanceof IntegerOption) {
-            return new IntegerOptionUI((IntegerOption) option, editable);
+            return new IntegerOptionUI(gui, (IntegerOption) option, editable);
         } else if (option instanceof StringOption) {
-            return new StringOptionUI((StringOption) option, editable);
+            return new StringOptionUI(gui, (StringOption) option, editable);
         } else if (option instanceof LanguageOption) {
-            return new LanguageOptionUI((LanguageOption) option, editable);
+            return new LanguageOptionUI(gui, (LanguageOption) option, editable);
         } else if (option instanceof AudioMixerOption) {
-            return new AudioMixerOptionUI((AudioMixerOption) option, editable);
+            return new AudioMixerOptionUI(gui, (AudioMixerOption) option, editable);
         } else if (option instanceof FreeColAction) {
-            return new FreeColActionUI((FreeColAction) option, editable);
+            return new FreeColActionUI(gui, (FreeColAction) option, editable);
         } else if (option instanceof UnitListOption) {
-            return new UnitListOptionUI((UnitListOption) option, editable);
+            return new UnitListOptionUI(gui, (UnitListOption) option, editable);
         } else {
             return null;
         }

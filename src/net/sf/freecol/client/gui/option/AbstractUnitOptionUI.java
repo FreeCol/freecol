@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -54,8 +55,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
     * @param option The <code>AbstractUnitOption</code> to make a user interface for
     * @param editable boolean whether user can modify the setting
     */
-    public AbstractUnitOptionUI(final AbstractUnitOption option, boolean editable) {
-        super(option, editable);
+    public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option, boolean editable) {
+        super(gui, option, editable);
 
         panel.setLayout(new MigLayout());
 
@@ -65,19 +66,20 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
 
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
-        numberUI = new IntegerOptionUI(numberOption, numberEditable);
+        numberUI = new IntegerOptionUI(gui, numberOption, numberEditable);
         numberUI.getComponent().setToolTipText(Messages.message("report.numberOfUnits"));
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
-        typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
+        typeUI = new UnitTypeOptionUI(gui, typeOption, typeEditable);
+
         typeUI.getComponent().setToolTipText(Messages.message("model.unit.type"));
         panel.add(typeUI.getComponent(), "width 35%");
 
         boolean roleEditable = editable
             && roleOption.getChoices().size() > 1;
-        roleUI = new StringOptionUI(roleOption, roleEditable);
+        roleUI = new StringOptionUI(gui,roleOption, roleEditable);
         roleUI.getComponent().setToolTipText(Messages.message("model.unit.role.name"));
         roleUI.setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");

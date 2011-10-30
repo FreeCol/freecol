@@ -350,8 +350,8 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        startGamePanel = new StartGamePanel(this);
-        serverListPanel = new ServerListPanel(this, freeColClient.getConnectController());
+        startGamePanel = new StartGamePanel(gui, this);
+        serverListPanel = new ServerListPanel(gui, this, freeColClient.getConnectController());
         europePanel = new EuropePanel(this);
         statusPanel = new StatusPanel(this);
         chatPanel = new ChatPanel(this);
@@ -847,7 +847,7 @@ public final class Canvas extends JDesktopPane {
             removeInGameComponents();
         }
 
-        showPanel(new NewPanel(this, specification));
+        showPanel(new NewPanel(gui, this, specification));
     }
 
     /**

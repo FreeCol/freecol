@@ -34,6 +34,7 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.common.model.GameOptions;
@@ -72,13 +73,17 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private PlayersTable table;
 
+    private GUI gui;
+
     /**
      * The constructor that will add the items to this panel.
+     * @param gui 
      *
      * @param parent The parent of this panel.
      */
-    public StartGamePanel(final Canvas parent) {
+    public StartGamePanel(GUI gui, final Canvas parent) {
         super(parent);
+        this.gui = gui;
     }
 
     public void initialize(boolean singlePlayer) {
@@ -269,7 +274,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             case CANCEL:
                 getFreeColClient().getConnectController().quitGame(true);
                 getCanvas().remove(this);
-                getCanvas().showPanel(new NewPanel(getCanvas()));
+                getCanvas().showPanel(new NewPanel(gui, getCanvas()));
                 break;
             case READY:
                 getFreeColClient().getPreGameController()
@@ -285,14 +290,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 }
                 break;
             case GAME_OPTIONS:
-                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getFreeColClient().isAdmin(), true));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(gui, getCanvas(), getFreeColClient().isAdmin(), true));
                 break;
             case MAP_GENERATOR_OPTIONS:
                 OptionGroup mgo = getFreeColClient().getGame()
                     .getMapGeneratorOptions();
                 FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
                 boolean loadCustomOptions = (importFile.getValue() == null);
-                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getCanvas(), mgo, getFreeColClient().isAdmin(),
+                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(gui, getCanvas(), mgo, getFreeColClient().isAdmin(),
                                                                             loadCustomOptions));
                 break;
             default:

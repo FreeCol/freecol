@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.Option;
 
 /**
@@ -44,8 +45,8 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
      * @param option The <code>IntegerOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public SliderOptionUI(final T option, boolean editable) {
-        super(option, editable);
+    public SliderOptionUI(GUI gui, final T option, boolean editable) {
+        super(gui, option, editable);
 
         slider.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                           super.getLabel().getText()));

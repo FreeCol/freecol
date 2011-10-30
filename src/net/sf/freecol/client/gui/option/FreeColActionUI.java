@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 
 
@@ -64,8 +65,8 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
      *       interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public FreeColActionUI(FreeColAction option, boolean editable) {
-        super(option, editable);
+    public FreeColActionUI(GUI gui, FreeColAction option, boolean editable) {
+        super(gui, option, editable);
 
         this.optionGroupUI = optionGroupUI;
         keyStroke = option.getAccelerator();

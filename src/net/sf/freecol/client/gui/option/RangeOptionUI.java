@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.RangeOption;
 
@@ -43,8 +44,8 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
      * @param option The <code>RangeOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public RangeOptionUI(final RangeOption option, boolean editable) {
-        super(option, editable);
+    public RangeOptionUI(GUI gui, final RangeOption option, boolean editable) {
+        super(gui, option, editable);
 
         JSlider slider = getComponent();
 

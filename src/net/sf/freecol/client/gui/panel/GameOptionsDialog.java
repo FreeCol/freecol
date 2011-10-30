@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.common.model.GameOptions;
@@ -42,8 +43,8 @@ public final class GameOptionsDialog extends OptionsDialog {
      * @param editable whether the game options can be modified
      * @param loadCustomOptions whether to load custom options
      */
-    public GameOptionsDialog(Canvas parent, boolean editable, boolean loadCustomOptions) {
-        super(parent, editable);
+    public GameOptionsDialog(GUI gui, Canvas parent, boolean editable, boolean loadCustomOptions) {
+        super(gui, parent, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

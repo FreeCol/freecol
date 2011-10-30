@@ -30,7 +30,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -43,15 +42,12 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     public static final String OPTION_GROUP_ID = "clientOptions";
 
-    private GUI gui;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ClientOptionsDialog(GUI gui, Canvas parent) {
-        super(parent, true);
-        this.gui = gui;
+        super(gui, parent, true);
         getButtons().clear();
         initialize(getClientOptions(), getClientOptions().getName(), null);
     }

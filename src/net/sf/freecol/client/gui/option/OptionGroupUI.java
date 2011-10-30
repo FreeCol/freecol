@@ -35,6 +35,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
@@ -57,6 +58,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
     private final JTabbedPane tb;
 
+    private GUI gui;
+
 
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
@@ -66,8 +69,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      *
      * @param option The <code>OptionGroup</code> to make a user interface for.
      */
-    public OptionGroupUI(OptionGroup option) {
-        this(option, true);
+    public OptionGroupUI(GUI gui, OptionGroup option) {
+        this(gui, option, true);
     }
 
     /**
@@ -77,8 +80,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * @param option The <code>OptionGroup</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public OptionGroupUI(OptionGroup option, boolean editable) {
+    public OptionGroupUI(GUI gui, OptionGroup option, boolean editable) {
         super(new BorderLayout());
+        this.gui = gui;
 
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
@@ -143,7 +147,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     }
 
     private void addOptionUI(Option option, JPanel panel, boolean editable) {
-        OptionUI ui = OptionUI.getOptionUI(option, editable);
+        OptionUI ui = OptionUI.getOptionUI(gui, option, editable);
         if (ui == null) {
             logger.warning("Unknown option type: " + option.toString());
         } else if (ui instanceof FreeColActionUI) {

@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.FileOption;
 
@@ -50,8 +51,8 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     * @param option The <code>FileOption</code> to make a user interface for.
     * @param editable boolean whether user can modify the setting
     */
-    public FileOptionUI(final FileOption option, boolean editable) {
-        super(option, editable);
+    public FileOptionUI(final GUI gui, final FileOption option, boolean editable) {
+        super(gui, option, editable);
 
         panel.add(getLabel());
 
@@ -63,7 +64,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         if (editable) {
             browse.addActionListener(new ActionListener() {
                public void actionPerformed(ActionEvent e) {
-                   final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
+                   final Canvas canvas = gui.getCanvas();
                    File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
 
                    if (file == null) {

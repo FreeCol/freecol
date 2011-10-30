@@ -182,7 +182,7 @@ public final class MapEditorController {
         final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
 
         OptionGroup group = freeColClient.getGame().getMapGeneratorOptions();
-        group = canvas.showFreeColDialog(new MapGeneratorOptionsDialog(canvas, group, true, true));
+        group = canvas.showFreeColDialog(new MapGeneratorOptionsDialog(gui, canvas, group, true, true));
         if (group == null) {
             return;
         }
