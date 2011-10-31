@@ -26,11 +26,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.CanvasMouseListener;
-import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
@@ -134,8 +130,6 @@ public final class PreGameController {
     * if all players are ready to start the game.
     */
     public void requestLaunch() {
-        Canvas canvas = gui.getCanvas();
-
         if (!freeColClient.getGame().isAllPlayersReadyToLaunch()) {
             gui.errorMessage("server.notAllReady");
             return;
@@ -144,7 +138,7 @@ public final class PreGameController {
         Element requestLaunchElement = DOMMessage.createNewRootElement("requestLaunch");
         freeColClient.getClient().send(requestLaunchElement);
 
-        canvas.showStatusPanel( Messages.message("status.startingGame") );
+        gui.getCanvas().showStatusPanel( Messages.message("status.startingGame") );
     }
 
 
@@ -205,9 +199,6 @@ public final class PreGameController {
      * Starts the game.
      */
     public void startGame() {
-        Canvas canvas = gui.getCanvas();
-        MapViewer mapViewer = gui.getMapViewer();
-
         for (Player player : freeColClient.getGame().getPlayers()) {
             addPlayerResources(player.getNationID());
         }
@@ -216,9 +207,9 @@ public final class PreGameController {
 
         Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
-            canvas.closeMainPanel();
-            canvas.closeMenus();
-            canvas.closeStatusPanel();
+            gui.getCanvas().closeMainPanel();
+            gui.getCanvas().closeMenus();
+            gui.getCanvas().closeStatusPanel();
             gui.playSound(null); // Stop the long introduction sound
             gui.playSound("sound.intro." + myPlayer.getNationID());
         }
@@ -231,14 +222,12 @@ public final class PreGameController {
         }
 
         InGameController igc = freeColClient.getInGameController();
-        mapViewer.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
+        gui.getMapViewer().setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
         if (freeColClient.getGame().getCurrentPlayer() == myPlayer) {
             igc.nextActiveUnit();
         }
-
-        canvas.addMouseListener(new CanvasMouseListener(canvas, mapViewer));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, mapViewer,
-                 freeColClient.getGame().getMap()));
+        
+        gui.setUpMouseListenersForCanvas();
 
         if (FreeCol.isInDebugMode() && FreeCol.getDebugRunTurns() > 0) {
             freeColClient.skipTurns(FreeCol.getDebugRunTurns());

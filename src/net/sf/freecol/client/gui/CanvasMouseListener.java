@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.Timer;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -44,22 +45,25 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private final Canvas canvas;
 
-    private final MapViewer gui;
+    private final MapViewer mapViewer;
 
     private final int doubleClickDelay = 200; // Milliseconds
     private Timer doubleClickTimer = new Timer(doubleClickDelay,this);
 
     private int centerX, centerY;
 
+    private FreeColClient freeColClient;
+
     /**
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
-     * @param g The GUI that holds information such as screen resolution.
+     * @param mapViewer The GUI that holds information such as screen resolution.
      */
-    public CanvasMouseListener(Canvas canvas, MapViewer g) {
+    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+        this.freeColClient = freeColClient;
         this.canvas = canvas;
-        gui = g;
+        this.mapViewer = mapViewer;
     }
 
     /**
@@ -70,7 +74,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
-                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (FreeCol.isInDebugMode()) {
                     if (tile.getSettlement() != null) {
                         canvas.debugForeignColony(tile.getSettlement());
@@ -116,33 +120,33 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
                 // Cancel goto if one is active
-                if (gui.isGotoStarted()) {
-                    gui.stopGoto();
+                if (mapViewer.isGotoStarted()) {
+                    mapViewer.stopGoto();
                 }
 
-                canvas.showTilePopup(gui.convertToMapTile(e.getX(), e.getY()), e.getX(), e.getY());
+                canvas.showTilePopup(mapViewer.convertToMapTile(e.getX(), e.getY()), e.getX(), e.getY());
             } else if (e.getButton() == MouseEvent.BUTTON2) {
-                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
-                    Unit unit = gui.getActiveUnit();
+                    Unit unit = mapViewer.getActiveUnit();
                     if (unit != null && unit.getTile() != tile) {
                         PathNode dragPath = unit.findPath(tile);
-                        gui.startGoto();
-                        gui.setGotoPath(dragPath);
+                        mapViewer.startGoto();
+                        mapViewer.setGotoPath(dragPath);
                     }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
-                if (gui.isGotoStarted()) {
-                    PathNode path = gui.getGotoPath();
+                if (mapViewer.isGotoStarted()) {
+                    PathNode path = mapViewer.getGotoPath();
                     if (path != null) {
-                        gui.stopGoto();
+                        mapViewer.stopGoto();
                         // Move the unit:
-                        Unit unit = gui.getActiveUnit();
-                        canvas.getFreeColClient().getInGameController()
+                        Unit unit = mapViewer.getActiveUnit();
+                        freeColClient.getInGameController()
                             .setDestination(unit, path.getLastNode().getTile());
-                        if (canvas.getFreeColClient().getGame()
-                            .getCurrentPlayer() == canvas.getFreeColClient().getMyPlayer()) {
-                            canvas.getFreeColClient().getInGameController()
+                        if (freeColClient.getGame()
+                            .getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                            freeColClient.getInGameController()
                                 .moveToDestination(unit);
                         }
                     }
@@ -167,20 +171,20 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      */
     public void mouseReleased(MouseEvent e) {
         try {
-            if (gui.getGotoPath() != null) {
+            if (mapViewer.getGotoPath() != null) {
                 // A mouse drag has ended (see CanvasMouseMotionListener).
 
-                PathNode temp = gui.getGotoPath();
+                PathNode temp = mapViewer.getGotoPath();
 
-                gui.stopGoto();
+                mapViewer.stopGoto();
 
                 // Move the unit:
-                Unit unit = gui.getActiveUnit();
-                InGameController ctlr = canvas.getFreeColClient()
+                Unit unit = mapViewer.getActiveUnit();
+                InGameController ctlr = freeColClient
                     .getInGameController();
                 ctlr.setDestination(unit, temp.getLastNode().getTile());
-                if (canvas.getFreeColClient().getGame().getCurrentPlayer()
-                    == canvas.getFreeColClient().getMyPlayer()) {
+                if (freeColClient.getGame().getCurrentPlayer()
+                    == freeColClient.getMyPlayer()) {
                     ctlr.moveToDestination(unit);
                     boolean canStayActive = unit.getState() == UnitState.ACTIVE
                     						&& unit.getDestination() == null
@@ -191,8 +195,8 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                     ctlr.nextActiveUnit();
                 }
 
-            } else if (gui.isGotoStarted()) {
-                gui.stopGoto();
+            } else if (mapViewer.isGotoStarted()) {
+                mapViewer.stopGoto();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);
@@ -201,6 +205,6 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     public void actionPerformed(ActionEvent timerEvent){
         doubleClickTimer.stop();
-        gui.setSelectedTile(gui.convertToMapTile(centerX, centerY), true);
+        mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY), true);
     }
 }

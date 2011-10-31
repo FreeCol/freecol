@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -47,11 +48,13 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
     private final Canvas canvas;
 
-    private final MapViewer gui;
+    private final MapViewer mapViewer;
 
     private final Map map;
 
     private ScrollThread scrollThread;
+
+    private FreeColClient freeColClient;
 
     // private static final int SCROLLSPACE = 3;
     private static final int DRAG_SCROLLSPACE = 100;
@@ -63,15 +66,16 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
-     * @param g The GUI that holds information such as screen resolution.
+     * @param mapViewer The GUI that holds information such as screen resolution.
      * @param m The Map that is currently being drawn on the Canvas (by the
      *            GUI).
      */
-    public CanvasMouseMotionListener(Canvas canvas, MapViewer g, Map m) {
+    public CanvasMouseMotionListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer, Map m) {
+        this.freeColClient = freeColClient;
         this.canvas = canvas;
-        gui = g;
-        map = m;
-        scrollThread = null;
+        this.mapViewer = mapViewer;
+        this.map = m;
+        this.scrollThread = null;
     }
 
     /**
@@ -82,7 +86,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
 
     	if (e.getComponent().isEnabled()
-          && canvas.getFreeColClient().getClientOptions()
+          && freeColClient.getClientOptions()
           .getBoolean(ClientOptions.AUTO_SCROLL)) {
 				auto_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
@@ -90,22 +94,22 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread = null;
         }
 
-        if (gui.isGotoStarted()) {
-            if (gui.getActiveUnit() == null) {
-                gui.stopGoto();
+        if (mapViewer.isGotoStarted()) {
+            if (mapViewer.getActiveUnit() == null) {
+                mapViewer.stopGoto();
             }
 
-            Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+            Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
 
             if (tile != null) {
                 if (lastTile != tile) {
                     lastTile = tile;
-                    if (gui.getActiveUnit() != null
-                        && gui.getActiveUnit().getTile() != tile) {
-                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                        gui.setGotoPath(dragPath);
+                    if (mapViewer.getActiveUnit() != null
+                        && mapViewer.getActiveUnit().getTile() != tile) {
+                        PathNode dragPath = mapViewer.getActiveUnit().findPath(tile);
+                        mapViewer.setGotoPath(dragPath);
                     } else {
-                        gui.setGotoPath(null);
+                        mapViewer.setGotoPath(null);
                     }
                 }
             }
@@ -120,7 +124,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
 
         if (e.getComponent().isEnabled()
-            && canvas.getFreeColClient().getClientOptions()
+            && freeColClient.getClientOptions()
             .getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
 				drag_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
@@ -128,26 +132,26 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread = null;
         }
 
-        Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+        Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
         if (tile != null &&
             (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
             // only perform the goto for the left mouse button
-            if (gui.isGotoStarted()) {
-                if (gui.getActiveUnit() == null) {
-                    gui.stopGoto();
+            if (mapViewer.isGotoStarted()) {
+                if (mapViewer.getActiveUnit() == null) {
+                    mapViewer.stopGoto();
                 } else {
                     if (lastTile != tile) {
                         lastTile = tile;
-                        if (gui.getActiveUnit().getTile() != tile) {
-                            PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                            gui.setGotoPath(dragPath);
+                        if (mapViewer.getActiveUnit().getTile() != tile) {
+                            PathNode dragPath = mapViewer.getActiveUnit().findPath(tile);
+                            mapViewer.setGotoPath(dragPath);
                         } else {
-                            gui.setGotoPath(null);
+                            mapViewer.setGotoPath(null);
                         }
                     }
                 }
             } else {
-                gui.startGoto();
+                mapViewer.startGoto();
             }
         }
     }
@@ -173,22 +177,22 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         if ((x < scrollspace) && (y < scrollspace)) {
             // Upper-Left
             direction = Direction.NW;
-        } else if ((x >= gui.getWidth() - scrollspace) && (y < scrollspace)) {
+        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y < scrollspace)) {
             // Upper-Right
             direction = Direction.NE;
-        } else if ((x >= gui.getWidth() - scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
             // Bottom-Right
             direction = Direction.SE;
-        } else if ((x < scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+        } else if ((x < scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
             // Bottom-Left
             direction = Direction.SW;
         } else if (y < scrollspace) {
             // Top
             direction = Direction.N;
-        } else if (x >= gui.getWidth() - scrollspace) {
+        } else if (x >= mapViewer.getWidth() - scrollspace) {
             // Right
             direction = Direction.E;
-        } else if (y >= gui.getHeight() - scrollspace) {
+        } else if (y >= mapViewer.getHeight() - scrollspace) {
             // Bottom
             direction = Direction.S;
         } else if (x < scrollspace) {
@@ -208,7 +212,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread.setDirection(direction);
         } else {
             // start scrolling in a direction
-            scrollThread = new ScrollThread(map, gui);
+            scrollThread = new ScrollThread(map, mapViewer);
             scrollThread.setDirection(direction);
             scrollThread.start();
         }

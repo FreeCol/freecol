@@ -263,11 +263,17 @@ public class GUI {
         frame.setJMenuBar(null);
     }
     
+    public void setUpMouseListenersForCanvas(){
+        canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, canvas, mapViewer,
+                 freeColClient.getGame().getMap()));
+    }
+    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
-    
+
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -390,10 +396,11 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
+    
     
     /**
      * Updates the label displaying the current amount of gold.
@@ -401,8 +408,7 @@ public class GUI {
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-    
-    
+
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
@@ -412,6 +418,6 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-
+    
     
 }

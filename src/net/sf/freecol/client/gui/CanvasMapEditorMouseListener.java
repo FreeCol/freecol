@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
@@ -65,16 +66,19 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
     private Point oldPoint;
     private Point startPoint;
 
+    private FreeColClient freeColClient;
+
     /**
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
      * @param mapViewer The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(Canvas canvas, MapViewer mapViewer) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+        this.freeColClient = freeColClient;
         this.canvas = canvas;
         this.mapViewer = mapViewer;
-        scrollThread = null;
+        this.scrollThread = null;
     }
 
 
@@ -84,8 +88,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      */
     private Map getMap() {
         Map map = null;
-        if (canvas.getFreeColClient().getGame() != null)
-            map = canvas.getFreeColClient().getGame().getMap();
+        if (freeColClient.getGame() != null)
+            map = freeColClient.getGame().getMap();
         return map;
     }
 
@@ -186,7 +190,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         JComponent component = (JComponent)e.getSource();
 
-        MapEditorController controller = canvas.getFreeColClient()
+        MapEditorController controller = freeColClient
             .getMapEditorController();
         boolean isTransformActive = controller.getMapTransform() != null;
 
@@ -264,7 +268,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
 
         if (e.getComponent().isEnabled() &&
-            canvas.getFreeColClient().getClientOptions()
+            freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUTO_SCROLL)) {
             auto_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
@@ -288,7 +292,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         oldPoint = e.getPoint();
         drawBox(component, startPoint, oldPoint);
         if (e.getComponent().isEnabled() &&
-            canvas.getFreeColClient().getClientOptions()
+            freeColClient.getClientOptions()
             .getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
             drag_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
@@ -307,7 +311,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
 
         // only bother to draw if a transformation is active
-        MapEditorController controller = canvas.getFreeColClient().getMapEditorController();
+        MapEditorController controller = freeColClient.getMapEditorController();
         if(controller.getMapTransform() == null){
         	return;
         }
