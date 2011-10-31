@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -75,7 +74,6 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
-import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -287,20 +285,6 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-    /**
-     * Sometimes units appear which the client does not know about,
-     * and are passed in as the first child of the parent element.
-     *
-     * @param game The <code>Game</code> to add the unit to.
-     * @param element The <code>Element</code> to find a unit in.
-     * @return A unit or null if none found.
-     */
-    private static Unit getUnitFromElement(Game game, Element element) {
-        if (element.getFirstChild() != null) {
-            return new Unit(game, (Element) element.getFirstChild());
-        }
-        return null;
-    }
 
     /**
      * Sometimes units appear which the client does not know about,
@@ -892,21 +876,6 @@ public final class InGameInputHandler extends InputHandler {
 
         new UpdateMenuBarSwingTask().invokeLater();
         return reply;
-    }
-
-    /**
-     * Summarizes a list of units to a string.
-     *
-     * @param unitList The list of <code>AbstractUnit</code>s to summarize.
-     * @return A summary.
-     */
-    private String unitListSummary(List<AbstractUnit> unitList) {
-        ArrayList<String> unitNames = new ArrayList<String>();
-        for (AbstractUnit au : unitList) {
-            unitNames.add(au.getNumber() + " "
-                          + Messages.message(Messages.getLabel(au)));
-        }
-        return Utils.join(" " + Messages.message("and") + " ", unitNames);
     }
 
     /**
