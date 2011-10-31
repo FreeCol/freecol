@@ -21,9 +21,9 @@ public class Animations {
      * @param source The source <code>Tile</code> for the unit.
      * @param destination The destination <code>Tile</code> for the unit.
      */
-    public static void unitMove(GUI gui, Canvas canvas, Unit unit, Tile source,
+    public static void unitMove(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit unit, Tile source,
                                 Tile destination) {
-        new UnitMoveAnimation(gui, canvas, unit, source, destination).animate();
+        new UnitMoveAnimation(freeColClient, gui, canvas, unit, source, destination).animate();
     }
     
     /**
@@ -34,9 +34,9 @@ public class Animations {
      * @param defender The <code>Unit</code> that is defending.
      * @param success Did the attack succeed?
      */
-    public static void unitAttack(GUI gui, Canvas canvas, Unit attacker, Unit defender,
+    public static void unitAttack(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit attacker, Unit defender,
                                   boolean success) {
-        new UnitAttackAnimation(gui, canvas, attacker, defender, success).animate();
+        new UnitAttackAnimation(freeColClient, gui, canvas, attacker, defender, success).animate();
     }
 
 
@@ -47,8 +47,7 @@ public class Animations {
      * @param unit the <code>Unit</code> to be animated.
      * @return The animation speed.
      */
-    public static int getAnimationSpeed(Canvas canvas, Unit unit) {
-        FreeColClient client = canvas.getFreeColClient();
+    public static int getAnimationSpeed(FreeColClient client, Unit unit) {
         String key = (client.getMyPlayer() == unit.getOwner())
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;

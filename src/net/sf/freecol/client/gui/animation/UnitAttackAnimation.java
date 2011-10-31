@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
@@ -39,6 +40,7 @@ final class UnitAttackAnimation {
     private final Unit defender;
     private final boolean success;
     private GUI gui;
+    private FreeColClient freeColClient;
 
     /**
      * Build a new attack animation.
@@ -48,8 +50,9 @@ final class UnitAttackAnimation {
      * @param defender The <code>Unit</code> that is defending.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(GUI gui, Canvas canvas, Unit attacker, Unit defender,
+    public UnitAttackAnimation(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit attacker, Unit defender,
                                boolean success) {
+        this.freeColClient = freeColClient;
         this.gui = gui;
         this.canvas = canvas;
         this.attacker = attacker;
@@ -98,13 +101,13 @@ final class UnitAttackAnimation {
                                                defender.getTile());
         SimpleZippedAnimation sza;
 
-        if (Animations.getAnimationSpeed(canvas, attacker) > 0) {
+        if (Animations.getAnimationSpeed(freeColClient, attacker) > 0) {
             if ((sza = getAnimation(attacker, direction)) != null) {
                 new UnitImageAnimation(gui, canvas, attacker, sza).animate();
             }
         }
 
-        if (!success && Animations.getAnimationSpeed(canvas, defender) > 0) {
+        if (!success && Animations.getAnimationSpeed(freeColClient, defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
                 new UnitImageAnimation(gui, canvas, defender, sza).animate();

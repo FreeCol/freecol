@@ -331,7 +331,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (!client.isHeadless()
-            && Animations.getAnimationSpeed(gui.getCanvas(), unit) > 0) {
+            && Animations.getAnimationSpeed(getFreeColClient(), unit) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             String newTileId = element.getAttribute("newTile");
             Tile oldTile, newTile;
@@ -1554,7 +1554,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !mapViewer.onScreen(sourceTile)) {
                 mapViewer.setFocusImmediately(sourceTile);
             }
-            Animations.unitMove(gui, canvas, unit, sourceTile, destinationTile);
+            Animations.unitMove(getFreeColClient(), gui, canvas, unit, sourceTile, destinationTile);
             canvas.refresh();
         }
     }
@@ -1608,7 +1608,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !mapViewer.onScreen(unit.getTile())) {
                 mapViewer.setFocusImmediately(unit.getTile());
             }
-            Animations.unitAttack(gui, canvas, unit, defender, success);
+            Animations.unitAttack(getFreeColClient(), gui, canvas, unit, defender, success);
             canvas.refresh();
         }
     }
