@@ -364,11 +364,11 @@ public class GUI {
             o.addPropertyChangeListener(new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent e) {
                         if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                            getCanvas().showInformationMessage("autodetectLanguageSelected");
+                            canvas.showInformationMessage("autodetectLanguageSelected");
                         } else {
                             Locale l = ((Language) e.getNewValue()).getLocale();
                             Messages.setMessageBundle(l);
-                            getCanvas().showInformationMessage(StringTemplate.template("newLanguageSelected")
+                            canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
                                 .addName("%language%", l.getDisplayName()));
                         }
                     }
@@ -379,16 +379,16 @@ public class GUI {
         if (showOpeningVideo && !loadGame) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getCanvas().showOpeningVideoPanel();
+                    canvas.showOpeningVideoPanel();
                 }
             });
         } else {
             if (!loadGame) {
-                getCanvas().showMainPanel();
+                canvas.showMainPanel();
             }
             playSound("sound.intro.general");
         }
-        getMapViewer().startCursorBlinking();
+        mapViewer.startCursorBlinking();
     }
 
     public void updateGameOptions() {

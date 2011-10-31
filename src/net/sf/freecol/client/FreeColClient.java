@@ -36,7 +36,6 @@ import net.sf.freecol.client.control.InGameInputHandler;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
@@ -82,7 +81,7 @@ public final class FreeColClient {
 
     private ServerAPI serverAPI;
 
-    
+    // GUI - this encapsulates the whole gui stuff
     private GUI gui;
 
 
@@ -455,16 +454,6 @@ public final class FreeColClient {
      */
     public Game getGame() {
         return game;
-    }
-
-    /**
-     * Gets the <code>Canvas</code> this client uses to display the
-     * GUI-components.
-     *
-     * @return The <code>Canvas</code>.
-     */
-    public Canvas getCanvas() {
-        return gui.getCanvas();
     }
 
     private void exitActions () {
