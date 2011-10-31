@@ -1550,11 +1550,11 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer gui = canvas.getMapViewer();
-            if (focus || !gui.onScreen(sourceTile)) {
-                gui.setFocusImmediately(sourceTile);
+            MapViewer mapViewer = gui.getMapViewer();
+            if (focus || !mapViewer.onScreen(sourceTile)) {
+                mapViewer.setFocusImmediately(sourceTile);
             }
-            Animations.unitMove(canvas, unit, sourceTile, destinationTile);
+            Animations.unitMove(gui, canvas, unit, sourceTile, destinationTile);
             canvas.refresh();
         }
     }
@@ -1604,11 +1604,11 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer gui = canvas.getMapViewer();
-            if (focus || !gui.onScreen(unit.getTile())) {
-                gui.setFocusImmediately(unit.getTile());
+            MapViewer mapViewer = gui.getMapViewer();
+            if (focus || !mapViewer.onScreen(unit.getTile())) {
+                mapViewer.setFocusImmediately(unit.getTile());
             }
-            Animations.unitAttack(canvas, unit, defender, success);
+            Animations.unitAttack(gui, canvas, unit, defender, success);
             canvas.refresh();
         }
     }

@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.AnimationEvent;
@@ -43,6 +44,7 @@ public final class UnitImageAnimation {
     private final Unit unit;
     private final SimpleZippedAnimation animation;
     private final Location currentLocation;
+    private GUI gui;
     
     /**
      * Constructor
@@ -50,8 +52,9 @@ public final class UnitImageAnimation {
      * @param unit The unit to be animated. 
      * @param animation The animation.
      */
-    public UnitImageAnimation(Canvas canvas, Unit unit,
+    public UnitImageAnimation(GUI gui, Canvas canvas, Unit unit,
                               SimpleZippedAnimation animation) {
+        this.gui = gui;
         this.canvas = canvas;
         this.unit = unit;
         this.currentLocation = unit.getLocation();
@@ -63,13 +66,13 @@ public final class UnitImageAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer gui = canvas.getMapViewer();
-        if (gui.getTilePosition(unit.getTile()) == null) {
+        final MapViewer mapViewer = gui.getMapViewer();
+        if (mapViewer.getTilePosition(unit.getTile()) == null) {
             return;
         }
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         canvas.paintImmediately(canvas.getBounds());
-        gui.executeWithUnitOutForAnimation(unit, unit.getTile(), new OutForAnimationCallback() {
+        mapViewer.executeWithUnitOutForAnimation(unit, unit.getTile(), new OutForAnimationCallback() {
             public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                 for (AnimationEvent event : animation) {
                     long time = System.nanoTime();
@@ -94,6 +97,6 @@ public final class UnitImageAnimation {
     }
     
     protected Rectangle getDirtyAnimationArea() {
-        return canvas.getMapViewer().getTileBounds(currentLocation.getTile());
+        return gui.getMapViewer().getTileBounds(currentLocation.getTile());
     }
 }

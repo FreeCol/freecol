@@ -98,7 +98,7 @@ public final class TilePopup extends JPopupMenu {
      * @param mapViewer An object with methods used for making the popup.
      */
     public TilePopup(final Tile tile, final FreeColClient freeColClient, final GUI gui,
-                     final Canvas canvas, final MapViewer mapViewer) {
+                     final Canvas canvas) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
@@ -106,7 +106,7 @@ public final class TilePopup extends JPopupMenu {
         this.canvas = canvas;
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.mapViewer = mapViewer;
+        this.mapViewer = gui.getMapViewer();
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = mapViewer.getActiveUnit();

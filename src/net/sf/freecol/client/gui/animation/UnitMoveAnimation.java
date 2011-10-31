@@ -25,6 +25,7 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
@@ -46,6 +47,8 @@ final class UnitMoveAnimation {
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
+
+    private GUI gui;
     
 
     /**
@@ -56,8 +59,9 @@ final class UnitMoveAnimation {
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(Canvas canvas, Unit unit, Tile sourceTile,
+    public UnitMoveAnimation(GUI gui, Canvas canvas, Unit unit, Tile sourceTile,
                              Tile destinationTile) {
+        this.gui = gui;
         this.canvas = canvas;
         this.unit = unit;
         this.sourceTile = sourceTile;
@@ -69,28 +73,28 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer gui = canvas.getMapViewer();
+        final MapViewer mapViewer = gui.getMapViewer();
         final int movementSpeed = Animations.getAnimationSpeed(canvas, unit);
-        final Point srcP = gui.getTilePosition(sourceTile);
-        final Point dstP = gui.getTilePosition(destinationTile);
+        final Point srcP = mapViewer.getTilePosition(sourceTile);
+        final Point dstP = mapViewer.getTilePosition(destinationTile);
         
         if (srcP == null || dstP == null || movementSpeed <= 0) return;
 
-        float scale = gui.getMapScale();
+        float scale = mapViewer.getMapScale();
         final int movementRatio = (int)(Math.pow(2, movementSpeed + 1) * scale);
-        final Rectangle r1 = gui.getTileBounds(sourceTile);
-        final Rectangle r2 = gui.getTileBounds(destinationTile);
+        final Rectangle r1 = mapViewer.getTileBounds(sourceTile);
+        final Rectangle r2 = mapViewer.getTileBounds(destinationTile);
         final Rectangle bounds = r1.union(r2);
 
-        gui.executeWithUnitOutForAnimation(unit, sourceTile,
+        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile,
             new OutForAnimationCallback() {
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                     final Point srcPoint
-                        = gui.getUnitLabelPositionInTile(unitLabel, srcP);
+                        = mapViewer.getUnitLabelPositionInTile(unitLabel, srcP);
                     final Point dstPoint
-                        = gui.getUnitLabelPositionInTile(unitLabel, dstP);
-                    final double xratio = gui.getTileWidth()
-                        / gui.getTileHeight();
+                        = mapViewer.getUnitLabelPositionInTile(unitLabel, dstP);
+                    final double xratio = mapViewer.getTileWidth()
+                        / mapViewer.getTileHeight();
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
                     final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0

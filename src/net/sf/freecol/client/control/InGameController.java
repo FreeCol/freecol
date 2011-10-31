@@ -3765,9 +3765,8 @@ public final class InGameController implements NetworkConstants {
      * Tell a unit to wait.
      */
     public void waitActiveUnit() {
-        Canvas canvas = gui.getCanvas();
-        MapViewer gui = canvas.getMapViewer();
-        gui.setActiveUnit(null);
+        MapViewer mapViewer = gui.getMapViewer();
+        mapViewer.setActiveUnit(null);
         nextActiveUnit();
     }
 
@@ -3798,7 +3797,6 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         // Always flush outstanding messages first.
-        Canvas canvas = gui.getCanvas();
         nextModelMessage();
         //if (canvas.isShowingSubPanel()) {
         //    canvas.getShowingSubPanel().requestFocus();
@@ -3813,14 +3811,14 @@ public final class InGameController implements NetworkConstants {
 
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
-        MapViewer gui = canvas.getMapViewer();
-        Unit unit = gui.getActiveUnit();
+        MapViewer mapViewer = gui.getMapViewer();
+        Unit unit = mapViewer.getActiveUnit();
         if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {
             return; // Current active unit has more moves to do.
         }
         if (player.hasNextActiveUnit()) {
-            gui.setActiveUnit(player.getNextActiveUnit());
+            mapViewer.setActiveUnit(player.getNextActiveUnit());
             return; // Successfully found a unit to display
         }
 
@@ -3830,12 +3828,12 @@ public final class InGameController implements NetworkConstants {
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
         // just select nothing and wait.
-        gui.setActiveUnit(null);
+        mapViewer.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
         if (moveMode >= MODE_END_TURN) {
             endTurn();
         } else if (tile != null) {
-            gui.setSelectedTile(tile, false);
+            mapViewer.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             endTurn();
         }

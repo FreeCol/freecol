@@ -273,7 +273,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         // Verify that it has at least two stops
         if (listModel.getSize() < 2) {
-            getCanvas().errorMessage("traderouteDialog.notEnoughStops");
+            gui.errorMessage("traderouteDialog.notEnoughStops");
             return false;
         }
 

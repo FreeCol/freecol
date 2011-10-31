@@ -20,10 +20,11 @@
 package net.sf.freecol.client.gui.animation;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -37,6 +38,7 @@ final class UnitAttackAnimation {
     private final Unit attacker;
     private final Unit defender;
     private final boolean success;
+    private GUI gui;
 
     /**
      * Build a new attack animation.
@@ -46,8 +48,9 @@ final class UnitAttackAnimation {
      * @param defender The <code>Unit</code> that is defending.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(Canvas canvas, Unit attacker, Unit defender,
+    public UnitAttackAnimation(GUI gui, Canvas canvas, Unit attacker, Unit defender,
                                boolean success) {
+        this.gui = gui;
         this.canvas = canvas;
         this.attacker = attacker;
         this.defender = defender;
@@ -62,9 +65,9 @@ final class UnitAttackAnimation {
      * @param direction The <code>Direction</code> of the attack.
      * @return An animation, if available.
      */
-    private SimpleZippedAnimation getAnimation(Canvas canvas, Unit unit,
+    private SimpleZippedAnimation getAnimation(Unit unit,
                                                Direction direction) {
-        float scale = canvas.getMapViewer().getMapScale();
+        float scale = gui.getMapViewer().getMapScale();
         String roleStr = (unit.getRole() == Role.DEFAULT) ? ""
             : "." + unit.getRole().getId();
         String startStr = unit.getType().getId() + roleStr + ".attack.";
@@ -96,15 +99,15 @@ final class UnitAttackAnimation {
         SimpleZippedAnimation sza;
 
         if (Animations.getAnimationSpeed(canvas, attacker) > 0) {
-            if ((sza = getAnimation(canvas, attacker, direction)) != null) {
-                new UnitImageAnimation(canvas, attacker, sza).animate();
+            if ((sza = getAnimation(attacker, direction)) != null) {
+                new UnitImageAnimation(gui, canvas, attacker, sza).animate();
             }
         }
 
         if (!success && Animations.getAnimationSpeed(canvas, defender) > 0) {
             direction = direction.getReverseDirection();
-            if ((sza = getAnimation(canvas, defender, direction)) != null) {
-                new UnitImageAnimation(canvas, defender, sza).animate();
+            if ((sza = getAnimation(defender, direction)) != null) {
+                new UnitImageAnimation(gui, canvas, defender, sza).animate();
             }
         }
     }

@@ -637,7 +637,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param messageID The i18n-keyname of the error message to display.
      */
-    public void errorMessage(String messageID) {
+    void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
 
@@ -986,7 +986,7 @@ public final class Canvas extends JDesktopPane {
 
         // change to default view mode
         // Must be done before removing jMenuBar to prevent exception (crash)
-        getMapViewer().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
+        gui.getMapViewer().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         for (Component c : getComponents()) {
             remove(c, false);
@@ -2218,7 +2218,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showTilePopup(Tile tile, int x, int y) {
         if (tile != null) {
-            TilePopup tp = new TilePopup(tile, freeColClient, gui, this, getMapViewer());
+            TilePopup tp = new TilePopup(tile, freeColClient, gui, this);
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
