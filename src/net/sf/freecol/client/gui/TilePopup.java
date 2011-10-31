@@ -81,31 +81,29 @@ public final class TilePopup extends JPopupMenu {
     public static final int UNIT_LINES_IN_FIRST_MENU = 9;
     public static final int UNIT_LINES_IN_OTHER_MENUS = 19;
 
-    private final Canvas canvas;
     private final FreeColClient freeColClient;
     private final GUI gui;
+    private final Canvas canvas;
     private final MapViewer mapViewer;
 
     private boolean hasAnItem = false;
 
     /**
      * The constructor that will insert the MenuItems.
-     *
+     * @param freeColClient The main controller object for the client.
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
-     * @param freeColClient The main controller object for the client.
      * @param canvas The component containing the map.
      * @param mapViewer An object with methods used for making the popup.
      */
-    public TilePopup(final Tile tile, final FreeColClient freeColClient, final GUI gui,
-                     final Canvas canvas) {
+    public TilePopup(final FreeColClient freeColClient, final GUI gui, final Tile tile) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
 
-        this.canvas = canvas;
         this.freeColClient = freeColClient;
         this.gui = gui;
+        this.canvas = gui.getCanvas();
         this.mapViewer = gui.getMapViewer();
 
         final Player player = freeColClient.getMyPlayer();

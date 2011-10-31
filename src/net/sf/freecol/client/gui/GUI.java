@@ -86,7 +86,7 @@ public class GUI {
      * @return boolean <b>true</b> if and only if client sound player has an instance
      */
     public boolean canPlaySound() {
-        return getSoundPlayer() != null;
+        return soundPlayer != null;
     }
 
     /**
@@ -214,11 +214,11 @@ public class GUI {
     public void playSound(String sound) {
         if (canPlaySound()) {
             if (sound == null) {
-               getSoundPlayer().stop();
+               soundPlayer.stop();
             } else {
                File file = ResourceManager.getAudio(sound);
                if (file != null) {
-                   getSoundPlayer().playOnce(file);
+                   soundPlayer.playOnce(file);
                }
                logger.finest(((file == null) ? "Could not load" : "Playing")
                              + " sound: " + sound);

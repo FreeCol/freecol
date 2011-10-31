@@ -63,9 +63,6 @@ public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
 
-    private static FreeColClient instance;
-
-
     // Control:
     private ConnectController connectController;
 
@@ -81,10 +78,10 @@ public final class FreeColClient {
 
     private ServerAPI serverAPI;
 
+
+
     // GUI - this encapsulates the whole gui stuff
     private GUI gui;
-
-
 
     // Networking:
     /**
@@ -101,6 +98,7 @@ public final class FreeColClient {
 
     private boolean isRetired = false;
 
+
     /**
      * Indicates if the game has started, has nothing to do with
      * whether or not the client is logged in.
@@ -110,7 +108,6 @@ public final class FreeColClient {
 
     /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
-
 
     private boolean mapEditor;
 
@@ -129,6 +126,7 @@ public final class FreeColClient {
      * approved login to a server.
      */
     private boolean loggedIn = false;
+
 
     /**
      * Describe headless here.
@@ -257,37 +255,18 @@ public final class FreeColClient {
                     }
                 });
         }
-
-        // Remember the first instance as a quasi-singleton.
-        if (instance == null) instance = this;
-    }
-
-
-    /**
-     * Gets the quasi-singleton instance.
-     */
-    public static FreeColClient get() {
-        return instance;
     }
 
  
 
     /**
-     * Get the <code>Headless</code> value.
+     * Meaningfully named access to the ServerAPI.
      *
-     * @return a <code>boolean</code> value
+     * @return A ServerAPI.
      */
-    public boolean isHeadless() {
-        return headless;
-    }
-
-    /**
-     * Set the <code>Headless</code> value.
-     *
-     * @param newHeadless The new Headless value.
-     */
-    public void setHeadless(final boolean newHeadless) {
-        this.headless = newHeadless;
+    public ServerAPI askServer() {
+        if (serverAPI == null) serverAPI = new ServerAPI(this, gui);
+        return serverAPI;
     }
 
     /**
@@ -308,13 +287,11 @@ public final class FreeColClient {
         return true;
     }
 
-
-    public void setMapEditor(boolean mapEditor) {
-        this.mapEditor = mapEditor;
-    }
-
-    public boolean isMapEditor() {
-        return mapEditor;
+    /**
+     * Continue playing after winning the game.
+     */
+    public void continuePlaying() {
+        client.send(DOMMessage.createNewRootElement("continuePlaying"));
     }
 
 
@@ -328,12 +305,346 @@ public final class FreeColClient {
     }
 
     /**
+     * Gets the <code>Client</code> that can be used to send messages to the
+     * server.
+     *
+     * @return the <code>Client</code>
+     * @see #setClient
+     */
+    public Client getClient() {
+        return client;
+    }
+
+
+    /**
      * Returns the object keeping the current client options.
      *
      * @return The <code>ClientOptions</code>.
      */
     public ClientOptions getClientOptions() {
         return clientOptions;
+    }
+
+    /**
+     * Gets the controller responsible for starting a server and connecting to
+     * it.
+     *
+     * @return The <code>ConnectController</code>.
+     */
+    public ConnectController getConnectController() {
+        return connectController;
+    }
+
+    /**
+     * Gets the <code>FreeColServer</code> started by the client.
+     *
+     * @return The <code>FreeColServer</code> or <code>null</code> if no
+     *         server has been started.
+     */
+    public FreeColServer getFreeColServer() {
+        return freeColServer;
+    }
+
+    /**
+     * Gets the <code>Game</code> that we are currently playing.
+     *
+     * @return The <code>Game</code>.
+     * @see #setGame
+     */
+    public Game getGame() {
+        return game;
+    }
+
+    public GUI getGUI() {
+        return gui;
+    }
+
+    /**
+     * Gets the controller that will be used when the game has been started.
+     *
+     * @return The <code>InGameController</code>.
+     */
+    public InGameController getInGameController() {
+        return inGameController;
+    }
+
+    /**
+     * Gets the input handler that will be used when the game has been started.
+     *
+     * @return The <code>InGameInputHandler</code>.
+     */
+    public InGameInputHandler getInGameInputHandler() {
+        return inGameInputHandler;
+    }
+
+    public MapEditorController getMapEditorController() {
+        return mapEditorController;
+    }
+
+    /**
+     * Gets the <code>Player</code> that uses this client.
+     *
+     * @return The <code>Player</code> made to represent this clients user.
+     * @see #setMyPlayer(Player)
+     */
+    public Player getMyPlayer() {
+        return player;
+    }
+
+    /**
+     * Gets the controller that will be used before the game has been started.
+     *
+     * @return The <code>PreGameController</code>.
+     */
+    public PreGameController getPreGameController() {
+        return preGameController;
+    }
+
+    /**
+     * Gets the input handler that will be used before the game has been
+     * started.
+     *
+     * @return The <code>PreGameInputHandler</code>.
+     */
+    public PreGameInputHandler getPreGameInputHandler() {
+        return preGameInputHandler;
+    }
+
+
+    /**
+     * Checks if this client is the game admin.
+     *
+     * @return <i>true</i> if the client is the game admin and <i>false</i>
+     *         otherwise. <i>false</i> is also returned if a game have not yet
+     *         been started.
+     */
+    public boolean isAdmin() {
+        if (getMyPlayer() == null) {
+            return false;
+        }
+        return getMyPlayer().isAdmin();
+    }
+
+
+    /**
+     * Get the <code>Headless</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isHeadless() {
+        return headless;
+    }
+
+
+    /**
+     * Checks if the game has started.
+     * @return <i>true</i> if the game has started.
+     * @see #setInGame
+     */
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    /**
+     * Returns <i>true</i> if this client is logged in to a server or
+     * <i>false</i> otherwise.
+     *
+     * @return <i>true</i> if this client is logged in to a server or
+     *         <i>false</i> otherwise.
+     */
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public boolean isMapEditor() {
+        return mapEditor;
+    }
+
+    /**
+     * Has the user retired the game.
+     *
+     * @return <i>true</i> if the user has retired the game and
+     *         <i>false</i> otherwise.
+     */
+    public boolean isRetired() {
+        return isRetired;
+    }
+
+    /**
+     * Is the user playing in singleplayer mode.
+     *
+     * @return <i>true</i> if the user is playing in singleplayer mode and
+     *         <i>false</i> otherwise.
+     * @see #setSingleplayer
+     */
+    public boolean isSingleplayer() {
+        return singleplayer;
+    }
+
+    /**
+     * Quits the application without any questions.
+     */
+    public void quit() {
+        getConnectController().quitGame(isSingleplayer());
+        exitActions();
+        gui.quit();
+        System.exit(0);
+    }
+
+    /**
+     * Set the game-wide next active unit if one can be found.
+     *
+     * @param unitId A unit id for the unit to make active.
+     */
+    public void setActiveUnit(String unitId) {
+        if (unitId != null && getGame() != null) {
+            Unit active = (Unit) getGame().getFreeColGameObject(unitId);
+            if (active != null) {
+                active.getOwner().resetIterators();
+                active.getOwner().setNextActiveUnit(active);
+                gui.getMapViewer().setActiveUnit(active);
+            }
+        }
+    }
+
+    /**
+     * Sets the <code>Client</code> that shall be used to send messages to the
+     * server.
+     *
+     * @param client the <code>Client</code>
+     * @see #getClient
+     */
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    /**
+     * Sets the <code>FreeColServer</code> which has been started by the
+     * client gui.
+     *
+     * @param freeColServer The <code>FreeColServer</code>.
+     * @see #getFreeColServer()
+     */
+    public void setFreeColServer(FreeColServer freeColServer) {
+        this.freeColServer = freeColServer;
+    }
+
+    /**
+     * Sets the <code>Game</code> that we are currently playing.
+     *
+     * @param game The <code>Game</code>.
+     * @see #getGame
+     */
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    /**
+     * Set the <code>Headless</code> value.
+     *
+     * @param newHeadless The new Headless value.
+     */
+    public void setHeadless(final boolean newHeadless) {
+        this.headless = newHeadless;
+    }
+
+    /**
+     * Notifies this GUI that the game has started or ended.
+     * @param inGame Indicates whether or not the game has started.
+     */
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
+    }
+
+    /**
+     * Sets whether or not the user has retired the game.
+     *
+     * @param isRetired Indicates whether or not the user has retired the game.
+     */
+    public void setIsRetired(boolean isRetired) {
+        this.isRetired = isRetired;
+    }
+
+    /**
+     * Sets whether or not this client is logged in to a server.
+     *
+     * @param loggedIn An indication of whether or not this client is logged in
+     *            to a server.
+     */
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+
+    public void setMapEditor(boolean mapEditor) {
+        this.mapEditor = mapEditor;
+    }
+
+    /**
+     * Sets the <code>Player</code> that uses this client.
+     *
+     * @param player The <code>Player</code> made to represent this clients
+     *            user.
+     * @see #getMyPlayer()
+     */
+    public void setMyPlayer(Player player) {
+        this.player = player;
+    }
+
+
+
+    /**
+     * Sets whether or not this game is a singleplayer game.
+     *
+     * @param singleplayer Indicates whether or not this game is a singleplayer
+     *            game.
+     * @see #isSingleplayer
+     */
+    public void setSingleplayer(boolean singleplayer) {
+        this.singleplayer = singleplayer;
+    }
+
+    public void setWindowed(boolean windowed) {
+        gui.setWindowed(windowed);
+    }
+
+    /**
+     * Start the game skipping turns.
+     *
+     * @param turns The number of turns to skip.
+     */
+    public void skipTurns(int turns) {
+        if (freeColServer == null) return;
+        freeColServer.getInGameController().setSkippedTurns(turns);
+        gui.getCanvas().closeMenus();
+        askServer().startSkipping();
+    }
+
+
+    private void exitActions () {
+       try {
+          // action: delete outdated autosave files
+          int validDays = getClientOptions().getInteger(ClientOptions.AUTOSAVE_VALIDITY);
+          long validPeriod = (long)validDays * 86400 * 1000;  // millisecond equivalent of valid days
+          long timeNow = System.currentTimeMillis();
+          File autosaveDir = FreeCol.getAutosaveDirectory();
+
+          if (validPeriod != 0) {
+             // analyse all files in autosave directory
+             String[] flist = autosaveDir.list();
+             for ( int i = 0; flist != null && i < flist.length; i++ ) {
+                String filename = flist[i];
+                // delete files which are older than valid period set by user option
+                if (filename.endsWith(".fsg")) {
+                   File saveGameFile = new File(autosaveDir, filename);
+                   if (saveGameFile.lastModified() + validPeriod < timeNow) {
+                       saveGameFile.delete();
+                   }
+                }
+             }
+          }
+       } catch (Exception e) {
+          e.printStackTrace();
+       }
     }
 
     /**
@@ -351,7 +662,6 @@ public final class FreeColClient {
         clientOptions = new ClientOptions();
         logger.info("Loaded default client options.");
 
-        ActionManager actionManager = getActionManager();
         if (actionManager != null) {
             clientOptions.add(actionManager);
             logger.info("Loaded client options from the action manager.");
@@ -387,330 +697,7 @@ public final class FreeColClient {
         ResourceManager.setModMappings(modMappings);
 
         // Update the actions, resources may have changed.
-        if (actionManager != null) actionManager.update();
-    }
-
-    public MapEditorController getMapEditorController() {
-        return mapEditorController;
-    }
-
-    /**
-     * Gets the <code>Player</code> that uses this client.
-     *
-     * @return The <code>Player</code> made to represent this clients user.
-     * @see #setMyPlayer(Player)
-     */
-    public Player getMyPlayer() {
-        return player;
-    }
-
-    /**
-     * Sets the <code>Player</code> that uses this client.
-     *
-     * @param player The <code>Player</code> made to represent this clients
-     *            user.
-     * @see #getMyPlayer()
-     */
-    public void setMyPlayer(Player player) {
-        this.player = player;
-    }
-
-    /**
-     * Sets the <code>FreeColServer</code> which has been started by the
-     * client gui.
-     *
-     * @param freeColServer The <code>FreeColServer</code>.
-     * @see #getFreeColServer()
-     */
-    public void setFreeColServer(FreeColServer freeColServer) {
-        this.freeColServer = freeColServer;
-    }
-
-    /**
-     * Gets the <code>FreeColServer</code> started by the client.
-     *
-     * @return The <code>FreeColServer</code> or <code>null</code> if no
-     *         server has been started.
-     */
-    public FreeColServer getFreeColServer() {
-        return freeColServer;
-    }
-
-    /**
-     * Sets the <code>Game</code> that we are currently playing.
-     *
-     * @param game The <code>Game</code>.
-     * @see #getGame
-     */
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
-    /**
-     * Gets the <code>Game</code> that we are currently playing.
-     *
-     * @return The <code>Game</code>.
-     * @see #setGame
-     */
-    public Game getGame() {
-        return game;
-    }
-
-    private void exitActions () {
-       try {
-          // action: delete outdated autosave files
-          int validDays = getClientOptions().getInteger(ClientOptions.AUTOSAVE_VALIDITY);
-          long validPeriod = (long)validDays * 86400 * 1000;  // millisecond equivalent of valid days
-          long timeNow = System.currentTimeMillis();
-          File autosaveDir = FreeCol.getAutosaveDirectory();
-
-          if (validPeriod != 0) {
-             // analyse all files in autosave directory
-             String[] flist = autosaveDir.list();
-             for ( int i = 0; flist != null && i < flist.length; i++ ) {
-                String filename = flist[i];
-                // delete files which are older than valid period set by user option
-                if (filename.endsWith(".fsg")) {
-                   File saveGameFile = new File(autosaveDir, filename);
-                   if (saveGameFile.lastModified() + validPeriod < timeNow) {
-                       saveGameFile.delete();
-                   }
-                }
-             }
-          }
-       } catch (Exception e) {
-          e.printStackTrace();
-       }
-    }
-
-
-    /**
-     * Quits the application without any questions.
-     */
-    public void quit() {
-        getConnectController().quitGame(isSingleplayer());
-        exitActions();
-        gui.quit();
-        System.exit(0);
-    }
-
-
-    /**
-     * Continue playing after winning the game.
-     */
-    public void continuePlaying() {
-        client.send(DOMMessage.createNewRootElement("continuePlaying"));
-    }
-
-
-    /**
-     * Checks if this client is the game admin.
-     *
-     * @return <i>true</i> if the client is the game admin and <i>false</i>
-     *         otherwise. <i>false</i> is also returned if a game have not yet
-     *         been started.
-     */
-    public boolean isAdmin() {
-        if (getMyPlayer() == null) {
-            return false;
-        }
-        return getMyPlayer().isAdmin();
-    }
-
-    /**
-     * Sets whether or not this game is a singleplayer game.
-     *
-     * @param singleplayer Indicates whether or not this game is a singleplayer
-     *            game.
-     * @see #isSingleplayer
-     */
-    public void setSingleplayer(boolean singleplayer) {
-        this.singleplayer = singleplayer;
-    }
-
-    /**
-     * Is the user playing in singleplayer mode.
-     *
-     * @return <i>true</i> if the user is playing in singleplayer mode and
-     *         <i>false</i> otherwise.
-     * @see #setSingleplayer
-     */
-    public boolean isSingleplayer() {
-        return singleplayer;
-    }
-
-    /**
-     * Sets whether or not the user has retired the game.
-     *
-     * @param isRetired Indicates whether or not the user has retired the game.
-     */
-    public void setIsRetired(boolean isRetired) {
-        this.isRetired = isRetired;
-    }
-
-    /**
-     * Has the user retired the game.
-     *
-     * @return <i>true</i> if the user has retired the game and
-     *         <i>false</i> otherwise.
-     */
-    public boolean isRetired() {
-        return isRetired;
-    }
-
-    /**
-     * Gets the controller responsible for starting a server and connecting to
-     * it.
-     *
-     * @return The <code>ConnectController</code>.
-     */
-    public ConnectController getConnectController() {
-        return connectController;
-    }
-
-    /**
-     * Gets the controller that will be used before the game has been started.
-     *
-     * @return The <code>PreGameController</code>.
-     */
-    public PreGameController getPreGameController() {
-        return preGameController;
-    }
-
-    /**
-     * Gets the input handler that will be used before the game has been
-     * started.
-     *
-     * @return The <code>PreGameInputHandler</code>.
-     */
-    public PreGameInputHandler getPreGameInputHandler() {
-        return preGameInputHandler;
-    }
-
-    /**
-     * Gets the controller that will be used when the game has been started.
-     *
-     * @return The <code>InGameController</code>.
-     */
-    public InGameController getInGameController() {
-        return inGameController;
-    }
-
-    /**
-     * Gets the input handler that will be used when the game has been started.
-     *
-     * @return The <code>InGameInputHandler</code>.
-     */
-    public InGameInputHandler getInGameInputHandler() {
-        return inGameInputHandler;
-    }
-
-    /**
-     * Sets the <code>Client</code> that shall be used to send messages to the
-     * server.
-     *
-     * @param client the <code>Client</code>
-     * @see #getClient
-     */
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    /**
-     * Gets the <code>Client</code> that can be used to send messages to the
-     * server.
-     *
-     * @return the <code>Client</code>
-     * @see #setClient
-     */
-    public Client getClient() {
-        return client;
-    }
-
-    /**
-     * Returns <i>true</i> if this client is logged in to a server or
-     * <i>false</i> otherwise.
-     *
-     * @return <i>true</i> if this client is logged in to a server or
-     *         <i>false</i> otherwise.
-     */
-    public boolean isLoggedIn() {
-        return loggedIn;
-    }
-
-    /**
-     * Sets whether or not this client is logged in to a server.
-     *
-     * @param loggedIn An indication of whether or not this client is logged in
-     *            to a server.
-     */
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
-    /**
-     * Meaningfully named access to the ServerAPI.
-     *
-     * @return A ServerAPI.
-     */
-    public ServerAPI askServer() {
-        if (serverAPI == null) serverAPI = new ServerAPI(this, gui);
-        return serverAPI;
-    }
-
-    /**
-     * Set the game-wide next active unit if one can be found.
-     *
-     * @param unitId A unit id for the unit to make active.
-     */
-    public void setActiveUnit(String unitId) {
-        if (unitId != null && getGame() != null) {
-            Unit active = (Unit) getGame().getFreeColGameObject(unitId);
-            if (active != null) {
-                active.getOwner().resetIterators();
-                active.getOwner().setNextActiveUnit(active);
-                gui.getMapViewer().setActiveUnit(active);
-            }
-        }
-    }
-
-
-
-    /**
-     * Notifies this GUI that the game has started or ended.
-     * @param inGame Indicates whether or not the game has started.
-     */
-    public void setInGame(boolean inGame) {
-        this.inGame = inGame;
-    }
-
-    /**
-     * Checks if the game has started.
-     * @return <i>true</i> if the game has started.
-     * @see #setInGame
-     */
-    public boolean isInGame() {
-        return inGame;
-    }
-
-    /**
-     * Start the game skipping turns.
-     *
-     * @param turns The number of turns to skip.
-     */
-    public void skipTurns(int turns) {
-        if (freeColServer == null) return;
-        freeColServer.getInGameController().setSkippedTurns(turns);
-        gui.getCanvas().closeMenus();
-        askServer().startSkipping();
-    }
-
-
-    public void setWindowed(boolean windowed) {
-        gui.setWindowed(windowed);
-    }
-
-    public GUI getGUI() {
-        return gui;
+        if (actionManager != null) 
+            actionManager.update();
     }
 }

@@ -54,7 +54,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     private final Canvas canvas;
 
-    private final MapViewer gui;
+    private final MapViewer mapViewer;
 
     private ScrollThread scrollThread;
 
@@ -69,11 +69,11 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
-     * @param g The GUI that holds information such as screen resolution.
+     * @param mapViewer The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(Canvas canvas, MapViewer g) {
+    public CanvasMapEditorMouseListener(Canvas canvas, MapViewer mapViewer) {
         this.canvas = canvas;
-        gui = g;
+        this.mapViewer = mapViewer;
         scrollThread = null;
     }
 
@@ -100,7 +100,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         try {
             if (e.getClickCount() > 1) {
-                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 canvas.showColonyPanel(tile);
             } else {
                 canvas.requestFocus();
@@ -143,7 +143,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-                Tile tile = gui.convertToMapTile(e.getX(), e.getY());
+                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
@@ -162,7 +162,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         canvas.showFreeColDialog(new EditSettlementDialog(canvas, tile.getIndianSettlement()));
                     }
                 } else {
-                    gui.setSelectedTile(null, true);
+                    mapViewer.setSelectedTile(null, true);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 startPoint = e.getPoint();
@@ -197,17 +197,17 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         	oldPoint = e.getPoint();
         }
         drawBox(component, startPoint, oldPoint);
-        if (gui.getFocus() != null) {
-            Tile start = gui.convertToMapTile(startPoint.x, startPoint.y);
+        if (mapViewer.getFocus() != null) {
+            Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
             Tile end = start;
             //Optimization, only check if the points are different
             if(startPoint.x != oldPoint.x || startPoint.y != oldPoint.y){
-            	end = gui.convertToMapTile(oldPoint.x, oldPoint.y);
+            	end = mapViewer.convertToMapTile(oldPoint.x, oldPoint.y);
             }
 
             // no option selected, just center map
             if(!isTransformActive){
-            	gui.setFocus(end);
+            	mapViewer.setFocus(end);
             	return;
             }
 
@@ -345,22 +345,22 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         if ((x < scrollspace) && (y < scrollspace)) {
             // Upper-Left
             direction = Direction.NW;
-        } else if ((x >= gui.getWidth() - scrollspace) && (y < scrollspace)) {
+        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y < scrollspace)) {
             // Upper-Right
             direction = Direction.NE;
-        } else if ((x >= gui.getWidth() - scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
             // Bottom-Right
             direction = Direction.SE;
-        } else if ((x < scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+        } else if ((x < scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
             // Bottom-Left
             direction = Direction.SW;
         } else if (y < scrollspace) {
             // Top
             direction = Direction.N;
-        } else if (x >= gui.getWidth() - scrollspace) {
+        } else if (x >= mapViewer.getWidth() - scrollspace) {
             // Right
             direction = Direction.E;
-        } else if (y >= gui.getHeight() - scrollspace) {
+        } else if (y >= mapViewer.getHeight() - scrollspace) {
             // Bottom
             direction = Direction.S;
         } else if (x < scrollspace) {
@@ -380,7 +380,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             scrollThread.setDirection(direction);
         } else {
             // start scrolling in a direction
-            scrollThread = new ScrollThread(gui);
+            scrollThread = new ScrollThread(mapViewer);
             scrollThread.setDirection(direction);
             scrollThread.start();
         }

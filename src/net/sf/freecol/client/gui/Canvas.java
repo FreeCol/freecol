@@ -339,9 +339,9 @@ public final class Canvas extends JDesktopPane {
         this.gui = gui;
         this.mapViewer = mapViewer;
 
-        colonyTileGUI = new MapViewer(client, gui, size, gui.getImageLibrary());
+        this.colonyTileGUI = new MapViewer(client, gui, size, gui.getImageLibrary());
 
-        initialSize = size;
+        this.initialSize = size;
 
         setLocation(0, 0);
         setSize(size);
@@ -777,9 +777,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Returns this <code>Canvas</code>'s <code>GUI</code>.
+     * Returns this <code>Canvas</code>'s <code>MapViewer</code>.
      *
-     * @return The <code>GUI</code>.
+     * @return The <code>MapViewer</code>.
      */
     public MapViewer getMapViewer() {
         return mapViewer;
@@ -2218,7 +2218,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showTilePopup(Tile tile, int x, int y) {
         if (tile != null) {
-            TilePopup tp = new TilePopup(tile, freeColClient, gui, this);
+            TilePopup tp = new TilePopup(freeColClient, gui, tile);
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
