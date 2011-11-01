@@ -45,9 +45,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     // Temporary variable for checking if we need to recalculate the path when
     // dragging units.
     private Tile lastTile;
-
-    private final Canvas canvas;
-
+    
     private final MapViewer mapViewer;
 
     private final Map map;
@@ -70,9 +68,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param m The Map that is currently being drawn on the Canvas (by the
      *            GUI).
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer, Map m) {
+    public CanvasMouseMotionListener(FreeColClient freeColClient, MapViewer mapViewer, Map m) {
         this.freeColClient = freeColClient;
-        this.canvas = canvas;
         this.mapViewer = mapViewer;
         this.map = m;
         this.scrollThread = null;
@@ -225,7 +222,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         private final Map map;
 
-        private final MapViewer gui;
+        private final MapViewer mapViewer;
 
         private Direction direction;
 
@@ -236,13 +233,13 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
          * The constructor to use.
          *
          * @param m The Map that needs to be scrolled.
-         * @param g The GUI that holds information such as screen resolution.
+         * @param mapViewer The GUI that holds information such as screen resolution.
          */
-        public ScrollThread(Map m, MapViewer g) {
+        public ScrollThread(Map m, MapViewer mapViewer) {
             super(FreeCol.CLIENT_THREAD+"Mouse scroller");
-            map = m;
-            gui = g;
-            cont = true;
+            this.map = m;
+            this.mapViewer = mapViewer;
+            this.cont = true;
         }
 
         /**
@@ -277,7 +274,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                         public void run() {
                             try {
                                 int x, y;
-                                Tile t = gui.getFocus();
+                                Tile t = mapViewer.getFocus();
                                 if (t == null) {
                                     return;
                                 }
@@ -287,53 +284,53 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                                     return;
                                 }
 
-                                if (gui.isMapNearTop(t.getY()) && gui.isMapNearTop(gui.getFocus().getY())) {
-                                    if (t.getY() > gui.getFocus().getY()) {
+                                if (mapViewer.isMapNearTop(t.getY()) && mapViewer.isMapNearTop(mapViewer.getFocus().getY())) {
+                                    if (t.getY() > mapViewer.getFocus().getY()) {
                                         y = t.getY();
                                         do {
                                             y += 2;
-                                        } while (gui.isMapNearTop(y));
+                                        } while (mapViewer.isMapNearTop(y));
                                     } else {
-                                        y = gui.getFocus().getY();
+                                        y = mapViewer.getFocus().getY();
                                     }
-                                } else if (gui.isMapNearBottom(t.getY()) && gui.isMapNearBottom(gui.getFocus().getY())) {
-                                    if (t.getY() < gui.getFocus().getY()) {
+                                } else if (mapViewer.isMapNearBottom(t.getY()) && mapViewer.isMapNearBottom(mapViewer.getFocus().getY())) {
+                                    if (t.getY() < mapViewer.getFocus().getY()) {
                                         y = t.getY();
                                         do {
                                             y -= 2;
-                                        } while (gui.isMapNearBottom(y));
+                                        } while (mapViewer.isMapNearBottom(y));
                                     } else {
-                                        y = gui.getFocus().getY();
+                                        y = mapViewer.getFocus().getY();
                                     }
                                 } else {
                                     y = t.getY();
                                 }
 
-                                if (gui.isMapNearLeft(t.getX(), t.getY())
-                                        && gui.isMapNearLeft(gui.getFocus().getX(), gui.getFocus().getY())) {
-                                    if (t.getX() > gui.getFocus().getX()) {
+                                if (mapViewer.isMapNearLeft(t.getX(), t.getY())
+                                        && mapViewer.isMapNearLeft(mapViewer.getFocus().getX(), mapViewer.getFocus().getY())) {
+                                    if (t.getX() > mapViewer.getFocus().getX()) {
                                         x = t.getX();
                                         do {
                                             x++;
-                                        } while (gui.isMapNearLeft(x, y));
+                                        } while (mapViewer.isMapNearLeft(x, y));
                                     } else {
-                                        x = gui.getFocus().getX();
+                                        x = mapViewer.getFocus().getX();
                                     }
-                                } else if (gui.isMapNearRight(t.getX(), t.getY())
-                                        && gui.isMapNearRight(gui.getFocus().getX(), gui.getFocus().getY())) {
-                                    if (t.getX() < gui.getFocus().getX()) {
+                                } else if (mapViewer.isMapNearRight(t.getX(), t.getY())
+                                        && mapViewer.isMapNearRight(mapViewer.getFocus().getX(), mapViewer.getFocus().getY())) {
+                                    if (t.getX() < mapViewer.getFocus().getX()) {
                                         x = t.getX();
                                         do {
                                             x--;
-                                        } while (gui.isMapNearRight(x, y));
+                                        } while (mapViewer.isMapNearRight(x, y));
                                     } else {
-                                        x = gui.getFocus().getX();
+                                        x = mapViewer.getFocus().getX();
                                     }
                                 } else {
                                     x = t.getX();
                                 }
 
-                                gui.setFocus(map.getTile(x,y));
+                                mapViewer.setFocus(map.getTile(x,y));
                             } catch (Exception e) {
                                 logger.log(Level.WARNING, "Exception while scrolling!", e);
                             }

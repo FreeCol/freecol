@@ -265,7 +265,7 @@ public class GUI {
     
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, canvas, mapViewer,
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
                  freeColClient.getGame().getMap()));
     }
     
