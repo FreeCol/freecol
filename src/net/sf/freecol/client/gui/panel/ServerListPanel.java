@@ -71,8 +71,8 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * @param connectController The controller responsible for creating new
      *            connections.
      */
-    public ServerListPanel(GUI gui, Canvas parent, ConnectController connectController) {
-        super(parent);
+    public ServerListPanel(GUI gui, ConnectController connectController) {
+        super(gui.getCanvas());
         this.gui = gui;
         this.connectController = connectController;
 
