@@ -2222,7 +2222,7 @@ public final class Canvas extends JDesktopPane {
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
-                showPanel(new TilePanel(this, tile));
+                showPanel(new TilePanel(gui, tile));
             }
         }
     }

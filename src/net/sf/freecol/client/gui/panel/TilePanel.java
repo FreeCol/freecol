@@ -24,7 +24,6 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-
 import java.util.logging.Logger;
 
 import javax.swing.ComponentInputMap;
@@ -36,15 +35,14 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.client.gui.Canvas;
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -59,14 +57,17 @@ public final class TilePanel extends FreeColPanel {
 
     private TileType tileType;
 
+    private GUI gui;
+
 
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent panel.
      * @param tile a <code>Tile</code> value
      */
-    public TilePanel(Canvas parent, Tile tile) {
-        super(parent);
+    public TilePanel(GUI gui, Tile tile) {
+        super(gui.getCanvas());
+        this.gui = gui;
 
         tileType = tile.getType();
 
@@ -92,7 +93,7 @@ public final class TilePanel extends FreeColPanel {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.translate(0, height - baseHeight);
-        getCanvas().getMapViewer().displayColonyTile(g, tile, null);
+        gui.getMapViewer().displayColonyTile(g, tile, null);
         add(new JLabel(new ImageIcon(image)));
 
         if (tile.getRegion() != null) {

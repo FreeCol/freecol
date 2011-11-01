@@ -526,7 +526,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new TilePanel(canvas, tile));
+                    canvas.showPanel(new TilePanel(gui, tile));
                 }
             });
 
