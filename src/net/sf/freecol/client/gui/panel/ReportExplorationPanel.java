@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Region;
@@ -52,10 +53,11 @@ public final class ReportExplorationPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ReportExplorationPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportExplorationAction.name"));
+    public ReportExplorationPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportExplorationAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

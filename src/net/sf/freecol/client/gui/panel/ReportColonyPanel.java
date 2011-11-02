@@ -39,6 +39,7 @@ import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -130,12 +131,13 @@ public final class ReportColonyPanel extends ReportPanel
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param gui 
      *
      * @param parent The parent of this panel.
      */
-    public ReportColonyPanel(GUI gui, Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportColonyAction.name"));
+    public ReportColonyPanel(FreeColClient freeColClient, GUI gui, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportColonyAction.name"));
         this.gui = gui;
         colonies = getSortedColonies();
 
@@ -314,7 +316,7 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    panel = new ColonyPanel(gui, canvas, (Colony) fcgo);
+                    panel = new ColonyPanel(getFreeColClient(), gui, canvas, (Colony) fcgo);
                 }
             }
             if (panel != null) {

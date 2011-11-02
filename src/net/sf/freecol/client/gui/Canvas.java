@@ -1227,7 +1227,7 @@ public final class Canvas extends JDesktopPane {
     public ColonyPanel showColonyPanel(Colony colony) {
         ColonyPanel panel = getColonyPanel(colony);
         if (panel != null) return panel;
-        panel = new ColonyPanel(gui, this, colony);
+        panel = new ColonyPanel(freeColClient, gui, this, colony);
         showSubPanel(panel, getPopupPosition(colony.getTile()));
         return panel;
     }
@@ -1922,7 +1922,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showPanel(new ReportTurnPanel(this, messages));
+        showPanel(new ReportTurnPanel(freeColClient, this, messages));
     }
 
     /**

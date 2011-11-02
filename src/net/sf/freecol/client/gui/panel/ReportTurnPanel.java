@@ -38,6 +38,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -67,12 +68,13 @@ public final class ReportTurnPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      * @param messages A variable number of ModelMessages
      */
-    public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportTurnAction.name"));
+    public ReportTurnPanel(FreeColClient freeColClient, Canvas parent, ModelMessage... messages) {
+        super(freeColClient, parent, Messages.message("reportTurnAction.name"));
 
         ClientOptions options = getClientOptions();
         this._messages = messages;

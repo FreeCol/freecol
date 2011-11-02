@@ -54,7 +54,7 @@ public class ReportLabourAction extends FreeColAction {
     public void actionPerformed(ActionEvent e) {
         if (freeColClient.getClientOptions().getInteger(ClientOptions.LABOUR_REPORT) ==
             ClientOptions.LABOUR_REPORT_CLASSIC) {
-            gui.getCanvas().showPanel(new ReportLabourPanel(gui.getCanvas()));
+            gui.getCanvas().showPanel(new ReportLabourPanel(freeColClient, gui.getCanvas()));
         } else {
             gui.getCanvas().showPanel(new CompactLabourReport(gui.getCanvas()));
         }

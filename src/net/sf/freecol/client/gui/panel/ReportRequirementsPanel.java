@@ -33,6 +33,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -40,7 +41,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -75,12 +75,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public ReportRequirementsPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportRequirementsAction.name"));
-        Player player = getMyPlayer();
+    public ReportRequirementsPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportRequirementsAction.name"));
         colonies = getSortedColonies();
 
         // Display Panel

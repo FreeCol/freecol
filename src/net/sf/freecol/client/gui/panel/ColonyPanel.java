@@ -64,6 +64,7 @@ import javax.swing.border.BevelBorder;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
@@ -164,11 +165,12 @@ public final class ColonyPanel extends FreeColPanel
 
     /**
      * The constructor for the panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel
      */
-    public ColonyPanel(GUI gui, final Canvas parent, Colony colony) {
-        super(parent.getFreeColClient(), parent);
+    public ColonyPanel(FreeColClient freeColClient, GUI gui, final Canvas parent, Colony colony) {
+        super(freeColClient, parent);
         
         this.gui = gui;
 
@@ -201,7 +203,7 @@ public final class ColonyPanel extends FreeColPanel
 
         warehousePanel = new WarehousePanel(this);
 
-        tilePanel = new TilePanel(this);
+        tilePanel = new TilePanel(freeColClient, this);
 
         buildingsPanel = new BuildingsPanel(this);
 
@@ -1349,11 +1351,12 @@ public final class ColonyPanel extends FreeColPanel
 
         /**
          * Creates this TilePanel.
+         * @param freeColClient 
          *
          * @param colonyPanel The panel that holds this TilePanel.
          */
-        public TilePanel(ColonyPanel colonyPanel) {
-            super(colonyPanel.getCanvas().getFreeColClient(), colonyPanel.getCanvas());
+        public TilePanel(FreeColClient freeColClient, ColonyPanel colonyPanel) {
+            super(freeColClient, colonyPanel.getCanvas());
             this.colonyPanel = colonyPanel;
             setBackground(Color.BLACK);
             setBorder(null);

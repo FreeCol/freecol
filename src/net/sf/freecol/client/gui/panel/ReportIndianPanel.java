@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -45,10 +46,11 @@ public final class ReportIndianPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ReportIndianPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportIndianAction.name"));
+    public ReportIndianPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
         reportPanel.setLayout(new MigLayout("wrap 5, fillx, insets 0", "[]20px[center]", ""));
         boolean needsSeperator = false;

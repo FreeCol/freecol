@@ -31,6 +31,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -40,8 +42,6 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Labour Report.
@@ -56,8 +56,8 @@ public final class ReportLabourPanel extends ReportPanel {
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
-    public ReportLabourPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportLabourAction.name"));
+    public ReportLabourPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportLabourAction.name"));
         colonies = getSortedColonies();
         gatherData();
         displayData();

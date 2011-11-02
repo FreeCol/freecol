@@ -260,7 +260,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @return True if the trade route is valid.
      */
     private boolean verifyNewTradeRoute() {
-        Player player = getCanvas().getFreeColClient().getMyPlayer();
+        Player player = getFreeColClient().getMyPlayer();
 
         // Check that the name is unique
         for (TradeRoute route : player.getTradeRoutes()) {
