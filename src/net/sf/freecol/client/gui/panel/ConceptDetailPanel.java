@@ -22,18 +22,18 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -67,8 +67,8 @@ public class ConceptDetailPanel extends FreeColPanel
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public ConceptDetailPanel(ColopediaPanel colopediaPanel) {
-        super(colopediaPanel.getCanvas().getFreeColClient(), colopediaPanel.getCanvas());
+    public ConceptDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel.getCanvas());
         this.colopediaPanel = colopediaPanel;
     }
 

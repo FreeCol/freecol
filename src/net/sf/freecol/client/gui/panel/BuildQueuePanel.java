@@ -60,6 +60,7 @@ import javax.swing.TransferHandler;
 import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -111,9 +112,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      */
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
-    public BuildQueuePanel(Colony colony, Canvas parent) {
+    public BuildQueuePanel(FreeColClient freeColClient, Colony colony, Canvas parent) {
 
-        super(parent.getFreeColClient(), parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(freeColClient, parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
         featureContainer = new FeatureContainer();
@@ -208,7 +209,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
 
-        constructionPanel = new ConstructionPanel(getCanvas(), colony, false);
+        constructionPanel = new ConstructionPanel(freeColClient, getCanvas(), colony, false);
         constructionPanel.setOpaque(false);
         StringTemplate buildingNothing = StringTemplate.template("colonyPanel.currentlyBuilding")
             .add("%buildable%", "nothing");

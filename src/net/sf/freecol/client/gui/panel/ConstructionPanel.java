@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -58,14 +59,18 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      */
     private StringTemplate defaultLabel = StringTemplate.key("colonyPanel.clickToBuild");
 
+    private FreeColClient freeColClient;
+
     /**
      * Creates this BuildingToolTip.
+     * @param freeColClient 
      *
      * @param parent a <code>Canvas</code> value
      * @param colony a <code>Colony</code> value
      */
-    public ConstructionPanel(final Canvas parent, Colony colony, boolean openBuildQueue) {
+    public ConstructionPanel(FreeColClient freeColClient, final Canvas parent, Colony colony, boolean openBuildQueue) {
 
+        this.freeColClient = freeColClient;
         this.parent = parent;
         this.openBuildQueue = openBuildQueue;
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
@@ -90,7 +95,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             {
                 addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        parent.showSubPanel(new BuildQueuePanel(colony,
+                        parent.showSubPanel(new BuildQueuePanel(freeColClient, colony,
                                                                     parent));
                         }
                     });

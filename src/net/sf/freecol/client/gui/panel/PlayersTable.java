@@ -47,17 +47,18 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
-import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -98,12 +99,12 @@ public final class PlayersTable extends JTable {
      * @param nationOptions a <code>NationOptions</code> value
      * @param myPlayer a <code>Player</code> value
      */
-    public PlayersTable(final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
+    public PlayersTable(FreeColClient freeColClient, final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
         super();
 
         library = canvas.getImageLibrary();
 
-        setModel(new PlayersTableModel(canvas.getFreeColClient().getPreGameController(), nationOptions, myPlayer));
+        setModel(new PlayersTableModel(freeColClient.getPreGameController(), nationOptions, myPlayer));
         setRowHeight(47);
 
         JButton nationButton = new JButton(Messages.message("nation"));

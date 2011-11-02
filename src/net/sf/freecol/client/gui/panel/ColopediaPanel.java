@@ -144,7 +144,7 @@ public final class ColopediaPanel extends FreeColPanel
         new FatherDetailPanel(this).addSubTrees(root);
         new NationDetailPanel(this).addSubTrees(root);
         new NationTypeDetailPanel(this).addSubTrees(root);
-        new ConceptDetailPanel(this).addSubTrees(root);
+        new ConceptDetailPanel(getFreeColClient(), this).addSubTrees(root);
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {

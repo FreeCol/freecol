@@ -194,7 +194,7 @@ public final class ColonyPanel extends FreeColPanel
 
         netProductionPanel.setOpaque(false);
 
-        constructionPanel = new ConstructionPanel(parent, colony, true);
+        constructionPanel = new ConstructionPanel(freeColClient, parent, colony, true);
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
@@ -435,7 +435,7 @@ public final class ColonyPanel extends FreeColPanel
                     }
                     break;
                 case BUILDQUEUE:
-                    canvas.showSubPanel(new BuildQueuePanel(colony, canvas));
+                    canvas.showSubPanel(new BuildQueuePanel(getFreeColClient(), colony, canvas));
                     updateConstructionPanel();
                     break;
                 case FILL:
@@ -864,7 +864,7 @@ public final class ColonyPanel extends FreeColPanel
 
             MouseAdapter mouseAdapter = new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        getCanvas().showSubPanel(new BuildQueuePanel(getColony(), getCanvas()));
+                        getCanvas().showSubPanel(new BuildQueuePanel(getFreeColClient(), getColony(), getCanvas()));
                     }
                 };
             ASingleBuildingPanel aSingleBuildingPanel;
