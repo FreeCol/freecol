@@ -68,18 +68,18 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(attackerUnit, parent, false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, parent, false, true);
             defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", defenderUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", defenderUnit.getLabel()));
-            defenderLabel = new UnitLabel(defenderUnit, parent, false, true);
+            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, parent, false, true);
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
             Settlement settlement = (Settlement) defender;
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(attackerUnit, parent, false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, parent, false, true);
             defenderName = settlement.getName();
             defenderLabel = new JLabel(parent.getImageIcon(settlement, false));
         } else {

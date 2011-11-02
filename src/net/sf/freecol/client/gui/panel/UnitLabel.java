@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -85,6 +86,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private InGameController inGameController;
 
+    private FreeColClient freeColClient;
+
 
     /**
      * Initializes this JLabel with the given unit data.
@@ -92,10 +95,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param unit The Unit that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      */
-    public UnitLabel(Unit unit, Canvas parent) {
+    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent) {
+        this.freeColClient = freeColClient;
         this.unit = unit;
         this.parent = parent;
-        this.inGameController = parent.getFreeColClient().getInGameController();
+        this.inGameController = freeColClient.getInGameController();
 
         selected = false;
         setSmall(false);
@@ -111,8 +115,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
-    public UnitLabel(Unit unit, Canvas parent, boolean isSmall) {
-        this(unit, parent);
+    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent, boolean isSmall) {
+        this(freeColClient, unit, parent);
         setSmall(isSmall);
         setIgnoreLocation(false);
     }
@@ -126,8 +130,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
      */
-    public UnitLabel(Unit unit, Canvas parent, boolean isSmall, boolean ignoreLocation) {
-        this(unit, parent);
+    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent, boolean isSmall, boolean ignoreLocation) {
+        this(freeColClient, unit, parent);
         setSmall(isSmall);
         setIgnoreLocation(ignoreLocation);
     }
@@ -245,7 +249,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
             setEnabled(true);
-        } else if (unit.getOwner() != parent.getFreeColClient().getMyPlayer()
+        } else if (unit.getOwner() != freeColClient.getMyPlayer()
             && unit.getColony() == null) {
             setEnabled(true);
         } else {
@@ -393,7 +397,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             if (uc instanceof ColonyPanel) {
                 if (unit.getColony() == null) {
                     parent.remove(uc);
-                    parent.getFreeColClient().getActionManager().update();
+                    freeColClient.getActionManager().update();
                 } else {
                     // ((ColonyPanel) uc).reinitialize();
                 }

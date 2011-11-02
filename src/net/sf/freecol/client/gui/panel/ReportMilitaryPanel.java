@@ -257,7 +257,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         } else {
             Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
             for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true);
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas(), true);
                 if (unit.getDestination() != null) {
                     String destination = Messages.message(unit.getDestination().getLocationNameFor(getMyPlayer()));
                     unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +

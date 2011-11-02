@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -59,14 +60,17 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
 
+    private FreeColClient freeColClient;
+
     /**
      * Creates this BuildingPanel.
      *
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingPanel(Building building, Canvas parent) {
+    public BuildingPanel(FreeColClient freeColClient, Building building, Canvas parent) {
 
+        this.freeColClient = freeColClient;
         this.building = building;
         this.parent = parent;
 
@@ -104,7 +108,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(unit, parent, true);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, parent, true);
             unitLabels.add(unitLabel);
             add(unitLabel);
         }

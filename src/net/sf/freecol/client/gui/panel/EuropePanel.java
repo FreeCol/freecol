@@ -160,7 +160,7 @@ public final class EuropePanel extends FreeColPanel {
         docksPanel.setTransferHandler(defaultTransferHandler);
         marketPanel.setTransferHandler(defaultTransferHandler);
 
-        pressListener = new DragListener(this);
+        pressListener = new DragListener(freeColClient, this);
         MouseListener releaseListener = new DropListener();
         toAmericaPanel.addMouseListener(releaseListener);
         toEuropePanel.addMouseListener(releaseListener);
@@ -504,7 +504,7 @@ public final class EuropePanel extends FreeColPanel {
                         belongs = false;
                     }
                     if (belongs) {
-                        UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                        UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                         add(unitLabel);
@@ -608,7 +608,7 @@ public final class EuropePanel extends FreeColPanel {
                 if (unit.isNaval()
                     && (unit.getState() == Unit.UnitState.ACTIVE
                         || unit.getState() == Unit.UnitState.SENTRY)) {
-                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);
@@ -674,7 +674,7 @@ public final class EuropePanel extends FreeColPanel {
             List<Unit> units = europe.getUnitList();
             for (Unit unit : units) {
                 if (!unit.isNaval()) {
-                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);

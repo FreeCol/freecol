@@ -101,11 +101,11 @@ public class BuildingToolTip extends JToolTip {
         add(new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId() + ".image"))));
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(unit, parent, false);
+            UnitLabel unitLabel = new UnitLabel(parent.getFreeColClient(), unit, parent, false);
             if (building.canTeach() && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                              unit.getNeededTurnsOfTraining());
-                UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
+                UnitLabel studentLabel = new UnitLabel(parent.getFreeColClient(), unit.getStudent(), parent, true);
                 studentLabel.setIgnoreLocation(true);
                 add(unitLabel);
                 add(progress, "split 2, flowy");

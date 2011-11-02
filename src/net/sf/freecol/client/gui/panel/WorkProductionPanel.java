@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.border.Border;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -58,8 +59,8 @@ public class WorkProductionPanel extends FreeColPanel {
         .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-    public WorkProductionPanel(Canvas canvas, Unit unit) {
-        super(canvas.getFreeColClient(), canvas);
+    public WorkProductionPanel(FreeColClient freeColClient, Canvas canvas, Unit unit) {
+        super(freeColClient, canvas);
 
         setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
 
@@ -114,7 +115,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
         Collections.sort(modifiers);
 
-        add(new UnitLabel(unit, canvas, false, false), "wrap");
+        add(new UnitLabel(getFreeColClient(), unit, canvas, false, false), "wrap");
 
         float result = 0;
         for (Modifier modifier : unitModifiers) {

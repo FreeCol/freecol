@@ -211,7 +211,7 @@ public final class ColonyPanel extends FreeColPanel
         cargoPanel.setParentPanel(this);
 
         defaultTransferHandler = new DefaultTransferHandler(freeColClient, parent, this);
-        pressListener = new DragListener(this);
+        pressListener = new DragListener(getFreeColClient(), this);
         releaseListener = new DropListener();
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
@@ -909,7 +909,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(building, getCanvas());
+                super(getFreeColClient(), building, getCanvas());
             }
 
             public void autoscroll(Point p) {
@@ -1085,7 +1085,7 @@ public final class ColonyPanel extends FreeColPanel
                     continue;
                 }
 
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                 if (isEditable()) {
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
@@ -1196,7 +1196,7 @@ public final class ColonyPanel extends FreeColPanel
             for (Unit unit : getColony().getTile().getUnitList()) {
                 if (!unit.isCarrier()) continue;
 
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
                     unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
@@ -1507,7 +1507,7 @@ public final class ColonyPanel extends FreeColPanel
                 removeAll();
                 UnitLabel unitLabel = null;
                 for (Unit unit : colonyTile.getUnitList()) {
-                    unitLabel = new UnitLabel(unit, getCanvas());
+                    unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);

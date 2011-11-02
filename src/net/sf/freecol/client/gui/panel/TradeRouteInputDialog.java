@@ -83,7 +83,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final CargoHandler cargoHandler = new CargoHandler();
 
-    private final MouseListener dragListener = new DragListener(this);
+    private final MouseListener dragListener = new DragListener(getFreeColClient(), this);
 
     private final MouseListener dropListener = new DropListener();
 

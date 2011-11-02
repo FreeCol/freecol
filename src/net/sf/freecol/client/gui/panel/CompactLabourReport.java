@@ -35,6 +35,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -82,23 +83,25 @@ public final class CompactLabourReport extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public CompactLabourReport(Canvas parent) {
-        this(parent, null);
+    public CompactLabourReport(FreeColClient freeColClient, Canvas parent) {
+        this(freeColClient, parent, null);
 
-        labourData = new LabourData(parent.getFreeColClient());
+        labourData = new LabourData(getFreeColClient());
         initialize();
     }
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    private CompactLabourReport(Canvas parent, LabourData.UnitData data) {
-        super(parent.getFreeColClient(), parent, data == null ? Messages.message("reportLabourAction.name")
+    private CompactLabourReport(FreeColClient freeColClient, Canvas parent, LabourData.UnitData data) {
+        super(freeColClient, parent, data == null ? Messages.message("reportLabourAction.name")
               : Messages.message("report.labour.details"));
         this.unitData = data;
 
@@ -610,7 +613,7 @@ public final class CompactLabourReport extends ReportPanel {
     private JButton createUnitNameButton(String name, final LabourData.UnitData unitData) {
         JButton button = createButton(name, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CompactLabourReport details = new CompactLabourReport(getCanvas(), unitData);
+                CompactLabourReport details = new CompactLabourReport(getFreeColClient(), getCanvas(), unitData);
                 details.initialize();
                 getCanvas().addAsFrame(details);
                 details.requestFocus();

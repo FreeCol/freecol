@@ -74,7 +74,7 @@ public class CargoPanel extends FreeColPanel
 
         carrier = null;
         defaultTransferHandler = new DefaultTransferHandler(freeColClient, parent, this);
-        pressListener = new DragListener(this);
+        pressListener = new DragListener(getFreeColClient(), this);
 
         if (withTitle) {
             border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
@@ -161,7 +161,7 @@ public class CargoPanel extends FreeColPanel
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
 
-                UnitLabel label = new UnitLabel(unit, getCanvas());
+                UnitLabel label = new UnitLabel(getFreeColClient(), unit, getCanvas());
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
