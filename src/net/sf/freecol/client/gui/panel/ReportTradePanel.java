@@ -33,6 +33,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -68,11 +69,12 @@ public final class ReportTradePanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public ReportTradePanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportTradeAction.name"));
+    public ReportTradePanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportTradeAction.name"));
         setSize(getMinimumSize());
 
         Player player = getMyPlayer();
