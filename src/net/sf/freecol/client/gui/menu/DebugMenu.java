@@ -439,7 +439,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayVictoryPanel"));
         victoryPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showPanel(new VictoryPanel(canvas));
+                    canvas.showPanel(new VictoryPanel(freeColClient, canvas));
                 }
             });
         panelMenu.add(victoryPanel);

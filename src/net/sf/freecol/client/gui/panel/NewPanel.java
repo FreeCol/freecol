@@ -37,6 +37,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -124,8 +125,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      *
      * @param parent The parent of this panel.
      */
-    public NewPanel(GUI gui, Canvas parent) {
-        this(gui, parent, null);
+    public NewPanel(FreeColClient freeColClient, GUI gui, Canvas parent) {
+        this(freeColClient, gui, parent, null);
     }
 
     /**
@@ -134,8 +135,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * @param parent The parent of this panel.
      * @param specification a <code>Specification</code> value, may be null
      */
-    public NewPanel(GUI gui, Canvas parent, Specification specification) {
-        super(parent.getFreeColClient(), parent);
+    public NewPanel(FreeColClient freeColClient, GUI gui, Canvas parent, Specification specification) {
+        super(freeColClient, parent);
         this.gui = gui;
         this.specification = specification;
         this.connectController = getFreeColClient().getConnectController();

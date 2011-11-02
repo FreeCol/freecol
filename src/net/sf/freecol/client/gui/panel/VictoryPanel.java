@@ -28,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -52,9 +53,9 @@ public final class VictoryPanel extends FreeColPanel {
      * 
      * @param parent The parent of this panel.
      */
-    public VictoryPanel(Canvas parent) {
+    public VictoryPanel(FreeColClient freeColClient, Canvas parent) {
 
-        super(parent.getFreeColClient(), parent);
+        super(freeColClient, parent);
         
         okButton.setText(Messages.message("victory.yes"));
 

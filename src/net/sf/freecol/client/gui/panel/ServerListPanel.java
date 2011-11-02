@@ -191,7 +191,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                 break;
             case CANCEL:
                 getCanvas().remove(this);
-                getCanvas().showPanel(new NewPanel(gui, getCanvas()));
+                getCanvas().showPanel(new NewPanel(getFreeColClient(), gui, getCanvas()));
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

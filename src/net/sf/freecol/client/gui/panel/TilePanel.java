@@ -36,6 +36,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -65,8 +66,8 @@ public final class TilePanel extends FreeColPanel {
      * @param parent The parent panel.
      * @param tile a <code>Tile</code> value
      */
-    public TilePanel(GUI gui, Tile tile) {
-        super(gui.getCanvas().getFreeColClient(), gui.getCanvas());
+    public TilePanel(FreeColClient freeColClient, GUI gui, Tile tile) {
+        super(freeColClient, gui.getCanvas());
         this.gui = gui;
 
         tileType = tile.getType();

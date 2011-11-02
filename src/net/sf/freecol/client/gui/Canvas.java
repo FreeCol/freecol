@@ -877,7 +877,7 @@ public final class Canvas extends JDesktopPane {
             removeInGameComponents();
         }
 
-        showPanel(new NewPanel(gui, this, specification));
+        showPanel(new NewPanel(freeColClient, gui, this, specification));
     }
 
     /**
@@ -2222,7 +2222,7 @@ public final class Canvas extends JDesktopPane {
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
-                showPanel(new TilePanel(gui, tile));
+                showPanel(new TilePanel(freeColClient, gui, tile));
             }
         }
     }

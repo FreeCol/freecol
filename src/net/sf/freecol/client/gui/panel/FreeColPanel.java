@@ -346,7 +346,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return A current <code>FreeColClient</code>.
      */
     public FreeColClient getFreeColClient() {
-        return canvas.getFreeColClient();
+        return freeColClient;
     }
 
     /**
@@ -355,7 +355,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Game</code> value
      */
     public Game getGame() {
-        return canvas.getFreeColClient().getGame();
+        return freeColClient.getGame();
     }
 
     /**
@@ -364,7 +364,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Specification</code> value
      */
     public Specification getSpecification() {
-        return canvas.getSpecification();
+        return freeColClient.getGame().getSpecification();
     }
 
     /**
@@ -373,7 +373,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return an <code>InGameController</code> value
      */
     public InGameController getController() {
-        return canvas.getFreeColClient().getInGameController();
+        return freeColClient.getInGameController();
     }
 
     /**
@@ -382,7 +382,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>Player</code> value
      */
     public Player getMyPlayer() {
-        return canvas.getFreeColClient().getMyPlayer();
+        return freeColClient.getMyPlayer();
     }
 
     /**
