@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -54,11 +55,12 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public ReportContinentalCongressPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, title);
+    public ReportContinentalCongressPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, title);
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);

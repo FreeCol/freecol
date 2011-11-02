@@ -205,7 +205,7 @@ public final class ReportLabourPanel extends ReportPanel {
             super.actionPerformed(event);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
-            ReportLabourDetailPanel details = new ReportLabourDetailPanel(getCanvas());
+            ReportLabourDetailPanel details = new ReportLabourDetailPanel(getFreeColClient(), getCanvas());
             details.setDetailPanel(createUnitDetails(unitType, details));
             getCanvas().addAsFrame(details);
             details.requestFocus();

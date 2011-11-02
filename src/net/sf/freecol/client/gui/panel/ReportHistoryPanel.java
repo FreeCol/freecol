@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -36,12 +37,13 @@ public final class ReportHistoryPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * 
      * @param parent The parent of this panel.
      */
-    public ReportHistoryPanel(Canvas parent) {
+    public ReportHistoryPanel(FreeColClient freeColClient, Canvas parent) {
 
-        super(parent.getFreeColClient(), parent, Messages.message("reportHistoryAction.name"));
+        super(freeColClient, parent, Messages.message("reportHistoryAction.name"));
 
         List<HistoryEvent> history = getMyPlayer().getHistory();
 
