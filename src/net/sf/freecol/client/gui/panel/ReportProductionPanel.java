@@ -29,6 +29,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -53,11 +54,12 @@ public final class ReportProductionPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public ReportProductionPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportProductionAction.name"));
+    public ReportProductionPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, Messages.message("reportProductionAction.name"));
 
         // TODO: can we extend this to cover farmed goods?
         goodsTypes = new ArrayList<GoodsType>();

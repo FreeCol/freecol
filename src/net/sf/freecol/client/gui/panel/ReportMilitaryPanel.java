@@ -31,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -92,11 +93,12 @@ public final class ReportMilitaryPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ReportMilitaryPanel(Canvas parent) {
+    public ReportMilitaryPanel(FreeColClient freeColClient, Canvas parent) {
 
-        super(parent.getFreeColClient(), parent, Messages.message("reportMilitaryAction.name"));
+        super(freeColClient, parent, Messages.message("reportMilitaryAction.name"));
 
         gatherData();
 
