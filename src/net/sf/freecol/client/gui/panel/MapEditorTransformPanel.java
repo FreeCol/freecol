@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -91,10 +92,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public MapEditorTransformPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, new BorderLayout());
+    public MapEditorTransformPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, new BorderLayout());
 
         // assume we have only native players for the moment
         if (getGame().getPlayers().isEmpty()) {

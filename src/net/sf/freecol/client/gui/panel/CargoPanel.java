@@ -24,20 +24,20 @@ import java.awt.Container;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.border.TitledBorder;
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -69,8 +69,8 @@ public class CargoPanel extends FreeColPanel
      * @param parent The parent Canvas that holds this CargoPanel
      * @param withTitle boolean
      */
-    public CargoPanel(Canvas parent, boolean withTitle) {
-        super(parent.getFreeColClient(), parent);
+    public CargoPanel(FreeColClient freeColClient, Canvas parent, boolean withTitle) {
+        super(freeColClient, parent);
 
         carrier = null;
         defaultTransferHandler = new DefaultTransferHandler(parent, this);

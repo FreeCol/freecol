@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -44,13 +45,14 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param canvas <code>Canvas</code>
      * @param settlement <code>IndianSettlement</code>
      */
-    public IndianSettlementPanel(final Canvas canvas, IndianSettlement settlement) {
+    public IndianSettlementPanel(FreeColClient freeColClient, final Canvas canvas, IndianSettlement settlement) {
         
-        super(canvas.getFreeColClient(), canvas);
+        super(freeColClient, canvas);
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
         

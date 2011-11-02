@@ -207,7 +207,7 @@ public final class ColonyPanel extends FreeColPanel
 
         buildingsPanel = new BuildingsPanel(this);
 
-        cargoPanel = new ColonyCargoPanel(parent);
+        cargoPanel = new ColonyCargoPanel(freeColClient, parent);
         cargoPanel.setParentPanel(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
@@ -810,8 +810,8 @@ public final class ColonyPanel extends FreeColPanel
      */
     public final class ColonyCargoPanel extends CargoPanel {
 
-        public ColonyCargoPanel(Canvas canvas) {
-            super(canvas, true);
+        public ColonyCargoPanel(FreeColClient freeColClient, Canvas canvas) {
+            super(freeColClient, canvas, true);
             setLayout(new MigLayout("wrap 6, fill, insets 0"));
         }
 

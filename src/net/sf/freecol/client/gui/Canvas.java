@@ -1512,7 +1512,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         IndianSettlementPanel panel
-            = new IndianSettlementPanel(this, indianSettlement);
+            = new IndianSettlementPanel(freeColClient, this, indianSettlement);
         showSubPanel(panel, getPopupPosition(indianSettlement.getTile()));
     }
 

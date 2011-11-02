@@ -140,7 +140,7 @@ public final class EuropePanel extends FreeColPanel {
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
         inPortPanel = new InPortPanel();
-        cargoPanel = new EuropeCargoPanel(parent);
+        cargoPanel = new EuropeCargoPanel(freeColClient, parent);
         cargoPanel.setParentPanel(this);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
@@ -452,8 +452,8 @@ public final class EuropePanel extends FreeColPanel {
      */
     public final class EuropeCargoPanel extends CargoPanel {
 
-        public EuropeCargoPanel(Canvas canvas) {
-            super(canvas, true);
+        public EuropeCargoPanel(FreeColClient freeColClient, Canvas canvas) {
+            super(freeColClient, canvas, true);
         }
 
     }
