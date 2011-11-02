@@ -45,7 +45,7 @@ public final class ReportEducationPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportEducationPanel(Canvas parent) {
-        super(parent, Messages.message("reportEducationAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportEducationAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
         Player player = getMyPlayer();

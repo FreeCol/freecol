@@ -37,7 +37,7 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
      * @param parent The parent of this panel.
      */
     public ReportLabourDetailPanel(Canvas parent) {
-        super(parent, Messages.message("report.labour.details"));
+        super(parent.getFreeColClient(), parent, Messages.message("report.labour.details"));
     }
 
     /**

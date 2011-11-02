@@ -57,7 +57,7 @@ public final class ReportProductionPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportProductionPanel(Canvas parent) {
-        super(parent, Messages.message("reportProductionAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportProductionAction.name"));
 
         // TODO: can we extend this to cover farmed goods?
         goodsTypes = new ArrayList<GoodsType>();

@@ -96,7 +96,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
      */
     public ReportMilitaryPanel(Canvas parent) {
 
-        super(parent, Messages.message("reportMilitaryAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportMilitaryAction.name"));
 
         gatherData();
 

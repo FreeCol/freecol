@@ -41,7 +41,7 @@ public final class ReportHistoryPanel extends ReportPanel {
      */
     public ReportHistoryPanel(Canvas parent) {
 
-        super(parent, Messages.message("reportHistoryAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportHistoryAction.name"));
 
         List<HistoryEvent> history = getMyPlayer().getHistory();
 

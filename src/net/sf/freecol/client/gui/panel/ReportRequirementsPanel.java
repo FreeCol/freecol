@@ -79,7 +79,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportRequirementsPanel(Canvas parent) {
-        super(parent, Messages.message("reportRequirementsAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportRequirementsAction.name"));
         Player player = getMyPlayer();
         colonies = getSortedColonies();
 

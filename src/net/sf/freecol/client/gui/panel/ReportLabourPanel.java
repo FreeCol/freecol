@@ -57,7 +57,7 @@ public final class ReportLabourPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportLabourPanel(Canvas parent) {
-        super(parent, Messages.message("reportLabourAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportLabourAction.name"));
         colonies = getSortedColonies();
         gatherData();
         displayData();

@@ -48,7 +48,7 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportIndianPanel(Canvas parent) {
-        super(parent, Messages.message("reportIndianAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
         reportPanel.setLayout(new MigLayout("wrap 5, fillx, insets 0", "[]20px[center]", ""));
         boolean needsSeperator = false;

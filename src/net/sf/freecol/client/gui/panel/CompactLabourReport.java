@@ -98,7 +98,7 @@ public final class CompactLabourReport extends ReportPanel {
      * @param parent The parent of this panel.
      */
     private CompactLabourReport(Canvas parent, LabourData.UnitData data) {
-        super(parent, data == null ? Messages.message("reportLabourAction.name")
+        super(parent.getFreeColClient(), parent, data == null ? Messages.message("reportLabourAction.name")
               : Messages.message("report.labour.details"));
         this.unitData = data;
 

@@ -135,7 +135,7 @@ public final class ReportColonyPanel extends ReportPanel
      * @param parent The parent of this panel.
      */
     public ReportColonyPanel(GUI gui, Canvas parent) {
-        super(parent, Messages.message("reportColonyAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportColonyAction.name"));
         this.gui = gui;
         colonies = getSortedColonies();
 

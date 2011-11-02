@@ -46,7 +46,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
      * @param prefix An optional message to add at the top of the panel.
      */
     public ReportHighScoresPanel(Canvas parent, String prefix) {
-        super(parent, Messages.message("reportHighScoresAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportHighScoresAction.name"));
         // Display Panel
         reportPanel.removeAll();
 

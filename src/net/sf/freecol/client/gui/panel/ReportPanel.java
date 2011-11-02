@@ -34,6 +34,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -78,8 +79,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param parent The parent of this panel.
      * @param title The title to display on the panel.
      */
-    public ReportPanel(Canvas parent, String title) {
-        super(parent.getFreeColClient(), parent);
+    public ReportPanel(FreeColClient freeColClient, Canvas parent, String title) {
+        super(freeColClient, parent);
 
         setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 

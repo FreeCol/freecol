@@ -72,7 +72,7 @@ public final class ReportTradePanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportTradePanel(Canvas parent) {
-        super(parent, Messages.message("reportTradeAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportTradeAction.name"));
         setSize(getMinimumSize());
 
         Player player = getMyPlayer();

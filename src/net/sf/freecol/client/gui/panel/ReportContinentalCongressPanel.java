@@ -58,7 +58,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportContinentalCongressPanel(Canvas parent) {
-        super(parent, title);
+        super(parent.getFreeColClient(), parent, title);
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);

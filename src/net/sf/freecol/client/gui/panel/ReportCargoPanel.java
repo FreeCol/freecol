@@ -73,7 +73,7 @@ public final class ReportCargoPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportCargoPanel(Canvas parent) {
-        super(parent, Messages.message("reportCargoAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportCargoAction.name"));
 
         gatherData();
 

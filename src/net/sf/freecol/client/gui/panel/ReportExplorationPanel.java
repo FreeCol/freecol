@@ -55,7 +55,7 @@ public final class ReportExplorationPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportExplorationPanel(Canvas parent) {
-        super(parent, Messages.message("reportExplorationAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportExplorationAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

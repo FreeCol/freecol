@@ -72,7 +72,7 @@ public final class ReportTurnPanel extends ReportPanel {
      * @param messages A variable number of ModelMessages
      */
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
-        super(parent, Messages.message("reportTurnAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportTurnAction.name"));
 
         ClientOptions options = getClientOptions();
         this._messages = messages;

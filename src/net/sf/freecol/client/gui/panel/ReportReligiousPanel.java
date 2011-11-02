@@ -43,7 +43,7 @@ public final class ReportReligiousPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportReligiousPanel(Canvas parent) {
-        super(parent, Messages.message("reportReligionAction.name"));
+        super(parent.getFreeColClient(), parent, Messages.message("reportReligionAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
         Player player = getMyPlayer();
