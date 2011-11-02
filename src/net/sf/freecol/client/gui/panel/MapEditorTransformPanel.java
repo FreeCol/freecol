@@ -94,7 +94,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * @param parent The parent of this panel.
      */
     public MapEditorTransformPanel(Canvas parent) {
-        super(parent, new BorderLayout());
+        super(parent.getFreeColClient(), parent, new BorderLayout());
 
         // assume we have only native players for the moment
         if (getGame().getPlayers().isEmpty()) {

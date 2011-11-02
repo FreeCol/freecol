@@ -55,7 +55,7 @@ public final class MainPanel extends FreeColPanel {
     * @param parent The parent of this panel.
     */
     public MainPanel(Canvas parent) {
-        super(parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+        super(parent.getFreeColClient(), parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 

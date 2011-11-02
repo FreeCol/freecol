@@ -56,7 +56,7 @@ public final class AboutPanel extends FreeColPanel {
     * @param parent The parent of this panel.
     */
     public AboutPanel(Canvas parent) {
-        super(parent, new MigLayout("wrap 2"));
+        super(parent.getFreeColClient(), parent, new MigLayout("wrap 2"));
 
         // Header with image
         Image tempImage = ResourceManager.getImage("TitleImage");

@@ -50,7 +50,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     * @param parent The parent of this panel.
     */
     public ChatPanel(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         JLabel label = new JLabel("Message: ");
 

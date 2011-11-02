@@ -70,7 +70,7 @@ public final class ColopediaPanel extends FreeColPanel
      * @param id a <code>String</code> value
      */
     public ColopediaPanel(Canvas parent, String id) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
@@ -123,7 +123,7 @@ public final class ColopediaPanel extends FreeColPanel
      * @see ChooseFoundingFatherDialog
      */
     ColopediaPanel(Canvas canvas) {
-        super(canvas);
+        super(canvas.getFreeColClient(), canvas);
     }
 
     /**

@@ -54,7 +54,7 @@ public final class VictoryPanel extends FreeColPanel {
      */
     public VictoryPanel(Canvas parent) {
 
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         
         okButton.setText(Messages.message("victory.yes"));
 

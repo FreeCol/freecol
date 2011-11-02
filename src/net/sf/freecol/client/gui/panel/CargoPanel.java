@@ -70,7 +70,7 @@ public class CargoPanel extends FreeColPanel
      * @param withTitle boolean
      */
     public CargoPanel(Canvas parent, boolean withTitle) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         carrier = null;
         defaultTransferHandler = new DefaultTransferHandler(parent, this);

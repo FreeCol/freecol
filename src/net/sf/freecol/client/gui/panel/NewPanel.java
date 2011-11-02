@@ -135,7 +135,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * @param specification a <code>Specification</code> value, may be null
      */
     public NewPanel(GUI gui, Canvas parent, Specification specification) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         this.gui = gui;
         this.specification = specification;
         this.connectController = getFreeColClient().getConnectController();

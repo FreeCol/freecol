@@ -82,7 +82,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * @param parent The parent of this panel.
      */
     public StartGamePanel(GUI gui, final Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         this.gui = gui;
     }
 

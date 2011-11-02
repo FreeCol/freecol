@@ -71,7 +71,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      *            connections.
      */
     public ServerListPanel(GUI gui, ConnectController connectController) {
-        super(gui.getCanvas());
+        super(gui.getCanvas().getFreeColClient(), gui.getCanvas());
         this.gui = gui;
         this.connectController = connectController;
 

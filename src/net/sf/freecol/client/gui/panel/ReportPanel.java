@@ -79,7 +79,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 

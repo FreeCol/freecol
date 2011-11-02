@@ -50,7 +50,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
      */
     public IndianSettlementPanel(final Canvas canvas, IndianSettlement settlement) {
         
-        super(canvas);
+        super(canvas.getFreeColClient(), canvas);
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
         

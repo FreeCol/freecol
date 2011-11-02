@@ -117,7 +117,7 @@ public final class EuropePanel extends FreeColPanel {
      * @param parent The parent of this panel
      */
     public EuropePanel(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setFocusCycleRoot(true);
 

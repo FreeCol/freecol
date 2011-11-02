@@ -20,8 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -82,8 +82,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -154,6 +154,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     protected JButton okButton = new JButton(Messages.message("ok"));
 
+    private FreeColClient freeColClient;
+
     protected static StyleContext styleContext = new StyleContext();
 
     static {
@@ -176,8 +178,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      *
      * @param parent <code>Canvas</code>
      */
-    public FreeColPanel(Canvas parent) {
-        this(parent, new FlowLayout());
+    public FreeColPanel(FreeColClient freeColClient, Canvas parent) {
+        this(freeColClient, parent, new FlowLayout());
     }
 
     /**
@@ -186,9 +188,10 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param parent The <code>Canvas</code> all panels belong to.
      * @param layout The <code>LayoutManager</code> to be used.
      */
-    public FreeColPanel(Canvas parent, LayoutManager layout) {
+    public FreeColPanel(FreeColClient freeColClient, Canvas parent, LayoutManager layout) {
         super(layout);
 
+        this.freeColClient = freeColClient;
         this.canvas = parent;
         setFocusCycleRoot(true);
 
@@ -213,7 +216,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>ClientOptions</code> value
      */
     protected ClientOptions getClientOptions() {
-        return getFreeColClient().getClientOptions();
+        return freeColClient.getClientOptions();
     }
 
     /**
@@ -223,7 +226,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a sorted List of Colonies
      */
     protected List<Colony> getSortedColonies() {
-        return getFreeColClient().getClientOptions()
+        return freeColClient.getClientOptions()
             .getSortedColonies(getMyPlayer());
     }
 
@@ -235,7 +238,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return an <code>int</code> value
      */
     private int getInteger(String key) {
-        return getFreeColClient().getClientOptions()
+        return freeColClient.getClientOptions()
             .getInteger(getClass().getName() + key);
     }
 
@@ -262,12 +265,12 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param value an <code>int</code> value
      */
     private void saveInteger(String key, int value) {
-        Option o = getFreeColClient().getClientOptions()
+        Option o = freeColClient.getClientOptions()
             .getOption(getClass().getName() + key);
         if (o == null) {
             IntegerOption io = new IntegerOption(getClass().getName() + key);
             io.setValue(value);
-            getFreeColClient().getClientOptions().add(io);
+            freeColClient.getClientOptions().add(io);
         } else if (o instanceof IntegerOption) {
             ((IntegerOption) o).setValue(value);
         }

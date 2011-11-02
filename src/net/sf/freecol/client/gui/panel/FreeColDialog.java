@@ -78,7 +78,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param parent The parent <code>Canvas</code>.
      */
     public FreeColDialog(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);

@@ -168,7 +168,7 @@ public final class ColonyPanel extends FreeColPanel
      * @param parent The parent of this panel
      */
     public ColonyPanel(GUI gui, final Canvas parent, Colony colony) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         
         this.gui = gui;
 
@@ -1353,7 +1353,7 @@ public final class ColonyPanel extends FreeColPanel
          * @param colonyPanel The panel that holds this TilePanel.
          */
         public TilePanel(ColonyPanel colonyPanel) {
-            super(colonyPanel.getCanvas());
+            super(colonyPanel.getCanvas().getFreeColClient(), colonyPanel.getCanvas());
             this.colonyPanel = colonyPanel;
             setBackground(Color.BLACK);
             setBorder(null);

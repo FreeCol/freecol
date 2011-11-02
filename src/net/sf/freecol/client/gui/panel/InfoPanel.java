@@ -84,7 +84,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param freeColClient The main controller object for the client.
      */
     public InfoPanel(final FreeColClient freeColClient, final GUI gui) {
-        super(gui.getCanvas());
+        super(gui.getCanvas().getFreeColClient(), gui.getCanvas());
         this.gui = gui;
         
         this.endTurnPanel = new EndTurnPanel(gui);

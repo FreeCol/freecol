@@ -66,7 +66,7 @@ public final class TilePanel extends FreeColPanel {
      * @param tile a <code>Tile</code> value
      */
     public TilePanel(GUI gui, Tile tile) {
-        super(gui.getCanvas());
+        super(gui.getCanvas().getFreeColClient(), gui.getCanvas());
         this.gui = gui;
 
         tileType = tile.getType();

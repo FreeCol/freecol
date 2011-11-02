@@ -59,7 +59,7 @@ public class WorkProductionPanel extends FreeColPanel {
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
     public WorkProductionPanel(Canvas canvas, Unit unit) {
-        super(canvas);
+        super(canvas.getFreeColClient(), canvas);
 
         setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
 

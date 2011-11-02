@@ -68,7 +68,7 @@ public class ConceptDetailPanel extends FreeColPanel
      * @param colopediaPanel the ColopediaPanel
      */
     public ConceptDetailPanel(ColopediaPanel colopediaPanel) {
-        super(colopediaPanel.getCanvas());
+        super(colopediaPanel.getCanvas().getFreeColClient(), colopediaPanel.getCanvas());
         this.colopediaPanel = colopediaPanel;
     }
 

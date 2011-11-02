@@ -113,7 +113,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     public BuildQueuePanel(Colony colony, Canvas parent) {
 
-        super(parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(parent.getFreeColClient(), parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
         featureContainer = new FeatureContainer();

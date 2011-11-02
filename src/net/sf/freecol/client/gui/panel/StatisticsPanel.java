@@ -156,7 +156,7 @@ public final class StatisticsPanel extends FreeColPanel
     * @param parent The parent of this panel.
     */
     public StatisticsPanel(Canvas parent) {
-        super(parent, new BorderLayout());
+        super(parent.getFreeColClient(), parent, new BorderLayout());
         
         // Retrieve the client and server data
         Map<String, String> serverStatistics
