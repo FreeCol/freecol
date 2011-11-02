@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 
 
@@ -46,11 +47,12 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
 
     /**
     * The constructor that will add the items to this panel.
+     * @param freeColClient 
     * 
     * @param parent The parent of this panel.
     */
-    public ChatPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public ChatPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
 
         JLabel label = new JLabel("Message: ");
 

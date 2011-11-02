@@ -51,6 +51,7 @@ import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
@@ -113,11 +114,12 @@ public final class EuropePanel extends FreeColPanel {
 
     /**
      * The constructor for a EuropePanel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel
      */
-    public EuropePanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public EuropePanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
 
         setFocusCycleRoot(true);
 

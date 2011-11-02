@@ -352,9 +352,9 @@ public final class Canvas extends JDesktopPane {
 
         startGamePanel = new StartGamePanel(freeColClient, gui, this);
         serverListPanel = new ServerListPanel(freeColClient, gui, freeColClient.getConnectController());
-        europePanel = new EuropePanel(this);
-        statusPanel = new StatusPanel(this);
-        chatPanel = new ChatPanel(this);
+        europePanel = new EuropePanel(freeColClient, this);
+        statusPanel = new StatusPanel(freeColClient, this);
+        chatPanel = new ChatPanel(freeColClient, this);
         clientOptionsDialog = new ClientOptionsDialog(gui, this);
         loadingSavegameDialog = new LoadingSavegameDialog(this);
 

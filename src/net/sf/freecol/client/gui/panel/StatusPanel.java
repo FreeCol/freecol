@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 
 
@@ -40,10 +41,11 @@ public final class StatusPanel extends FreeColPanel {
 
     /**
     * Creates a new <code>StatusPanel</code>.
+     * @param freeColClient 
     * @param parent The parent of this panel.
     */
-    public StatusPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, new FlowLayout());
+    public StatusPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, new FlowLayout());
 
         setFocusCycleRoot(false);
         setFocusable(false);
