@@ -51,6 +51,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -80,12 +81,16 @@ public final class DefaultTransferHandler extends TransferHandler {
     private final Canvas canvas;
     private final FreeColPanel parentPanel;
 
+    private FreeColClient freeColClient;
+
     /**
     * The constructor to use.
+     * @param freeColClient 
     * @param canvas The <code>Canvas</code>.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
-    public DefaultTransferHandler(Canvas canvas, FreeColPanel parentPanel) {
+    public DefaultTransferHandler(FreeColClient freeColClient, Canvas canvas, FreeColPanel parentPanel) {
+        this.freeColClient = freeColClient;
         this.canvas = canvas;
         this.parentPanel = parentPanel;
     }
@@ -372,7 +377,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     && requiredGoods.getAmount() <= goods.getAmount()) {
                                     int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
                                                           equipment.getMaximumCount());
-                                    unitLabel.getCanvas().getFreeColClient().getInGameController()
+                                    freeColClient.getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
                                     return true;
@@ -438,7 +443,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     && requiredGoods.getAmount() <= label.getAmount()) {
                                     int amount = Math.min(label.getAmount() / requiredGoods.getAmount(),
                                                           equipment.getMaximumCount());
-                                    unitLabel.getCanvas().getFreeColClient().getInGameController()
+                                    freeColClient.getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
                                     return true;

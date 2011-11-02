@@ -210,7 +210,7 @@ public final class ColonyPanel extends FreeColPanel
         cargoPanel = new ColonyCargoPanel(freeColClient, parent);
         cargoPanel.setParentPanel(this);
 
-        defaultTransferHandler = new DefaultTransferHandler(parent, this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, parent, this);
         pressListener = new DragListener(this);
         releaseListener = new DropListener();
 
