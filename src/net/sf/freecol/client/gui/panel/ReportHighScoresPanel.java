@@ -26,6 +26,7 @@ import java.util.List;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
@@ -45,8 +46,8 @@ public final class ReportHighScoresPanel extends ReportPanel {
      * @param parent The parent of this panel.
      * @param prefix An optional message to add at the top of the panel.
      */
-    public ReportHighScoresPanel(Canvas parent, String prefix) {
-        super(parent.getFreeColClient(), parent, Messages.message("reportHighScoresAction.name"));
+    public ReportHighScoresPanel(FreeColClient freeColClient, Canvas parent, String prefix) {
+        super(freeColClient, parent, Messages.message("reportHighScoresAction.name"));
         // Display Panel
         reportPanel.removeAll();
 

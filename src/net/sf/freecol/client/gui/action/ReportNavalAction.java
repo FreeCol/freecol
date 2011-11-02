@@ -50,6 +50,6 @@ public class ReportNavalAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showPanel(new ReportNavalPanel(gui.getCanvas()));
+        gui.getCanvas().showPanel(new ReportNavalPanel(freeColClient, gui.getCanvas()));
     }
 }

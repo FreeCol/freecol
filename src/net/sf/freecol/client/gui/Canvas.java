@@ -1502,7 +1502,7 @@ public final class Canvas extends JDesktopPane {
      * @param messageId An optional message to add to the high scores panel.
      */
     public void showHighScoresPanel(String messageId) {
-        showPanel(new ReportHighScoresPanel(this, messageId), false);
+        showPanel(new ReportHighScoresPanel(freeColClient, this, messageId), false);
     }
 
     /**
