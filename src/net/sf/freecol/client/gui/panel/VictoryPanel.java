@@ -73,7 +73,7 @@ public final class VictoryPanel extends FreeColPanel {
         continueButton.addActionListener(this);
         enterPressesWhenFocused(continueButton);
 
-        if (parent.getFreeColClient().isSingleplayer()) {
+        if (getFreeColClient().isSingleplayer()) {
             add(okButton, "newline 20, split 2, tag ok");
             add(continueButton);
         } else {

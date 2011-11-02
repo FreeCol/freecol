@@ -30,6 +30,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.MapEditorAction;
@@ -52,10 +53,11 @@ public final class MainPanel extends FreeColPanel {
 
     /**
     * The constructor that will add the items to this panel.
+     * @param freeColClient 
     * @param parent The parent of this panel.
     */
-    public MainPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+    public MainPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 

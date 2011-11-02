@@ -582,7 +582,7 @@ public class DebugMenu extends JMenu {
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showPanel(new StatisticsPanel(canvas));
+                    canvas.showPanel(new StatisticsPanel(freeColClient, canvas));
                 }
             });
         statistics.setEnabled(true);

@@ -40,6 +40,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -152,11 +153,12 @@ public final class StatisticsPanel extends FreeColPanel
     
     /**
     * The constructor that will add the items to this panel.
+     * @param freeColClient 
     * 
     * @param parent The parent of this panel.
     */
-    public StatisticsPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent, new BorderLayout());
+    public StatisticsPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent, new BorderLayout());
         
         // Retrieve the client and server data
         Map<String, String> serverStatistics
