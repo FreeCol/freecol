@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -70,8 +71,8 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * @param connectController The controller responsible for creating new
      *            connections.
      */
-    public ServerListPanel(GUI gui, ConnectController connectController) {
-        super(gui.getCanvas().getFreeColClient(), gui.getCanvas());
+    public ServerListPanel(FreeColClient freeColClient, GUI gui, ConnectController connectController) {
+        super(freeColClient, gui.getCanvas());
         this.gui = gui;
         this.connectController = connectController;
 

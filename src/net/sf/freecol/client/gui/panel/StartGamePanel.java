@@ -33,10 +33,10 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
@@ -81,8 +81,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      *
      * @param parent The parent of this panel.
      */
-    public StartGamePanel(GUI gui, final Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public StartGamePanel(FreeColClient freeColClient, GUI gui, final Canvas parent) {
+        super(freeColClient, parent);
         this.gui = gui;
     }
 
