@@ -1236,7 +1236,8 @@ public final class InGameController implements NetworkConstants {
             gui.errorMessage("fileNotFound");
             return;
         }
-        if (!gui.getCanvas().showConfirmDialog("stopCurrentGame.text",
+        if (freeColClient.isInGame()
+            && !gui.getCanvas().showConfirmDialog("stopCurrentGame.text",
                 "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
         }
