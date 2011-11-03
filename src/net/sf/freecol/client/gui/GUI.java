@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.AudioMixerOption;
@@ -418,6 +419,11 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
+    
+    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
+        canvas.showPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
+    }
+    
     
     
 }
