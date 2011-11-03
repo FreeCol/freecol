@@ -114,7 +114,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @param parent The parent of this panel.
      */
     public TradeRouteInputDialog(GUI gui, final Canvas parent, TradeRoute newRoute) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         
         this.gui = gui;
 

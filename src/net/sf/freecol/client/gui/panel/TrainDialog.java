@@ -63,7 +63,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
      */
     public TrainDialog(Canvas parent, EuropePanel.EuropeAction europeAction) {
 
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         okButton.setText(Messages.message("trainDialog.done"));
 

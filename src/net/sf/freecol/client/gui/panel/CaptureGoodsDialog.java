@@ -67,7 +67,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
      * @param loot The <code>Goods</code> to loot.
      */
     public CaptureGoodsDialog(Canvas parent, Unit winner, List<Goods> loot) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         
         maxCargo = winner.getSpaceLeft();
 

@@ -57,7 +57,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
      * @param parent The parent of this panel.
      */
     public WarehouseDialog(Canvas parent, Colony colony) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         warehouseDialog = new JPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);

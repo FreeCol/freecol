@@ -55,7 +55,7 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
      * @param parent The parent of this panel.
      */
     public RiverStylePanel(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         setLayout(new BorderLayout());
         
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));

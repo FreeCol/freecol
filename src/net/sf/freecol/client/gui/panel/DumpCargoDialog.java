@@ -61,7 +61,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
      * @param unit an <code>Unit</code> value
      */
     public DumpCargoDialog(Canvas parent, Unit unit) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         header = new JLabel(Messages.message("dumpCargo"));
         header.setFont(smallHeaderFont);

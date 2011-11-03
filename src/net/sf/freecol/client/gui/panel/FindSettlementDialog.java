@@ -78,7 +78,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
      * The constructor to use.
      */
     public FindSettlementDialog(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         for (Player player : getGame().getPlayers()) {
             knownSettlements.addAll(player.getSettlements());

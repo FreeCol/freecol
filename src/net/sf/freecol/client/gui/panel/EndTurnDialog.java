@@ -94,7 +94,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
      * The constructor to use.
      */
     public EndTurnDialog(Canvas parent, List<Unit> units) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setLayout(new MigLayout("wrap 1", "[align center]"));
 

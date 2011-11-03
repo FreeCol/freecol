@@ -55,7 +55,7 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
      */
     public SelectAmountDialog(Canvas parent, GoodsType goodsType,
         int available, int defaultAmount, boolean needToPay) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setFocusCycleRoot(true);
 

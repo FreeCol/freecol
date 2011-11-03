@@ -48,7 +48,7 @@ public final class EventPanel extends FreeColDialog<Boolean> {
      */
     public EventPanel(Canvas parent, EventType type) {
 
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setLayout(new MigLayout("wrap 1", "[center]", "[]20"));
 

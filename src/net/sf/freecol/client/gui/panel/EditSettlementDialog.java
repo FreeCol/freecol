@@ -85,7 +85,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      */
     public EditSettlementDialog(Canvas canvas, final IndianSettlement settlement) {
         
-        super(canvas);
+        super(canvas.getFreeColClient(), canvas);
         this.settlement = settlement;
 
         okButton.addActionListener(this);

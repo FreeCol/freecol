@@ -52,7 +52,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(Canvas parent, String message) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setLayout(new MigLayout());
 
@@ -71,7 +71,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * @param parent The parent of this panel.
      */
     public ErrorPanel(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         File logFile = new File(FreeCol.getLogFile());
         byte[] buffer = new byte[(int) logFile.length()];

@@ -72,7 +72,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public TradeRouteDialog(final GUI gui, final Canvas parent, TradeRoute selectedRoute) {
 
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         
         this.gui = gui;
 

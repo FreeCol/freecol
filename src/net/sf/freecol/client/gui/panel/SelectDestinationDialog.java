@@ -99,7 +99,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * The constructor to use.
      */
     public SelectDestinationDialog(Canvas parent, Unit unit) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         // Collect the goods the unit is carrying.
         final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();

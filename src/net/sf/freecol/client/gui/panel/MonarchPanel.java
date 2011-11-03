@@ -60,7 +60,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      */
     public MonarchPanel(Canvas parent, MonarchAction action,
                         StringTemplate template) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         String messageId = "model.monarch.action." + action.toString();
         String yesId = messageId + ".yes";

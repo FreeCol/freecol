@@ -49,7 +49,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
      * @param parent The parent of this panel.
      */
     public ConfirmDeclarationDialog(final Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         Player player = getMyPlayer();
 
         StringTemplate nation

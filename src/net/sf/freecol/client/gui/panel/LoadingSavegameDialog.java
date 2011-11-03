@@ -69,7 +69,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
      * @param parent The parent of this panel.
      */
     public LoadingSavegameDialog(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         setLayout(new BorderLayout());
 
         buttons.add(okButton);

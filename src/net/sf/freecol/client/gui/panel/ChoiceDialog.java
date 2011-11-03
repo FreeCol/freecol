@@ -59,7 +59,7 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * @param choices List of <code>ChoiceItem<T></code>
      */
     public ChoiceDialog(Canvas parent, String text, String cancelText, List<ChoiceItem<T>> choices) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);

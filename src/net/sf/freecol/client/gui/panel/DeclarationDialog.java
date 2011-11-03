@@ -60,7 +60,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
      * @param parent The parent of this panel.
      */
     public DeclarationDialog(final Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         this.signaturePanel = new SignaturePanel();
 
         setLayout(null);

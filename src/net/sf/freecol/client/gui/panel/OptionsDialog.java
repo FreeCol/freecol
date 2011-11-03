@@ -86,7 +86,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param editable boolean
      */
     public OptionsDialog(GUI gui, Canvas parent, boolean editable) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         this.gui = gui;
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));

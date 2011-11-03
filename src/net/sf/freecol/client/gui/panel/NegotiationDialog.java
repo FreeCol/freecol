@@ -108,7 +108,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * @param agreement a <code>DiplomaticTrade</code> with the offer
      */
     public NegotiationDialog(Canvas parent, Unit unit, Settlement settlement, DiplomaticTrade agreement) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         setFocusCycleRoot(true);
 
         this.unit = unit;

@@ -45,7 +45,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
     public PreCombatDialog(final Canvas parent,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel

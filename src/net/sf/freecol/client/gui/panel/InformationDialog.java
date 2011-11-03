@@ -58,7 +58,7 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @param images The images to be displayed in the dialog.
      */
     public InformationDialog(Canvas parent, String[] texts, ImageIcon[] images) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
         JPanel textPanel = new JPanel();

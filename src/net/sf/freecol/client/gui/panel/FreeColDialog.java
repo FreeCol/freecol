@@ -48,6 +48,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -77,8 +78,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      *
      * @param parent The parent <code>Canvas</code>.
      */
-    public FreeColDialog(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public FreeColDialog(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
@@ -171,7 +172,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @return <code>FreeColDialog</code>
      * @see ChoiceItem
      */
-    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(GUI gui, String text,
+    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(FreeColClient freeColClient, GUI gui, String text,
         String cancelText, List<ChoiceItem<T>> choices) {
 
         if (choices.isEmpty()) {
@@ -181,7 +182,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
         final Canvas canvas = gui.getCanvas();
         final FreeColDialog<ChoiceItem<T>> choiceDialog
-            = new FreeColDialog<ChoiceItem<T>>(canvas) {
+            = new FreeColDialog<ChoiceItem<T>>(freeColClient, canvas) {
                 @Override
                 public void requestFocus() {
                     for (JButton b : choiceBtnLst) {
@@ -270,16 +271,16 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param cancelText The text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<Boolean> createConfirmDialog(GUI gui, String text, String okText, String cancelText) {
-        return createConfirmDialog(gui, new String[] {text}, null, okText, cancelText);
+    public static FreeColDialog<Boolean> createConfirmDialog(final FreeColClient freeColClient, GUI gui, String text, String okText, String cancelText) {
+        return createConfirmDialog(freeColClient, gui, new String[] {text}, null, okText, cancelText);
     }
 
-    public static FreeColDialog<Boolean> createConfirmDialog(GUI gui, String[] texts,
+    public static FreeColDialog<Boolean> createConfirmDialog(FreeColClient freeColClient, GUI gui, String[] texts,
         ImageIcon[] icons, String okText, String cancelText) {
         // create the dialog
         final Canvas canvas = gui.getCanvas();
         final FreeColDialog<Boolean> confirmDialog
-            = new FreeColDialog<Boolean>(canvas);
+            = new FreeColDialog<Boolean>(freeColClient, canvas);
 
         confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
@@ -325,13 +326,13 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param cancelText The text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<String> createInputDialog(GUI gui, String text,
+    public static FreeColDialog<String> createInputDialog(FreeColClient freeColClient, GUI gui, String text,
         String defaultValue, String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
         final Canvas canvas = gui.getCanvas();
         final FreeColDialog<String> inputDialog
-            = new FreeColDialog<String>(canvas)  {
+            = new FreeColDialog<String>(freeColClient, canvas)  {
                 @Override
                 public void requestFocus() {
                     input.requestFocus();
@@ -373,7 +374,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
 
-    public static FreeColDialog<Dimension> createMapSizeDialog(final GUI gui, final Canvas canvas) {
+    public static FreeColDialog<Dimension> createMapSizeDialog(FreeColClient freeColClient, final GUI gui, final Canvas canvas) {
 
         final int defaultHeight = 100;
         final int defaultWidth = 40;
@@ -385,7 +386,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
-        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(canvas);
+        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(freeColClient, canvas);
 
         mapSizeDialog.setLayout(new MigLayout("wrap 2"));
 
@@ -434,11 +435,11 @@ public class FreeColDialog<T> extends FreeColPanel {
      *       dialog.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<File> createLoadDialog(GUI gui, File directory,
+    public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
                                                        FileFilter[] fileFilters) {
         final Canvas canvas = gui.getCanvas();
         final FreeColDialog<File> loadDialog
-            = new FreeColDialog<File>(canvas);
+            = new FreeColDialog<File>(freeColClient, canvas);
         final JFileChooser fileChooser = new JFileChooser(directory);
 
         loadDialog.okButton.addActionListener(new ActionListener() {
@@ -483,11 +484,11 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param defaultName Default filename for the savegame.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<File> createSaveDialog(GUI gui, File directory,
+    public static FreeColDialog<File> createSaveDialog(FreeColClient freeColClient, GUI gui, File directory,
         final String standardName, FileFilter[] fileFilters, String defaultName) {
         final Canvas canvas = gui.getCanvas();
         final FreeColDialog<File> saveDialog
-            = new FreeColDialog<File>(canvas);
+            = new FreeColDialog<File>(freeColClient, canvas);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 

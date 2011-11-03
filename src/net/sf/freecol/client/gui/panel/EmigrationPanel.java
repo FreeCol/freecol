@@ -52,7 +52,7 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
      * The constructor to use.
      */
     public EmigrationPanel(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));

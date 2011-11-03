@@ -55,7 +55,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
      * The constructor to use.
      */
     public RecruitDialog(Canvas parent) {
-        super(parent);
+        super(parent.getFreeColClient(), parent);
 
         setFocusCycleRoot(true);
 
