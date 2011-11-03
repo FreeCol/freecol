@@ -831,6 +831,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void declareIndependence() {
         if (!requireOurTurn()) return;
+        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
 
         // Check for adequate support.
@@ -838,8 +839,10 @@ public final class InGameController implements NetworkConstants {
             .getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
-                gui.getCanvas().showInformationMessage(StringTemplate.template(limit.getDescriptionKey())
-                    .addAmount("%limit%", limit.getRightHandSide().getValue()));
+                gui.getCanvas().showInformationMessage(StringTemplate
+                    .template(limit.getDescriptionKey())
+                    .addAmount("%limit%",
+                        limit.getRightHandSide().getValue(game)));
                 return;
             }
         }
