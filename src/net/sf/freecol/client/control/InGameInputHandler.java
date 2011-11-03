@@ -962,7 +962,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     public Element addObject(Element element) {
-        FreeColClient fcc = getFreeColClient();
+        final FreeColClient fcc = getFreeColClient();
         Game game = getGame();
         boolean displayMessage = false;
         Specification spec = game.getSpecification();
@@ -1006,7 +1006,11 @@ public final class InGameInputHandler extends InputHandler {
         }
         if (displayMessage
             && fcc.getMyPlayer().equals(game.getCurrentPlayer())) {
-            fcc.getInGameController().nextModelMessage();
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        fcc.getInGameController().nextModelMessage();
+                    }
+                });
         }
         return null;
     }
