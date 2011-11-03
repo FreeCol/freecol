@@ -33,6 +33,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -57,11 +58,12 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
+     * @param freeColClient 
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public UnitDetailPanel(ColopediaPanel colopediaPanel) {
-        super(colopediaPanel, PanelType.UNITS.toString(), 0.5);
+    public UnitDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel, PanelType.UNITS.toString(), 0.5);
     }
 
 

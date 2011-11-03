@@ -73,6 +73,6 @@ public class ColopediaAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = gui.getCanvas();
-        canvas.showPanel(new ColopediaPanel(canvas, getId()));
+        canvas.showPanel(new ColopediaPanel(getFreeColClient(), canvas, getId()));
     }
 }

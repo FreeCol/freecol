@@ -39,6 +39,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -69,8 +70,8 @@ public final class ColopediaPanel extends FreeColPanel
      * @param parent The parent of this panel.
      * @param id a <code>String</code> value
      */
-    public ColopediaPanel(Canvas parent, String id) {
-        super(parent.getFreeColClient(), parent);
+    public ColopediaPanel(FreeColClient freeColClient, Canvas parent, String id) {
+        super(freeColClient, parent);
 
         setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
@@ -122,8 +123,8 @@ public final class ColopediaPanel extends FreeColPanel
      * @param canvas a <code>Canvas</code> value
      * @see ChooseFoundingFatherDialog
      */
-    ColopediaPanel(Canvas canvas) {
-        super(canvas.getFreeColClient(), canvas);
+    ColopediaPanel(FreeColClient freeColClient, Canvas canvas) {
+        super(freeColClient, canvas);
     }
 
     /**
@@ -136,14 +137,14 @@ public final class ColopediaPanel extends FreeColPanel
         DefaultMutableTreeNode root
             = new DefaultMutableTreeNode(new ColopediaTreeItem(null, null, name, null));
 
-        new TerrainDetailPanel(this).addSubTrees(root);
-        new ResourcesDetailPanel(this).addSubTrees(root);
-        new GoodsDetailPanel(this).addSubTrees(root);
-        new UnitDetailPanel(this).addSubTrees(root);
-        new BuildingDetailPanel(this).addSubTrees(root);
-        new FatherDetailPanel(this).addSubTrees(root);
-        new NationDetailPanel(this).addSubTrees(root);
-        new NationTypeDetailPanel(this).addSubTrees(root);
+        new TerrainDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new ResourcesDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new GoodsDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new UnitDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new BuildingDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new FatherDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new NationDetailPanel(getFreeColClient(), this).addSubTrees(root);
+        new NationTypeDetailPanel(getFreeColClient(), this).addSubTrees(root);
         new ConceptDetailPanel(getFreeColClient(), this).addSubTrees(root);
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);

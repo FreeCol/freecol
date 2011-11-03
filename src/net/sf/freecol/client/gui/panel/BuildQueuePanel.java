@@ -998,7 +998,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
                     int index = source.locationToIndex(e.getPoint());
                     BuildableType type = (BuildableType) source.getModel().getElementAt(index);
-                    getCanvas().showPanel(new ColopediaPanel(getCanvas(), type.getId()));
+                    getCanvas().showPanel(new ColopediaPanel(getFreeColClient(), getCanvas(), type.getId()));
                 } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
                         DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
                         if (source.getSelectedIndex() == -1) {

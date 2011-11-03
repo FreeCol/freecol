@@ -160,7 +160,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     @Override
     public JToolTip createToolTip() {
-        return new BuildingToolTip(building, parent);
+        return new BuildingToolTip(freeColClient, building, parent);
     }
 
     public void addPropertyChangeListeners() {

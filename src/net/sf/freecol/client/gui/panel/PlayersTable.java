@@ -99,7 +99,7 @@ public final class PlayersTable extends JTable {
      * @param nationOptions a <code>NationOptions</code> value
      * @param myPlayer a <code>Player</code> value
      */
-    public PlayersTable(FreeColClient freeColClient, final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
+    public PlayersTable(final FreeColClient freeColClient, final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
         super();
 
         library = canvas.getImageLibrary();
@@ -115,13 +115,13 @@ public final class PlayersTable extends JTable {
 
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATIONS.toString()));
+                    canvas.showPanel(new ColopediaPanel(freeColClient, canvas, PanelType.NATIONS.toString()));
                 }
             });
 
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATION_TYPES.toString()));
+                    canvas.showPanel(new ColopediaPanel(freeColClient, canvas, PanelType.NATION_TYPES.toString()));
                 }
             });
 

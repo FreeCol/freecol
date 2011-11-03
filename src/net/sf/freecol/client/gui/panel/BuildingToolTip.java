@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -49,11 +50,12 @@ public class BuildingToolTip extends JToolTip {
 
     /**
      * Creates this BuildingToolTip.
+     * @param freeColClient 
      *
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingToolTip(Building building, Canvas parent) {
+    public BuildingToolTip(FreeColClient freeColClient, Building building, Canvas parent) {
 
         int workplaces = building.getUnitCapacity();
 
@@ -101,11 +103,11 @@ public class BuildingToolTip extends JToolTip {
         add(new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId() + ".image"))));
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(parent.getFreeColClient(), unit, parent, false);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, parent, false);
             if (building.canTeach() && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                              unit.getNeededTurnsOfTraining());
-                UnitLabel studentLabel = new UnitLabel(parent.getFreeColClient(), unit.getStudent(), parent, true);
+                UnitLabel studentLabel = new UnitLabel(freeColClient, unit.getStudent(), parent, true);
                 studentLabel.setIgnoreLocation(true);
                 add(unitLabel);
                 add(progress, "split 2, flowy");
