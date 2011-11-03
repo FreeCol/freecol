@@ -191,7 +191,25 @@ public class ServerColony extends Colony implements ServerModelObject {
                  : new BuildQueue[] { buildQueue, populationQueue }) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
-            if (!info.getConsumption().isEmpty()) {
+            if (info.getConsumption().isEmpty()) {
+                BuildableType build = queue.getCurrentlyBuilding();
+                if (build != null) {
+                    AbstractGoods needed = new AbstractGoods();
+                    int complete = getTurnsToComplete(build, needed);
+                    // Warn if about to fail, or if no useful progress
+                    // towards completion is possible.
+                    if (complete == -1 || complete == UNDEFINED) {
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                "model.colony.buildableNeedsGoods",
+                                this, build)
+                            .addName("%colony%", getName())
+                            .add("%buildable%", build.getNameKey())
+                            .addAmount("%amount%", needed.getAmount())
+                            .add("%goodsType%", needed.getType().getNameKey()));
+                    }
+                }
+            } else {
                 // Ready to build something.  TODO: OO!
                 BuildableType buildable = csNextBuildable(queue, random, cs);
                 if (buildable == null) {
