@@ -50,6 +50,6 @@ public class ShowGameOptionsAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = gui.getCanvas();
-        canvas.showPanel(new GameOptionsDialog(gui, canvas, false, false));
+        canvas.showPanel(new GameOptionsDialog(freeColClient, gui, canvas, false, false));
     }
 }

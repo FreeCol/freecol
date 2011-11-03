@@ -34,9 +34,9 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.client.gui.Canvas;
-
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 
 
 /**
@@ -58,8 +58,8 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * @param cancelText <code>String</code>
      * @param choices List of <code>ChoiceItem<T></code>
      */
-    public ChoiceDialog(Canvas parent, String text, String cancelText, List<ChoiceItem<T>> choices) {
-        super(parent.getFreeColClient(), parent);
+    public ChoiceDialog(FreeColClient freeColClient, Canvas parent, String text, String cancelText, List<ChoiceItem<T>> choices) {
+        super(freeColClient, parent);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);

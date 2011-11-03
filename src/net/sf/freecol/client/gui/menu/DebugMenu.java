@@ -319,7 +319,7 @@ public class DebugMenu extends JMenu {
                         actions.add(new ChoiceItem<MonarchAction>(action));
                     }
                     ChoiceDialog<MonarchAction> choiceDialog
-                        = new ChoiceDialog<MonarchAction>(canvas, monarchTitle,
+                        = new ChoiceDialog<MonarchAction>(freeColClient, canvas, monarchTitle,
                                                           "Cancel", actions);
                     MonarchAction action
                         = canvas.showFreeColDialog(choiceDialog, null);
@@ -429,7 +429,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayMonarchPanel"));
         monarchPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showFreeColDialog(new MonarchPanel(canvas,
+                    canvas.showFreeColDialog(new MonarchPanel(freeColClient, canvas,
                             Monarch.MonarchAction.RAISE_TAX_WAR));
                 }
             });
@@ -654,7 +654,7 @@ public class DebugMenu extends JMenu {
             }
         }
         ChoiceDialog<FoundingFather> choiceDialog
-            = new ChoiceDialog<FoundingFather>(canvas, fatherTitle, "Cancel",
+            = new ChoiceDialog<FoundingFather>(freeColClient, canvas, fatherTitle, "Cancel",
                 fathers);
         FoundingFather father = canvas.showFreeColDialog(choiceDialog, null);
         if (father != null) {

@@ -37,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -65,11 +66,12 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public LoadingSavegameDialog(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public LoadingSavegameDialog(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
         setLayout(new BorderLayout());
 
         buttons.add(okButton);

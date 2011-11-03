@@ -52,6 +52,6 @@ public class FindSettlementAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = gui.getCanvas();
-        canvas.showPanel(new FindSettlementDialog<Canvas>(canvas), false);
+        canvas.showPanel(new FindSettlementDialog<Canvas>(freeColClient, canvas), false);
     }
 }

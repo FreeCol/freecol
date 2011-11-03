@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
@@ -62,14 +63,15 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      * @param mgo the map generator options
      * @param editable whether the options may be edited
      * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(GUI gui, Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
-        super(gui, parent, editable);
+    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+        super(freeColClient, gui, parent, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

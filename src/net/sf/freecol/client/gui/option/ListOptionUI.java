@@ -41,6 +41,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -63,6 +64,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
     private JButton removeButton = new JButton(Messages.message("list.remove"));
     private JButton upButton = new JButton(Messages.message("list.up"));
     private JButton downButton = new JButton(Messages.message("list.down"));
+    private FreeColClient freeColClient;
 
 
 
@@ -74,8 +76,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
      *            for.
      * @param editable boolean whether user can modify the setting
      */
-    public ListOptionUI(GUI gui, final ListOption<T> option, boolean editable) {
+    public ListOptionUI(FreeColClient freeColClient, GUI gui, final ListOption<T> option, boolean editable) {
         super(gui, option, editable);
+        this.freeColClient = freeColClient;
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          super.getLabel().getText()));
@@ -146,7 +149,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
     private void showAddElementDialog() {
         final Canvas canvas = gui.getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
-        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(canvas.getFreeColClient(), canvas) {
+        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(freeColClient, canvas) {
             @Override
             public void requestFocus() {
                 addButton.requestFocus();

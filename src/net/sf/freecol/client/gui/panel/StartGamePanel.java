@@ -290,14 +290,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 }
                 break;
             case GAME_OPTIONS:
-                getCanvas().showFreeColDialog(new GameOptionsDialog(gui, getCanvas(), getFreeColClient().isAdmin(), true));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(getFreeColClient(), gui, getCanvas(), getFreeColClient().isAdmin(), true));
                 break;
             case MAP_GENERATOR_OPTIONS:
                 OptionGroup mgo = getFreeColClient().getGame()
                     .getMapGeneratorOptions();
                 FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
                 boolean loadCustomOptions = (importFile.getValue() == null);
-                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(gui, getCanvas(), mgo, getFreeColClient().isAdmin(),
+                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getFreeColClient(), gui, getCanvas(), mgo, getFreeColClient().isAdmin(),
                                                                             loadCustomOptions));
                 break;
             default:

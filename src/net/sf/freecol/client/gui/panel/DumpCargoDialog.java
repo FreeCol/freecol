@@ -28,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
@@ -56,12 +57,13 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * 
      * @param parent The parent panel.
      * @param unit an <code>Unit</code> value
      */
-    public DumpCargoDialog(Canvas parent, Unit unit) {
-        super(parent.getFreeColClient(), parent);
+    public DumpCargoDialog(FreeColClient freeColClient, Canvas parent, Unit unit) {
+        super(freeColClient, parent);
 
         header = new JLabel(Messages.message("dumpCargo"));
         header.setFont(smallHeaderFont);

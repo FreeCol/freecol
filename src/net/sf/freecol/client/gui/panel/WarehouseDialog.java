@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -53,11 +54,12 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      */
-    public WarehouseDialog(Canvas parent, Colony colony) {
-        super(parent.getFreeColClient(), parent);
+    public WarehouseDialog(FreeColClient freeColClient, Canvas parent, Colony colony) {
+        super(freeColClient, parent);
 
         warehouseDialog = new JPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);

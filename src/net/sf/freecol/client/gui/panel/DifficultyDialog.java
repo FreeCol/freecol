@@ -31,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -79,8 +80,8 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      * @param parent a <code>Canvas</code> value
      * @param level an <code>OptionGroup</code> value
      */
-    public DifficultyDialog(GUI gui, Canvas parent, OptionGroup level) {
-        super(gui, parent, false);
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Canvas parent, OptionGroup level) {
+        super(freeColClient, gui, parent, false);
         difficultyBox.setRenderer(new BoxRenderer());
         specification = getSpecification();
 
@@ -98,8 +99,8 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      * @param parent The parent of this panel.
      * @param specification a <code>Specification</code> value
      */
-    public DifficultyDialog(GUI gui, Canvas parent, Specification specification) {
-        super(gui, parent, true);
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Canvas parent, Specification specification) {
+        super(freeColClient, gui, parent, true);
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 

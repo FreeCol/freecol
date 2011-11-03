@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -100,8 +101,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param goods a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(AbstractGoods goods, Canvas parent) {
-        this(goods, -1, parent);
+    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, Canvas parent) {
+        this(freeColClient, goods, -1, parent);
     }
 
     /**
@@ -111,8 +112,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param maximum an <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
-        this(goods, maximum.getAmount(), parent);
+    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
+        this(freeColClient, goods, maximum.getAmount(), parent);
     }
 
     /**
@@ -122,8 +123,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param amount an <code>int</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(GoodsType goodsType, int amount, Canvas parent) {
-        this(new AbstractGoods(goodsType, amount), -1, parent);
+    public ProductionLabel(FreeColClient freeColClient,GoodsType goodsType, int amount, Canvas parent) {
+        this(freeColClient, new AbstractGoods(goodsType, amount), -1, parent);
     }
 
     /**
@@ -133,10 +134,10 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param maximum a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(AbstractGoods goods, int maximum, Canvas parent) {
+    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, int maximum, Canvas parent) {
         super(goods, parent);
         this.maximumProduction = maximumProduction;
-        ClientOptions options = parent.getFreeColClient().getClientOptions();
+        ClientOptions options = freeColClient.getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 

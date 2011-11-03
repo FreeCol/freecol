@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
@@ -42,10 +43,10 @@ import net.sf.freecol.common.model.Unit;
 
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
-    public PreCombatDialog(final Canvas parent,
+    public PreCombatDialog(FreeColClient freeColClient, final Canvas parent,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(parent.getFreeColClient(), parent);
+        super(freeColClient, parent);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel

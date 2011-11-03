@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -60,10 +61,11 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
 
     /**
      * The constructor to use.
+     * @param freeColClient 
      */
-    public TrainDialog(Canvas parent, EuropePanel.EuropeAction europeAction) {
+    public TrainDialog(FreeColClient freeColClient, Canvas parent, EuropePanel.EuropeAction europeAction) {
 
-        super(parent.getFreeColClient(), parent);
+        super(freeColClient, parent);
 
         okButton.setText(Messages.message("trainDialog.done"));
 

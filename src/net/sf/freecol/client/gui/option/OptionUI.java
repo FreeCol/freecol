@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.option;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -164,7 +165,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
 
     @SuppressWarnings("unchecked")
-    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
+    public static OptionUI getOptionUI(FreeColClient freeColClient, GUI gui, Option option, boolean editable) {
         if (option instanceof BooleanOption) {
             return new BooleanOptionUI(gui, (BooleanOption) option, editable);
         } else if (option instanceof FileOption) {
@@ -172,7 +173,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof PercentageOption) {
             return new PercentageOptionUI(gui, (PercentageOption) option, editable);
         } else if (option instanceof ListOption<?>) {
-            return new ListOptionUI(gui, (ListOption) option, editable);
+            return new ListOptionUI(freeColClient, gui, (ListOption) option, editable);
         } else if (option instanceof RangeOption) {
             return new RangeOptionUI(gui, (RangeOption) option, editable);
         } else if (option instanceof SelectOption) {
@@ -188,7 +189,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof FreeColAction) {
             return new FreeColActionUI(gui, (FreeColAction) option, editable);
         } else if (option instanceof UnitListOption) {
-            return new UnitListOptionUI(gui, (UnitListOption) option, editable);
+            return new UnitListOptionUI(freeColClient, gui, (UnitListOption) option, editable);
         } else {
             return null;
         }

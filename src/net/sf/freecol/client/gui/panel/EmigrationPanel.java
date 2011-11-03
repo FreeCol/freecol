@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
@@ -50,9 +51,10 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
 
     /**
      * The constructor to use.
+     * @param freeColClient 
      */
-    public EmigrationPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public EmigrationPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));

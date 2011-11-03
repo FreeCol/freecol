@@ -19,20 +19,20 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 
 public class InformationDialog extends FreeColDialog<Boolean> {
@@ -45,8 +45,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
      */
-    public InformationDialog(Canvas canvas, String text, ImageIcon image) {
-        this(canvas, new String[] { text }, new ImageIcon[] { image });
+    public InformationDialog(FreeColClient freeColClient, Canvas canvas, String text, ImageIcon image) {
+        this(freeColClient, canvas, new String[] { text }, new ImageIcon[] { image });
     }
 
     /**
@@ -57,8 +57,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
      */
-    public InformationDialog(Canvas parent, String[] texts, ImageIcon[] images) {
-        super(parent.getFreeColClient(), parent);
+    public InformationDialog(FreeColClient freeColClient, Canvas parent, String[] texts, ImageIcon[] images) {
+        super(freeColClient,  parent);
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
         JPanel textPanel = new JPanel();

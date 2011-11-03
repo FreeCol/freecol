@@ -399,7 +399,7 @@ public final class ColonyPanel extends FreeColPanel
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
-                netProductionPanel.add(new ProductionLabel(goodsType, amount, getCanvas()));
+                netProductionPanel.add(new ProductionLabel(getFreeColClient(), goodsType, amount, getCanvas()));
             }
         }
 
@@ -429,7 +429,7 @@ public final class ColonyPanel extends FreeColPanel
                     unload();
                     break;
                 case WAREHOUSE:
-                    if (canvas.showFreeColDialog(new WarehouseDialog(canvas,
+                    if (canvas.showFreeColDialog(new WarehouseDialog(getFreeColClient(), canvas,
                                                                      colony))) {
                         updateWarehousePanel();
                     }
@@ -1015,7 +1015,7 @@ public final class ColonyPanel extends FreeColPanel
         }
 
         public JToolTip createToolTip() {
-            return new RebelToolTip(getColony(), getCanvas());
+            return new RebelToolTip(getFreeColClient(), getColony(), getCanvas());
         }
 
         public void update() {
@@ -1465,7 +1465,7 @@ public final class ColonyPanel extends FreeColPanel
                 ProductionInfo info = colony.getProductionInfo(colonyTile);
                 if (info == null) return;
                 for (AbstractGoods goods : info.getProduction()) {
-                    add(new ProductionLabel(goods, getCanvas()));
+                    add(new ProductionLabel(getFreeColClient(), goods, getCanvas()));
                 }
             }
 

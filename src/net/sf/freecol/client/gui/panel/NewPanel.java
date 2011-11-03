@@ -289,7 +289,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 switch(action) {
                 case SINGLE:
                     OptionGroup level = getCanvas()
-                        .showFreeColDialog(new DifficultyDialog(gui, getCanvas(), getSpecification()));
+                        .showFreeColDialog(new DifficultyDialog(getFreeColClient(), gui, getCanvas(), getSpecification()));
                     Advantages advantages;
                     if (level != null) {
                         getSpecification().applyDifficultyLevel(level);
@@ -310,7 +310,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
                         level = getCanvas()
-                            .showFreeColDialog(new DifficultyDialog(gui, getCanvas(), getSpecification()));
+                            .showFreeColDialog(new DifficultyDialog(getFreeColClient(), gui, getCanvas(), getSpecification()));
                         getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
                         connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),

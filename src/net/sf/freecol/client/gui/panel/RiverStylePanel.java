@@ -28,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -52,10 +53,11 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
     private static final int DELETE = 0;
     /**
      * The constructor that will add the items to this panel. 
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public RiverStylePanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public RiverStylePanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
         setLayout(new BorderLayout());
         
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));

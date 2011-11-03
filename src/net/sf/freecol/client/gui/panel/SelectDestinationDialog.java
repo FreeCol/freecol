@@ -48,6 +48,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -97,9 +98,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     /**
      * The constructor to use.
+     * @param freeColClient 
      */
-    public SelectDestinationDialog(Canvas parent, Unit unit) {
-        super(parent.getFreeColClient(), parent);
+    public SelectDestinationDialog(FreeColClient freeColClient, Canvas parent, Unit unit) {
+        super(freeColClient, parent);
 
         // Collect the goods the unit is carrying.
         final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();

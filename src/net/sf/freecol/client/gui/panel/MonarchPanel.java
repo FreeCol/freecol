@@ -26,13 +26,13 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.StringTemplate;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel is used to show information about a tile.
@@ -47,20 +47,21 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      * @param parent The parent panel.
      * @param action The MonarchAction
      */
-    public MonarchPanel(Canvas parent, MonarchAction action) {
-        this(parent, action, null);
+    public MonarchPanel(FreeColClient freeColClient, Canvas parent, MonarchAction action) {
+        this(freeColClient, parent, action, null);
     }
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent panel.
      * @param action The MonarchAction
      * @param template The StringTemplate to use
      */
-    public MonarchPanel(Canvas parent, MonarchAction action,
+    public MonarchPanel(FreeColClient freeColClient, Canvas parent, MonarchAction action,
                         StringTemplate template) {
-        super(parent.getFreeColClient(), parent);
+        super(freeColClient, parent);
 
         String messageId = "model.monarch.action." + action.toString();
         String yesId = messageId + ".yes";

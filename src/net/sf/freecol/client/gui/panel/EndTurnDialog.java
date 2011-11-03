@@ -42,13 +42,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
 
+import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -93,8 +93,8 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
     /**
      * The constructor to use.
      */
-    public EndTurnDialog(Canvas parent, List<Unit> units) {
-        super(parent.getFreeColClient(), parent);
+    public EndTurnDialog(FreeColClient freeColClient, Canvas parent, List<Unit> units) {
+        super(freeColClient, parent);
 
         setLayout(new MigLayout("wrap 1", "[align center]"));
 

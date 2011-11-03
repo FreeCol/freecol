@@ -264,7 +264,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             GoodsType workType = unit.getWorkType();
             int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
 
-            ProductionLabel pl = new ProductionLabel(workType, production, getCanvas());
+            ProductionLabel pl = new ProductionLabel(freeColClient, workType, production, getCanvas());
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);

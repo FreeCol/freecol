@@ -32,6 +32,7 @@ import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -47,12 +48,13 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
 
     /**
      * Displays the given error message.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      * @param message The error message to display in this error panel.
      */
-    public ErrorPanel(Canvas parent, String message) {
-        super(parent.getFreeColClient(), parent);
+    public ErrorPanel(FreeColClient freeColClient, Canvas parent, String message) {
+        super(freeColClient, parent);
 
         setLayout(new MigLayout());
 
@@ -70,8 +72,8 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      *
      * @param parent The parent of this panel.
      */
-    public ErrorPanel(Canvas parent) {
-        super(parent.getFreeColClient(), parent);
+    public ErrorPanel(FreeColClient freeColClient, Canvas parent) {
+        super(freeColClient, parent);
 
         File logFile = new File(FreeCol.getLogFile());
         byte[] buffer = new byte[(int) logFile.length()];
@@ -111,7 +113,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (SHOW.equals(command)) {
-            getCanvas().showFreeColPanel(new ErrorPanel(getCanvas()));
+            getCanvas().showFreeColPanel(new ErrorPanel(getFreeColClient(), getCanvas()));
         } else {
             super.actionPerformed(event);
         }

@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -39,11 +40,12 @@ public class RebelToolTip extends JToolTip {
 
     /**
      * Creates this RebelToolTip.
+     * @param freeColClient 
      *
      * @param colony the colony for which to display information
      * @param parent a <code>Canvas</code> value
      */
-    public RebelToolTip(Colony colony, Canvas parent) {
+    public RebelToolTip(FreeColClient freeColClient, Colony colony, Canvas parent) {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
@@ -64,7 +66,7 @@ public class RebelToolTip extends JToolTip {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(goodsType, production, parent), "span 2");
+            add(new ProductionLabel(freeColClient, goodsType, production, parent), "span 2");
         }
         int liberty = colony.getLiberty();
         int modulo = liberty % Colony.LIBERTY_PER_REBEL;

@@ -42,6 +42,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -74,6 +75,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
     private JButton[] buttons = new JButton[] {
         editButton, addButton, removeButton, upButton, downButton
     };
+    private FreeColClient freeColClient;
 
 
     /**
@@ -83,7 +85,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
      * @param option
      * @param editable boolean whether user can modify the setting
      */
-    public UnitListOptionUI(final GUI gui, final UnitListOption option, boolean editable) {
+    public UnitListOptionUI(FreeColClient freeColClient, final GUI gui, final UnitListOption option, boolean editable) {
         super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -165,7 +167,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
 
     private boolean showEditDialog(GUI gui, AbstractUnitOption option) {
         final Canvas canvas = gui.getCanvas();
-        final EditDialog editDialog = new EditDialog(gui, canvas, option);
+        final EditDialog editDialog = new EditDialog(freeColClient, gui, canvas, option);
         return canvas.showFreeColDialog(editDialog);
     }
 
@@ -173,8 +175,8 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
 
         private AbstractUnitOptionUI ui;
 
-        public EditDialog(GUI gui, Canvas canvas, AbstractUnitOption option) {
-            super(canvas.getFreeColClient(), canvas);
+        public EditDialog(FreeColClient freeColClient, GUI gui, Canvas canvas, AbstractUnitOption option) {
+            super(freeColClient, canvas);
             setLayout(new MigLayout());
             ui = new AbstractUnitOptionUI(gui, option, true);
             add(ui.getComponent());

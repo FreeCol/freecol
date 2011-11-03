@@ -618,7 +618,7 @@ public final class InGameInputHandler extends InputHandler {
         List<FoundingFather> ffs = message.getFathers();
         Canvas canvas = gui.getCanvas();
         ChooseFoundingFatherDialog dialog
-            = new ChooseFoundingFatherDialog(canvas, ffs);
+            = new ChooseFoundingFatherDialog(getFreeColClient(), canvas, ffs);
         FoundingFather ff = canvas.showFreeColDialog(dialog);
         if (ff != null) {
             message.setResult(ff);
@@ -1950,7 +1950,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected Object doWork() {
             Canvas canvas = gui.getCanvas();
-            boolean choice = canvas.showFreeColDialog(new MonarchPanel(canvas,
+            boolean choice = canvas.showFreeColDialog(new MonarchPanel(getFreeColClient(), canvas,
                     action, replace));
             return Boolean.valueOf(choice);
         }

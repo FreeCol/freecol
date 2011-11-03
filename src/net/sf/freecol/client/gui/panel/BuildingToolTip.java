@@ -79,7 +79,7 @@ public class BuildingToolTip extends JToolTip {
             AbstractGoods production = info.getProduction().get(0);
             AbstractGoods maximumProduction = info.getMaximumProduction().isEmpty()
                 ? production : info.getMaximumProduction().get(0);
-            ProductionLabel productionOutput = new ProductionLabel(production, maximumProduction, parent);
+            ProductionLabel productionOutput = new ProductionLabel(freeColClient, production, maximumProduction, parent);
             if (info.getConsumption().isEmpty()) {
                 add(productionOutput, "span");
             } else {
@@ -87,7 +87,7 @@ public class BuildingToolTip extends JToolTip {
                 if (consumption.getAmount() > 0) {
                     AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
                         ? consumption: info.getMaximumConsumption().get(0);
-                    ProductionLabel productionInput = new ProductionLabel(consumption, maximumConsumption, parent);
+                    ProductionLabel productionInput = new ProductionLabel(freeColClient, consumption, maximumConsumption, parent);
                     add(productionInput, "span, split 3");
                     add(arrow);
                     add(productionOutput);

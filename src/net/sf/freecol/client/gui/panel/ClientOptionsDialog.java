@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.MapControlsAction;
@@ -44,10 +45,11 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ClientOptionsDialog(GUI gui, Canvas parent) {
-        super(gui, parent, true);
+    public ClientOptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent) {
+        super(freeColClient, gui, parent, true);
         getButtons().clear();
         initialize(getClientOptions(), getClientOptions().getName(), null);
     }

@@ -996,7 +996,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
         if (units.size() > 0) {
-            if (!gui.getCanvas().showFreeColDialog(new EndTurnDialog(gui.getCanvas(), units))) {
+            if (!gui.getCanvas().showFreeColDialog(new EndTurnDialog(freeColClient, gui.getCanvas(), units))) {
                 return;
             }
         }

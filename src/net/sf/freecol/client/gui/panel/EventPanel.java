@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -42,13 +43,14 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      * @param type The type of this panel.
      */
-    public EventPanel(Canvas parent, EventType type) {
+    public EventPanel(FreeColClient freeColClient, Canvas parent, EventType type) {
 
-        super(parent.getFreeColClient(), parent);
+        super(freeColClient, parent);
 
         setLayout(new MigLayout("wrap 1", "[center]", "[]20"));
 

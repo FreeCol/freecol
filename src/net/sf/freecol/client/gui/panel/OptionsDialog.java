@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -81,12 +82,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent <code>Canvas</code> The parent of this panel
      * @param editable boolean
      */
-    public OptionsDialog(GUI gui, Canvas parent, boolean editable) {
-        super(parent.getFreeColClient(), parent);
+    public OptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent, boolean editable) {
+        super(freeColClient, parent);
         this.gui = gui;
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
@@ -125,7 +127,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(gui, group, isEditable());
+        ui = new OptionGroupUI(getFreeColClient(), gui, group, isEditable());
         optionPanel = new JPanel() {
             @Override
             public String getUIClassID() {
@@ -178,7 +180,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        ui = new OptionGroupUI(gui, group, isEditable());
+        ui = new OptionGroupUI(getFreeColClient(), gui, group, isEditable());
         optionPanel.add(ui);
         revalidate();
         repaint();

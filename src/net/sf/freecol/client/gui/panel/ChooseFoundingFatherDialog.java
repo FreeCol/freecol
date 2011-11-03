@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
@@ -51,6 +52,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
     /**
      * The constructor that will add the items to this panel.
+     * @param freeColClient 
      *
      * @param parent The parent of this panel.
      * @param possibleFoundingFathers The founding fathers which can
@@ -59,8 +61,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      *        values identifies a <code>FoundingFather</code> to be
      *        picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(Canvas parent, List<FoundingFather> possibleFoundingFathers) {
-        super(parent.getFreeColClient(), parent);
+    public ChooseFoundingFatherDialog(FreeColClient freeColClient, Canvas parent, List<FoundingFather> possibleFoundingFathers) {
+        super(freeColClient, parent);
         this.possibleFathers = possibleFoundingFathers;
         setLayout(new MigLayout("wrap 1", "align center"));
 
