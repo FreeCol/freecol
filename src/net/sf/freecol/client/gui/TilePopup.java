@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -366,6 +367,21 @@ public final class TilePopup extends JPopupMenu {
                 });
             add(addu);
 
+            for (Unit u : tile.getUnitList()) {
+                if (u.getSpaceLeft() > 0) {
+                    final Unit unit = u;
+                    JMenuItem addg = new JMenuItem("Add goods");
+                    addg.setOpaque(false);
+                    addg.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                debugAddGoodsToUnit(serverGame, unit);
+                            }
+                        });
+                    add(addg);
+                    break;
+                }
+            }
+
             JMenuItem dumpItem = new JMenuItem("Dump tile");
             dumpItem.setOpaque(false);
             dumpItem.addActionListener(new ActionListener() {
@@ -621,6 +637,42 @@ public final class TilePopup extends JPopupMenu {
         mapViewer.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
         canvas.refresh();
+    }
+
+    /**
+     * Debug action to add goods to a unit.
+     *
+     * @param serverGame The server <code>Game</code> containing the tile.
+     * @param tile The <code>Unit</code> to add to.
+     */
+    private void debugAddGoodsToUnit(final Game serverGame, Unit unit) {
+        Specification spec = serverGame.getSpecification();
+        List<ChoiceItem<GoodsType>> gtl
+            = new ArrayList<ChoiceItem<GoodsType>>();
+        for (GoodsType t : spec.getGoodsTypeList()) {
+            if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
+            gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
+                                              t));
+        }
+        GoodsType goodsType = gui.getCanvas()
+            .showChoiceDialog(null, "Select Goods Type", "Cancel", gtl);
+        if (goodsType == null) return;
+        String amount = canvas.showInputDialog(null,
+            StringTemplate.name("Select Goods Amount"), "20",
+            "ok", "cancel", true);
+        if (amount == null) return;
+        int a;
+        try {
+            a = Integer.parseInt(amount);
+        } catch (NumberFormatException nfe) {
+            return;
+        }
+        GoodsType sGoodsType = spec.getGoodsType(goodsType.getId());
+        GoodsContainer ugc = unit.getGoodsContainer();
+        GoodsContainer sgc = (GoodsContainer) serverGame
+            .getFreeColGameObject(ugc.getId());
+        ugc.setAmount(goodsType, a);
+        sgc.setAmount(sGoodsType, a);
     }
 
     /**
