@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -595,12 +596,28 @@ public final class TilePopup extends JPopupMenu {
             .getFreeColGameObject(player.getId());
         Tile serverTile = (Tile) serverGame
             .getFreeColGameObject(tile.getId());
-        ServerUnit serverUnit
-            = new ServerUnit(serverGame, serverTile, serverPlayer, unitChoice);
+        Unit carrier = null;
+        if (!serverTile.isLand() && !unitChoice.isNaval()) {
+            for (Unit u : serverTile.getUnitList()) {
+                if (u.isNaval()
+                    && u.getSpaceLeft() >= unitChoice.getSpaceTaken()) {
+                    carrier = u;
+                    break;
+                }
+            }
+        }
+        ServerUnit serverUnit = new ServerUnit(serverGame,
+            (carrier != null) ? carrier : serverTile,
+            serverPlayer, unitChoice);
         serverUnit.setMovesLeft(serverUnit.getInitialMovesLeft());
-        Unit unit = new Unit(freeColClient.getGame(),
-                serverUnit.toXMLElement(DOMMessage.createNewDocument()));
-        tile.add(unit);
+        Game game = freeColClient.getGame();
+        Unit unit = new Unit(game,
+            serverUnit.toXMLElement(DOMMessage.createNewDocument()));
+        if (carrier == null) {
+            tile.add(unit);
+        } else {
+            ((Unit)game.getFreeColGameObject(carrier.getId())).add(unit);
+        }
         mapViewer.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
         canvas.refresh();
