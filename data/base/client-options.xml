@@ -178,6 +178,7 @@
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
       <!-- If enabled: Automatically ends the turn when no units can be made active. -->
       <booleanOption id="model.option.autoEndTurn" defaultValue="false"/>
+      <booleanOption id="model.option.showEndTurnDialog" defaultValue="true"/>
       <selectOption id="model.option.indianDemandResponse" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.indianDemandResponse.ask" value="0"/>
         <selectValue label="clientOptions.indianDemandResponse.accept" value="1"/>

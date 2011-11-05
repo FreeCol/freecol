@@ -989,15 +989,18 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         // Show the end turn dialog, or not.
-        List<Unit> units = new ArrayList<Unit>();
-        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
-            if (unit.couldMove()) {
-                units.add(unit);
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_END_TURN_DIALOG)) {
+            List<Unit> units = new ArrayList<Unit>();
+            for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+                if (unit.couldMove()) {
+                    units.add(unit);
+                }
             }
-        }
-        if (units.size() > 0) {
-            if (!gui.getCanvas().showFreeColDialog(new EndTurnDialog(freeColClient, gui.getCanvas(), units))) {
-                return;
+            if (units.size() > 0) {
+                if (!gui.getCanvas().showFreeColDialog(new EndTurnDialog(freeColClient, gui.getCanvas(), units))) {
+                    return;
+                }
             }
         }
 

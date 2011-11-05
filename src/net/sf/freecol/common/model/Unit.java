@@ -1717,14 +1717,14 @@ public class Unit extends FreeColGameObject
                 && tradeRoute == null
                 && !isUnderRepair()
                 && !isAtSea()
-                && !(isInEurope() && isOnCarrier());            
-        case FORTIFIED: case FORTIFYING: case IN_COLONY: case IMPROVING: 
-        case TO_EUROPE: case TO_AMERICA:
+                && !(isInEurope() && isOnCarrier())
+                // this should never happen anyway, since these units
+                // should have state IN_COLONY, but better safe than
+                // sorry
+                && !(location instanceof WorkLocation);
+        case FORTIFIED: case FORTIFYING: case IN_COLONY: case IMPROVING:
+        case TO_EUROPE: case TO_AMERICA: case SENTRY:
             break;
-        case SENTRY: // Can load a passenger in Europe?
-            return isInEurope()
-                && !isOnCarrier()
-                && getOwner().getEurope().hasCarrierWithSpace(getSpaceTaken());
         default:
             throw new IllegalStateException("Bogus state: " + getState());
         }
@@ -2227,7 +2227,7 @@ public class Unit extends FreeColGameObject
             // ...but that should be unnecessary.
             // end compatibility code
             ;
-    } 
+    }
 
     /**
      * Gets the owner of this Unit.
@@ -2293,7 +2293,7 @@ public class Unit extends FreeColGameObject
         if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
             owner.modifyScore(getType().getScoreValue());
         }
-        
+
         // for speed optimizations
         if(!isOnCarrier()) {
             getOwner().setExplored(this);
@@ -2608,7 +2608,7 @@ public class Unit extends FreeColGameObject
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
         }
-        
+
         // Check for role change for reseting the experience.
         // Soldier and Dragoon are compatible, no loss of experience.
         if (!role.isCompatibleWith(oldRole)) {
@@ -3445,10 +3445,10 @@ public class Unit extends FreeColGameObject
         String ownerId = in.getAttributeValue(null, "owner");
         owner = (Player) getGame().getFreeColGameObject(ownerId);
         if (owner == null) owner = new Player(getGame(), ownerId);
-        
+
         nationality = in.getAttributeValue(null, "nationality");
         ethnicity = in.getAttributeValue(null, "ethnicity");
-        
+
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
         } else {

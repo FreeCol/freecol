@@ -339,6 +339,11 @@ public class ClientOptions extends OptionGroup {
     public static final String AUTO_END_TURN = "model.option.autoEndTurn";
 
     /**
+     * Show EndTurnDialog.
+     */
+    public static final String SHOW_END_TURN_DIALOG = "model.option.showEndTurnDialog";
+
+    /**
      * The type of labour report to display.
      */
     public static final String LABOUR_REPORT = "model.option.labourReport";
