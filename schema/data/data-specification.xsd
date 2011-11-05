@@ -738,6 +738,13 @@
   <xs:element name="unitListOption">
     <xs:complexType>
       <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="template">
+          <xs:complexType>
+            <xs:all>
+              <xs:element ref="unitOption"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="unitOption"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
