@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -50,8 +51,8 @@ public class BuildingToolTip extends JToolTip {
 
     /**
      * Creates this BuildingToolTip.
-     * @param freeColClient 
      *
+     * @param freeColClient
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
@@ -120,6 +121,12 @@ public class BuildingToolTip extends JToolTip {
         int diff = building.getUnitCapacity() - building.getUnitCount();
         for (int index = 0; index < diff; index++) {
             add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
+        }
+
+        int breedingNumber = building.getGoodsOutputType().getBreedingNumber();
+        if (breedingNumber < GoodsType.INFINITY
+            && breedingNumber > building.getColony().getGoodsCount(building.getGoodsOutputType())) {
+            add(new JLabel(Messages.message("colopedia.goods.breedingNumber") + " " + breedingNumber));
         }
 
         setPreferredSize(layout.preferredLayoutSize(this));
