@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -123,10 +124,14 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
         }
 
-        int breedingNumber = building.getGoodsOutputType().getBreedingNumber();
+        GoodsType output = building.getGoodsOutputType();
+        int breedingNumber = output.getBreedingNumber();
         if (breedingNumber < GoodsType.INFINITY
-            && breedingNumber > building.getColony().getGoodsCount(building.getGoodsOutputType())) {
-            add(new JLabel(Messages.message("colopedia.goods.breedingNumber") + " " + breedingNumber));
+            && breedingNumber > building.getColony().getGoodsCount(output)) {
+            StringTemplate t = StringTemplate.template("buildingToolTip.breeding")
+                .addAmount("%number%", breedingNumber)
+                .add("%goods%", output.getNameKey());
+            add(new JLabel(Messages.message(t)));
         }
 
         setPreferredSize(layout.preferredLayoutSize(this));
