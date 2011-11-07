@@ -643,7 +643,7 @@ public final class DragListener extends MouseAdapter {
                     JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
                     pay.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                inGameController.payArrears(goods);
+                                inGameController.payArrears(goods.getType());
                                 if (parentPanel instanceof CargoPanel) {
                                     CargoPanel cargoPanel = (CargoPanel) parentPanel;
                                     cargoPanel.initialize();

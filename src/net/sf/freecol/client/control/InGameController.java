@@ -104,8 +104,657 @@ import net.sf.freecol.server.FreeColServer;
  */
 public final class InGameController implements NetworkConstants {
 
-    // Simple helper container to remember a colony state prior to some
-    // change, and fire off any consequent property changes.
+    private static final Logger logger = Logger.getLogger(InGameController.class.getName());
+
+    private final FreeColClient freeColClient;
+
+    private final short UNIT_LAST_MOVE_DELAY = 300;
+
+    // Selecting next unit depends on mode--- either from the active list,
+    // from the going-to list, or flush going-to and end the turn.
+    private final int MODE_NEXT_ACTIVE_UNIT = 0;
+    private final int MODE_EXECUTE_GOTO_ORDERS = 1;
+    private final int MODE_END_TURN = 2;
+    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
+
+    private int turnsPlayed = 0;
+
+    /** The most recently saved game file, or <b>null</b>. */
+    private File lastSaveGameFile;
+
+    private static FileFilter FSG_FILTER = new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(".fsg");
+            }
+        };
+
+    // A map of messages to be ignored.
+    private HashMap<String, Integer> messagesToIgnore
+        = new HashMap<String, Integer>();
+
+    private GUI gui;
+
+
+    /**
+     * The constructor to use.
+     *
+     * @param freeColClient The main controller.
+     */
+    public InGameController(FreeColClient freeColClient, GUI gui) {
+        this.freeColClient = freeColClient;
+        this.gui = gui;
+        // TODO: fetch value of lastSaveGameFile from a persistent client value
+        // lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
+    }
+
+
+    // Public configuration.
+
+    /**
+     * Informs this controller that a game has been newly loaded.
+     */
+    public void setGameConnected () {
+       turnsPlayed = 0;
+    }
+
+    /**
+     * Sets the "debug mode" to be active or not. Calls
+     * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
+     * <code>FreeColMenuBar</code>.
+     *
+     * @param debug Set to <code>true</code> to enable debug mode.
+     */
+    public void setInDebugMode(boolean debug) {
+        FreeCol.setInDebugMode(debug);
+        logger.info("Debug mode set to " + debug);
+        gui.updateMenuBar();
+    }
+
+
+    // Private utilities
+
+    /**
+     * Meaningfully named access to the ServerAPI.
+     *
+     * @return The ServerAPI.
+     */
+    private ServerAPI askServer() {
+        return freeColClient.askServer();
+    }
+
+    /**
+     * Gets the specification for the current game.
+     *
+     * @return The current game specification.
+     */
+    private Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
+    }
+
+    /**
+     * Require that it is this client's player's turn.
+     * Put up the notYourTurn message if not.
+     *
+     * @return True if it is our turn.
+     */
+    private boolean requireOurTurn() {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            gui.getCanvas().showInformationMessage("notYourTurn");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if an attack results in a transition from peace or cease fire to
+     * war and, if so, warn the player.
+     *
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param target The target <code>Tile</code>.
+     * @return True to attack, false to abort.
+     */
+    private boolean confirmHostileAction(Unit attacker, Tile target) {
+        if (attacker.hasAbility(Ability.PIRACY)) {
+            // Privateers can attack and remain at peace
+            return true;
+        }
+
+        Player enemy;
+        if (target.getSettlement() != null) {
+            enemy = target.getSettlement().getOwner();
+        } else if (target == attacker.getTile()) {
+            // Fortify on tile owned by another nation
+            enemy = target.getOwner();
+            if (enemy == null) return true;
+        } else {
+            Unit defender = target.getDefendingUnit(attacker);
+            if (defender == null) {
+                logger.warning("Attacking, but no defender - will try!");
+                return true;
+            }
+            if (defender.hasAbility(Ability.PIRACY)) {
+                // Privateers can be attacked and remain at peace
+                return true;
+            }
+            enemy = defender.getOwner();
+        }
+
+        String messageID = null;
+        switch (attacker.getOwner().getStance(enemy)) {
+        case WAR:
+            logger.finest("Player at war, no confirmation needed");
+            return true;
+        case UNCONTACTED: case PEACE:
+            messageID = "model.diplomacy.attack.peace";
+            break;
+        case CEASE_FIRE:
+            messageID = "model.diplomacy.attack.ceaseFire";
+            break;
+        case ALLIANCE:
+            messageID = "model.diplomacy.attack.alliance";
+            break;
+        }
+        return gui.getCanvas().showConfirmDialog(attacker.getTile(),
+            StringTemplate.template(messageID)
+            .addStringTemplate("%nation%", enemy.getNationName()),
+            "model.diplomacy.attack.confirm", "cancel");
+    }
+
+    /**
+     * Shows the pre-combat dialog if enabled, allowing the user to
+     * view the odds and possibly cancel the attack.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param tile The target <code>Tile</code>.
+     * @return True to attack, false to abort.
+     */
+    private boolean confirmPreCombat(Unit attacker, Tile tile) {
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
+            Settlement settlement = tile.getSettlement();
+            // Don't tell the player how a settlement is defended!
+            FreeColGameObject defender = (settlement != null) ? settlement
+                : tile.getDefendingUnit(attacker);
+            return gui.getCanvas().showPreCombatDialog(attacker, defender,
+                                                       tile);
+        }
+        return true;
+    }
+
+    /**
+     * Convenience function to find an adjacent settlement.  Intended
+     * to be called in contexts where we are expecting a settlement to
+     * be there, such as when handling a particular move type.
+     *
+     * @param tile The <code>Tile</code> to start at.
+     * @param direction The <code>Direction</code> to step.
+     * @return A settlement on the adjacent tile if any.
+     */
+    private Settlement getSettlementAt(Tile tile, Direction direction) {
+        return tile.getNeighbourOrNull(direction).getSettlement();
+    }
+
+    /**
+     * Convenience function to find the nation controlling an adjacent
+     * settlement.  Intended to be called in contexts where we are
+     * expecting a settlement or unit to be there, such as when
+     * handling a particular move type.
+     *
+     * @param tile The <code>Tile</code> to start at.
+     * @param direction The <code>Direction</code> to step.
+     * @return The name of the nation controlling a settlement on the
+     *         adjacent tile if any.
+     */
+    private StringTemplate getNationAt(Tile tile, Direction direction) {
+        Tile newTile = tile.getNeighbourOrNull(direction);
+        Player player = null;
+        if (newTile.getSettlement() != null) {
+            player = newTile.getSettlement().getOwner();
+        } else if (newTile.getFirstUnit() != null) {
+            player = newTile.getFirstUnit().getOwner();
+        } else { // should not happen
+            player = freeColClient.getGame().getUnknownEnemy();
+        }
+        return player.getNationName();
+    }
+
+
+    // Utilities to handle the transitions between the active unit,
+    // execute-orders and end-turn controller states.
+
+    /**
+     * Actually do the goto orders operation.
+     *
+     * @return True if all goto orders have been performed and no units
+     *     reached their destination and are free to move again.
+     */
+    private boolean doExecuteGotoOrders() {
+        // Ensure the goto mode sticks.
+        if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
+            moveMode = MODE_EXECUTE_GOTO_ORDERS;
+        }
+
+        // Process all units.
+        boolean result = true;
+        Player player = freeColClient.getMyPlayer();
+        MapViewer mapViewer = gui.getMapViewer();
+        while (player.hasNextGoingToUnit()) {
+            Unit unit = player.getNextGoingToUnit();
+            mapViewer.setActiveUnit(unit);
+
+            // Give the player a chance to deal with any problems
+            // shown in a popup before pressing on with more moves.
+            if (gui.getCanvas().isShowingSubPanel()) {
+                gui.getCanvas().getShowingSubPanel().requestFocus();
+                return false;
+            }
+
+            // Move the unit as much as possible
+            if (moveToDestination(unit)) result = false;
+            nextModelMessage();
+        }
+        mapViewer.setActiveUnit(null);
+        return result;
+    }
+
+    /**
+     * Really end the turn.
+     */
+    private void doEndTurn() {
+        // Clear active unit if any.
+        MapViewer mapViewer = gui.getMapViewer();
+        mapViewer.setActiveUnit(null);
+
+        // Unskip all skipped, some may have been faked in-client.
+        // Server-side skipped units are set active in csNewTurn.
+        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+            if (unit.getState() == UnitState.SKIPPED) {
+                unit.setState(UnitState.ACTIVE);
+            }
+        }
+
+        // Restart the selection cycle.
+        moveMode = MODE_NEXT_ACTIVE_UNIT;
+        turnsPlayed++;
+
+        // Inform the server of end of turn.
+        askServer().endTurn();
+    }
+
+
+    // Trade route support.
+
+    /**
+     * Follows a trade route, doing load/unload actions, moving the unit,
+     * and updating the stop and destination.
+     *
+     * @param unit The <code>Unit</code> on the route.
+     * @return True if the unit should keep moving, which can only
+     *     happen if the trade route is found to be broken and the
+     *     unit is thrown off it.
+     */
+    private boolean followTradeRoute(Unit unit) {
+        Player player = unit.getOwner();
+        TradeRoute tr = unit.getTradeRoute();
+        String name = tr.getName();
+        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+        boolean detailed = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
+        List<Stop> stops = tr.getStops();
+        Stop stop;
+        boolean result = false;
+
+        for (;;) {
+            stop = unit.getStop();
+            // Complain and return if the stop is no longer valid.
+            if (!TradeRoute.isStopValid(unit, stop)) {
+                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                        "traderoute.broken", unit)
+                    .addName("%route%", name));
+                clearOrders(unit);
+                result = true;
+                break;
+            }
+
+            // Is the unit at the stop already?
+            boolean atStop;
+            if (stop.getLocation() instanceof Europe) {
+                atStop = unit.isInEurope();
+            } else if (stop.getLocation() instanceof Colony) {
+                atStop = unit.getTile() == stop.getLocation().getTile();
+            } else {
+                throw new IllegalStateException("Bogus stop location: "
+                    + (FreeColGameObject) stop.getLocation());
+            }
+            if (atStop) {
+                // Anything to unload?
+                unloadUnitAtStop(unit, (detailed) ? messages : null);
+
+                // Anything to load?
+                loadUnitAtStop(unit, (detailed) ? messages : null);
+
+                // If the un/load consumed the moves, break now before
+                // updating the stop.  This allows next move to arrive
+                // here again having taken a second shot at
+                // un/loading, but this time should not have consumed
+                // the moves.
+                if (unit.getMovesLeft() <= 0) break;
+
+                // Update the stop.
+                int index = unit.validateCurrentStop();
+                askServer().updateCurrentStop(unit);
+
+                // Check if the server reset this stop as the current one.
+                // This means there is no work to do anywhere in the whole
+                // trade route.  Skip the unit if so.
+                int next = unit.validateCurrentStop();
+                if (next == index) {
+                    Location loc = stop.getLocation();
+                    if (detailed) {
+                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                                "traderoute.noWork", unit)
+                            .addName("%route%", name)
+                            .addStringTemplate("%unit%",
+                                Messages.getLabel(unit))
+                            .addStringTemplate("%location%",
+                                loc.getLocationNameFor(player)));
+                    }
+                    unit.setState(UnitState.SKIPPED);
+                    break;
+                }
+
+                // Check for and notify of missing stops.
+                if (detailed) {
+                    for (;;) {
+                        if (++index >= stops.size()) index = 0;
+                        if (index == next) break;
+                        Location loc = stops.get(index).getLocation();
+                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                                "traderoute.skipStop", unit)
+                            .addName("%route%", name)
+                            .addStringTemplate("%unit%",
+                                Messages.getLabel(unit))
+                            .addStringTemplate("%location%",
+                                loc.getLocationNameFor(player)));
+                    }
+                }
+                continue; // Stop was updated, loop.
+            }
+
+            // Not at stop, give up if no moves left.
+            if (unit.getMovesLeft() <= 0
+                || unit.getState() == UnitState.SKIPPED) {
+                break;
+            }
+
+            // Find a path to the stop.  Skip if none.
+            Location destination = stop.getLocation();
+            PathNode path = (destination instanceof Europe)
+                ? unit.findPathToEurope()
+                : unit.findPath(destination.getTile());
+            if (path == null) {
+                StringTemplate dest = destination.getLocationNameFor(player);
+                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                        "traderoute.noPath", unit)
+                    .addName("%route%", name)
+                    .addStringTemplate("%unit%", Messages.getLabel(unit))
+                    .addStringTemplate("%location%", dest));
+                unit.setState(UnitState.SKIPPED);
+                break;
+            }
+
+            // Try to follow the path.
+            // Ignore the result, check for unload before returning.
+            followPath(unit, path);
+        }
+
+        for (ModelMessage m : messages) player.addModelMessage(m);
+        return result;
+    }
+
+    /**
+     * Work out what goods to load onto a unit at a stop, and load them.
+     *
+     * @param unit The <code>Unit</code> to load.
+     * @param messages An optional list of messages to update.
+     * @return True if goods were loaded.
+     */
+    private boolean loadUnitAtStop(Unit unit, List<ModelMessage> messages) {
+        // Copy the list of goods types to load at this stop.
+        Stop stop = unit.getStop();
+        List<GoodsType> goodsTypesToLoad
+            = new ArrayList<GoodsType>(stop.getCargo());
+        boolean ret = false;
+
+        // First handle partial loads.
+        // For each cargo the unit is already carrying, and which is
+        // not to be unloaded at this stop, check if the cargo is
+        // completely full and if not, try to fill to capacity.
+        Colony colony = unit.getColony();
+        Location loc = (unit.isInEurope()) ? unit.getOwner().getEurope()
+            : colony;
+        Game game = freeColClient.getGame();
+        for (Goods goods : unit.getGoodsList()) {
+            GoodsType type = goods.getType();
+            int index, toLoad;
+            if ((toLoad = GoodsContainer.CARGO_SIZE - goods.getAmount()) > 0
+                && (index = goodsTypesToLoad.indexOf(type)) >= 0) {
+                int present, atStop;
+                if (unit.isInEurope()) {
+                    present = atStop = Integer.MAX_VALUE;
+                } else {
+                    present = colony.getGoodsContainer().getGoodsCount(type);
+                    atStop = colony.getExportAmount(type);
+                }
+                if (atStop > 0) {
+                    Goods cargo = new Goods(game, loc, type,
+                        Math.min(toLoad, atStop));
+                    if (loadGoods(cargo, unit)) {
+                        if (messages != null) {
+                            messages.add(getLoadGoodsMessage(unit, type,
+                                    cargo.getAmount(), present,
+                                    atStop, toLoad));
+                        }
+                        ret = true;
+                    }
+                } else if (present > 0) {
+                    if (messages != null) {
+                        messages.add(getLoadGoodsMessage(unit, type,
+                                0, present, 0, toLoad));
+                    }
+                }
+                // Do not try to load this goods type again.  Either
+                // it has already succeeded, or it can not ever
+                // succeed because there is nothing available.
+                goodsTypesToLoad.remove(index);
+            }
+        }
+
+        // Then fill any remaining empty cargo slots.
+        for (GoodsType type : goodsTypesToLoad) {
+            if (unit.getSpaceLeft() <= 0) break; // Full
+            int toLoad = GoodsContainer.CARGO_SIZE;
+            int present, atStop;
+            if (unit.isInEurope()) {
+                present = atStop = Integer.MAX_VALUE;
+            } else {
+                present = colony.getGoodsContainer().getGoodsCount(type);
+                atStop = colony.getExportAmount(type);
+            }
+            if (atStop > 0) {
+                Goods cargo = new Goods(game, loc, type,
+                    Math.min(toLoad, atStop));
+                if (loadGoods(cargo, unit)) {
+                    if (messages != null) {
+                        messages.add(getLoadGoodsMessage(unit, type,
+                                cargo.getAmount(), present, atStop, toLoad));
+                    }
+                    ret = true;
+                }
+            } else if (present > 0) {
+                if (messages != null) {
+                    messages.add(getLoadGoodsMessage(unit, type,
+                            0, present, 0, toLoad));
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets a message describing a goods loading.
+     *
+     * @param unit The <code>Unit</code> that is loading.
+     * @param type The <code>GoodsType</code> the type of goods being loaded.
+     * @param amount The amount of goods loaded.
+     * @param present The amount of goods already at the location.
+     * @param atStop The amount of goods available to load.
+     * @param toLoad The amount of goods the unit could load.
+     * @return A model message describing the load.
+     */
+    private ModelMessage getLoadGoodsMessage(Unit unit, GoodsType type,
+                                             int amount, int present,
+                                             int atStop, int toLoad) {
+        Player player = unit.getOwner();
+        Location loc = unit.getLocation();
+        String route = unit.getTradeRoute().getName();
+        String key = null;
+        int more = 0;
+
+        if (toLoad < atStop) {
+            key = "traderoute.loadImportLimited";
+            more = atStop - toLoad;
+        } else if (present > atStop && toLoad > atStop) {
+            key = "traderoute.loadExportLimited";
+            more = present - atStop;
+        } else {
+            key = "traderoute.load";
+        }
+        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key, unit)
+            .addName("%route%", route)
+            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addStringTemplate("%location%", loc.getLocationNameFor(player))
+            .addAmount("%amount%", amount)
+            .add("%goods%", type.getNameKey())
+            .addAmount("%more%", more);
+    }
+
+    /**
+     * Work out what goods to unload from a unit at a stop, and unload them.
+     *
+     * @param unit The <code>Unit</code> to unload.
+     * @param messages A list of messages to update.
+     * @return True if something was unloaded.
+     */
+    private boolean unloadUnitAtStop(Unit unit, List<ModelMessage> messages) {
+        Colony colony = unit.getColony();
+        Stop stop = unit.getStop();
+        final List<GoodsType> goodsTypesToLoad = stop.getCargo();
+        boolean ret = false;
+
+        // Unload everything that is on the carrier but not listed to
+        // be loaded at this stop.
+        Game game = freeColClient.getGame();
+        for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
+            GoodsType type = goods.getType();
+            if (goodsTypesToLoad.contains(type)) continue; // Keep this cargo.
+
+            int atStop = (colony == null) ? Integer.MAX_VALUE // Europe
+                : colony.getImportAmount(type);
+            int toUnload = goods.getAmount();
+            if (toUnload > atStop) {
+                String locName = colony.getName();
+                String overflow = Integer.toString(toUnload - atStop);
+                int option = freeColClient.getClientOptions()
+                    .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
+                switch (option) {
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
+                    StringTemplate template
+                        = StringTemplate.template("traderoute.warehouseCapacity")
+                        .addStringTemplate("%unit%", Messages.getLabel(unit))
+                        .addName("%colony%", locName)
+                        .addName("%amount%", overflow)
+                        .add("%goods%", goods.getNameKey());
+                    if (!gui.getCanvas().showConfirmDialog(colony.getTile(), template,
+                            "yes", "no")) {
+                        toUnload = atStop;
+                    }
+                    break;
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:
+                    toUnload = atStop;
+                    break;
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ALWAYS:
+                    break;
+                default:
+                    logger.warning("Illegal UNLOAD_OVERFLOW_RESPONSE: "
+                        + Integer.toString(option));
+                    break;
+                }
+            }
+
+            // Try to unload.
+            Goods cargo = (goods.getAmount() == toUnload) ? goods
+                : new Goods(game, unit, type, toUnload);
+            if (unloadGoods(cargo, unit, colony)) {
+                if (messages != null) {
+                    messages.add(getUnloadGoodsMessage(unit, type,
+                            cargo.getAmount(), atStop, goods.getAmount(),
+                            toUnload));
+                }
+                ret = true;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets a message describing a goods unloading.
+     *
+     * @param unit The <code>Unit</code> that is unloading.
+     * @param type The <code>GoodsType</code> the type of goods being unloaded.
+     * @param amount The amount of goods unloaded.
+     * @param present The amount of goods already carried by the unit.
+     * @param atStop The amount of goods available to unload.
+     * @param toUnload The amount of goods actually unloaded.
+     * @return A model message describing the unload.
+     */
+    private ModelMessage getUnloadGoodsMessage(Unit unit, GoodsType type,
+                                               int amount, int atStop,
+                                               int present, int toUnload) {
+        String key = null;
+        int overflow = 0;
+
+        if (present == toUnload) {
+            key = "traderoute.unload";
+        } else if (toUnload > atStop) {
+            key = "traderoute.overflow";
+            overflow = toUnload - atStop;
+        } else {
+            key = "traderoute.nounload";
+            overflow = present - atStop;
+        }
+
+        StringTemplate loc = unit.getLocation().getLocationNameFor(unit.getOwner());
+        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key,
+            unit)
+            .addName("%route%", unit.getTradeRoute().getName())
+            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addStringTemplate("%location%", loc)
+            .addAmount("%amount%", amount)
+            .addAmount("%overflow%", overflow)
+            .add("%goods%", type.getNameKey());
+    }
+
+    
+    // Property change support.
+
+    /**
+     * Helper container to remember a colony state prior to some
+     * change, and fire off any consequent property changes.
+     */
     private class ColonyWas {
         private Colony colony;
         private int population;
@@ -145,8 +794,10 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    // Simple helper container to remember the Europe state prior to
-    // some change, and fire off any consequent property changes.
+    /**
+     * Helper container to remember the Europe state prior to some
+     * change, and fire off any consequent property changes.
+     */
     private class EuropeWas {
         private Europe europe;
         private int unitCount;
@@ -169,8 +820,10 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    // Simple helper container to remember a unit state prior to some
-    // change, and fire off any consequent property changes.
+    /**
+     * Helper container to remember a unit state prior to some change,
+     * and fire off any consequent property changes.
+     */
     private class UnitWas {
         private Unit unit;
         private UnitType type;
@@ -274,52 +927,513 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    private static final Logger logger = Logger.getLogger(InGameController.class.getName());
-    private final FreeColClient freeColClient;
-    private final short UNIT_LAST_MOVE_DELAY = 300;
 
-    // Selecting next unit depends on mode--- either from the active list,
-    // from the going-to list, or flush going-to and end the turn.
-    private final int MODE_NEXT_ACTIVE_UNIT = 0;
-    private final int MODE_EXECUTE_GOTO_ORDERS = 1;
-
-    private final int MODE_END_TURN = 2;
-
-    private int moveMode = MODE_NEXT_ACTIVE_UNIT;
-
-    private int turnsPlayed = 0;
-
-    /** The most recently saved game file, or <b>null</b>. */
-    private File lastSaveGameFile;
-
-
-    private static FileFilter FSG_FILTER = new FileFilter() {
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(".fsg");
-            }
-        };
+    // Server access routines called from multiple places.
 
     /**
-     * A hash map of messages to be ignored.
-     */
-    private HashMap<String, Integer> messagesToIgnore
-        = new HashMap<String, Integer>();
-
-
-    private GUI gui;
-
-    /**
-     * The constructor to use.
+     * Claim a tile.
      *
-     * @param freeColClient The main controller.
+     * @param player The <code>Player</code> that is claiming.
+     * @param tile The <code>Tile</code> to claim.
+     * @param colony An optional <code>Colony</code> to own the tile.
+     * @param price The price required.
+     * @param offer An offer to pay.
+     * @return True if the claim succeeded.
      */
-    public InGameController(FreeColClient freeColClient, GUI gui) {
-        this.freeColClient = freeColClient;
-        this.gui = gui;
-// TODO: fetch value of lastSaveGameFile from a persistent client value
-//        lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
+    private boolean claimTile(Player player, Tile tile, Colony colony,
+                              int price, int offer) {
+        Player owner = tile.getOwner();
+        if (price < 0) return false; // not for sale
+        if (price > 0) { // for sale by natives
+            if (offer >= price) { // offered more than enough
+                price = offer;
+            } else if (offer < 0) { // plan to steal
+                price = NetworkConstants.STEAL_LAND;
+            } else {
+                boolean canAccept = player.checkGold(price);
+                switch (gui.getCanvas().showClaimDialog(tile, player, price,
+                        owner, canAccept)) {
+                case CANCEL:
+                    return false;
+                case ACCEPT: // accepted price
+                    break;
+                case STEAL:
+                    price = NetworkConstants.STEAL_LAND;
+                    break;
+                default:
+                    throw new IllegalStateException("showClaimDialog fail");
+                }
+            }
+        } // else price == 0 and we can just proceed
+
+        // Ask the server
+        if (askServer().claimLand(tile, colony, price)
+            && tile.getOwner() == player) {
+            gui.updateGoldLabel();
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * Emigrate a unit from Europe.
+     *
+     * @param player The <code>Player</code> that owns the unit.
+     * @param slot The slot to emigrate from.
+     */
+    private void emigrate(Player player, int slot) {
+        Europe europe = player.getEurope();
+        EuropeWas europeWas = new EuropeWas(europe);
+        if (askServer().emigrate(slot)) {
+            europeWas.fireChanges();
+            gui.updateGoldLabel();
+        }
+    }
+
+    /**
+     * Follow a path.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param path The path to follow.
+     * @return True if the unit has completed the path and can move further.
+     */
+    private boolean followPath(Unit unit, PathNode path) {
+        // Traverse the path to the destination.
+        for (; path != null; path = path.next) {
+
+            // Special case for the map edges on maps not
+            // surrounded by high seas.
+            if (unit.getDestination() instanceof Europe
+                && unit.getTile() != null
+                && unit.getTile().canMoveToEurope()) {
+                moveTo(unit, unit.getDestination());
+                return false;
+            }
+
+            if (!moveDirection(unit, path.getDirection(), false)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Load some goods onto a carrier.
+     *
+     * @param goods The <code>Goods</code> to load.
+     * @param carrier The <code>Unit</code> to load onto.
+     * @return True if the load succeeded.
+     */
+    private boolean loadGoods(Goods goods, Unit carrier) {
+        if (carrier.isInEurope() && goods.getLocation() instanceof Europe) {
+            if (!carrier.getOwner().canTrade(goods)) return false;
+            return buyGoods(goods.getType(), goods.getAmount(), carrier);
+        }
+        GoodsType type = goods.getType();
+        GoodsContainer container = carrier.getGoodsContainer();
+        int oldAmount = container.getGoodsCount(type);
+        UnitWas unitWas = new UnitWas(carrier);
+        Colony colony = carrier.getColony();
+        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
+        if (askServer().loadCargo(goods, carrier)
+            && container.getGoodsCount(type) != oldAmount) {
+            if (colonyWas != null) colonyWas.fireChanges();
+            unitWas.fireChanges();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Unload some goods from a carrier.
+     *
+     * @param goods The <code>Goods</code> to unload.
+     * @param carrier The <code>Unit</code> carrying the goods.
+     * @param colony The <code>Colony</code> to unload to,
+     *               or null if unloading in Europe.
+     * @return True if the unload succeeded.
+     */
+    private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
+        if (colony == null && carrier.isInEurope()) {
+            return (!carrier.getOwner().canTrade(goods)) ? false
+                : sellGoods(goods);
+        }
+        GoodsType type = goods.getType();
+        GoodsContainer container = carrier.getGoodsContainer();
+        int oldAmount = container.getGoodsCount(type);
+        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(carrier);
+        if (askServer().unloadCargo(goods)
+            && container.getGoodsCount(type) != oldAmount) {
+            if (colonyWas != null) colonyWas.fireChanges();
+            unitWas.fireChanges();
+            return true;
+        }
+        return false;
+    }
+
+
+    // Utilities connected with saving the game
+
+    /**
+     * Creates at least one autosave game file of the currently played
+     * game in the autosave directory. Does nothing if there is no
+     * game running.
+     *
+     */
+    private void autosave_game () {
+        Game game = freeColClient.getGame();
+        if (game == null) return;
+
+        // unconditional save per round (fix file "last-turn")
+        String autosave_text
+            = Messages.message("clientOptions.savegames.autosave.fileprefix");
+        String filename = autosave_text + "-"
+            + Messages.message("clientOptions.savegames.autosave.lastturn")
+            + ".fsg";
+        String beforeFilename = autosave_text + "-"
+            + Messages.message("clientOptions.savegames.autosave.beforelastturn")
+            + ".fsg";
+        File autosaveDir = FreeCol.getAutosaveDirectory();
+        File saveGameFile = new File(autosaveDir, filename);
+        File beforeSaveFile = new File(autosaveDir, beforeFilename);
+
+        // if "last-turn" file exists, shift it to "before-last-turn" file
+        if (saveGameFile.exists()) {
+           beforeSaveFile.delete();
+           saveGameFile.renameTo(beforeSaveFile);
+        }
+        saveGame(saveGameFile);
+
+        // conditional save after user-set period
+        ClientOptions options = freeColClient.getClientOptions();
+        int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
+        int turnNumber = game.getTurn().getNumber();
+        if (savegamePeriod <= 1
+            || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+            Player player = game.getCurrentPlayer();
+            String playerNation = player == null ? ""
+                : Messages.message(player.getNation().getNameKey());
+            String gid = Integer.toHexString(game.getUUID().hashCode());
+            filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
+                + '-' + gid  + "_" + playerNation
+                + "_" + getSaveGameString(game.getTurn()) + ".fsg";
+            saveGameFile = new File(autosaveDir, filename);
+            saveGame(saveGameFile);
+        }
+    }
+
+    /**
+     * Returns a string representation of the given turn suitable for
+     * savegame files.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "1602_1_Spring", "1503"...
+     */
+    private String getSaveGameString(Turn turn) {
+        int year = turn.getYear();
+        switch (turn.getSeason()) {
+        case SPRING:
+            return Integer.toString(year) + "_1_" + Messages.message("spring");
+        case AUTUMN:
+            return Integer.toString(year) + "_2_" + Messages.message("autumn");
+        case YEAR:
+        default:
+            return Integer.toString(year);
+        }
+    }
+
+    /** 
+     * Gets the most recently saved game file, or <b>null</b>.  (This
+     * may be either from a recent arbitrary user operation or an
+     * autosave function.)
+     *
+     *  @return The recent save game file
+     */
+    public File getLastSaveGameFile() {
+        File lastSave = null;
+        for (File directory : new File[] {
+                FreeCol.getSaveDirectory(), FreeCol.getAutosaveDirectory() }) {
+            for (File savegame : directory.listFiles(FSG_FILTER)) {
+                if (lastSave == null
+                    || savegame.lastModified() > lastSave.lastModified()) {
+                    lastSave = savegame;
+                }
+            }
+        }
+        return lastSave;
+    }
+
+    /**
+     * Opens a dialog where the user should specify the filename and
+     * loads the game.
+     */
+    public void loadGame() {
+        File file = gui.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
+        if (file == null) return;
+        if (!file.isFile()) {
+            gui.errorMessage("fileNotFound");
+            return;
+        }
+        if (freeColClient.isInGame()
+            && !gui.getCanvas().showConfirmDialog("stopCurrentGame.text",
+                "stopCurrentGame.yes", "stopCurrentGame.no")) {
+            return;
+        }
+
+        freeColClient.getConnectController().quitGame(true);
+        gui.getCanvas().removeInGameComponents();
+        freeColClient.getConnectController().loadGame(file);
+    }
+
+    /**
+     * Reloads a game state which was previously saved via
+     * <code>quicksaveGame</code>.
+     *
+     * @return boolean <b>true</b> if and only if a game was loaded
+     */
+    public boolean quickReload () {
+        Game game = freeColClient.getGame();
+        if (game != null) {
+            String gid = Integer.toHexString(game.getUUID().hashCode());
+            String filename = "quicksave-" + gid + ".fsg";
+            File file = new File(FreeCol.getAutosaveDirectory(), filename);
+            if (file.isFile()) {
+                // ask user to confirm reload action
+                boolean ok = true; // canvas.showConfirmDialog(gid, gid, filename);
+                
+                // perform loading game state if answer == ok
+                if (ok) {
+                    freeColClient.getConnectController().quitGame(true);
+                    gui.getCanvas().removeInGameComponents();
+                    freeColClient.getConnectController().loadGame(file);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Opens a dialog where the user should specify the filename and
+     * saves the game.
+     *
+     * @return True if the game was saved.
+     */
+    public boolean saveGame() {
+        Player player = freeColClient.getMyPlayer();
+        Game game = freeColClient.getGame();
+        String gid = Integer.toHexString(game.getUUID().hashCode());
+        String fileName = /* player.getName() + "_" */ gid + "_"
+            + Messages.message(player.getNationName()) + "_"
+            + getSaveGameString(game.getTurn());
+        fileName = fileName.replaceAll(" ", "_");
+
+        if (freeColClient.canSaveCurrentGame()) {
+            final File file
+                = gui.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), fileName);
+            if (file != null) {
+                FreeCol.setSaveDirectory(file.getParentFile());
+                return saveGame(file);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Saves the game to the given file.
+     *
+     * @param file The <code>File</code>.
+     * @return True if the game was saved.
+     */
+    public boolean saveGame(final File file) {
+        FreeColServer server = freeColClient.getFreeColServer();
+        boolean result = false;
+        gui.getCanvas().showStatusPanel(Messages.message("status.savingGame"));
+        try {
+            server.setActiveUnit(gui.getMapViewer().getActiveUnit());
+            server.saveGame(file, freeColClient.getMyPlayer().getName(),
+                freeColClient.getClientOptions());
+            lastSaveGameFile = file;
+            gui.getCanvas().closeStatusPanel();
+            result = true;
+        } catch (IOException e) {
+            gui.errorMessage("couldNotSaveGame");
+        }
+        gui.getCanvas().requestFocusInWindow();
+        return result;
+    }
+
+    /**
+     * Saves the game to a fix-named file in the autosave directory, which may
+     * be used for quick-reload.
+     *
+     * @return boolean <b>true</b> if and only if the game was saved
+     */
+    public boolean quicksaveGame () {
+        Game game = freeColClient.getGame();
+        if (game != null) {
+            String gid = Integer.toHexString(game.getUUID().hashCode());
+            String filename = "quicksave-" + gid + ".fsg";
+            File file = new File(FreeCol.getAutosaveDirectory(), filename);
+            return saveGame(file);
+        }
+        return false;
+    }
+
+
+    // Utilities for message handling.
+
+    /**
+     * Provides an opportunity to filter the messages delivered to the canvas.
+     *
+     * @param message the message that is candidate for delivery to the canvas
+     * @return true if the message should be delivered
+     */
+    private boolean shouldAllowMessage(ModelMessage message) {
+        BooleanOption option = freeColClient.getClientOptions()
+            .getBooleanOption(message);
+        return (option == null) ? true : option.getValue();
+    }
+
+    private synchronized void startIgnoringMessage(String key, int turn) {
+        logger.finer("Ignoring model message with key " + key);
+        messagesToIgnore.put(key, new Integer(turn));
+    }
+
+    private synchronized void stopIgnoringMessage(String key) {
+        logger.finer("Removing model message with key " + key
+            + " from ignored messages.");
+        messagesToIgnore.remove(key);
+    }
+
+    private synchronized Integer getTurnForMessageIgnored(String key) {
+        return messagesToIgnore.get(key);
+    }
+
+    /**
+     * Ignore this ModelMessage from now on until it is not generated
+     * in a turn.
+     *
+     * @param message a <code>ModelMessage</code> value
+     * @param flag whether to ignore the ModelMessage or not
+     */
+    public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
+        String key = message.getSourceId();
+        if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
+            for (String otherkey : message.getKeys()) {
+                if ("%goods%".equals(otherkey)) {
+                    key += otherkey;
+                }
+                break;
+            }
+        }
+        if (flag) {
+            startIgnoringMessage(key,
+                freeColClient.getGame().getTurn().getNumber());
+        } else {
+            stopIgnoringMessage(key);
+        }
+    }
+
+    /**
+     * Displays pending <code>ModelMessage</code>s.
+     *
+     * @param allMessages Display all messages or just the undisplayed ones.
+     */
+    public void displayModelMessages(boolean allMessages) {
+        displayModelMessages(allMessages, false);
+    }
+
+    /**
+     * Displays pending <code>ModelMessage</code>s.
+     *
+     * @param allMessages Display all messages or just the undisplayed ones.
+     * @param endOfTurn Use a turn report panel if necessary.
+     */
+    public void displayModelMessages(final boolean allMessages,
+                                     final boolean endOfTurn) {
+        Player player = freeColClient.getMyPlayer();
+        int thisTurn = freeColClient.getGame().getTurn().getNumber();
+        final ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+
+        for (ModelMessage m : ((allMessages) ? player.getModelMessages()
+                : player.getNewModelMessages())) {
+            if (shouldAllowMessage(m)) {
+                if (m.getMessageType() == MessageType.WAREHOUSE_CAPACITY) {
+                    String key = m.getSourceId();
+                    switch (m.getTemplateType()) {
+                    case TEMPLATE:
+                        for (String otherkey : m.getKeys()) {
+                            if ("%goods%".equals(otherkey)) {
+                                key += otherkey;
+                                break;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+
+                    Integer turn = getTurnForMessageIgnored(key);
+                    if (turn != null && turn.intValue() == thisTurn - 1) {
+                        startIgnoringMessage(key, thisTurn);
+                        m.setBeenDisplayed(true);
+                        continue;
+                    }
+                }
+                messages.add(m);
+            }
+
+            // flag all messages delivered as "beenDisplayed".
+            m.setBeenDisplayed(true);
+        }
+
+        for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
+            if (entry.getValue().intValue() < thisTurn - 1) {
+                if (logger.isLoggable(Level.FINER)) {
+                    logger.finer("Removing old model message with key "
+                        + entry.getKey() + " from ignored messages.");
+                }
+                stopIgnoringMessage(entry.getKey());
+            }
+        }
+
+        if (messages.size() > 0) {
+            final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
+            Runnable uiTask = new Runnable() {
+                    public void run() {
+                        if (endOfTurn) {
+                            gui.getCanvas().showReportTurnPanel(a);
+                        } else {
+                            gui.getCanvas().showModelMessages(a);
+                        }
+                    }
+                };
+            freeColClient.getActionManager().update();
+            if (SwingUtilities.isEventDispatchThread()) {
+                uiTask.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(uiTask);
+                } catch (InterruptedException e) {
+                    logger.log(Level.WARNING, "Message display", e);
+                } catch (InvocationTargetException e) {
+                    logger.log(Level.WARNING, "Message display", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Displays the next <code>ModelMessage</code>.
+     */
+    public void nextModelMessage() {
+        displayModelMessages(false);
+    }
+
+
+    // All the routines from here on are called from actions.
+    // They (usually) then make requests to the server.
 
     /**
      * Abandon a colony with no units.
@@ -345,15 +1459,6 @@ public final class InGameController implements NetworkConstants {
             mapViewer.setActiveUnit(null);
             mapViewer.setSelectedTile(tile, false);
         }
-    }
-
-    /**
-     * Meaningfully named access to the ServerAPI.
-     *
-     * @return The ServerAPI.
-     */
-    public ServerAPI askServer() {
-        return freeColClient.askServer();
     }
 
     /**
@@ -453,7 +1558,6 @@ public final class InGameController implements NetworkConstants {
         return false;
     }
 
-
     /**
      * Use the active unit to build a colony.
      */
@@ -488,7 +1592,7 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
-            && !showColonyWarnings(tile, unit)) {
+            && !buildColonyShowWarnings(tile, unit)) {
             return;
         }
 
@@ -536,6 +1640,119 @@ public final class InGameController implements NetworkConstants {
             }
         }
     }
+
+    /**
+     * A colony is proposed to be built.  Show warnings if this has
+     * disadvantages.
+     *
+     * @param tile The <code>Tile</code> on which the colony is to be built.
+     * @param unit The <code>Unit</code> which is to build the colony.
+     */
+    private boolean buildColonyShowWarnings(Tile tile, Unit unit) {
+        boolean landLocked = true;
+        boolean ownedByEuropeans = false;
+        boolean ownedBySelf = false;
+        boolean ownedByIndians = false;
+
+        java.util.Map<GoodsType, Integer> goodsMap
+            = new HashMap<GoodsType, Integer>();
+        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+            if (goodsType.isFoodType()) {
+                int potential = 0;
+                if (tile.getType().isPrimaryGoodsType(goodsType)) {
+                    potential = tile.potential(goodsType, null);
+                }
+                goodsMap.put(goodsType, new Integer(potential));
+            } else if (goodsType.isBuildingMaterial()) {
+                while (goodsType.isRefined()) {
+                    goodsType = goodsType.getRawMaterial();
+                }
+                int potential = 0;
+                if (tile.getType().isSecondaryGoodsType(goodsType)) {
+                    potential = tile.potential(goodsType, null);
+                }
+                goodsMap.put(goodsType, new Integer(potential));
+            }
+        }
+
+        for (Tile newTile: tile.getSurroundingTiles(1)) {
+            if (!newTile.isLand()) {
+                landLocked = false;
+            }
+            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                entry.setValue(entry.getValue().intValue()
+                    + newTile.potential(entry.getKey(), null));
+            }
+            Player tileOwner = newTile.getOwner();
+            if (tileOwner == unit.getOwner()) {
+                if (newTile.getOwningSettlement() != null) {
+                    // we are using newTile
+                    ownedBySelf = true;
+                } else {
+                    for (Tile ownTile: newTile.getSurroundingTiles(1)) {
+                        Colony colony = ownTile.getColony();
+                        if (colony != null
+                            && colony.getOwner() == unit.getOwner()) {
+                            // newTile can be used from an own colony
+                            ownedBySelf = true;
+                            break;
+                        }
+                    }
+                }
+            } else if (tileOwner != null && tileOwner.isEuropean()) {
+                ownedByEuropeans = true;
+            } else if (tileOwner != null) {
+                ownedByIndians = true;
+            }
+        }
+
+        int food = 0;
+        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+            if (entry.getKey().isFoodType()) {
+                food += entry.getValue().intValue();
+            }
+        }
+
+        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+        if (landLocked) {
+            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                    "buildColony.landLocked", unit,
+                    getSpecification().getGoodsType("model.goods.fish")));
+        }
+        if (food < 8) {
+            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                    "buildColony.noFood", unit,
+                    getSpecification().getPrimaryFoodType()));
+        }
+        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+            if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
+                messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                        "buildColony.noBuildingMaterials",
+                        unit, entry.getKey())
+                    .add("%goods%", entry.getKey().getNameKey()));
+            }
+        }
+
+        if (ownedBySelf) {
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                    "buildColony.ownLand", unit));
+        }
+        if (ownedByEuropeans) {
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                    "buildColony.EuropeanLand", unit));
+        }
+        if (ownedByIndians) {
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                    "buildColony.IndianLand", unit));
+        }
+
+        if (messages.isEmpty()) return true;
+        ModelMessage[] modelMessages
+            = messages.toArray(new ModelMessage[messages.size()]);
+        return gui.getCanvas().showConfirmDialog(unit.getTile(),
+            modelMessages, "buildColony.yes", "buildColony.no");
+    }
+
 
     /**
      * Buy goods in Europe.
@@ -640,7 +1857,6 @@ public final class InGameController implements NetworkConstants {
             }
         }
     }
-
 
     /**
      * Changes the work type of this <code>Unit</code>.
@@ -827,7 +2043,6 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Declares independence for the home country.
-     *
      */
     public void declareIndependence() {
         if (!requireOurTurn()) return;
@@ -880,7 +2095,8 @@ public final class InGameController implements NetworkConstants {
         MapViewer mapViewer = gui.getMapViewer();
         Unit unit = mapViewer.getActiveUnit();
         if (unit == null) return;
-        Tile tile = (gui.getCanvas().isShowingSubPanel()) ? null : unit.getTile();
+        Tile tile = (gui.getCanvas().isShowingSubPanel()) ? null
+            : unit.getTile();
         if (!gui.getCanvas().showConfirmDialog(tile,
                 StringTemplate.key("disbandUnit.text"),
                 "disbandUnit.yes", "disbandUnit.no")) {
@@ -890,95 +2106,6 @@ public final class InGameController implements NetworkConstants {
         // Try to disband
         if (askServer().disbandUnit(unit)) {
             nextActiveUnit();
-        }
-    }
-
-    /**
-     * Displays pending <code>ModelMessage</code>s.
-     *
-     * @param allMessages Display all messages or just the undisplayed ones.
-     */
-    public void displayModelMessages(boolean allMessages) {
-        displayModelMessages(allMessages, false);
-    }
-
-    /**
-     * Displays pending <code>ModelMessage</code>s.
-     *
-     * @param allMessages Display all messages or just the undisplayed ones.
-     * @param endOfTurn Use a turn report panel if necessary.
-     */
-    public void displayModelMessages(final boolean allMessages,
-                                     final boolean endOfTurn) {
-        Player player = freeColClient.getMyPlayer();
-        int thisTurn = freeColClient.getGame().getTurn().getNumber();
-        final ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
-
-        for (ModelMessage m : ((allMessages) ? player.getModelMessages()
-                : player.getNewModelMessages())) {
-            if (shouldAllowMessage(m)) {
-                if (m.getMessageType() == MessageType.WAREHOUSE_CAPACITY) {
-                    String key = m.getSourceId();
-                    switch (m.getTemplateType()) {
-                    case TEMPLATE:
-                        for (String otherkey : m.getKeys()) {
-                            if ("%goods%".equals(otherkey)) {
-                                key += otherkey;
-                                break;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-
-                    Integer turn = getTurnForMessageIgnored(key);
-                    if (turn != null && turn.intValue() == thisTurn - 1) {
-                        startIgnoringMessage(key, thisTurn);
-                        m.setBeenDisplayed(true);
-                        continue;
-                    }
-                }
-                messages.add(m);
-            }
-
-            // flag all messages delivered as "beenDisplayed".
-            m.setBeenDisplayed(true);
-        }
-
-        for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
-            if (entry.getValue().intValue() < thisTurn - 1) {
-                if (logger.isLoggable(Level.FINER)) {
-                    logger.finer("Removing old model message with key "
-                        + entry.getKey() + " from ignored messages.");
-                }
-                stopIgnoringMessage(entry.getKey());
-            }
-        }
-
-        if (messages.size() > 0) {
-            final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
-            Runnable uiTask = new Runnable() {
-                    public void run() {
-                        if (endOfTurn) {
-                            gui.getCanvas().showReportTurnPanel(a);
-                        } else {
-                            gui.getCanvas().showModelMessages(a);
-                        }
-                    }
-                };
-            freeColClient.getActionManager().update();
-            if (SwingUtilities.isEventDispatchThread()) {
-                uiTask.run();
-            } else {
-                try {
-                    SwingUtilities.invokeAndWait(uiTask);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Message display", e);
-                } catch (InvocationTargetException e) {
-                    logger.log(Level.WARNING, "Message display", e);
-                }
-            }
         }
     }
 
@@ -998,9 +2125,9 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if (units.size() > 0) {
-                if (!gui.getCanvas().showFreeColDialog(new EndTurnDialog(freeColClient, gui.getCanvas(), units))) {
-                    return;
-                }
+                EndTurnDialog dialog
+                    = new EndTurnDialog(freeColClient, gui.getCanvas(), units);
+                if (!gui.getCanvas().showFreeColDialog(dialog)) return;
             }
         }
 
@@ -1070,10 +2197,6 @@ public final class InGameController implements NetworkConstants {
         return freeColClient.getGame().getStatistics(null);
     }
 
-
-    // Public user actions that may require interactive confirmation
-    // before requesting an update from the server.
-
     /**
      * Retrieves high scores from server.
      *
@@ -1081,27 +2204,6 @@ public final class InGameController implements NetworkConstants {
      */
     public List<HighScore> getHighScores() {
         return askServer().getHighScores();
-    }
-
-    /** Returns the most recently saved game file, or <b>null</b>.
-     *  (This may be either from a recent arbitrary user operation or an
-     *  autosave function.)
-     *
-     *  @return File recent save game file
-     */
-    public File getLastSaveGameFile () {
-        File lastSave = null;
-        for (File directory : new File[] {
-                FreeCol.getSaveDirectory(), FreeCol.getAutosaveDirectory() }) {
-            for (File savegame : directory.listFiles(FSG_FILTER)) {
-                if (lastSave == null
-                    || savegame.lastModified() > lastSave.lastModified()) {
-                    lastSave = savegame;
-                }
-            }
-        }
-
-       return lastSave;
     }
 
     /**
@@ -1141,36 +2243,12 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Retrieves server statistics.
+     * Retrieves the server statistics.
      *
      * @return A <code>Map</code> containing the server statistics.
      */
     public java.util.Map<String, String> getServerStatistics() {
         return askServer().getStatistics();
-    }
-
-    /**
-     * Ignore this ModelMessage from now on until it is not generated in a turn.
-     *
-     * @param message a <code>ModelMessage</code> value
-     * @param flag whether to ignore the ModelMessage or not
-     */
-    public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
-        String key = message.getSourceId();
-        if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
-            for (String otherkey : message.getKeys()) {
-                if ("%goods%".equals(otherkey)) {
-                    key += otherkey;
-                }
-                break;
-            }
-        }
-        if (flag) {
-            startIgnoringMessage(key,
-                freeColClient.getGame().getTurn().getNumber());
-        } else {
-            stopIgnoringMessage(key);
-        }
     }
 
     /**
@@ -1232,64 +2310,8 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Opens a dialog where the user should specify the filename and
-     * loads the game.
-     */
-    public void loadGame() {
-        File file = gui.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
-        if (file == null) return;
-        if (!file.isFile()) {
-            gui.errorMessage("fileNotFound");
-            return;
-        }
-        if (freeColClient.isInGame()
-            && !gui.getCanvas().showConfirmDialog("stopCurrentGame.text",
-                "stopCurrentGame.yes", "stopCurrentGame.no")) {
-            return;
-        }
-
-        freeColClient.getConnectController().quitGame(true);
-        gui.getCanvas().removeInGameComponents();
-        freeColClient.getConnectController().loadGame(file);
-    }
-
-    /**
-     * Moves the specified unit in a specified direction. This may
-     * result in many different types of action.
-     *
-     * @param unit The <code>Unit</code> to be moved.
-     * @param direction The direction in which to move the unit.
-     */
-    public void move(Unit unit, Direction direction) {
-        if (!requireOurTurn()) return;
-
-        moveDirection(unit, direction, true);
-
-        // TODO: check if this is necessary for all actions?
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    freeColClient.getActionManager().update();
-                    gui.updateMenuBar();
-                }
-            });
-    }
-
-    /**
-     * Moves the active unit in a specified direction. This may result in an
-     * attack, move... action.
-     *
-     * @param direction The direction in which to move the active unit.
-     */
-    public void moveActiveUnit(Direction direction) {
-        Unit unit = gui.getMapViewer().getActiveUnit();
-        if (unit != null && requireOurTurn()) {
-            clearGotoOrders(unit);
-            move(unit, direction);
-        } // else: nothing: There is no active unit that can be moved.
-    }
-
-    /**
      * Moves the specified unit somewhere that requires crossing the high seas.
+     * Public because this is called from the TilePopup and the Europe panel.
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param destination The <code>Location</code> to be moved to.
@@ -1341,6 +2363,41 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Moves the active unit in a specified direction. This may result in an
+     * attack, move... action.
+     *
+     * @param direction The direction in which to move the active unit.
+     */
+    public void moveActiveUnit(Direction direction) {
+        Unit unit = gui.getMapViewer().getActiveUnit();
+        if (unit != null && requireOurTurn()) {
+            clearGotoOrders(unit);
+            move(unit, direction);
+        } // else: nothing: There is no active unit that can be moved.
+    }
+
+    /**
+     * Moves the specified unit in a specified direction. This may
+     * result in many different types of action.
+     *
+     * @param unit The <code>Unit</code> to be moved.
+     * @param direction The direction in which to move the unit.
+     */
+    public void move(Unit unit, Direction direction) {
+        if (!requireOurTurn()) return;
+
+        moveDirection(unit, direction, true);
+
+        // TODO: check if this is necessary for all actions?
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    freeColClient.getActionManager().update();
+                    gui.updateMenuBar();
+                }
+            });
+    }
+
+    /**
      * Moves the given unit towards its destination/s if possible.
      *
      * @param unit The <code>Unit</code> to move.
@@ -1349,7 +2406,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean moveToDestination(Unit unit) {
         if (!requireOurTurn()) return false;
-        if (unit.getTradeRoute() != null) return moveTradeRoute(unit);
+        if (unit.getTradeRoute() != null) return followTradeRoute(unit);
         MapViewer mapViewer = gui.getMapViewer();
         mapViewer.setActiveUnit(unit);
         Player player = freeColClient.getMyPlayer();
@@ -1385,7 +2442,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Try to follow the path.
-            if (!movePath(unit, path)) break;
+            if (!followPath(unit, path)) break;
         }
 
         // Clear ordinary destinations if arrived.
@@ -1412,1391 +2469,6 @@ public final class InGameController implements NetworkConstants {
             }
         }
         return false;
-    }
-
-    /**
-     * Moves the specified unit to Europe.
-     *
-     * @param unit The <code>Unit</code> to be moved to Europe.
-     */
-    public void moveToEurope(Unit unit) {
-        if (!requireOurTurn()) return;
-
-        if (!unit.canMoveToEurope()) {
-            gui.playSound("sound.event.illegalMove");
-            return;
-        }
-
-        if (askServer().moveTo(unit, unit.getOwner().getEurope())) {
-            nextActiveUnit();
-        }
-    }
-
-    /**
-     * Makes a new unit active.
-     */
-    public void nextActiveUnit() {
-        nextActiveUnit(null);
-    }
-
-    /**
-     * Makes a new unit active if any, or focus on a tile (useful if the
-     * current unit just died).
-     * Displays any new <code>ModelMessage</code>s with
-     * {@link #nextModelMessage}.
-     *
-     * @param tile The <code>Tile</code> to select if no new unit can
-     *             be made active.
-     */
-    public void nextActiveUnit(Tile tile) {
-        if (!requireOurTurn()) return;
-
-        // Always flush outstanding messages first.
-        nextModelMessage();
-        //if (canvas.isShowingSubPanel()) {
-        //    canvas.getShowingSubPanel().requestFocus();
-        //    return;
-        //}
-
-        // Flush any outstanding orders once the mode is raised.
-        if (moveMode >= MODE_EXECUTE_GOTO_ORDERS
-            && !doExecuteGotoOrders()) {
-            return;
-        }
-
-        // Look for active units.
-        Player player = freeColClient.getMyPlayer();
-        MapViewer mapViewer = gui.getMapViewer();
-        Unit unit = mapViewer.getActiveUnit();
-        if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
-            && unit.getState() != UnitState.SKIPPED) {
-            return; // Current active unit has more moves to do.
-        }
-        if (player.hasNextActiveUnit()) {
-            mapViewer.setActiveUnit(player.getNextActiveUnit());
-            return; // Successfully found a unit to display
-        }
-
-        // No active units left.  Do the goto orders.
-        if (!doExecuteGotoOrders()) return;
-
-        // If not already ending the turn, use the fallback tile if
-        // supplied, then check for automatic end of turn, otherwise
-        // just select nothing and wait.
-        mapViewer.setActiveUnit(null);
-        ClientOptions options = freeColClient.getClientOptions();
-        if (moveMode >= MODE_END_TURN) {
-            endTurn();
-        } else if (tile != null) {
-            mapViewer.setSelectedTile(tile, false);
-        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
-            endTurn();
-        }
-    }
-
-    /**
-     * Displays the next <code>ModelMessage</code>.
-     */
-    public void nextModelMessage() {
-        displayModelMessages(false);
-    }
-
-    /**
-     * Pays the tax arrears on this type of goods.
-     *
-     * @param goods The goods for which to pay arrears.
-     * @return True if the arrears were paid.
-     */
-    public boolean payArrears(Goods goods) {
-        return payArrears(goods.getType());
-    }
-
-    /**
-     * Pays the tax arrears on this type of goods.
-     *
-     * @param type The type of goods for which to pay arrears.
-     * @return True if the arrears were paid.
-     */
-    public boolean payArrears(GoodsType type) {
-        if (!requireOurTurn()) return false;
-
-        Player player = freeColClient.getMyPlayer();
-        int arrears = player.getArrears(type);
-        if (arrears <= 0) return false;
-        if (!player.checkGold(arrears)) {
-            gui.getCanvas().showInformationMessage(StringTemplate.template("model.europe.cantPayArrears")
-                .addAmount("%amount%", arrears));
-            return false;
-        }
-        if (gui.getCanvas().showConfirmDialog(null,
-                StringTemplate.template("model.europe.payArrears")
-                .addAmount("%amount%", arrears),
-                "ok", "cancel")
-            && askServer().payArrears(type)
-            && player.canTrade(type)) {
-            gui.updateGoldLabel();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Buys the remaining hammers and tools for the {@link Building} currently
-     * being built in the given <code>Colony</code>.
-     *
-     * @param colony The {@link Colony} where the building should be bought.
-     */
-    public void payForBuilding(Colony colony) {
-        if (!requireOurTurn()) return;
-
-        if (!colony.canPayToFinishBuilding()) {
-            gui.errorMessage("notEnoughGold");
-            return;
-        }
-        int price = colony.getPriceForBuilding();
-        if (!gui.getCanvas().showConfirmDialog(null,
-                StringTemplate.template("payForBuilding.text")
-                .addAmount("%amount%", price),
-                "payForBuilding.yes", "payForBuilding.no")) {
-            return;
-        }
-
-        ColonyWas colonyWas = new ColonyWas(colony);
-        if (askServer().payForBuilding(colony)
-            && colony.getPriceForBuilding() == 0) {
-            colonyWas.fireChanges();
-            gui.updateGoldLabel();
-        }
-    }
-
-    /**
-     * Puts the specified unit outside the colony.
-     *
-     * @param unit The <code>Unit</code>
-     * @return <i>true</i> if the unit was successfully put outside the colony.
-     */
-    public boolean putOutsideColony(Unit unit) {
-        if (!requireOurTurn()) return false;
-
-        Colony colony = unit.getColony();
-        if (colony == null) {
-            throw new IllegalStateException("Unit is not in colony.");
-        } else if (!colony.canReducePopulation()) {
-            return false;
-        }
-
-        ColonyWas colonyWas = new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit);
-        if (askServer().putOutsideColony(unit)) {
-            colonyWas.fireChanges();
-            unitWas.fireChanges();
-            return true;
-        }
-        return false;
-    }
-
-    /** Reloads a game state which was previously saved via <code>quicksaveGame</code>.
-     *
-     * @return boolean <b>true</b> if and only if a game was loaded
-     */
-    public boolean quickReload () {
-       Game game = freeColClient.getGame();
-       if (game != null) {
-          String gid = Integer.toHexString(game.getUUID().hashCode());
-          String filename = "quicksave-" + gid + ".fsg";
-          File file = new File(FreeCol.getAutosaveDirectory(), filename);
-          if (file.isFile()) {
-             // ask user to confirm reload action
-             boolean ok = true; // canvas.showConfirmDialog(gid, gid, filename);
-
-             // perform loading game state if answer == ok
-             if (ok) {
-                freeColClient.getConnectController().quitGame(true);
-                gui.getCanvas().removeInGameComponents();
-                freeColClient.getConnectController().loadGame(file);
-                return true;
-             }
-          }
-       }
-       return false;
-    }
-
-    /**
-     * Saves the game to a fix-named file in the autosave directory, which may
-     * be used for quick-reload.
-     *
-     * @return boolean <b>true</b> if and only if the game was saved
-     */
-    public boolean quicksaveGame () {
-       Game game = freeColClient.getGame();
-       if (game != null) {
-          String gid = Integer.toHexString(game.getUUID().hashCode());
-          String filename = "quicksave-" + gid + ".fsg";
-          File file = new File(FreeCol.getAutosaveDirectory(), filename);
-          return saveGame(file);
-       }
-       return false;
-    }
-
-    /**
-     * Recruit a unit from a specified index in Europe.
-     *
-     * @param index The index in Europe to recruit from ([0..2]).
-     */
-    public void recruitUnitInEurope(int index) {
-        if (!requireOurTurn()) return;
-
-        Player player = freeColClient.getMyPlayer();
-        if (!player.checkGold(player.getRecruitPrice())) {
-            gui.errorMessage("notEnoughGold");
-            return;
-        }
-
-        emigrate(player, index + 1);
-    }
-
-    /**
-     * Renames a <code>Nameable</code>.
-     * Apparently this can be done while it is not your turn.
-     *
-     * @param object The object to rename.
-     */
-    public void rename(Nameable object) {
-        Player player = freeColClient.getMyPlayer();
-        if (!(object instanceof Ownable)
-            || ((Ownable) object).getOwner() != player) {
-            return;
-        }
-
-        String name = null;
-        if (object instanceof Colony) {
-            Colony colony = (Colony) object;
-            name = gui.getCanvas().showInputDialog(colony.getTile(),
-                StringTemplate.key("renameColony.text"), colony.getName(),
-                "renameColony.yes", "renameColony.no", true);
-            if (name == null) {
-                // User cancelled, 0-length invalid.
-                return;
-            } else if (colony.getName().equals(name)) {
-                // No change
-                return;
-            } else if (player.getSettlement(name) != null) {
-                // Colony name must be unique.
-                gui.getCanvas().showInformationMessage((Colony) object,
-                    StringTemplate.template("nameColony.notUnique")
-                    .addName("%name%", name));
-                return;
-            }
-        } else if (object instanceof Unit) {
-            Unit unit = (Unit) object;
-            name = gui.getCanvas().showInputDialog(unit.getTile(),
-                StringTemplate.key("renameUnit.text"), unit.getName(),
-                "renameUnit.yes", "renameUnit.no", false);
-            if (name == null) return; // User cancelled, 0-length clears name.
-        } else {
-            logger.warning("Tried to rename an unsupported Nameable: "
-                + object.toString());
-            return;
-        }
-
-        askServer().rename((FreeColGameObject) object, name);
-    }
-
-    /**
-     * Opens a dialog where the user should specify the filename and
-     * saves the game.
-     *
-     * @return True if the game was saved.
-     */
-    public boolean saveGame() {
-        Player player = freeColClient.getMyPlayer();
-        Game game = freeColClient.getGame();
-        String gid = Integer.toHexString(game.getUUID().hashCode());
-        String fileName = /* player.getName() + "_" */ gid + "_"
-            + Messages.message(player.getNationName()) + "_"
-            + getSaveGameString(game.getTurn());
-        fileName = fileName.replaceAll(" ", "_");
-
-        if (freeColClient.canSaveCurrentGame()) {
-            final File file
-                = gui.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), fileName);
-            if (file != null) {
-                FreeCol.setSaveDirectory(file.getParentFile());
-                return saveGame(file);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Saves the game to the given file.
-     *
-     * @param file The <code>File</code>.
-     * @return True if the game was saved.
-     */
-    public boolean saveGame(final File file) {
-        FreeColServer server = freeColClient.getFreeColServer();
-        boolean result = false;
-        gui.getCanvas().showStatusPanel(Messages.message("status.savingGame"));
-        try {
-            server.setActiveUnit(gui.getMapViewer().getActiveUnit());
-            server.saveGame(file, freeColClient.getMyPlayer().getName(),
-                freeColClient.getClientOptions());
-            lastSaveGameFile = file;
-            gui.getCanvas().closeStatusPanel();
-            result = true;
-        } catch (IOException e) {
-            gui.errorMessage("couldNotSaveGame");
-        }
-        gui.getCanvas().requestFocusInWindow();
-        return result;
-    }
-
-    /**
-     * Selects a destination for this unit. Europe and the player's
-     * colonies are valid destinations.
-     *
-     * @param unit The unit for which to select a destination.
-     */
-    public void selectDestination(Unit unit) {
-        Location destination = gui.getCanvas().showSelectDestinationDialog(unit);
-        if (destination == null) return; // user aborted
-
-        if (setDestination(unit, destination)
-            && freeColClient.getGame().getCurrentPlayer()
-                == freeColClient.getMyPlayer()) {
-            if (destination instanceof Europe) {
-                if (unit.getTile() != null
-                    && unit.getTile().canMoveToEurope()) {
-                    moveTo(unit, destination);
-                } else {
-                    moveToDestination(unit);
-                }
-            } else {
-                if (unit.isInEurope()) {
-                    moveTo(unit, destination);
-                } else {
-                    moveToDestination(unit);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sells goods in Europe.
-     *
-     * @param goods The goods to be sold.
-     * @return True if the sale succeeds.
-     */
-    public boolean sellGoods(Goods goods) {
-        if (!requireOurTurn()) return false;
-
-        // Sanity checks.
-        Player player = freeColClient.getMyPlayer();
-        if (goods == null) {
-            throw new NullPointerException("Goods must not be null.");
-        }
-        Unit carrier = null;
-        if (goods.getLocation() instanceof Unit) {
-            carrier = (Unit) goods.getLocation();
-        }
-        if (carrier == null) {
-            throw new IllegalStateException("Goods not on carrier.");
-        } else if (!carrier.isInEurope()) {
-            throw new IllegalStateException("Goods not on carrier in Europe.");
-        } else if (!player.canTrade(goods)) {
-            throw new IllegalStateException("Goods are boycotted.");
-        }
-
-        // Try to sell.  Remember a bunch of stuff first so the transaction
-        // can be logged.
-        Market market = player.getMarket();
-        GoodsType type = goods.getType();
-        int amount = goods.getAmount();
-        int price = market.getPaidForSale(type);
-        int tax = player.getTax();
-        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        UnitWas unitWas = new UnitWas(carrier);
-        if (askServer().sellGoods(goods, carrier)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            gui.playSound("sound.event.sellCargo");
-            unitWas.fireChanges();
-            for (TransactionListener l : market.getTransactionListener()) {
-                l.logSale(type, amount, price, tax);
-            }
-            gui.updateGoldLabel();
-            return true;
-        }
-
-        // Sale failed for some reason.
-        return false;
-    }
-
-    /**
-     * Sends a public chat message.
-     *
-     * @param chat The text of the message.
-     */
-    public void sendChat(String chat) {
-        askServer().chat(chat);
-    }
-
-    /**
-     * Changes the current construction project of a <code>Colony</code>.
-     *
-     * @param colony The <code>Colony</code>
-     * @param buildQueue List of <code>BuildableType</code>
-     */
-    public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
-        if (!requireOurTurn()) return;
-
-        ColonyWas colonyWas = new ColonyWas(colony);
-        if (askServer().setBuildQueue(colony, buildQueue)) {
-            colonyWas.fireChanges();
-        }
-    }
-
-    /**
-     * Set a player to be the new current player.
-     *
-     * @param player The <code>Player</code> to be the new current player.
-     */
-    public void setCurrentPlayer(Player player) {
-        logger.finest("Entering client setCurrentPlayer: " + player.getName());
-        Game game = freeColClient.getGame();
-        game.setCurrentPlayer(player);
-
-        if (freeColClient.getMyPlayer().equals(player)
-            && freeColClient.getFreeColServer() != null) {
-
-           // auto-save the game (if it isn't newly loaded)
-           if ( turnsPlayed > 0 ) {
-              autosave_game();
-           }
-
-           player.invalidateCanSeeTiles();
-
-           // Check for emigration.
-           if (player.checkEmigrate()) {
-                if (player.hasAbility("model.ability.selectRecruit")
-                    && player.getEurope().recruitablesDiffer()) {
-                    int index = gui.getCanvas().showEmigrationPanel(false);
-                    emigrate(player, index + 1);
-                } else {
-                    emigrate(player, 0);
-                }
-           }
-
-           // GUI management.
-           if (!freeColClient.isSingleplayer()) {
-               gui.playSound("sound.anthem." + player.getNationID());
-           }
-           displayModelMessages(true, true);
-        }
-        logger.finest("Exiting client setCurrentPlayer: " + player.getName());
-    }
-
-    /**
-     * Set the destination of the given unit.
-     *
-     * @param unit The <code>Unit</code> to direct.
-     * @param destination The destination <code>Location</code>.
-     * @return True if the destination was set.
-     * @see Unit#setDestination(Location)
-     */
-    public boolean setDestination(Unit unit, Location destination) {
-        if (unit.getTradeRoute() != null) {
-            StringTemplate template
-                = StringTemplate.template("traderoute.reassignRoute")
-                .addStringTemplate("%unit%", Messages.getLabel(unit))
-                .addName("%route%", unit.getTradeRoute().getName());
-            if (!gui.getCanvas().showConfirmDialog(unit.getTile(), template,
-                    "yes", "no")) return false;
-        }
-        return askServer().setDestination(unit, destination)
-            && unit.getDestination() == destination;
-    }
-
-    /**
-     * Informs this controller that a game has been newly loaded.
-     */
-    public void setGameConnected () {
-       turnsPlayed = 0;
-    }
-
-    /**
-     * Sets the export settings of the custom house.
-     *
-     * @param colony The colony with the custom house.
-     * @param goodsType The goods for which to set the settings.
-     */
-    public void setGoodsLevels(Colony colony, GoodsType goodsType) {
-        askServer().setGoodsLevels(colony,
-            colony.getExportData(goodsType));
-    }
-
-    /**
-     * Sets the "debug mode" to be active or not. Calls
-     * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
-     * <code>FreeColMenuBar</code>.
-     *
-     * @param debug Set to <code>true</code> to enable debug mode.
-     */
-    public void setInDebugMode(boolean debug) {
-        FreeCol.setInDebugMode(debug);
-        logger.info("Debug mode set to " + debug);
-        gui.updateMenuBar();
-    }
-
-    /**
-     * Sets the trade routes for this player
-     *
-     * @param routes The trade routes to set.
-     */
-    public void setTradeRoutes(List<TradeRoute> routes) {
-        askServer().setTradeRoutes(routes);
-    }
-
-    // End of move-consequents
-
-
-    /**
-     * Skip a unit.
-     */
-    public void skipActiveUnit() {
-        changeState(gui.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
-    }
-
-    /**
-     * Trains a unit of a specified type in Europe.
-     *
-     * @param unitType The type of unit to be trained.
-     */
-    public void trainUnitInEurope(UnitType unitType) {
-        if (!requireOurTurn()) return;
-
-        Player player = freeColClient.getMyPlayer();
-        Europe europe = player.getEurope();
-        if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            gui.errorMessage("notEnoughGold");
-            return;
-        }
-
-        EuropeWas europeWas = new EuropeWas(europe);
-        if (askServer().trainUnitInEurope(unitType)) {
-            gui.updateGoldLabel();
-            europeWas.fireChanges();
-        }
-    }
-
-    /**
-     * Unload, including dumping cargo.
-     *
-     * @param unit The <code>Unit<code> that is dumping.
-     */
-    public void unload(Unit unit) {
-        if (!requireOurTurn()) return;
-
-        // Sanity tests.
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (!unit.isCarrier()) {
-            throw new IllegalArgumentException("Unit is not a carrier.");
-        }
-
-        Player player = freeColClient.getMyPlayer();
-        boolean inEurope = unit.isInEurope();
-        if (unit.getColony() != null) {
-            // In colony, unload units and goods.
-            for (Unit u : unit.getUnitList()) {
-                leaveShip(u);
-            }
-            for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
-                unloadCargo(goods, false);
-            }
-        } else {
-            if (inEurope) { // In Europe, unload non-boycotted goods
-                for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
-                    if (player.canTrade(goods)) unloadCargo(goods, false);
-                }
-            }
-            // Goods left here must be dumped.
-            if (unit.getGoodsCount() > 0) {
-                List<Goods> goodsList
-                    = gui.getCanvas().showDumpCargoDialog(unit);
-                if (goodsList != null) {
-                    for (Goods goods : goodsList) {
-                        unloadCargo(goods, true);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Unload cargo. If the unit carrying the cargo is not in a
-     * harbour, or if the given boolean is true, the goods will be
-     * dumped.
-     *
-     * @param goods The <code>Goods<code> to unload.
-     * @param dump If true, dump the goods.
-     */
-    public void unloadCargo(Goods goods, boolean dump) {
-        if (!requireOurTurn()) return;
-
-        // Sanity tests.
-        if (goods == null) {
-            throw new IllegalArgumentException("Null goods.");
-        } else if (goods.getAmount() <= 0) {
-            throw new IllegalArgumentException("Empty goods.");
-        }
-        Unit carrier = null;
-        if (!(goods.getLocation() instanceof Unit)) {
-            throw new IllegalArgumentException("Unload from non-unit.");
-        }
-        carrier = (Unit) goods.getLocation();
-        Colony colony = null;
-        if (!carrier.isInEurope()) {
-            if (carrier.getTile() == null) {
-                throw new IllegalArgumentException("Carrier with null location.");
-            }
-            colony = carrier.getColony();
-            if (!dump && colony == null) {
-                throw new IllegalArgumentException("Unload is really a dump.");
-            }
-        }
-
-        // Try to unload.  TODO: should there be a sound for this?
-        unloadGoods(goods, carrier, colony);
-    }
-
-    /**
-     * Updates a trade route.
-     *
-     * @param route The trade route to update.
-     */
-    public void updateTradeRoute(TradeRoute route) {
-        askServer().updateTradeRoute(route);
-    }
-
-    /**
-     * Tell a unit to wait.
-     */
-    public void waitActiveUnit() {
-        MapViewer mapViewer = gui.getMapViewer();
-        mapViewer.setActiveUnit(null);
-        nextActiveUnit();
-    }
-
-    /**
-     * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
-     *
-     * @param unit The <code>Unit</code>.
-     * @param workLocation The <code>WorkLocation</code>.
-     */
-    public void work(Unit unit, WorkLocation workLocation) {
-        if (!requireOurTurn()) return;
-
-        Colony colony = workLocation.getColony();
-        if (workLocation instanceof ColonyTile) {
-            Tile tile = ((ColonyTile) workLocation).getWorkTile();
-            if (tile.hasLostCityRumour()) {
-                gui.getCanvas()
-                    .showInformationMessage("tileHasRumour");
-                return;
-            }
-            if (tile.getOwner() != unit.getOwner()) {
-                if (!claimLand(tile, colony, 0)) return;
-            }
-        }
-
-        // Try to change the work location.
-        ColonyWas colonyWas = new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit);
-        if (askServer().work(unit, workLocation)
-            && unit.getLocation() == workLocation) {
-            colonyWas.fireChanges();
-            unitWas.fireChanges();
-        }
-    }
-
-    /**
-     * Attack.
-     *
-     * @param unit The <code>Unit</code> to perform the attack.
-     * @param direction The direction in which to attack.
-     */
-    private void attack(Unit unit, Direction direction) {
-        Unit defender = unit.getTile().getNeighbourOrNull(direction)
-            .getDefendingUnit(unit);
-        if (askServer().attack(unit, direction)) {
-            gui.getCanvas().refresh();
-            nextActiveUnit();
-        }
-    }
-
-    /**
-     * User interaction for buying from the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     */
-    private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
-        Player player = freeColClient.getMyPlayer();
-        Goods goods = null;
-
-        // Get list of goods for sale
-        List<Goods> forSale
-            = askServer().getGoodsForSaleInSettlement(unit, settlement);
-        for (;;) {
-            if (forSale.isEmpty()) {
-                // There is nothing to sell to the player
-                gui.getCanvas().showInformationMessage(settlement,
-                    "trade.nothingToSell");
-                return;
-            }
-
-            // Choose goods to buy
-            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
-                "buyProposition.text", "buyProposition.nothing", forSale);
-            if (goods == null) break; // Trade aborted by the player
-
-            int gold = -1; // Initially ask for a price
-            for (;;) {
-                gold = askServer().buyProposition(unit, settlement,
-                    goods, gold);
-                if (gold == NO_TRADE) { // Proposal was refused
-                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
-                    return;
-                } else if (gold < 0) {
-                    return; // Server fail
-                }
-
-                // Show dialog for buy proposal
-                boolean canBuy = player.checkGold(gold);
-                switch (gui.getCanvas().showBuyDialog(unit, settlement, goods, gold,
-                        canBuy)) {
-                case CANCEL: // User cancelled
-                    return;
-                case BUY: // Accept price, make purchase
-                    if (askServer().buyFromSettlement(unit,
-                            settlement, goods, gold)) {
-                        gui.updateGoldLabel(); // Assume success
-                    }
-                    return;
-                case HAGGLE: // Try to negotiate a lower price
-                    gold = gold * 9 / 10;
-                    break;
-                default:
-                    throw new IllegalStateException("showBuyDialog fail");
-                }
-            }
-        }
-    }
-
-    /**
-     * User interaction for delivering a gift to the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     */
-    private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
-        Goods goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
-            "gift.text", "cancel", unit.getGoodsList());
-        if (goods != null) {
-            askServer().deliverGiftToSettlement(unit, settlement, goods);
-        }
-    }
-
-    /**
-     * User interaction for selling to the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     */
-    private void attemptSellToSettlement(Unit unit, Settlement settlement) {
-        Goods goods = null;
-        for (;;) {
-            // Choose goods to sell
-            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
-                "sellProposition.text", "sellProposition.nothing",
-                unit.getGoodsList());
-            if (goods == null) break; // Trade aborted by the player
-
-            int gold = -1; // Initially ask for a price
-            for (;;) {
-                gold = askServer().sellProposition(unit, settlement,
-                    goods, gold);
-
-                if (gold == NO_NEED_FOR_THE_GOODS) {
-                    gui.getCanvas().showInformationMessage(settlement,
-                        StringTemplate.template("trade.noNeedForTheGoods")
-                        .add("%goods%", goods.getNameKey()));
-                    return;
-                } else if (gold == NO_TRADE) {
-                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
-                    return;
-                }
-
-                // Show dialog for sale proposal
-                switch (gui.getCanvas().showSellDialog(unit, settlement, goods, gold)) {
-                case CANCEL:
-                    return;
-                case SELL: // Accepted price, make the sale
-                    if (askServer().sellToSettlement(unit,
-                            settlement, goods, gold)) {
-                        gui.updateGoldLabel(); // Assume success
-                    }
-                    return;
-                case HAGGLE: // Ask for more money
-                    gold = (gold * 11) / 10;
-                    break;
-                case GIFT: // Decide to make a gift of the goods
-                    askServer().deliverGiftToSettlement(unit,
-                        settlement, goods);
-                    return;
-                default:
-                    throw new IllegalStateException("showSellDialog fail");
-                }
-            }
-        }
-    }
-
-    /**
-     * Creates at least one autosave game file of the currently played
-     * game in the autosave directory. Does nothing if there is no
-     * game running.
-     *
-     */
-    private void autosave_game () {
-        Game game = freeColClient.getGame();
-        if (game == null) return;
-
-        // unconditional save per round (fix file "last-turn")
-        String autosave_text
-            = Messages.message("clientOptions.savegames.autosave.fileprefix");
-        String filename = autosave_text + "-"
-            + Messages.message("clientOptions.savegames.autosave.lastturn")
-            + ".fsg";
-        String beforeFilename = autosave_text + "-"
-            + Messages.message("clientOptions.savegames.autosave.beforelastturn")
-            + ".fsg";
-        File autosaveDir = FreeCol.getAutosaveDirectory();
-        File saveGameFile = new File(autosaveDir, filename);
-        File beforeSaveFile = new File(autosaveDir, beforeFilename);
-
-        // if "last-turn" file exists, shift it to "before-last-turn" file
-        if (saveGameFile.exists()) {
-           beforeSaveFile.delete();
-           saveGameFile.renameTo(beforeSaveFile);
-        }
-        saveGame(saveGameFile);
-
-        // conditional save after user-set period
-        ClientOptions options = freeColClient.getClientOptions();
-        int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
-        int turnNumber = game.getTurn().getNumber();
-        if (savegamePeriod <= 1
-            || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-            Player player = game.getCurrentPlayer();
-            String playerNation = player == null ? ""
-                : Messages.message(player.getNation().getNameKey());
-            String gid = Integer.toHexString(game.getUUID().hashCode());
-            filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                + '-' + gid  + "_" + playerNation
-                + "_" + getSaveGameString(game.getTurn()) + ".fsg";
-            saveGameFile = new File(autosaveDir, filename);
-            saveGame(saveGameFile);
-        }
-    }
-
-    /**
-     * Claim a tile.
-     *
-     * @param player The <code>Player</code> that is claiming.
-     * @param tile The <code>Tile</code> to claim.
-     * @param colony An optional <code>Colony</code> to own the tile.
-     * @param price The price required.
-     * @param offer An offer to pay.
-     * @return True if the claim succeeded.
-     */
-    private boolean claimTile(Player player, Tile tile, Colony colony,
-                              int price, int offer) {
-        Player owner = tile.getOwner();
-        if (price < 0) return false; // not for sale
-        if (price > 0) { // for sale by natives
-            if (offer >= price) { // offered more than enough
-                price = offer;
-            } else if (offer < 0) { // plan to steal
-                price = NetworkConstants.STEAL_LAND;
-            } else {
-                boolean canAccept = player.checkGold(price);
-                switch (gui.getCanvas().showClaimDialog(tile, player, price,
-                        owner, canAccept)) {
-                case CANCEL:
-                    return false;
-                case ACCEPT: // accepted price
-                    break;
-                case STEAL:
-                    price = NetworkConstants.STEAL_LAND;
-                    break;
-                default:
-                    throw new IllegalStateException("showClaimDialog fail");
-                }
-            }
-        } // else price == 0 and we can just proceed
-
-        // Ask the server
-        if (askServer().claimLand(tile, colony, price)
-            && tile.getOwner() == player) {
-            gui.updateGoldLabel();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if an attack results in a transition from peace or cease fire to
-     * war and, if so, warn the player.
-     *
-     * @param attacker The potential attacking <code>Unit</code>.
-     * @param target The target <code>Tile</code>.
-     * @return True to attack, false to abort.
-     */
-    private boolean confirmHostileAction(Unit attacker, Tile target) {
-        if (attacker.hasAbility(Ability.PIRACY)) {
-            // Privateers can attack and remain at peace
-            return true;
-        }
-
-        Player enemy;
-        if (target.getSettlement() != null) {
-            enemy = target.getSettlement().getOwner();
-        } else if (target == attacker.getTile()) {
-            // Fortify on tile owned by another nation
-            enemy = target.getOwner();
-            if (enemy == null) return true;
-        } else {
-            Unit defender = target.getDefendingUnit(attacker);
-            if (defender == null) {
-                logger.warning("Attacking, but no defender - will try!");
-                return true;
-            }
-            if (defender.hasAbility(Ability.PIRACY)) {
-                // Privateers can be attacked and remain at peace
-                return true;
-            }
-            enemy = defender.getOwner();
-        }
-
-        String messageID = null;
-        switch (attacker.getOwner().getStance(enemy)) {
-        case WAR:
-            logger.finest("Player at war, no confirmation needed");
-            return true;
-        case UNCONTACTED: case PEACE:
-            messageID = "model.diplomacy.attack.peace";
-            break;
-        case CEASE_FIRE:
-            messageID = "model.diplomacy.attack.ceaseFire";
-            break;
-        case ALLIANCE:
-            messageID = "model.diplomacy.attack.alliance";
-            break;
-        }
-        return gui.getCanvas().showConfirmDialog(attacker.getTile(),
-            StringTemplate.template(messageID)
-            .addStringTemplate("%nation%", enemy.getNationName()),
-            "model.diplomacy.attack.confirm", "cancel");
-    }
-
-    /**
-     * If the client options include a pre-combat dialog, allow the
-     * user to view the odds and possibly cancel the attack.
-     *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param tile The target <code>Tile</code>.
-     * @return True to attack, false to abort.
-     */
-    private boolean confirmPreCombat(Unit attacker, Tile tile) {
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
-            Settlement settlement = tile.getSettlement();
-            // Don't tell the player how a settlement is defended!
-            FreeColGameObject defender = (settlement != null) ? settlement
-                : tile.getDefendingUnit(attacker);
-            return gui.getCanvas().showPreCombatDialog(attacker, defender, tile);
-        }
-        return true;
-    }
-
-    /**
-     * Really end the turn.
-     */
-    private void doEndTurn() {
-        // Clear active unit if any.
-        MapViewer mapViewer = gui.getMapViewer();
-        mapViewer.setActiveUnit(null);
-
-        // Unskip all skipped, some may have been faked in-client.
-        // Server-side skipped units are set active in csNewTurn.
-        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
-            if (unit.getState() == UnitState.SKIPPED) {
-                unit.setState(UnitState.ACTIVE);
-            }
-        }
-
-        // Restart the selection cycle.
-        moveMode = MODE_NEXT_ACTIVE_UNIT;
-        turnsPlayed++;
-
-        // Inform the server of end of turn.
-        askServer().endTurn();
-    }
-
-    /**
-     * Actually do the goto orders operation.
-     *
-     * @return True if all goto orders have been performed and no units
-     *     reached their destination and are free to move again.
-     */
-    private boolean doExecuteGotoOrders() {
-        // Ensure the goto mode sticks.
-        if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
-            moveMode = MODE_EXECUTE_GOTO_ORDERS;
-        }
-
-        // Process all units.
-        boolean result = true;
-        Player player = freeColClient.getMyPlayer();
-        MapViewer mapViewer = gui.getMapViewer();
-        while (player.hasNextGoingToUnit()) {
-            Unit unit = player.getNextGoingToUnit();
-            mapViewer.setActiveUnit(unit);
-
-            // Give the player a chance to deal with any problems
-            // shown in a popup before pressing on with more moves.
-            if (gui.getCanvas().isShowingSubPanel()) {
-                gui.getCanvas().getShowingSubPanel().requestFocus();
-                return false;
-            }
-
-            // Move the unit as much as possible
-            if (moveToDestination(unit)) result = false;
-            nextModelMessage();
-        }
-        mapViewer.setActiveUnit(null);
-        return result;
-    }
-
-    /**
-     * Emigrate a unit from Europe.
-     *
-     * @param player The <code>Player</code> that owns the unit.
-     * @param slot The slot to emigrate from.
-     */
-    private void emigrate(Player player, int slot) {
-        Europe europe = player.getEurope();
-        EuropeWas europeWas = new EuropeWas(europe);
-        if (askServer().emigrate(slot)) {
-            europeWas.fireChanges();
-            gui.updateGoldLabel();
-        }
-    }
-
-    /**
-     * Gets a message describing a goods loading.
-     *
-     * @param unit The <code>Unit</code> that is loading.
-     * @param type The <code>GoodsType</code> the type of goods being loaded.
-     * @param amount The amount of goods loaded.
-     * @param present The amount of goods already at the location.
-     * @param atStop The amount of goods available to load.
-     * @param toLoad The amount of goods the unit could load.
-     * @return A model message describing the load.
-     */
-    private ModelMessage getLoadGoodsMessage(Unit unit, GoodsType type,
-                                             int amount, int present,
-                                             int atStop, int toLoad) {
-        Player player = unit.getOwner();
-        Location loc = unit.getLocation();
-        String route = unit.getTradeRoute().getName();
-        String key = null;
-        int more = 0;
-
-        if (toLoad < atStop) {
-            key = "traderoute.loadImportLimited";
-            more = atStop - toLoad;
-        } else if (present > atStop && toLoad > atStop) {
-            key = "traderoute.loadExportLimited";
-            more = present - atStop;
-        } else {
-            key = "traderoute.load";
-        }
-        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key, unit)
-            .addName("%route%", route)
-            .addStringTemplate("%unit%", Messages.getLabel(unit))
-            .addStringTemplate("%location%", loc.getLocationNameFor(player))
-            .addAmount("%amount%", amount)
-            .add("%goods%", type.getNameKey())
-            .addAmount("%more%", more);
-    }
-
-    /**
-     * Convenience function to find the nation controlling an adjacent
-     * settlement.  Intended to be called in contexts where we are
-     * expecting a settlement or unit to be there, such as when
-     * handling a particular move type.
-     *
-     * @param tile The <code>Tile</code> to start at.
-     * @param direction The <code>Direction</code> to step.
-     * @return The name of the nation controlling a settlement on the
-     *         adjacent tile if any.
-     */
-    private StringTemplate getNationAt(Tile tile, Direction direction) {
-        Tile newTile = tile.getNeighbourOrNull(direction);
-        Player player = null;
-        if (newTile.getSettlement() != null) {
-            player = newTile.getSettlement().getOwner();
-        } else if (newTile.getFirstUnit() != null) {
-            player = newTile.getFirstUnit().getOwner();
-        } else { // should not happen
-            player = freeColClient.getGame().getUnknownEnemy();
-        }
-        return player.getNationName();
-    }
-
-    /**
-     * Returns a string representation of the given turn suitable for
-     * savegame files.
-     *
-     * @param turn a <code>Turn</code> value
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "1602_1_Spring", "1503"...
-     */
-    private String getSaveGameString(Turn turn) {
-        int year = turn.getYear();
-        switch (turn.getSeason()) {
-        case SPRING:
-            return Integer.toString(year) + "_1_" + Messages.message("spring");
-        case AUTUMN:
-            return Integer.toString(year) + "_2_" + Messages.message("autumn");
-        case YEAR:
-        default:
-            return Integer.toString(year);
-        }
-    }
-
-    /**
-     * Convenience function to find an adjacent settlement.  Intended
-     * to be called in contexts where we are expecting a settlement to
-     * be there, such as when handling a particular move type.
-     *
-     * @param tile The <code>Tile</code> to start at.
-     * @param direction The <code>Direction</code> to step.
-     * @return A settlement on the adjacent tile if any.
-     */
-    private Settlement getSettlementAt(Tile tile, Direction direction) {
-        return tile.getNeighbourOrNull(direction).getSettlement();
-    }
-
-    private Specification getSpecification() {
-        return freeColClient.getGame().getSpecification();
-    }
-
-    private synchronized Integer getTurnForMessageIgnored(String key) {
-        return messagesToIgnore.get(key);
-    }
-
-    /**
-     * Gets a message describing a goods unloading.
-     *
-     * @param unit The <code>Unit</code> that is unloading.
-     * @param type The <code>GoodsType</code> the type of goods being unloaded.
-     * @param amount The amount of goods unloaded.
-     * @param present The amount of goods already carried by the unit.
-     * @param atStop The amount of goods available to unload.
-     * @param toUnload The amount of goods actually unloaded.
-     * @return A model message describing the unload.
-     */
-    private ModelMessage getUnloadGoodsMessage(Unit unit, GoodsType type,
-                                               int amount, int atStop,
-                                               int present, int toUnload) {
-        String key = null;
-        int overflow = 0;
-
-        if (present == toUnload) {
-            key = "traderoute.unload";
-        } else if (toUnload > atStop) {
-            key = "traderoute.overflow";
-            overflow = toUnload - atStop;
-        } else {
-            key = "traderoute.nounload";
-            overflow = present - atStop;
-        }
-
-        StringTemplate loc = unit.getLocation().getLocationNameFor(unit.getOwner());
-        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key,
-            unit)
-            .addName("%route%", unit.getTradeRoute().getName())
-            .addStringTemplate("%unit%", Messages.getLabel(unit))
-            .addStringTemplate("%location%", loc)
-            .addAmount("%amount%", amount)
-            .addAmount("%overflow%", overflow)
-            .add("%goods%", type.getNameKey());
-    }
-
-    /**
-     * Load some goods onto a carrier.
-     *
-     * @param goods The <code>Goods</code> to load.
-     * @param carrier The <code>Unit</code> to load onto.
-     * @return True if the load succeeded.
-     */
-    private boolean loadGoods(Goods goods, Unit carrier) {
-        if (carrier.isInEurope() && goods.getLocation() instanceof Europe) {
-            if (!carrier.getOwner().canTrade(goods)) return false;
-            return buyGoods(goods.getType(), goods.getAmount(), carrier);
-        }
-        GoodsType type = goods.getType();
-        GoodsContainer container = carrier.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
-        UnitWas unitWas = new UnitWas(carrier);
-        Colony colony = carrier.getColony();
-        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        if (askServer().loadCargo(goods, carrier)
-            && container.getGoodsCount(type) != oldAmount) {
-            if (colonyWas != null) colonyWas.fireChanges();
-            unitWas.fireChanges();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Work out what goods to load onto a unit at a stop, and load them.
-     *
-     * @param unit The <code>Unit</code> to load.
-     * @param messages An optional list of messages to update.
-     * @return True if goods were loaded.
-     */
-    private boolean loadUnitAtStop(Unit unit, List<ModelMessage> messages) {
-        // Copy the list of goods types to load at this stop.
-        Stop stop = unit.getStop();
-        List<GoodsType> goodsTypesToLoad
-            = new ArrayList<GoodsType>(stop.getCargo());
-        boolean ret = false;
-
-        // First handle partial loads.
-        // For each cargo the unit is already carrying, and which is
-        // not to be unloaded at this stop, check if the cargo is
-        // completely full and if not, try to fill to capacity.
-        Colony colony = unit.getColony();
-        Location loc = (unit.isInEurope()) ? unit.getOwner().getEurope()
-            : colony;
-        Game game = freeColClient.getGame();
-        for (Goods goods : unit.getGoodsList()) {
-            GoodsType type = goods.getType();
-            int index, toLoad;
-            if ((toLoad = GoodsContainer.CARGO_SIZE - goods.getAmount()) > 0
-                && (index = goodsTypesToLoad.indexOf(type)) >= 0) {
-                int present, atStop;
-                if (unit.isInEurope()) {
-                    present = atStop = Integer.MAX_VALUE;
-                } else {
-                    present = colony.getGoodsContainer().getGoodsCount(type);
-                    atStop = colony.getExportAmount(type);
-                }
-                if (atStop > 0) {
-                    Goods cargo = new Goods(game, loc, type,
-                        Math.min(toLoad, atStop));
-                    if (loadGoods(cargo, unit)) {
-                        if (messages != null) {
-                            messages.add(getLoadGoodsMessage(unit, type,
-                                    cargo.getAmount(), present,
-                                    atStop, toLoad));
-                        }
-                        ret = true;
-                    }
-                } else if (present > 0) {
-                    if (messages != null) {
-                        messages.add(getLoadGoodsMessage(unit, type,
-                                0, present, 0, toLoad));
-                    }
-                }
-                // Do not try to load this goods type again.  Either
-                // it has already succeeded, or it can not ever
-                // succeed because there is nothing available.
-                goodsTypesToLoad.remove(index);
-            }
-        }
-
-        // Then fill any remaining empty cargo slots.
-        for (GoodsType type : goodsTypesToLoad) {
-            if (unit.getSpaceLeft() <= 0) break; // Full
-            int toLoad = GoodsContainer.CARGO_SIZE;
-            int present, atStop;
-            if (unit.isInEurope()) {
-                present = atStop = Integer.MAX_VALUE;
-            } else {
-                present = colony.getGoodsContainer().getGoodsCount(type);
-                atStop = colony.getExportAmount(type);
-            }
-            if (atStop > 0) {
-                Goods cargo = new Goods(game, loc, type,
-                    Math.min(toLoad, atStop));
-                if (loadGoods(cargo, unit)) {
-                    if (messages != null) {
-                        messages.add(getLoadGoodsMessage(unit, type,
-                                cargo.getAmount(), present, atStop, toLoad));
-                    }
-                    ret = true;
-                }
-            } else if (present > 0) {
-                if (messages != null) {
-                    messages.add(getLoadGoodsMessage(unit, type,
-                            0, present, 0, toLoad));
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Confirm attack or demand a tribute from a native settlement, following
-     * an attacking move.
-     *
-     * @param unit The <code>Unit</code> to perform the attack.
-     * @param direction The direction in which to attack.
-     */
-    private void moveAttack(Unit unit, Direction direction) {
-        clearGotoOrders(unit);
-
-        // Extra option with native settlement
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        IndianSettlement is = target.getIndianSettlement();
-        if (is != null && unit.isArmed()) {
-            switch (gui.getCanvas().showArmedUnitIndianSettlementDialog(is)) {
-            case CANCEL:
-                return;
-            case INDIAN_SETTLEMENT_ATTACK:
-                break; // Go on to usual attack confirmation.
-            case INDIAN_SETTLEMENT_TRIBUTE:
-                moveTribute(unit, direction);
-                return;
-            default:
-                logger.warning("showArmedUnitIndianSettlementDialog failure.");
-                return;
-            }
-        }
-
-        // Normal attack confirmation.
-        if (confirmHostileAction(unit, target)
-            && confirmPreCombat(unit, target)) {
-            attack(unit, direction);
-        }
     }
 
     /**
@@ -2946,6 +2618,42 @@ public final class InGameController implements NetworkConstants {
                 gui.playSound("sound.event.illegalMove");
             }
             return false;
+        }
+    }
+
+    /**
+     * Confirm attack or demand a tribute from a native settlement, following
+     * an attacking move.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     */
+    private void moveAttack(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
+
+        // Extra option with native settlement
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        IndianSettlement is = target.getIndianSettlement();
+        if (is != null && unit.isArmed()) {
+            switch (gui.getCanvas().showArmedUnitIndianSettlementDialog(is)) {
+            case CANCEL:
+                return;
+            case INDIAN_SETTLEMENT_ATTACK:
+                break; // Go on to usual attack confirmation.
+            case INDIAN_SETTLEMENT_TRIBUTE:
+                moveTribute(unit, direction);
+                return;
+            default:
+                logger.warning("showArmedUnitIndianSettlementDialog failure.");
+                return;
+            }
+        }
+
+        // Normal attack confirmation.
+        if (confirmHostileAction(unit, target)
+            && confirmPreCombat(unit, target)) {
+            askServer().attack(unit, direction);
         }
     }
 
@@ -3230,31 +2938,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Move a unit along a path.
-     *
-     * @param unit The <code>Unit</code> to move.
-     * @param path The path to follow.
-     * @return True if the unit has completed the path and can move further.
-     */
-    private boolean movePath(Unit unit, PathNode path) {
-        // Traverse the path to the destination.
-        for (; path != null; path = path.next) {
-
-            // Special case for the map edges on maps not
-            // surrounded by high seas.
-            if (unit.getDestination() instanceof Europe
-                && unit.getTile() != null
-                && unit.getTile().canMoveToEurope()) {
-                moveTo(unit, unit.getDestination());
-                return false;
-            }
-
-            if (!moveDirection(unit, path.getDirection(), false)) return false;
-        }
-        return true;
-    }
-
-    /**
      * Move to a foreign colony and either attack, negotiate with the
      * foreign power or spy on them.  Follows a move of
      * MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT.
@@ -3309,7 +2992,7 @@ public final class InGameController implements NetworkConstants {
             return;
         case INDIAN_SETTLEMENT_ATTACK:
             if (confirmPreCombat(unit, tile)) {
-                attack(unit, direction);
+                askServer().attack(unit, direction);
             }
             return;
         case INDIAN_SETTLEMENT_SPEAK:
@@ -3474,131 +3157,130 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Operates a trade route, doing load/unload actions, moving the unit,
-     * and updating the stop and destination.
+     * User interaction for buying from the natives.
      *
-     * @param unit The <code>Unit</code> on the route.
-     * @return True if the unit should keep moving, which can only
-     *     happen if the trade route is found to be broken and the
-     *     unit is thrown off it.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
      */
-    private boolean moveTradeRoute(Unit unit) {
-        Player player = unit.getOwner();
-        TradeRoute tr = unit.getTradeRoute();
-        String name = tr.getName();
-        List<ModelMessage> messages = new ArrayList<ModelMessage>();
-        boolean detailed = freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
-        List<Stop> stops = tr.getStops();
-        Stop stop;
-        boolean result = false;
+    private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
+        Player player = freeColClient.getMyPlayer();
+        Goods goods = null;
 
+        // Get list of goods for sale
+        List<Goods> forSale
+            = askServer().getGoodsForSaleInSettlement(unit, settlement);
         for (;;) {
-            stop = unit.getStop();
-            // Complain and return if the stop is no longer valid.
-            if (!TradeRoute.isStopValid(unit, stop)) {
-                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                        "traderoute.broken", unit)
-                    .addName("%route%", name));
-                clearOrders(unit);
-                result = true;
-                break;
+            if (forSale.isEmpty()) {
+                // There is nothing to sell to the player
+                gui.getCanvas().showInformationMessage(settlement,
+                    "trade.nothingToSell");
+                return;
             }
 
-            // Is the unit at the stop already?
-            boolean atStop;
-            if (stop.getLocation() instanceof Europe) {
-                atStop = unit.isInEurope();
-            } else if (stop.getLocation() instanceof Colony) {
-                atStop = unit.getTile() == stop.getLocation().getTile();
-            } else {
-                throw new IllegalStateException("Bogus stop location: "
-                    + (FreeColGameObject) stop.getLocation());
-            }
-            if (atStop) {
-                // Anything to unload?
-                unloadUnitAtStop(unit, (detailed) ? messages : null);
+            // Choose goods to buy
+            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+                "buyProposition.text", "buyProposition.nothing", forSale);
+            if (goods == null) break; // Trade aborted by the player
 
-                // Anything to load?
-                loadUnitAtStop(unit, (detailed) ? messages : null);
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                gold = askServer().buyProposition(unit, settlement,
+                    goods, gold);
+                if (gold == NO_TRADE) { // Proposal was refused
+                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
+                    return;
+                } else if (gold < 0) {
+                    return; // Server fail
+                }
 
-                // If the un/load consumed the moves, break now before
-                // updating the stop.  This allows next move to arrive
-                // here again having taken a second shot at
-                // un/loading, but this time should not have consumed
-                // the moves.
-                if (unit.getMovesLeft() <= 0) break;
-
-                // Update the stop.
-                int index = unit.validateCurrentStop();
-                askServer().updateCurrentStop(unit);
-
-                // Check if the server reset this stop as the current one.
-                // This means there is no work to do anywhere in the whole
-                // trade route.  Skip the unit if so.
-                int next = unit.validateCurrentStop();
-                if (next == index) {
-                    Location loc = stop.getLocation();
-                    if (detailed) {
-                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                "traderoute.noWork", unit)
-                            .addName("%route%", name)
-                            .addStringTemplate("%unit%",
-                                Messages.getLabel(unit))
-                            .addStringTemplate("%location%",
-                                loc.getLocationNameFor(player)));
+                // Show dialog for buy proposal
+                boolean canBuy = player.checkGold(gold);
+                switch (gui.getCanvas().showBuyDialog(unit, settlement, goods, gold,
+                        canBuy)) {
+                case CANCEL: // User cancelled
+                    return;
+                case BUY: // Accept price, make purchase
+                    if (askServer().buyFromSettlement(unit,
+                            settlement, goods, gold)) {
+                        gui.updateGoldLabel(); // Assume success
                     }
-                    unit.setState(UnitState.SKIPPED);
+                    return;
+                case HAGGLE: // Try to negotiate a lower price
+                    gold = gold * 9 / 10;
                     break;
+                default:
+                    throw new IllegalStateException("showBuyDialog fail");
                 }
-
-                // Check for and notify of missing stops.
-                if (detailed) {
-                    for (;;) {
-                        if (++index >= stops.size()) index = 0;
-                        if (index == next) break;
-                        Location loc = stops.get(index).getLocation();
-                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                "traderoute.skipStop", unit)
-                            .addName("%route%", name)
-                            .addStringTemplate("%unit%",
-                                Messages.getLabel(unit))
-                            .addStringTemplate("%location%",
-                                loc.getLocationNameFor(player)));
-                    }
-                }
-                continue; // Stop was updated, loop.
             }
-
-            // Not at stop, give up if no moves left.
-            if (unit.getMovesLeft() <= 0
-                || unit.getState() == UnitState.SKIPPED) {
-                break;
-            }
-
-            // Find a path to the stop.  Skip if none.
-            Location destination = stop.getLocation();
-            PathNode path = (destination instanceof Europe)
-                ? unit.findPathToEurope()
-                : unit.findPath(destination.getTile());
-            if (path == null) {
-                StringTemplate dest = destination.getLocationNameFor(player);
-                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                        "traderoute.noPath", unit)
-                    .addName("%route%", name)
-                    .addStringTemplate("%unit%", Messages.getLabel(unit))
-                    .addStringTemplate("%location%", dest));
-                unit.setState(UnitState.SKIPPED);
-                break;
-            }
-
-            // Try to follow the path.
-            // Ignore the result, check for unload before returning.
-            movePath(unit, path);
         }
+    }
 
-        for (ModelMessage m : messages) player.addModelMessage(m);
-        return result;
+    /**
+     * User interaction for selling to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    private void attemptSellToSettlement(Unit unit, Settlement settlement) {
+        Goods goods = null;
+        for (;;) {
+            // Choose goods to sell
+            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+                "sellProposition.text", "sellProposition.nothing",
+                unit.getGoodsList());
+            if (goods == null) break; // Trade aborted by the player
+
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                gold = askServer().sellProposition(unit, settlement,
+                    goods, gold);
+
+                if (gold == NO_NEED_FOR_THE_GOODS) {
+                    gui.getCanvas().showInformationMessage(settlement,
+                        StringTemplate.template("trade.noNeedForTheGoods")
+                        .add("%goods%", goods.getNameKey()));
+                    return;
+                } else if (gold == NO_TRADE) {
+                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
+                    return;
+                }
+
+                // Show dialog for sale proposal
+                switch (gui.getCanvas().showSellDialog(unit, settlement, goods, gold)) {
+                case CANCEL:
+                    return;
+                case SELL: // Accepted price, make the sale
+                    if (askServer().sellToSettlement(unit,
+                            settlement, goods, gold)) {
+                        gui.updateGoldLabel(); // Assume success
+                    }
+                    return;
+                case HAGGLE: // Ask for more money
+                    gold = (gold * 11) / 10;
+                    break;
+                case GIFT: // Decide to make a gift of the goods
+                    askServer().deliverGiftToSettlement(unit,
+                        settlement, goods);
+                    return;
+                default:
+                    throw new IllegalStateException("showSellDialog fail");
+                }
+            }
+        }
+    }
+
+    /**
+     * User interaction for delivering a gift to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
+        Goods goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+            "gift.text", "cancel", unit.getGoodsList());
+        if (goods != null) {
+            askServer().deliverGiftToSettlement(unit, settlement, goods);
+        }
     }
 
     /**
@@ -3614,7 +3296,6 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }
     }
-
 
     /**
      * Move a missionary into a native settlement, following a move of
@@ -3691,178 +3372,149 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
+    // end move-consequents
+
+
     /**
-     * Require that it is this client's player's turn.
-     * Put up the notYourTurn message if not.
-     *
-     * @return True if it is our turn.
+     * Makes a new unit active.
      */
-    private boolean requireOurTurn() {
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            gui.getCanvas().showInformationMessage("notYourTurn");
+    public void nextActiveUnit() {
+        nextActiveUnit(null);
+    }
+
+    /**
+     * Makes a new unit active if any, or focus on a tile (useful if the
+     * current unit just died).
+     * Displays any new <code>ModelMessage</code>s with
+     * {@link #nextModelMessage}.
+     *
+     * @param tile The <code>Tile</code> to select if no new unit can
+     *             be made active.
+     */
+    public void nextActiveUnit(Tile tile) {
+        if (!requireOurTurn()) return;
+
+        // Always flush outstanding messages first.
+        nextModelMessage();
+        //if (canvas.isShowingSubPanel()) {
+        //    canvas.getShowingSubPanel().requestFocus();
+        //    return;
+        //}
+
+        // Flush any outstanding orders once the mode is raised.
+        if (moveMode >= MODE_EXECUTE_GOTO_ORDERS
+            && !doExecuteGotoOrders()) {
+            return;
+        }
+
+        // Look for active units.
+        Player player = freeColClient.getMyPlayer();
+        MapViewer mapViewer = gui.getMapViewer();
+        Unit unit = mapViewer.getActiveUnit();
+        if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
+            && unit.getState() != UnitState.SKIPPED) {
+            return; // Current active unit has more moves to do.
+        }
+        if (player.hasNextActiveUnit()) {
+            mapViewer.setActiveUnit(player.getNextActiveUnit());
+            return; // Successfully found a unit to display
+        }
+
+        // No active units left.  Do the goto orders.
+        if (!doExecuteGotoOrders()) return;
+
+        // If not already ending the turn, use the fallback tile if
+        // supplied, then check for automatic end of turn, otherwise
+        // just select nothing and wait.
+        mapViewer.setActiveUnit(null);
+        ClientOptions options = freeColClient.getClientOptions();
+        if (moveMode >= MODE_END_TURN) {
+            endTurn();
+        } else if (tile != null) {
+            mapViewer.setSelectedTile(tile, false);
+        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
+            endTurn();
+        }
+    }
+
+    /**
+     * Pays the tax arrears on this type of goods.
+     *
+     * @param type The type of goods for which to pay arrears.
+     * @return True if the arrears were paid.
+     */
+    public boolean payArrears(GoodsType type) {
+        if (!requireOurTurn()) return false;
+
+        Player player = freeColClient.getMyPlayer();
+        int arrears = player.getArrears(type);
+        if (arrears <= 0) return false;
+        if (!player.checkGold(arrears)) {
+            gui.getCanvas().showInformationMessage(StringTemplate.template("model.europe.cantPayArrears")
+                .addAmount("%amount%", arrears));
             return false;
         }
-        return true;
+        if (gui.getCanvas().showConfirmDialog(null,
+                StringTemplate.template("model.europe.payArrears")
+                .addAmount("%amount%", arrears),
+                "ok", "cancel")
+            && askServer().payArrears(type)
+            && player.canTrade(type)) {
+            gui.updateGoldLabel();
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Provides an opportunity to filter the messages delivered to the canvas.
+     * Buys the remaining hammers and tools for the {@link Building} currently
+     * being built in the given <code>Colony</code>.
      *
-     * @param message the message that is candidate for delivery to the canvas
-     * @return true if the message should be delivered
+     * @param colony The {@link Colony} where the building should be bought.
      */
-    private boolean shouldAllowMessage(ModelMessage message) {
-        BooleanOption option = freeColClient.getClientOptions()
-            .getBooleanOption(message);
-        return (option == null) ? true : option.getValue();
+    public void payForBuilding(Colony colony) {
+        if (!requireOurTurn()) return;
+
+        if (!colony.canPayToFinishBuilding()) {
+            gui.errorMessage("notEnoughGold");
+            return;
+        }
+        int price = colony.getPriceForBuilding();
+        if (!gui.getCanvas().showConfirmDialog(null,
+                StringTemplate.template("payForBuilding.text")
+                .addAmount("%amount%", price),
+                "payForBuilding.yes", "payForBuilding.no")) {
+            return;
+        }
+
+        ColonyWas colonyWas = new ColonyWas(colony);
+        if (askServer().payForBuilding(colony)
+            && colony.getPriceForBuilding() == 0) {
+            colonyWas.fireChanges();
+            gui.updateGoldLabel();
+        }
     }
 
     /**
-     * A colony is proposed to be built.  Show warnings if this has
-     * disadvantages.
+     * Puts the specified unit outside the colony.
      *
-     * @param tile The <code>Tile</code> on which the colony is to be built.
-     * @param unit The <code>Unit</code> which is to build the colony.
+     * @param unit The <code>Unit</code>
+     * @return <i>true</i> if the unit was successfully put outside the colony.
      */
-    private boolean showColonyWarnings(Tile tile, Unit unit) {
-        boolean landLocked = true;
-        boolean ownedByEuropeans = false;
-        boolean ownedBySelf = false;
-        boolean ownedByIndians = false;
+    public boolean putOutsideColony(Unit unit) {
+        if (!requireOurTurn()) return false;
 
-        java.util.Map<GoodsType, Integer> goodsMap
-            = new HashMap<GoodsType, Integer>();
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (goodsType.isFoodType()) {
-                int potential = 0;
-                if (tile.getType().isPrimaryGoodsType(goodsType)) {
-                    potential = tile.potential(goodsType, null);
-                }
-                goodsMap.put(goodsType, new Integer(potential));
-            } else if (goodsType.isBuildingMaterial()) {
-                while (goodsType.isRefined()) {
-                    goodsType = goodsType.getRawMaterial();
-                }
-                int potential = 0;
-                if (tile.getType().isSecondaryGoodsType(goodsType)) {
-                    potential = tile.potential(goodsType, null);
-                }
-                goodsMap.put(goodsType, new Integer(potential));
-            }
+        Colony colony = unit.getColony();
+        if (colony == null) {
+            throw new IllegalStateException("Unit is not in colony.");
+        } else if (!colony.canReducePopulation()) {
+            return false;
         }
 
-        for (Tile newTile: tile.getSurroundingTiles(1)) {
-            if (!newTile.isLand()) {
-                landLocked = false;
-            }
-            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-                entry.setValue(entry.getValue().intValue()
-                    + newTile.potential(entry.getKey(), null));
-            }
-            Player tileOwner = newTile.getOwner();
-            if (tileOwner == unit.getOwner()) {
-                if (newTile.getOwningSettlement() != null) {
-                    // we are using newTile
-                    ownedBySelf = true;
-                } else {
-                    for (Tile ownTile: newTile.getSurroundingTiles(1)) {
-                        Colony colony = ownTile.getColony();
-                        if (colony != null
-                            && colony.getOwner() == unit.getOwner()) {
-                            // newTile can be used from an own colony
-                            ownedBySelf = true;
-                            break;
-                        }
-                    }
-                }
-            } else if (tileOwner != null && tileOwner.isEuropean()) {
-                ownedByEuropeans = true;
-            } else if (tileOwner != null) {
-                ownedByIndians = true;
-            }
-        }
-
-        int food = 0;
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (entry.getKey().isFoodType()) {
-                food += entry.getValue().intValue();
-            }
-        }
-
-        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
-        if (landLocked) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                    "buildColony.landLocked", unit,
-                    getSpecification().getGoodsType("model.goods.fish")));
-        }
-        if (food < 8) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                    "buildColony.noFood", unit,
-                    getSpecification().getPrimaryFoodType()));
-        }
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
-                messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                        "buildColony.noBuildingMaterials",
-                        unit, entry.getKey())
-                    .add("%goods%", entry.getKey().getNameKey()));
-            }
-        }
-
-        if (ownedBySelf) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
-                    "buildColony.ownLand", unit));
-        }
-        if (ownedByEuropeans) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
-                    "buildColony.EuropeanLand", unit));
-        }
-        if (ownedByIndians) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
-                    "buildColony.IndianLand", unit));
-        }
-
-        if (messages.isEmpty()) return true;
-        ModelMessage[] modelMessages
-            = messages.toArray(new ModelMessage[messages.size()]);
-        return gui.getCanvas().showConfirmDialog(unit.getTile(),
-            modelMessages, "buildColony.yes", "buildColony.no");
-    }
-
-    private synchronized void startIgnoringMessage(String key, int turn) {
-        logger.finer("Ignoring model message with key " + key);
-        messagesToIgnore.put(key, new Integer(turn));
-    }
-
-    private synchronized void stopIgnoringMessage(String key) {
-        logger.finer("Removing model message with key " + key
-            + " from ignored messages.");
-        messagesToIgnore.remove(key);
-    }
-
-    /**
-     * Unload some goods from a carrier.
-     *
-     * @param goods The <code>Goods</code> to unload.
-     * @param carrier The <code>Unit</code> carrying the goods.
-     * @param colony The <code>Colony</code> to unload to,
-     *               or null if unloading in Europe.
-     * @return True if the unload succeeded.
-     */
-    private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null && carrier.isInEurope()) {
-            return (!carrier.getOwner().canTrade(goods)) ? false
-                : sellGoods(goods);
-        }
-        GoodsType type = goods.getType();
-        GoodsContainer container = carrier.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
-        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(carrier);
-        if (askServer().unloadCargo(goods)
-            && container.getGoodsCount(type) != oldAmount) {
-            if (colonyWas != null) colonyWas.fireChanges();
+        ColonyWas colonyWas = new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(unit);
+        if (askServer().putOutsideColony(unit)) {
+            colonyWas.fireChanges();
             unitWas.fireChanges();
             return true;
         }
@@ -3870,71 +3522,412 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Work out what goods to unload from a unit at a stop, and unload them.
+     * Recruit a unit from a specified index in Europe.
      *
-     * @param unit The <code>Unit</code> to unload.
-     * @param messages A list of messages to update.
-     * @return True if something was unloaded.
+     * @param index The index in Europe to recruit from ([0..2]).
      */
-    private boolean unloadUnitAtStop(Unit unit, List<ModelMessage> messages) {
-        Colony colony = unit.getColony();
-        Stop stop = unit.getStop();
-        final List<GoodsType> goodsTypesToLoad = stop.getCargo();
-        boolean ret = false;
+    public void recruitUnitInEurope(int index) {
+        if (!requireOurTurn()) return;
 
-        // Unload everything that is on the carrier but not listed to
-        // be loaded at this stop.
-        Game game = freeColClient.getGame();
-        for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
-            GoodsType type = goods.getType();
-            if (goodsTypesToLoad.contains(type)) continue; // Keep this cargo.
+        Player player = freeColClient.getMyPlayer();
+        if (!player.checkGold(player.getRecruitPrice())) {
+            gui.errorMessage("notEnoughGold");
+            return;
+        }
 
-            int atStop = (colony == null) ? Integer.MAX_VALUE // Europe
-                : colony.getImportAmount(type);
-            int toUnload = goods.getAmount();
-            if (toUnload > atStop) {
-                String locName = colony.getName();
-                String overflow = Integer.toString(toUnload - atStop);
-                int option = freeColClient.getClientOptions()
-                    .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
-                switch (option) {
-                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
-                    StringTemplate template
-                        = StringTemplate.template("traderoute.warehouseCapacity")
-                        .addStringTemplate("%unit%", Messages.getLabel(unit))
-                        .addName("%colony%", locName)
-                        .addName("%amount%", overflow)
-                        .add("%goods%", goods.getNameKey());
-                    if (!gui.getCanvas().showConfirmDialog(colony.getTile(), template,
-                            "yes", "no")) {
-                        toUnload = atStop;
-                    }
-                    break;
-                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:
-                    toUnload = atStop;
-                    break;
-                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ALWAYS:
-                    break;
-                default:
-                    logger.warning("Illegal UNLOAD_OVERFLOW_RESPONSE: "
-                        + Integer.toString(option));
-                    break;
+        emigrate(player, index + 1);
+    }
+
+    /**
+     * Renames a <code>Nameable</code>.
+     * Apparently this can be done while it is not your turn.
+     *
+     * @param object The object to rename.
+     */
+    public void rename(Nameable object) {
+        Player player = freeColClient.getMyPlayer();
+        if (!(object instanceof Ownable)
+            || ((Ownable) object).getOwner() != player) {
+            return;
+        }
+
+        String name = null;
+        if (object instanceof Colony) {
+            Colony colony = (Colony) object;
+            name = gui.getCanvas().showInputDialog(colony.getTile(),
+                StringTemplate.key("renameColony.text"), colony.getName(),
+                "renameColony.yes", "renameColony.no", true);
+            if (name == null) {
+                // User cancelled, 0-length invalid.
+                return;
+            } else if (colony.getName().equals(name)) {
+                // No change
+                return;
+            } else if (player.getSettlement(name) != null) {
+                // Colony name must be unique.
+                gui.getCanvas().showInformationMessage((Colony) object,
+                    StringTemplate.template("nameColony.notUnique")
+                    .addName("%name%", name));
+                return;
+            }
+        } else if (object instanceof Unit) {
+            Unit unit = (Unit) object;
+            name = gui.getCanvas().showInputDialog(unit.getTile(),
+                StringTemplate.key("renameUnit.text"), unit.getName(),
+                "renameUnit.yes", "renameUnit.no", false);
+            if (name == null) return; // User cancelled, 0-length clears name.
+        } else {
+            logger.warning("Tried to rename an unsupported Nameable: "
+                + object.toString());
+            return;
+        }
+
+        askServer().rename((FreeColGameObject) object, name);
+    }
+
+    /**
+     * Selects a destination for this unit. Europe and the player's
+     * colonies are valid destinations.
+     *
+     * @param unit The unit for which to select a destination.
+     */
+    public void selectDestination(Unit unit) {
+        Location destination = gui.getCanvas()
+            .showSelectDestinationDialog(unit);
+        if (destination == null) return; // user aborted
+
+        if (setDestination(unit, destination)
+            && freeColClient.getGame().getCurrentPlayer()
+                == freeColClient.getMyPlayer()) {
+            if (destination instanceof Europe) {
+                if (unit.getTile() != null
+                    && unit.getTile().canMoveToEurope()) {
+                    moveTo(unit, destination);
+                } else {
+                    moveToDestination(unit);
+                }
+            } else {
+                if (unit.isInEurope()) {
+                    moveTo(unit, destination);
+                } else {
+                    moveToDestination(unit);
                 }
             }
+        }
+    }
 
-            // Try to unload.
-            Goods cargo = (goods.getAmount() == toUnload) ? goods
-                : new Goods(game, unit, type, toUnload);
-            if (unloadGoods(cargo, unit, colony)) {
-                if (messages != null) {
-                    messages.add(getUnloadGoodsMessage(unit, type,
-                            cargo.getAmount(), atStop, goods.getAmount(),
-                            toUnload));
+    /**
+     * Sells goods in Europe.
+     *
+     * @param goods The goods to be sold.
+     * @return True if the sale succeeds.
+     */
+    public boolean sellGoods(Goods goods) {
+        if (!requireOurTurn()) return false;
+
+        // Sanity checks.
+        Player player = freeColClient.getMyPlayer();
+        if (goods == null) {
+            throw new NullPointerException("Goods must not be null.");
+        }
+        Unit carrier = null;
+        if (goods.getLocation() instanceof Unit) {
+            carrier = (Unit) goods.getLocation();
+        }
+        if (carrier == null) {
+            throw new IllegalStateException("Goods not on carrier.");
+        } else if (!carrier.isInEurope()) {
+            throw new IllegalStateException("Goods not on carrier in Europe.");
+        } else if (!player.canTrade(goods)) {
+            throw new IllegalStateException("Goods are boycotted.");
+        }
+
+        // Try to sell.  Remember a bunch of stuff first so the transaction
+        // can be logged.
+        Market market = player.getMarket();
+        GoodsType type = goods.getType();
+        int amount = goods.getAmount();
+        int price = market.getPaidForSale(type);
+        int tax = player.getTax();
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        UnitWas unitWas = new UnitWas(carrier);
+        if (askServer().sellGoods(goods, carrier)
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
+            gui.playSound("sound.event.sellCargo");
+            unitWas.fireChanges();
+            for (TransactionListener l : market.getTransactionListener()) {
+                l.logSale(type, amount, price, tax);
+            }
+            gui.updateGoldLabel();
+            return true;
+        }
+
+        // Sale failed for some reason.
+        return false;
+    }
+
+    /**
+     * Sends a public chat message.
+     *
+     * @param chat The text of the message.
+     */
+    public void sendChat(String chat) {
+        askServer().chat(chat);
+    }
+
+    /**
+     * Changes the current construction project of a <code>Colony</code>.
+     *
+     * @param colony The <code>Colony</code>
+     * @param buildQueue List of <code>BuildableType</code>
+     */
+    public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
+        if (!requireOurTurn()) return;
+
+        ColonyWas colonyWas = new ColonyWas(colony);
+        if (askServer().setBuildQueue(colony, buildQueue)) {
+            colonyWas.fireChanges();
+        }
+    }
+
+    /**
+     * Set a player to be the new current player.
+     *
+     * @param player The <code>Player</code> to be the new current player.
+     */
+    public void setCurrentPlayer(Player player) {
+        logger.finest("Entering client setCurrentPlayer: " + player.getName());
+        Game game = freeColClient.getGame();
+        game.setCurrentPlayer(player);
+
+        if (freeColClient.getMyPlayer().equals(player)
+            && freeColClient.getFreeColServer() != null) {
+
+           // auto-save the game (if it isn't newly loaded)
+           if ( turnsPlayed > 0 ) {
+              autosave_game();
+           }
+
+           player.invalidateCanSeeTiles();
+
+           // Check for emigration.
+           if (player.checkEmigrate()) {
+                if (player.hasAbility("model.ability.selectRecruit")
+                    && player.getEurope().recruitablesDiffer()) {
+                    int index = gui.getCanvas().showEmigrationPanel(false);
+                    emigrate(player, index + 1);
+                } else {
+                    emigrate(player, 0);
                 }
-                ret = true;
+           }
+
+           // GUI management.
+           if (!freeColClient.isSingleplayer()) {
+               gui.playSound("sound.anthem." + player.getNationID());
+           }
+           displayModelMessages(true, true);
+        }
+        logger.finest("Exiting client setCurrentPlayer: " + player.getName());
+    }
+
+    /**
+     * Set the destination of the given unit.
+     *
+     * @param unit The <code>Unit</code> to direct.
+     * @param destination The destination <code>Location</code>.
+     * @return True if the destination was set.
+     * @see Unit#setDestination(Location)
+     */
+    public boolean setDestination(Unit unit, Location destination) {
+        if (unit.getTradeRoute() != null) {
+            StringTemplate template
+                = StringTemplate.template("traderoute.reassignRoute")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addName("%route%", unit.getTradeRoute().getName());
+            if (!gui.getCanvas().showConfirmDialog(unit.getTile(), template,
+                    "yes", "no")) return false;
+        }
+        return askServer().setDestination(unit, destination)
+            && unit.getDestination() == destination;
+    }
+
+    /**
+     * Sets the export settings of the custom house.
+     *
+     * @param colony The colony with the custom house.
+     * @param goodsType The goods for which to set the settings.
+     */
+    public void setGoodsLevels(Colony colony, GoodsType goodsType) {
+        askServer().setGoodsLevels(colony,
+            colony.getExportData(goodsType));
+    }
+
+    /**
+     * Sets the trade routes for this player
+     *
+     * @param routes The trade routes to set.
+     */
+    public void setTradeRoutes(List<TradeRoute> routes) {
+        askServer().setTradeRoutes(routes);
+    }
+
+    /**
+     * Skip a unit.
+     */
+    public void skipActiveUnit() {
+        changeState(gui.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
+    }
+
+    /**
+     * Trains a unit of a specified type in Europe.
+     *
+     * @param unitType The type of unit to be trained.
+     */
+    public void trainUnitInEurope(UnitType unitType) {
+        if (!requireOurTurn()) return;
+
+        Player player = freeColClient.getMyPlayer();
+        Europe europe = player.getEurope();
+        if (!player.checkGold(europe.getUnitPrice(unitType))) {
+            gui.errorMessage("notEnoughGold");
+            return;
+        }
+
+        EuropeWas europeWas = new EuropeWas(europe);
+        if (askServer().trainUnitInEurope(unitType)) {
+            gui.updateGoldLabel();
+            europeWas.fireChanges();
+        }
+    }
+
+    /**
+     * Unload, including dumping cargo.
+     *
+     * @param unit The <code>Unit<code> that is dumping.
+     */
+    public void unload(Unit unit) {
+        if (!requireOurTurn()) return;
+
+        // Sanity tests.
+        if (unit == null) {
+            throw new IllegalArgumentException("Null unit.");
+        } else if (!unit.isCarrier()) {
+            throw new IllegalArgumentException("Unit is not a carrier.");
+        }
+
+        Player player = freeColClient.getMyPlayer();
+        boolean inEurope = unit.isInEurope();
+        if (unit.getColony() != null) {
+            // In colony, unload units and goods.
+            for (Unit u : unit.getUnitList()) {
+                leaveShip(u);
+            }
+            for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
+                unloadCargo(goods, false);
+            }
+        } else {
+            if (inEurope) { // In Europe, unload non-boycotted goods
+                for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
+                    if (player.canTrade(goods)) unloadCargo(goods, false);
+                }
+            }
+            // Goods left here must be dumped.
+            if (unit.getGoodsCount() > 0) {
+                List<Goods> goodsList
+                    = gui.getCanvas().showDumpCargoDialog(unit);
+                if (goodsList != null) {
+                    for (Goods goods : goodsList) {
+                        unloadCargo(goods, true);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Unload cargo. If the unit carrying the cargo is not in a
+     * harbour, or if the given boolean is true, the goods will be
+     * dumped.
+     *
+     * @param goods The <code>Goods<code> to unload.
+     * @param dump If true, dump the goods.
+     */
+    public void unloadCargo(Goods goods, boolean dump) {
+        if (!requireOurTurn()) return;
+
+        // Sanity tests.
+        if (goods == null) {
+            throw new IllegalArgumentException("Null goods.");
+        } else if (goods.getAmount() <= 0) {
+            throw new IllegalArgumentException("Empty goods.");
+        }
+        Unit carrier = null;
+        if (!(goods.getLocation() instanceof Unit)) {
+            throw new IllegalArgumentException("Unload from non-unit.");
+        }
+        carrier = (Unit) goods.getLocation();
+        Colony colony = null;
+        if (!carrier.isInEurope()) {
+            if (carrier.getTile() == null) {
+                throw new IllegalArgumentException("Carrier with null location.");
+            }
+            colony = carrier.getColony();
+            if (!dump && colony == null) {
+                throw new IllegalArgumentException("Unload is really a dump.");
             }
         }
 
-        return ret;
+        // Try to unload.  TODO: should there be a sound for this?
+        unloadGoods(goods, carrier, colony);
+    }
+
+    /**
+     * Updates a trade route.
+     *
+     * @param route The trade route to update.
+     */
+    public void updateTradeRoute(TradeRoute route) {
+        askServer().updateTradeRoute(route);
+    }
+
+    /**
+     * Tell a unit to wait.
+     */
+    public void waitActiveUnit() {
+        MapViewer mapViewer = gui.getMapViewer();
+        mapViewer.setActiveUnit(null);
+        nextActiveUnit();
+    }
+
+    /**
+     * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
+     *
+     * @param unit The <code>Unit</code>.
+     * @param workLocation The <code>WorkLocation</code>.
+     */
+    public void work(Unit unit, WorkLocation workLocation) {
+        if (!requireOurTurn()) return;
+
+        Colony colony = workLocation.getColony();
+        if (workLocation instanceof ColonyTile) {
+            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            if (tile.hasLostCityRumour()) {
+                gui.getCanvas()
+                    .showInformationMessage("tileHasRumour");
+                return;
+            }
+            if (tile.getOwner() != unit.getOwner()) {
+                if (!claimLand(tile, colony, 0)) return;
+            }
+        }
+
+        // Try to change the work location.
+        ColonyWas colonyWas = new ColonyWas(colony);
+        UnitWas unitWas = new UnitWas(unit);
+        if (askServer().work(unit, workLocation)
+            && unit.getLocation() == workLocation) {
+            colonyWas.fireChanges();
+            unitWas.fireChanges();
+        }
     }
 }

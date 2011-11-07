@@ -171,7 +171,7 @@ public final class TilePopup extends JPopupMenu {
                                 return;
                             }
                             freeColClient.getInGameController()
-                                .moveToEurope(activeUnit);
+                                .moveTo(activeUnit, player.getEurope());
                         }
                     });
                 add(europeMenuItem);

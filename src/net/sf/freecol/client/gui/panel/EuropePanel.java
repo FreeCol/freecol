@@ -390,7 +390,7 @@ public final class EuropePanel extends FreeColPanel {
                 if (getMyPlayer().canTrade(goods)) {
                     getController().sellGoods(goods);
                 } else {
-                    getController().payArrears(goods);
+                    getController().payArrears(goods.getType());
                 }
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
@@ -775,7 +775,7 @@ public final class EuropePanel extends FreeColPanel {
                 } else {
                     switch (getCanvas().showBoycottedGoodsDialog(goods, europe)) {
                     case PAY_ARREARS:
-                        getController().payArrears(goods);
+                        getController().payArrears(goods.getType());
                         break;
                     case DUMP_CARGO:
                         getController().unloadCargo(goods, true);
