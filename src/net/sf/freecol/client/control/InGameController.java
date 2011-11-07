@@ -833,8 +833,10 @@ public final class InGameController implements NetworkConstants {
         private GoodsType work;
         private int amount;
         private Colony colony;
+        private EquipmentType equipmentType;
+        private int equipmentAmount;
 
-        public UnitWas(Unit unit) {
+        public UnitWas(Unit unit, EquipmentType equipmentType) {
             this.unit = unit;
             this.type = unit.getType();
             this.role = unit.getRole();
@@ -842,6 +844,9 @@ public final class InGameController implements NetworkConstants {
             this.work = unit.getWorkType();
             this.amount = getAmount(loc, work);
             this.colony = unit.getColony();
+            this.equipmentType = equipmentType;
+            this.equipmentAmount = (equipmentType == null) ? 0
+                : unit.getEquipmentCount(equipmentType);
         }
 
         /**
@@ -853,6 +858,7 @@ public final class InGameController implements NetworkConstants {
             Location newLoc = null;
             GoodsType newWork = null;
             int newAmount = 0;
+            int newEquipmentAmount = 0;
             if (!unit.isDisposed()) {
                 newLoc = unit.getLocation();
                 if (colony != null) {
@@ -861,6 +867,8 @@ public final class InGameController implements NetworkConstants {
                     newWork = unit.getWorkType();
                     newAmount = (newWork == null) ? 0
                         : getAmount(newLoc, newWork);
+                    newEquipmentAmount = (equipmentType == null) ? 0
+                        : unit.getEquipmentCount(equipmentType);                
                 }
             }
 
@@ -898,6 +906,11 @@ public final class InGameController implements NetworkConstants {
             }
             if (unit.getGoodsContainer() != null) {
                 unit.getGoodsContainer().fireChanges();
+            }
+            if (equipmentType != null
+                && equipmentAmount != newEquipmentAmount) {
+                unit.firePropertyChange(Unit.EQUIPMENT_CHANGE,
+                    equipmentAmount, newEquipmentAmount);
             }
         }
 
@@ -1031,7 +1044,7 @@ public final class InGameController implements NetworkConstants {
         GoodsType type = goods.getType();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
-        UnitWas unitWas = new UnitWas(carrier);
+        UnitWas unitWas = new UnitWas(carrier, null);
         Colony colony = carrier.getColony();
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         if (askServer().loadCargo(goods, carrier)
@@ -1061,7 +1074,7 @@ public final class InGameController implements NetworkConstants {
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(carrier);
+        UnitWas unitWas = new UnitWas(carrier, null);
         if (askServer().unloadCargo(goods)
             && container.getGoodsCount(type) != oldAmount) {
             if (colonyWas != null) colonyWas.fireChanges();
@@ -1548,7 +1561,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Proceed to board
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (askServer().embark(unit, carrier, null)
             && unit.getLocation() == carrier) {
             gui.playSound("sound.event.loadCargo");
@@ -1803,7 +1816,7 @@ public final class InGameController implements NetworkConstants {
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         int price = market.getCostToBuy(type);
-        UnitWas unitWas = new UnitWas(carrier);
+        UnitWas unitWas = new UnitWas(carrier, null);
         if (askServer().buyGoods(carrier, type, toBuy)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             gui.playSound("sound.event.loadCargo");
@@ -1897,7 +1910,7 @@ public final class InGameController implements NetworkConstants {
     public void changeWorkType(Unit unit, GoodsType workType) {
         if (!requireOurTurn()) return;
 
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (askServer().changeWorkType(unit, workType)) {
             unitWas.fireChanges();
         }
@@ -1937,7 +1950,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update if cash in succeeds.
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (cash && askServer().cashInTreasureTrain(unit)
             && unit.isDisposed()) {
             gui.playSound("sound.event.cashInTreasureTrain");
@@ -2168,14 +2181,9 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        int oldAmount = unit.getEquipmentCount(type);
-        int newAmount;
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit);
-        if (askServer().equipUnit(unit, type, amount)
-            && (newAmount = unit.getEquipmentCount(type)) != oldAmount) {
-            unit.firePropertyChange(Unit.EQUIPMENT_CHANGE,
-                oldAmount, newAmount);
+        UnitWas unitWas = new UnitWas(unit, null);
+        if (askServer().equipUnit(unit, type, amount)) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
             gui.updateGoldLabel();
@@ -2270,8 +2278,8 @@ public final class InGameController implements NetworkConstants {
         }
         Unit carrier = (Unit) unit.getLocation();
 
-        // Ask the server
-        UnitWas unitWas = new UnitWas(unit);
+        // Proceed to disembark
+        UnitWas unitWas = new UnitWas(unit, null);
         if (askServer().disembark(unit)
             && unit.getLocation() != carrier) {
             checkCashInTreasureTrain(unit);
@@ -2900,7 +2908,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Ask the server
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (!askServer().move(unit, direction)) return;
         unitWas.fireChanges();
 
@@ -3551,7 +3559,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         ColonyWas colonyWas = new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (askServer().putOutsideColony(unit)) {
             colonyWas.fireChanges();
             unitWas.fireChanges();
@@ -3689,7 +3697,7 @@ public final class InGameController implements NetworkConstants {
         int price = market.getPaidForSale(type);
         int tax = player.getTax();
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        UnitWas unitWas = new UnitWas(carrier);
+        UnitWas unitWas = new UnitWas(carrier, null);
         if (askServer().sellGoods(goods, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             gui.playSound("sound.event.sellCargo");
@@ -3962,7 +3970,7 @@ public final class InGameController implements NetworkConstants {
 
         // Try to change the work location.
         ColonyWas colonyWas = new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit);
+        UnitWas unitWas = new UnitWas(unit, null);
         if (askServer().work(unit, workLocation)
             && unit.getLocation() == workLocation) {
             colonyWas.fireChanges();
