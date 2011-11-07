@@ -73,7 +73,8 @@ public class DiplomacyMessage extends DOMMessage {
 
     /**
      * Create a new <code>DiplomacyMessage</code> from a
-     * supplied element.
+     * supplied element.  The unit is supplied in case it was hidden in
+     * some way, such as aboard a ship.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
@@ -154,8 +155,10 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (unit.getTile() == null) {
             return DOMMessage.clientError("Unit is not on the map: "
                 + unit.getId());
+        } else if (unit.getOwner() != serverPlayer) {
+            return DOMMessage.clientError("Player does not own unit: "
+                + unit.getId());
         }
-        Player unitPlayer = unit.getOwner();
 
         Settlement settlement = getSettlement();
         if (settlement == null) {
@@ -167,7 +170,7 @@ public class DiplomacyMessage extends DOMMessage {
             return DOMMessage.clientError("Unit " + unit.getId()
                 + " is not adjacent to settlement " + settlement.getId());
         }
-        Player settlementPlayer = settlement.getOwner();
+        Player otherPlayer = settlement.getOwner();
 
         if (agreement == null) {
             return DOMMessage.clientError("Null diplomatic agreement.");
@@ -179,28 +182,15 @@ public class DiplomacyMessage extends DOMMessage {
             return DOMMessage.clientError("Null sender in agreement.");
         } else if (recipientPlayer == null) {
             return DOMMessage.clientError("Null recipient in agreement.");
-        } else if (senderPlayer != (Player) serverPlayer
-            && recipientPlayer != (Player) serverPlayer) {
-            return DOMMessage.clientError("Server player not in agreement: "
-                + serverPlayer.getId());
-        } else if (senderPlayer == recipientPlayer) {
-            return DOMMessage.clientError("Auto-agreement detected: "
+        } else if (senderPlayer != (Player) serverPlayer) {
+            return DOMMessage.clientError("Sender is not the unit owner: "
                 + senderPlayer.getId());
+        } else if (recipientPlayer != otherPlayer) {
+            return DOMMessage.clientError("Recipient is not the settlement owner: "
+                + recipientPlayer.getId());
         } else if (senderPlayer == refPlayer || recipientPlayer == refPlayer) {
             return DOMMessage.clientError("The REF does not negotiate: "
                 + refPlayer.getId());
-        } else if (unitPlayer == senderPlayer
-            && settlementPlayer == recipientPlayer) {
-            ; // OK, initial or repeated proposal by unit player.
-            // Move type is checked in the controller as it has the sessions.
-        } else if (unitPlayer == recipientPlayer
-            && settlementPlayer == senderPlayer) {
-            ; // OK, counter proposal by settlement player.
-        } else {
-            return DOMMessage.clientError("Diplomatic agreement parties: "
-                + senderPlayer.getId() + " + " + recipientPlayer.getId()
-                + " are not the same as unit + settlement owner: "
-                + unitPlayer.getId() + " + " + settlementPlayer.getId());
         }
 
         // Valid, try to trade.

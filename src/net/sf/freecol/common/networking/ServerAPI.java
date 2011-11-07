@@ -183,8 +183,7 @@ public class ServerAPI {
                                + ((messageId != null) ? messageId : "")
                                + "/" + ((messageText != null)
                                    ? messageText : ""));
-                freeColClient.getInGameInputHandler()
-                    .handle(freeColClient.getClient().getConnection(), reply);
+                handleReply(reply);
             }
             return null;
         }
@@ -228,6 +227,18 @@ public class ServerAPI {
     }
 
     /**
+     * Handle a reply element using the client input handler.
+     *
+     * @param reply The reply <code>Element</code> to handle.
+     */
+    private void handleReply(Element reply) {
+        if (reply != null) {
+            freeColClient.getInGameInputHandler()
+                .handle(freeColClient.getClient().getConnection(), reply);
+        }
+    }
+
+    /**
      * Extends askExpecting to also handle returns from the server.
      *
      * @param message A <code>DOMMessage</code> to send.
@@ -240,8 +251,7 @@ public class ServerAPI {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
 
-        freeColClient.getInGameInputHandler()
-            .handle(freeColClient.getClient().getConnection(), reply);
+        handleReply(reply);
         return true;
     }
 
@@ -549,12 +559,20 @@ public class ServerAPI {
      * @param unit The <code>Unit</code> conducting the diplomacy.
      * @param settlement The <code>Settlement</code> to negotiate with.
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
-     * @return True if the server interaction succeeded.
+     * @return The resulting agreement or null if none present.
      */
-    public boolean diplomacy(Unit unit, Settlement settlement,
-                             DiplomaticTrade agreement) {
-        return askHandling(new DiplomacyMessage(unit, settlement, agreement),
+    public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
+                                     DiplomaticTrade agreement) {
+        Element reply = askExpecting(new DiplomacyMessage(unit, settlement,
+                                                          agreement),
             null, null);
+        if (reply == null) return null;
+        if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+            Game game = freeColClient.getGame();
+            return new DiplomacyMessage(game, reply).getAgreement();
+        }
+        handleReply(reply);
+        return null;
     }
 
     /**

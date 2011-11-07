@@ -661,18 +661,26 @@ public final class InGameInputHandler extends InputHandler {
             new ShowInformationMessageSwingTask(StringTemplate
                 .template("negotiationDialog.offerAccepted")
                     .addName("%nation%", nation)).show();
+            new UpdateMenuBarSwingTask().invokeLater();
             break;
         case REJECT_TRADE:
             new ShowInformationMessageSwingTask(StringTemplate
                 .template("negotiationDialog.offerRejected")
                     .addName("%nation%", nation)).show();
+            new UpdateMenuBarSwingTask().invokeLater();
             break;
         case PROPOSE_TRADE:
-            new DiplomacySwingTask(unit, settlement, agreement)
-                .invokeLater();
-            break;
+            DiplomaticTrade ourAgreement = gui.getCanvas()
+                .showNegotiationDialog(unit, settlement, agreement);
+            if (ourAgreement == null) {
+                agreement.setStatus(TradeStatus.REJECT_TRADE);
+            } else {
+                agreement = ourAgreement;
+            }
+            return new DiplomacyMessage(unit, settlement, agreement)
+                .toXMLElement();
         default:
-            logger.warning("Bogus trade status");
+            logger.warning("Bogus trade status: " + agreement.getStatus());
             break;
         }
         return null;
@@ -1337,42 +1345,6 @@ public final class InGameInputHandler extends InputHandler {
             if (requestFocus && !canvas.isShowingSubPanel()) {
                 canvas.requestFocusInWindow();
             }
-        }
-    }
-
-    /**
-     * This class displays a negotiation dialog and acts on the result.
-     */
-    class DiplomacySwingTask extends NoResultCanvasSwingTask {
-
-        private Unit unit;
-        private Settlement settlement;
-        private DiplomaticTrade proposal;
-
-
-        /**
-         * Constructor.
-         *
-         * @param unit The unit which is negotiating.
-         * @param settlement The settlement to negotiate with.
-         * @param proposal The proposal made by the unit owner.
-         */
-        public DiplomacySwingTask(Unit unit, Settlement settlement,
-                                  DiplomaticTrade proposal) {
-            this.unit = unit;
-            this.settlement = settlement;
-            this.proposal = proposal;
-        }
-
-        protected void doWork(Canvas canvas) {
-            DiplomaticTrade agreement
-                = canvas.showNegotiationDialog(unit, settlement, proposal);
-            if (agreement == null) {
-                agreement = proposal;
-                agreement.setStatus(TradeStatus.REJECT_TRADE);
-            }
-            getFreeColClient().askServer().diplomacy(unit, settlement,
-                                                     agreement);
         }
     }
 

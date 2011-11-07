@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
@@ -3083,19 +3084,57 @@ public final class InGameController implements NetworkConstants {
         if (settlement == null) return;
 
         // Can not negotiate with the REF.
-        if (settlement.getOwner() == unit.getOwner().getREFPlayer()) {
+        Player player = unit.getOwner();
+        if (settlement.getOwner() == player.getREFPlayer()) {
             throw new IllegalStateException("Unit tried to negotiate with REF");
         }
 
-        String nation = Messages.message(settlement.getOwner().getNationName());
-        DiplomaticTrade agreement
-            = gui.getCanvas().showNegotiationDialog(unit, settlement, null);
-        if (agreement != null) {
-            // Send this agreement to the other player.
-            askServer().diplomacy(unit, settlement, agreement);
-        } else {
-            nextActiveUnit();
+        ModelMessage m = null;
+        String nation
+            = Messages.message(settlement.getOwner().getNationName());
+        DiplomaticTrade ourAgreement = null;
+        DiplomaticTrade agreement = null;
+        TradeStatus status;
+        for (;;) {
+            ourAgreement = gui.getCanvas()
+                .showNegotiationDialog(unit, settlement, agreement);
+            if (ourAgreement == null) {
+                if (agreement == null) break;
+                agreement.setStatus(TradeStatus.REJECT_TRADE);
+            } else {
+                agreement = ourAgreement;
+            }
+            if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
+                askServer().diplomacy(unit, settlement, agreement);
+                gui.updateMenuBar();
+                break;
+            }
+
+            agreement = askServer().diplomacy(unit, settlement, agreement);
+            status = (agreement == null) ? TradeStatus.REJECT_TRADE
+                : agreement.getStatus();
+            switch (status) {
+            case PROPOSE_TRADE:
+                continue; // counter proposal, try again
+            case ACCEPT_TRADE:
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerAccepted",
+                                     settlement)
+                    .addName("%nation%", nation);
+                break;
+            case REJECT_TRADE:
+                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerRejected",
+                                     settlement)
+                    .addName("%nation%", nation);
+                break;
+            default:
+                throw new IllegalStateException("Bogus trade status" + status);
+            }
+            player.addModelMessage(m);
+            break; // only counter proposals should loop
         }
+        nextActiveUnit();
     }
 
     /**

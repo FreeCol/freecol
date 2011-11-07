@@ -2964,6 +2964,9 @@ public final class InGameController extends Controller {
 
     /**
      * Diplomatic trades.
+     * Note that when an agreement is accepted we always process the
+     * agreement that was sent, not what was returned, cutting off a
+     * possibility for cheating.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
@@ -2975,78 +2978,84 @@ public final class InGameController extends Controller {
                                    Settlement settlement,
                                    DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
+        ServerPlayer otherPlayer = (ServerPlayer) settlement.getOwner();
         DiplomacySession session
             = TransactionSession.lookup(DiplomacySession.class,
                 unit, settlement);
-        ServerPlayer otherPlayer;
-        if (serverPlayer == (ServerPlayer) agreement.getSender()) {
-            otherPlayer = (ServerPlayer) agreement.getRecipient();
-        } else if (serverPlayer == (ServerPlayer) agreement.getRecipient()) {
-            otherPlayer = (ServerPlayer) agreement.getSender();
-        } else {
-            return DOMMessage.clientError("Dodgy agreement ownership.");
-        }
+        TradeStatus status;
         Player.makeContact(serverPlayer, otherPlayer);
 
-        switch (agreement.getStatus()) {
-        case ACCEPT_TRADE:
-            if (session == null) {
-                return DOMMessage.clientError("ACCEPT without open session.");
-            }
-            // Use the agreement that was sent, not the one returned, to
-            // frustrate tricksy clients.
-            agreement = session.getAgreement();
-            agreement.setStatus(TradeStatus.ACCEPT_TRADE);
-            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_EARLY,
-                new DiplomacyMessage(unit, settlement, agreement));
-            session.complete(cs);
-            csAcceptTrade(unit, settlement, agreement, cs);
-            break;
-
-        case REJECT_TRADE:
-            if (session == null) {
-                return DOMMessage.clientError("REJECT without open session.");
-            }
-            agreement = session.getAgreement();
-            agreement.setStatus(TradeStatus.REJECT_TRADE);
-            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_EARLY,
-                new DiplomacyMessage(unit, settlement, agreement));
-            session.complete(cs);
-            break;
-
+        switch (status = agreement.getStatus()) {
         case PROPOSE_TRADE:
             if (session == null) {
-                // Some checks only apply when first proposing a trade,
-                // which can only be detected here where we handle sessions.
-                // Insist initial proposal is by the unit owner, and that
-                // the move type is valid (will become invalid when the
-                // moves left are zeroed below).
-                if (serverPlayer != (ServerPlayer) unit.getOwner()) {
-                    return DOMMessage.clientError("Diplomacy must be proposed"
-                        + " by the unit owner: " + unit.getOwner().getId());
-                }
                 Unit.MoveType type = unit.getMoveType(settlement.getTile());
                 if (type != Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
-                    return DOMMessage.clientError("Unable to enter "
-                        + settlement.getName() + ": " + type.whyIllegal());
+                        return DOMMessage.clientError("Unable to enter "
+                            + settlement.getId() + ": " + type.whyIllegal());
                 }
-                
-                // All is well, set up the session and clear unit moves.
                 session = new DiplomacySession(unit, settlement);
                 unit.setMovesLeft(0);
                 cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
             }
             session.setAgreement(agreement);
-            cs.add(See.only(otherPlayer), ChangePriority.CHANGE_LATE,
-                new DiplomacyMessage(unit, settlement, agreement));
             break;
-
+        case ACCEPT_TRADE:
+            if (session == null) {
+                return DOMMessage.clientError("Accept-trade with no session");
+            }
+            agreement = session.getAgreement();
+            agreement.setStatus(status);
+            csAcceptTrade(unit, settlement, agreement, cs);
+            break;
+        case REJECT_TRADE:
+            if (session == null) {
+                return DOMMessage.clientError("Reject-trade with no session");
+            }
+            agreement = session.getAgreement();
+            agreement.setStatus(status);
+            break;
         default:
-            return DOMMessage.clientError("Bogus trade");
+            return DOMMessage.clientError("Bogus trade status: " + status);
         }
+            
+        DOMMessage reply = askTimeout(otherPlayer,
+            new DiplomacyMessage(unit, settlement, agreement));
+        DiplomaticTrade theirAgreement = (reply instanceof DiplomacyMessage)
+            ? ((DiplomacyMessage)reply).getAgreement()
+            : null;
+        if (status != TradeStatus.PROPOSE_TRADE) {
+            session.complete(cs);
+            sendToOthers(serverPlayer, cs);
+            return cs.build(serverPlayer);
+        }
+        status = (theirAgreement == null) ? TradeStatus.REJECT_TRADE
+            : theirAgreement.getStatus();
+        switch (status) {
+        case PROPOSE_TRADE:
+            session.setAgreement(agreement = theirAgreement);
+            break;
+        case ACCEPT_TRADE:
+            agreement.setStatus(status);
+            csAcceptTrade(unit, settlement, agreement, cs);
+            session.complete(cs);
+            break;
+        case REJECT_TRADE:
+            agreement.setStatus(status);
+            session.complete(cs);
+            break;
+        default:
+            logger.warning("Bogus trade status: " + status);
+            break;
+        }
+        // Update *everyone* with the result, *and* return a
+        // DiplomacyMessage to the originating player because that is
+        // what ServerAPI.askDiplomacy is expecting.
+        sendToAll(cs);
 
-        sendToOthers(serverPlayer, cs);
-        return cs.build(serverPlayer);
+        return new ChangeSet()
+            .add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new DiplomacyMessage(unit, settlement, agreement))
+            .build(serverPlayer);
     }
 
     /**
