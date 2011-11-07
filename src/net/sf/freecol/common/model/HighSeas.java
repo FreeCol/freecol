@@ -155,9 +155,7 @@ public class HighSeas extends UnitLocation {
      */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         destinations.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
+        super.readChildren(in);
     }
 
     /**
