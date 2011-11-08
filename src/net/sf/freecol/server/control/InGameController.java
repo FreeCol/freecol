@@ -2542,17 +2542,19 @@ public final class InGameController extends Controller {
         session.setGift();
 
         // Inform the receiver of the gift.
+        ModelMessage m = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
+                                          "model.unit.gift",
+                                          settlement, goods.getType())
+            .addStringTemplate("%player%", serverPlayer.getNationName())
+            .add("%type%", goods.getNameKey())
+            .addAmount("%amount%", goods.getAmount())
+            .addName("%settlement%", settlement.getName());
+        cs.addMessage(See.only(serverPlayer), m);
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
         if (receiver.isConnected() && settlement instanceof Colony) {
             cs.add(See.only(receiver), unit);
             cs.add(See.only(receiver), settlement);
-            cs.addMessage(See.only(receiver),
-                new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
-                                 "model.unit.gift", settlement, goods.getType())
-                    .addStringTemplate("%player%", serverPlayer.getNationName())
-                    .add("%type%", goods.getNameKey())
-                    .addAmount("%amount%", goods.getAmount())
-                    .addName("%colony%", settlement.getName()));
+            cs.addMessage(See.only(receiver), m);
         }
         logger.info("Gift delivered by unit: " + unit.getId()
                     + " to settlement: " + settlement.getName());

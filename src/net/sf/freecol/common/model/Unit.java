@@ -1516,13 +1516,14 @@ public class Unit extends FreeColGameObject
      * @return The appropriate <code>MoveType</code>.
      */
     private MoveType getTradeMoveType(Settlement settlement) {
-        if (getOwner().atWarWith(settlement.getOwner())) {
-            return MoveType.MOVE_NO_ACCESS_WAR;
-        } else if (settlement instanceof Colony) {
-            return (hasAbility("model.ability.tradeWithForeignColonies"))
-                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
-                : MoveType.MOVE_NO_ACCESS_TRADE;
+        if (settlement instanceof Colony) {
+            return (getOwner().atWarWith(settlement.getOwner()))
+                ? MoveType.MOVE_NO_ACCESS_WAR
+                : (!hasAbility("model.ability.tradeWithForeignColonies"))
+                ? MoveType.MOVE_NO_ACCESS_TRADE
+                : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
         } else if (settlement instanceof IndianSettlement) {
+            // Do not block for war, bringing gifts is allowed
             return (!allowContact(settlement))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (goodsContainer.getGoodsCount() > 0)
