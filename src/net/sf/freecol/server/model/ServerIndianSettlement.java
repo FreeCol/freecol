@@ -114,17 +114,16 @@ public class ServerIndianSettlement extends IndianSettlement
 
         // Now check the food situation
         int storedFood = getGoodsCount(spec.getPrimaryFoodType());
-        if (storedFood <= 0) {
-            if (getUnitCount() > 1) {
-                Unit victim = Utils.getRandomMember(logger, "Choose starver",
-                                                    getUnitList(), random);
-                cs.addDispose(See.only(owner), this, victim);
-                logger.finest("Famine in " + getName());
-            } else {
-                cs.addDispose(See.perhaps().always(owner), getTile(), this);
-                logger.info(getName() + " collapsed due to famine.");
-                return;
-            }
+        if (storedFood <= 0 && getUnitCount() > 0) {
+            Unit victim = Utils.getRandomMember(logger, "Choose starver",
+                getUnitList(), random);
+            cs.addDispose(See.only(owner), this, victim);
+            logger.finest("Famine in " + getName());
+        }
+        if (getUnitCount() <= 0) {
+            cs.addDispose(See.perhaps().always(owner), getTile(), this);
+            logger.info(getName() + " collapsed.");
+            return;
         }
 
         // Check for new resident.
