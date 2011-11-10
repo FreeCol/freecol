@@ -996,6 +996,25 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Gets the best defender type available to this colony.
+     *
+     * @return The best available defender type.
+     */
+    public UnitType getBestDefenderType() {
+        UnitType bestDefender = null;
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+            if (unitType.getDefence() > 0
+                && (bestDefender == null
+                    || bestDefender.getDefence() < unitType.getDefence())
+                && !unitType.hasAbility(Ability.NAVAL_UNIT)
+                && unitType.isAvailableTo(getOwner())) {
+                bestDefender = unitType;
+            }
+        }
+        return bestDefender;
+    }
+
+    /**
      * Determines whether this colony is sufficiently unprotected and
      * contains something worth pillaging.  To be called by CombatModels
      * when the attacker has defeated an unarmed colony defender.

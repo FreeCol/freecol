@@ -370,8 +370,7 @@ public class AIColonyTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         Colony colony = getStandardColony();
-        assertEquals(artilleryType, AIColony.getBestDefender(colony));
-
+        assertEquals(artilleryType, colony.getBestDefenderType());
     }
 
 }
