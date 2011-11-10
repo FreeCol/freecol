@@ -529,6 +529,15 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
+     * Colony tiles can not auto-produce except for the center tile.
+     *
+     * @return True if this work location can produce goods without workers.
+     */
+    public boolean canAutoProduce() {
+        return isColonyCenterTile();
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *

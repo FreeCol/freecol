@@ -112,6 +112,14 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                                                GoodsType goodsType);
 
     /**
+     * Can this work location can produce goods without workers?
+     *
+     * @return True if this work location can produce goods without workers.
+     */
+    public abstract boolean canAutoProduce();
+
+
+    /**
      * Checks if this work location is available to the colony to be worked.
      *
      * @return The reason why/not the work location can be worked.
