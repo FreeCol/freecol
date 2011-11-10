@@ -248,10 +248,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     public NoAddReason getNoWorkReason() {
-        BuildingType type = getType();
-
-        return (type.getWorkPlaces() <= 0) ? NoAddReason.CAPACITY_EXCEEDED
-            : NoAddReason.NONE;
+        return NoAddReason.NONE;
     }
 
     /**
