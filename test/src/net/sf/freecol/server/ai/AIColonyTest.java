@@ -271,16 +271,23 @@ public class AIColonyTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         game.setCurrentPlayer(colony.getOwner());
         Player dutch = getGame().getPlayer("model.nation.dutch");
-        ColonyTile colonyTile = colony.getColonyTiles().get(0);
-
-        assertNull(AIColony.bestUnitForWorkLocation(null, colonyTile, sugarType));
-
         List<Unit> units = new ArrayList<Unit>();
-        assertNull(AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
-
         final UnitType servantType = spec().getUnitType("model.unit.indenturedServant");
-        Unit servant = new ServerUnit(getGame(), null, dutch, servantType);
+        Unit servant = new ServerUnit(getGame(), colony.getTile(),
+                                      dutch, servantType);
         units.add(servant);
+
+        ColonyTile colonyTile = null;
+        for (ColonyTile ct : colony.getColonyTiles()) {
+            if (!ct.isFull()) {
+                colonyTile = ct;
+                break;
+            }
+        }
+        assertNotNull(colonyTile);
+        assertNull(AIColony.bestUnitForWorkLocation(null, colonyTile, sugarType));
+        assertNull(AIColony.bestUnitForWorkLocation(new ArrayList<Unit>(), colonyTile, sugarType));
+
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, grainType));
 

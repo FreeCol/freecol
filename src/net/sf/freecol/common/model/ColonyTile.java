@@ -174,7 +174,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     @Override
     public int getUnitCapacity() {
-        return UNIT_CAPACITY;
+        return (isColonyCenterTile()) ? 0 : UNIT_CAPACITY;
     }
 
     /**
