@@ -616,7 +616,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * Gets the potential productivity of a given goods type from using
      * a unit of a given type in this building.
      *
-     * @param unitType The <code>UnitType</code> to check.
+     * @param unitType The optional <code>UnitType</code> to check.
      * @param goodsType The <code>GoodsType</code> to check.
      * @return The amount of goods potentially produced.
      */
@@ -626,9 +626,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             production += buildingType.getBasicProduction();
             if (production > 0) {
                 production += getColony().getProductionBonus();
-                unitType.getFeatureContainer()
-                    .applyModifier(Math.max(1, production),
-                        getGoodsOutputType().getId());
+                if (unitType != null) {
+                    unitType.getFeatureContainer()
+                        .applyModifier(Math.max(1, production),
+                            getGoodsOutputType().getId());
+                }
                 production = (int) FeatureContainer
                     .applyModifiers(production, getGame().getTurn(),
                         getProductionModifiers());
