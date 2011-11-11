@@ -145,9 +145,10 @@ public abstract class TransactionSession {
      */
     public static <T extends TransactionSession> T lookup(Class<T> type,
         String s1, String s2) {
-        TransactionSession ts = allSessions.get(makeSessionKey(type, s1, s2));
+    	String key = makeSessionKey(type, s1, s2);
+        TransactionSession ts = allSessions.get(key);
         if (ts != null && ts.completed) {
-            allSessions.remove(ts);
+            allSessions.remove(key);
             ts = null;
         }
         return (ts == null) ? null : type.cast(ts);
