@@ -265,14 +265,17 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param value an <code>int</code> value
      */
     private void saveInteger(String key, int value) {
-        Option o = freeColClient.getClientOptions()
-            .getOption(getClass().getName() + key);
-        if (o == null) {
-            IntegerOption io = new IntegerOption(getClass().getName() + key);
-            io.setValue(value);
-            freeColClient.getClientOptions().add(io);
-        } else if (o instanceof IntegerOption) {
-            ((IntegerOption) o).setValue(value);
+        if (freeColClient != null
+            && freeColClient.getClientOptions() != null) {
+            Option o = freeColClient.getClientOptions()
+                .getOption(getClass().getName() + key);
+            if (o == null) {
+                IntegerOption io = new IntegerOption(getClass().getName() + key);
+                io.setValue(value);
+                freeColClient.getClientOptions().add(io);
+            } else if (o instanceof IntegerOption) {
+                ((IntegerOption) o).setValue(value);
+            }
         }
     }
 
