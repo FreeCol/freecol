@@ -659,7 +659,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public void notifyClose() {
         firePropertyChange("closing", false, true);
         Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
-        if (frame != null) {
+        if (frame != null
+            && getClientOptions().getBoolean("model.option.rememberPanelPositions")) {
             saveInteger(".x", frame.getLocation().x);
             saveInteger(".y", frame.getLocation().y);
         }

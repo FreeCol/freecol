@@ -159,6 +159,11 @@ public class ClientOptions extends OptionGroup {
     public static final String USE_PIXMAPS = "model.option.usePixmaps";
 
     /**
+     * Whether to remember the positions of various panels.
+     */
+    public static final String REMEMBER_PANEL_POSITIONS = "model.option.rememberPanelPositions";
+
+    /**
      * Whether to display borders by default or not.
      */
     public static final String DISPLAY_BORDERS = "model.option.displayBorders";

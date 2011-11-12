@@ -49,6 +49,8 @@
       <booleanOption id="model.option.unitLastMoveDelay" defaultValue="true"/>
       <!-- Use pixmaps or not? -->
       <booleanOption id="model.option.usePixmaps" defaultValue="true"/>
+      <!-- Remember panel positions? -->
+      <booleanOption id="model.option.rememberPanelPositions" defaultValue="false"/>
       <!-- Option for in tile text display -->
       <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
