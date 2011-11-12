@@ -331,6 +331,18 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if ("choice".equals(in.getLocalName())) {
+            choices.add(getSpecification().getUnitType(in.getAttributeValue(null, VALUE_TAG)));
+            in.nextTag();
+        }
+    }
+
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unitTypeOption".
@@ -338,4 +350,11 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     public static String getXMLElementTagName() {
         return "unitTypeOption";
     }
+
+    public String toString() {
+        return getXMLElementTagName() + " [value=" + value
+            + ", addNone=" + addNone + ", generateChoices=" + generateChoices
+            + "]";
+    }
+
 }

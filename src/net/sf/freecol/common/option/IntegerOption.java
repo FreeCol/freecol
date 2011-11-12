@@ -228,4 +228,9 @@ public class IntegerOption extends AbstractOption<Integer> {
     public static String getXMLElementTagName() {
         return "integerOption";
     }
+
+    public String toString() {
+        return getXMLElementTagName() + " [value=" + value + "]";
+    }
+
 }

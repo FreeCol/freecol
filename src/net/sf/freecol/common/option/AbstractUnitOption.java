@@ -224,20 +224,21 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        number = new IntegerOption(getId() + ".number", getSpecification());
+        unitType = new UnitTypeOption(getId() + ".unitType", getSpecification());
+        role = new StringOption(getId() + ".role", getSpecification());
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
             if ("number".equals(tag)) {
-                number = new IntegerOption(getId() + ".number", getSpecification());
                 number.readFromXMLImpl(in);
             } else if ("unitType".equals(tag)) {
-                unitType = new UnitTypeOption(getId() + ".unitType", getSpecification());
                 unitType.readFromXMLImpl(in);
             } else if ("role".equals(tag)) {
-                role = new StringOption(getId() + ".role", getSpecification());
                 role.readFromXMLImpl(in);
             }
         }
-        if (unitType.getValue() != null) {
+
+        if (unitType.getValue() != null && role.getValue() != null && number.getValue() != null) {
             setValue(new AbstractUnit(unitType.getValue(), Role.valueOf(role.getValue()), number.getValue()));
         } else {
             setValue(null);

@@ -218,4 +218,18 @@ public class StringOption extends AbstractOption<String> {
     public static String getXMLElementTagName() {
         return "stringOption";
     }
+
+    public String toString() {
+        String result = "";
+        if (choices != null) {
+            for (String choice : choices) {
+                result += ", " + choice;
+            }
+            if (result.length() > 0) {
+                result = result.substring(2);
+            }
+        }
+        return getXMLElementTagName() + " [value=" + value
+            + ", choices=[" + result + "]]";
+    }
 }
