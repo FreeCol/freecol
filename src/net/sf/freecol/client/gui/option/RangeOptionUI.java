@@ -68,5 +68,21 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         slider.setSnapToTicks(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateOption() {
+        getOption().setValueRank(getComponent().getValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        getComponent().setValue(getOption().getValueRank());
+    }
+
 
 }
