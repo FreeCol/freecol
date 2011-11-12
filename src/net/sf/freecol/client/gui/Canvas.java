@@ -1819,11 +1819,11 @@ public final class Canvas extends JDesktopPane {
         vp.play();
 
         final class AbortListener implements KeyListener, MouseListener, VideoListener {
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {}
+
+            public void keyReleased(KeyEvent e) {
                 execute();
             }
-
-            public void keyReleased(KeyEvent e) {}
 
             public void keyTyped(KeyEvent e) {}
 
