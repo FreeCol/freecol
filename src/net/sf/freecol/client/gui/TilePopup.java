@@ -367,6 +367,18 @@ public final class TilePopup extends JPopupMenu {
                 });
             add(addu);
 
+            if (!tile.isEmpty()) {
+                final List<Unit> tileUnits = tile.getUnitList();
+                JMenuItem adda = new JMenuItem("Reset moves");
+                adda.setOpaque(false);
+                adda.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            debugResetUnitsMoves(serverGame, tileUnits);
+                        }
+                    });
+                add(adda);
+            }
+
             for (Unit u : tile.getUnitList()) {
                 if (u.getSpaceLeft() > 0) {
                     final Unit unit = u;
@@ -636,6 +648,26 @@ public final class TilePopup extends JPopupMenu {
         }
         mapViewer.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
+        canvas.refresh();
+    }
+
+    /**
+     * Debug action to reset the moves left of the units on a tile.
+     *
+     * @param serverGame The server <code>Game</code> containing the tile.
+     * @param units The <code>Unit</code>s to reactivate.
+     */
+    private void debugResetUnitsMoves(final Game serverGame, List<Unit> units) {
+        boolean first = true;
+        for (Unit u : units) {
+            Unit su = (Unit)serverGame.getFreeColGameObject(u.getId());
+            u.setMovesLeft(u.getInitialMovesLeft());
+            su.setMovesLeft(su.getInitialMovesLeft());
+            if (first) {
+                mapViewer.setActiveUnit(u);
+                first = false;
+            }
+        }
         canvas.refresh();
     }
 
