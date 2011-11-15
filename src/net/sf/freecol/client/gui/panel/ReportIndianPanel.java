@@ -161,7 +161,11 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(skillLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
-                if (visited && wantedGoods[0] != null) {
+                if (!visited) {
+                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+                } else if (wantedGoods[0] == null) {
+                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsNone"));
+                } else {
                     JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
                     goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
                     String split = "split " + String.valueOf(wantedGoods.length);
@@ -175,8 +179,6 @@ public final class ReportIndianPanel extends ReportPanel {
                             reportPanel.add(goodsLabel);
                         }
                     }
-                } else {
-                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
                 }
             }
         } else {

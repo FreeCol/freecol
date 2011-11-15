@@ -92,33 +92,38 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
+        int n = 0;
+        for (int i = 0; i < wantedGoods.length; i++) {
+            if (wantedGoods[i] != null) n++;
+        }
         String sale;
         add(localizedLabel("indianSettlement.highlyWanted"), "newline");
         if (!visited) {
             add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+        } else if (wantedGoods[0] == null) {
+            add(localizedLabel("indianSettlement.wantedGoodsNone"));
         } else {
             sale = player.getLastSaleString(settlement, wantedGoods[0]);
             add(new JLabel(Messages.message(wantedGoods[0].getNameKey())
                            + ((sale == null) ? "" : " " + sale),
                            canvas.getImageIcon(wantedGoods[0], false),
                            JLabel.CENTER));
+            n--;
         }
 
         add(localizedLabel("indianSettlement.otherWanted"), "newline");
         if (!visited) {
             add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+        } else if (n == 0) {
+            add(localizedLabel("indianSettlement.wantedGoodsNone"));
         } else {
-            int i, n = 1;
-            for (i = 2; i < wantedGoods.length; i++) {
-                if (wantedGoods[i] != null) n++;
-            }
             sale = player.getLastSaleString(settlement, wantedGoods[1]);
             add(new JLabel(Messages.message(wantedGoods[1].getNameKey())
                            + ((sale == null) ? "" : " " + sale),
                            canvas.getImageIcon(wantedGoods[1], false),
                            JLabel.CENTER),
                 "split " + Integer.toString(n));
-            for (i = 2; i < wantedGoods.length; i++) {
+            for (int i = 2; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
                     sale = player.getLastSaleString(settlement,wantedGoods[i]);
                     add(new JLabel(Messages.message(wantedGoods[i].getNameKey())

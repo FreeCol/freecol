@@ -53,6 +53,12 @@ public class IndianSettlement extends Settlement {
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
 
+    // Do not sell less than this amount of goods.
+    public static final int TRADE_MINIMUM_SIZE = 20;
+
+    // Do not buy goods when the price is this low.
+    public static final int TRADE_MINIMUM_PRICE = 3;
+
     public static final int GOODS_BASE_PRICE = 12;
 
     /** The amount of goods a brave can produce a single turn. */
@@ -107,16 +113,19 @@ public class IndianSettlement extends Settlement {
     private java.util.Map<Player, Tension> alarm
         = new HashMap<Player, Tension>();
 
-    // Sort goods types descending by price.
+    // When choosing what goods to buy, sort goods types descending by price.
     private final Comparator<GoodsType> wantedGoodsComparator
         = new Comparator<GoodsType>() {
             public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-                return getPriceToBuy(goodsType2, GoodsContainer.CARGO_SIZE)
-                - getPriceToBuy(goodsType1, GoodsContainer.CARGO_SIZE);
+                return (getNormalGoodsPriceToBuy(goodsType2,
+                        GoodsContainer.CARGO_SIZE)
+                    - getNormalGoodsPriceToBuy(goodsType1,
+                        GoodsContainer.CARGO_SIZE));
             }
         };
 
-    // Sort goods with new world goods first, then by price, and amount.
+    // When choosing what goods to sell, sort goods with new world
+    // goods first, then by price, then amount.
     private final Comparator<Goods> exportGoodsComparator
         = new Comparator<Goods>() {
             public int compare(Goods goods1, Goods goods2) {
@@ -130,7 +139,7 @@ public class IndianSettlement extends Settlement {
                         GoodsContainer.CARGO_SIZE);
                     int a2 = Math.min(goods1.getAmount(),
                         GoodsContainer.CARGO_SIZE);
-                    cmp = getPriceToBuy(t2, a2) - getPriceToBuy(t1, a1);
+                    cmp = getPriceToSell(t2, a2) - getPriceToSell(t1, a1);
                     if (cmp == 0) {
                         cmp = a2 - a1;
                     }
@@ -552,7 +561,7 @@ public class IndianSettlement extends Settlement {
     }
 
     public void setWantedGoods(int index, GoodsType type) {
-        if (0 <= index && index <= 2) {
+        if (0 <= index && index < wantedGoods.length) {
             wantedGoods[index] = type;
         }
     }
@@ -890,6 +899,7 @@ public class IndianSettlement extends Settlement {
                     .applyModifierSet((float) amount, getGame().getTurn(),
                         unit.getModifierSet("model.modifier.tradeVolumePenalty")));
             }
+            if (amount < TRADE_MINIMUM_SIZE) continue;
             result.add(new Goods(getGame(), this, goods.getType(), amount));
             count++;
             if (count >= limit) break;
@@ -941,33 +951,28 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Updates the variable wantedGoods.
-     *
-     * <br><br>
+     * Updates the goods wanted by this settlement.
      *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
      */
     public void updateWantedGoods() {
-        /* TODO: Try the different types goods in "random" order
-         * (based on the numbers of units on this tile etc): */
         List<GoodsType> goodsTypes = new ArrayList<GoodsType>(getSpecification().getGoodsTypeList());
         Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
-            // Indians do not ask for horses or guns
-            if (goodsType.isMilitaryGoods())
+            // The natives do not trade military or non-storable goods.
+            if (goodsType.isMilitaryGoods() || !goodsType.isStorable())
                 continue;
-            // no sense asking for bells or crosses
-            if (!goodsType.isStorable())
-                continue;
-            if (wantedIndex < wantedGoods.length) {
-                wantedGoods[wantedIndex] = goodsType;
-                wantedIndex++;
-            } else {
-                break;
-            }
+            if (getNormalGoodsPriceToBuy(goodsType, GoodsContainer.CARGO_SIZE)
+                <= GoodsContainer.CARGO_SIZE * TRADE_MINIMUM_PRICE
+                || wantedIndex >= wantedGoods.length) break;
+            wantedGoods[wantedIndex] = goodsType;
+            wantedIndex++;
+        }
+        for (; wantedIndex < wantedGoods.length; wantedIndex++) {
+            wantedGoods[wantedIndex] = null;
         }
     }
 
@@ -1126,8 +1131,10 @@ public class IndianSettlement extends Settlement {
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             writeAttribute(out, "learnableSkill", learnableSkill);
             for (int i = 0; i < wantedGoods.length; i++) {
-                String tag = "wantedGoods" + Integer.toString(i);
-                out.writeAttribute(tag, wantedGoods[i].getId());
+                if (wantedGoods[i] != null) {
+                    String tag = "wantedGoods" + Integer.toString(i);
+                    out.writeAttribute(tag, wantedGoods[i].getId());
+                }
             }
         } else if (pet != null) {
             writeAttribute(out, "learnableSkill", pet.getSkill());
@@ -1217,9 +1224,8 @@ public class IndianSettlement extends Settlement {
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
             String wantedGoodsId = getAttribute(in, tag, null);
-            if (wantedGoodsId != null) {
-                wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsId);
-            }
+            wantedGoods[i] = (wantedGoodsId == null) ? null
+                : getSpecification().getGoodsType(wantedGoodsId);
         }
 
         convertProgress = getAttribute(in, "convertProgress", 0);
@@ -1245,11 +1251,13 @@ public class IndianSettlement extends Settlement {
             alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
             in.nextTag(); // close element
         } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
-            String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME, in, new String[0]);
-            for (int i = 0; i < wantedGoodsID.length; i++) {
-                if (i == 3)
-                    break;
-                wantedGoods[i] = getSpecification().getGoodsType(wantedGoodsID[i]);
+            String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME,
+                                                          in, new String[0]);
+            for (int i = 0; i < wantedGoods.length; i++) {
+                String goodsId = (i < wantedGoodsID.length) ? wantedGoodsID[i]
+                    : null;
+                wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
+                    : getSpecification().getGoodsType(goodsId);
             }
         } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
             in.nextTag();

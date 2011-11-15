@@ -314,12 +314,20 @@ public class NativeAIPlayer extends AIPlayer {
         String goldKey = "tradeGold#" + goods.getType().getId()
             + "#" + goods.getAmount() + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
-
+        int price;
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
+            price = is.getPriceToSell(goods);
+            switch (is.getAlarm(buyer).getLevel()) {
+            case HAPPY: case CONTENT:
+                break;
+            case DISPLEASED:
+                price *= 2;
+                break;
+            default:
+                return NetworkConstants.NO_TRADE;
+            }
             Set<Modifier> modifiers = new HashSet<Modifier>();
-            int price = is.getPriceToSell(goods)
-                + getPlayer().getTension(buyer).getValue();
             Unit missionary = is.getMissionary(buyer);
             if (missionary != null
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
@@ -332,29 +340,26 @@ public class NativeAIPlayer extends AIPlayer {
                 getGame().getTurn(), modifiers);
             sessionRegister.put(goldKey, new Integer(price));
             return price;
-        } else {
-            int price = registered.intValue();
-            if (price < 0 || price == gold) {
-                return price;
-            } else if (gold < (price * 9) / 10) {
-                logger.warning("Cheating attempt: sending a offer too low");
-                sessionRegister.put(goldKey, new Integer(-1));
-                return NetworkConstants.NO_TRADE;
-            } else {
-                int haggling = 1;
-                if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey).intValue();
-                }
-                if (getAIRandom().nextInt(3 + haggling) < 3) {
-                    sessionRegister.put(goldKey, new Integer(gold));
-                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
-                    return gold;
-                } else {
-                    sessionRegister.put(goldKey, new Integer(-1));
-                    return NetworkConstants.NO_TRADE;
-                }
-            }
         }
+        price = registered.intValue();
+        if (price < 0 || price == gold) return price;
+        if (gold < (price * 9) / 10) {
+            logger.warning("Cheating attempt: sending a offer too low");
+            sessionRegister.put(goldKey, new Integer(-1));
+            return NetworkConstants.NO_TRADE;
+        }
+
+        int haggling = 1;
+        if (sessionRegister.containsKey(hagglingKey)) {
+            haggling = sessionRegister.get(hagglingKey).intValue();
+        }
+        if (getAIRandom().nextInt(3 + haggling) >= 3) {
+            sessionRegister.put(goldKey, new Integer(-1));
+            return NetworkConstants.NO_TRADE;
+        }
+        sessionRegister.put(goldKey, new Integer(gold));
+        sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+        return gold;
     }
 
     /**
@@ -379,13 +384,23 @@ public class NativeAIPlayer extends AIPlayer {
         int price;
         if (sessionRegister.containsKey(goldKey)) {
             price = sessionRegister.get(goldKey).intValue();
-            if (price <= 0) {
-                return price;
-            }
         } else {
+            price = is.getPriceToBuy(goods);
+            switch (is.getAlarm(seller).getLevel()) {
+            case HAPPY: case CONTENT:
+                break;
+            case DISPLEASED:
+                price /= 2;
+                break;
+            case ANGRY:
+                if (!goods.getType().isMilitaryGoods())
+                    return NetworkConstants.NO_TRADE;
+                price /= 2;
+                break;
+            default:
+                return NetworkConstants.NO_TRADE;
+            }
             Set<Modifier> modifiers = new HashSet<Modifier>();
-            price = is.getPriceToBuy(goods)
-                - getPlayer().getTension(seller).getValue();
             Unit missionary = is.getMissionary(seller);
             if (missionary != null
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
@@ -399,26 +414,23 @@ public class NativeAIPlayer extends AIPlayer {
             if (price <= 0) return 0;
             sessionRegister.put(goldKey, new Integer(price));
         }
-        if (gold < 0 || price == gold) {
-            return price;
-        } else if (gold > (price * 11) / 10) {
+        if (gold < 0 || price == gold) return price;
+        if (gold > (price * 11) / 10) {
             logger.warning("Cheating attempt: haggling with a request too high");
             sessionRegister.put(goldKey, new Integer(-1));
             return NetworkConstants.NO_TRADE;
-        } else {
-            int haggling = 1;
-            if (sessionRegister.containsKey(hagglingKey)) {
-                haggling = sessionRegister.get(hagglingKey).intValue();
-            }
-            if (getAIRandom().nextInt(3 + haggling) < 3) {
-                sessionRegister.put(goldKey, new Integer(gold));
-                sessionRegister.put(hagglingKey, new Integer(haggling + 1));
-                return gold;
-            } else {
-                sessionRegister.put(goldKey, new Integer(-1));
-                return NetworkConstants.NO_TRADE;
-            }
         }
+        int haggling = 1;
+        if (sessionRegister.containsKey(hagglingKey)) {
+            haggling = sessionRegister.get(hagglingKey).intValue();
+        }
+        if (getAIRandom().nextInt(3 + haggling) >= 3) {
+            sessionRegister.put(goldKey, new Integer(-1));
+            return NetworkConstants.NO_TRADE;
+        }
+        sessionRegister.put(goldKey, new Integer(gold));
+        sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+        return gold;
     }
 
 /* Internal methods ***********************************************************/

@@ -2793,24 +2793,17 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Has a player visited a native settlement?
-     * If the player has, the client will have received an update of
-     * the wantedGoods, so test if they are valid.
      *
-     * Obviously this is only useful on the client side, but it is needed
-     * by the native report and settlement popup to clarify whether the
-     * skill at the settlement is null because it has been depleted, or
-     * because we just have not found out what it is yet.
+     * This is needed by the native report and settlement popup to
+     * clarify whether the skill at the settlement is null because it
+     * has been depleted, or because we just have not found out what
+     * it is yet.
      *
      * @param settlement The <code>IndianSettlement</code> to query.
      * @return True if the player has visited the settlement.
      */
     public boolean hasVisited(IndianSettlement settlement) {
-        GoodsType[] wanted = settlement.getWantedGoods();
-        if (wanted == null) return false;
-        for (GoodsType g : wanted) {
-            if (g == null) return false;
-        }
-        return true;
+        return settlement.hasContactedSettlement(this);
     }
 
     /**
