@@ -2332,7 +2332,7 @@ public final class MapViewer {
                             Image leftImage = null;
                             Image rightImage = null;
                             if (settlement instanceof Colony) {
-                                String size = Integer.toString(((Colony) settlement).getUnitCount());
+                                String size = Integer.toString(((Colony) settlement).getDisplayUnitCount());
                                 leftImage = createLabel(g, size, font, backgroundColor);
 
                                 if (settlement.getOwner() == clientPlayer) {
@@ -2541,7 +2541,7 @@ public final class MapViewer {
                 // Draw image of colony in center of the tile.
                 centerImage(g, colonyImage);
                 if (withNumber) {
-                    String populationString = Integer.toString(((Colony)settlement).getUnitCount());
+                    String populationString = Integer.toString(((Colony)settlement).getDisplayUnitCount());
                     int bonus = ((Colony)settlement).getProductionBonus();
                     Color theColor = ResourceManager.getProductionColor(bonus);
                     Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);

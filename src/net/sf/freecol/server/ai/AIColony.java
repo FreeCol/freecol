@@ -857,6 +857,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             logger.fine("No need to rearrange workers in " + colony.getName() + ".");
             return false;
         }
+        
+        // Lock the apparent unit count while the colony is changing.
+        colony.setDisplayUnitCount(colony.getUnitCount());
 
         // TODO: Detect a siege and move the workers temporarily around.
 
@@ -1208,6 +1211,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // no need to rearrange workers again immediately
         rearrangeWorkers = false;
+        colony.setDisplayUnitCount(-1); // disable the unit count override
         return true;
     }
 

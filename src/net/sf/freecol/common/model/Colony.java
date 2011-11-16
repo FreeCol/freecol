@@ -136,6 +136,7 @@ public class Colony extends Settlement implements Nameable {
 
     // Will only be used on enemy colonies:
     protected int unitCount = -1;
+    protected int displayUnitCount = -1;
     protected String stockadeKey = null;
 
     /** The turn in which this colony was established. */
@@ -218,9 +219,9 @@ public class Colony extends Settlement implements Nameable {
     public String getImageKey() {
         if (isUndead()) return "undead";
 
-        int unitCount = getUnitCount();
-        String key = (unitCount <= 3) ? "small"
-            : (unitCount <= 7) ? "medium"
+        int count = getDisplayUnitCount();
+        String key = (count <= 3) ? "small"
+            : (count <= 7) ? "medium"
             : "large";
         String stockade = getStockadeKey();
         if (stockade != null) key += stockade;
@@ -395,16 +396,6 @@ public class Colony extends Settlement implements Nameable {
         }
         // Changing the owner might alter bonuses applied by founding fathers:
         updatePopulation(0);
-    }
-
-    /**
-     * Sets the number of units inside the colony, used in enemy colonies
-     *
-     * @param unitCount The units inside the colony
-     * @see #getUnitCount
-     */
-    public void setUnitCount(int unitCount) {
-        this.unitCount = unitCount;
     }
 
     /**
@@ -798,20 +789,39 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the number of units at this colony.  Units are located in a
-     * {@link WorkLocation}s.
+     * Gets the number of units inside this colony, which is just the sum
+     * of the units at each work location.
      *
      * @return The number of <code>Unit</code>s in this colony.
      */
     public int getUnitCount() {
+        if (unitCount >= 0) return unitCount;
         int count = 0;
-        if (unitCount != -1) {
-            return unitCount;
-        }
         for (WorkLocation w : getCurrentWorkLocations()) {
             count += w.getUnitCount();
         }
         return count;
+    }
+
+    /**
+     * Gets the apparent number of units at this colony.
+     * Used in client enemy colonies
+     *
+     * @return The apparent number of <code>Unit</code>s at this colony.
+     */
+    public int getDisplayUnitCount() {
+        return (displayUnitCount > 0) ? displayUnitCount : getUnitCount();
+    }
+
+    /**
+     * Sets the apparent number of units inside the colony.
+     * Used in client enemy colonies
+     *
+     * @param displayUnitCount The apparent number of <code>Unit</code>s
+     *     inside the colony.
+     */
+    public void setDisplayUnitCount(int displayUnitCount) {
+        this.displayUnitCount = displayUnitCount;
     }
 
     /**
@@ -972,7 +982,7 @@ public class Colony extends Settlement implements Nameable {
     public Unit getDefendingUnit(Unit attacker) {
         List<Unit> unitList = getUnitList();
 
-        if (unitCount != -1 && unitList.isEmpty()) {
+        if (unitCount >= 0 && unitList.isEmpty()) {
             // There are units, but we don't see them
             return null;
         }
