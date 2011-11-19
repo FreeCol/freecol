@@ -1711,25 +1711,16 @@ public class Unit extends FreeColGameObject
      * @return True if this unit could still be moved by the player.
      */
     public boolean couldMove() {
-        switch (getState()) {
-        case ACTIVE: case SKIPPED:
-            return getMovesLeft() > 0
-                && destination == null // Can not reach next tile
-                && tradeRoute == null
-                && !isUnderRepair()
-                && !isAtSea()
-                && !(isInEurope() && isOnCarrier())
-                // this should never happen anyway, since these units
-                // should have state IN_COLONY, but better safe than
-                // sorry
-                && !(location instanceof WorkLocation);
-        case FORTIFIED: case FORTIFYING: case IN_COLONY: case IMPROVING:
-        case TO_EUROPE: case TO_AMERICA: case SENTRY:
-            break;
-        default:
-            throw new IllegalStateException("Bogus state: " + getState());
-        }
-        return false;
+        return getState() == UnitState.ACTIVE
+            && getMovesLeft() > 0
+            && destination == null // Can not reach next tile
+            && tradeRoute == null
+            && !isUnderRepair()
+            && !isAtSea()
+            && !(isInEurope() && isOnCarrier())
+            // this should never happen anyway, since these units
+            // should have state IN_COLONY, but better safe than sorry
+            && !(location instanceof WorkLocation);
     }
 
 
