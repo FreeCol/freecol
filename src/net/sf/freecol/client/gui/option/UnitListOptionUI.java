@@ -34,6 +34,8 @@ import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -60,7 +62,8 @@ import net.sf.freecol.common.option.UnitListOption;
  *
  * TODO: derive from ListOptionUI
  */
-public final class UnitListOptionUI extends OptionUI<UnitListOption> {
+public final class UnitListOptionUI extends OptionUI<UnitListOption>
+    implements ListSelectionListener {
 
     private JPanel panel = new JPanel();
     private JList list;
@@ -162,6 +165,11 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
             }
         });
 
+        editButton.setEnabled(false);
+        removeButton.setEnabled(false);
+        upButton.setEnabled(false);
+        downButton.setEnabled(false);
+        list.addListSelectionListener(this);
         initialize();
     }
 
@@ -236,6 +244,16 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption> {
         model.clear();
         for (AbstractUnitOption o : getOption().getValue()) {
             model.addElement(o);
+        }
+    }
+
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting() == false) {
+            boolean enabled = (list.getSelectedValue() != null);
+            editButton.setEnabled(enabled);
+            removeButton.setEnabled(enabled);
+            upButton.setEnabled(enabled);
+            downButton.setEnabled(enabled);
         }
     }
 
