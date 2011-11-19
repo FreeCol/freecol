@@ -216,7 +216,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>ClientOptions</code> value
      */
     protected ClientOptions getClientOptions() {
-        return freeColClient.getClientOptions();
+        return freeColClient == null ? null : freeColClient.getClientOptions();
     }
 
     /**
@@ -660,6 +660,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         firePropertyChange("closing", false, true);
         Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
         if (frame != null
+            && getClientOptions() != null
             && getClientOptions().getBoolean("model.option.rememberPanelPositions")) {
             saveInteger(".x", frame.getLocation().x);
             saveInteger(".y", frame.getLocation().y);
