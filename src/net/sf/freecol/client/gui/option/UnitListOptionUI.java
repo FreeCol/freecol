@@ -49,6 +49,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit.Role;
@@ -304,8 +305,12 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption>
             c.setForeground(list.getForeground());
             c.setFont(list.getFont());
             AbstractUnit unit = ((AbstractUnitOption) value).getValue();
-            String key = unit.getRole() == Role.DEFAULT ? unit.getId()
-                : "model.unit." + unit.getRole().toString().toLowerCase(Locale.US);
+            String key = unit.getId();
+            if (unit.getUnitType(getOption().getSpecification())
+                .hasAbility(Ability.CAN_BE_EQUIPPED)
+                && unit.getRole() != Role.DEFAULT) {
+                key = "model.unit." + unit.getRole().toString().toLowerCase(Locale.US);
+            }
             StringTemplate template = StringTemplate.template(key + ".name")
                 .addAmount("%number%", unit.getNumber())
                 .add("%unit%", unit.getId() + ".name");
