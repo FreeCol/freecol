@@ -172,6 +172,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public boolean damage() {
         if (canBeDamaged()) {
             setType(buildingType.getUpgradesFrom());
+            getColony().invalidateCache();
             return true;
         }
         return false;
@@ -186,6 +187,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public boolean upgrade() {
         if (canBuildNext()) {
             setType(buildingType.getUpgradesTo());
+            getColony().invalidateCache();
             return true;
         }
         return false;
