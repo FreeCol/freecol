@@ -1364,7 +1364,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getMembers() {
         float result = (sonsOfLiberty * getUnitCount()) / 100f;
-        return Math.round(result);
+        return (int)Math.floor(result);
     }
 
     /**
