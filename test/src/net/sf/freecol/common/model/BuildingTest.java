@@ -619,8 +619,60 @@ public class BuildingTest extends FreeColTestCase {
                 }
             }
         }
-
-
     }
 
+    public void testToolsMusketProduction() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        BuildingType armoryType
+            = spec().getBuildingType("model.building.armory");
+        BuildingType blacksmithType
+            = spec().getBuildingType("model.building.blacksmithHouse");
+
+        Colony colony = getStandardColony(8);
+        List<Unit> units = colony.getUnitList();
+        // make sure there are enough goods to get started
+        //colony.addGoods(spec().getGoodsType("model.goods.food"), 100);
+        colony.addGoods(spec().getGoodsType("model.goods.ore"), 100);
+        // make sure no penalties apply
+        colony.addGoods(spec().getGoodsType("model.goods.bells"),
+                        Colony.LIBERTY_PER_REBEL * 3);
+        colony.updatePopulation(0);
+
+        Building smithy = colony.getBuilding(blacksmithType);
+        smithy.add(units.get(0));
+        smithy.add(units.get(1));
+        Building armory = new ServerBuilding(game, colony, armoryType);
+        colony.addBuilding(armory);
+        armory.add(units.get(2));
+        armory.add(units.get(3));
+
+        assertEquals(3, smithy.getType().getBasicProduction());
+        assertEquals(6, smithy.getProduction());
+        assertEquals(3, armory.getType().getBasicProduction());
+        assertEquals(6, armory.getProduction());
+
+        smithy.upgrade();
+        armory.upgrade();
+
+        assertEquals(6, smithy.getType().getBasicProduction());
+        assertEquals(12, smithy.getProduction());
+        assertEquals(6, armory.getType().getBasicProduction());
+        assertEquals(12, armory.getProduction());
+
+        // make sure we can build factory level buildings
+        colony.getOwner().addFather(spec().getFoundingFather("model.foundingFather.adamSmith"));
+
+        smithy.upgrade();
+        armory.upgrade();
+
+        assertEquals(6, smithy.getType().getBasicProduction());
+        assertEquals(18, smithy.getProduction());
+        assertEquals(6, armory.getType().getBasicProduction());
+        assertEquals("According to bug report #3430371, the arsenal does not enjoy "
+                     + "the usual factory level production bonus of 50%",
+                     12, armory.getProduction());
+
+    }
 }
