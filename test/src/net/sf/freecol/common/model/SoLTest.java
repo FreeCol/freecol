@@ -23,22 +23,21 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class SoLTest extends FreeColTestCase {
 
-
     public void testSoL() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        final GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         Colony colony = getStandardColony(7);
         for (int i = 1; i <= 100; i++) {
-            int requiredBells = ((colony.getSoL() + 1) * Colony.LIBERTY_PER_REBEL *
-                                 colony.getUnitCount()) / 100;
-            colony.addGoods(bellsType, requiredBells - colony.getGoodsCount(bellsType));
+            int requiredBells = (Colony.LIBERTY_PER_REBEL
+                * (colony.getSoL() + 1) * colony.getUnitCount()) / 100;
+            colony.addGoods(bellsType,
+                            requiredBells - colony.getGoodsCount(bellsType));
             colony.updatePopulation(0);
             assertEquals(colony.getSoL(), i);
             assertEquals(colony.getTory(), 100 - i);
-            assertEquals(colony.getMembers(), Math.round(i * 7 / 100f));
-
+            assertEquals(colony.getMembers(), (int) Math.floor(i * 7 / 100f));
         }
     }
 
