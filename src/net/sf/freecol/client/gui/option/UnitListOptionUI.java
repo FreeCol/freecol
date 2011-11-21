@@ -250,7 +250,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption>
 
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
-            boolean enabled = (list.getSelectedValue() != null);
+            boolean enabled = (isEditable() && list.getSelectedValue() != null);
             editButton.setEnabled(enabled);
             removeButton.setEnabled(enabled);
             upButton.setEnabled(enabled);
