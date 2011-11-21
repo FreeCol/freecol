@@ -19,8 +19,12 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Locale;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -28,6 +32,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
@@ -42,12 +47,15 @@ import net.sf.freecol.common.option.UnitTypeOption;
  * net.sf.freecol.common.option.AbstractUnitOption}. In order to enable
  * values to be both seen and changed.
  */
-public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
+public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
+    implements ItemListener {
 
     private JPanel panel = new JPanel();
     private IntegerOptionUI numberUI;
     private UnitTypeOptionUI typeUI;
     private StringOptionUI roleUI;
+
+    private boolean roleEditable;
 
     /**
     * Creates a new <code>AbstractUnitOptionUI</code> for the given <code>AbstractUnitOption</code>.
@@ -75,13 +83,14 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
         typeUI = new UnitTypeOptionUI(gui, typeOption, typeEditable);
 
         typeUI.getComponent().setToolTipText(Messages.message("model.unit.type"));
+        typeUI.getComponent().addItemListener(this);
         panel.add(typeUI.getComponent(), "width 35%");
 
-        boolean roleEditable = editable
+        roleEditable = editable
             && roleOption.getChoices().size() > 1;
         roleUI = new StringOptionUI(gui,roleOption, roleEditable);
         roleUI.getComponent().setToolTipText(Messages.message("model.unit.role.name"));
-        roleUI.setRenderer(new RoleRenderer());
+        roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");
 
         initialize();
@@ -115,6 +124,18 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>  {
         typeUI.reset();
         roleUI.reset();
         numberUI.reset();
+    }
+
+    public void itemStateChanged(ItemEvent e) {
+        JComboBox box = roleUI.getComponent();
+        UnitType type = (UnitType) typeUI.getComponent().getSelectedItem();
+        if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+            box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
+            box.setEnabled(roleEditable);
+        } else {
+            box.setModel(new DefaultComboBoxModel(new String[] { Role.DEFAULT.toString() }));
+            box.setEnabled(false);
+        }
     }
 
     private class RoleRenderer extends FreeColComboBoxRenderer {

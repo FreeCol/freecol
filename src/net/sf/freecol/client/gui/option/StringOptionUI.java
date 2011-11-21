@@ -59,10 +59,6 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
         initialize();
     }
 
-    public void setRenderer(ListCellRenderer renderer) {
-        box.setRenderer(renderer);
-    }
-
     /**
      * {@inheritDoc}
      */
