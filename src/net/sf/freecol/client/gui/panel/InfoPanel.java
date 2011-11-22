@@ -440,7 +440,7 @@ public final class InfoPanel extends FreeColPanel {
             String labelString = Messages.message("infoPanel.endTurnPanel.text");
             int width = getFontMetrics(getFont()).stringWidth(labelString);
             if (width > 150 ) {
-                int index = MapViewer.getBreakingPoint(labelString);
+                int index = Messages.getBreakingPoint(labelString);
                 if (index > 0) {
                     add(new JLabel(labelString.substring(0, index)));
                     add(new JLabel(labelString.substring(index + 1)));

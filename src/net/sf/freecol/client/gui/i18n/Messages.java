@@ -784,5 +784,26 @@ public class Messages {
         }
     }
 
+    /**
+     * Breaks a line between two words. The breaking point
+     * is as close to the center as possible.
+     *
+     * @param string The line for which we should determine a
+     *               breaking point.
+     * @return The best breaking point or <code>-1</code> if there
+     *         are none.
+     */
+     public static int getBreakingPoint(String string) {
+         int center = string.length() / 2;
+         for (int offset = 0; offset < center; offset++) {
+             if (string.charAt(center + offset) == ' ') {
+                 return center + offset;
+             } else if (string.charAt(center - offset) == ' ') {
+                 return center - offset;
+             }
+         }
+         return -1;
+     }
+
 
 }

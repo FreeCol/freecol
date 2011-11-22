@@ -33,7 +33,6 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -110,7 +109,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());
-            int breakingPoint = MapViewer.getBreakingPoint(clickToBuild);
+            int breakingPoint = Messages.getBreakingPoint(clickToBuild);
             if (breakingPoint > 0) {
                 add(new JLabel(clickToBuild.substring(0, breakingPoint)),
                     "span, align center");
