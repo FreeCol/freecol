@@ -54,9 +54,13 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * Constructor for ServerBuilding.
      *
      * @param game The <code>Game</code> this object belongs to.
+     * @param colony The <code>Colony</code> in which this building is located.
+     * @param type The <code>BuildingType</code> of building.
      */
-    protected Building(Game game) {
+    protected Building(Game game, Colony colony, BuildingType type) {
         super(game);
+        setColony(colony);
+        this.buildingType = type;
     }
 
     /**

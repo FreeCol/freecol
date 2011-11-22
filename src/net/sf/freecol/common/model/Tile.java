@@ -174,6 +174,38 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     // ------------------------------------------------------------ static methods
+    /**
+     * Creates a temporary copy of this tile for planning purposes.
+     * The copy is identical except:
+     *   - it is not present on the map
+     *   - it has no owner, owning settlement or settlement
+     * The latter is not a problem as the main use of this routine
+     * is by Colony.getScratchColony() which needs to change these fields
+     * anyway.
+     * Note that the following fields are shared--- do not mutate them!
+     *   + The tile item container
+     *   + The player explored tiles.
+     * Colony.getCorrespondingWorkLocation() depends on the tics being shared.
+     *
+     * @return A scratch version of this tile.
+     */
+    public Tile getScratchTile() {
+        Game game = getGame();
+        Tile scratch = new Tile(game, type, x, y);
+        scratch.owner = null;
+        scratch.settlement = null;
+        scratch.owningSettlement = null;
+        if (tileItemContainer == null) {
+            tileItemContainer = new TileItemContainer(getGame(), this);
+        }
+        scratch.tileItemContainer = tileItemContainer;
+        scratch.playerExploredTiles = playerExploredTiles;
+        scratch.region = region;
+        scratch.connected = connected;
+        scratch.moveToEurope = moveToEurope;
+        scratch.style = style;
+        return scratch;
+    }
 
     public boolean isViewShared() {
         return (getGame().getViewOwner() != null);

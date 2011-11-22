@@ -407,6 +407,7 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Unit not found in tile",found);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", colonyTile);
+        dutch.addSettlement(colony);
         nonServerBuildColony(soldier, colony);
 
         assertFalse("soldier should be inside the colony",soldier.getLocation() == colonyTile);

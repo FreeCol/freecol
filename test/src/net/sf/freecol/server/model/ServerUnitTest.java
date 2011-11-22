@@ -179,6 +179,7 @@ public class ServerUnitTest extends FreeColTestCase {
 
         ServerColony colony = new ServerColony(game, dutch, "New Amsterdam",
                                                soldier.getTile());
+        dutch.addSettlement(colony);
 
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);

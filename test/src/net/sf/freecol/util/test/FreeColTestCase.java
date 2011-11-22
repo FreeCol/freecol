@@ -567,6 +567,7 @@ public class FreeColTestCase extends TestCase {
                                              settlementTile, isCapital,
                                              skillToTeach, isVisited,
                                              residentMissionary);
+            indianPlayer.addSettlement(camp);
 
             // Add braves
             for(int i=0; i < initialBravesInCamp; i++){

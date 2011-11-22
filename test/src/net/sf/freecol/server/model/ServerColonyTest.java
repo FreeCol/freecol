@@ -166,6 +166,7 @@ public class ServerColonyTest extends FreeColTestCase {
         game.setMap(map);
 
         ServerColony colony = new ServerColony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+        dutch.addSettlement(colony);
 
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");

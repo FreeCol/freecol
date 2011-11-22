@@ -201,6 +201,102 @@ public class Colony extends Settlement implements Nameable {
 
 
     /**
+     * Creates a temporary copy of this colony for planning purposes.
+     * The copy is identical except:
+     *   - it is obviously not actually present on the map
+     *   - it does not appear in the list of player colonies
+     *   - it contains no units in its work locations
+     *   - its export data is clear
+     *   - its build queue is empty
+     *   - its production cache is empty
+     *   - its name is prefixed with "scratch"
+     * Note that the following fields are shared--- do not mutate them!
+     *   + the goods container
+     *   + the population queue
+     *
+     * @return A scratch version of this colony.
+     */
+    public Colony getScratchColony() {
+        Game game = getGame();
+        Player owner = getOwner();
+        Colony scratch = new Colony(game, owner, "scratch" + getName(),
+            getTile().getScratchTile());
+        scratch.setGoodsContainer(getGoodsContainer());
+        FeatureContainer fc = scratch.getFeatureContainer();
+        for (Ability a : getFeatureContainer().getAbilities()) fc.addAbility(a);
+        for (Modifier m : getFeatureContainer().getModifiers()) fc.addModifier(m);
+        scratch.colonyTiles.clear();
+        for (ColonyTile ct : colonyTiles) {
+            Tile wt = ct.getWorkTile();
+            Tile t;
+            if (ct.isColonyCenterTile()) {
+                t = scratch.getTile();
+                t.setSettlement(scratch);
+            } else {
+                t = wt.getScratchTile();
+            }
+            if (wt.getOwner() == owner) {
+                t.setOwner(owner);
+                t.setOwningSettlement(scratch);
+            }
+            scratch.colonyTiles.add(new ColonyTile(game, scratch, t));
+        }
+        scratch.buildingMap.clear();
+        for (Entry<String, Building> e : buildingMap.entrySet()) {
+            scratch.buildingMap.put(e.getKey(),
+                new Building(game, scratch, e.getValue().getType()));
+        }
+        scratch.exportData.clear();
+        scratch.established = established;
+        scratch.sonsOfLiberty = sonsOfLiberty;
+        scratch.oldSonsOfLiberty = oldSonsOfLiberty;
+        scratch.tories = tories;
+        scratch.oldTories = oldTories;
+        scratch.productionBonus = productionBonus;
+        scratch.immigration = immigration;
+        scratch.liberty = liberty;
+        scratch.landLocked = landLocked;
+        scratch.buildQueue.clear();
+        scratch.populationQueue = populationQueue;
+        // ignore unitCount and stockadeKey
+        // leave productionCache as is
+        return scratch;
+    }
+
+    /**
+     * Finds the corresponding work location in a scratch colony.
+     *
+     * @param wl The <code>WorkLocation</code> in the original colony.
+     * @return The corresponding <code>WorkLocation</code> or null if not found.
+     */
+    public WorkLocation getCorrespondingWorkLocation(WorkLocation wl) {
+        Colony original = wl.getColony();
+        // Insist that this is a scratch colony, and the work location
+        // is in the original or vice versa.
+        if (getName().equals("scratch" + original.getName())
+            || original.getName().equals("scratch" + getName())) {
+            if (wl instanceof Building) {
+                // Types are unique for buildings, so use that as a key
+                BuildingType type = ((Building)wl).getType();
+                for (Building b : getBuildings()) {
+                    if (b.getType() == type) return b;
+                }
+            } else if (wl instanceof ColonyTile) {
+                // ColonyTiles are harder because the underlying tile is
+                // also a scratch-version, but the scratch and original
+                // tile share item containers.
+                Tile workTile = ((ColonyTile)wl).getWorkTile();
+                for (ColonyTile c : getColonyTiles()) {
+                    if (c.getWorkTile().getTileItemContainer()
+                        == workTile.getTileItemContainer()) return c;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Gets the name of this <code>Settlement</code> for a particular player.
      *
      * @param player A <code>Player</code> to return the name for.

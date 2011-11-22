@@ -86,8 +86,6 @@ abstract public class Settlement extends GoodsLocation
 
         featureContainer = new FeatureContainer();
         setType(owner.getNationType().getSettlementType(false));
-
-        owner.addSettlement(this);
     }
 
 

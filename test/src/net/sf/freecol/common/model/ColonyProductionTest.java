@@ -82,6 +82,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
+        dutch.addSettlement(colony);
         GoodsType foodType = grainType;
         soldier.setWorkType(foodType);
         nonServerBuildColony(soldier, colony);
@@ -148,6 +149,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch, pioneerType);
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
+        dutch.addSettlement(colony);
         pioneer.setWorkType(foodType);
         nonServerBuildColony(pioneer, colony);
 

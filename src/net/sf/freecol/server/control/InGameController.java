@@ -2746,6 +2746,7 @@ public final class InGameController extends Controller {
         }
         if (serverPlayer.isEuropean()) {
             settlement = new ServerColony(game, serverPlayer, name, tile);
+            serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(serverPlayer.isAI());
         } else {
             IndianNationType nationType
@@ -2763,6 +2764,7 @@ public final class InGameController extends Controller {
                                                     tile, false, skill,
                                                     new HashSet<Player>(),
                                                     null);
+            serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);
             // TODO: its lame that the settlement starts with no contacts
         }

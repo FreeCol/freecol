@@ -656,6 +656,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = new ServerIndianSettlement(map.getGame(), player, name, tile,
                                          capital, skill,
                                          new HashSet<Player>(), null);
+        player.addSettlement(settlement);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
 
         int low = settlement.getType().getMinimumSize();
@@ -892,6 +893,7 @@ public class SimpleMapGenerator implements MapGenerator {
         String colonyName = Messages.message(player.getNationName())
             + " Colony";
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
+        player.addSettlement(colony);
         colony.placeSettlement(true);
         for (Tile tile : colonyTile.getSurroundingTiles(1)) {
             if (tile.getSettlement() == null

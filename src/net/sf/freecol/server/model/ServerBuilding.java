@@ -53,13 +53,11 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * Creates a new ServerBuilding.
      *
      * @param game The <code>Game</code> this object belongs to.
-     * @param colony The colony in which this building is located.
-     * @param type The type of building.
+     * @param colony The <code>Colony</code> in which this building is located.
+     * @param type The <code>BuildingType</code> of building.
      */
     public ServerBuilding(Game game, Colony colony, BuildingType type) {
-        super(game);
-        setColony(colony);
-        this.buildingType = type;
+        super(game, colony, type);
     }
 
 
