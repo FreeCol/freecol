@@ -603,7 +603,6 @@ public class NativeAIPlayer extends AIPlayer {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
 
-        final boolean fewColonies = false;
         boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {

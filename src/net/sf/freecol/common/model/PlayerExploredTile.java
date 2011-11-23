@@ -229,7 +229,6 @@ public class PlayerExploredTile extends FreeColGameObject {
             out.writeAttribute("owningSettlement", owningSettlement.getId());
         }
 
-        Settlement settlement = tile.getSettlement();
         if (colonyUnitCount > 0) {
             out.writeAttribute("colonyUnitCount",
                 Integer.toString(colonyUnitCount));

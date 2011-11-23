@@ -1723,8 +1723,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public Ownable chooseMilitaryTarget(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
-        final Player player = getPlayer();
-        Mission mission = null;
 
         final Unit unit = aiUnit.getUnit();
         final Map map = aiMain.getGame().getMap();
