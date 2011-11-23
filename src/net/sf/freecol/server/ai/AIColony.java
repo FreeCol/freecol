@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -530,22 +531,22 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return hammersRequiredForBuilding;
     }
 
+    /**
+     * Is the colony badly defended?
+     * TODO: check if this heuristic makes sense.
+     *
+     * @return True if the colony needs more defenders.
+     */
     public boolean isBadlyDefended() {
-        int defence = 0;
+        CombatModel cm = getGame().getCombatModel();
+        float defence = 0.0f;
         for (Unit unit : colony.getTile().getUnitList()) {
-            // TODO: better algorithm to determine defence
-            // should be located in combat model?
-            defence += unit.getType().getDefence();
-            if (unit.isArmed()) {
-                defence += 1;
-            }
-            if (unit.isMounted()) {
-                defence += 1;
+            if (unit.isDefensiveUnit()) {
+                defence += cm.getDefencePower(null, unit);
             }
         }
 
-        // TODO: is this heuristic suitable?
-        return defence < 3 * colony.getUnitCount();
+        return defence < 2.0 * colony.getUnitCount();
     }
 
 

@@ -86,9 +86,21 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return True if no defender is provided.
      */
-    public boolean combatIsMeasurement(FreeColGameObject attacker,
-                                       FreeColGameObject defender) {
+    public boolean combatIsAttackMeasurement(FreeColGameObject attacker,
+                                             FreeColGameObject defender) {
         return attacker instanceof Unit && defender == null;
+    }
+
+    /**
+     * Is this just a measurement of defence power?
+     *
+     * @param attacker The attacker.
+     * @param defender The defender.
+     * @return True if no attacker is provided.
+     */
+    public boolean combatIsDefenceMeasurement(FreeColGameObject attacker,
+                                              FreeColGameObject defender) {
+        return attacker == null && defender instanceof Unit;
     }
 
     /**

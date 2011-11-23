@@ -98,8 +98,8 @@ public class SimpleCombatModel extends CombatModel {
                                  FreeColGameObject defender) {
         float result = 0.0f;
         if (attacker == null) {
-            throw new IllegalArgumentException("Null attacker");
-        } else if (combatIsMeasurement(attacker, defender)
+            throw new IllegalStateException("Null attacker");
+        } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
@@ -132,9 +132,8 @@ public class SimpleCombatModel extends CombatModel {
     public float getDefencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
         float result;
-        if (attacker == null) {
-            throw new IllegalArgumentException("Null attacker");
-        } else if (combatIsAttack(attacker, defender)
+        if (combatIsDefenceMeasurement(attacker, defender)
+            || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             result = FeatureContainer.applyModifierSet(0,
                     defender.getGame().getTurn(),
@@ -158,7 +157,9 @@ public class SimpleCombatModel extends CombatModel {
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
-        if (combatIsMeasurement(attacker, defender)
+        if (attacker == null) {
+            throw new IllegalStateException("Null attacker");
+        } else if (combatIsAttackMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
@@ -245,7 +246,7 @@ public class SimpleCombatModel extends CombatModel {
             result.addAll(spec.getModifiers(AMPHIBIOUS_ATTACK));
         }
 
-        if (combatIsMeasurement(attacker, defender)) {
+        if (combatIsAttackMeasurement(attacker, defender)) {
             ; // No defender information available
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, REF bombardment bonus
@@ -294,7 +295,8 @@ public class SimpleCombatModel extends CombatModel {
     public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
-        if (combatIsAttack(attacker, defender)) {
+        if (combatIsDefenceMeasurement(attacker, defender)
+            || combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit) defender;
             result.add(new Modifier(Modifier.DEFENCE,
                                     Specification.BASE_DEFENCE_SOURCE,
@@ -356,7 +358,6 @@ public class SimpleCombatModel extends CombatModel {
     private void addLandDefensiveModifiers(FreeColGameObject attacker,
                                            FreeColGameObject defender,
                                            Set<Modifier> result) {
-        Unit attackerUnit = (Unit) attacker;
         Unit defenderUnit = (Unit) defender;
         Specification spec = defender.getSpecification();
         // Auto-equip and equipment bonuses.
@@ -393,7 +394,8 @@ public class SimpleCombatModel extends CombatModel {
                               .getModifierSet(Modifier.DEFENCE));
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
-                    && attackerUnit.getOwner().isIndian()) {
+                    && attacker != null
+                    && ((Unit)attacker).getOwner().isIndian()) {
                     result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
                 }
             }
