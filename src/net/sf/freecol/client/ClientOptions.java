@@ -47,13 +47,10 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
 
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 
@@ -640,35 +637,6 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    private void updateFromXML(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(OptionGroup.getXMLElementTagName())) {
-                updateFromXML(in);
-            } else {
-                String idStr = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                if (idStr == null) idStr = in.getLocalName();
-                Option o = getOption(idStr);
-                if (o != null) {
-                    o.readFromXML(in);
-                } else {
-                    // Ignore this option.  Usually only occurs if the
-                    // option is from an old save game.
-                    final String ignoredTag = in.getLocalName();
-                    logger.info("Not updating new option \"" + idStr + "\" ("
-                        + ignoredTag + ") could not be found.");
-                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT
-                        || !in.getLocalName().equals(ignoredTag));
-                }
-            }
-        }
-    }
 
 
     /**

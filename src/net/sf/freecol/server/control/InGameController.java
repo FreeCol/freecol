@@ -959,7 +959,6 @@ public final class InGameController extends Controller {
      */
     private void csMonarchAction(final ServerPlayer serverPlayer,
                                  MonarchAction action, ChangeSet cs) {
-        final Game game = getGame();
         final Monarch monarch = serverPlayer.getMonarch();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;

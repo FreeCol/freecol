@@ -864,7 +864,6 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element monarchAction(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
         Game game = getGame();
         MonarchActionMessage message = new MonarchActionMessage(game, element);
         MonarchAction action = message.getAction();
@@ -1031,7 +1030,6 @@ public final class InGameInputHandler extends InputHandler {
      */
     public Element newLandName(Element element) {
         Game game = getGame();
-        Player player = getFreeColClient().getMyPlayer();
         NewLandNameMessage message = new NewLandNameMessage(game, element);
         Unit unit = message.getUnit(game);
         String defaultName = message.getNewLandName();

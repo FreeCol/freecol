@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -162,17 +161,6 @@ final class ReceivingThread extends Thread {
         locked = false;
     }
 
-    /**
-     * Logger.getLevel() returns null if inheriting from a parent logger,
-     * so we have to traverse the parent tree to find the actual level.
-     *
-     * @param logger The <code>Logger</code> to query.
-     * @return The real level the Logger is running at.
-     */
-    private static Level getRealLevel(Logger logger) {
-        while (logger.getLevel() == null) logger = logger.getParent();
-        return logger.getLevel();
-    }
 
     /**
      * Listens to the inputstream and calls the messagehandler for each message
