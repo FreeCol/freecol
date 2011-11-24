@@ -592,7 +592,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
-        Player seller = unit.getOwner();
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
         // the client should have prevented this

@@ -693,7 +693,6 @@ public final class ReportColonyPanel extends ReportPanel
         for (Unit u : teachers) {
             int left = u.getNeededTurnsOfTraining()
                 - u.getTurnsOfTraining();
-            JLabel teach;
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
                     lib.getUnitImageIcon(u.getType(), Role.DEFAULT,
@@ -882,7 +881,6 @@ public final class ReportColonyPanel extends ReportPanel
 
         String layout = (suggestions.size() <= 1) ? null
             : "split " + Integer.toString(suggestions.size());
-        int i = 0;
         List<UnitType> types = new ArrayList<UnitType>();
         types.addAll(suggestions.keySet());
         Collections.sort(types, new Comparator<UnitType>() {

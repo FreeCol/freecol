@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.StringTemplate;
@@ -201,7 +202,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             }
         }
 
-        if (type.getBreedingNumber() < type.INFINITY) {
+        if (type.getBreedingNumber() < FreeColObject.INFINITY) {
             panel.add(localizedLabel("colopedia.goods.breedingNumber"), "newline 20");
             panel.add(new JLabel(Integer.toString(type.getBreedingNumber())));
         }

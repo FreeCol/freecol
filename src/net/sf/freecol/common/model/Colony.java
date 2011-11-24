@@ -2463,7 +2463,6 @@ public class Colony extends Settlement implements Nameable {
             = spec.getTileImprovementType("model.improvement.plow");
         final TileImprovementType roadImprovement
             = spec.getTileImprovementType("model.improvement.road");
-        Tile tile = getTile();
 
         for (Tile t : getTile().getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) exploreTiles.add(t);

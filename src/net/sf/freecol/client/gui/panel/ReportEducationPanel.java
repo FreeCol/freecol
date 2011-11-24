@@ -50,7 +50,6 @@ public final class ReportEducationPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
         List<Colony> colonies = getSortedColonies();
-        int production = 0;
         for (Colony colony : colonies) {
             for (Building building : colony.getBuildings()) {
                 if (building.canTeach()) {
