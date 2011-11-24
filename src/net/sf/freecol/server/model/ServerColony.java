@@ -186,8 +186,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         // does a build add it to the built list, so that we can
         // remove the item built from it *after* updating applying the
         // production changes.
-        List<BuildQueue> built = new ArrayList<BuildQueue>();
-        for (BuildQueue queue
+        List<BuildQueue<BuildableType>> built = new ArrayList<BuildQueue<BuildableType>>();
+        for (BuildQueue<BuildableType> queue
                  : new BuildQueue[] { buildQueue, populationQueue }) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
@@ -240,7 +240,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         // recalculated one will see the build as incomplete due to
         // missing the goods just updated.
         // Hence the need for a copy of the current production map.
-        int turnsToStarvation = INFINITY;
         TypeCountMap<GoodsType> productionMap = getProductionMap();
         for (GoodsType goodsType : productionMap.keySet()) {
             int net = productionMap.getCount(goodsType);
@@ -296,7 +295,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Now that the goods have been updated it is safe to remove the
         // built item from its build queue.
         if (!built.isEmpty()) {
-            for (BuildQueue queue : built) {
+            for (BuildQueue<BuildableType> queue : built) {
                 switch(queue.getCompletionAction()) {
                 case SHUFFLE:
                     if (queue.size() > 1) {
@@ -496,7 +495,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      * @return The unit that was built.
      */
-    private Unit csBuildUnit(BuildQueue buildQueue, Random random,
+    private Unit csBuildUnit(BuildQueue<BuildableType> buildQueue, Random random,
                              ChangeSet cs) {
         Unit unit = new ServerUnit(getGame(), getTile(), owner,
             (UnitType) buildQueue.getCurrentlyBuilding());
@@ -526,7 +525,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if the build was successful.
      */
-    private boolean csBuildBuilding(BuildQueue buildQueue, ChangeSet cs) {
+    private boolean csBuildBuilding(BuildQueue<BuildableType> buildQueue, ChangeSet cs) {
         BuildingType type = (BuildingType) buildQueue.getCurrentlyBuilding();
         BuildingType from = type.getUpgradesFrom();
         boolean success;
@@ -576,7 +575,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      * @return The next buildable that can be built, or null if nothing.
      */
-    private BuildableType csNextBuildable(BuildQueue queue, Random random,
+    private BuildableType csNextBuildable(BuildQueue<BuildableType> queue, Random random,
                                           ChangeSet cs) {
         Specification spec = getSpecification();
         ServerPlayer owner = (ServerPlayer) getOwner();
