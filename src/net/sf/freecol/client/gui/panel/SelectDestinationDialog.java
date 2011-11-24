@@ -145,6 +145,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         Action quitAction = new AbstractAction(Messages.message("selectDestination.cancel")) {
                 public void actionPerformed(ActionEvent e) {
                     getCanvas().remove(SelectDestinationDialog.this);
+                    setResponse(null);
                 }
             };
 

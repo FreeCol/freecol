@@ -252,6 +252,11 @@ public class FreeColDialog<T> extends FreeColPanel {
         if (cancelText != null) {
             choiceDialog.cancelButton.setText(cancelText);
             choiceDialog.add(choiceDialog.cancelButton, "newline 20, tag cancel");
+            choiceDialog.cancelButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        choiceDialog.setResponse(null);
+                    }
+                });
         }
 
         choiceDialog.setSize(choiceDialog.getPreferredSize());
@@ -362,10 +367,20 @@ public class FreeColDialog<T> extends FreeColPanel {
         if (cancelText == null) {
             inputDialog.add(inputDialog.okButton, "tag ok");
             inputDialog.setCancelComponent(inputDialog.okButton);
+            inputDialog.okButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        inputDialog.setResponse(null);
+                    }
+                });
         } else {
             inputDialog.cancelButton.setText(cancelText);
             inputDialog.add(inputDialog.okButton, "split 2, tag ok");
             inputDialog.add(inputDialog.cancelButton, "tag cancel");
+            inputDialog.cancelButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        inputDialog.setResponse(null);
+                    }
+                });
         }
 
         inputDialog.setSize(inputDialog.getPreferredSize());
@@ -420,6 +435,11 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         mapSizeDialog.add(mapSizeDialog.okButton, "newline 20, span, split2, tag ok");
         mapSizeDialog.add(mapSizeDialog.cancelButton, "tag cancel");
+        mapSizeDialog.cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    mapSizeDialog.setResponse(null);
+                }
+            });
 
         mapSizeDialog.setSize(mapSizeDialog.getPreferredSize());
 
@@ -466,6 +486,11 @@ public class FreeColDialog<T> extends FreeColPanel {
         loadDialog.add(fileChooser, "grow");
         loadDialog.add(loadDialog.okButton, "newline 20, split 2, tag ok");
         loadDialog.add(loadDialog.cancelButton, "tag cancel");
+        loadDialog.cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    loadDialog.setResponse(null);
+                }
+            });
         loadDialog.setSize(480, 320);
 
         return loadDialog;
