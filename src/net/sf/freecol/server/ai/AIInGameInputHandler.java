@@ -222,7 +222,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         final Game game = freeColServer.getGame();
         final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
-        if (serverPlayer.getId() == currentPlayer.getId()) {
+        if (currentPlayer != null
+            && serverPlayer.getId() == currentPlayer.getId()) {
             logger.finest("Starting new Thread for " + serverPlayer.getName());
             Thread t = new Thread(FreeCol.SERVER_THREAD+"AIPlayer (" + serverPlayer.getName() + ")") {
                 public void run() {
