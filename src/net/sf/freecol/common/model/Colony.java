@@ -2379,7 +2379,8 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getAdjustedNetProductionOf(GoodsType goodsType) {
         int result = productionCache.getNetProductionOf(goodsType);
-        for (BuildQueue<BuildableType> queue : new BuildQueue[] { buildQueue, populationQueue }) {
+        for (BuildQueue<?> queue : new BuildQueue<?>[] { buildQueue,
+                                                         populationQueue }) {
             ProductionInfo info = productionCache.getProductionInfo(queue);
             if (info != null) {
                 for (AbstractGoods goods : info.getConsumption()) {
