@@ -282,13 +282,8 @@ public class DOMMessage {
      * @return The root <code>Element</code> of the error message.
      */
     public static Element clientError(String message) {
-        if (FreeCol.isInDebugMode()) {
-            try {
-                throw new IllegalStateException(message);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Client error", e);
-            }
-        }
+        logger.warning(message);
+        if (FreeCol.isInDebugMode()) Thread.dumpStack();
         Element errorElement = createNewRootElement("error");
         errorElement.setAttribute("messageID", "server.reject");
         errorElement.setAttribute("message", message);
