@@ -175,4 +175,13 @@ public class UnitWas {
         }
         return 0;
     }
+
+
+    public Location getLocation() {
+        return loc;
+    }
+
+    public GoodsType getWorkType() {
+        return work;
+    }
 }
