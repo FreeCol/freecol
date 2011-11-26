@@ -296,7 +296,9 @@ public abstract class GoodsLocation extends UnitLocation {
                                  boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
-        goodsContainer.toXML(out, player, showAll, toSavedGame);
+        if (goodsContainer != null) {
+            goodsContainer.toXML(out, player, showAll, toSavedGame);
+        }
     }
 
     /**
