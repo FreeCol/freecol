@@ -51,6 +51,9 @@ public class ColonyWas {
         this.productionBonus = colony.getProductionBonus();
         this.buildQueue
             = new ArrayList<BuildableType>(colony.getBuildQueue());
+        if (colony.getGoodsContainer() != null) {
+            colony.getGoodsContainer().saveState();
+        }
     }
 
     /**
@@ -74,6 +77,8 @@ public class ColonyWas {
             String pc = ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
             colony.firePropertyChange(pc, buildQueue, newBuildQueue);
         }
-        colony.getGoodsContainer().fireChanges();
+        if (colony.getGoodsContainer() != null) {
+            colony.getGoodsContainer().fireChanges();
+        }
     }
 }

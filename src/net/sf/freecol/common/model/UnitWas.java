@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Set;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
@@ -32,7 +34,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -51,30 +53,30 @@ public class UnitWas {
     private Unit.Role role;
     private Location loc;
     private GoodsType work;
-    private int amount;
+    private int workAmount;
     private Colony colony;
-    private EquipmentType equipmentType;
-    private int equipmentAmount;
+    private GoodsContainer goodsContainer;
+    private TypeCountMap<EquipmentType> equipment;
 
 
     /**
-     * Main constructor.  The equipment type is just one expected to
-     * change, not the whole equipment list.
+     * Main constructor.
      *
      * @param unit The <code>Unit</code> to check changes to.
-     * @param equipmentType Some equipment that might change.
      */
-    public UnitWas(Unit unit, EquipmentType equipmentType) {
+    public UnitWas(Unit unit) {
         this.unit = unit;
         this.type = unit.getType();
         this.role = unit.getRole();
         this.loc = unit.getLocation();
         this.work = unit.getWorkType();
-        this.amount = getAmount(loc, work);
+        this.workAmount = getAmount(loc, work);
         this.colony = unit.getColony();
-        this.equipmentType = equipmentType;
-        this.equipmentAmount = (equipmentType == null) ? 0
-            : unit.getEquipmentCount(equipmentType);
+        this.equipment = new TypeCountMap<EquipmentType>();
+        this.equipment.add(unit.getEquipment());
+        if (unit.getGoodsContainer() != null) {
+            unit.getGoodsContainer().saveState();
+        }
     }
 
     /**
@@ -85,18 +87,17 @@ public class UnitWas {
         Unit.Role newRole = null;
         Location newLoc = null;
         GoodsType newWork = null;
-        int newAmount = 0;
-        int newEquipmentAmount = 0;
+        int newWorkAmount = 0;
+        TypeCountMap<EquipmentType> newEquipment = null;
         if (!unit.isDisposed()) {
             newLoc = unit.getLocation();
             if (colony != null) {
                 newType = unit.getType();
                 newRole = unit.getRole();
                 newWork = unit.getWorkType();
-                newAmount = (newWork == null) ? 0
+                newWorkAmount = (newWork == null) ? 0
                     : getAmount(newLoc, newWork);
-                newEquipmentAmount = (equipmentType == null) ? 0
-                    : unit.getEquipmentCount(equipmentType);                
+                newEquipment = unit.getEquipment();
             }
         }
 
@@ -118,27 +119,34 @@ public class UnitWas {
                     newRole.toString());
             }
             if (work == newWork) {
-                if (work != null && amount != newAmount) {
+                if (work != null && workAmount != newWorkAmount) {
                     colony.firePropertyChange(work.getId(),
-                        amount, newAmount);
+                        workAmount, newWorkAmount);
                 }
             } else {
                 if (work != null) {
-                    colony.firePropertyChange(work.getId(), amount, 0);
+                    colony.firePropertyChange(work.getId(), workAmount, 0);
                 }
                 if (newWork != null) {
                     colony.firePropertyChange(newWork.getId(),
-                        0, newAmount);
+                        0, newWorkAmount);
+                }
+            }
+        }
+        if (newEquipment != null) {
+            Set<EquipmentType> keys = new HashSet<EquipmentType>();
+            keys.addAll(equipment.keySet());
+            keys.addAll(newEquipment.keySet());
+            for (EquipmentType e : keys) {
+                int cOld = equipment.getCount(e);
+                int cNew = newEquipment.getCount(e);
+                if (cOld != cNew) {
+                    unit.firePropertyChange(Unit.EQUIPMENT_CHANGE, cOld, cNew);
                 }
             }
         }
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().fireChanges();
-        }
-        if (equipmentType != null
-            && equipmentAmount != newEquipmentAmount) {
-            unit.firePropertyChange(Unit.EQUIPMENT_CHANGE,
-                equipmentAmount, newEquipmentAmount);
         }
     }
 
