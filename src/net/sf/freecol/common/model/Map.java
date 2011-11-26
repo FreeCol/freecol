@@ -85,6 +85,10 @@ public class Map extends FreeColGameObject implements Location {
             Direction.NE, Direction.SE, Direction.SW, Direction.NW
         };
 
+        public static final Direction[] corners = new Direction[] {
+            Direction.N, Direction.E, Direction.S, Direction.W
+        };
+
         private int oddDX, oddDY, evenDX, evenDY;
 
         Direction(int oddDX, int oddDY, int evenDX, int evenDY) {

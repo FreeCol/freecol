@@ -61,12 +61,7 @@ public class TerrainGenerator {
     public static final int LAND_REGIONS_SCORE_VALUE = 1000;
     public static final int LAND_REGION_MIN_SCORE = 5;
     public static final int PACIFIC_SCORE_VALUE = 100;
-
     public static final int LAND_REGION_MAX_SIZE = 75;
-
-    public static final Direction[] corners = new Direction[] {
-        Direction.N, Direction.E, Direction.S, Direction.W
-    };
 
     private final OptionGroup mapGeneratorOptions;
     private final Random random;
@@ -93,6 +88,10 @@ public class TerrainGenerator {
         this.random = random;
     }
 
+    // TODO: this might be useful elsewhere, too
+    private int limitToRange(int value, int lower, int upper) {
+        return Math.max(lower, Math.min(value, upper));
+    }
 
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
@@ -149,8 +148,8 @@ public class TerrainGenerator {
         int maximumLatitude = getMapGeneratorOptions()
             .getInteger(MapGeneratorOptions.MAXIMUM_LATITUDE);
         // make sure the values are in range
-        minimumLatitude = Math.max(-90, Math.min(90, minimumLatitude));
-        maximumLatitude = Math.max(-90, Math.min(90, maximumLatitude));
+        minimumLatitude = limitToRange(minimumLatitude, -90, 90);
+        maximumLatitude = limitToRange(maximumLatitude, -90, 90);
         map.setMinimumLatitude(Math.min(minimumLatitude, maximumLatitude));
         map.setMaximumLatitude(Math.max(minimumLatitude, maximumLatitude));
 
@@ -217,7 +216,7 @@ public class TerrainGenerator {
             new EnumMap<Direction, Boolean>(Direction.class);
 
         // corners
-        for (Direction d : corners) {
+        for (Direction d : Direction.corners) {
             Tile tile = ocean.getNeighbourOrNull(d);
             connections.put(d, (tile != null && tile.isLand()));
         }
@@ -235,7 +234,7 @@ public class TerrainGenerator {
         }
         int result = 0;
         int index = 0;
-        for (Direction d : corners) {
+        for (Direction d : Direction.corners) {
             if (connections.get(d)) {
                 result += (int) Math.pow(2, index);
             }
@@ -409,21 +408,27 @@ public class TerrainGenerator {
     	// temperature calculation
         int poleTemperature = -20;
         int equatorTemperature= 40;
-        if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_COLD) {
+        switch(temperaturePreference) {
+        case MapGeneratorOptions.TEMPERATURE_COLD:
             poleTemperature = -20;
             equatorTemperature = 25;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_CHILLY) {
+            break;
+        case MapGeneratorOptions.TEMPERATURE_CHILLY:
             poleTemperature = -20;
             equatorTemperature = 30;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_TEMPERATE) {
+            break;
+        case MapGeneratorOptions.TEMPERATURE_TEMPERATE:
             poleTemperature = -10;
             equatorTemperature = 35;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_WARM) {
+            break;
+        case MapGeneratorOptions.TEMPERATURE_WARM:
             poleTemperature = -5;
             equatorTemperature = 40;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_HOT) {
+            break;
+        case MapGeneratorOptions.TEMPERATURE_HOT:
             poleTemperature = 0;
             equatorTemperature = 40;
+            break;
         }
 
         int temperatureRange = equatorTemperature-poleTemperature;
@@ -431,19 +436,13 @@ public class TerrainGenerator {
             * temperatureRange/90;
         int temperatureDeviation = 7; // +/- 7 degrees randomization
         localeTemperature += random.nextInt(temperatureDeviation*2)-temperatureDeviation;
-        if (localeTemperature>40)
-            localeTemperature = 40;
-        if (localeTemperature<-20)
-            localeTemperature = -20;
+        localeTemperature = limitToRange(localeTemperature, -20, 40);
 
         // humidity calculation
         int localeHumidity = game.getSpecification().getRangeOption(MapGeneratorOptions.HUMIDITY).getValue();
         int humidityDeviation = 20; // +/- 20% randomization
         localeHumidity += random.nextInt(humidityDeviation*2) - humidityDeviation;
-        if (localeHumidity<0)
-            localeHumidity = 0;
-        if (localeHumidity>100)
-            localeHumidity = 100;
+        localeHumidity = limitToRange(localeHumidity, 0, 100);
 
         /*
          * Make and use a backup of the specified list, because we are modifying the list here.
@@ -1289,7 +1288,9 @@ public class TerrainGenerator {
         do {
             for (Direction direction : Direction.values()) {
                 Position n = p.getAdjacent(direction);
-                if (Map.isValid(n,boolmap.length,boolmap[0].length) && boolmap[n.getX()][n.getY()] && !visited[n.getX()][n.getY()] && limit > 0) {
+                if (Map.isValid(n,boolmap.length,boolmap[0].length)
+                    && boolmap[n.getX()][n.getY()]
+                    && !visited[n.getX()][n.getY()] && limit > 0) {
                     visited[n.getX()][n.getY()] = true;
                     limit--;
                     q.add(n);
