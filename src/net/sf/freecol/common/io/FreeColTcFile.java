@@ -69,7 +69,6 @@ public class FreeColTcFile extends FreeColModFile {
             } else {
                 result = new ResourceMapping();
             }
-            result.addAll(createRiverMapping());
             result.addAll(super.getResourceMapping());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,25 +131,6 @@ public class FreeColTcFile extends FreeColModFile {
         return map;
     }
     */
-
-    public ResourceMapping createRiverMapping() {
-        ResourceMapping map = new ResourceMapping();
-        String pathPrefix = "resources/images/river/";
-        String key, path;
-        for (int index = 0; index < ResourceManager.RIVER_STYLES; index++) {
-            path = pathPrefix +"river" + index + ".png";
-            map.add("river" + index, ResourceFactory.createResource(getURI(path)));
-        }
-        for (Direction d : Direction.longSides) {
-            key = "delta_" + d + "_small";
-            path = pathPrefix + key + ".png";
-            map.add(key, ResourceFactory.createResource(getURI(path)));
-            key = "delta_" + d + "_large";
-            path = pathPrefix + key + ".png";
-            map.add(key, ResourceFactory.createResource(getURI(path)));
-        }
-        return map;
-    }
 
     public static File getRulesDirectory() {
         return new File(FreeCol.getDataDirectory(), DIRECTORY);

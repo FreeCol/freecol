@@ -347,7 +347,7 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
-        String key = "delta_" + direction + (magnitude == 1 ? "_small" : "_large");
+        String key = "model.tile.delta_" + direction + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
     }
 
@@ -362,7 +362,7 @@ public final class ImageLibrary {
     }
 
     public Image getRiverImage(int index, double scale) {
-        return ResourceManager.getImage("river" + index, scale);
+        return ResourceManager.getImage("model.tile.river" + index, scale);
     }
 
     /**
