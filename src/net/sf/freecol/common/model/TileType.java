@@ -39,6 +39,7 @@ public final class TileType extends FreeColGameObjectType {
     private boolean forest;
     private boolean water;
     private boolean canSettle;
+    private boolean elevation;
 
     private int basicMoveCost;
     private int basicWorkTurns;
@@ -125,6 +126,15 @@ public final class TileType extends FreeColGameObjectType {
      */
     public boolean isConnected() {
         return connected;
+    }
+    
+    /**
+     * Is this tile an elevation.
+     * 
+     * @return <tt>true</tt> if and only if the tile is an elevation, <tt>false</tt> otherwise.
+     */
+    public boolean isElevation() {
+    	return elevation;
     }
 
     public boolean canSettle() {
@@ -387,6 +397,7 @@ public final class TileType extends FreeColGameObjectType {
         out.writeAttribute("basic-work-turns", Integer.toString(basicWorkTurns));
         out.writeAttribute("is-forest", Boolean.toString(forest));
         out.writeAttribute("is-water", Boolean.toString(water));
+        out.writeAttribute("is-elevation", Boolean.toString(elevation));
         out.writeAttribute("is-connected", Boolean.toString(connected));
         out.writeAttribute("can-settle", Boolean.toString(canSettle));
     }
@@ -479,6 +490,7 @@ public final class TileType extends FreeColGameObjectType {
                 "basic-work-turns"));
         forest = getAttribute(in, "is-forest", false);
         water = getAttribute(in, "is-water", false);
+        elevation = getAttribute(in, "is-elevation", false);
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
     }

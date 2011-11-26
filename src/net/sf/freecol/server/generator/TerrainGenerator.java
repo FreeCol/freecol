@@ -22,6 +22,7 @@ package net.sf.freecol.server.generator;
 import java.awt.Rectangle;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,13 +71,15 @@ public class TerrainGenerator {
     private final OptionGroup mapGeneratorOptions;
     private final Random random;
 
-    private TileType ocean;
     private TileType lake;
     private TileImprovementType riverType;
     private TileImprovementType fishBonusLandType;
     private TileImprovementType fishBonusRiverType;
 
-    private ArrayList<TileType> terrainTileTypes = null;
+    private ArrayList<TileType> terrainTileTypes;
+    private ArrayList<TileType> oceanTileTypes;
+
+    // TODO dynamic lakes, mountains and hills
 
     /**
      * Creates a new <code>TerrainGenerator</code>.
@@ -125,7 +128,6 @@ public class TerrainGenerator {
      */
     public void createMap(Game game, Game importGame, boolean[][] landMap) {
         Specification spec = game.getSpecification();
-        ocean = spec.getTileType("model.tile.ocean");
         lake = spec.getTileType("model.tile.lake");
         riverType = spec.getTileImprovementType("model.improvement.river");
         fishBonusLandType = spec.getTileImprovementType("model.improvement.fishBonusLand");
@@ -253,7 +255,7 @@ public class TerrainGenerator {
         if (landMap[x][y]) {
             t = new Tile(game, getRandomLandTileType(game, latitude), x, y);
         } else {
-            t = new Tile(game, ocean, x, y);
+            t = new Tile(game, getRandomOceanTileType(game, latitude), x, y);
         }
 
         return t;
@@ -341,6 +343,27 @@ public class TerrainGenerator {
         return mapGeneratorOptions;
     }
 
+    /**
+     *
+     * @param game
+     * @param latitude
+     * @return
+     */
+    private TileType getRandomOceanTileType(Game game, int latitude) {
+    	// create the main list of TileTypes the first time, and reuse it afterwards
+        if (oceanTileTypes==null) {
+        	oceanTileTypes = new ArrayList<TileType>();
+            for (TileType tileType : game.getSpecification().getTileTypeList()) {
+                if (tileType.isWater() && tileType.isConnected()
+                	&& !tileType.hasAbility("model.ability.moveToEurope")) {
+                	oceanTileTypes.add(tileType);
+                }
+
+            }
+        }
+
+        return getRandomTileType(game, oceanTileTypes, latitude);
+    }
 
     /**
      * Gets a random land tile type based on the given percentage.
@@ -352,18 +375,12 @@ public class TerrainGenerator {
      *          +/-90 is on the bottom/top of the map (poles).
      */
     private TileType getRandomLandTileType(Game game, int latitude) {
-        // decode options
-        final int forestChance = getMapGeneratorOptions().getInteger("model.option.forestNumber");
-        final int temperaturePreference = getMapGeneratorOptions().getInteger("model.option.temperature");
-
         // create the main list of TileTypes the first time, and reuse it afterwards
         if (terrainTileTypes==null) {
             terrainTileTypes = new ArrayList<TileType>();
             for (TileType tileType : game.getSpecification().getTileTypeList()) {
-                if (tileType.getId().equals("model.tile.hills") ||
-                    tileType.getId().equals("model.tile.mountains") ||
-                    tileType.isWater()) {
-                    // do not generate hills or mountains at this time
+                if (tileType.isElevation() || tileType.isWater()) {
+                    // do not generate elevated and water tiles at this time
                     // they are created separately
                     continue;
                 }
@@ -371,7 +388,25 @@ public class TerrainGenerator {
             }
         }
 
-        // temperature calculation
+        return getRandomTileType(game, terrainTileTypes, latitude);
+    }
+
+    /**
+     * Returns a TileType, that fits to the regional requirements.
+     * <br/><br/>
+     * TODO: Can be used for mountains and rivers too.
+     *
+     * @param game The game.
+     * @param candidates A list of <tt>TileType</tt>s to use for calculations.
+     * @param latitude The latitude.
+     * @return A <tt>TileType</tt> that fits to the regional requirements.
+     */
+    private TileType getRandomTileType(Game game, List<TileType> candidates, int latitude) {
+    	// decode options
+        final int forestChance = getMapGeneratorOptions().getInteger("model.option.forestNumber");
+        final int temperaturePreference = getMapGeneratorOptions().getInteger("model.option.temperature");
+
+    	// temperature calculation
         int poleTemperature = -20;
         int equatorTemperature= 40;
         if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_COLD) {
@@ -390,6 +425,7 @@ public class TerrainGenerator {
             poleTemperature = 0;
             equatorTemperature = 40;
         }
+
         int temperatureRange = equatorTemperature-poleTemperature;
         int localeTemperature = poleTemperature + (90 - Math.abs(latitude))
             * temperatureRange/90;
@@ -409,9 +445,16 @@ public class TerrainGenerator {
         if (localeHumidity>100)
             localeHumidity = 100;
 
-        // initialize list of candidates with all terrain TileTypes
-        ArrayList<TileType> candidateTileTypes = new ArrayList<TileType>();
-        candidateTileTypes.addAll(terrainTileTypes);
+        /*
+         * Make and use a backup of the specified list, because we are modifying the list here.
+         */
+        List<TileType> candidateTileTypes = new ArrayList<TileType>(candidates);
+        /*
+         * There will be a check for forested later, but there might be tiles like
+         * oceans/mountains that do not support forests. Therefore shuffle now,
+         * because in this case, we will just use the last one standing.
+         */
+        Collections.shuffle(candidateTileTypes, this.random);
 
         // remove those that do not match the current temperature
         Iterator<TileType> it = candidateTileTypes.iterator();
@@ -442,13 +485,19 @@ public class TerrainGenerator {
                     +" and humidity==" + localeHumidity);
         }
 
-        // Choose based on forested/unforested
+        // Choose based on forested/unforested if possible
         boolean forested = random.nextInt(100) < forestChance;
         it = candidateTileTypes.iterator();
         while (it.hasNext()) {
             TileType t = it.next();
             if (t.isForested() != forested) {
-                it.remove();
+            	/*
+            	 * Fix for land/ocean/mountain tiles that do not support forests. In this case
+            	 * return the last one standing. (shuffled before to get random tiles here)
+            	 */
+            	if (it.hasNext()) {
+            		it.remove();
+            	}
             }
         }
         if (candidateTileTypes.size() == 1) {
@@ -458,8 +507,11 @@ public class TerrainGenerator {
                     +" and humidity==" + localeHumidity + " and forested=="+forested);
         }
 
-        // All scoped, if none have been selected by elimination, randomly choose one
-        return candidateTileTypes.get(random.nextInt(candidateTileTypes.size()));
+        /*
+         * Return the first one, if more than one is left after termination.
+		 * Note, that we shuffled the list already.
+         */
+        return candidateTileTypes.get(0);
     }
 
 
