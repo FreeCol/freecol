@@ -566,6 +566,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
             sb.append(entry.getKey() + "=" + entry.getValue() + ", ");
         }
+        sb.setLength(sb.length() - 2);
         return sb.toString();
     }
 

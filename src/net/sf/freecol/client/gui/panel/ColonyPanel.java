@@ -97,6 +97,10 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
+ *
+ * Beware that in debug mode, this might be a server-side version of the colony
+ * which is why we need to call getColony().getSpecification() to get the
+ * spec that corresponds to the good types in this colony.
  */
 public final class ColonyPanel extends FreeColPanel
     implements ActionListener, PropertyChangeListener {
@@ -396,7 +400,7 @@ public final class ColonyPanel extends FreeColPanel
         colony.invalidateCache();
         netProductionPanel.removeAll();
 
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : getColony().getSpecification().getGoodsTypeList()) {
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(getFreeColClient(), goodsType, amount, getCanvas()));
@@ -1266,12 +1270,13 @@ public final class ColonyPanel extends FreeColPanel
          * Update this WarehousePanel.
          */
         private void update() {
-            final int threshold = getClientOptions()
-                .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
+            final int threshold = (FreeCol.isInDebugMode()) ? 1
+                : getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
-            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                Goods goods = getColony().getGoodsContainer().getGoods(goodsType);
-                if (goodsType.isStorable() && goods.getAmount() >= threshold) {
+            GoodsContainer container = getColony().getGoodsContainer();
+            for (Goods goods : container.getCompactGoods()) {
+                if (goods.getType().isStorable()
+                    && goods.getAmount() >= threshold) {
                     GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
                     if (colonyPanel.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
