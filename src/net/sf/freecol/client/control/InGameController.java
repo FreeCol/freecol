@@ -2182,7 +2182,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(unit, null);
+        UnitWas unitWas = new UnitWas(unit, type);
         if (askServer().equipUnit(unit, type, amount)) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
