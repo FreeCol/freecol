@@ -46,6 +46,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ListOptionSelector;
 
@@ -164,6 +166,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
         addElementDialog.add(buttons, BorderLayout.SOUTH);
 
         final JComboBox mods = new JComboBox(getOption().getListOptionSelector().getOptions().toArray());
+        mods.setRenderer(new ChoiceRenderer());
         addElementDialog.add(mods, BorderLayout.CENTER);
 
         addButton.addActionListener(new ActionListener() {
@@ -264,6 +267,22 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
         @Override
         public String toString() {
             return text;
+        }
+    }
+
+    private class ChoiceRenderer extends FreeColComboBoxRenderer {
+
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            if (value instanceof ModInfo) {
+                String key = "mod." + ((ModInfo) value).getId();
+                label.setText(Messages.message(key + ".name"));
+                if (Messages.containsKey(key + ".shortDescription")) {
+                    label.setToolTipText(Messages.message(key + ".shortDescription"));
+                }
+            } else {
+                label.setText(value.toString());
+            }
         }
     }
 }
