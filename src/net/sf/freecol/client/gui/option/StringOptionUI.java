@@ -83,7 +83,11 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message((String) value + ".name"));
+            String key = (String) value;
+            label.setText(Messages.message(key + ".name"));
+            if (Messages.containsKey(key + ".shortDescription")) {
+                label.setToolTipText(Messages.message(key + ".shortDescription"));
+            }
         }
     }
 }
