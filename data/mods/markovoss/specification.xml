@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<freecol-specification>
+  <!-- Remove silver from minerals -->
+  <resource-types>
+    <resource-type id="model.resource.minerals"
+      minimum-value="40" maximum-value="400">
+      <modifier id="model.goods.ore" type="additive" value="3" />
+      <modifier id="model.goods.silver" type="additive" value="1"
+        delete="true" />
+    </resource-type>
+  </resource-types>
+  <!-- Change available resources - remove ore from every tile except mountains 
+    and hills - remove silver from every tile and let it only appear as a special 
+    resource - allow production of cotton on desert-tiles only -->
+  <tile-types>
+    <tile-type id="model.tile.plains" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="60" temperatureMin="0"
+        temperatureMax="15" altitudeMin="1" altitudeMax="2" />
+      <primary-production goods-type="model.goods.grain"
+        value="5" />
+      <secondary-production goods-type="model.goods.cotton"
+        value="2" />
+      <production goods-type="model.goods.grain" value="5" />
+      <production goods-type="model.goods.cotton" value="2" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.grassland" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="25" humidityMax="70" temperatureMin="10"
+        temperatureMax="25" altitudeMin="1" altitudeMax="1" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.tobacco"
+        value="3" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.tobacco" value="3" />
+    </tile-type>
+    <tile-type id="model.tile.prairie" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="20" humidityMax="50" temperatureMin="15"
+        temperatureMax="30" altitudeMin="1" altitudeMax="1" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.cotton"
+        value="3" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.cotton" value="3" />
+    </tile-type>
+    <tile-type id="model.tile.savannah" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="25" humidityMax="70" temperatureMin="30"
+        temperatureMax="40" altitudeMin="1" altitudeMax="1" />
+      <primary-production goods-type="model.goods.grain"
+        value="4" />
+      <secondary-production goods-type="model.goods.sugar"
+        value="3" />
+      <production goods-type="model.goods.grain" value="4" />
+      <production goods-type="model.goods.sugar" value="3" />
+    </tile-type>
+    <tile-type id="model.tile.marsh" basic-move-cost="6"
+      basic-work-turns="5">
+      <gen humidityMin="50" humidityMax="100" temperatureMin="5"
+        temperatureMax="15" altitudeMin="2" altitudeMax="2" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="25" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.tobacco"
+        value="2" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.tobacco" value="2" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.swamp" basic-move-cost="6"
+      basic-work-turns="7">
+      <gen humidityMin="50" humidityMax="100" temperatureMin="10"
+        temperatureMax="40" altitudeMin="1" altitudeMax="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="25" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.sugar"
+        value="2" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.sugar" value="2" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.desert" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="25" temperatureMin="10"
+        temperatureMax="40" altitudeMin="1" altitudeMax="2" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" tile-production="veryLow" />
+      <secondary-production goods-type="model.goods.cotton"
+        value="1" />
+      <production goods-type="model.goods.grain" value="0" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <!-- new deserts -->
+    <tile-type id="model.tile.sandDesert" basic-move-cost="6"
+      basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="25" temperatureMin="25"
+        temperatureMax="40" altitudeMin="1" altitudeMax="2" />
+      <primary-production goods-type="model.goods.cotton"
+        value="1" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <resource type="model.resource.oasis" probability="100" />
+    </tile-type>
+    <tile-type id="model.tile.dryDesert" basic-move-cost="3"
+      basic-work-turns="3">
+      <gen humidityMin="0" humidityMax="25" temperatureMin="25"
+        temperatureMax="40" altitudeMin="1" altitudeMax="2" />
+      <primary-production goods-type="model.goods.cotton"
+        value="1" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <resource type="model.resource.oasis" probability="100" />
+    </tile-type>
+    <tile-type id="model.tile.tundra" basic-move-cost="3"
+      basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-5"
+        temperatureMax="5" altitudeMin="1" altitudeMax="3" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.ore"
+        value="0" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.mixedForest" basic-move-cost="6"
+      basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="60" temperatureMin="0"
+        temperatureMax="15" altitudeMin="1" altitudeMax="2" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.furs"
+        value="3" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <production goods-type="model.goods.furs" value="3" />
+      <production goods-type="model.goods.lumber" value="6" />
+    </tile-type>
+    <tile-type id="model.tile.coniferForest" basic-move-cost="6"
+      basic-work-turns="4" is-forest="true">
+      <gen humidityMin="25" humidityMax="70" temperatureMin="10"
+        temperatureMax="25" altitudeMin="1" altitudeMax="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.furs"
+        value="2" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.tobacco" value="1" />
+      <production goods-type="model.goods.furs" value="2" />
+      <production goods-type="model.goods.lumber" value="6" />
+    </tile-type>
+    <tile-type id="model.tile.broadleafForest"
+      basic-move-cost="6" basic-work-turns="4" is-forest="true">
+      <gen humidityMin="20" humidityMax="50" temperatureMin="15"
+        temperatureMax="30" altitudeMin="1" altitudeMax="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.furs"
+        value="2" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <production goods-type="model.goods.furs" value="2" />
+      <production goods-type="model.goods.lumber" value="4" />
+    </tile-type>
+    <tile-type id="model.tile.tropicalForest" basic-move-cost="6"
+      basic-work-turns="6" is-forest="true">
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <gen humidityMin="25" humidityMax="70" temperatureMin="30"
+        temperatureMax="40" altitudeMin="1" altitudeMax="1" />
+      <primary-production goods-type="model.goods.grain"
+        value="3" />
+      <secondary-production goods-type="model.goods.furs"
+        value="2" />
+      <production goods-type="model.goods.grain" value="3" />
+      <production goods-type="model.goods.sugar" value="1" />
+      <production goods-type="model.goods.furs" value="2" />
+      <production goods-type="model.goods.lumber" value="4" />
+    </tile-type>
+    <tile-type id="model.tile.wetlandForest" basic-move-cost="9"
+      basic-work-turns="6" is-forest="true">
+      <gen humidityMin="50" humidityMax="100" temperatureMin="5"
+        temperatureMax="15" altitudeMin="2" altitudeMax="2" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.furs"
+        value="2" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.tobacco" value="1" />
+      <production goods-type="model.goods.furs" value="2" />
+      <production goods-type="model.goods.lumber" value="4" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.rainForest" basic-move-cost="9"
+      basic-work-turns="7" is-forest="true">
+      <gen humidityMin="50" humidityMax="100" temperatureMin="10"
+        temperatureMax="40" altitudeMin="1" altitudeMax="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="75" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.furs"
+        value="1" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.sugar" value="1" />
+      <production goods-type="model.goods.furs" value="1" />
+      <production goods-type="model.goods.lumber" value="4" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.scrubForest" basic-move-cost="3"
+      basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="25" temperatureMin="10"
+        temperatureMax="40" altitudeMin="1" altitudeMax="2" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" />
+      <primary-production goods-type="model.goods.grain"
+        value="0" tile-production="veryLow" />
+      <secondary-production goods-type="model.goods.furs"
+        value="2" />
+      <production goods-type="model.goods.grain" value="0" />
+      <production goods-type="model.goods.cotton" value="1" />
+      <production goods-type="model.goods.furs" value="2" />
+      <production goods-type="model.goods.lumber" value="2" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.borealForest" basic-move-cost="6"
+      basic-work-turns="4" is-forest="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-5"
+        temperatureMax="5" altitudeMin="1" altitudeMax="3" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.furs"
+        value="3" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.furs" value="3" />
+      <production goods-type="model.goods.lumber" value="4" />
+      <production goods-type="model.goods.ore" value="0" />
+    </tile-type>
+    <tile-type id="model.tile.hills" basic-move-cost="6"
+      basic-work-turns="4" is-elevation="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="2" altitudeMax="3" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="100" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" />
+      <secondary-production goods-type="model.goods.ore"
+        value="4" />
+      <production goods-type="model.goods.grain" value="2" />
+      <production goods-type="model.goods.ore" value="4" />
+    </tile-type>
+    <tile-type id="model.tile.mountains" basic-move-cost="9"
+      basic-work-turns="7" is-elevation="true" can-settle="false">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="3" altitudeMax="3" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="150" />
+      <production goods-type="model.goods.ore" value="4" />
+      <production goods-type="model.goods.silver" value="0" />
+    </tile-type>
+    <!-- ARCTIC TILES -->
+    <tile-type id="model.tile.arctic" basic-move-cost="6"
+      basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="0" altitudeMin="1" altitudeMax="3" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.grain"
+        value="1" tile-production="high" />
+    </tile-type>
+    <!-- new arctic tiles -->
+    <tile-type id="model.tile.arcticDesert" basic-move-cost="6"
+      basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="0" altitudeMin="1" altitudeMax="3" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.grain"
+        value="1" tile-production="high" />
+    </tile-type>
+    <tile-type id="model.tile.frozenWater" basic-move-cost="6"
+      basic-work-turns="4">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="0" altitudeMin="1" altitudeMax="3" />
+      <primary-production goods-type="model.goods.grain"
+        value="2" tile-production="veryHigh" />
+      <primary-production goods-type="model.goods.grain"
+        value="1" tile-production="high" />
+    </tile-type>
+    <!-- OCEAN TILES -->
+    <tile-type id="model.tile.ocean" basic-move-cost="3"
+      basic-work-turns="4" is-water="true" can-settle="false"
+      is-connected="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="-2" altitudeMax="-1" />
+      <production goods-type="model.goods.fish" value="2" />
+    </tile-type>
+    <!-- new arctic ocean tiles -->
+    <tile-type id="model.tile.arcticOcean" basic-move-cost="6"
+      basic-work-turns="4" is-water="true" can-settle="false"
+      is-connected="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="-10" altitudeMin="-2" altitudeMax="-1" />
+      <production goods-type="model.goods.fish" value="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+    </tile-type>
+    <tile-type id="model.tile.arcticOcean2" basic-move-cost="8"
+      basic-work-turns="4" is-water="true" can-settle="false"
+      is-connected="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="-10" altitudeMin="-2" altitudeMax="-1" />
+      <production goods-type="model.goods.fish" value="1" />
+      <modifier id="model.modifier.defence" type="percentage"
+        value="50" />
+    </tile-type>
+    <tile-type id="model.tile.lake" basic-move-cost="3"
+      basic-work-turns="4" is-water="true" can-settle="false"
+      is-connected="false">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="-2" altitudeMax="-1" />
+      <production goods-type="model.goods.fish" value="2" />
+    </tile-type>
+    <tile-type id="model.tile.highSeas" basic-move-cost="3"
+      basic-work-turns="4" is-water="true" can-settle="false"
+      is-connected="true">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="-3" altitudeMax="-2" />
+      <production goods-type="model.goods.fish" value="2" />
+      <ability id="model.ability.moveToEurope" />
+    </tile-type>
+    <tile-type id="model.tile.greatRiver" basic-move-cost="3"
+      basic-work-turns="4" is-water="true" can-settle="false">
+      <gen humidityMin="0" humidityMax="100" temperatureMin="-20"
+        temperatureMax="40" altitudeMin="-3" altitudeMax="-2" />
+      <production goods-type="model.goods.fish" value="2" />
+    </tile-type>
+  </tile-types>
+  <options>
+    <!-- Allow longer gameplay since building colonies will become more difficult -->
+    <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.years">
+        <!-- The very first year of the game. -->
+        <integerOption id="model.option.startingYear"
+          value="1492" minimumValue="1492" maximumValue="1900" />
+        <!-- The first year in which there are two turns. -->
+        <integerOption id="model.option.seasonYear" value="1492"
+          minimumValue="1492" maximumValue="1900" />
+        <!-- The year in which owning a colony becomes mandatory. -->
+        <integerOption id="model.option.mandatoryColonyYear"
+          value="1600" minimumValue="1492" maximumValue="1900" />
+        <!-- The very last year of the game. -->
+        <integerOption id="model.option.lastYear" value="1850"
+          minimumValue="1492" maximumValue="1900" />
+        <!-- The last year of the game for a colonial player. -->
+        <integerOption id="model.option.lastColonialYear"
+          value="1800" minimumValue="1492" maximumValue="1900" />
+      </optionGroup>
+    </optionGroup>
+    <!-- Increase map size to support more room for random resource placing. 
+      NOTE: You should start the game with -Xmx1024M or more. -->
+    <optionGroup id="mapGeneratorOptions">
+      <optionGroup id="mapGeneratorOptions.landGenerator">
+        <!-- Options for setting the size of the map -->
+        <integerOption id="model.option.mapWidth" value="100"
+          minimumValue="20" maximumValue="800" />
+        <integerOption id="model.option.mapHeight" value="100"
+          minimumValue="20" maximumValue="800" />
+      </optionGroup>
+    </optionGroup>
+  </options>
+</freecol-specification>
