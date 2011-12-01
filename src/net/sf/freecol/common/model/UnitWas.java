@@ -19,25 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Set;
+import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.TypeCountMap;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
 
 
 /**

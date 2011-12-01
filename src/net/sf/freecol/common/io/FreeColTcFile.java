@@ -23,9 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.resources.ResourceFactory;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 /**

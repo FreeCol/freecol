@@ -21,14 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 
 
 /**

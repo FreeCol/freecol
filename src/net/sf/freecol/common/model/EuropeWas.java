@@ -19,10 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.sf.freecol.common.model.Europe;
 
 
 /**
