@@ -55,6 +55,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -636,15 +637,6 @@ public final class Canvas extends JDesktopPane {
      * Displays an error message.
      *
      * @param messageID The i18n-keyname of the error message to display.
-     */
-    void errorMessage(String messageID) {
-        errorMessage(messageID, "Unspecified error: " + messageID);
-    }
-
-    /**
-     * Displays an error message.
-     *
-     * @param messageID The i18n-keyname of the error message to display.
      * @param message An alternative message to display if the resource specified
      *            by <code>messageID</code> is unavailable.
      */
@@ -743,10 +735,10 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-
     public ImageLibrary getImageLibrary() {
         return gui.getImageLibrary();
     }
+
 
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
@@ -785,7 +777,6 @@ public final class Canvas extends JDesktopPane {
         return initialSize;
     }
 
-
     /**
      * The any panel this <code>Canvas</code> is displaying.
      *
@@ -806,6 +797,7 @@ public final class Canvas extends JDesktopPane {
         }
         return null;
     }
+
 
     /**
      * Describe <code>getSpecification</code> method here.
@@ -1106,7 +1098,6 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? BuyAction.CANCEL : result;
     }
 
-
     /**
      * Displays the <code>LootCargoDialog</code>.
      *
@@ -1118,6 +1109,7 @@ public final class Canvas extends JDesktopPane {
         CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, this, winner, loot);
         return showFreeColDialog(dialog, winner.getTile());
     }
+
 
     /**
      * Displays the <code>ChatPanel</code>.
@@ -1238,7 +1230,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-
     /**
      * Display a dialog to confirm a declaration of independence.
      *
@@ -1247,6 +1238,7 @@ public final class Canvas extends JDesktopPane {
     public List<String> showConfirmDeclarationDialog() {
         return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, this));
     }
+
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -1538,9 +1530,6 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? TradeAction.CANCEL : result;
     }
 
-
-    // A variety of special purpose panels/dialogs follow
-
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1550,6 +1539,9 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
+
+
+    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2177,22 +2169,7 @@ public final class Canvas extends JDesktopPane {
      * @param panel <code>FreeColPanel</code>, panel to show
      */
     public void showSubPanel(FreeColPanel panel) {
-        repaint();
-        addAsFrame(panel);
-        panel.requestFocus();
-    }
-
-    /**
-     * Displays a <code>FreeColPanel</code> at a generalized position.
-     *
-     * @param panel <code>FreeColPanel</code>, panel to show
-     * @param popupPosition <code>PopupPosition</code> The generalized
-     *     position to place the panel.
-     */
-    public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
-        repaint();
-        addAsFrame(panel, false, popupPosition);
-        panel.requestFocus();
+        showSubPanel(panel, PopupPosition.CENTERED);
     }
 
     /**
@@ -2226,7 +2203,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, this, unit.getTradeRoute()),
                                  unit.getTile());
     }
-
 
     /**
      * Displays a dialog that asks the user what he wants to do with his
@@ -2302,6 +2278,15 @@ public final class Canvas extends JDesktopPane {
 
 
     /**
+     * Displays an error message.
+     *
+     * @param messageID The i18n-keyname of the error message to display.
+     */
+    void errorMessage(String messageID) {
+        errorMessage(messageID, "Unspecified error: " + messageID);
+    }
+
+    /**
      * Adds a component centered on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
      *
@@ -2314,6 +2299,7 @@ public final class Canvas extends JDesktopPane {
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox) {
         return addAsFrame(comp, toolBox, PopupPosition.CENTERED);
     }
+
 
     /**
      * Adds a component on this Canvas inside a frame. Removes the
@@ -2485,6 +2471,19 @@ public final class Canvas extends JDesktopPane {
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
+    }
+
+    /**
+     * Displays a <code>FreeColPanel</code> at a generalized position.
+     *
+     * @param panel <code>FreeColPanel</code>, panel to show
+     * @param popupPosition <code>PopupPosition</code> The generalized
+     *     position to place the panel.
+     */
+    private void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
+        repaint();
+        addAsFrame(panel, false, popupPosition);
+        panel.requestFocus();
     }
 
     /**
