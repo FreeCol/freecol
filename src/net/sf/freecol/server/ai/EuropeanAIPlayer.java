@@ -848,7 +848,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Collections.sort(unmountedSoldiers,comp);
 
         while(unmountedSoldiers.size() > 0 
-                && colony.canBuildEquipment(horsesEqType)){
+                && colony.canProvideEquipment(horsesEqType)){
             Unit soldier = unmountedSoldiers.remove(0);
             cheatEquipmentGoods(colony, horsesEqType, 1);
             AIMessage.askEquipUnit(getAIUnit(soldier), horsesEqType, 1);

@@ -135,7 +135,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         colony.addGoods(musketsType, 100);
         colony.addGoods(horsesType, 100);
-        assertTrue("Colony should be hable to equip units with horses",colony.canBuildEquipment(horsesEqType));
+        assertTrue("Colony should be able to equip units with horses",
+            colony.canProvideEquipment(horsesEqType));
 
         Unit expertSoldier = new ServerUnit(game, colony.getTile(),
                                             colony.getOwner(),

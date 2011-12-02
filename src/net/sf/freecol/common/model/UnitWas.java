@@ -163,6 +163,10 @@ public class UnitWas {
     }
 
 
+    public Unit getUnit() {
+        return unit;
+    }
+
     public Location getLocation() {
         return loc;
     }

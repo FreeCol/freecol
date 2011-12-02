@@ -210,8 +210,7 @@ public class Colony extends Settlement implements Nameable {
      *   - its build queue is empty
      *   - its production cache is empty
      *   - its name is prefixed with "scratch"
-     * Note that the following fields are shared--- do not mutate them!
-     *   + the goods container
+     * Note that this fields is shared--- do not mutate!
      *   + the population queue
      *
      * @return A scratch version of this colony.
@@ -221,7 +220,11 @@ public class Colony extends Settlement implements Nameable {
         Player owner = getOwner();
         Colony scratch = new Colony(game, owner, "scratch" + getName(),
             getTile().getScratchTile());
-        scratch.setGoodsContainer(getGoodsContainer());
+        GoodsContainer container = new GoodsContainer(game, scratch);
+        for (Goods g : getCompactGoods()) {
+            container.addGoods(g.getType(), g.getAmount());
+        }
+        scratch.setGoodsContainer(container);
         FeatureContainer fc = scratch.getFeatureContainer();
         for (Ability a : getFeatureContainer().getAbilities()) fc.addAbility(a);
         for (Modifier m : getFeatureContainer().getModifiers()) fc.addModifier(m);
@@ -364,6 +367,39 @@ public class Colony extends Settlement implements Nameable {
         return result;
     }
 
+    /**
+     * Determines if this colony build the given type of equipment?
+     * Unlike canBuildEquipment, this takes goods "reserved"
+     * for building or breeding purposes into account.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return True if the colony can provide the equipment.
+     * @see Colony#canBuildEquipment(EquipmentType equipmentType)
+     */
+    public boolean canProvideEquipment(EquipmentType equipmentType) {
+        if (!canBuildEquipment(equipmentType)) return false;
+        for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+            int available = getGoodsCount(goods.getType());
+
+            int breedingNumber = goods.getType().getBreedingNumber();
+            if (breedingNumber != GoodsType.INFINITY) {
+                available -= breedingNumber;
+            }
+
+            BuildableType buildable = getCurrentlyBuilding();
+            if (buildable != null) {
+                for (AbstractGoods ag : buildable.getGoodsRequired()) {
+                    if (ag.getType() == goods.getType()) {
+                        available -= ag.getAmount();
+                        break;
+                    }
+                }
+            }
+
+            if (available < goods.getAmount()) return false;
+        }
+        return true;
+    }
 
     /**
      * Returns true if the colony can reduce its population
