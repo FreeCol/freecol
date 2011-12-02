@@ -1459,8 +1459,7 @@ public final class Canvas extends JDesktopPane {
      *         the dialog.
      */
     public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
-    	PopupPosition popupPosition = getPopupPosition(tile);
-        showSubPanel(freeColDialog, popupPosition);
+        showFreeColPanel(freeColDialog, tile);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         return response;
