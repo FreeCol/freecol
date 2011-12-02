@@ -180,7 +180,6 @@ public class LostCityRumour extends TileItem {
             && unit.hasAbility("model.ability.scoutIndianSettlement");
         boolean hasDeSoto = unit != null
             && unit.getOwner().hasAbility("model.ability.rumoursAlwaysPositive");
-
         // The following arrays contain percentage values for
         // "good" and "bad" events when scouting with a non-expert
         // at the various difficulty levels [0..4] exact values
@@ -203,6 +202,8 @@ public class LostCityRumour extends TileItem {
         int percentNeutral;
         int percentBad;
         int percentGood;
+        difficulty = Math.max(0, Math.min(BAD_EVENT_PERCENTAGE.length-1,
+                                          difficulty));
         if (hasDeSoto) {
             percentBad  = 0;
             percentGood = 100;
