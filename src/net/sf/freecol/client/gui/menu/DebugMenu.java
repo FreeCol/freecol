@@ -322,7 +322,7 @@ public class DebugMenu extends JMenu {
                         = new ChoiceDialog<MonarchAction>(freeColClient, canvas, monarchTitle,
                                                           "Cancel", actions);
                     MonarchAction action
-                        = canvas.showFreeColDialog(choiceDialog, null);
+                        = canvas.showFreeColDialog(choiceDialog);
                     server.getInGameController()
                         .setMonarchAction(serverPlayer, action);
                 }
@@ -656,7 +656,7 @@ public class DebugMenu extends JMenu {
         ChoiceDialog<FoundingFather> choiceDialog
             = new ChoiceDialog<FoundingFather>(freeColClient, canvas, fatherTitle, "Cancel",
                 fathers);
-        FoundingFather father = canvas.showFreeColDialog(choiceDialog, null);
+        FoundingFather father = canvas.showFreeColDialog(choiceDialog);
         if (father != null) {
             server.getInGameController()
                 .addFoundingFather((ServerPlayer) serverPlayer,

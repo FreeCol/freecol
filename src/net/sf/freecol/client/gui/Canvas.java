@@ -1405,37 +1405,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given dialog, making sure a tile is visible.
-     *
-     * @param freeColDialog The dialog to be displayed
-     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *         the dialog.
-     */
-    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
-        showFreeColPanel(freeColDialog, tile);
-        T response = freeColDialog.getResponse();
-        remove(freeColDialog);
-        return response;
-    }
-
-    /**
      * Displays the given panel.
      *
      * @param panel The panel to be displayed
      */
     public void showFreeColPanel(FreeColPanel panel) {
         showFreeColPanel(panel, null);
-    }
-
-    /**
-     * Displays the given panel, making sure a tile is visible.
-     *
-     * @param panel The panel to be displayed
-     * @param tile A <code>Tile</code> to make visible (not under the panel!)
-     */
-    public void showFreeColPanel(FreeColPanel panel, Tile tile) {
-        showSubPanel(panel, getPopupPosition(tile));
     }
 
     /**
@@ -1502,9 +1477,6 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
-
-    // A variety of special purpose panels/dialogs follow
-
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1539,6 +1511,9 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(freeColClient.getGame().getMessageDisplay(message),
                                message);
     }
+
+
+    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2201,7 +2176,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel.updateGameOptions();
     }
 
-
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();
 
@@ -2368,6 +2342,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     /**
      * Filters out and displays the EventPanel messages.
      *
@@ -2424,6 +2399,31 @@ public final class Canvas extends JDesktopPane {
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
+    }
+
+    /**
+     * Displays the given dialog, making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    private <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
+        showFreeColPanel(freeColDialog, tile);
+        T response = freeColDialog.getResponse();
+        remove(freeColDialog);
+        return response;
+    }
+
+    /**
+     * Displays the given panel, making sure a tile is visible.
+     *
+     * @param panel The panel to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the panel!)
+     */
+    private void showFreeColPanel(FreeColPanel panel, Tile tile) {
+        showSubPanel(panel, getPopupPosition(tile));
     }
 
     /**
