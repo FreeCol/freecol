@@ -46,8 +46,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -55,7 +53,6 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas.PopupPosition;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -442,41 +439,6 @@ public final class Canvas extends JDesktopPane {
      */
     public JInternalFrame addAsFrame(JComponent comp) {
         return addAsFrame(comp, false, PopupPosition.CENTERED);
-    }
-
-    /**
-     * Adds a component centered on this Canvas inside a frame. Removes the
-     * statuspanel if visible (and <code>comp != statusPanel</code>).
-     *
-     * The frame cannot be moved or resized.
-     *
-     * @param comp The component to add to this ToEuropePanel.
-     * @return The <code>JInternalFrame</code> that was created and added.
-     */
-    public JInternalFrame addAsSimpleFrame(JComponent comp) {
-        final JInternalFrame f = new JInternalFrame();
-        JScrollPane scrollPane =
-            new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        f.getContentPane().add(scrollPane);
-        f.pack();
-        addCentered(f);
-        f.setName(comp.getClass().getSimpleName());
-
-        if (f.getUI() instanceof BasicInternalFrameUI) {
-            BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
-            biu.setNorthPane(null);
-        }
-
-        f.setFrameIcon(null);
-        f.setVisible(true);
-        f.setResizable(false);
-        try {
-            f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-        }
-
-        return f;
     }
 
 
