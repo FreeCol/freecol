@@ -1340,7 +1340,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
         for (ArrayList<Wish> al : workerWishes.values()) {
             for (Wish w : al) {
-                if (!distances.containsKey(w.getDestination())) {
+                if (w.getDestination() != null
+                    && !distances.containsKey(w.getDestination())) {
                     distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
                 }
             }
