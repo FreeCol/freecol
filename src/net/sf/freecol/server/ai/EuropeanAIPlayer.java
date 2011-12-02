@@ -2018,9 +2018,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (t instanceof AIUnit && !tm.getUnit().canCarryUnits()) {
                     continue;
                 }
-
-                if (t.getTransportSource().getTile()
-                    == tm.getUnit().getTile()) {
+                if (t.getTransportSource() != null
+                    && (t.getTransportSource().getTile()
+                        == tm.getUnit().getTile())) {
                     if (bestTransportTurns > 0
                         || (bestTransportTurns == 0
                             && transportSpace > bestTransportSpace)) {
