@@ -1482,8 +1482,7 @@ public final class Canvas extends JDesktopPane {
      * @param tile A <code>Tile</code> to make visible (not under the panel!)
      */
     public void showFreeColPanel(FreeColPanel panel, Tile tile) {
-        showSubPanel(panel, (tile == null) ? PopupPosition.CENTERED
-            : getPopupPosition(tile));
+        showSubPanel(panel, getPopupPosition(tile));
     }
 
     /**
