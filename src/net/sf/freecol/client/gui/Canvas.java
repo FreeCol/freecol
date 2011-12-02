@@ -821,7 +821,7 @@ public final class Canvas extends JDesktopPane {
             removeInGameComponents();
         }
 
-        showPanel(new NewPanel(freeColClient, gui, this, specification));
+        showSubPanel(new NewPanel(freeColClient, gui, this, specification));
     }
 
     /**
@@ -1083,7 +1083,7 @@ public final class Canvas extends JDesktopPane {
         if (freeColClient.isSingleplayer()) {
             return; // In single player, no chat available
         }
-        showPanel(chatPanel);
+        showSubPanel(chatPanel);
     }
 
     /**
@@ -1813,15 +1813,6 @@ public final class Canvas extends JDesktopPane {
      * Displays a <code>FreeColPanel</code>.
      *
      * @param panel a <code>FreeColPanel</code> value
-     */
-    public void showPanel(FreeColPanel panel) {
-        showSubPanel(panel);
-    }
-
-    /**
-     * Displays a <code>FreeColPanel</code>.
-     *
-     * @param panel a <code>FreeColPanel</code> value
      * @param centered a <code>boolean</code> value
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
@@ -1864,7 +1855,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showPanel(new ReportTurnPanel(freeColClient, this, messages));
+        showSubPanel(new ReportTurnPanel(freeColClient, this, messages));
     }
 
     /**
@@ -2150,7 +2141,7 @@ public final class Canvas extends JDesktopPane {
             if (tp.hasItem()) {
                 showPopup(tp, x, y);
             } else if (tile.isExplored()) {
-                showPanel(new TilePanel(freeColClient, gui, tile));
+                showSubPanel(new TilePanel(freeColClient, gui, tile));
             }
         }
     }

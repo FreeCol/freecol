@@ -421,7 +421,7 @@ public class GUI {
     }
     
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        canvas.showPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
+        canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
     }
     
     

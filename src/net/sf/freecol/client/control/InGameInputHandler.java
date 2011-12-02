@@ -1635,7 +1635,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
         protected void doWork(Canvas canvas) {
-            canvas.showPanel(new VictoryPanel(getFreeColClient(), canvas));
+            canvas.showSubPanel(new VictoryPanel(getFreeColClient(), canvas));
         }
     }
 

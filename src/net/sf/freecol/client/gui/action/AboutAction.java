@@ -51,6 +51,6 @@ public class AboutAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = gui.getCanvas();
-        canvas.showPanel(new AboutPanel(freeColClient, canvas));
+        canvas.showSubPanel(new AboutPanel(freeColClient, canvas));
     }
 }

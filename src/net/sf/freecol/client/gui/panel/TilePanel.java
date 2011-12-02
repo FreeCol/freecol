@@ -171,7 +171,7 @@ public final class TilePanel extends FreeColPanel {
         if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            getCanvas().showPanel(new ColopediaPanel(getFreeColClient(), getCanvas(), command));
+            getCanvas().showSubPanel(new ColopediaPanel(getFreeColClient(), getCanvas(), command));
         }
     }
 

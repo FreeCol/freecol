@@ -439,7 +439,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayVictoryPanel"));
         victoryPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showPanel(new VictoryPanel(freeColClient, canvas));
+                    canvas.showSubPanel(new VictoryPanel(freeColClient, canvas));
                 }
             });
         panelMenu.add(victoryPanel);
@@ -582,7 +582,7 @@ public class DebugMenu extends JMenu {
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showPanel(new StatisticsPanel(freeColClient, canvas));
+                    canvas.showSubPanel(new StatisticsPanel(freeColClient, canvas));
                 }
             });
         statistics.setEnabled(true);
