@@ -17,21 +17,17 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.common.io;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
-		//$JUnit-BEGIN$
-		suite.addTest(net.sf.freecol.common.io.AllTests.suite());
-		suite.addTest(net.sf.freecol.common.option.AllTests.suite());
-		suite.addTest(net.sf.freecol.common.model.AllTests.suite());
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+	TestSuite suite = new TestSuite("Test for net.sf.freecol.common.option");
+        suite.addTestSuite(ModTest.class);
+        return suite;
+    }
 
 }

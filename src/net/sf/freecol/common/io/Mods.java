@@ -64,12 +64,11 @@ public class Mods {
      */
     public static FreeColModFile getModFile(File file) {
         try {
-            // The constructor will throw on IO problems, and
-            // getModDescriptor will throw if there is no valid
-            // mod.xml.  That is all we require ATM to consider this a
-            // valid mod.
-            FreeColModFile fcmf = new FreeColModFile(file);
-            return (fcmf.getModDescriptor() == null) ? null : fcmf;
+            /* The constructor will throw on IO problems, and if there
+             * is no valid mod.xml.  That is all we require ATM to
+             * consider this a valid mod.
+             */
+            return new FreeColModFile(file);
         } catch (IOException e) {
             return null;
         }
@@ -121,7 +120,11 @@ public class Mods {
             if (dir.isDirectory()) {
                 File modDescription = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);
                 if (modDescription.exists()) {
-                    result.add(new FreeColTcFile(dir));
+                    try {
+                        result.add(new FreeColTcFile(dir));
+                    } catch(IOException e) {
+                        logger.warning("Failed to create rule set " + dir);
+                    }
                 }
             }
         }

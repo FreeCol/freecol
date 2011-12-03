@@ -198,10 +198,10 @@ public class Messages {
                     InputStream is = fcmf.getInputStream(fileName);
                     loadResources(is);
                     logger.finest("Loaded message bundle " + fileName + " from "
-                                  + fcmf.getModInfo().getName() + ".");
+                                  + fcmf.getId() + ".");
                 } catch (IOException e) {
                     logger.fine("No message bundle " + fileName + " in "
-                                + fcmf.getModInfo().getName() + ".");
+                                + fcmf.getId() + ".");
                 }
             }
         }

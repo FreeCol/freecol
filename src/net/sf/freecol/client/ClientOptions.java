@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -504,41 +503,40 @@ public class ClientOptions extends OptionGroup {
                 "client-options.xml"));
 
         final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
-        final ListOptionSelector<ModInfo> selector
-            = new ListOptionSelector<ModInfo>() {
+        final ListOptionSelector<FreeColModFile> selector
+            = new ListOptionSelector<FreeColModFile>() {
 
-            private final Map<String, ModInfo> mods
-                = new HashMap<String, ModInfo>();
+            private final Map<String, FreeColModFile> mods
+                = new HashMap<String, FreeColModFile>();
 
             private void init() {
                 mods.clear();
                 for (FreeColModFile f : Mods.getAllMods()) {
-                    ModInfo modInfo = f.getModInfo();
-                    if (modInfo != null && modInfo.getId() != null) {
-                        mods.put(modInfo.getId(), modInfo);
+                    if (f.getId() != null) {
+                        mods.put(f.getId(), f);
                     }
                 }
             }
 
-            public String getId(ModInfo t) {
+            public String getId(FreeColModFile t) {
                 return t.getId();
             }
 
-            public ModInfo getObject(String id) {
+            public FreeColModFile getObject(String id) {
                 init();
                 return mods.get(id);
             }
 
-            public List<ModInfo> getOptions() {
+            public List<FreeColModFile> getOptions() {
                 init();
-                return new ArrayList<ModInfo>(mods.values());
+                return new ArrayList<FreeColModFile>(mods.values());
             }
 
-            public String toString(ModInfo t) {
-                return t.getName();
+            public String toString(FreeColModFile t) {
+                return t.getId();
             }
         };
-        new ListOption<ModInfo>(selector, USER_MODS, modsGroup);
+        new ListOption<FreeColModFile>(selector, USER_MODS, modsGroup);
         add(modsGroup);
     }
 
@@ -552,10 +550,10 @@ public class ClientOptions extends OptionGroup {
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
         ListOption<?> options = (ListOption<?>) getOption(ClientOptions.USER_MODS);
         for (Object o : options.getValue()) {
-            ModInfo modInfo = (ModInfo) o;
+            FreeColModFile modInfo = (FreeColModFile) o;
             if (modInfo == null) continue;
             for (FreeColModFile f : fcmfs) {
-                if (modInfo.getId().equals(f.getModInfo().getId())) {
+                if (modInfo.getId().equals(f.getId())) {
                     active.add(f);
                     break;
                 }

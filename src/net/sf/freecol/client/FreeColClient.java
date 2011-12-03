@@ -22,6 +22,7 @@ package net.sf.freecol.client;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -149,8 +150,8 @@ public final class FreeColClient {
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
-        
-        
+
+
         gui = new GUI(this);
 
         // Look for base data directory.  Failure is fatal.
@@ -203,8 +204,13 @@ public final class FreeColClient {
         // need to move to base because the action manager requires them.
         FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
-        FreeColTcFile tcData = new FreeColTcFile("classic");
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        try {
+            FreeColTcFile tcData = new FreeColTcFile("classic");
+            ResourceManager.setTcMapping(tcData.getResourceMapping());
+        } catch(IOException e) {
+            System.out.println("Failed to load resource mapping from rule set 'classic'.");
+            System.exit(1);
+        }
         actionManager.initializeActions();
 
         // Load the client options, which handle reloading the
@@ -236,7 +242,7 @@ public final class FreeColClient {
         }
 
         // Start the GUI.
-        
+
         gui.hideSplashScreen();
 
         final Dimension windowSize = size;
@@ -257,7 +263,7 @@ public final class FreeColClient {
         }
     }
 
- 
+
 
     /**
      * Meaningfully named access to the ServerAPI.
@@ -697,7 +703,7 @@ public final class FreeColClient {
         ResourceManager.setModMappings(modMappings);
 
         // Update the actions, resources may have changed.
-        if (actionManager != null) 
+        if (actionManager != null)
             actionManager.update();
     }
 }

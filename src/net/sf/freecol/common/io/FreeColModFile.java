@@ -36,13 +36,14 @@ import net.sf.freecol.common.model.Specification;
  * A modification.
  */
 public class FreeColModFile extends FreeColDataFile {
-    
+
     public static final String SPECIFICATION_FILE = "specification.xml";
     public static final String MOD_DESCRIPTOR_FILE = "mod.xml";
     public static final String[] FILE_ENDINGS = new String[] {".fmd", ".zip"};
 
     private String id;
-    private final ModInfo modInfo;
+    private String parent;
+
 
 
     /**
@@ -51,16 +52,14 @@ public class FreeColModFile extends FreeColDataFile {
      * @param file The <code>File</code> containing a FreeCol mod.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColModFile(final File file) {
+    public FreeColModFile(final File file) throws IOException {
         super(file);
-
-        this.id = file.getName();
-        this.modInfo = new ModInfo(id);
+        readModDescriptor();
     }
 
     /**
      * Gets the input stream to the specification.
-     * 
+     *
      * @return An <code>InputStream</code> to the file
      *      "specification.xml" within this data file.
      * @throws IOException if thrown while opening the
@@ -82,22 +81,22 @@ public class FreeColModFile extends FreeColDataFile {
         si.close();
         return specification;
     }
-    
+
     /**
-     * Returns an object representing this mod.
-     * 
+     * Reads a file object representing this mod.
+     *
      * @return The meta information for this mod file.
      * @throws IOException if thrown while reading the
      *      "mod.xml" file.
      */
-    protected ModDescriptor getModDescriptor() throws IOException {
+    protected void readModDescriptor() throws IOException {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader in = null;
         try {
             in = xif.createXMLStreamReader(getModDescriptorInputStream());
             in.nextTag();
-            final ModDescriptor mi = new ModDescriptor(in);
-            return mi;
+            id = in.getAttributeValue(null, "id");
+            parent = in.getAttributeValue(null, "parent");
         } catch (XMLStreamException e) {
             final IOException e2 = new IOException("XMLStreamException.");
             e2.initCause(e);
@@ -113,7 +112,7 @@ public class FreeColModFile extends FreeColDataFile {
 
     /**
      * Gets the input stream to the mod meta file.
-     * 
+     *
      * @return An <code>InputStream</code> to the file
      *      "mod.xml" within this data file.
      * @throws IOException if thrown while opening the
@@ -142,75 +141,11 @@ public class FreeColModFile extends FreeColDataFile {
     }
 
     /**
-     * Gets the ModInfo for this mod.
-     *
-     * @return The ModInfo for this mod.
+     * Gets the parent of the mod.
+     * @return a <code>String</code> value
      */
-    public ModInfo getModInfo() {
-        return modInfo;
+    public String getParent() {
+        return parent;
     }
 
-
-    public static class ModInfo {
-
-        private final String id;
-
-        private ModInfo(final String id) {
-            this.id = id;
-        }
-
-        /**
-         * Gets the ID of this mod.
-         * @return The ID of the mod.
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Gets the name of this mod.
-         */
-        public String getName() {
-            return Messages.message("mod." + getId() + ".name");
-        }
-
-        /**
-         * Gets a short description of this mod.
-         */
-        public String getShortDescription() {
-            return Messages.message("mod." + getId() + ".shortDescription");
-        }
-
-        /**
-         * Gets the name of this mod.
-         * @return The same as {@link #getName()}.
-         */
-        public String toString() {
-            return getName();
-        }
-    }
-
-    protected static class ModDescriptor {
-
-        private final String parent;
-        
-        /**
-         * Initiates a new <code>ModInfo</code> from XML.
-         *
-         * @param in The input stream containing the XML.
-         * @throws XMLStreamException if a problem was encountered
-         *      during parsing.
-         */
-        protected ModDescriptor(XMLStreamReader in) throws XMLStreamException {
-            this.parent = in.getAttributeValue(null, "parent");
-        }
-        
-        /**
-         * Gets the parent of the mod.
-         * @return a <code>String</code> value
-         */
-        public String getParent() {
-            return parent;
-        }
-    }
 }

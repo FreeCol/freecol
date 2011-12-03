@@ -44,7 +44,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.common.io.FreeColModFile.ModInfo;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.NationOptions.Advantages;
@@ -142,12 +142,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         this.connectController = getFreeColClient().getConnectController();
 
         for (FreeColTcFile tc : Mods.getRuleSets()) {
-            specificationBox.addItem(tc.getModInfo());
+            specificationBox.addItem(tc);
             if ((specification == null && FreeCol.DEFAULT_TC.equals(tc.getId()))
                 || (specification != null && specification.getId().equals(tc.getId()))) {
-                specificationBox.setSelectedItem(tc.getModInfo());
+                specificationBox.setSelectedItem(tc);
             }
         }
+
+        specificationBox.setRenderer(new FreeColModFileRenderer());
 
         JButton cancel = new JButton( Messages.message("cancel") );
         JLabel nameLabel = localizedLabel("name");
@@ -219,7 +221,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     public Specification getSpecification() {
         if (specification == null) {
             try {
-                String tc = ((ModInfo) specificationBox.getSelectedItem()).getId();
+                String tc = ((FreeColModFile) specificationBox.getSelectedItem()).getId();
                 FreeColTcFile tcData = new FreeColTcFile(tc);
                 specification = tcData.getSpecification();
             } catch(Exception e) {
@@ -350,6 +352,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         @Override
         public void setLabelValues(JLabel label, Object value) {
             label.setText(Messages.message("playerOptions." + value.toString()));
+        }
+    }
+
+    private class FreeColModFileRenderer extends FreeColComboBoxRenderer {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            FreeColModFile mod = (FreeColModFile) value;
+            label.setText(Messages.message("mod." + mod.getId() + ".name"));
         }
     }
 }

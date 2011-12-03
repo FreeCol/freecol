@@ -38,7 +38,7 @@ public class FreeColTcFile extends FreeColModFile {
      * @param file The file to load.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColTcFile(final File file) {
+    public FreeColTcFile(final File file) throws IOException {
         super(file);
     }
 
@@ -48,7 +48,7 @@ public class FreeColTcFile extends FreeColModFile {
      * @param id The id of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColTcFile(final String id) {
+    public FreeColTcFile(final String id) throws IOException {
         super(new File(getRulesDirectory(), id));
     }
 
@@ -59,9 +59,8 @@ public class FreeColTcFile extends FreeColModFile {
     public ResourceMapping getResourceMapping() {
         ResourceMapping result;
         try {
-            final ModDescriptor info = getModDescriptor();
-            if (info.getParent() != null) {
-                final FreeColTcFile parentTcData = new FreeColTcFile(info.getParent());
+            if (getParent() != null) {
+                final FreeColTcFile parentTcData = new FreeColTcFile(getParent());
                 result = parentTcData.getResourceMapping();
             } else {
                 result = new ResourceMapping();
