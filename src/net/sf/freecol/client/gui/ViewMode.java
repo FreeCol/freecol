@@ -38,11 +38,11 @@ public class ViewMode {
 
     private Unit savedActiveUnit;
 
-    private MapViewer gui;
+    private MapViewer mapViewer;
 
 
     public ViewMode(MapViewer gui) {
-        this.gui = gui;
+        this.mapViewer = gui;
     }
 
     public void toggleViewMode() {
@@ -61,15 +61,15 @@ public class ViewMode {
 
         switch (currentMode) {
         case ViewMode.MOVE_UNITS_MODE:
-            if (gui.getActiveUnit() == null) {
-                gui.setActiveUnit(savedActiveUnit);
+            if (mapViewer.getActiveUnit() == null) {
+                mapViewer.setActiveUnit(savedActiveUnit);
             }
             savedActiveUnit = null;
             logger.warning("Change view to Move Units Mode");
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            savedActiveUnit = gui.getActiveUnit();
-            gui.setActiveUnit(null);
+            savedActiveUnit = mapViewer.getActiveUnit();
+            mapViewer.setActiveUnit(null);
             logger.warning("Change view to View Terrain Mode");
             break;
         }
@@ -82,11 +82,11 @@ public class ViewMode {
     public boolean displayTileCursor(Tile tile) {
         if (currentMode == ViewMode.VIEW_TERRAIN_MODE) {
 
-            Tile selectedTile = gui.getSelectedTile();
+            Tile selectedTile = mapViewer.getSelectedTile();
             if (selectedTile == null || tile == null) {
                 return false;
             } else if (selectedTile.equals(tile)) {
-                TerrainCursor cursor = gui.getCursor();
+                TerrainCursor cursor = mapViewer.getCursor();
                 cursor.setTile(tile);
                 return true;
             }
@@ -98,9 +98,9 @@ public class ViewMode {
     public boolean displayUnitCursor(Unit unit) {
         if (currentMode == ViewMode.MOVE_UNITS_MODE) {
 
-            TerrainCursor cursor = gui.getCursor();
+            TerrainCursor cursor = mapViewer.getCursor();
 
-            if ((unit == gui.getActiveUnit()) && (cursor.isActive() || (unit.getMovesLeft() == 0))) {
+            if ((unit == mapViewer.getActiveUnit()) && (cursor.isActive() || (unit.getMovesLeft() == 0))) {
                 cursor.setTile(unit.getTile());
                 return true;
             }
