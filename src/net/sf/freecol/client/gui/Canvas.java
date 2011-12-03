@@ -463,18 +463,6 @@ public final class Canvas extends JDesktopPane {
      * Adds a component centered on this Canvas. Removes the statuspanel if
      * visible (and <code>comp != statusPanel</code>).
      *
-     * @param comp The component to add
-     * @return The component argument.
-     */
-    public Component addCentered(Component comp) {
-        addCentered(comp, null);
-        return comp;
-    }
-
-    /**
-     * Adds a component centered on this Canvas. Removes the statuspanel if
-     * visible (and <code>comp != statusPanel</code>).
-     *
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
      */
