@@ -29,9 +29,12 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class ModTest extends FreeColTestCase {
 
     public void testGetAllMods() {
+        // check that there are some mods
+        assertFalse(Mods.getAllMods().isEmpty());
         // check that all mod files can be loaded
         for (FreeColModFile mod : Mods.getAllMods()) {
             assertNotNull("Id of mod " + mod + " should not be null", mod.getId());
+            assertEquals(mod, Mods.getModFile(mod.getId()));
         }
 
     }

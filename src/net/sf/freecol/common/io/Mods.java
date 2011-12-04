@@ -23,7 +23,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -35,25 +38,34 @@ public class Mods {
 
     private static final Logger logger = Logger.getLogger(Mods.class.getName());
 
+    private static final Map<String, FreeColModFile> allMods =
+        new HashMap<String, FreeColModFile>();
+
     public static final FileFilter MOD_FILTER =
         new FileFilter() {
             public boolean accept(File f) {
                 final String name = f.getName();
-                if (".".equals(f.getName().substring(0, 1))) {
+                if (name.startsWith(".")) {
                     // Ignore `hidden' files.
                     return false;
-                }
-                if (f.isDirectory()) {
+                } else if (f.isDirectory()) {
                     return true;
-                }
-                for (String ending : FreeColModFile.FILE_ENDINGS) {
-                    if (name.endsWith(ending)) {
-                        return true;
+                } else {
+                    for (String ending : FreeColModFile.FILE_ENDINGS) {
+                        if (name.endsWith(ending)) {
+                            return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
             }
         };
+
+    static {
+        getDirectoryMods(FreeCol.getUserModsDirectory());
+        getDirectoryMods(FreeCol.getStandardModsDirectory());
+    }
+
 
     /**
      * Gets a mod file from a file (possibly a directory).
@@ -75,24 +87,32 @@ public class Mods {
     }
 
     /**
+     * Returns the <code>FreeColModFile</code> with the given ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>FreeColModFile</code> value
+     */
+    public static FreeColModFile getModFile(String id) {
+        return allMods.get(id);
+    }
+
+    /**
      * Loads all valid mods from a specified directory.
      *
      * @param directory The directory to load from.
      * @return A list of valid mods.
      */
-    private static List<FreeColModFile> getDirectoryMods(File directory) {
-        List<FreeColModFile> mods = new ArrayList<FreeColModFile>();
+    private static void getDirectoryMods(File directory) {
         if (directory != null && directory.isDirectory()) {
             for (File f : directory.listFiles(MOD_FILTER)) {
                 FreeColModFile fcmf = getModFile(f);
                 if (fcmf != null) {
-                    mods.add(fcmf);
+                    allMods.put(fcmf.getId(), fcmf);
                 } else {
                     logger.warning("Failed to load mod from: " + f.getName());
                 }
             }
         }
-        return mods;
     }
 
     /**
@@ -101,11 +121,8 @@ public class Mods {
      *
      * @return A list of <code>FreeColModFile</code>s contain mods.
      */
-    public static List<FreeColModFile> getAllMods() {
-        List<FreeColModFile> mods
-            = getDirectoryMods(FreeCol.getUserModsDirectory());
-        mods.addAll(getDirectoryMods(FreeCol.getStandardModsDirectory()));
-        return mods;
+    public static Collection<FreeColModFile> getAllMods() {
+        return allMods.values();
     }
 
     /**

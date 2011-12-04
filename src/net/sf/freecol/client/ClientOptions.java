@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -546,7 +547,7 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        final List<FreeColModFile> fcmfs = Mods.getAllMods();
+        final Collection<FreeColModFile> fcmfs = Mods.getAllMods();
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
         ListOption<?> options = (ListOption<?>) getOption(ClientOptions.USER_MODS);
         for (Object o : options.getValue()) {
