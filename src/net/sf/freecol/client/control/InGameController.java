@@ -1280,7 +1280,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             MapViewer mapViewer = gui.getMapViewer();
             mapViewer.setActiveUnit(null);
-            mapViewer.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile, false);
         }
     }
 
@@ -1454,7 +1454,7 @@ public final class InGameController implements NetworkConstants {
             player.invalidateCanSeeTiles();
             gui.playSound("sound.event.buildingComplete");
             mapViewer.setActiveUnit(null);
-            mapViewer.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile, false);
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
@@ -2750,7 +2750,8 @@ public final class InGameController implements NetworkConstants {
             } else {
                 displayModelMessages(false);
                 MapViewer mapViewer = gui.getMapViewer();
-                if (!mapViewer.onScreen(tile)) mapViewer.setSelectedTile(tile, false);
+                if (!mapViewer.onScreen(tile)) 
+                    gui.setSelectedTile(tile, false);
             }
         }
     }
@@ -3287,7 +3288,7 @@ public final class InGameController implements NetworkConstants {
         if (moveMode >= MODE_END_TURN) {
             endTurn();
         } else if (tile != null) {
-            mapViewer.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             endTurn();
         }

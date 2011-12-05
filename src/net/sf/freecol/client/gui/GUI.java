@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -424,6 +425,8 @@ public class GUI {
         canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
     }
     
-    
+    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
+        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
+    }
     
 }
