@@ -48,7 +48,6 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -497,21 +496,6 @@ public final class FreeColClient {
         System.exit(0);
     }
 
-    /**
-     * Set the game-wide next active unit if one can be found.
-     *
-     * @param unitId A unit id for the unit to make active.
-     */
-    public void setActiveUnit(String unitId) {
-        if (unitId != null && getGame() != null) {
-            Unit active = (Unit) getGame().getFreeColGameObject(unitId);
-            if (active != null) {
-                active.getOwner().resetIterators();
-                active.getOwner().setNextActiveUnit(active);
-                gui.getMapViewer().setActiveUnit(active);
-            }
-        }
-    }
 
     /**
      * Sets the <code>Client</code> that shall be used to send messages to the

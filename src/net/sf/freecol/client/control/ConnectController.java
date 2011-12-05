@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -293,7 +294,13 @@ public final class ConnectController {
                         freeColClient.getInGameController()
                             .setCurrentPlayer(thisPlayer);
                         if (activeUnitId != null) {
-                            freeColClient.setActiveUnit(activeUnitId);
+                            Unit active = (Unit) freeColClient.getGame().getFreeColGameObject(activeUnitId);
+                            if (active != null) {
+                                active.getOwner().resetIterators();
+                                active.getOwner().setNextActiveUnit(active);
+                                gui.getMapViewer().setActiveUnit(active);
+                            }
+                            
                         } else {
                             gui.setSelectedTile(entryTile, false);
                         }
