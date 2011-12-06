@@ -1411,7 +1411,6 @@ public final class MapViewer {
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
         }
-        forceReposition();
         gui.getCanvas().refresh();
     }
 
@@ -1485,8 +1484,7 @@ public final class MapViewer {
     public void setFocus(Tile focus) {
         this.focus = focus;
 
-        forceReposition();
-        gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
+        gui.getCanvas().refresh();
     }
 
 
