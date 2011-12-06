@@ -3208,14 +3208,6 @@ public final class MapViewer {
         }
     }
 
-    /**
-     * Position the map so that the Tile at the focus location is
-     * displayed at the center.
-     */
-    private void positionMap() {
-        if (focus != null)
-            positionMap(focus);
-    }
 
     /**
      * Position the map so that the supplied location is
@@ -3366,9 +3358,8 @@ public final class MapViewer {
     }
 
     private void repositionMapIfNeeded() {
-        if (bottomRow < 0) {
-            positionMap();
-        }
+        if (bottomRow < 0 && focus != null)
+            positionMap(focus);
     }
 
 

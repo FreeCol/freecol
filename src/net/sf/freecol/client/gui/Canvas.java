@@ -1117,7 +1117,7 @@ public final class Canvas extends JDesktopPane {
         ColonyPanel panel = getColonyPanel(colony);
         if (panel != null) return panel;
         panel = new ColonyPanel(freeColClient, gui, this, colony);
-        showSubPanel(panel, getPopupPosition(colony.getTile()));
+        showFreeColPanel(panel, colony.getTile());
         return panel;
     }
 
@@ -1375,7 +1375,7 @@ public final class Canvas extends JDesktopPane {
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         IndianSettlementPanel panel
             = new IndianSettlementPanel(freeColClient, this, indianSettlement);
-        showSubPanel(panel, getPopupPosition(indianSettlement.getTile()));
+        showFreeColPanel(panel, indianSettlement.getTile());
     }
 
     /**
