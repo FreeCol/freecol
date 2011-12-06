@@ -178,7 +178,7 @@ public final class FreeColClient {
         gui.displaySpashScreen(splashFilename);
 
         // Determine the window size.
-        setWindowed(size != null);
+        gui.setWindowed((size != null));
         if (size != null && size.width < 0) {
             size = gui.determineWindowSize();
         }
@@ -466,16 +466,6 @@ public final class FreeColClient {
     }
 
     /**
-     * Has the user retired the game.
-     *
-     * @return <i>true</i> if the user has retired the game and
-     *         <i>false</i> otherwise.
-     */
-    public boolean isRetired() {
-        return isRetired;
-    }
-
-    /**
      * Is the user playing in singleplayer mode.
      *
      * @return <i>true</i> if the user is playing in singleplayer mode and
@@ -591,10 +581,6 @@ public final class FreeColClient {
      */
     public void setSingleplayer(boolean singleplayer) {
         this.singleplayer = singleplayer;
-    }
-
-    public void setWindowed(boolean windowed) {
-        gui.setWindowed(windowed);
     }
 
     /**
