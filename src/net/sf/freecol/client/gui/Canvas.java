@@ -494,20 +494,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Closes all the menus that are currently open.
-     */
-    public void closeMenus() {
-        for (JInternalFrame frame : getAllFrames()) {
-            for (Component c : frame.getContentPane().getComponents()) {
-                if (c instanceof FreeColPanel) {
-                    ((FreeColPanel) c).notifyClose();
-                }
-            }
-            frame.dispose();
-        }
-    }
-
-    /**
      * Closes the <code>StatusPanel</code>.
      *
      * @see #showStatusPanel
@@ -560,8 +546,6 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-
-
     /**
      * Displays an error message.
      *
@@ -582,6 +566,8 @@ public final class Canvas extends JDesktopPane {
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, this, display);
         showFreeColPanel(errorPanel);
     }
+
+
 
     /**
      * Gets any currently displayed colony panel for the specified colony.
@@ -668,7 +654,6 @@ public final class Canvas extends JDesktopPane {
         return gui.getImageLibrary();
     }
 
-
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
      *
@@ -677,6 +662,7 @@ public final class Canvas extends JDesktopPane {
     public LoadingSavegameDialog getLoadingSavegameDialog() {
         return loadingSavegameDialog;
     }
+
 
     /**
      * Returns the MapControls of this Canvas.
@@ -727,7 +713,6 @@ public final class Canvas extends JDesktopPane {
         return null;
     }
 
-
     /**
      * Describe <code>getSpecification</code> method here.
      *
@@ -736,6 +721,7 @@ public final class Canvas extends JDesktopPane {
     public Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
     }
+
 
     /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
@@ -1039,7 +1025,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(dialog, winner.getTile());
     }
 
-
     /**
      * Displays the <code>ChatPanel</code>.
      *
@@ -1052,6 +1037,7 @@ public final class Canvas extends JDesktopPane {
         }
         showSubPanel(chatPanel);
     }
+
 
     /**
      * Displays a dialog with a text and a cancel-button, in addition
@@ -1168,7 +1154,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, this));
     }
 
-
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
@@ -1185,6 +1170,7 @@ public final class Canvas extends JDesktopPane {
                                                                    Messages.message(cancelText)),
                                  null);
     }
+
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -1479,9 +1465,6 @@ public final class Canvas extends JDesktopPane {
                                message);
     }
 
-
-    // A variety of special purpose panels/dialogs follow
-
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1490,6 +1473,9 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(String messageId) {
         showInformationMessage(null, StringTemplate.key(messageId));
     }
+
+
+    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2167,6 +2153,20 @@ public final class Canvas extends JDesktopPane {
             mapViewer.setSize(getSize());
             mapViewer.forceReposition();
             oldSize = getSize();
+        }
+    }
+
+    /**
+     * Closes all the menus that are currently open.
+     */
+    void closeMenus() {
+        for (JInternalFrame frame : getAllFrames()) {
+            for (Component c : frame.getContentPane().getComponents()) {
+                if (c instanceof FreeColPanel) {
+                    ((FreeColPanel) c).notifyClose();
+                }
+            }
+            frame.dispose();
         }
     }
 

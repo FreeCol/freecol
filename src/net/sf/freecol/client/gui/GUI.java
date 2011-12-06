@@ -130,6 +130,10 @@ public class GUI {
         frame.setVisible(true);
     }
 
+    public void closeMenus() {
+        canvas.closeMenus();
+    }
+
     public Dimension determineWindowSize() {
         
         Rectangle bounds = GraphicsEnvironment
@@ -193,16 +197,16 @@ public class GUI {
     public Canvas getCanvas() {
         return canvas;
     }
-
+    
+    
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-    
-    
+
     public MapViewer getMapViewer() {
         return mapViewer;
     }
-
+    
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
@@ -210,19 +214,19 @@ public class GUI {
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
-    
+
     public void hideSplashScreen() {
         if (splash != null) {
             splash.setVisible(false);
             splash.dispose();
         }
     }
+    
 
     public boolean isWindowed() {
         return windowed;
     }
     
-
     /**
      * Plays some sound. Parameter == null stops playing a sound.
      *
@@ -254,12 +258,12 @@ public class GUI {
             }
         }
     }
+
     
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
 
-    
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
@@ -270,7 +274,7 @@ public class GUI {
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
-
+    
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
@@ -278,23 +282,23 @@ public class GUI {
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-    
+
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-
+    
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
                  freeColClient.getGame().getMap()));
     }
     
+    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
-    
-    
+
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
     }
@@ -421,7 +425,7 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
@@ -436,12 +440,10 @@ public class GUI {
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-    
+
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-
-    
 }

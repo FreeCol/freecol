@@ -382,7 +382,7 @@ public final class ConnectController {
                 this.message = message;
             }
             public void run() {
-                canvas.closeMenus();
+                gui.closeMenus();
                 gui.errorMessage( message );
             }
         }

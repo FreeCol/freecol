@@ -111,7 +111,7 @@ public final class MapEditorController {
             final MapViewer mapViewer = gui.getMapViewer();
 
             canvas.closeMainPanel();
-            canvas.closeMenus();
+            gui.closeMenus();
             freeColClient.setInGame(true);
 
             // We may need to reset the zoom value to the default value
@@ -196,7 +196,7 @@ public final class MapEditorController {
             freeColClient.getActionManager().update();
             canvas.refresh();
         } catch (FreeColException e) {
-            canvas.closeMenus();
+            gui.closeMenus();
             gui.errorMessage( e.getMessage() );
         }
     }
@@ -301,7 +301,7 @@ public final class MapEditorController {
                 this.message = message;
             }
             public void run() {
-                canvas.closeMenus();
+                gui.closeMenus();
                 gui.errorMessage( message );
             }
         }

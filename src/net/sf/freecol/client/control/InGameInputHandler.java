@@ -1119,7 +1119,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     public Element closeMenus() {
-        gui.getCanvas().closeMenus();
+        gui.closeMenus();
         return null;
     }
 
