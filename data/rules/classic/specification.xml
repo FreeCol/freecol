@@ -913,7 +913,9 @@
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.piracy" value="true"/>
     </unit-type>
-    <unit-type id="wagon" abstract="true" lineOfSight="1" />
+    <unit-type id="wagon" abstract="true" lineOfSight="1">
+      <ability id="model.ability.foundColony" value="false"/>
+    </unit-type>
     <unit-type id="model.unit.artillery" extends="wagon" offence="7" defence="5" movement="3"
                price="500" scoreValue="2">
       <required-goods id="model.goods.hammers" value="192"/>
