@@ -566,10 +566,8 @@ public final class InGameInputHandler extends InputHandler {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Canvas canvas = gui.getCanvas();
-                canvas.displayChatMessage(chatMessage.getPlayer(),
-                                          chatMessage.getMessage(),
-                                          chatMessage.isPrivate());
+                gui.displayChatMessage(chatMessage.getMessage(),
+                                       chatMessage.isPrivate());
             }
         });
         return null;

@@ -34,8 +34,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 
 public class GUI {
@@ -146,6 +146,20 @@ public class GUI {
     
     }
 
+    /**
+     * Tells the map controls that a chat message was received.
+     *
+     * @param sender The player who sent the chat message to the server.
+     * @param message The chat message.
+     * @param privateChat 'true' if the message is a private one, 'false'
+     *            otherwise.
+     * @see GUIMessage
+     */
+    public void displayChatMessage(String message, boolean privateChat) {
+        mapViewer.addMessage(new GUIMessage(freeColClient.getMyPlayer().getName() + ": " + message,
+                                      imageLibrary.getColor(freeColClient.getMyPlayer())));
+    }
+
     public void displaySpashScreen(final String splashFilename) {
         splash = null;
         if (splashFilename != null) {
@@ -183,16 +197,16 @@ public class GUI {
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-
+    
+    
     public MapViewer getMapViewer() {
         return mapViewer;
     }
-    
-    
+
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
-
+    
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
@@ -203,10 +217,11 @@ public class GUI {
             splash.dispose();
         }
     }
-    
+
     public boolean isWindowed() {
         return windowed;
     }
+    
 
     /**
      * Plays some sound. Parameter == null stops playing a sound.
@@ -228,7 +243,6 @@ public class GUI {
         }
     }
     
-
     public void quit() {
         if (!isWindowed()) {
             try {
@@ -244,6 +258,7 @@ public class GUI {
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
+
     
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
@@ -252,19 +267,22 @@ public class GUI {
         }
     }
 
-    
+    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
+        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
+    }
+
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
-
+    
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-
+    
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-    
+
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
@@ -274,6 +292,11 @@ public class GUI {
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
+    }
+    
+    
+    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
+        canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
     }
 
     /**
@@ -398,11 +421,10 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-    
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-    
     
     /**
      * Updates the label displaying the current amount of gold.
@@ -410,23 +432,16 @@ public class GUI {
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-
+    
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-
+    
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-    
-    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
-    }
-    
-    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
-        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
-    }
+
     
 }

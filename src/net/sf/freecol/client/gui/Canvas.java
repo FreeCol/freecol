@@ -351,8 +351,8 @@ public final class Canvas extends JDesktopPane {
         startGamePanel = new StartGamePanel(freeColClient, gui, this);
         serverListPanel = new ServerListPanel(freeColClient, gui, freeColClient.getConnectController());
         europePanel = new EuropePanel(freeColClient, this);
-        statusPanel = new StatusPanel(freeColClient, this);
-        chatPanel = new ChatPanel(freeColClient, this);
+        statusPanel = new StatusPanel(freeColClient, this); 
+        chatPanel = new ChatPanel(freeColClient, gui, this);
         clientOptionsDialog = new ClientOptionsDialog(freeColClient, gui, this);
         loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, this);
 
@@ -560,28 +560,7 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-    /**
-     * Tells the map controls that a chat message was received.
-     *
-     * @param sender The player who sent the chat message to the server.
-     * @param message The chat message.
-     * @param privateChat 'true' if the message is a private one, 'false'
-     *            otherwise.
-     * @see GUIMessage
-     */
-    public void displayChatMessage(Player sender, String message, boolean privateChat) {
-        mapViewer.addMessage(new GUIMessage(sender.getName() + ": " + message,
-                                      gui.getImageLibrary().getColor(sender)));
-    }
 
-    /**
-     * Displays a chat message originating from this client.
-     *
-     * @param message The chat message.
-     */
-    public void displayChatMessage(String message) {
-        displayChatMessage(freeColClient.getMyPlayer(), message, false);
-    }
 
     /**
      * Displays an error message.
