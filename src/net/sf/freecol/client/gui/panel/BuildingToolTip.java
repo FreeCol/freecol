@@ -125,7 +125,8 @@ public class BuildingToolTip extends JToolTip {
         }
 
         GoodsType output = building.getGoodsOutputType();
-        int breedingNumber = output.getBreedingNumber();
+        int breedingNumber = (output == null) ? GoodsType.INFINITY
+            : output.getBreedingNumber();
         if (breedingNumber < GoodsType.INFINITY
             && breedingNumber > building.getColony().getGoodsCount(output)) {
             StringTemplate t = StringTemplate.template("buildingToolTip.breeding")
