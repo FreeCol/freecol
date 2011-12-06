@@ -162,6 +162,8 @@ public class GUI {
     public void displayChatMessage(String message, boolean privateChat) {
         mapViewer.addMessage(new GUIMessage(freeColClient.getMyPlayer().getName() + ": " + message,
                                       imageLibrary.getColor(freeColClient.getMyPlayer())));
+
+        canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     public void displaySpashScreen(final String splashFilename) {

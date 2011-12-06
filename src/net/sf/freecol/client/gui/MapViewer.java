@@ -368,7 +368,6 @@ public final class MapViewer {
         }
         messages.add(message);
 
-        gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
     /**
