@@ -115,7 +115,7 @@ public final class MapEditorController {
             freeColClient.setInGame(true);
 
             // We may need to reset the zoom value to the default value
-            mapViewer.scaleMap(2f);
+            gui.scaleMap(2f);
             
             gui.setupMapEditorMenuBar();
             JInternalFrame f = gui.getCanvas().addAsToolBox(new MapEditorTransformPanel(freeColClient, canvas));

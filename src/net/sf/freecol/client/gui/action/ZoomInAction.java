@@ -72,7 +72,7 @@ public class ZoomInAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getMapViewer().scaleMap(1/4f);
+        gui.scaleMap(1/4f);
         update();
         freeColClient.getActionManager().getFreeColAction(ZoomOutAction.id).update();
     }

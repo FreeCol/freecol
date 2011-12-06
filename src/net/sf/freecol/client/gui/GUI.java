@@ -448,4 +448,9 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
+    
+    public void scaleMap(float delta) {
+        mapViewer.scaleMap(delta);
+        canvas.refresh();
+    }
 }

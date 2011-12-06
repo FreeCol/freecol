@@ -1410,7 +1410,6 @@ public final class MapViewer {
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
         }
-        gui.getCanvas().refresh();
     }
 
 
