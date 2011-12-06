@@ -451,6 +451,13 @@ public class GUI {
     
     public void scaleMap(float delta) {
         mapViewer.scaleMap(delta);
+        refresh();
+    }
+    
+
+    public void refresh() { 
+        mapViewer.forceReposition();
         canvas.refresh();
     }
+    
 }

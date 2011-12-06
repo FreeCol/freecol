@@ -156,7 +156,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     mapViewer.displayCoordinates
                         = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                    canvas.refresh();
+                    gui.refresh();
                 }
             });
         sc.setEnabled(true);
@@ -192,7 +192,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     mapViewer.displayColonyValue = false;
                     mapViewer.displayColonyValuePlayer = null;
-                    canvas.refresh();
+                    gui.refresh();
                 }
             });
         this.add(cvpMenu);
@@ -209,7 +209,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     mapViewer.displayColonyValue = true;
                     mapViewer.displayColonyValuePlayer = null;
-                    canvas.refresh();
+                    gui.refresh();
                 }
             });
         this.add(cvpMenu);
@@ -232,7 +232,7 @@ public class DebugMenu extends JMenu {
                         public void actionPerformed(ActionEvent e) {
                             mapViewer.displayColonyValue = true;
                             mapViewer.displayColonyValuePlayer = p;
-                            canvas.refresh();
+                            gui.refresh();
                         }
                     });
             }
@@ -492,7 +492,7 @@ public class DebugMenu extends JMenu {
                     mapViewer.debugShowMission
                         = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     dami.setEnabled(mapViewer.debugShowMission);
-                    canvas.refresh();
+                    gui.refresh();
                 }
             });
         dam.setEnabled(true);
@@ -523,7 +523,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     mapViewer.debugShowMissionInfo
                         = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                    canvas.refresh();
+                    gui.refresh();
                 }
             });
         dami.setEnabled(mapViewer.debugShowMission);

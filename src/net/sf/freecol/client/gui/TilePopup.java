@@ -647,7 +647,7 @@ public final class TilePopup extends JPopupMenu {
         }
         mapViewer.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
-        canvas.refresh();
+        gui.refresh();
     }
 
     /**
@@ -667,7 +667,7 @@ public final class TilePopup extends JPopupMenu {
                 first = false;
             }
         }
-        canvas.refresh();
+        gui.refresh();
     }
 
     /**

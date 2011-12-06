@@ -791,14 +791,6 @@ public final class Canvas extends JDesktopPane {
         mapViewer.display(g2d);
     }
 
-    /**
-     * Refreshes this Canvas visually.
-     */
-    public void refresh() {
-        mapViewer.forceReposition();
-        repaint(0, 0, getWidth(), getHeight());
-    }
-
     public void refreshPlayersTable() {
         startGamePanel.refreshPlayersTable();
 
@@ -1038,7 +1030,6 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(chatPanel);
     }
 
-
     /**
      * Displays a dialog with a text and a cancel-button, in addition
      * to buttons for each of the objects returned for the given list.
@@ -1060,6 +1051,7 @@ public final class Canvas extends JDesktopPane {
         ChoiceItem<T> response = showFreeColDialog(choiceDialog, tile);
         return (response == null) ? null : response.getObject();
     }
+
 
     public <T> T showChoiceDialog(Tile tile, StringTemplate template, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
@@ -1171,7 +1163,6 @@ public final class Canvas extends JDesktopPane {
                                  null);
     }
 
-
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
@@ -1214,6 +1205,7 @@ public final class Canvas extends JDesktopPane {
                                                 okText, cancelText);
         return showFreeColDialog(confirmDialog, tile);
     }
+
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -1474,9 +1466,6 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(null, StringTemplate.key(messageId));
     }
 
-
-    // A variety of special purpose panels/dialogs follow
-
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1485,6 +1474,9 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(StringTemplate template) {
         showInformationMessage(null, template);
     }
+
+
+    // A variety of special purpose panels/dialogs follow
 
     /**
      * Displays a dialog with a text field and a ok/cancel option.
@@ -2170,7 +2162,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-
     /**
      * Displays an error message.
      *
@@ -2178,6 +2169,14 @@ public final class Canvas extends JDesktopPane {
      */
     void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
+    }
+
+
+    /**
+     * Refreshes this Canvas visually.
+     */
+    void refresh() {
+        repaint(0, 0, getWidth(), getHeight());
     }
 
     /**

@@ -1482,7 +1482,7 @@ public final class MapViewer {
     public void setFocus(Tile focus) {
         this.focus = focus;
 
-        gui.getCanvas().refresh();
+        gui.refresh();
     }
 
 
@@ -1509,7 +1509,7 @@ public final class MapViewer {
     public void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
 
-        gui.getCanvas().refresh();
+        gui.refresh();
     }
 
 

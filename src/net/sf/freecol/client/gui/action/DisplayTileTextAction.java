@@ -94,7 +94,7 @@ public class DisplayTileTextAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
             freeColClient.getClientOptions().setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
-            gui.getCanvas().refresh();
+            gui.refresh();
         }
     }
 }

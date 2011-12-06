@@ -252,7 +252,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                     }
                 }
             }
-            canvas.refresh();
+            freeColClient.getGUI().refresh();
             canvas.requestFocus();
         }
     }
@@ -299,7 +299,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             scrollThread.stopScrolling();
             scrollThread = null;
         }
-        canvas.refresh();
+        freeColClient.getGUI().refresh();
     }
 
     private void drawBox(JComponent component, Point startPoint, Point endPoint) {

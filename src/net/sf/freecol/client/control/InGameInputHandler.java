@@ -1336,7 +1336,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            canvas.refresh();
+            gui.refresh();
 
             if (requestFocus && !canvas.isShowingSubPanel()) {
                 canvas.requestFocusInWindow();
@@ -1527,7 +1527,7 @@ public final class InGameInputHandler extends InputHandler {
                 mapViewer.setFocusImmediately(sourceTile);
             }
             Animations.unitMove(getFreeColClient(), gui, canvas, unit, sourceTile, destinationTile);
-            canvas.refresh();
+            gui.refresh();
         }
     }
 
@@ -1581,7 +1581,7 @@ public final class InGameInputHandler extends InputHandler {
                 mapViewer.setFocusImmediately(unit.getTile());
             }
             Animations.unitAttack(getFreeColClient(), gui, canvas, unit, defender, success);
-            canvas.refresh();
+            gui.refresh();
         }
     }
 

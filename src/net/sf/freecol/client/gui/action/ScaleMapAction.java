@@ -237,6 +237,6 @@ public class ScaleMapAction extends FreeColAction {
         }*/
 
         gui.setSelectedTile(map.getTile(0, 0), false);
-        gui.getCanvas().refresh();
+        gui.refresh();
     }
 }

@@ -1676,7 +1676,7 @@ public final class InGameController implements NetworkConstants {
                     || unit.getState() == UnitState.SKIPPED)) {
                 nextActiveUnit();
             } else {
-                gui.getCanvas().refresh();
+                gui.refresh();
             }
         }
     }

@@ -77,7 +77,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
         gui.getMapViewer().setFocus(game.getMap().getTile(1,1));
         freeColClient.getActionManager().update();
-        canvas.refresh();
+        gui.refresh();
     }
 
 }
