@@ -872,6 +872,7 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.evadeAttack" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
       <modifier id="model.modifier.tradeVolumePenalty"
                 value="-75" type="percentage"/>
     </unit-type>
