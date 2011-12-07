@@ -114,16 +114,16 @@ public class GUI {
         }
         frame.setJMenuBar(menuBar);
         if (frame instanceof WindowedFrame) {
-            ((WindowedFrame) frame).setCanvas(getCanvas());
-            frame.getContentPane().add(getCanvas());
+            ((WindowedFrame) frame).setCanvas(canvas);
+            frame.getContentPane().add(canvas);
             if (getWindowBounds() != null) {
                 frame.setBounds(getWindowBounds());
             } else {
                 frame.pack();
             }
         } else if (frame instanceof FullScreenFrame) {
-            ((FullScreenFrame) frame).setCanvas(getCanvas());
-            frame.getContentPane().add(getCanvas());
+            ((FullScreenFrame) frame).setCanvas(canvas);
+            frame.getContentPane().add(canvas);
         }
         mapViewer.forceReposition();
         canvas.updateSizes();
@@ -390,7 +390,7 @@ public class GUI {
                 }
             });
 
-        this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, getImageLibrary());
+        this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, imageLibrary);
         this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
