@@ -306,12 +306,7 @@ public final class Canvas extends JDesktopPane {
 
     private final LoadingSavegameDialog loadingSavegameDialog;
 
-    /**
-     * This is the GUI instance used to paint the colony tiles in the
-     * ColonyPanel and other panels. It should not be scaled along
-     * with the default GUI.
-     */
-    private final MapViewer colonyTileGUI;
+
 
     private boolean clientOptionsDialogShowing = false;
 
@@ -336,8 +331,6 @@ public final class Canvas extends JDesktopPane {
         this.freeColClient = client;
         this.gui = gui;
         this.mapViewer = mapViewer;
-
-        this.colonyTileGUI = new MapViewer(client, gui, size, gui.getImageLibrary());
 
         this.initialSize = size;
 
@@ -587,10 +580,6 @@ public final class Canvas extends JDesktopPane {
             }
         }
         return null;
-    }
-
-    public MapViewer getColonyTileGUI() {
-        return colonyTileGUI;
     }
 
     /**

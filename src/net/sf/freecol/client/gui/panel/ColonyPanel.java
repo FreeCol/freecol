@@ -1370,7 +1370,7 @@ public final class ColonyPanel extends FreeColPanel
 
         @Override
         public void paintComponent(Graphics g) {
-            MapViewer colonyTileGUI = getCanvas().getColonyTileGUI();
+            MapViewer colonyTileGUI = gui.getColonyTileGUI();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());

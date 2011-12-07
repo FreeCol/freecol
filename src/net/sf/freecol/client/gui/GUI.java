@@ -68,6 +68,13 @@ public class GUI {
 
     private MapViewer mapViewer;
 
+    /**
+     * This is the MapViewer instance used to paint the colony tiles in the
+     * ColonyPanel and other panels. It should not be scaled along
+     * with the default MapViewer.
+     */
+    private MapViewer colonyTileGUI;
+    
     private ImageLibrary imageLibrary;
 
     private SoundPlayer soundPlayer;
@@ -77,7 +84,7 @@ public class GUI {
     private Rectangle windowBounds;
 
     private JWindow splash;
-
+    
     public GUI(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.imageLibrary = new ImageLibrary();
@@ -200,6 +207,10 @@ public class GUI {
         return canvas;
     }
     
+
+    public MapViewer getColonyTileGUI() {
+        return colonyTileGUI;
+    }
     
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
@@ -413,6 +424,8 @@ public class GUI {
 
         this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, imageLibrary);
         this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
+        this.colonyTileGUI = new MapViewer(freeColClient, this, innerWindowSize, imageLibrary);
+
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
