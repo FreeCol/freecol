@@ -361,6 +361,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Gets the direction to a neighbouring tile from this one.
+     *
+     * @param tile The other <code>Tile</code>.
+     * @return The direction to the other tile, or null if not a neighbour.
+     */
+    public Direction getDirection(Tile tile) {
+        return getMap().getDirection(this, tile);
+    }
+
+    /**
      * Returns the <code>TileItemContainer</code>.
      *
      * @return a <code>TileItemContainer</code> value

@@ -121,8 +121,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
             return StringTemplate.name(name);
         } else {
             return StringTemplate.template("nearLocation")
-                .add("%direction%", "direction." + getGame().getMap()
-                    .getDirection(getTile(), workTile).toString())
+                .add("%direction%", "direction."
+                    + getTile().getDirection(workTile).toString())
                 .addName("%location%", name);
         }
     }

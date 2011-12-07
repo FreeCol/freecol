@@ -174,8 +174,8 @@ public class IndianDemandMission extends Mission {
                     int tension = Math.max(unitTension,
                         unit.getOwner().getTension(enemy).getValue());
                     if (tension >= Tension.Level.CONTENT.getLimit()) {
-                        Direction d = getGame().getMap()
-                            .getDirection(unit.getTile(), target.getTile());
+                        Direction d = unit.getTile()
+                            .getDirection(target.getTile());
                         if (d != null) AIMessage.askAttack(au, d);
                     }
                     logger.info("Indian demand by " + unit

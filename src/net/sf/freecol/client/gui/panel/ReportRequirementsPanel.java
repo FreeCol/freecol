@@ -220,8 +220,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     private void addTileWarning(StyledDocument doc, Colony colony,
                                 String messageId, Tile tile) {
-        Direction direction = tile.getMap()
-            .getDirection(colony.getTile(), tile);
+        Direction direction = colony.getTile().getDirection(tile);
         String message = Messages.message(StringTemplate.template(messageId)
             .add("%type%", tile.getType().getNameKey())
             .add("%direction%", direction.getNameKey())

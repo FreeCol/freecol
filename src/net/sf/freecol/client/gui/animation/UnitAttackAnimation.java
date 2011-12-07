@@ -97,8 +97,8 @@ final class UnitAttackAnimation {
      */
     public void animate() {
         Map map = attacker.getGame().getMap();
-        Direction direction = map.getDirection(attacker.getTile(),
-                                               defender.getTile());
+        Direction direction = attacker.getTile()
+            .getDirection(defender.getTile());
         SimpleZippedAnimation sza;
 
         if (Animations.getAnimationSpeed(freeColClient, attacker) > 0) {
