@@ -1480,8 +1480,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         void doWork(Canvas canvas) {
-            canvas.refreshTile(_oldTile);
-            canvas.refreshTile(_newTile);
+            gui.refreshTile(_oldTile);
+            gui.refreshTile(_newTile);
         }
 
 

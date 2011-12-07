@@ -262,15 +262,36 @@ public class GUI {
     }
 
     
+    public void refresh() { 
+        mapViewer.forceReposition();
+        canvas.refresh();
+    }
+
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
 
+    /**
+     * Refreshes the screen at the specified Tile.
+     *
+     * @param t The tile to refresh.
+     */
+    public void refreshTile(Tile t) {
+        if (t.getX() >= 0 && t.getY() >= 0) {
+            canvas.repaint(mapViewer.getTileBounds(t));
+        }
+    }
+    
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
             ((FreeColMenuBar) menuBar).reset();
         }
+    }
+    
+    public void scaleMap(float delta) {
+        mapViewer.scaleMap(delta);
+        refresh();
     }
 
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
@@ -281,6 +302,7 @@ public class GUI {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
     
+    
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
@@ -288,23 +310,22 @@ public class GUI {
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-    
+
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
                  freeColClient.getGame().getMap()));
     }
     
-    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
-
+    
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
     }
-
+    
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -427,7 +448,7 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-    
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
@@ -439,25 +460,17 @@ public class GUI {
         frame.getJMenuBar().repaint();
     }
     
+
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
+    
 
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-    
-    public void scaleMap(float delta) {
-        mapViewer.scaleMap(delta);
-        refresh();
-    }
-    
 
-    public void refresh() { 
-        mapViewer.forceReposition();
-        canvas.refresh();
-    }
     
 }

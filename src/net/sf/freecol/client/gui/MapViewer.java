@@ -1613,11 +1613,11 @@ public final class MapViewer {
             ret = true;
         } else {
             if (oldTile != null) {
-                gui.getCanvas().refreshTile(oldTile);
+                gui.refreshTile(oldTile);
             }
 
             if (selectedTile != null) {
-                gui.getCanvas().refreshTile(selectedTile);
+                gui.refreshTile(selectedTile);
             }
         }
         return ret;
@@ -1648,7 +1648,7 @@ public final class MapViewer {
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     Tile tile = getActiveUnit().getTile();
                     if (isTileVisible(tile)) {
-                        gui.getCanvas().refreshTile(tile);
+                        gui.refreshTile(tile);
                     }
                 }
             }

@@ -787,17 +787,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Refreshes the screen at the specified Tile.
-     *
-     * @param t The tile to refresh.
-     */
-    public void refreshTile(Tile t) {
-        if (t.getX() >= 0 && t.getY() >= 0) {
-            repaint(mapViewer.getTileBounds(t));
-        }
-    }
-
-    /**
      * Removes the given component from this Container.
      *
      * @param comp The component to remove from this Container.
