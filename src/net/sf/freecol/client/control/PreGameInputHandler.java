@@ -364,7 +364,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
 
         game.removePlayer(player);
 
-        gui.getCanvas().refreshPlayersTable();
+        gui.refreshPlayersTable();
 
         return null;
     }
