@@ -143,7 +143,7 @@ public final class PlayersTable extends JTable {
 
         TableColumn advantagesColumn = getColumnModel().getColumn(ADVANTAGE_COLUMN);
         if (nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
-            advantagesColumn.setCellEditor(new AdvantageCellEditor(canvas.getSpecification().getEuropeanNationTypes()));
+            advantagesColumn.setCellEditor(new AdvantageCellEditor(freeColClient.getGame().getSpecification().getEuropeanNationTypes()));
         }
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
         advantagesColumn.setHeaderRenderer(renderer);

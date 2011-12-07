@@ -714,16 +714,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Describe <code>getSpecification</code> method here.
-     *
-     * @return a <code>Specification</code> value
-     */
-    public Specification getSpecification() {
-        return freeColClient.getGame().getSpecification();
-    }
-
-
-    /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
      *
      * @return <code>true</code> if no internal frames are open.
@@ -2360,7 +2350,8 @@ public final class Canvas extends JDesktopPane {
      * @return A <code>PopupPosition</code> for a panel to be displayed.
      */
     private PopupPosition getPopupPosition(Tile tile) {
-        if (tile == null) return PopupPosition.CENTERED;
+        if (tile == null) 
+            return PopupPosition.CENTERED;
         int where = mapViewer.setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT

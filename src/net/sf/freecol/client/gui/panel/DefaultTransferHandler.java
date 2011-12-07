@@ -369,7 +369,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     Unit unit = unitLabel.getUnit();
                     if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                         Goods goods = label.getGoods();
-                        for (EquipmentType equipment : canvas.getSpecification()
+                        for (EquipmentType equipment : freeColClient.getGame().getSpecification()
                                  .getEquipmentTypeList()) {
                             if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
                                 AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
@@ -435,7 +435,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     UnitLabel unitLabel = (UnitLabel) comp;
                     Unit unit = unitLabel.getUnit();
                     if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                        for (EquipmentType equipment : canvas.getSpecification()
+                        for (EquipmentType equipment : freeColClient.getGame().getSpecification()
                                  .getEquipmentTypeList()) {
                             if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
                                 AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
