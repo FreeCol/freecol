@@ -2490,7 +2490,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final float MOD_FOOD_VERY_LOW          = 0.5f;
 
         //applied per goods
-        final float MOD_BUILD_MATERIAL_MISSING = 0.25f;
+        final float MOD_BUILD_MATERIAL_MISSING = 0.10f;
 
         //applied per surrounding tile
         final float MOD_ADJ_SETTLEMENT_BIG     = 0.25f;
