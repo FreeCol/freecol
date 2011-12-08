@@ -45,7 +45,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -1705,22 +1704,10 @@ public final class Canvas extends JDesktopPane {
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
         repaint();
-        addAsFrame(panel, false, (centered) ? PopupPosition.CENTERED
-                   : PopupPosition.ORIGIN);
+        addAsFrame(panel, false, PopupPosition.ORIGIN);
         panel.requestFocus();
     }
 
-    /**
-     * Shows the given popup at the given position on the screen.
-     *
-     * @param popup The JPopupMenu to show.
-     * @param x The x-coordinate at which to show the popup.
-     * @param y The y-coordinate at which to show the popup.
-     */
-    public void showPopup(JPopupMenu popup, int x, int y) {
-        popup.show(this, x, y);
-        popup.repaint();
-    }
 
     /**
      * Display a dialog to confirm a combat.
@@ -2027,7 +2014,8 @@ public final class Canvas extends JDesktopPane {
         if (tile != null) {
             TilePopup tp = new TilePopup(freeColClient, gui, tile);
             if (tp.hasItem()) {
-                showPopup(tp, x, y);
+                tp.show(this, x, y);
+                tp.repaint();
             } else if (tile.isExplored()) {
                 showSubPanel(new TilePanel(freeColClient, gui, tile));
             }
