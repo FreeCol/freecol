@@ -402,6 +402,20 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Adds the goods for n of a piece of equipment to the colony.
+     *
+     * @param type The <code>EquipmentType</code> to add.
+     * @param n The number of pieces of equipment (may be negative).
+     */
+    public void addEquipmentGoods(EquipmentType type, int n) {
+        for (AbstractGoods ag : type.getGoodsRequired()) {
+            if (ag.getType().isStorable()) {
+                addGoods(ag.getType(), n * ag.getAmount());
+            }
+        }
+    }
+            
+    /**
      * Returns true if the colony can reduce its population
      * voluntarily. This is generally the case, but can be prevented
      * by buildings such as the stockade.
