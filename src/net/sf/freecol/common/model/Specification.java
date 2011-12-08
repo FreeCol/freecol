@@ -105,6 +105,8 @@ public final class Specification {
     private final List<GoodsType> libertyGoodsTypeList = new ArrayList<GoodsType>();
     private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<GoodsType>();
 
+    private final List<GoodsType> rawBuildingGoodsTypeList = new ArrayList<GoodsType>();
+
     private final List<ResourceType> resourceTypeList = new ArrayList<ResourceType>();
 
     private final List<TileType> tileTypeList = new ArrayList<TileType>();
@@ -287,6 +289,9 @@ public final class Specification {
             }
             if (goodsType.isImmigrationGoodsType()) {
                 immigrationGoodsTypeList.add(goodsType);
+            }
+            if (goodsType.isRawBuildingMaterial() && !goodsType.isFoodType()) {
+                rawBuildingGoodsTypeList.add(goodsType);
             }
             if (goodsType.isStorable()) {
                 storableTypes++;
@@ -789,6 +794,10 @@ public final class Specification {
 
     public int numberOfFarmedGoodsTypes() {
         return farmedGoodsTypeList.size();
+    }
+
+    public final List<GoodsType> getRawBuildingGoodsTypeList() {
+        return rawBuildingGoodsTypeList;
     }
 
     /**

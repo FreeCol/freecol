@@ -2538,14 +2538,15 @@ public class Player extends FreeColGameObject implements Nameable {
         float advantage = 1f;
 
         //set up maps for all foods and building materials
-        TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
+        final Specification spec = getSpecification();
+        TypeCountMap<GoodsType> rawBuildingMaterialMap
+            = new TypeCountMap<GoodsType>();
+        for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
+            rawBuildingMaterialMap.incrementCount(g, 0);
+        }
         TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type.isFoodType()) {
-                foodMap.incrementCount(type, 0);
-            } else if (type.isRawBuildingMaterial()) {
-                buildingMaterialMap.incrementCount(type, 0);
-            }
+        for (GoodsType g : spec.getFoodGoodsTypeList()) {
+            foodMap.incrementCount(g, 0);
         }
 
         //penalty for building on a resource tile,
@@ -2617,7 +2618,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                 if (type.isFoodType()) {
                                     foodMap.incrementCount(type, highProductionValue);
                                 } else if (type.isRawBuildingMaterial()) {
-                                    buildingMaterialMap.incrementCount(type, highProductionValue);
+                                    rawBuildingMaterialMap.incrementCount(type, highProductionValue);
                                 }
                             }
                         }
@@ -2660,8 +2661,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         //check availability of key goods        
-        for (GoodsType type : buildingMaterialMap.keySet()) {
-            Integer amount = buildingMaterialMap.getCount(type);
+        for (GoodsType type : rawBuildingMaterialMap.keySet()) {
+            Integer amount = rawBuildingMaterialMap.getCount(type);
             if (amount == 0) {
                 advantage *= MOD_BUILD_MATERIAL_MISSING;
             }
