@@ -446,6 +446,10 @@ public abstract class Mission extends AIObject {
 
 
     protected boolean unitLeavesShip(AIUnit aiUnit) {
+        Colony colony = aiUnit.getUnit().getColony();
+        if (colony != null) {
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+        }
         return AIMessage.askDisembark(aiUnit);
     }
 

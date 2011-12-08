@@ -1307,6 +1307,11 @@ public class TransportMission extends Mission {
             } else {
                 logger.warning("Unknown Transportable.");
             }
+            // Kick the colony if the unit or goods available changes.
+            Colony colony = carrier.getColony();
+            if (colony != null) {
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            }
         }
 
         return transportListChanged;
@@ -1381,6 +1386,11 @@ public class TransportMission extends Mission {
                 }
             } else {
                 logger.warning("Unknown Transportable: " + t);
+            }
+            // Kick the colony if the unit or goods available changes.
+            Colony colony = carrier.getColony();
+            if (colony != null) {
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         }
 

@@ -2739,6 +2739,7 @@ public class Colony extends Settlement implements Nameable {
         throws XMLStreamException {
         super.readAttributes(in);
 
+        int oldUnitCount = getUnitCount();
         owner.addSettlement(this);
         established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
@@ -2819,6 +2820,11 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         // end compatibility code
+        
+        // Hack to kick AI colonies when the population changes.
+        if (owner.isAI() && getUnitCount() != oldUnitCount) {
+            firePropertyChange(REARRANGE_WORKERS, true, false);
+        }
     }
 
     /**
