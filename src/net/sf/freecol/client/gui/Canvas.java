@@ -448,7 +448,7 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsToolBox(JComponent comp) {
-        return addAsFrame(comp, true);
+        return addAsFrame(comp, true, PopupPosition.CENTERED);
     }
 
     /**
@@ -2134,21 +2134,6 @@ public final class Canvas extends JDesktopPane {
     void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
-
-    /**
-     * Adds a component centered on this Canvas inside a frame. Removes the
-     * statuspanel if visible (and <code>comp != statusPanel</code>).
-     *
-     * @param comp The component to add to this ToEuropePanel.
-     * @param toolBox Should be set to true if the resulting frame
-     *      is used as a toolbox (that is: it should not be counted
-     *      as a frame).
-     * @return The <code>JInternalFrame</code> that was created and added.
-     */
-    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox) {
-        return addAsFrame(comp, toolBox, PopupPosition.CENTERED);
-    }
-
 
     /**
      * Adds a component on this Canvas inside a frame. Removes the
