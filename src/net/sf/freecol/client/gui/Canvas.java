@@ -1020,12 +1020,6 @@ public final class Canvas extends JDesktopPane {
     }
 
 
-    public <T> T showChoiceDialog(Tile tile, StringTemplate template, String cancelKey,
-                                  List<ChoiceItem<T>> choices) {
-        return showChoiceDialog(tile, Messages.message(template),
-                                Messages.message(cancelKey), choices);
-    }
-
     /**
      * Display the panel for claiming land.
      *
@@ -1292,17 +1286,7 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(EventType type) {
-        showEventPanel(null, type);
-    }
-
-    /**
-     * Display an event panel.
-     *
-     * @param tile An optional <code>Tile</code> to make visible.
-     * @param type The <code>EventType</code>.
-     */
-    public void showEventPanel(Tile tile, EventType type) {
-        showFreeColPanel(new EventPanel(freeColClient, this, type), tile);
+        showFreeColPanel(new EventPanel(freeColClient, this, type), null);
     }
 
     /**
@@ -1322,7 +1306,7 @@ public final class Canvas extends JDesktopPane {
      * @param panel The panel to be displayed
      */
     public void showFreeColPanel(FreeColPanel panel) {
-        showFreeColPanel(panel, null);
+        showSubPanel(panel, PopupPosition.CENTERED);
     }
 
     /**
@@ -1798,7 +1782,8 @@ public final class Canvas extends JDesktopPane {
             .addStringTemplate("%unit%", Messages.getLabel(unit))
             .addName("%colony%", colony.getName());
         ScoutColonyAction result =
-            showChoiceDialog(unit.getTile(), template, "cancel", choices);
+            showChoiceDialog(unit.getTile(), Messages.message(template),
+        Messages.message("cancel"), choices);
         return (result == null) ? ScoutColonyAction.CANCEL : result;
     }
 
