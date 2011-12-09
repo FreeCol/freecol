@@ -417,6 +417,23 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    private void takeTurn(Player player, boolean newTurn) {
+        final FreeColClient fcc = getFreeColClient();
+
+        fcc.getInGameController().setCurrentPlayer(player);
+
+        if (newTurn) {
+            List<Settlement> settlements = player.getSettlements();
+            Tile defTile = ((settlements.size() > 0)
+                ? settlements.get(0).getTile()
+                : player.getEntryLocation().getTile()).getSafeTile(null, null);
+            player.resetIterators();
+            fcc.getInGameController().nextActiveUnit(defTile);
+        }
+
+        fcc.getActionManager().update();
+    }
+
     /**
      * Handles a "setCurrentPlayer"-message.
      *
@@ -445,29 +462,20 @@ public final class InGameInputHandler extends InputHandler {
             fcc.quit();
         }
 
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        fcc.getInGameController().setCurrentPlayer(newPlayer);
-
-                        if (newTurn) {
-                            List<Settlement> settlements
-                                = newPlayer.getSettlements();
-                            Tile defTile = ((settlements.size() > 0)
-                                ? settlements.get(0).getTile()
-                                : newPlayer.getEntryLocation().getTile())
-                                .getSafeTile(null, null);
-                            newPlayer.resetIterators();
-                            fcc.getInGameController().nextActiveUnit(defTile);
+        if (SwingUtilities.isEventDispatchThread()) {
+            takeTurn(newPlayer, newTurn);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            takeTurn(newPlayer, newTurn);
                         }
-
-                        fcc.getActionManager().update();
-                    }
-                });
-        } catch (InterruptedException e) {
-            // Ignore
-        } catch (InvocationTargetException e) {
-            // Ignore
+                    });
+            } catch (InterruptedException e) {
+                // Ignore
+            } catch (InvocationTargetException e) {
+                // Ignore
+            }
         }
 
         new RefreshCanvasSwingTask(true).invokeLater();
