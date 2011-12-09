@@ -56,7 +56,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
         
-        JLabel settlementLabel = new JLabel(canvas.getImageIcon(settlement, false));
+        JLabel settlementLabel = new JLabel(canvas.getImageLibrary().getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean visited = player.hasVisited(settlement);
@@ -75,7 +75,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                                                      .addStringTemplate("%nation%", missionary.getOwner().getNationName())
                                                      .addStringTemplate("%unit%", missionary.getLabel()));
-            add(new JLabel(missionaryName, canvas.getImageIcon(missionary, true), JLabel.CENTER));
+            add(new JLabel(missionaryName, canvas.getImageLibrary().getImageIcon(missionary, true), JLabel.CENTER));
         }
 
         add(localizedLabel("indianSettlement.learnableSkill"), "newline");
@@ -85,7 +85,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(localizedLabel("indianSettlement.skillNone"));
             } else {
                 add(new JLabel(Messages.message(skillType.getNameKey()),
-                               canvas.getImageIcon(skillType, true), JLabel.CENTER));
+                               canvas.getImageLibrary().getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
             add(localizedLabel("indianSettlement.skillUnknown"));
@@ -106,7 +106,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             sale = player.getLastSaleString(settlement, wantedGoods[0]);
             add(new JLabel(Messages.message(wantedGoods[0].getNameKey())
                            + ((sale == null) ? "" : " " + sale),
-                           canvas.getImageIcon(wantedGoods[0], false),
+                           canvas.getImageLibrary().getImageIcon(wantedGoods[0], false),
                            JLabel.CENTER));
             n--;
         }
@@ -120,7 +120,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             sale = player.getLastSaleString(settlement, wantedGoods[1]);
             add(new JLabel(Messages.message(wantedGoods[1].getNameKey())
                            + ((sale == null) ? "" : " " + sale),
-                           canvas.getImageIcon(wantedGoods[1], false),
+                           canvas.getImageLibrary().getImageIcon(wantedGoods[1], false),
                            JLabel.CENTER),
                 "split " + Integer.toString(n));
             for (int i = 2; i < wantedGoods.length; i++) {
@@ -128,7 +128,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     sale = player.getLastSaleString(settlement,wantedGoods[i]);
                     add(new JLabel(Messages.message(wantedGoods[i].getNameKey())
                                    + ((sale == null) ? "" : " " + sale),
-                                   canvas.getImageIcon(wantedGoods[i], false),
+                                   canvas.getImageLibrary().getImageIcon(wantedGoods[i], false),
                                    JLabel.CENTER));
                 }
             }

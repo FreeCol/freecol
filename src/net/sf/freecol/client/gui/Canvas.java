@@ -581,63 +581,7 @@ public final class Canvas extends JDesktopPane {
         return null;
     }
 
-    /**
-     * Returns the appropriate ImageIcon for Object.
-     *
-     * @param display The Object to display.
-     * @return The appropriate ImageIcon.
-     */
-    public ImageIcon getImageIcon(Object display, boolean small) {
-        ImageLibrary imageLibrary = gui.getImageLibrary();
-        Image image = null;
-        if (display == null) {
-            return new ImageIcon();
-        } else if (display instanceof GoodsType) {
-            GoodsType goodsType = (GoodsType) display;
-            try {
-                image = imageLibrary.getGoodsImage(goodsType);
-            } catch (Exception e) {
-                logger.warning("could not find image for goods " + goodsType);
-            }
-        } else if (display instanceof Unit) {
-            Unit unit = (Unit) display;
-            try {
-                image = imageLibrary.getUnitImageIcon(unit).getImage();
-            } catch (Exception e) {
-                logger.warning("could not find image for unit " + unit.toString());
-            }
-        } else if (display instanceof UnitType) {
-            UnitType unitType = (UnitType) display;
-            try {
-                image = imageLibrary.getUnitImageIcon(unitType).getImage();
-            } catch (Exception e) {
-                logger.warning("could not find image for unit " + unitType);
-            }
-        } else if (display instanceof Settlement) {
-            Settlement settlement = (Settlement) display;
-            try {
-                image = imageLibrary.getSettlementImage(settlement);
-            } catch (Exception e) {
-                logger.warning("could not find image for settlement " + settlement);
-            }
-        } else if (display instanceof LostCityRumour) {
-            try {
-                image = imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            } catch (Exception e) {
-                logger.warning("could not find image for lost city rumour");
-            }
-        } else if (display instanceof Player) {
-            image = imageLibrary.getCoatOfArmsImage(((Player) display).getNation());
-        }
-        if (image != null && small) {
-            return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
-                                                         (image.getHeight(null) / 3) *2,
-                                                         Image.SCALE_SMOOTH));
-        } else {
-            return (image != null) ? new ImageIcon(image) : null;
-        }
-    }
-
+ 
     public ImageLibrary getImageLibrary() {
         return gui.getImageLibrary();
     }
@@ -1158,7 +1102,7 @@ public final class Canvas extends JDesktopPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + id + ".");
             }
-            images[i] = getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
+            images[i] = gui.getImageLibrary().getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
         }
 
         FreeColDialog<Boolean> confirmDialog
@@ -1383,7 +1327,7 @@ public final class Canvas extends JDesktopPane {
         String text = Messages.message(template);
         ImageIcon icon = null;
         if (displayObject != null) {
-            icon = getImageIcon(displayObject, false);
+            icon = gui.getImageLibrary().getImageIcon(displayObject, false);
         }
         Tile tile = null;
         if (displayObject instanceof Tile) {
@@ -1574,7 +1518,7 @@ public final class Canvas extends JDesktopPane {
                 logger.warning("could not find message with id: "
                     + messages.get(i).getId() + ".");
             }
-            messageIcon[i] = getImageIcon(game
+            messageIcon[i] = gui.getImageLibrary().getImageIcon(game
                 .getMessageDisplay(messages.get(i)), false);
         }
 

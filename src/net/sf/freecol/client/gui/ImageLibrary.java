@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -808,6 +809,63 @@ public final class ImageLibrary {
             return null;
         } else {
             return ResourceManager.getImage("path." + getPathType(u) + ".nextTurn.image");
+        }
+    }
+
+    
+    /**
+     * Returns the appropriate ImageIcon for Object.
+     *
+     * @param display The Object to display.
+     * @return The appropriate ImageIcon.
+     */
+    public ImageIcon getImageIcon(Object display, boolean small) {
+        Image image = null;
+        if (display == null) {
+            return new ImageIcon();
+        } else if (display instanceof GoodsType) {
+            GoodsType goodsType = (GoodsType) display;
+            try {
+                image = this.getGoodsImage(goodsType);
+            } catch (Exception e) {
+                logger.warning("could not find image for goods " + goodsType);
+            }
+        } else if (display instanceof Unit) {
+            Unit unit = (Unit) display;
+            try {
+                image = this.getUnitImageIcon(unit).getImage();
+            } catch (Exception e) {
+                logger.warning("could not find image for unit " + unit.toString());
+            }
+        } else if (display instanceof UnitType) {
+            UnitType unitType = (UnitType) display;
+            try {
+                image = this.getUnitImageIcon(unitType).getImage();
+            } catch (Exception e) {
+                logger.warning("could not find image for unit " + unitType);
+            }
+        } else if (display instanceof Settlement) {
+            Settlement settlement = (Settlement) display;
+            try {
+                image = this.getSettlementImage(settlement);
+            } catch (Exception e) {
+                logger.warning("could not find image for settlement " + settlement);
+            }
+        } else if (display instanceof LostCityRumour) {
+            try {
+                image = this.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
+            } catch (Exception e) {
+                logger.warning("could not find image for lost city rumour");
+            }
+        } else if (display instanceof Player) {
+            image = this.getCoatOfArmsImage(((Player) display).getNation());
+        }
+        if (image != null && small) {
+            return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
+                                                         (image.getHeight(null) / 3) *2,
+                                                         Image.SCALE_SMOOTH));
+        } else {
+            return (image != null) ? new ImageIcon(image) : null;
         }
     }
 
