@@ -756,7 +756,7 @@ public final class Canvas extends JDesktopPane {
             gui.updateMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
-                takeFocus();
+                requestFocus();
             }
         }
     }
@@ -2273,15 +2273,6 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
 
-    /**
-     * Makes sure that this Canvas takes the focus. It will keep on trying for a
-     * while even its request doesn't get granted immediately.
-     */
-    private void takeFocus() {
-        if (!isShowingSubPanel()) {
-            requestFocus();
-        }
-    }
     
     
 }
