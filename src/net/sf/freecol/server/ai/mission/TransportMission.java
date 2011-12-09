@@ -1353,7 +1353,7 @@ public class TransportMission extends Mission {
                         // give up on it and do something else with
                         // the carrier.  Similarly also for the goods
                         // loads below.
-                        AIMessage.askEmbark(getAIUnit(), u);
+                        AIMessage.askEmbark(getAIUnit(), u, null);
                         tli.remove();
                         transportListChanged = true;
                     } else {

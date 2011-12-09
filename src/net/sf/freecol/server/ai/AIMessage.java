@@ -344,11 +344,14 @@ public class AIMessage {
      *
      * @param aiUnit The <code>AIUnit</code> carrier.
      * @param unit The <code>Unit</code> that is embarking.
+     * @param direction The <code>Direction</code> to embark in (may be null).
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askEmbark(AIUnit aiUnit, Unit unit) {
+    public static boolean askEmbark(AIUnit aiUnit, Unit unit,
+                                    Direction direction) {
         return sendMessage(aiUnit.getConnection(),
-                           new EmbarkMessage(unit, aiUnit.getUnit(), null));
+                           new EmbarkMessage(unit, aiUnit.getUnit(),
+                                             direction));
     }
 
 

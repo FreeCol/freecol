@@ -362,6 +362,37 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Aborts the mission for a unit, but tries to recover the unit onto
+     * a neighbouring carrier.
+     *
+     * @param aiU The <code>AIUnit</code> whose mission is ended.
+     */
+    private void abortUnitMission(AIUnit aiU) {
+        aiU.setMission(null);
+        // There is a common stuffup where the AIs converge on the
+        // same location on a small island.  First mover gets the
+        // colony, the rest get stuck there when their mission is aborted.
+        //
+        // TODO: drop this when a more general `marooned unit rescue'
+        // mission is written.
+        Unit unit = aiU.getUnit();
+        Tile tile = unit.getTile();
+        if (!unit.isCarrier() && !unit.isOnCarrier() && tile != null) {
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                for (Unit u : t.getUnitList()) {
+                    if (u.getOwner() == unit.getOwner()
+                        && u.isCarrier()
+                        && u.getSpaceLeft() >= unit.getSpaceTaken()) {
+                        AIMessage.askEmbark(getAIMain().getAIUnit(u), unit,
+                            tile.getDirection(t));
+                        return; // Let the carrier update its transport list.
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Aborts all the missions which are no longer valid.
      */
     protected void abortInvalidMissions() {
@@ -371,7 +402,7 @@ public abstract class AIPlayer extends AIObject {
             if (!mission.isValid()) {
                 logger.finest("Abort invalid mission: " + mission
                     + " for: " + au.getUnit());
-                au.setMission(null);
+                abortUnitMission(au);
             }
         }
     }
@@ -386,11 +417,11 @@ public abstract class AIPlayer extends AIObject {
             if (!mission.isValid()) {
                 logger.finest("Abort invalid mission: " + mission
                               + " for: " + au.getUnit());
-                au.setMission(null);
+                abortUnitMission(au);
             } else if (mission.isOneTime()) {
                 logger.finest("Abort one-time mission: " + mission
                               + " for: " + au.getUnit());
-                au.setMission(null);
+                abortUnitMission(au);
             }
         }
     }
