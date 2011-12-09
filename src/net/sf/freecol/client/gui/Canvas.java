@@ -530,11 +530,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    public void displayChat(String senderNme, String message, boolean privateChat) {
-        startGamePanel.displayChat(senderNme, message, privateChat);
-
-    }
-
     /**
      * Displays an error message.
      *
@@ -556,8 +551,6 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(errorPanel);
     }
 
-
-
     /**
      * Gets any currently displayed colony panel for the specified colony.
      *
@@ -578,11 +571,13 @@ public final class Canvas extends JDesktopPane {
         return null;
     }
 
- 
+
+
     public ImageLibrary getImageLibrary() {
         return gui.getImageLibrary();
     }
 
+ 
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
      *
@@ -592,7 +587,6 @@ public final class Canvas extends JDesktopPane {
         return loadingSavegameDialog;
     }
 
-
     /**
      * Returns the MapControls of this Canvas.
      *
@@ -601,6 +595,7 @@ public final class Canvas extends JDesktopPane {
     public MapControls getMapControls() {
         return mapControls;
     }
+
 
     /**
      * Returns this <code>Canvas</code>'s <code>MapViewer</code>.
@@ -960,7 +955,6 @@ public final class Canvas extends JDesktopPane {
         return (response == null) ? null : response.getObject();
     }
 
-
     /**
      * Display the panel for claiming land.
      *
@@ -990,6 +984,7 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? ClaimAction.CANCEL : result;
     }
 
+
     /**
      * Displays a dialog for setting client options.
      *
@@ -1017,7 +1012,8 @@ public final class Canvas extends JDesktopPane {
      */
     public ColonyPanel showColonyPanel(Colony colony) {
         ColonyPanel panel = getColonyPanel(colony);
-        if (panel != null) return panel;
+        if (panel != null) 
+            return panel;
         panel = new ColonyPanel(freeColClient, gui, this, colony);
         showFreeColPanel(panel, colony.getTile());
         return panel;
@@ -1108,7 +1104,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(confirmDialog, tile);
     }
 
-
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
@@ -1128,6 +1123,7 @@ public final class Canvas extends JDesktopPane {
                                                                    Messages.message(cancelText)),
                                  tile);
     }
+
 
     /**
      * Display a dialog following declaration of independence.
@@ -1367,9 +1363,6 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(null, template);
     }
 
-
-    // A variety of special purpose panels/dialogs follow
-
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
@@ -1412,6 +1405,9 @@ public final class Canvas extends JDesktopPane {
         }
         return response;
     }
+
+
+    // A variety of special purpose panels/dialogs follow
 
     /**
      * Displays a dialog where the user may choose a file. This is the same as
@@ -1633,7 +1629,6 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
 
-
     /**
      * Display a dialog to confirm a combat.
      *
@@ -1648,6 +1643,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new PreCombatDialog(freeColClient, this, attacker, defender),
                                  tile);
     }
+
 
     /**
      * Show the new turn report.
@@ -1937,14 +1933,14 @@ public final class Canvas extends JDesktopPane {
      * @see TilePopup
      */
     public void showTilePopup(Tile tile, int x, int y) {
-        if (tile != null) {
-            TilePopup tp = new TilePopup(freeColClient, gui, tile);
-            if (tp.hasItem()) {
-                tp.show(this, x, y);
-                tp.repaint();
-            } else if (tile.isExplored()) {
-                showSubPanel(new TilePanel(freeColClient, gui, tile));
-            }
+        if (tile == null) 
+            return;
+        TilePopup tp = new TilePopup(freeColClient, gui, tile);
+        if (tp.hasItem()) {
+            tp.show(this, x, y);
+            tp.repaint();
+        } else if (tile.isExplored()) {
+            showSubPanel(new TilePanel(freeColClient, gui, tile));
         }
     }
 
@@ -2042,6 +2038,11 @@ public final class Canvas extends JDesktopPane {
             }
             frame.dispose();
         }
+    }
+
+    void displayChat(String senderNme, String message, boolean privateChat) {
+        startGamePanel.displayChat(senderNme, message, privateChat);
+
     }
 
     /**

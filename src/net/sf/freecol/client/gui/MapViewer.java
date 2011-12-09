@@ -1395,25 +1395,6 @@ public final class MapViewer {
 
 
     /**
-     * Change the scale of the map by delta.
-     *
-     * @param delta a <code>float</code> value
-     */
-    public void scaleMap(float delta) {
-        float newScale = lib.getScalingFactor() + delta;
-        try {
-            if (newScale >= 1f) {
-                setImageLibrary(gui.getImageLibrary());
-            } else {
-                setImageLibrary(gui.getImageLibrary().getScaledImageLibrary(newScale));
-            }
-        } catch (Exception ex) {
-            logger.warning("Failed to retrieve scaled image library.");
-        }
-    }
-
-
-    /**
     * Sets the active unit. Invokes {@link #setSelectedTile(Tile, boolean)} if the
     * selected tile is another tile than where the <code>activeUnit</code>
     * is located.
@@ -1543,6 +1524,7 @@ public final class MapViewer {
         return where;
     }
 
+
     /**
     * Selects the tile at the specified position. There are three
     * possible cases:
@@ -1623,7 +1605,6 @@ public final class MapViewer {
         return ret;
     }
 
-
     /**
      * Describe <code>setSize</code> method here.
      *
@@ -1633,7 +1614,6 @@ public final class MapViewer {
         this.size = size;
         updateMapDisplayVariables();
     }
-
 
 
     /**
@@ -1659,6 +1639,8 @@ public final class MapViewer {
         cursor.startBlinking();
     }
 
+
+
     /**
     * Starts a goto operation on the mapboard.
     */
@@ -1667,7 +1649,6 @@ public final class MapViewer {
         gui.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
         setGotoPath(null);
     }
-
 
     /**
      * Describe <code>stopBlinking</code> method here.
@@ -1701,6 +1682,25 @@ public final class MapViewer {
             : (activeUnit.getDestination().getTile() == activeUnit.getTile())
             ? null // Do nothing, unit has arrived
             : activeUnit.findPath(activeUnit.getDestination().getTile());
+    }
+
+
+    /**
+     * Change the scale of the map by delta.
+     *
+     * @param delta a <code>float</code> value
+     */
+    void scaleMap(float delta) {
+        float newScale = lib.getScalingFactor() + delta;
+        try {
+            if (newScale >= 1f) {
+                setImageLibrary(gui.getImageLibrary());
+            } else {
+                setImageLibrary(gui.getImageLibrary().getScaledImageLibrary(newScale));
+            }
+        } catch (Exception ex) {
+            logger.warning("Failed to retrieve scaled image library.");
+        }
     }
 
 
