@@ -71,15 +71,6 @@ public class BuildColonyMission extends Mission {
     /** The value of the target <code>Tile</code>. */
     private int colonyValue;
 
-    /**
-     * The mission will look for a new colony site, instead of aborting this
-     * mission, if the colony value drop below the given level if this variable
-     * is set to <code>true</code>.
-     */
-    private boolean doNotGiveUp = false;
-
-    private boolean colonyBuilt = false;
-
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -102,28 +93,6 @@ public class BuildColonyMission extends Mission {
         if (target == null) {
             throw new NullPointerException("target == null");
         }
-
-        if (!getUnit().isColonist()) {
-            logger.warning("Only colonists can build a new Colony.");
-            throw new IllegalArgumentException("Only colonists can build a new Colony.");
-        }
-    }
-
-    /**
-     * Creates a <code>BuildColonyMission</code> for the given
-     * <code>AIUnit</code>. The mission will try to find the closest and best
-     * site for a colony, and build the colony there. It will not stop until a
-     * {@link net.sf.freecol.common.model.Colony} gets built.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     */
-    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
-
-        this.target = null;
-        this.colonyValue = -1;
-        this.doNotGiveUp = true;
 
         if (!getUnit().isColonist()) {
             logger.warning("Only colonists can build a new Colony.");
@@ -158,6 +127,13 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
+     * Gets the target of this mission.
+     */
+    public Tile getTarget() {
+        return target;
+    }
+
+    /**
      * Performs this mission.
      *
      * @param connection The <code>Connection</code> to the server.
@@ -166,72 +142,58 @@ public class BuildColonyMission extends Mission {
         Unit unit = getUnit();
         Player player = unit.getOwner();
 
-        if (!isValid()) {
-            return;
-        }
+        if (!isValid()) return;
 
-        if (unit.getTile() == null) {
-            return;
-        }
-
-        // Check target is valid and value has not degraded.
-        int newValue = (target == null) ? -1 : player.getColonyValue(target);
-        if (newValue <= 0 || newValue < colonyValue) {
-            if (!doNotGiveUp
-                || (target = findColonyLocation(getUnit())) == null) {
-                doNotGiveUp = false;
-                return;
-            }
-            colonyValue = player.getColonyValue(target);
-        }
+        Tile tile = unit.getTile();
+        if (tile == null) return;
 
         // Move towards the target.
-        if (unit.getTile() != null) {
-            if (target != unit.getTile()) {
-                Direction r = moveTowards(target);
-                if (r == null || !moveButDontAttack(r)) return;
+        if (tile != target) {
+            Direction r = moveTowards(target);
+            if (r == null || !moveButDontAttack(r)) return;
+        }
+
+        // Are we there yet?
+        if (unit.canBuildColony()
+            && tile == target
+            && unit.getMovesLeft() > 0) {
+            if (target.getOwner() == null) {
+                ; // All is well
+            } else if (target.getOwner() == player) {
+                // Already ours, clear users
+                Colony colony = (Colony) target.getOwningSettlement();
+                if (colony != null
+                    && colony.getColonyTile(target) != null) {
+                    colony.getColonyTile(target).relocateWorkers();
+                }
+            } else { // Not our tile, claim it first
+                int price = player.getLandPrice(target);
+                if (price < 0) { // Someone has got in first
+                    target = null;
+                    return;
+                }
+                if (price > 0 && !player.checkGold(price)
+                    && getAIRandom().nextInt(4) == 0) {
+                    // CHEAT: add gold so player can buy the land
+                    player.modifyGold(price);
+                }
+                if (!AIMessage.askClaimLand(connection, target, null,
+                        (player.checkGold(price))
+                        ? price : NetworkConstants.STEAL_LAND)
+                    || target.getOwner() != player) {
+                    target = null; // Claim failed, try a different tile
+                    return;
+                }
             }
-            if (unit.canBuildColony()
-                && target == unit.getTile()
-                && unit.getMovesLeft() > 0) {
-                if (target.getOwner() == null) {
-                    ; // All is well
-                } else if (target.getOwner() == player) {
-                    // Already ours, clear users
-                    Colony colony = (Colony) target.getOwningSettlement();
-                    if (colony != null
-                        && colony.getColonyTile(target) != null) {
-                        colony.getColonyTile(target).relocateWorkers();
-                    }
-                } else { // Not our tile, claim it first
-                    int price = player.getLandPrice(target);
-                    if (price < 0) { // Someone has got in first
-                        target = null;
-                        return;
-                    }
-                    if (price > 0 && !player.checkGold(price)
-                        && getAIRandom().nextInt(4) == 0) {
-                        // CHEAT: add gold so player can buy the land
-                        player.modifyGold(price);
-                    }
-                    if (!AIMessage.askClaimLand(connection, target, null,
-                            (player.checkGold(price))
-                                                ? price
-                                                : NetworkConstants.STEAL_LAND)
-                        || target.getOwner() != player) {
-                        target = null; // Claim failed, try a different tile
-                        return;
-                    }
-                }
-                if (AIMessage.askBuildColony(getAIUnit(), Player.ASSIGN_SETTLEMENT_NAME)
-                    && target.getSettlement() != null) {
-                    colonyBuilt = true;
-                    AIColony aiColony = getAIMain().getAIColony(target.getColony());
-                    getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
-                } else {
-                    logger.warning("Could not build an AI colony on tile "
-                                   + target.getPosition().toString());
-                }
+            if (AIMessage.askBuildColony(getAIUnit(),
+                    Player.ASSIGN_SETTLEMENT_NAME)
+                && target.getSettlement() != null) {
+                AIColony aiColony = getAIMain().getAIColony(target.getColony());
+                getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(),
+                        getAIUnit(), aiColony));
+            } else {
+                logger.warning("Could not build an AI colony on tile "
+                    + target.getPosition().toString());
             }
         }
     }
@@ -367,17 +329,15 @@ public class BuildColonyMission extends Mission {
     /**
      * Checks if this mission is still valid to perform.
      *
-     * This mission will be invalidated when the colony has been built
-     * or if the <code>target.getColonyValue()</code> decreases.
+     * Normal missions will be invalidated when the colony has been built.
      *
      * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
-        return super.isValid() && !colonyBuilt
-            && (doNotGiveUp
-                || (target != null
-                    && target.getSettlement() == null
-                    && colonyValue <= getUnit().getOwner().getColonyValue(target)));
+        return super.isValid()
+            && (target != null
+                && target.getSettlement() == null
+                && colonyValue >= getUnit().getOwner().getColonyValue(target));
     }
 
 
@@ -394,7 +354,7 @@ public class BuildColonyMission extends Mission {
      */
     public String getDebuggingInfo() {
         final String targetName = (target != null) ? target.getPosition().toString() : "unassigned";
-        return targetName + " " + colonyValue + (doNotGiveUp ? "!" : "");
+        return targetName + " " + colonyValue;
     }
 
 
@@ -413,8 +373,6 @@ public class BuildColonyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         writeAttribute(out, "target", target);
-        out.writeAttribute("doNotGiveUp", Boolean.toString(doNotGiveUp));
-        out.writeAttribute("colonyBuilt", Boolean.toString(colonyBuilt));
     }
 
     /**
@@ -432,15 +390,6 @@ public class BuildColonyMission extends Mission {
         } else {
             target = null;
         }
-
-        final String doNotGiveUpStr = in.getAttributeValue(null,
-            "doNotGiveUp");
-        if (doNotGiveUpStr != null) {
-            doNotGiveUp = Boolean.valueOf(doNotGiveUpStr).booleanValue();
-        } else {
-            doNotGiveUp = false;
-        }
-        colonyBuilt = Boolean.valueOf(in.getAttributeValue(null, "colonyBuilt")).booleanValue();
     }
 
     /**
