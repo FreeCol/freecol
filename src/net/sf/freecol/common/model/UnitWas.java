@@ -174,4 +174,43 @@ public class UnitWas {
     public GoodsType getWorkType() {
         return work;
     }
+
+    public String toString() {
+        Tile tile = colony.getTile();
+        String eqStr = "/";
+        for (EquipmentType e : equipment.keySet()) {
+            eqStr += e.toString().substring(16, 17);
+        }
+        String locStr = (loc == null) ? ""
+            : (loc instanceof Building)
+            ? ((Building)loc).getType().toString().substring(15)
+            : (loc instanceof ColonyTile)
+            ? tile.getDirection(((ColonyTile)loc).getWorkTile()).toString()
+            : (loc instanceof Tile)
+            ? (loc.getId() + eqStr)
+            : loc.getId();
+        Location newLoc = unit.getLocation();
+        String newEqStr = "/";
+        for (EquipmentType e : unit.getEquipment().keySet()) {
+            newEqStr += e.toString().substring(16, 17);
+        }
+        String newLocStr = (newLoc == null) ? ""
+            : (newLoc instanceof Building)
+            ? ((Building)newLoc).getType().toString().substring(15)
+            : (newLoc instanceof ColonyTile)
+            ? tile.getDirection(((ColonyTile)newLoc).getWorkTile()).toString()
+            : (newLoc instanceof Tile)
+            ? (newLoc.getId() + newEqStr)
+            : newLoc.getId();
+        GoodsType newWork = unit.getWorkType();
+        int newWorkAmount = (newWork == null) ? 0 : getAmount(newLoc, newWork);
+        return String.format("%-30s %-25s -> %-25s",
+            unit.getId() + ":" + unit.getType().toString().substring(11),
+            locStr + ((work == null || workAmount <= 0) ? "" : "("
+                + Integer.toString(workAmount) + " "
+                + work.toString().substring(12) + ")"),
+            newLocStr + ((newWork == null || newWorkAmount <= 0) ? "" : "("
+                + Integer.toString(newWorkAmount) + " "
+                + newWork.toString().substring(12) + ")"));
+    }
 }

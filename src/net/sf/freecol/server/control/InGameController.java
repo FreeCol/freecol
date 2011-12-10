@@ -708,11 +708,22 @@ public final class InGameController extends Controller {
                 return null;
             }
 
+            // ATM AI player colony-rearrangements do not use the standard
+            // c-s model but exploit the fact that the AIs and the server
+            // are still in the same memory space.  This means that
+            // the colony sizes will be wrongly reported unless we take
+            // the following explicit action.
+            ChangeSet cs = new ChangeSet();
+            if (player.isAI() && player.isEuropean()) {
+                for (Colony c : player.getColonies()) {
+                    cs.add(See.perhaps().except(player), c);
+                }
+            }
+
             // Clean up futures from the current player.
             resolveOutstandingQueries();
 
             // Check for new turn
-            ChangeSet cs = new ChangeSet();
             if (game.isNextPlayerInNewTurn()) {
                 game.csNewTurn(random, cs);
                 if (debugOnlyAITurns > 0) {

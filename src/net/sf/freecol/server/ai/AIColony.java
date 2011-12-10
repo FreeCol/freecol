@@ -24,6 +24,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,25 +40,39 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.server.ai.mission.BuildColonyMission;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
+import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -71,26 +86,24 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
-    private static enum ExperienceUpgrade { NONE, SOME, EXPERT }
-
-    /**
-     * The FreeColGameObject this AIObject contains AI-information for.
-     */
+    // The colony this AIColony is managing.
     private Colony colony;
 
+    // The current production plan for the colony.
     private ColonyPlan colonyPlan;
 
+    // Goods to export from the colony.
     private ArrayList<AIGoods> aiGoods = new ArrayList<AIGoods>();
 
+    // Useful things for the colony.
     private ArrayList<Wish> wishes = new ArrayList<Wish>();
 
-    private ArrayList<TileImprovementPlan> tileImprovementPlans = new ArrayList<TileImprovementPlan>();
+    // Plans to improve neighbouring tiles.
+    private ArrayList<TileImprovementPlan> tileImprovementPlans
+        = new ArrayList<TileImprovementPlan>();
 
-    /**
-     * Records whether the workers in this Colony need to be
-     * rearranged.
-     */
-    private boolean rearrangeWorkers = false;
+    // When should the workers in this Colony be rearranged?
+    private Turn rearrangeWorkers = new Turn(0);
 
 
     /**
@@ -126,21 +139,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public AIColony(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public AIColony(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
-    }
-
-    protected AIUnit getAIUnit(Unit unit) {
-        return getAIMain().getAIUnit(unit);
-    }
-
-    protected AIPlayer getAIOwner() {
-        return getAIMain().getAIPlayer(colony.getOwner());
-    }
-
-    protected Connection getConnection() {
-        return getAIOwner().getConnection();
     }
 
     /**
@@ -163,6 +165,29 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Gets the current plan for this colony.
+     *
+     * @return The current <code>ColonyPlan</code>.
+     */
+    public ColonyPlan getColonyPlan() {
+        return colonyPlan;
+    }
+
+
+    protected AIUnit getAIUnit(Unit unit) {
+        return getAIMain().getAIUnit(unit);
+    }
+
+    protected AIPlayer getAIOwner() {
+        return getAIMain().getAIPlayer(colony.getOwner());
+    }
+
+    protected Connection getConnection() {
+        return getAIOwner().getConnection();
+    }
+
+
+    /**
      * Disposes this <code>AIColony</code>.
      */
     public void dispose() {
@@ -172,332 +197,333 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 disposeList.add(ag);
             }
         }
-        for(Wish w : wishes) {
+        for (Wish w : wishes) {
             disposeList.add(w);
         }
-        for(TileImprovementPlan ti : tileImprovementPlans) {
+        for (TileImprovementPlan ti : tileImprovementPlans) {
             disposeList.add(ti);
         }
-        for(AIObject o : disposeList) {
+        for (AIObject o : disposeList) {
             o.dispose();
         }
         super.dispose();
     }
 
     /**
-     * Returns an <code>Iterator</code> of the goods to be shipped from this
-     * colony. The item with the highest
-     * {@link Transportable#getTransportPriority transport priority} gets
-     * returned first by this <code>Iterator</code>.
+     * Rearranges the workers within this colony using the {@link ColonyPlan}.
+     * TODO: Detect military threats and boost defence.
      *
-     * @return The <code>Iterator</code>.
+     * @return True if the workers were rearranged.
      */
-    public Iterator<AIGoods> getAIGoodsIterator() {
-        Iterator<AIGoods> agi = aiGoods.iterator();
-        // TODO: Remove the following code and replace by throw RuntimeException
-        while (agi.hasNext()) {
-            AIGoods ag = agi.next();
-            if (ag.getGoods().getLocation() != colony) {
-                agi.remove();
+    public boolean rearrangeWorkers() {
+        int turn = getGame().getTurn().getNumber();
+        if (rearrangeWorkers.getNumber() > turn) return false;
+        int nextRearrange = Integer.MAX_VALUE;
+        final AIMain aiMain = getAIMain();
+        final Tile tile = colony.getTile();
+        final Player player = colony.getOwner();
+        final Specification spec = colony.getSpecification();
+
+        // See if there are neighbouring LCRs to explore, or tiles
+        // to steal, or just unclaimed tiles (a neighbouring settlement
+        // might have disappeared or relinquished a tile).
+        // This needs to be done early so that new tiles can be
+        // included in any new colony plan.
+        exploreLCRs();
+        stealTiles();
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (player.canClaimForSettlement(t)) {
+                AIMessage.askClaimLand(getConnection(), t, colony, 0);
             }
         }
-        return aiGoods.iterator();
-    }
 
-    /**
-     * Gets an <code>Iterator</code> for every <code>Wish</code> the
-     * <code>Colony</code> has.
-     *
-     * @return The <code>Iterator</code>. The items with the
-     *         {@link Wish#getValue highest value} appears first in the
-     *         <code>Iterator</code>
-     * @see Wish
-     */
-    public Iterator<Wish> getWishIterator() {
-        return wishes.iterator();
-    }
+        // Update the colony plan.
+        colonyPlan.update();
 
-    public List<WorkerWish> getWorkerWishes() {
-        List<WorkerWish> result = new ArrayList<WorkerWish>();
-        for (Wish wish : wishes) {
-            if (wish instanceof WorkerWish) {
-                result.add((WorkerWish) wish);
+        // Now that we know what raw materials are available in the
+        // colony plan, set the current buildable, first backing out
+        // of anything currently being built that is now impossible.
+        // If a buildable is chosen, refine the worker allocation in
+        // the colony plan in case the required building materials
+        // have changed.
+        BuildableType build = colony.getCurrentlyBuilding();
+        if (!colony.canBuild(build)) build = null;
+        for (BuildableType b : colonyPlan.getBuildableTypes()) {
+            if (colony.canBuild(b)) {
+                if (b != build) {
+                    List<BuildableType> queue = new ArrayList<BuildableType>();
+                    queue.add(b);
+                    AIMessage.askSetBuildQueue(this, queue);
+                }
+                break;
             }
         }
-        return result;
-    }
-
-
-    /**
-     * Creates a list of the <code>Tile</code>-improvements which will
-     * increase the production by this <code>Colony</code>.
-     *
-     * @see TileImprovementPlan
-     */
-    public void createTileImprovementPlans() {
-
-        Map<Tile, TileImprovementPlan> plans =
-            new HashMap<Tile, TileImprovementPlan>();
-        for (TileImprovementPlan plan : tileImprovementPlans) {
-            plans.put(plan.getTarget(), plan);
+        build = colony.getCurrentlyBuilding();
+        if (build != null) {
+            colonyPlan.refine(build);
+            nextRearrange = Math.min(nextRearrange,
+                Math.max(1, colony.getTurnsToComplete(build, null)));
         }
-        for (WorkLocationPlan wlp : colonyPlan.getWorkLocationPlans()) {
-            if (wlp.getWorkLocation() instanceof ColonyTile) {
-                ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
-                Tile target = colonyTile.getWorkTile();
-                boolean others = target.getOwningSettlement() != colony
-                    && target.getOwner() == colony.getOwner();
-                TileImprovementPlan plan = plans.get(target);
-                if (plan == null) {
-                    if (others) continue; // owned by another of our colonies
-                    plan = wlp.createTileImprovementPlan();
-                    if (plan != null) {
-                        int value = plan.getValue();
-                        if (!colonyTile.isEmpty()) value *= 2;
-                        value -= colony.getOwner().getLandPrice(target);
-                        plan.setValue(value);
-                        tileImprovementPlans.add(plan);
-                        plans.put(target, plan);
-                    }
-                } else if (wlp.updateTileImprovementPlan(plan) == null
-                           || others) {
-                    tileImprovementPlans.remove(plan);
-                    plan.dispose();
+
+        // Collect all potential workers from the colony and from the tile,
+        // being careful not to disturb existing non-colony missions.
+        // Note the special case of a unit aiming to build a colony on this
+        // tile, which happens regularly with the initial AI colony.
+        // Remember where the units came from.
+        List<Unit> workers = colony.getUnitList();
+        List<UnitWas> was = new ArrayList<UnitWas>();
+        for (Unit u : workers) was.add(new UnitWas(u));
+        for (Unit u : tile.getUnitList()) {
+            if (!u.isPerson()) continue;
+            Mission mission = getAIUnit(u).getMission();
+            if (mission == null
+                || mission instanceof IdleAtColonyMission
+                || mission instanceof WorkInsideColonyMission
+                || (mission instanceof BuildColonyMission
+                    && ((BuildColonyMission)mission).getTarget() == tile)
+                // TODO: drop this when the AI stops building excessive armies
+                || mission instanceof DefendSettlementMission) {
+                workers.add(u);
+                was.add(new UnitWas(u));
+            }
+        }
+
+        // Assign the workers according to the colony plan.
+        Colony scratch = colonyPlan.assignWorkers(workers);
+        // ATM we just accept this assignment.
+        // Plan to rearrange when the warehouse hits a limit.
+        int warehouse = scratch.getWarehouseCapacity();
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (!g.isStorable() || g.limitIgnored()) continue;
+            int have = scratch.getGoodsCount(g);
+            int net = scratch.getNetProductionOf(g);
+            if (net >= 0 && have >= warehouse) continue;
+            nextRearrange = Math.max(1, Math.min(nextRearrange,
+                    (net < 0) ? (have / -net)
+                    : (net > 0) ? ((warehouse - have) / net)
+                    : Integer.MAX_VALUE));
+        }
+
+        // Apply the arrangement, and give suitable missions to all units.
+        // For now, do a soft rearrange (that is, no c-s messaging).
+        // Also change the goods counts as we may have changed equipment.
+        // TODO: Better would be to restore the initial state and use
+        // a special c-s message to execute the rearrangement--- code to
+        // untangle the movement dependencies is non-trivial.
+        for (Unit u : scratch.getUnitList()) {
+            AIUnit aiU = getAIUnit(u);
+            WorkLocation wl = (WorkLocation)u.getLocation();
+            wl = colony.getCorrespondingWorkLocation(wl);
+            u.setLocation(wl);
+            aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
+        }
+        for (Unit u : scratch.getTile().getUnitList()) {
+            u.setLocation(tile);
+            if (u.isArmed()) {
+                AIUnit aiU = getAIUnit(u);
+                aiU.setMission(new DefendSettlementMission(aiMain, aiU,
+                                                           colony));
+            }
+        }            
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (!g.isStorable()) continue;
+            int oldCount = colony.getGoodsCount(g);
+            int newCount = scratch.getGoodsCount(g);
+            if (newCount != oldCount) {
+                colony.getGoodsContainer().addGoods(g, newCount - oldCount);
+            }
+        }
+        scratch.dispose();
+
+        // Emergency recovery if something broke and the colony is empty.
+        if (colony.getUnitCount() <= 0) {
+            String destruct = "Autodestruct at " + colony.getName();
+            for (UnitWas uw : was) destruct += uw.toString();
+            logger.warning(destruct);
+            avertAutoDestruction();
+        }
+
+        // Argh.  We may have chosen to build something we can no
+        // longer build due to a colony size limitation.  Try to find
+        // something, but do not re-refine/assign as we may get caught
+        // in an infinite loop.  Just rearrange next turn.
+        build = colony.getCurrentlyBuilding();
+        if (!colony.canBuild(build)) {
+            build = null;
+            for (BuildableType b : colonyPlan.getBuildableTypes()) {
+                if (colony.canBuild(b)) {
+                    build = b;
+                    break;
+                }
+            }
+            List<BuildableType> queue = new ArrayList<BuildableType>();
+            if (build != null) queue.add(build);
+            AIMessage.askSetBuildQueue(this, queue);
+            nextRearrange = 1;
+        }
+
+        // For now, cap the rearrangement horizon, because confidence
+        // that we are triggering on all relevant changes is low.
+        nextRearrange = Math.min(nextRearrange, 15);
+
+        // Log the changes.
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rearrange " + colony.getName()
+            + " (" + colony.getUnitCount() + ")"
+            + " build=" + colony.getCurrentlyBuilding()
+            + " " + getGame().getTurn()
+            + " + " + nextRearrange + "\n");
+        for (UnitWas uw : was) sb.append(uw.toString() + "\n");
+        logger.finest(sb.toString());
+
+        // FIXME: should be executed just once, when the custom house is built
+        if (colony.hasAbility(Ability.EXPORT)) {
+            // TODO: make generic
+            final GoodsType silverType
+                = spec.getGoodsType("model.goods.silver");
+            colony.getExportData(silverType).setExported(true);
+
+            for (GoodsType g : spec.getGoodsTypeList()) {
+                if (g.isNewWorldLuxuryType()) {
+                    colony.getExportData(g).setExported(true);
                 }
             }
         }
 
-        Tile centerTile = colony.getTile();
-        TileImprovementPlan centerPlan = plans.get(centerTile);
-        TileImprovementType type = WorkLocationPlan
-            .findBestTileImprovementType(centerTile, colony.getSpecification()
-                                         .getGoodsType("model.goods.grain"));
-        if (type == null) {
-            if (centerPlan != null) {
-                tileImprovementPlans.remove(centerPlan);
+        // TODO: these look rational but need review.
+        createTileImprovementPlans();
+        createWishes();
+        checkConditionsForHorseBreed();
+
+        // Set the next rearrangement turn.
+        rearrangeWorkers = new Turn(turn + nextRearrange);
+        return true;
+    }
+
+    /**
+     * Explores any neighbouring LCRs.
+     * Choose non-expert persons for the exploration.
+     */
+    private void exploreLCRs() {
+        final Tile tile = colony.getTile();
+        List<Unit> explorers = new ArrayList<Unit>();
+        for (Unit u : tile.getUnitList()) {
+            if (u.isPerson()
+                && (u.getType().getSkill() <= 0
+                    || u.hasAbility("model.ability.expertScout"))) {
+                explorers.add(u);
             }
-        } else {
-            if (centerPlan == null) {
-                centerPlan = new TileImprovementPlan(getAIMain(), colony.getTile(), type, 30);
-                tileImprovementPlans.add(0, centerPlan);
+        }
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.hasLostCityRumour()) {
+                Direction direction = tile.getDirection(t);
+                for (;;) {
+                    if (explorers.isEmpty()) return;
+                    Unit u = explorers.get(0);
+                    explorers.remove(0);
+                    if (!u.getMoveType(t).isProgress()) continue;
+                    if (AIMessage.askMove(getAIUnit(u), direction)
+                        && !t.hasLostCityRumour()) {
+                        u.setDestination(tile);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Steals neighbouring tiles but only if the colony has some
+     * defence.  Grab everything if at war with the owner, otherwise
+     * just take the tile that best helps with the currently required
+     * raw building materials with a lesser interest in food.
+     */
+    private void stealTiles() {
+        final Specification spec = colony.getSpecification();
+        final Tile tile = colony.getTile();
+        final Player player = colony.getOwner();
+        boolean hasDefender = false;
+        for (Unit u : tile.getUnitList()) {
+            if (u.isDefensiveUnit()
+                && getAIUnit(u).getMission() instanceof DefendSettlementMission) {
+                // TODO: be smarter
+                hasDefender = true;
+                break;
+            }
+        }
+        if (!hasDefender) return;
+
+        // What goods are really needed?
+        List<GoodsType> needed = new ArrayList<GoodsType>();
+        for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
+            if (colony.getProductionOf(g) <= 0) needed.add(g);
+        }
+
+        // If a tile can be stolen, do so if already at war with the
+        // owner or if it is the best one available.
+        UnitType unitType = spec.getDefaultUnitType();
+        Tile steal = null;
+        float score = 1.0f;
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            Player owner = t.getOwner();
+            if (owner == null || owner == player
+                || owner.isEuropean()) continue;
+            if (owner.atWarWith(player)) {
+                if (AIMessage.askClaimLand(getConnection(), t, colony,
+                        NetworkConstants.STEAL_LAND)
+                    && t.getOwner() == player) {
+                    logger.info(player.getName() + " stole tile " + t
+                        + " from hostile " + owner.getName());
+                }
             } else {
-                centerPlan.setType(type);
-            }
-        }
-
-        Collections.sort(tileImprovementPlans);
-    }
-
-    /**
-     * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovementPlan</code>s needed by this colony.
-     *
-     * @return The <code>Iterator</code>.
-     * @see TileImprovementPlan
-     */
-    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
-        return tileImprovementPlans.iterator();
-    }
-
-    /**
-     * Removes a <code>TileImprovementPlan</code> from the list
-     * @return True if it was successfully deleted, false otherwise
-     */
-    public boolean removeTileImprovementPlan(TileImprovementPlan plan){
-        return tileImprovementPlans.remove(plan);
-    }
-
-    /**
-     * Creates the wishes for the <code>Colony</code>.
-     */
-    private void createWishes() {
-        wishes.clear();
-        createWorkerWishes();
-        createGoodsWishes();
-    }
-
-    private void createWorkerWishes() {
-
-        int expertValue = 100;
-
-        // For every non-expert, request expert replacement. TODO:
-        // value should depend on how urgently the unit is needed, and
-        // possibly on skill, too.
-        for (Unit unit : colony.getUnitList()) {
-            if (unit.getWorkType() != null
-                && unit.getWorkType() != unit.getType().getExpertProduction()) {
-                UnitType expert = colony.getSpecification().getExpertForProducing(unit.getWorkType());
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, expert, true));
-            }
-        }
-
-        // request population increase
-        if (wishes.isEmpty()) {
-            int newPopulation = colony.getUnitCount() + 1;
-            if (colony.governmentChange(newPopulation) >= 0) {
-                // population increase incurs no penalty
-                boolean needFood = colony.getFoodProduction()
-                    <= colony.getFoodConsumption() + colony.getOwner().getMaximumFoodConsumption();
-                // choose expert for best work location plan
-                UnitType expert = getNextExpert(needFood);
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
-            }
-        }
-
-        // TODO: check for students
-        // TODO: add missionaries
-
-        // increase defense value
-        boolean badlyDefended = isBadlyDefended();
-        if (badlyDefended) {
-            UnitType bestDefender = getBestDefender(colony);
-            if (bestDefender != null) {
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, bestDefender, true));
-            }
-        }
-    }
-
-    /**
-     * Returns the best defender for the given colony.
-     *
-     * @param colony a <code>Colony</code> value
-     * @return an <code>UnitType</code> value
-     */
-    public static UnitType getBestDefender(Colony colony) {
-        UnitType bestDefender = null;
-        for (UnitType unitType : colony.getSpecification().getUnitTypeList()) {
-            if ((bestDefender == null
-                 || bestDefender.getDefence() < unitType.getDefence())
-                && !unitType.hasAbility(Ability.NAVAL_UNIT)
-                && unitType.isAvailableTo(colony.getOwner())) {
-                bestDefender = unitType;
-            }
-        }
-        return bestDefender;
-    }
-
-    private void createGoodsWishes() {
-        int goodsWishValue = 50;
-
-        // request goods
-        // TODO: improve heuristics
-        TypeCountMap<GoodsType> requiredGoods = new TypeCountMap<GoodsType>();
-
-        // add building materials
-        if (colony.getCurrentlyBuilding() != null) {
-            for (AbstractGoods goods : colony.getCurrentlyBuilding().getGoodsRequired()) {
-                if (colony.getAdjustedNetProductionOf(goods.getType()) == 0) {
-                    requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                // Pick the best tile to steal, considering mainly the
+                // building goods needed, but including food at a lower
+                // weight.
+                float s = 0.0f;
+                for (GoodsType g : needed) {
+                    s += t.potential(g, unitType);
+                }
+                for (GoodsType g : spec.getFoodGoodsTypeList()) {
+                    s += 0.1 * t.potential(g, unitType);
+                }
+                if (s > score) {
+                    score = s;
+                    steal = t;
                 }
             }
         }
-
-        // add materials required to improve tiles
-        for (TileImprovementPlan plan : tileImprovementPlans) {
-            for (AbstractGoods goods : plan.getType().getExpendedEquipmentType()
-                     .getGoodsRequired()) {
-                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+        if (steal != null) {
+            Player owner = steal.getOwner();
+            if (AIMessage.askClaimLand(getConnection(), steal, colony,
+                    NetworkConstants.STEAL_LAND)
+                && steal.getOwner() == player) {
+                logger.info(player.getName() + " stole tile " + steal
+                    + " (score = " + score
+                    + ") from " + owner.getName());
             }
         }
-
-        // add raw materials for buildings
-        for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
-            if (workLocation instanceof Building) {
-                Building building = (Building) workLocation;
-                GoodsType inputType = building.getGoodsInputType();
-                ProductionInfo info = colony.getProductionInfo(building);
-                if (inputType != null
-                    && info != null
-                    && !info.hasMaximumProduction()) {
-                    // TODO: find better heuristics
-                    requiredGoods.incrementCount(inputType, 100);
-                }
-            }
-        }
-
-        // add breedable goods
-        for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
-            if (goodsType.isBreedable()) {
-                requiredGoods.incrementCount(goodsType, goodsType.getBreedingNumber());
-            }
-        }
-
-        // add materials required to build military equipment
-        if (isBadlyDefended()) {
-            for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
-                if (type.isMilitaryEquipment()) {
-                    for (Unit unit : colony.getUnitList()) {
-                        if (unit.canBeEquippedWith(type)) {
-                            for (AbstractGoods goods : type.getGoodsRequired()) {
-                                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        for (GoodsType type : requiredGoods.keySet()) {
-            GoodsType requiredType = type;
-            while (requiredType != null && !requiredType.isStorable()) {
-                requiredType = requiredType.getRawMaterial();
-            }
-            if (requiredType != null) {
-                int amount = Math.min((requiredGoods.getCount(requiredType)
-                                       - colony.getGoodsCount(requiredType)),
-                                      colony.getWarehouseCapacity());
-                if (amount > 0) {
-                    int value = colonyCouldProduce(requiredType) ?
-                        goodsWishValue / 10 : goodsWishValue;
-                    wishes.add(new GoodsWish(getAIMain(), colony, value, amount, requiredType));
-                }
-            }
-        }
-        Collections.sort(wishes);
-    }
-
-    private boolean colonyCouldProduce(GoodsType goodsType) {
-        if (goodsType.isBreedable()) {
-            return colony.getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
-        } else if (goodsType.isFarmed()) {
-            for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                if (colonyTile.getWorkTile().potential(goodsType, null) > 0) {
-                    return true;
-                }
-            }
-        } else {
-            if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
-                if (goodsType.getRawMaterial() == null) {
-                    return true;
-                } else {
-                    return colonyCouldProduce(goodsType.getRawMaterial());
-                }
-            }
-        }
-        return false;
     }
 
 
     private UnitType getNextExpert(boolean onlyFood) {
         // some type should be returned, not null
-        UnitType bestType = colony.getSpecification().getUnitType("model.unit.freeColonist");
-        for (WorkLocationPlan plan : colonyPlan.getSortedWorkLocationPlans()) {
-            if (plan.getGoodsType().isFoodType() || !onlyFood) {
-                WorkLocation location = plan.getWorkLocation();
-                if (location instanceof ColonyTile) {
-                    ColonyTile colonyTile = (ColonyTile) location;
-                    if (colonyTile.canBeWorked()) {
-                        bestType = colony.getSpecification()
-                            .getExpertForProducing(plan.getGoodsType());
-                        break;
-                    }
-                } else if (location instanceof Building) {
-                    Building building = (Building) location;
-                    if (building.canBeWorked()) {
-                        bestType = building.getExpertUnitType();
-                        break;
-                    }
+        UnitType bestType = colony.getSpecification().getDefaultUnitType();
+        List<WorkLocationPlan> plans = colonyPlan.getFoodPlans();
+        if (!onlyFood) plans.addAll(colonyPlan.getWorkPlans());
+        for (WorkLocationPlan plan : plans) {
+            WorkLocation location = plan.getWorkLocation();
+            if (location instanceof ColonyTile) {
+                ColonyTile colonyTile = (ColonyTile) location;
+                if (colonyTile.canBeWorked()) {
+                    bestType = colony.getSpecification()
+                        .getExpertForProducing(plan.getGoodsType());
+                    break;
+                }
+            } else if (location instanceof Building) {
+                Building building = (Building) location;
+                if (building.canBeWorked()) {
+                    bestType = building.getExpertUnitType();
+                    break;
                 }
             }
         }
@@ -538,15 +564,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return True if the colony needs more defenders.
      */
     public boolean isBadlyDefended() {
-        CombatModel cm = getGame().getCombatModel();
-        float defence = 0.0f;
-        for (Unit unit : colony.getTile().getUnitList()) {
-            if (unit.isDefensiveUnit()) {
-                defence += cm.getDefencePower(null, unit);
-            }
-        }
-
-        return defence < 2.0 * colony.getUnitCount();
+        return colony.getTotalDefencePower() < 1.5f * colony.getUnitCount();
     }
 
 
@@ -762,6 +780,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Returns an <code>Iterator</code> of the goods to be shipped from this
+     * colony. The item with the highest
+     * {@link Transportable#getTransportPriority transport priority} gets
+     * returned first by this <code>Iterator</code>.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<AIGoods> getAIGoodsIterator() {
+        Iterator<AIGoods> agi = aiGoods.iterator();
+        // TODO: Remove the following code and replace by throw RuntimeException
+        while (agi.hasNext()) {
+            AIGoods ag = agi.next();
+            if (ag.getGoods().getLocation() != colony) {
+                agi.remove();
+            }
+        }
+        return aiGoods.iterator();
+    }
 
     /**
      * Returns the available amount of the GoodsType given.
@@ -782,606 +819,266 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         return Math.max(0, colony.getGoodsCount(goodsType) - materialsRequiredForBuilding);
     }
-
-
+ 
     /**
-     * Returns <code>true</code> if this AIColony can build the given
-     * type of equipment. Unlike the method of the Colony, this takes
-     * goods "reserved" for building or breeding purposes into account.
+     * Gets an <code>Iterator</code> for every <code>Wish</code> the
+     * <code>Colony</code> has.
      *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return a <code>boolean</code> value
-     * @see Colony#canBuildEquipment(EquipmentType equipmentType)
+     * @return The <code>Iterator</code>. The items with the
+     *         {@link Wish#getValue highest value} appears first in the
+     *         <code>Iterator</code>
+     * @see Wish
      */
-    public boolean canBuildEquipment(EquipmentType equipmentType) {
-        if (getColony().canBuildEquipment(equipmentType)) {
-            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                int breedingNumber = goods.getType().getBreedingNumber();
-                if (breedingNumber != GoodsType.INFINITY &&
-                    getColony().getGoodsCount(goods.getType()) < goods.getAmount() + breedingNumber) {
-                    return false;
-                }
-                if (getAvailableGoods(goods.getType()) < goods.getAmount()) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public Iterator<Wish> getWishIterator() {
+        return wishes.iterator();
     }
 
-    /**
-     * Try to use a tile.  Steal it if necessary.
-     *
-     * @param tile The <code>Tile</code> to use.
-     * @return True if the tile can be used.
-     */
-    private boolean tryUseTile(Tile tile) {
-        if (tile.getOwningSettlement() == colony) return true;
-        return colony.getOwner().canClaimForSettlement(tile)
-            && AIMessage.askClaimLand(getConnection(), tile, colony, 0)
-            && tile.getOwningSettlement() == colony;
-    }
-
-    /**
-     * Find a colony's best tile to put a unit to produce a type of
-     * goods.  Steals land from other settlements only when it is
-     * free.
-     *
-     * @param unit The <code>Unit</code> to work the tile.
-     * @param goodsType The type of goods to produce.
-     * @return The best choice of available vacant colony tiles, or
-     *         null if nothing suitable.
-     */
-    private ColonyTile getBestVacantTile(Unit unit, GoodsType goodsType) {
-        ColonyTile colonyTile = colony.getVacantColonyTileFor(unit, true, goodsType);
-        if (colonyTile == null) return null;
-
-        // Check if the tile needs to be claimed from another settlement.
-        Tile tile = colonyTile.getWorkTile();
-        return (tryUseTile(tile)) ? colonyTile : null;
-    }
-
-    /**
-     * Rearranges the workers within this colony. This is done according to the
-     * {@link ColonyPlan}, although minor adjustments can be done to increase
-     * production.
-     *
-     * @param connection The <code>Connection</code> to be used when
-     *            communicating with the server.
-     */
-    public boolean rearrangeWorkers(Connection connection) {
-        colonyPlan.create();
-
-        if (!rearrangeWorkers) {
-            logger.fine("No need to rearrange workers in " + colony.getName() + ".");
-            return false;
-        }
-        
-        // Lock the apparent unit count while the colony is changing.
-        colony.setDisplayUnitCount(colony.getUnitCount());
-
-        // TODO: Detect a siege and move the workers temporarily around.
-
-        checkForUnequippedExpertPioneer();
-
-        checkForUnarmedExpertSoldier();
-
-        List<Unit> units = new ArrayList<Unit>();
-        List<WorkLocationPlan> workLocationPlans = colonyPlan.getWorkLocationPlans();
-        Collections.sort(workLocationPlans);
-
-        // Remove all colonists from the colony:
-        for (Unit u : colony.getUnitList()) {
-            if (u.isPerson()) units.add(u);
-            // Do not set location to null, but to the tile of the
-            // colony this unit is being removed from!
-            u.setLocation(colony.getTile());
-        }
-
-        // Place the experts:
-        placeExpertsInWorkPlaces(units, workLocationPlans);
-
-        boolean workerAdded = true;
-        GoodsType foodType = colony.getSpecification().getGoodsType("model.goods.grain");
-        while (workerAdded) {
-            workerAdded = false;
-            // Use a food production plan if necessary:
-            int food = colony.getFoodProduction() - colony.getFoodConsumption();
-            for (int i = 0; i < workLocationPlans.size() && food < 2; i++) {
-                WorkLocationPlan wlp = workLocationPlans.get(i);
-                WorkLocation wl = wlp.getWorkLocation();
-                if (wlp.getGoodsType() == foodType
-                    && (((ColonyTile) wl).getWorkTile().isLand()
-                        || colony.hasAbility(Ability.PRODUCE_IN_WATER))) {
-                    Unit bestUnit = null;
-                    int bestProduction = 0;
-                    Iterator<Unit> unitIterator = units.iterator();
-                    while (unitIterator.hasNext()) {
-                        Unit unit = unitIterator.next();
-                        int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                                                                              foodType);
-                        if (production > 1
-                            && (bestUnit == null || production > bestProduction || production == bestProduction
-                                && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
-                            bestUnit = unit;
-                            bestProduction = production;
-                        }
-                    }
-                    if (bestUnit != null
-                        && wlp.getWorkLocation().canAdd(bestUnit)) {
-                        bestUnit.setLocation(wlp.getWorkLocation());
-                        bestUnit.setWorkType(wlp.getGoodsType());
-                        units.remove(bestUnit);
-                        workLocationPlans.remove(wlp);
-                        workerAdded = true;
-                        food = colony.getFoodProduction() - colony.getFoodConsumption();
-                    }
-                }
-            }
-            // Use the next non-food plan:
-            if (food >= 2) {
-                for (int i = 0; i < workLocationPlans.size(); i++) {
-                    WorkLocationPlan wlp = workLocationPlans.get(i);
-                    if (wlp.getGoodsType() != foodType) {
-                        Unit bestUnit = null;
-                        int bestProduction = 0;
-                        Iterator<Unit> unitIterator = units.iterator();
-                        while (unitIterator.hasNext()) {
-                            Unit unit = unitIterator.next();
-                            int production = 0;
-                            WorkLocation location = wlp.getWorkLocation();
-                            if (location instanceof ColonyTile) {
-                                production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                                                                                  wlp.getGoodsType());
-                            } else if (location instanceof Building) {
-                                production = ((Building) location).getUnitProductivity(unit);
-                            }
-                            if (bestUnit == null || production > bestProduction || production == bestProduction
-                                && unit.getSkillLevel() < bestUnit.getSkillLevel()) {
-                                bestUnit = unit;
-                                bestProduction = production;
-                            }
-                        }
-                        if (bestUnit != null
-                            && wlp.getWorkLocation().canAdd(bestUnit)) {
-                            bestUnit.setLocation(wlp.getWorkLocation());
-                            bestUnit.setWorkType(wlp.getGoodsType());
-                            units.remove(bestUnit);
-                            workLocationPlans.remove(wlp);
-                            workerAdded = true;
-                            food = colony.getFoodProduction() - colony.getFoodConsumption();
-                        }
-                    }
-                }
-            }
-        }
-
-        // Ensure that we have enough food:
-        int food = colony.getFoodProduction() - colony.getFoodConsumption();
-        while (food < 0 && colony.getGoodsCount(foodType) + food * 3 < 0) {
-            WorkLocation bestPick = null;
-            for (WorkLocation wl : colony.getCurrentWorkLocations()) {
-                if (wl.getUnitCount() > 0) {
-                    if (wl instanceof ColonyTile) {
-                        ColonyTile ct = (ColonyTile) wl;
-                        for (Unit u : ct.getUnitList()) {
-                            if (u.getWorkType() != foodType) {
-                                int uProduction = ct.getProductionOf(u, foodType);
-                                if (uProduction > 1) {
-                                    if (bestPick == null || bestPick instanceof Building) {
-                                        bestPick = wl;
-                                    } else {
-                                        ColonyTile bpct = (ColonyTile) bestPick;
-                                        int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), foodType);
-                                        if (uProduction > bestPickProduction
-                                            || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
-                                                .getSkillLevel())) {
-                                            bestPick = wl;
-                                        }
-                                    }
-                                } else {
-                                    if (bestPick == null) {
-                                        bestPick = wl;
-                                    }
-                                    // else - TODO: This might be the
-                                    // best pick sometimes:
-                                }
-                            }
-                        }
-                    } else { // wl instanceof Building
-                        if (bestPick == null
-                            || (bestPick instanceof Building && ((Building) wl).getProduction() < ((Building) bestPick)
-                                .getProduction())) {
-                            bestPick = wl;
-                        }
-                    }
-                }
-            }
-            if (bestPick == null) {
-                break;
-            }
-            if (bestPick instanceof ColonyTile) {
-                ColonyTile ct = (ColonyTile) bestPick;
-                Unit u = ct.getUnit();
-                if (ct.getProductionOf(u, foodType) > 1) {
-                    u.setWorkType(foodType);
-                } else {
-                    u.setLocation(colony.getTile());
-                    AIUnit au = getAIUnit(u);
-                    if (au.getMission() instanceof WorkInsideColonyMission) {
-                        au.setMission(null);
-                    }
-                }
-            } else { // bestPick instanceof Building
-                Building b = (Building) bestPick;
-                Iterator<Unit> unitIterator = b.getUnitIterator();
-                Unit bestUnit = unitIterator.next();
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    if (u.getType().getExpertProduction() != u.getWorkType()) {
-                        bestUnit = u;
-                        break;
-                    }
-                }
-                bestUnit.setLocation(colony.getTile());
-                AIUnit au = getAIUnit(bestUnit);
-                if (au.getMission() instanceof WorkInsideColonyMission) {
-                    au.setMission(null);
-                }
-            }
-
-            food = colony.getFoodProduction() - colony.getFoodConsumption();
-        }
-
-        // Move any workers not producing anything to a temporary location.
-        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
-            while (wl.getUnitCount() > 0 && wl instanceof Building
-                   && !colony.isProductive(wl)) {
-                Iterator<Unit> unitIterator = wl.getUnitIterator();
-                Unit bestPick = unitIterator.next();
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    if (u.getType().getExpertProduction() != u.getWorkType()) {
-                        bestPick = u;
-                        break;
-                    }
-                }
-                GoodsType type = bestPick.getWorkType().getRawMaterial();
-                WorkLocation w = (type == null) ? null
-                    : getBestVacantTile(bestPick, type);
-                if (w == null) {
-                    type = colony.getSpecification()
-                        .getGoodsType("model.goods.bells");
-                    w = colony.getBuildingForProducing(type);
-                }
-                if (w == null) {
-                    w = getBestVacantTile(bestPick, foodType);
-                    type = foodType;
-                }
-                if (w != null) {
-                    bestPick.setLocation(w);
-                    bestPick.setWorkType(type);
-                    break;
-                } else {
-                    bestPick.setLocation(colony.getTile());
-                }
-                if (w == wl) break;
-            }
-        }
-
-        // TODO: Move workers to temporarily improve the production.
-
-        // Changes the production type of workers producing a cargo there
-        // is no room for.
-        List<GoodsType> goodsList = colony.getSpecification().getGoodsTypeList();
-        for (GoodsType goodsType : goodsList) {
-            int production = colony.getNetProductionOf(goodsType);
-            int in_stock = colony.getGoodsCount(goodsType);
-            if (foodType != goodsType
-                && goodsType.isStorable()
-                && production + in_stock > colony.getWarehouseCapacity()) {
-                Iterator<Unit> unitIterator = colony.getUnitIterator();
-                int waste = production + in_stock - colony.getWarehouseCapacity();
-                while (unitIterator.hasNext() && waste > 0){
-                    Unit unit = unitIterator.next();
-                    if (unit.getWorkType() == goodsType) {
-                        final Location oldLocation = unit.getLocation();
-                        unit.setLocation(colony.getTile());
-                        boolean working = false;
-                        waste = colony.getGoodsCount(goodsType)
-                            + colony.getNetProductionOf(goodsType)
-                            - colony.getWarehouseCapacity();
-                        int best = 0;
-                        for (GoodsType goodsType2 : goodsList) {
-                            if (!goodsType2.isFarmed())
-                                continue;
-                            ColonyTile bestTile = getBestVacantTile(unit, goodsType2);
-                            int production2 = (bestTile == null ? 0 :
-                                               bestTile.getProductionOf(unit, goodsType2));
-                            if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
-                                + colony.getNetProductionOf(goodsType2) < colony.getWarehouseCapacity()){
-                                if (working){
-                                    unit.setLocation(colony.getTile());
-                                }
-                                unit.setLocation(bestTile);
-                                unit.setWorkType(goodsType2);
-                                best = production2;
-                                working = true;
-                            }
-                        }
-                        if (!working){
-                            //units.add(unit);
-                            /*
-                             * Keep the unit inside the colony. Units outside
-                             * colonies are assigned Missions.
-                             */
-                            // TODO: Create a Mission for units temporarily moved outside colonies.
-                            //Assuming that unit already has the correct UnitState here.
-                            //If not, this will be fixed by setLocation(),
-                            //resulting in a logger warning.
-                            unit.setLocation(oldLocation);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        // Use any remaining food plans:
-        for (int i = 0; i < workLocationPlans.size(); i++) {
-            WorkLocationPlan wlp = workLocationPlans.get(i);
-            WorkLocation wl = wlp.getWorkLocation();
-            if (wlp.getGoodsType() == foodType
-                && (((ColonyTile) wl).getWorkTile().isLand()
-                    || colony.hasAbility(Ability.PRODUCE_IN_WATER))) {
-                Unit bestUnit = null;
-                int bestProduction = 0;
-                Iterator<Unit> unitIterator = units.iterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
-                    int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                                                                          foodType);
-                    if (production > 1
-                        && (bestUnit == null || production > bestProduction || production == bestProduction
-                            && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
-                        bestUnit = unit;
-                        bestProduction = production;
-                    }
-                }
-                if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
-
-                    bestUnit.setLocation(wlp.getWorkLocation());
-                    bestUnit.setWorkType(wlp.getGoodsType());
-                    units.remove(bestUnit);
-                    workLocationPlans.remove(wlp);
-                }
-            }
-        }
-
-        // Put any remaining workers outside the colony:
-        Iterator<Unit> ui6 = units.iterator();
-        while (ui6.hasNext()) {
-            Unit u = ui6.next();
-            u.setLocation(colony.getTile());
-            AIUnit au = getAIUnit(u);
-            if (au.getMission() instanceof WorkInsideColonyMission) {
-                au.setMission(null);
-            }
-        }
-
-        // FIXME: should be executed just once, when the custom house is built
-        /*if (colony.hasAbility(Ability.EXPORT)) {
-          colony.setExports(Goods.SILVER, true);
-          colony.setExports(Goods.RUM, true);
-          colony.setExports(Goods.CIGARS, true);
-          colony.setExports(Goods.CLOTH, true);
-          colony.setExports(Goods.COATS, true);
-          }*/
-
-        decideBuildable(connection);
-        createTileImprovementPlans();
-        createWishes();
-        colonyPlan.adjustProductionAndManufacture();
-        checkConditionsForHorseBreed();
-
-        if (this.colony.getUnitCount()<=0) {
-            // Something bad happened, there is no remaining unit
-            // working in the colony.
-            //
-            // Throwing an exception stalls the AI and wrecks the
-            // colony in a weird way.  Try to recover by hopefully
-            // finding a unit outside the colony and stuffing it into
-            // the town hall.
-            if (colony.getTile().getUnitCount() > 0) {
-                logger.warning("Colony " + colony.getName()
-                               + " autodestruct averted.");
-                Unit u = colony.getTile().getFirstUnit();
-                GoodsType bells = colony.getSpecification()
-                    .getGoodsType("model.goods.bells");
-                u.setLocation(colony.getBuildingForProducing(bells));
-                u.setWorkType(bells);
-                getAIUnit(u).setMission(null);
-            } else {
-                throw new IllegalStateException("Colony " + colony.getName()
-                                                + " contains no units!");
-            }
-
-        }
-
-        // no need to rearrange workers again immediately
-        rearrangeWorkers = false;
-        colony.setDisplayUnitCount(-1); // disable the unit count override
-        return true;
-    }
-
-    private void checkForUnequippedExpertPioneer() {
-        if (colony.getUnitCount() < 2) {
-            return;
-        }
-
-        for(Unit unit : colony.getUnitList()){
-            if(!unit.hasAbility(Ability.EXPERT_PIONEER)){
-                continue;
-            }
-            AIUnit aiu = getAIUnit(unit);
-            if( aiu == null){
-                continue;
-            }
-            //if its not valid for this unit, is not valid for any other, no need to continue
-            if(!PioneeringMission.isValid(aiu)){
-                return;
-            }
-            unit.setLocation(colony.getTile());
-            aiu.setMission(new PioneeringMission(getAIMain(), aiu));
-            return;
-        }
-    }
-
-
-    public static Unit bestUnitForWorkLocation(Collection<Unit> units, WorkLocation workLocation,
-                                               GoodsType goodsType) {
-
-        if (units == null || units.isEmpty() || workLocation == null
-            || workLocation.isFull()
-            || (workLocation instanceof ColonyTile && goodsType == null)) {
-            return null;
-        } else {
-            Tile tile = null;
-            Building building = null;
-            UnitType expert = null;
-            if (workLocation instanceof ColonyTile) {
-                tile = ((ColonyTile) workLocation).getWorkTile();
-                expert = goodsType.getSpecification().getExpertForProducing(goodsType);
-            } else if (workLocation instanceof Building) {
-                building = (Building) workLocation;
-                expert = building.getExpertUnitType();
-            } else {
-                return null;
-            }
-
-            Unit bestUnit = null;
-            int production = 0;
-            int bestProduction = 0;
-            int experience = 0;
-            int wastedExperience = 0;
-            ExperienceUpgrade canBeUpgraded = ExperienceUpgrade.NONE;
-            for (Unit unit : units) {
-                if (unit.getType() == expert) {
-                    // can't get any better than this
-                    return unit;
-                } else {
-                    if (tile != null) {
-                        production = unit.getProductionOf(goodsType,
-                                                          tile.potential(goodsType, unit.getType()));
-                    } else if (building != null) {
-                        production = building.getUnitProductivity(unit);
-                    }
-                    if (production > bestProduction) {
-                        // production is better
-                        bestUnit = unit;
-                        bestProduction = production;
-                        canBeUpgraded = getExperienceUpgrade(unit, expert);
-                        if (canBeUpgraded == ExperienceUpgrade.NONE) {
-                            experience = 0;
-                            wastedExperience = 0;
-                        } else {
-                            if (unit.getWorkType() == goodsType) {
-                                experience = unit.getExperience();
-                                wastedExperience = 0;
-                            } else {
-                                experience = 0;
-                                wastedExperience = unit.getExperience();
-                            }
-                        }
-                    } else if (production == bestProduction) {
-                        ExperienceUpgrade upgradeable = getExperienceUpgrade(unit, expert);
-                        if ((upgradeable == ExperienceUpgrade.EXPERT
-                             && (canBeUpgraded != ExperienceUpgrade.EXPERT
-                                 || (unit.getWorkType() == goodsType
-                                     && unit.getExperience() > experience)
-                                 || (unit.getWorkType() != goodsType
-                                     && unit.getExperience() < wastedExperience)))
-                            || (upgradeable == ExperienceUpgrade.NONE
-                                && canBeUpgraded == ExperienceUpgrade.SOME)) {
-                            // production is equal, but unit is better
-                            // from an education perspective
-                            bestUnit = unit;
-                            canBeUpgraded = upgradeable;
-                            if (unit.getWorkType() == goodsType) {
-                                experience = unit.getExperience();
-                                wastedExperience = 0;
-                            } else {
-                                experience = 0;
-                                wastedExperience = unit.getExperience();
-                            }
-                        }
-                    }
-                }
-            }
-            if (bestProduction == 0) {
-                return null;
-            } else {
-                return bestUnit;
-            }
-        }
-    }
-
-    private static ExperienceUpgrade getExperienceUpgrade(Unit unit, UnitType expert) {
-        ExperienceUpgrade result = ExperienceUpgrade.NONE;
-        for (UnitTypeChange change : unit.getType().getTypeChanges()) {
-            if (change.asResultOf(ChangeType.EXPERIENCE)) {
-                if (expert == change.getNewUnitType()) {
-                    return ExperienceUpgrade.EXPERT;
-                } else {
-                    result = ExperienceUpgrade.SOME;
-                }
+    public List<WorkerWish> getWorkerWishes() {
+        List<WorkerWish> result = new ArrayList<WorkerWish>();
+        for (Wish wish : wishes) {
+            if (wish instanceof WorkerWish) {
+                result.add((WorkerWish) wish);
             }
         }
         return result;
     }
 
-
-
     /**
-     * Checks if the colony has an unarmed expert soldier inside
-     * If there are conditions to arm it, put it outside for later equip
+     * Creates the wishes for the <code>Colony</code>.
      */
-    private void checkForUnarmedExpertSoldier() {
-        EquipmentType musketsEqType = colony.getSpecification().getEquipmentType("model.equipment.muskets");
+    private void createWishes() {
+        wishes.clear();
+        createWorkerWishes();
+        createGoodsWishes();
+    }
 
-        for(Unit unit : colony.getUnitList()){
-            if(colony.getUnitCount() == 1){
-                return;
+    private void createWorkerWishes() {
+
+        int expertValue = 100;
+
+        // For every non-expert, request expert replacement. TODO:
+        // value should depend on how urgently the unit is needed, and
+        // possibly on skill, too.
+        for (Unit unit : colony.getUnitList()) {
+            if (unit.getWorkType() != null
+                && unit.getWorkType() != unit.getType().getExpertProduction()) {
+                UnitType expert = colony.getSpecification().getExpertForProducing(unit.getWorkType());
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, expert, true));
             }
+        }
 
-            if(!unit.hasAbility(Ability.EXPERT_SOLDIER)){
-                continue;
+        // request population increase
+        if (wishes.isEmpty()) {
+            int newPopulation = colony.getUnitCount() + 1;
+            if (colony.governmentChange(newPopulation) >= 0) {
+                // population increase incurs no penalty
+                boolean needFood = colony.getFoodProduction()
+                    <= colony.getFoodConsumption() + colony.getOwner().getMaximumFoodConsumption();
+                // choose expert for best work location plan
+                UnitType expert = getNextExpert(needFood);
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
             }
+        }
 
-            // check if colony has goods to equip unit
-            if(colony.canBuildEquipment(musketsEqType)){
-                unit.setLocation(colony.getTile());
-                continue;
-            }
+        // TODO: check for students
+        // TODO: add missionaries
 
-            // check for armed non-expert unit
-            for(Unit outsideUnit : colony.getTile().getUnitList()){
-                if(outsideUnit.isArmed()
-                        && !outsideUnit.hasAbility(Ability.EXPERT_SOLDIER)){
-                    unit.setLocation(colony.getTile());
-                    break;
-                }
+        // increase defense value
+        boolean badlyDefended = isBadlyDefended();
+        if (badlyDefended) {
+            UnitType bestDefender = colony.getBestDefenderType();
+            if (bestDefender != null) {
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, bestDefender, true));
             }
         }
     }
 
+    private void createGoodsWishes() {
+        int goodsWishValue = 50;
+
+        // request goods
+        // TODO: improve heuristics
+        TypeCountMap<GoodsType> requiredGoods = new TypeCountMap<GoodsType>();
+
+        // add building materials
+        if (colony.getCurrentlyBuilding() != null) {
+            for (AbstractGoods goods : colony.getCurrentlyBuilding().getGoodsRequired()) {
+                if (colony.getAdjustedNetProductionOf(goods.getType()) == 0) {
+                    requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                }
+            }
+        }
+
+        // add materials required to improve tiles
+        for (TileImprovementPlan plan : tileImprovementPlans) {
+            for (AbstractGoods goods : plan.getType().getExpendedEquipmentType()
+                     .getGoodsRequired()) {
+                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+            }
+        }
+
+        // add raw materials for buildings
+        for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
+            if (workLocation instanceof Building) {
+                Building building = (Building) workLocation;
+                GoodsType inputType = building.getGoodsInputType();
+                ProductionInfo info = colony.getProductionInfo(building);
+                if (inputType != null
+                    && info != null
+                    && !info.hasMaximumProduction()) {
+                    // TODO: find better heuristics
+                    requiredGoods.incrementCount(inputType, 100);
+                }
+            }
+        }
+
+        // add breedable goods
+        for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isBreedable()) {
+                requiredGoods.incrementCount(goodsType, goodsType.getBreedingNumber());
+            }
+        }
+
+        // add materials required to build military equipment
+        if (isBadlyDefended()) {
+            for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
+                if (type.isMilitaryEquipment()) {
+                    for (Unit unit : colony.getUnitList()) {
+                        if (unit.canBeEquippedWith(type)) {
+                            for (AbstractGoods goods : type.getGoodsRequired()) {
+                                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (GoodsType type : requiredGoods.keySet()) {
+            GoodsType requiredType = type;
+            while (requiredType != null && !requiredType.isStorable()) {
+                requiredType = requiredType.getRawMaterial();
+            }
+            if (requiredType != null) {
+                int amount = Math.min((requiredGoods.getCount(requiredType)
+                                       - colony.getGoodsCount(requiredType)),
+                                      colony.getWarehouseCapacity());
+                if (amount > 0) {
+                    int value = colonyCouldProduce(requiredType) ?
+                        goodsWishValue / 10 : goodsWishValue;
+                    wishes.add(new GoodsWish(getAIMain(), colony, value, amount, requiredType));
+                }
+            }
+        }
+        Collections.sort(wishes);
+    }
+
+    private boolean colonyCouldProduce(GoodsType goodsType) {
+        if (goodsType.isBreedable()) {
+            return colony.getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
+        } else if (goodsType.isFarmed()) {
+            for (ColonyTile colonyTile : colony.getColonyTiles()) {
+                if (colonyTile.getWorkTile().potential(goodsType, null) > 0) {
+                    return true;
+                }
+            }
+        } else {
+            if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
+                if (goodsType.getRawMaterial() == null) {
+                    return true;
+                } else {
+                    return colonyCouldProduce(goodsType.getRawMaterial());
+                }
+            }
+        }
+        return false;
+    }
+
     /**
-     * Verifies if the <code>Colony</code> has conditions for breeding horses,
-     *and un-mounts a mounted <code>Unit</code> if available, to have horses to breed.
+     * Returns an <code>Iterator</code> over all the
+     * <code>TileImprovementPlan</code>s needed by this colony.
+     *
+     * @return The <code>Iterator</code>.
+     * @see TileImprovementPlan
      */
-    void checkConditionsForHorseBreed() {
+    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
+        return tileImprovementPlans.iterator();
+    }
+
+    /**
+     * Removes a <code>TileImprovementPlan</code> from the list
+     * @return True if it was successfully deleted, false otherwise
+     */
+    public boolean removeTileImprovementPlan(TileImprovementPlan plan){
+        return tileImprovementPlans.remove(plan);
+    }
+
+    /**
+     * Creates a list of the <code>Tile</code>-improvements which will
+     * increase the production by this <code>Colony</code>.
+     *
+     * @see TileImprovementPlan
+     */
+    public void createTileImprovementPlans() {
+        Map<Tile, TileImprovementPlan> plans
+            = new HashMap<Tile, TileImprovementPlan>();
+        for (TileImprovementPlan plan : tileImprovementPlans) {
+            plans.put(plan.getTarget(), plan);
+        }
+        for (WorkLocationPlan wlp : colonyPlan.getTilePlans()) {
+            ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
+            Tile target = colonyTile.getWorkTile();
+            boolean others = target.getOwningSettlement() != colony
+                && target.getOwner() == colony.getOwner();
+            TileImprovementPlan plan = plans.get(target);
+            if (plan == null) {
+                if (others) continue; // owned by another of our colonies
+                plan = wlp.createTileImprovementPlan();
+                if (plan != null) {
+                    int value = plan.getValue();
+                    if (!colonyTile.isEmpty()) value *= 2;
+                    value -= colony.getOwner().getLandPrice(target);
+                    plan.setValue(value);
+                    tileImprovementPlans.add(plan);
+                    plans.put(target, plan);
+                }
+            } else if (wlp.updateTileImprovementPlan(plan) == null
+                || others) {
+                tileImprovementPlans.remove(plan);
+                plan.dispose();
+            }
+        }
+
+        Tile centerTile = colony.getTile();
+        TileImprovementPlan centerPlan = plans.get(centerTile);
+        TileImprovementType type = WorkLocationPlan
+            .findBestTileImprovementType(centerTile, colony.getSpecification()
+                                         .getGoodsType("model.goods.grain"));
+        if (type == null) {
+            if (centerPlan != null) {
+                tileImprovementPlans.remove(centerPlan);
+            }
+        } else {
+            if (centerPlan == null) {
+                centerPlan = new TileImprovementPlan(getAIMain(), colony.getTile(), type, 30);
+                tileImprovementPlans.add(0, centerPlan);
+            } else {
+                centerPlan.setType(type);
+            }
+        }
+
+        Collections.sort(tileImprovementPlans);
+    }
+
+    /**
+     * Verifies if the <code>Colony</code> has conditions for breeding
+     * horses, and un-mounts a mounted <code>Unit</code> if available,
+     * to have horses to breed.
+     *
+     * Method is public so the test suite can call it.
+     */
+    public void checkConditionsForHorseBreed() {
         GoodsType horsesType = colony.getSpecification().getGoodsType("model.goods.horses");
         EquipmentType horsesEqType = colony.getSpecification().getEquipmentType("model.equipment.horses");
         GoodsType reqGoodsType = horsesType.getRawMaterial();
@@ -1410,102 +1107,47 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
     }
-
-    private void placeExpertsInWorkPlaces(List<Unit> units, List<WorkLocationPlan> workLocationPlans) {
-        boolean canProduceInWater = colony.hasAbility(Ability.PRODUCE_IN_WATER);
-
-        // Since we will change the original list, we need to make a copy to iterate from
-        Iterator<Unit> uit = new ArrayList<Unit>(units).iterator();
-        while (uit.hasNext()) {
-            Unit unit = uit.next();
-
-            GoodsType expertProd = unit.getType().getExpertProduction();
-
-            // not an expert
-            if(expertProd == null){
-                continue;
-            }
-
-            WorkLocationPlan bestWorkPlan = null;
-            int bestProduction = 0;
-
-            Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-            while (wlpIterator.hasNext()) {
-                WorkLocationPlan wlp = wlpIterator.next();
-                WorkLocation wl = wlp.getWorkLocation();
-
-                GoodsType locGoods = wlp.getGoodsType();
-
-                boolean isColonyTile = wl instanceof ColonyTile;
-
-                // Sanity check.  Make sure the tile is usable by this colony.
-                if (isColonyTile
-                    && !tryUseTile(((ColonyTile)wl).getWorkTile())) continue;
-
-                boolean isLand = true;
-                if(isColonyTile){
-                    isLand = ((ColonyTile) wl).getWorkTile().isLand();
+ 
+    /**
+     * Something bad happened, there is no remaining unit working in
+     * the colony.
+     *
+     * Throwing an exception stalls the AI and wrecks the colony in a
+     * weird way.  Try to recover by hopefully finding a unit outside
+     * the colony and stuffing it into the town hall.
+     */
+    private void avertAutoDestruction() {
+        List<GoodsType> libertyGoods = colony.getSpecification()
+            .getLibertyGoodsTypeList();
+        for (Unit u : colony.getTile().getUnitList()) {
+            if (!u.isPerson()) continue;
+            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+                if (!wl.canAdd(u)) continue;
+                for (GoodsType type : libertyGoods) {
+                    if (wl.getPotentialProduction(u.getType(), type) > 0
+                        && AIMessage.askWork(getAIUnit(u), wl)
+                        && u.getLocation() == wl) {
+                        AIMessage.askChangeWorkType(getAIUnit(u), type);
+                        logger.warning("Colony " + colony.getName()
+                            + " autodestruct averted.");
+                        break;
+                    }
                 }
-
-                //Colony cannot get fish yet
-                if(isColonyTile && !isLand && !canProduceInWater){
-                    continue;
-                }
-
-                // not a fit
-                if(expertProd != locGoods){
-                    continue;
-                }
-
-                // no need to look any further, only one place to work in
-                if(!isColonyTile){
-                    bestWorkPlan = wlp;
-                    break;
-                }
-
-                int planProd = wlp.getProductionOf(expertProd);
-                if(bestWorkPlan == null || bestProduction < planProd){
-                    bestWorkPlan = wlp;
-                    bestProduction = planProd;
-
-                }
-            }
-
-            if (bestWorkPlan != null) {
-                unit.setLocation(bestWorkPlan.getWorkLocation());
-                unit.setWorkType(bestWorkPlan.getGoodsType());
-                workLocationPlans.remove(bestWorkPlan);
-                units.remove(unit);
             }
         }
-    }
-
-    /**
-     * Decides what to build in the <code>Colony</code>.
-     *
-     * @param connection The connection to use when communicating with the
-     *            server.
-     */
-    private void decideBuildable(Connection connection) {
-        Iterator<BuildableType> bi = colonyPlan.getBuildable();
-        BuildableType buildable = (bi.hasNext()) ? bi.next() : null;
-        if (buildable != null && colony.canBuild(buildable)
-            && buildable != colony.getCurrentlyBuilding()) {
-            List<BuildableType> queue = new ArrayList<BuildableType>();
-            queue.add(buildable);
-            AIMessage.askSetBuildQueue(this, queue);
+        // No good, no choice but to fail.
+        if (colony.getUnitCount() <= 0) {
+            throw new IllegalStateException("Colony " + colony.getName()
+                + " rearrangement leaves no units!");
         }
     }
 
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("Property change REARRANGE_WORKERS fired.");
-        rearrangeWorkers = true;
+        rearrangeWorkers = new Turn(0);
     }
 
-    public ColonyPlan getColonyPlan() {
-        return colonyPlan;
-    }
-
+    // Serialization
 
     /**
      * Writes this object to an XML stream.
@@ -1582,7 +1224,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         wishes.clear();
 
         colonyPlan = new ColonyPlan(getAIMain(), colony);
-        colonyPlan.create();
+        colonyPlan.update();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + "ListElement")) {

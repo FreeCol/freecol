@@ -166,7 +166,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
         ensureColonyMissions();
-        secureSettlements();
+        //secureSettlements();
         giveNormalMissions();
         bringGifts();
         demandTribute();
@@ -734,7 +734,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
 
-            c.rearrangeWorkers(getConnection());
+            c.rearrangeWorkers();
         }
     }
 
@@ -1953,7 +1953,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             Iterator<AIGoods> agi = ac.getAIGoodsIterator();
             while (agi.hasNext()) {
                 AIGoods ag = agi.next();
-                if (ag.getTransportDestination() != null && ag.getTransport() == null) {
+                if (ag.getTransportDestination() != null
+                    && ag.getTransport() == null) {
                     transportables.add(ag);
                 }
             }

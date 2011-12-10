@@ -177,6 +177,11 @@ public final class Ability extends Feature {
     public static final String PIRACY = "model.ability.piracy";
 
     /**
+     * The ability to repair certain units.
+     */
+    public static final String REPAIR_UNITS = "model.ability.repairUnits";
+
+    /**
      * The ability to produce goods (e.g. fish) on water tiles.
      */
     public static final String PRODUCE_IN_WATER =
