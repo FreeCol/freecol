@@ -22,8 +22,6 @@ package net.sf.freecol.common.io;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ModTest extends FreeColTestCase {

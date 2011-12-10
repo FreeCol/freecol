@@ -19,11 +19,8 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildableType;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -32,7 +29,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
