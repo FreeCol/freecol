@@ -377,7 +377,8 @@ public abstract class AIPlayer extends AIObject {
         // mission is written.
         Unit unit = aiU.getUnit();
         Tile tile = unit.getTile();
-        if (!unit.isCarrier() && !unit.isOnCarrier() && tile != null) {
+        if (!unit.isCarrier() && !unit.isOnCarrier() && tile != null
+            && tile.getColony() == null) {
             for (Tile t : tile.getSurroundingTiles(1)) {
                 for (Unit u : t.getUnitList()) {
                     if (u.getOwner() == unit.getOwner()
