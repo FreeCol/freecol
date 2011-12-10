@@ -34,7 +34,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -540,11 +539,7 @@ public final class Canvas extends JDesktopPane {
     public void errorMessage(String messageID, String message) {
         String display = null;
         if (messageID != null) {
-            try {
-                display = Messages.message(messageID);
-            } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + messageID);
-            }
+            display = Messages.message(messageID);
         }
         if (display == null || "".equals(display)) display = message;
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, this, display);
@@ -1075,26 +1070,13 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
                                      String okText, String cancelText) {
-        try {
-            okText = Messages.message(okText);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + okText + ".");
-        }
-        try {
-            cancelText = Messages.message(cancelText);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + cancelText + ".");
-        }
+        okText = Messages.message(okText);
+        cancelText = Messages.message(cancelText);
 
         String[] texts = new String[messages.length];
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
-            String id = messages[i].getId();
-            try {
-                texts[i] = Messages.message(messages[i]);
-            } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + id + ".");
-            }
+            texts[i] = Messages.message(messages[i]);
             images[i] = gui.getImageLibrary().getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
         }
 
@@ -1392,16 +1374,7 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
 
-            String okTxt = "ok";
-            String txt = "enterSomeText";
-            try {
-                okTxt = Messages.message(okTxt);
-                txt = Messages.message(txt);
-            } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: "
-                               + txt + " or " + okTxt + ".");
-            }
-            showFreeColPanel(new InformationDialog(freeColClient, this, txt, null), tile);
+            showFreeColPanel(new InformationDialog(freeColClient, this, Messages.message("enterSomeText"), null), tile);
         }
         return response;
     }
@@ -1488,29 +1461,12 @@ public final class Canvas extends JDesktopPane {
         List<ModelMessage> messages = filterEventPanels(modelMessages);
         if (messages.size() <= 0) return;
         Game game = freeColClient.getGame();
-        String okText = "ok";
-        String cancelText = "display";
+        String okText = Messages.message("ok");
+        String cancelText = Messages.message("display");
         String[] messageText = new String[messages.size()];
         ImageIcon[] messageIcon = new ImageIcon[messages.size()];
-        try {
-            okText = Messages.message(okText);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: "
-                + okText + ".");
-        }
-        try {
-            cancelText = Messages.message(cancelText);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: "
-                + cancelText + ".");
-        }
         for (int i = 0; i < messages.size(); i++) {
-            try {
-                messageText[i] = Messages.message(messages.get(i));
-            } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: "
-                    + messages.get(i).getId() + ".");
-            }
+            messageText[i] = Messages.message(messages.get(i));
             messageIcon[i] = gui.getImageLibrary().getImageIcon(game
                 .getMessageDisplay(messages.get(i)), false);
         }
