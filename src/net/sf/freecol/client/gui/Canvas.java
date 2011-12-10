@@ -543,7 +543,7 @@ public final class Canvas extends JDesktopPane {
         }
         if (display == null || "".equals(display)) display = message;
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, this, display);
-        showFreeColPanel(errorPanel);
+        showSubPanel(errorPanel);
     }
 
     /**
@@ -1220,15 +1220,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given panel.
-     *
-     * @param panel The panel to be displayed
-     */
-    public void showFreeColPanel(FreeColPanel panel) {
-        showSubPanel(panel, PopupPosition.CENTERED);
-    }
-
-    /**
      * Displays the high scores panel.
      *
      * @param messageId An optional message to add to the high scores panel.
@@ -1492,8 +1483,8 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            showFreeColPanel(new InformationDialog(freeColClient, this,
-                    messageText, messageIcon));
+            showSubPanel(new InformationDialog(freeColClient, this,
+            messageText, messageIcon));
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
             }
