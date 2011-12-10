@@ -1171,6 +1171,22 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Gets the total defence power.
+     *
+     * @return The total defence power.
+     */
+    public float getTotalDefencePower() {
+        CombatModel cm = getGame().getCombatModel();
+        float defence = 0.0f;
+        for (Unit unit : getTile().getUnitList()) {
+            if (unit.isDefensiveUnit()) {
+                defence += cm.getDefencePower(null, unit);
+            }
+        }
+        return defence;
+    }
+
+    /**
      * Determines whether this colony is sufficiently unprotected and
      * contains something worth pillaging.  To be called by CombatModels
      * when the attacker has defeated an unarmed colony defender.
