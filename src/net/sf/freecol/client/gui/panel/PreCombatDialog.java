@@ -29,7 +29,7 @@ import javax.swing.JSeparator;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FeatureContainer;
@@ -43,10 +43,10 @@ import net.sf.freecol.common.model.Unit;
 
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
-    public PreCombatDialog(FreeColClient freeColClient, final Canvas parent,
+    public PreCombatDialog(FreeColClient freeColClient, GUI gui,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(freeColClient, parent);
+        super(freeColClient, gui);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel
@@ -69,20 +69,20 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, parent, false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getCanvas(), false, true);
             defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", defenderUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", defenderUnit.getLabel()));
-            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, parent, false, true);
+            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, getCanvas(), false, true);
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
             Settlement settlement = (Settlement) defender;
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, parent, false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getCanvas(), false, true);
             defenderName = settlement.getName();
-            defenderLabel = new JLabel(parent.getImageLibrary().getImageIcon(settlement, false));
+            defenderLabel = new JLabel(gui.getImageLibrary().getImageIcon(settlement, false));
         } else {
             throw new IllegalStateException("Bogus attack");
         }

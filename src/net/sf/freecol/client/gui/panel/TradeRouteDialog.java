@@ -65,7 +65,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
     private final DefaultListModel listModel = new DefaultListModel();
     private final JList tradeRoutes = new JList(listModel);
     private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
-    private GUI gui;
 
     /**
      * The constructor that will add the items to this panel.
@@ -73,9 +72,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public TradeRouteDialog(FreeColClient freeColClient, final GUI gui, final Canvas parent, TradeRoute selectedRoute) {
 
-        super(freeColClient, parent);
-        
-        this.gui = gui;
+        super(freeColClient, gui);
 
         deassignRouteButton.addActionListener(this);
         deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
@@ -199,7 +196,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
-        Unit unit = gui.getMapViewer().getActiveUnit();
+        Unit unit = getGUI().getMapViewer().getActiveUnit();
         TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
         if (unit != null && route != null) {
             switch (action) {

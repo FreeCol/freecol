@@ -37,8 +37,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FAFile;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
@@ -61,8 +61,8 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
      * 
      * @param parent The parent of this panel.
      */
-    public DeclarationDialog(FreeColClient freeColClient, final Canvas parent) {
-        super(freeColClient, parent);
+    public DeclarationDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
         this.signaturePanel = new SignaturePanel();
 
         setLayout(null);

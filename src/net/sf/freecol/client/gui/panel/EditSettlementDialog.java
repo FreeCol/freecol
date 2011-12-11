@@ -40,7 +40,7 @@ import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -85,9 +85,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      * The constructor that will add the items to this panel.
      * @param freeColClient 
      */
-    public EditSettlementDialog(FreeColClient freeColClient, Canvas canvas, final IndianSettlement settlement) {
+    public EditSettlementDialog(FreeColClient freeColClient, GUI gui, final IndianSettlement settlement) {
         
-        super(freeColClient, canvas);
+        super(freeColClient, gui);
         this.settlement = settlement;
 
         okButton.addActionListener(this);

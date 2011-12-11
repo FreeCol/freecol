@@ -40,7 +40,7 @@ import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
@@ -96,8 +96,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * @param unit an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
      */
-    public NegotiationDialog(FreeColClient freeColClient, Canvas parent, Unit unit, Settlement settlement) {
-        this(freeColClient, parent, unit, settlement, null);
+    public NegotiationDialog(FreeColClient freeColClient, GUI gui, Unit unit, Settlement settlement) {
+        this(freeColClient, gui, unit, settlement, null);
     }
 
     /**
@@ -109,8 +109,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * @param settlement a <code>Settlement</code> value
      * @param agreement a <code>DiplomaticTrade</code> with the offer
      */
-    public NegotiationDialog(FreeColClient freeColClient, Canvas parent, Unit unit, Settlement settlement, DiplomaticTrade agreement) {
-        super(freeColClient, parent);
+    public NegotiationDialog(FreeColClient freeColClient, GUI gui, Unit unit, Settlement settlement, DiplomaticTrade agreement) {
+        super(freeColClient, gui);
         setFocusCycleRoot(true);
 
         this.unit = unit;

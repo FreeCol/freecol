@@ -28,13 +28,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -62,8 +61,8 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
      * @param parent The parent panel.
      * @param unit an <code>Unit</code> value
      */
-    public DumpCargoDialog(FreeColClient freeColClient, Canvas parent, Unit unit) {
-        super(freeColClient, parent);
+    public DumpCargoDialog(FreeColClient freeColClient, GUI gui, Unit unit) {
+        super(freeColClient, gui);
 
         header = new JLabel(Messages.message("dumpCargo"));
         header.setFont(smallHeaderFont);

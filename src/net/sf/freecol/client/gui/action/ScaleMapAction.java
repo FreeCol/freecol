@@ -107,7 +107,7 @@ public class ScaleMapAction extends FreeColAction {
         final JTextField inputWidth = new JTextField(Integer.toString(oldMap.getWidth()), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(oldMap.getHeight()), COLUMNS);
 
-        final FreeColDialog<MapSize> inputDialog = new FreeColDialog<MapSize>(freeColClient, canvas) {
+        final FreeColDialog<MapSize> inputDialog = new FreeColDialog<MapSize>(freeColClient, gui) {
             @Override
             public void requestFocus() {
                 inputWidth.requestFocus();

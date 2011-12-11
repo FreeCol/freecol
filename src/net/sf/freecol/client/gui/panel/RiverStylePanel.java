@@ -29,7 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -56,8 +56,8 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
      * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public RiverStylePanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public RiverStylePanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
         setLayout(new BorderLayout());
         
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));

@@ -1949,7 +1949,7 @@ public final class InGameController implements NetworkConstants {
             }
             if (units.size() > 0) {
                 EndTurnDialog dialog
-                    = new EndTurnDialog(freeColClient, gui.getCanvas(), units);
+                    = new EndTurnDialog(freeColClient, gui, units);
                 if (!gui.getCanvas().showFreeColDialog(dialog)) return;
             }
         }

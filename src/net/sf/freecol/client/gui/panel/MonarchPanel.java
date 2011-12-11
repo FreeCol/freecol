@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
@@ -47,8 +48,8 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      * @param parent The parent panel.
      * @param action The MonarchAction
      */
-    public MonarchPanel(FreeColClient freeColClient, Canvas parent, MonarchAction action) {
-        this(freeColClient, parent, action, null);
+    public MonarchPanel(FreeColClient freeColClient, GUI gui, MonarchAction action) {
+        this(freeColClient, gui, action, null);
     }
 
     /**
@@ -59,9 +60,9 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      * @param action The MonarchAction
      * @param template The StringTemplate to use
      */
-    public MonarchPanel(FreeColClient freeColClient, Canvas parent, MonarchAction action,
+    public MonarchPanel(FreeColClient freeColClient, GUI gui, MonarchAction action,
                         StringTemplate template) {
-        super(freeColClient, parent);
+        super(freeColClient, gui);
 
         String messageId = "model.monarch.action." + action.toString();
         String yesId = messageId + ".yes";

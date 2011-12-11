@@ -38,7 +38,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
@@ -70,8 +70,8 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
      *
      * @param parent The parent of this panel.
      */
-    public LoadingSavegameDialog(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public LoadingSavegameDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
         setLayout(new BorderLayout());
 
         buttons.add(okButton);

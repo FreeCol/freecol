@@ -185,7 +185,7 @@ public final class UnitListOptionUI extends OptionUI<UnitListOption>
         private AbstractUnitOptionUI ui;
 
         public EditDialog(FreeColClient freeColClient, GUI gui, Canvas canvas, AbstractUnitOption option) {
-            super(freeColClient, canvas);
+            super(freeColClient, gui);
             setLayout(new MigLayout());
             ui = new AbstractUnitOptionUI(gui, option, true);
             add(ui.getComponent());

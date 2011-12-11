@@ -151,7 +151,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
     private void showAddElementDialog() {
         final Canvas canvas = gui.getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
-        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(freeColClient, canvas) {
+        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(freeColClient, gui) {
             @Override
             public void requestFocus() {
                 addButton.requestFocus();

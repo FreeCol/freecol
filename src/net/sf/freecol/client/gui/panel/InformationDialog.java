@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -45,8 +46,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, Canvas canvas, String text, ImageIcon image) {
-        this(freeColClient, canvas, new String[] { text }, new ImageIcon[] { image });
+    public InformationDialog(FreeColClient freeColClient, GUI gui, String text, ImageIcon image) {
+        this(freeColClient, gui, new String[] { text }, new ImageIcon[] { image });
     }
 
     /**
@@ -57,8 +58,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, Canvas parent, String[] texts, ImageIcon[] images) {
-        super(freeColClient,  parent);
+    public InformationDialog(FreeColClient freeColClient, GUI gui, String[] texts, ImageIcon[] images) {
+        super(freeColClient,  gui);
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
         JPanel textPanel = new JPanel();

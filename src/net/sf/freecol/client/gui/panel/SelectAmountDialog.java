@@ -29,7 +29,7 @@ import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 
@@ -53,9 +53,9 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
     /**
      * The constructor to use.
      */
-    public SelectAmountDialog(FreeColClient freeColClient, Canvas parent, GoodsType goodsType,
+    public SelectAmountDialog(FreeColClient freeColClient, GUI gui, GoodsType goodsType,
         int available, int defaultAmount, boolean needToPay) {
-        super(freeColClient, parent);
+        super(freeColClient, gui);
 
         setFocusCycleRoot(true);
 

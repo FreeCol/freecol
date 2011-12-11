@@ -48,8 +48,8 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ClientOptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent) {
-        super(freeColClient, gui, parent, true);
+    public ClientOptionsDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, true);
         getButtons().clear();
         initialize(getClientOptions(), getClientOptions().getName(), null);
     }
@@ -79,7 +79,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
             try {
                 getGroup().save(file);
                 getFreeColClient().getActionManager().update();
-                gui.resetMenuBar();
+                getGUI().resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 MapControlsAction mca = (MapControlsAction) getFreeColClient()
                     .getActionManager().getFreeColAction(MapControlsAction.id);

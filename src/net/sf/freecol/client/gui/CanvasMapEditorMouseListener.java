@@ -151,7 +151,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
-                        int style = canvas.showFreeColDialog(new RiverStylePanel(freeColClient, canvas));
+                        int style = canvas.showFreeColDialog(new RiverStylePanel(freeColClient, canvas.getGUI()));
                         if (style == -1) {
                             // user canceled
                         } else if (style == 0) {
@@ -163,7 +163,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         }
                     }
                     if (tile.getIndianSettlement() != null) {
-                        canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, canvas, tile.getIndianSettlement()));
+                        canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, canvas.getGUI(), tile.getIndianSettlement()));
                     }
                 } else {
                     mapViewer.setSelectedTile(null, true);

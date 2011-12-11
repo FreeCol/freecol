@@ -70,8 +70,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      * @param editable whether the options may be edited
      * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
-        super(freeColClient, gui, parent, editable);
+    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+        super(freeColClient, gui, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

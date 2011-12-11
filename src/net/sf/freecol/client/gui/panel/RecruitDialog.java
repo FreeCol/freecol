@@ -27,15 +27,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * The panel that allows a user to recruit people in Europe.
@@ -56,8 +55,8 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
      * The constructor to use.
      * @param freeColClient 
      */
-    public RecruitDialog(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public RecruitDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         setFocusCycleRoot(true);
 

@@ -366,8 +366,8 @@ public final class Canvas extends JDesktopPane {
         europePanel = new EuropePanel(freeColClient, gui);
         statusPanel = new StatusPanel(freeColClient, gui); 
         chatPanel = new ChatPanel(freeColClient, gui);
-        clientOptionsDialog = new ClientOptionsDialog(freeColClient, gui, this);
-        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, this);
+        clientOptionsDialog = new ClientOptionsDialog(freeColClient, gui);
+        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, gui);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -567,7 +567,7 @@ public final class Canvas extends JDesktopPane {
             display = Messages.message(messageID);
         }
         if (display == null || "".equals(display)) display = message;
-        ErrorPanel errorPanel = new ErrorPanel(freeColClient, this, display);
+        ErrorPanel errorPanel = new ErrorPanel(freeColClient, gui, display);
         showSubPanel(errorPanel);
     }
 
@@ -953,7 +953,7 @@ public final class Canvas extends JDesktopPane {
      * @return list of <code>Goods</code> to loot
      */
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, this, winner, loot);
+        CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, gui, winner, loot);
         return showFreeColDialog(dialog, winner.getTile());
     }
 
@@ -1094,7 +1094,7 @@ public final class Canvas extends JDesktopPane {
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
-        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, this));
+        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, gui));
     }
 
     /**
@@ -1168,11 +1168,11 @@ public final class Canvas extends JDesktopPane {
      * Display a dialog following declaration of independence.
      */
     public void showDeclarationDialog() {
-        showFreeColDialog(new DeclarationDialog(freeColClient, this));
+        showFreeColDialog(new DeclarationDialog(freeColClient, gui));
     }
 
     public void showDifficultyDialog() {
-        showSubPanel(new DifficultyDialog(freeColClient, gui, this, freeColClient.getGame().getDifficultyLevel()));
+        showSubPanel(new DifficultyDialog(freeColClient, gui, freeColClient.getGame().getDifficultyLevel()));
     }
 
     /**
@@ -1182,7 +1182,7 @@ public final class Canvas extends JDesktopPane {
      * @return A list of <code>Goods</code> to dump.
      */
     public List<Goods> showDumpCargoDialog(Unit unit) {
-        DumpCargoDialog dumpDialog = new DumpCargoDialog(freeColClient, this, unit);
+        DumpCargoDialog dumpDialog = new DumpCargoDialog(freeColClient, gui, unit);
         return showFreeColDialog(dumpDialog, unit.getTile());
     }
 
@@ -1195,7 +1195,7 @@ public final class Canvas extends JDesktopPane {
      * @return The emigrant that was chosen by the user.
      */
     public int showEmigrationPanel(boolean fountainOfYouth) {
-        EmigrationPanel emigrationPanel = new EmigrationPanel(freeColClient, this);
+        EmigrationPanel emigrationPanel = new EmigrationPanel(freeColClient, gui);
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
         return showFreeColDialog(emigrationPanel);
     }
@@ -1227,11 +1227,11 @@ public final class Canvas extends JDesktopPane {
         case SAIL:
             return -1;
         case RECRUIT:
-            localDialog = new RecruitDialog(freeColClient, this);
+            localDialog = new RecruitDialog(freeColClient, gui);
             break;
         case PURCHASE:
         case TRAIN:
-            localDialog = new TrainDialog(freeColClient, this, europeAction);
+            localDialog = new TrainDialog(freeColClient, gui, europeAction);
             break;
         }
         localDialog.initialize();
@@ -1269,11 +1269,11 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(EventType type) {
-        showFreeColPanel(new EventPanel(freeColClient, this, type), null);
+        showFreeColPanel(new EventPanel(freeColClient, gui, type), null);
     }
 
     public void showFindSettlementDialog() {
-        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, this), PopupPosition.ORIGIN);
+        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, gui), PopupPosition.ORIGIN);
     }
 
     /**
@@ -1288,7 +1288,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        showSubPanel(new GameOptionsDialog(freeColClient, gui, this, editable, loadCustomOptions));
+        showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions));
     }
 
     /**
@@ -1385,7 +1385,7 @@ public final class Canvas extends JDesktopPane {
             gui.playSound("sound.event.alertSound");
         }
 
-        showFreeColPanel(new InformationDialog(freeColClient, this, text, icon), tile);
+        showFreeColPanel(new InformationDialog(freeColClient, gui, text, icon), tile);
     }
 
     public void showInformationMessage(ModelMessage message) {
@@ -1440,7 +1440,7 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
 
-            showFreeColPanel(new InformationDialog(freeColClient, this, Messages.message("enterSomeText"), null), tile);
+            showFreeColPanel(new InformationDialog(freeColClient, gui, Messages.message("enterSomeText"), null), tile);
         }
         return response;
     }
@@ -1504,7 +1504,7 @@ public final class Canvas extends JDesktopPane {
 
 
     public void showLogFilePanel() {
-        showSubPanel(new ErrorPanel(freeColClient, this));
+        showSubPanel(new ErrorPanel(freeColClient, gui));
 
     }
 
@@ -1561,7 +1561,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            showSubPanel(new InformationDialog(freeColClient, this,
+            showSubPanel(new InformationDialog(freeColClient, gui,
             messageText, messageIcon));
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
@@ -1580,7 +1580,7 @@ public final class Canvas extends JDesktopPane {
      */
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         NegotiationDialog negotiationDialog
-            = new NegotiationDialog(freeColClient, this, unit, settlement, agreement);
+            = new NegotiationDialog(freeColClient, gui, unit, settlement, agreement);
         negotiationDialog.initialize();
         return showFreeColDialog(negotiationDialog, unit.getTile());
     }
@@ -1661,7 +1661,7 @@ public final class Canvas extends JDesktopPane {
     public boolean showPreCombatDialog(FreeColGameObject attacker,
                                        FreeColGameObject defender,
                                        Tile tile) {
-        return showFreeColDialog(new PreCombatDialog(freeColClient, this, attacker, defender),
+        return showFreeColDialog(new PreCombatDialog(freeColClient, gui, attacker, defender),
                                  tile);
     }
 
@@ -1875,7 +1875,7 @@ public final class Canvas extends JDesktopPane {
      * @return A destination for the unit, or null.
      */
     public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColDialog(new SelectDestinationDialog(freeColClient, this, unit),
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient, gui, unit),
                                  unit.getTile());
     }
 

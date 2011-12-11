@@ -62,8 +62,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      *        values identifies a <code>FoundingFather</code> to be
      *        picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(FreeColClient freeColClient, GUI gui, Canvas parent, List<FoundingFather> possibleFoundingFathers) {
-        super(freeColClient, parent);
+    public ChooseFoundingFatherDialog(FreeColClient freeColClient, GUI gui, List<FoundingFather> possibleFoundingFathers) {
+        super(freeColClient, gui);
         this.possibleFathers = possibleFoundingFathers;
         setLayout(new MigLayout("wrap 1", "align center"));
 

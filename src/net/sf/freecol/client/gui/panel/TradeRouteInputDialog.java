@@ -106,7 +106,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final JLabel destinationLabel = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
 
-    private GUI gui;
 
 
     /**
@@ -115,10 +114,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @param parent The parent of this panel.
      */
     public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui, final Canvas parent, TradeRoute newRoute) {
-        super(freeColClient, parent);
-        
-        this.gui = gui;
-
+        super(freeColClient, gui);
         originalRoute = newRoute;
 
         goodsPanel = new GoodsPanel();
@@ -267,14 +263,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         for (TradeRoute route : player.getTradeRoutes()) {
             if (route.getId().equals(originalRoute.getId())) continue;
             if (route.getName().equals(tradeRouteName.getText())) {
-                gui.errorMessage("traderouteDialog.duplicateName");
+                getGUI().errorMessage("traderouteDialog.duplicateName");
                 return false;
             }
         }
 
         // Verify that it has at least two stops
         if (listModel.getSize() < 2) {
-            gui.errorMessage("traderouteDialog.notEnoughStops");
+            getGUI().errorMessage("traderouteDialog.notEnoughStops");
             return false;
         }
 

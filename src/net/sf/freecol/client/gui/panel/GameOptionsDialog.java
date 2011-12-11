@@ -44,8 +44,8 @@ public final class GameOptionsDialog extends OptionsDialog {
      * @param editable whether the game options can be modified
      * @param loadCustomOptions whether to load custom options
      */
-    public GameOptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent, boolean editable, boolean loadCustomOptions) {
-        super(freeColClient, gui, parent, editable);
+    public GameOptionsDialog(FreeColClient freeColClient, GUI gui, boolean editable, boolean loadCustomOptions) {
+        super(freeColClient, gui, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

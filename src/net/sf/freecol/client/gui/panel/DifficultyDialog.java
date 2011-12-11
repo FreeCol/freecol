@@ -80,8 +80,8 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      * @param parent a <code>Canvas</code> value
      * @param level an <code>OptionGroup</code> value
      */
-    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Canvas parent, OptionGroup level) {
-        super(freeColClient, gui, parent, false);
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui, OptionGroup level) {
+        super(freeColClient, gui, false);
         difficultyBox.setRenderer(new BoxRenderer());
         specification = getSpecification();
 
@@ -99,8 +99,8 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      * @param parent The parent of this panel.
      * @param specification a <code>Specification</code> value
      */
-    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Canvas parent, Specification specification) {
-        super(freeColClient, gui, parent, true);
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Specification specification) {
+        super(freeColClient, gui, true);
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 

@@ -44,6 +44,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
@@ -77,8 +78,8 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
     /**
      * The constructor to use.
      */
-    public FindSettlementDialog(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public FindSettlementDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         for (Player player : getGame().getPlayers()) {
             knownSettlements.addAll(player.getSettlements());

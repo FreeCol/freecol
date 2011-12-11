@@ -36,7 +36,7 @@ import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.StringTemplate;
@@ -68,8 +68,8 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
      * @param winner The <code>Unit</code> that is looting.
      * @param loot The <code>Goods</code> to loot.
      */
-    public CaptureGoodsDialog(FreeColClient freeColClient, Canvas parent, Unit winner, List<Goods> loot) {
-        super(freeColClient, parent);
+    public CaptureGoodsDialog(FreeColClient freeColClient, GUI gui, Unit winner, List<Goods> loot) {
+        super(freeColClient, gui);
         
         maxCargo = winner.getSpaceLeft();
 

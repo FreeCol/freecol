@@ -35,6 +35,7 @@ import javax.swing.table.TableCellEditor;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -71,8 +72,8 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
          * @param freeColClient 
         * @param l The ActionListener for the OK and cancel buttons.
         */
-        public ColorChooserPanel(FreeColClient freeColClient, ActionListener l) {
-            super(freeColClient, canvas.getGUI());
+        public ColorChooserPanel(FreeColClient freeColClient, GUI gui, ActionListener l) {
+            super(freeColClient, gui);
 
             JButton okButton = new JButton( Messages.message("ok") );
             JButton cancelButton = new JButton( Messages.message("cancel") );
@@ -99,7 +100,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     * The constructor to use.
     * @param canvas The top level component that holds all other components.
     */
-    public ColorCellEditor(FreeColClient freeColClient, Canvas canvas) {
+    public ColorCellEditor(FreeColClient freeColClient, GUI gui, Canvas canvas) {
         this.canvas = canvas;
 
         colorEditButton = new JButton();
@@ -109,7 +110,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
 
         colorChooser = new JColorChooser();
 
-        colorChooserPanel = new ColorChooserPanel(freeColClient, this);
+        colorChooserPanel = new ColorChooserPanel(freeColClient, gui, this);
         colorChooserPanel.setLocation(canvas.getWidth() / 2 - colorChooserPanel.getWidth()
                 / 2, canvas.getHeight() / 2 - colorChooserPanel.getHeight() / 2);
     }

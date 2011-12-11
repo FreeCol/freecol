@@ -78,8 +78,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      *
      * @param parent The parent <code>Canvas</code>.
      */
-    public FreeColDialog(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent.getGUI());
+    public FreeColDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
@@ -180,9 +180,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         }
 
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
-        final Canvas canvas = gui.getCanvas();
         final FreeColDialog<ChoiceItem<T>> choiceDialog
-            = new FreeColDialog<ChoiceItem<T>>(freeColClient, canvas) {
+            = new FreeColDialog<ChoiceItem<T>>(freeColClient, gui) {
                 @Override
                 public void requestFocus() {
                     for (JButton b : choiceBtnLst) {
@@ -283,9 +282,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     public static FreeColDialog<Boolean> createConfirmDialog(FreeColClient freeColClient, GUI gui, String[] texts,
         ImageIcon[] icons, String okText, String cancelText) {
         // create the dialog
-        final Canvas canvas = gui.getCanvas();
         final FreeColDialog<Boolean> confirmDialog
-            = new FreeColDialog<Boolean>(freeColClient, canvas);
+            = new FreeColDialog<Boolean>(freeColClient, gui);
 
         confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
@@ -335,9 +333,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         String defaultValue, String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
-        final Canvas canvas = gui.getCanvas();
         final FreeColDialog<String> inputDialog
-            = new FreeColDialog<String>(freeColClient, canvas)  {
+            = new FreeColDialog<String>(freeColClient, gui)  {
                 @Override
                 public void requestFocus() {
                     input.requestFocus();
@@ -401,7 +398,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
-        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(freeColClient, canvas);
+        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(freeColClient, gui);
 
         mapSizeDialog.setLayout(new MigLayout("wrap 2"));
 
@@ -457,9 +454,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
                                                        FileFilter[] fileFilters) {
-        final Canvas canvas = gui.getCanvas();
         final FreeColDialog<File> loadDialog
-            = new FreeColDialog<File>(freeColClient, canvas);
+            = new FreeColDialog<File>(freeColClient, gui);
         final JFileChooser fileChooser = new JFileChooser(directory);
 
         loadDialog.okButton.addActionListener(new ActionListener() {
@@ -511,9 +507,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FreeColDialog<File> createSaveDialog(FreeColClient freeColClient, GUI gui, File directory,
         final String standardName, FileFilter[] fileFilters, String defaultName) {
-        final Canvas canvas = gui.getCanvas();
         final FreeColDialog<File> saveDialog
-            = new FreeColDialog<File>(freeColClient, canvas);
+            = new FreeColDialog<File>(freeColClient, gui);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 

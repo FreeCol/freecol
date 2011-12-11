@@ -67,7 +67,6 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
 
     private List<JButton> buttons = new ArrayList<JButton>();
 
-    protected GUI gui;
 
     protected static final FileFilter[] filters = new FileFilter[] {
         new FileFilter() {
@@ -87,9 +86,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param parent <code>Canvas</code> The parent of this panel
      * @param editable boolean
      */
-    public OptionsDialog(FreeColClient freeColClient, GUI gui, Canvas parent, boolean editable) {
-        super(freeColClient, parent);
-        this.gui = gui;
+    public OptionsDialog(FreeColClient freeColClient, GUI gui, boolean editable) {
+        super(freeColClient, gui);
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
 
@@ -127,7 +125,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(getFreeColClient(), gui, group, isEditable());
+        ui = new OptionGroupUI(getFreeColClient(), getGUI(), group, isEditable());
         optionPanel = new JPanel() {
             @Override
             public String getUIClassID() {
@@ -180,7 +178,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        ui = new OptionGroupUI(getFreeColClient(), gui, group, isEditable());
+        ui = new OptionGroupUI(getFreeColClient(), getGUI(), group, isEditable());
         optionPanel.add(ui);
         revalidate();
         repaint();

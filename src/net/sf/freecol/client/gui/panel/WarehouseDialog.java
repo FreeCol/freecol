@@ -31,16 +31,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Asks the user if he's sure he wants to quit.
@@ -58,8 +57,8 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
      *
      * @param parent The parent of this panel.
      */
-    public WarehouseDialog(FreeColClient freeColClient, Canvas parent, Colony colony) {
-        super(freeColClient, parent);
+    public WarehouseDialog(FreeColClient freeColClient, GUI gui, Colony colony) {
+        super(freeColClient, gui);
 
         warehouseDialog = new JPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);

@@ -36,7 +36,7 @@ import javax.swing.KeyStroke;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -58,8 +58,8 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * @param cancelText <code>String</code>
      * @param choices List of <code>ChoiceItem<T></code>
      */
-    public ChoiceDialog(FreeColClient freeColClient, Canvas parent, String text, String cancelText, List<ChoiceItem<T>> choices) {
-        super(freeColClient, parent);
+    public ChoiceDialog(FreeColClient freeColClient, GUI gui, String text, String cancelText, List<ChoiceItem<T>> choices) {
+        super(freeColClient, gui);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);

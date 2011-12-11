@@ -33,7 +33,7 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
@@ -53,8 +53,8 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * @param parent The parent of this panel.
      * @param message The error message to display in this error panel.
      */
-    public ErrorPanel(FreeColClient freeColClient, Canvas parent, String message) {
-        super(freeColClient, parent);
+    public ErrorPanel(FreeColClient freeColClient, GUI gui, String message) {
+        super(freeColClient, gui);
 
         setLayout(new MigLayout());
 
@@ -72,8 +72,8 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      *
      * @param parent The parent of this panel.
      */
-    public ErrorPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public ErrorPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         File logFile = new File(FreeCol.getLogFile());
         byte[] buffer = new byte[(int) logFile.length()];

@@ -430,7 +430,7 @@ public final class ColonyPanel extends FreeColPanel
                     unload();
                     break;
                 case WAREHOUSE:
-                    if (canvas.showFreeColDialog(new WarehouseDialog(getFreeColClient(), canvas,
+                    if (canvas.showFreeColDialog(new WarehouseDialog(getFreeColClient(), getGUI(),
                                                                      colony))) {
                         updateWarehousePanel();
                     }
