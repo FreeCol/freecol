@@ -49,7 +49,7 @@ import javax.swing.table.TableColumn;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -94,15 +94,16 @@ public final class PlayersTable extends JTable {
 
     /**
      * The constructor that will add the items to this panel.
+     * @param gui 
      *
      * @param canvas a <code>Canvas</code> value
      * @param nationOptions a <code>NationOptions</code> value
      * @param myPlayer a <code>Player</code> value
      */
-    public PlayersTable(final FreeColClient freeColClient, final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
+    public PlayersTable(final FreeColClient freeColClient, final GUI gui, NationOptions nationOptions, Player myPlayer) {
         super();
 
-        library = canvas.getImageLibrary();
+        library = gui.getImageLibrary();
 
         setModel(new PlayersTableModel(freeColClient.getPreGameController(), nationOptions, myPlayer));
         setRowHeight(47);
@@ -115,13 +116,13 @@ public final class PlayersTable extends JTable {
 
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showColopediaPanel(PanelType.NATIONS.toString());
+                    gui.getCanvas().showColopediaPanel(PanelType.NATIONS.toString());
                 }
             });
 
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showColopediaPanel(PanelType.NATION_TYPES.toString());
+                    gui.getCanvas().showColopediaPanel(PanelType.NATION_TYPES.toString());
                 }
             });
 

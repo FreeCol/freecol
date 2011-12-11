@@ -96,7 +96,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setCancelComponent(cancel);
 
-        table = new PlayersTable(getFreeColClient(), getCanvas(), nationOptions, getMyPlayer());
+        table = new PlayersTable(getFreeColClient(), getGUI(), nationOptions, getMyPlayer());
 
         start = new JButton(Messages.message("startGame"));
         gameOptions = new JButton(Messages.message("gameOptions"));

@@ -590,13 +590,6 @@ public final class Canvas extends JDesktopPane {
         }
         return null;
     }
-
-
-
-    public ImageLibrary getImageLibrary() {
-        return gui.getImageLibrary();
-    }
-
  
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
