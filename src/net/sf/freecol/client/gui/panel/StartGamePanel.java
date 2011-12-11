@@ -274,7 +274,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             case CANCEL:
                 getFreeColClient().getConnectController().quitGame(true);
                 getCanvas().remove(this);
-                getCanvas().showSubPanel(new NewPanel(getFreeColClient(), gui, getCanvas()));
+                getCanvas().showNewPanel();
                 break;
             case READY:
                 getFreeColClient().getPreGameController()

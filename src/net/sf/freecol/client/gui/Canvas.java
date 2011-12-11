@@ -687,7 +687,7 @@ public final class Canvas extends JDesktopPane {
             removeInGameComponents();
         }
 
-        showSubPanel(new NewPanel(freeColClient, gui, this, specification));
+        showNewPanel(specification);
     }
 
     /**
@@ -1522,6 +1522,15 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(negotiationDialog, unit.getTile());
     }
 
+    public void showNewPanel() {
+        showSubPanel(new NewPanel(freeColClient, gui, this));
+    }
+
+    public void showNewPanel(Specification specification) {
+        showSubPanel(new NewPanel(freeColClient, gui, this, specification));
+    }
+
+
     /**
      * Shows the <code>OpenGamePanel</code>.
      */
@@ -1578,7 +1587,6 @@ public final class Canvas extends JDesktopPane {
         vp.addMouseListener(l);
         vp.addVideoListener(l);
     }
-
 
     /**
      * Display a dialog to confirm a combat.
@@ -1867,7 +1875,7 @@ public final class Canvas extends JDesktopPane {
         statusPanel.setStatusMessage(message);
         addCentered(statusPanel, STATUS_LAYER);
     }
-
+    
     /**
      * Displays a <code>FreeColPanel</code>.
      * @param panel <code>FreeColPanel</code>, panel to show
@@ -1879,7 +1887,7 @@ public final class Canvas extends JDesktopPane {
     public void showTilePanel(Tile tile) {
         showSubPanel(new TilePanel(freeColClient, gui, tile));
     }
-    
+
     /**
      * Shows a tile popup.
      *
@@ -1961,6 +1969,7 @@ public final class Canvas extends JDesktopPane {
         startGamePanel.updateGameOptions();
     }
 
+
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();
 
@@ -1988,7 +1997,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-
     /**
      * Closes all the menus that are currently open.
      */
@@ -2003,6 +2011,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
 
@@ -2016,7 +2025,6 @@ public final class Canvas extends JDesktopPane {
     void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
-
 
     /**
      * Refreshes this Canvas visually.
@@ -2181,7 +2189,7 @@ public final class Canvas extends JDesktopPane {
         }
         return (JInternalFrame) temp;
     }
-
+    
     /**
      * Given a tile to be made visible, determine a position to popup
      * a panel.
@@ -2197,7 +2205,8 @@ public final class Canvas extends JDesktopPane {
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
     }
-
+    
+    
     /**
      * Displays the given dialog, making sure a tile is visible.
      *
@@ -2223,7 +2232,6 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, getPopupPosition(tile));
     }
     
-    
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
      *
@@ -2236,5 +2244,6 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
+
     
 }
