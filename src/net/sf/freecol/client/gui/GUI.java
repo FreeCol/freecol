@@ -332,11 +332,7 @@ public class GUI {
         this.windowed = windowed;
         
     }
-    
-    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        canvas.showSubPanel(new GameOptionsDialog(freeColClient, this, canvas, editable, loadCustomOptions));
-    }
-    
+
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */

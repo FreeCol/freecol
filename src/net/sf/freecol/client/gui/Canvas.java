@@ -73,6 +73,7 @@ import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
@@ -2359,6 +2360,12 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
+    
+    
+    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
+        showSubPanel(new GameOptionsDialog(freeColClient, gui, this, editable, loadCustomOptions));
+    }
+    
     
     
 }
