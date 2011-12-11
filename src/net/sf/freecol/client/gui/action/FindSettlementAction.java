@@ -21,11 +21,8 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 
 /**
  * An action for finding a settlement on the map.
@@ -51,7 +48,6 @@ public class FindSettlementAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = gui.getCanvas();
-        canvas.showPanel(new FindSettlementDialog<Canvas>(freeColClient, canvas), false);
+        gui.getCanvas().showFindSettlementDialog();
     }
 }

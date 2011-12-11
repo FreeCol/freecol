@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
@@ -1208,6 +1209,10 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(new EventPanel(freeColClient, this, type), null);
     }
 
+    public void showFindSettlementDialog() {
+        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, this), PopupPosition.ORIGIN);
+    }
+
     /**
      * Displays the given dialog.
      *
@@ -1225,8 +1230,9 @@ public final class Canvas extends JDesktopPane {
      * @param messageId An optional message to add to the high scores panel.
      */
     public void showHighScoresPanel(String messageId) {
-        showPanel(new ReportHighScoresPanel(freeColClient, this, messageId), false);
+        showSubPanel(new ReportHighScoresPanel(freeColClient, this, messageId), PopupPosition.ORIGIN);
     }
+
 
     /**
      * Displays the panel of the given native settlement.
@@ -1239,6 +1245,8 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(panel, indianSettlement.getTile());
     }
 
+    
+    
     /**
      * Displays the panel for trading with an <code>IndianSettlement</code>.
      *
@@ -1562,18 +1570,6 @@ public final class Canvas extends JDesktopPane {
         addKeyListener(l);
         vp.addMouseListener(l);
         vp.addVideoListener(l);
-    }
-
-    /**
-     * Displays a <code>FreeColPanel</code>.
-     *
-     * @param panel a <code>FreeColPanel</code> value
-     * @param centered a <code>boolean</code> value
-     */
-    public void showPanel(FreeColPanel panel, boolean centered) {
-        repaint();
-        addAsFrame(panel, false, PopupPosition.ORIGIN);
-        panel.requestFocus();
     }
 
     /**
