@@ -910,7 +910,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(getFreeColClient(), building, getCanvas());
+                super(getFreeColClient(), building, getGUI(), getCanvas());
             }
 
             public void autoscroll(Point p) {
@@ -1086,7 +1086,7 @@ public final class ColonyPanel extends FreeColPanel
                     continue;
                 }
 
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                 if (isEditable()) {
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
@@ -1197,7 +1197,7 @@ public final class ColonyPanel extends FreeColPanel
             for (Unit unit : getColony().getTile().getUnitList()) {
                 if (!unit.isCarrier()) continue;
 
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
                     unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
@@ -1509,7 +1509,7 @@ public final class ColonyPanel extends FreeColPanel
                 removeAll();
                 UnitLabel unitLabel = null;
                 for (Unit unit : colonyTile.getUnitList()) {
-                    unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                    unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);

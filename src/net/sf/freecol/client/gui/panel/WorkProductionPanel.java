@@ -113,7 +113,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
         Collections.sort(modifiers);
 
-        add(new UnitLabel(getFreeColClient(), unit, getCanvas(), false, false), "wrap");
+        add(new UnitLabel(getFreeColClient(), unit, getGUI(), false, false), "wrap");
 
         float result = 0;
         for (Modifier modifier : unitModifiers) {

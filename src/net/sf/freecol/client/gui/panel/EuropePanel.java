@@ -505,7 +505,7 @@ public final class EuropePanel extends FreeColPanel {
                         belongs = false;
                     }
                     if (belongs) {
-                        UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                        UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                         add(unitLabel);
@@ -609,7 +609,7 @@ public final class EuropePanel extends FreeColPanel {
                 if (unit.isNaval()
                     && (unit.getState() == Unit.UnitState.ACTIVE
                         || unit.getState() == Unit.UnitState.SENTRY)) {
-                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);
@@ -675,7 +675,7 @@ public final class EuropePanel extends FreeColPanel {
             List<Unit> units = europe.getUnitList();
             for (Unit unit : units) {
                 if (!unit.isNaval()) {
-                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);

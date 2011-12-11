@@ -189,7 +189,7 @@ public final class ReportColonyPanel extends ReportPanel
             List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas(), true, true);
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true, true);
                 colonistsPanel.add(unitLabel);
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
@@ -197,7 +197,7 @@ public final class ReportColonyPanel extends ReportPanel
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas(), true, true);
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true, true);
                 unitsPanel.add(unitLabel);
             }
             if(buildableLabel != null && currentType.getSpecification().getUnitTypeList().contains(currentType)) {

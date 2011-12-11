@@ -161,7 +161,7 @@ public class CargoPanel extends FreeColPanel
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
 
-                UnitLabel label = new UnitLabel(getFreeColClient(), unit, getCanvas());
+                UnitLabel label = new UnitLabel(getFreeColClient(), unit, getGUI());
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);

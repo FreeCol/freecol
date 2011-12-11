@@ -38,6 +38,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -62,15 +63,18 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
      * Creates this BuildingPanel.
      *
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingPanel(FreeColClient freeColClient, Building building, Canvas parent) {
+    public BuildingPanel(FreeColClient freeColClient, Building building, GUI gui, Canvas parent) {
 
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.building = building;
         this.parent = parent;
 
@@ -108,7 +112,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, parent, true);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, true);
             unitLabels.add(unitLabel);
             add(unitLabel);
         }
@@ -160,7 +164,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     @Override
     public JToolTip createToolTip() {
-        return new BuildingToolTip(freeColClient, building, parent);
+        return new BuildingToolTip(freeColClient, building, gui, parent);
     }
 
     public void addPropertyChangeListeners() {

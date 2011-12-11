@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -76,7 +77,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private final Unit unit;
 
-    private final Canvas parent;
 
     private boolean selected;
 
@@ -88,6 +88,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
 
     /**
      * Initializes this JLabel with the given unit data.
@@ -95,10 +97,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param unit The Unit that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent) {
+    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui) {
         this.freeColClient = freeColClient;
         this.unit = unit;
-        this.parent = parent;
+        this.gui = gui;
         this.inGameController = freeColClient.getInGameController();
 
         selected = false;
@@ -115,8 +117,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent, boolean isSmall) {
-        this(freeColClient, unit, parent);
+    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui, boolean isSmall) {
+        this(freeColClient, unit, gui);
         setSmall(isSmall);
         setIgnoreLocation(false);
     }
@@ -130,20 +132,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, Canvas parent, boolean isSmall, boolean ignoreLocation) {
-        this(freeColClient, unit, parent);
+    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui, boolean isSmall, boolean ignoreLocation) {
+        this(freeColClient, unit, gui);
         setSmall(isSmall);
         setIgnoreLocation(ignoreLocation);
     }
 
-    /**
-     * Returns the parent Canvas object.
-     *
-     * @return This UnitLabel's Canvas.
-     */
-    public Canvas getCanvas() {
-        return parent;
-    }
 
     /**
      * Returns this UnitLabel's unit data.
@@ -180,8 +174,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        ImageIcon imageIcon = parent.getImageLibrary().getUnitImageIcon(unit);
-        ImageIcon disabledImageIcon = parent.getImageLibrary().getUnitImageIcon(unit, true);
+        ImageIcon imageIcon = gui.getImageLibrary().getUnitImageIcon(unit);
+        ImageIcon disabledImageIcon = gui.getImageLibrary().getUnitImageIcon(unit, true);
         if (isSmall) {
             setPreferredSize(null);
             // setIcon(new
@@ -197,7 +191,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
-                setSize(new Dimension(parent.getImageLibrary().getTerrainImageWidth(tileType) / 2,
+                setSize(new Dimension(gui.getImageLibrary().getTerrainImageWidth(tileType) / 2,
                                       imageIcon.getIconHeight()));
             } else {
                 setPreferredSize(null);
@@ -264,7 +258,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             GoodsType workType = unit.getWorkType();
             int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
 
-            ProductionLabel pl = new ProductionLabel(freeColClient, workType, production, getCanvas());
+            ProductionLabel pl = new ProductionLabel(freeColClient, workType, production, gui.getCanvas());
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);
@@ -273,7 +267,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                    getParent() instanceof EuropePanel.InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
-            g.drawImage(parent.getMapViewer().getOccupationIndicatorImage(g, unit), 0, 0, null);
+            g.drawImage(gui.getMapViewer().getOccupationIndicatorImage(g, unit), 0, 0, null);
 
             if (unit.isUnderRepair()) {
                 String underRepair = Messages.message(StringTemplate.template("underRepair")
@@ -281,9 +275,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = ResourceManager.getFont("NormalFont", 14f);
-                Image repairImage1 = parent.getMapViewer()
+                Image repairImage1 = gui.getMapViewer()
                     .createStringImage((Graphics2D)g, underRepair1, Color.RED, font);
-                Image repairImage2 = parent.getMapViewer()
+                Image repairImage2 = gui.getMapViewer()
                     .createStringImage((Graphics2D)g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
@@ -352,7 +346,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             break;
         case ACTIVATE_UNIT:
             inGameController.changeState(unit, Unit.UnitState.ACTIVE);
-            parent.getMapViewer().setActiveUnit(unit);
+            gui.getMapViewer().setActiveUnit(unit);
             break;
         case FORTIFY:
             inGameController.changeState(unit, Unit.UnitState.FORTIFYING);
@@ -361,7 +355,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             inGameController.changeState(unit, Unit.UnitState.SENTRY);
             break;
         case COLOPEDIA:
-            getCanvas().showColopediaPanel(unit.getId());
+            gui.getCanvas().showColopediaPanel(unit.getId());
             break;
         case LEAVE_TOWN:
             inGameController.putOutsideColony(unit);
@@ -381,7 +375,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     public void updateIcon() {
-        ImageLibrary lib = parent.getImageLibrary();
+        ImageLibrary lib = gui.getImageLibrary();
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
         setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
@@ -396,7 +390,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         while (uc != null) {
             if (uc instanceof ColonyPanel) {
                 if (unit.getColony() == null) {
-                    parent.remove(uc);
+                    gui.getCanvas().remove(uc);
                     freeColClient.getActionManager().update();
                 } else {
                     // ((ColonyPanel) uc).reinitialize();

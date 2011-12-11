@@ -69,18 +69,18 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getCanvas(), false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getGUI(), false, true);
             defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", defenderUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", defenderUnit.getLabel()));
-            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, getCanvas(), false, true);
+            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, getGUI(), false, true);
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
             Settlement settlement = (Settlement) defender;
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getCanvas(), false, true);
+            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getGUI(), false, true);
             defenderName = settlement.getName();
             defenderLabel = new JLabel(gui.getImageLibrary().getImageIcon(settlement, false));
         } else {

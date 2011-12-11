@@ -25,8 +25,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -35,8 +37,6 @@ import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel represents a single building in a Colony.
@@ -50,6 +50,9 @@ public class BuildingToolTip extends JToolTip {
     }
 
 
+    private GUI gui;
+
+
     /**
      * Creates this BuildingToolTip.
      *
@@ -57,7 +60,8 @@ public class BuildingToolTip extends JToolTip {
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingToolTip(FreeColClient freeColClient, Building building, Canvas parent) {
+    public BuildingToolTip(FreeColClient freeColClient, Building building, GUI gui, Canvas parent) {
+        this.gui = gui;
 
         int workplaces = building.getUnitCapacity();
 
@@ -105,11 +109,11 @@ public class BuildingToolTip extends JToolTip {
         add(new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId() + ".image"))));
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, parent, false);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, false);
             if (building.canTeach() && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                              unit.getNeededTurnsOfTraining());
-                UnitLabel studentLabel = new UnitLabel(freeColClient, unit.getStudent(), parent, true);
+                UnitLabel studentLabel = new UnitLabel(freeColClient, unit.getStudent(), gui, true);
                 studentLabel.setIgnoreLocation(true);
                 add(unitLabel);
                 add(progress, "split 2, flowy");

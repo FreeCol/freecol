@@ -182,7 +182,7 @@ public final class ReportNavalPanel extends ReportPanel {
 
         Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
         for (Unit unit : unitList) {
-        	UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getCanvas(), true);
+        	UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true);
         	if (unit.getDestination() != null) {
               String destination = Messages.message(unit.getDestination().getLocationNameFor(getMyPlayer()));
               unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>"
@@ -198,7 +198,7 @@ public final class ReportNavalPanel extends ReportPanel {
         		reportPanel.add(goodsLabel);
         	}
         	for (Unit unitLoaded : unit.getUnitList()) {
-        		UnitLabel unitLoadedLabel = new UnitLabel(getFreeColClient(), unitLoaded, getCanvas(), true);
+        		UnitLabel unitLoadedLabel = new UnitLabel(getFreeColClient(), unitLoaded, getGUI(), true);
         		reportPanel.add(unitLoadedLabel);
         	}
         }
