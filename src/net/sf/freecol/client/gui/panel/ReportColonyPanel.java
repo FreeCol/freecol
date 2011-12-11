@@ -310,23 +310,24 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    panel = new BuildQueuePanel(getFreeColClient(), (Colony) fcgo, canvas);
+                    canvas.showBuildQueuePanel((Colony) fcgo, new Runnable() {
+                        public void run() {
+                            updateCompactColonyPanel();
+                        }
+                    });
+                    return;
                 }
             } else {
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    panel = new ColonyPanel(getFreeColClient(), gui, canvas, (Colony) fcgo);
-                }
-            }
-            if (panel != null) {
-                panel.addClosingCallback(new Runnable() {
+                    canvas.showColonyPanel((Colony) fcgo, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }
                     });
-                canvas.showSubPanel(panel);
-                return;
+                    return;
+                }
             }
         }
         super.actionPerformed(event);

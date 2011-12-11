@@ -27,7 +27,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
-import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
