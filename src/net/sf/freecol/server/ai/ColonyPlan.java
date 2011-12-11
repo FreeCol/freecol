@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -49,6 +50,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -146,7 +149,7 @@ public class ColonyPlan {
 
     // Comparator to sort buildable types on their priority in the
     // buildPlan map.
-    private final Comparator<BuildPlan> buildPlanComparator
+    private static final Comparator<BuildPlan> buildPlanComparator
         = new Comparator<BuildPlan>() {
             public int compare(BuildPlan b1, BuildPlan b2) {
                 double d = b1.getValue() - b2.getValue();
@@ -182,6 +185,10 @@ public class ColonyPlan {
     private final List<GoodsType> otherRawGoodsTypes
         = new ArrayList<GoodsType>();
 
+    // Equipment types needed for certain roles.
+    private static final Map<Role, List<EquipmentType>> roleEquipment
+        = new HashMap<Role, List<EquipmentType>>();
+
 
     /**
      * Creates a new <code>ColonyPlan</code>.
@@ -197,6 +204,7 @@ public class ColonyPlan {
         this.colony = colony;
         this.profileType = ProfileType
             .getProfileTypeFromSize(colony.getUnitCount());
+        initializeRoleEquipment();
     }
 
     /**
@@ -209,6 +217,40 @@ public class ColonyPlan {
     public ColonyPlan(AIMain aiMain, Element element) {
         this.aiMain = aiMain;
         readFromXMLElement(element);
+        initializeRoleEquipment();
+    }
+
+    /**
+     * Initializes roleEquipment.  How about that.
+     */
+    private void initializeRoleEquipment() {
+        if (!roleEquipment.isEmpty()) return;
+        UnitType defaultUnit = spec().getDefaultUnitType();
+        for (EquipmentType e : spec().getEquipmentTypeList()) {
+            Boolean b = e.getUnitAbilitiesRequired()
+                .get("model.ability.bornInIndianSettlement");
+            if (b != null && b.booleanValue()) continue;
+            Role r = e.getRole();
+            if (r != null) {
+                List<EquipmentType> eq = roleEquipment.get(r);
+                if (eq == null) eq = new ArrayList<EquipmentType>();
+                eq.add(e);
+                roleEquipment.put(r, eq);
+            }
+        }
+        // TODO: Not quite completely generic yet.  There are more
+        // equipment types that are compatible with the soldier role.
+        // The spec expresses this with <compatible-equipment> but
+        // it does not express that while muskets and horses are compatible
+        // for a soldier, they are not for a scout.
+        for (EquipmentType e : spec().getEquipmentTypeList()) {
+            if (!e.isMilitaryEquipment()) continue;
+            Boolean b = e.getUnitAbilitiesRequired()
+                .get("model.ability.bornInIndianSettlement");
+            if (b != null && b.booleanValue()) continue;
+            List<EquipmentType> eq = roleEquipment.get(Role.SOLDIER);
+            if (!eq.contains(e)) eq.add(e);
+        }
     }
 
     /**
@@ -1040,63 +1082,57 @@ public class ColonyPlan {
     }
 
     /**
-     * Equips a unit.
+     * Equips a unit for a role.
      *
-     * @param unit The <code>Unit</code>s to equip if possible.
-     * @param type The <code>EquipmentType</code> to provide.
+     * @param unit The <code>Unit</code> to equip if possible.
+     * @param role The <code>Role</code> for the unit to take.
      * @param colony The <code>Colony</code> that provides the equipment.
-     * @return True if the unit was eqipped.
+     * @return True if the unit was equipped.
      */
-    private boolean equipUnit(Unit unit, EquipmentType type, Colony colony) {
+    private boolean equipUnit(Unit unit, Role role, Colony colony) {
+        List<EquipmentType> equipment = roleEquipment.get(role);
+        if (equipment == null || equipment.isEmpty()) return false;
+        EquipmentType type = equipment.get(0);
         if (!unit.isPerson()
             || !colony.canProvideEquipment(type)
             || !unit.canBeEquippedWith(type)) return false;
         unit.setLocation(colony.getTile());
         unit.changeEquipment(type, 1);
         colony.addEquipmentGoods(type, -1);
+        for (int i = 1; i < equipment.size(); i++) {
+            type = equipment.get(i);
+            if (colony.canProvideEquipment(type)
+                && unit.canBeEquippedWith(type)) {
+                unit.changeEquipment(type, 1);
+                colony.addEquipmentGoods(type, -1);
+            }
+        }
         return true;
     }
 
     /**
-     * Equips any experts with implicitly out-of-colony jobs
-     * (pioneers, scouts or veteran soldiers).
+     * Equips any experts with implicitly out-of-colony jobs.
      *
      * @param workers A list of <code>Unit</code>s to scan.
      * @param scratch A scratch <code>Colony</code> to use to find equipment.
      */
     private void equipOutdoorExperts(List<Unit> workers, Colony scratch) {
-        // TODO: make the equipment types generic
-        final EquipmentType horsesEqType
-            = spec().getEquipmentType("model.equipment.horses");
-        final EquipmentType musketsEqType
-            = spec().getEquipmentType("model.equipment.muskets");
-        final EquipmentType toolsEqType
-            = spec().getEquipmentType("model.equipment.tools");
-        final Tile tile = scratch.getTile();
-
-        int i = 0;
-        while (i < workers.size()) {
+        final Role outdoorRoles[] = new Role[] { Role.PIONEER,
+                                                 Role.SOLDIER,
+                                                 Role.SCOUT };
+        for (int i = 0; i < workers.size(); i++) {
             if (workers.size() <= 1) break;
             Unit u = workers.get(i);
-            if (u.hasAbility(Ability.EXPERT_PIONEER)
-                && equipUnit(u, toolsEqType, scratch)) {
-                workers.remove(u);
-                continue;
+            for (int j = 0; j < outdoorRoles.length; j++) {
+                String ability = "model.ability.expert"
+                    + outdoorRoles[j].toString().substring(0, 1)
+                    + outdoorRoles[j].toString().substring(1).toLowerCase();
+                if (u.hasAbility(ability)
+                    && equipUnit(u, outdoorRoles[j], scratch)) {
+                    workers.remove(u);
+                    continue;
+                }
             }
-            if (u.hasAbility(Ability.EXPERT_SOLDIER)
-                && equipUnit(u, musketsEqType, scratch)) {
-                equipUnit(u, horsesEqType, scratch);
-                workers.remove(u);
-                continue;
-            }
-            // Scout *after* soldier.
-            // TODO: do it the other way round if there are no scouts.
-            if (u.hasAbility(Ability.EXPERT_SCOUT)
-                && equipUnit(u, horsesEqType, scratch)) {
-                workers.remove(u);
-                continue;
-            }
-            i++;
         }
     }
 
@@ -1262,10 +1298,6 @@ public class ColonyPlan {
     public Colony assignWorkers(List<Unit> workers) {
         final GoodsType foodType = spec().getPrimaryFoodType();
         final int maxUnitFood = colony.getOwner().getMaximumFoodConsumption();
-        final EquipmentType horsesEqType
-            = spec().getEquipmentType("model.equipment.horses");
-        final EquipmentType musketsEqType
-            = spec().getEquipmentType("model.equipment.muskets");
 
         // Collect the work location plans.  Note that the plans are
         // pre-sorted in order of desirability.
@@ -1296,9 +1328,7 @@ public class ColonyPlan {
         // TODO: scan for neighbouring hostiles
         Collections.sort(workers, Unit.getSkillLevelComparator());
         for (Unit u : new ArrayList<Unit>(workers)) {
-            if (workers.size() <= 1
-                || !colony.canProvideEquipment(musketsEqType)) break;
-            
+            if (workers.size() <= 1) break;
             // TODO: this `adequate defence' heuristic is still
             // quite experimental.  When ready it should be moved to
             // isBadlyDefended, but there are problems.
@@ -1316,10 +1346,7 @@ public class ColonyPlan {
             //}
             if (defence >= wanted) break;
 
-            if (equipUnit(u, musketsEqType, scratch)) {
-                equipUnit(u, horsesEqType, scratch);
-                workers.remove(u);
-            }
+            if (equipUnit(u, Role.SOLDIER, scratch)) workers.remove(u);
         }
 
         // Greedy assignment of other workers to plans.
@@ -1466,9 +1493,7 @@ public class ColonyPlan {
         workers.addAll(tile.getUnitList());
         Collections.sort(workers, Unit.getSkillLevelComparator());
         for (Unit u : workers) {
-            if (equipUnit(u, musketsEqType, scratch)) {
-                equipUnit(u, horsesEqType, scratch);
-            }
+            equipUnit(u, Role.SOLDIER, scratch);
         }
 
         return scratch;
