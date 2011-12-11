@@ -94,8 +94,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             {
                 addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        parent.showSubPanel(new BuildQueuePanel(freeColClient, colony,
-                                                                    parent));
+                        parent.showBuildQueuePanel(colony);
                         }
                     });
             }

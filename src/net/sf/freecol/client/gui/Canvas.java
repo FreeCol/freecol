@@ -53,6 +53,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -2245,5 +2246,8 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
 
-    
+    public void showBuildQueuePanel(Colony colony) {
+        showSubPanel(new BuildQueuePanel(freeColClient, colony, this));
+
+    }
 }

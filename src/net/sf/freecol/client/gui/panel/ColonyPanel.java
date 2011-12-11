@@ -439,7 +439,7 @@ public final class ColonyPanel extends FreeColPanel
                     }
                     break;
                 case BUILDQUEUE:
-                    canvas.showSubPanel(new BuildQueuePanel(getFreeColClient(), colony, canvas));
+                    canvas.showBuildQueuePanel(colony);
                     updateConstructionPanel();
                     break;
                 case FILL:
@@ -868,7 +868,7 @@ public final class ColonyPanel extends FreeColPanel
 
             MouseAdapter mouseAdapter = new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        getCanvas().showSubPanel(new BuildQueuePanel(getFreeColClient(), getColony(), getCanvas()));
+                        getCanvas().showBuildQueuePanel(getColony());
                     }
                 };
             ASingleBuildingPanel aSingleBuildingPanel;
