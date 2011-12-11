@@ -63,6 +63,7 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
+import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
@@ -84,7 +85,11 @@ import net.sf.freecol.client.gui.panel.ReportCargoPanel;
 import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportEducationPanel;
+import net.sf.freecol.client.gui.panel.ReportExplorationPanel;
+import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
+import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
+import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
@@ -2287,5 +2292,25 @@ public final class Canvas extends JDesktopPane {
         repaint();
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
+    }
+    
+    public void showDifficultyDialog() {
+        showSubPanel(new DifficultyDialog(freeColClient, gui, this, freeColClient.getGame().getDifficultyLevel()));
+    }
+    
+    public void showReportExplorationPanel() {
+        showSubPanel(new ReportExplorationPanel(freeColClient, this));
+    }
+    
+    public void showReportForeignAffairPanel() {
+        showSubPanel(new ReportForeignAffairPanel(freeColClient, this));
+    }
+    
+    public void showReportHistoryPanel() {
+        showSubPanel(new ReportHistoryPanel(freeColClient, this));
+    }
+    
+    public void showReportIndianPanel() {
+        showSubPanel(new ReportIndianPanel(freeColClient, this));
     }
 }

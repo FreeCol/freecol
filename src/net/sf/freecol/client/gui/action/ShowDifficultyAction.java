@@ -22,9 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.DifficultyDialog;
 
 /**
  * An action for displaying the current difficulty level.
@@ -49,7 +47,6 @@ public class ShowDifficultyAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = gui.getCanvas();
-        canvas.showSubPanel(new DifficultyDialog(freeColClient, gui, canvas, freeColClient.getGame().getDifficultyLevel()));
+        gui.getCanvas().showDifficultyDialog();
     }
 }
