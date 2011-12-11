@@ -369,7 +369,7 @@ public final class ReportColonyPanel extends ReportPanel
         final Specification spec = getSpecification();
         final GoodsType foodType = spec.getPrimaryFoodType();
         final UnitType colonistType = spec.getDefaultUnitType();
-        final ImageLibrary lib = getCanvas().getImageLibrary();
+        final ImageLibrary lib = getGUI().getImageLibrary();
 
         // Assemble the fundamental facts about this colony
         final String cac = colony.getId();
@@ -770,7 +770,7 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.add(newLabel("report.colony.road.header", null, null,
                                  stpl("report.colony.road.description")));
         for (GoodsType g : goodsTypes) {
-            ImageIcon ii = getCanvas().getImageLibrary()
+            ImageIcon ii = getGUI().getImageLibrary()
                 .getScaledGoodsImageIcon(g, 0.667);
             JLabel l = newLabel(null, ii, null,
                 stpl("report.colony.production.header")
@@ -780,7 +780,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
-            = getCanvas().getImageLibrary().getUnitImageIcon(colonistType,
+            = getGUI().getImageLibrary().getUnitImageIcon(colonistType,
                 Role.DEFAULT, true, 0.333);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
@@ -875,7 +875,7 @@ public final class ReportColonyPanel extends ReportPanel
     private void addUnits(final HashMap<UnitType, Suggestion> suggestions,
                           List<UnitType> have, Colony colony, int grow) {
         final String action = colony.getId();
-        final ImageLibrary lib = getCanvas().getImageLibrary();
+        final ImageLibrary lib = getGUI().getImageLibrary();
         final Specification spec = getSpecification();
 
         String layout = (suggestions.size() <= 1) ? null
