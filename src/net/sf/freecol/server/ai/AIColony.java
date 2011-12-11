@@ -24,9 +24,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -93,6 +95,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     // When should the workers in this Colony be rearranged?
     private Turn rearrangeWorkers = new Turn(0);
+
+    // Goods that should be exported.
+    private static final Set<GoodsType> exportable = new HashSet<GoodsType>();
 
 
     /**
@@ -365,16 +370,21 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (UnitWas uw : was) sb.append(uw.toString() + "\n");
         logger.finest(sb.toString());
 
-        // FIXME: should be executed just once, when the custom house is built
+        // Change the export settings when required.
+        // TODO: consider market prices.
         if (colony.hasAbility(Ability.EXPORT)) {
-            // TODO: make generic
-            final GoodsType silverType
-                = spec.getGoodsType("model.goods.silver");
-            colony.getExportData(silverType).setExported(true);
-
-            for (GoodsType g : spec.getGoodsTypeList()) {
-                if (g.isNewWorldLuxuryType()) {
-                    colony.getExportData(g).setExported(true);
+            if (exportable.isEmpty()) initializeExportable();
+            if (player.getMarket() == null) {
+                for (GoodsType g : spec.getGoodsTypeList()) {
+                    if (!g.isStorable()) continue;
+                    colony.getExportData(g).setExported(false);
+                }
+            } else {
+                for (GoodsType g : spec.getGoodsTypeList()) {
+                    if (!g.isStorable()) continue;
+                    boolean export = exportable.contains(g);
+                    colony.getExportData(g).setExported(export);
+                    if (export) colony.getExportData(g).setExportLevel(0);
                 }
             }
         }
@@ -387,6 +397,26 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Set the next rearrangement turn.
         rearrangeWorkers = new Turn(turn + nextRearrange);
         return true;
+    }
+
+    /**
+     * Initialize the exportable set with goods that should be
+     * exported.  Should include the new world luxury goods, and
+     * things that are not used to make anything, like silver.
+     */
+    private void initializeExportable() {
+        final Specification spec = colony.getSpecification();
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (g.isStorable()
+                && !g.isRawMaterial()
+                && !g.isFoodType()
+                && !g.isTradeGoods()) exportable.add(g);
+        }
+        for (EquipmentType e : spec.getEquipmentTypeList()) {
+            for (AbstractGoods ag : e.getGoodsRequired()) {
+                exportable.remove(ag.getType());
+            }
+        }
     }
 
     /**
