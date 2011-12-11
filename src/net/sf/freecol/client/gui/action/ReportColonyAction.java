@@ -23,10 +23,8 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 
 
 /**
@@ -50,6 +48,6 @@ public class ReportColonyAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showSubPanel(new ReportColonyPanel(freeColClient, gui, gui.getCanvas()));
+        gui.getCanvas().showReportColonyPanel();
     }
 }

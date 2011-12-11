@@ -53,6 +53,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
@@ -79,6 +80,10 @@ import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
+import net.sf.freecol.client.gui.panel.ReportCargoPanel;
+import net.sf.freecol.client.gui.panel.ReportColonyPanel;
+import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
+import net.sf.freecol.client.gui.panel.ReportEducationPanel;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
@@ -819,6 +824,10 @@ public final class Canvas extends JDesktopPane {
         repaint();
     }
 
+    public void showAboutPanel() {
+        showSubPanel(new AboutPanel(freeColClient, this));
+    }
+
     /**
      * Displays a dialog that asks the user what he wants to do with his armed
      * unit in a native settlement.
@@ -939,6 +948,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(chatPanel);
     }
 
+
     /**
      * Displays a dialog with a text and a cancel-button, in addition
      * to buttons for each of the objects returned for the given list.
@@ -960,7 +970,6 @@ public final class Canvas extends JDesktopPane {
         ChoiceItem<T> response = showFreeColDialog(choiceDialog, tile);
         return (response == null) ? null : response.getObject();
     }
-
 
     /**
      * Display the panel for claiming land.
@@ -1054,6 +1063,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, this));
     }
 
+
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
@@ -1070,7 +1080,6 @@ public final class Canvas extends JDesktopPane {
                                                                    Messages.message(cancelText)),
                                  null);
     }
-
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -1223,11 +1232,13 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(new EventPanel(freeColClient, this, type), null);
     }
 
+
     public void showFindSettlementDialog() {
         showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, this), PopupPosition.ORIGIN);
     }
 
-
+    
+    
     /**
      * Displays the given dialog.
      *
@@ -1239,8 +1250,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(freeColDialog, null);
     }
 
-    
-    
     /**
      * Displays the high scores panel.
      *
@@ -1340,6 +1349,9 @@ public final class Canvas extends JDesktopPane {
                                message);
     }
 
+
+    // A variety of special purpose panels/dialogs follow
+
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1348,9 +1360,6 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(String messageId) {
         showInformationMessage(null, StringTemplate.key(messageId));
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -1518,6 +1527,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     /**
      * Displays the <code>NegotiationDialog</code>.
      *
@@ -1533,7 +1543,6 @@ public final class Canvas extends JDesktopPane {
         negotiationDialog.initialize();
         return showFreeColDialog(negotiationDialog, unit.getTile());
     }
-
 
     public void showNewPanel() {
         showSubPanel(new NewPanel(freeColClient, gui, this));
@@ -1613,6 +1622,25 @@ public final class Canvas extends JDesktopPane {
                                        Tile tile) {
         return showFreeColDialog(new PreCombatDialog(freeColClient, this, attacker, defender),
                                  tile);
+    }
+
+    public void showReportCargoPanel() {
+        showSubPanel(new ReportCargoPanel(freeColClient, this));
+
+    }
+
+    public void showReportColonyPanel() {
+        showSubPanel(new ReportColonyPanel(freeColClient, gui, this));
+
+    }
+
+    public void showReportContinentalCongressPanel() {
+        showSubPanel(new ReportContinentalCongressPanel(freeColClient, this));
+    }
+
+    public void showReportEducationPanel() {
+        showSubPanel(new ReportEducationPanel(freeColClient, this));
+
     }
 
     /**
@@ -1758,7 +1786,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new SelectDestinationDialog(freeColClient, this, unit),
                                  unit.getTile());
     }
-
+    
     /**
      * Displays the panel for negotiating a sale to a settlement.
      *
@@ -1869,7 +1897,7 @@ public final class Canvas extends JDesktopPane {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
     }
-    
+
     public void showStatisticsPanel() {
         showSubPanel(new StatisticsPanel(freeColClient, this));
     }
@@ -1887,6 +1915,7 @@ public final class Canvas extends JDesktopPane {
         statusPanel.setStatusMessage(message);
         addCentered(statusPanel, STATUS_LAYER);
     }
+
 
     /**
      * Displays a <code>FreeColPanel</code>.
@@ -1921,6 +1950,7 @@ public final class Canvas extends JDesktopPane {
             showTilePanel(tile);
         }
     }
+
 
     /**
      * Display a dialog to select a trade route for a unit.
@@ -1973,7 +2003,6 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? MissionaryAction.CANCEL : result;
     }
 
-
     public void showVictoryPanel() {
         showSubPanel(new VictoryPanel(freeColClient, this));
     }
@@ -1985,7 +2014,6 @@ public final class Canvas extends JDesktopPane {
     public void updateGameOptions() {
         startGamePanel.updateGameOptions();
     }
-
 
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();
@@ -2013,7 +2041,7 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
     }
-
+    
     /**
      * Closes all the menus that are currently open.
      */
@@ -2027,12 +2055,13 @@ public final class Canvas extends JDesktopPane {
             frame.dispose();
         }
     }
-
+    
+    
     void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
 
     }
-
+    
     /**
      * Displays an error message.
      *
@@ -2041,7 +2070,7 @@ public final class Canvas extends JDesktopPane {
     void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
-
+    
     /**
      * Refreshes this Canvas visually.
      */
@@ -2163,7 +2192,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
     
-    
     /**
      * Filters out and displays the EventPanel messages.
      *
@@ -2222,7 +2250,7 @@ public final class Canvas extends JDesktopPane {
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
     }
-
+    
     /**
      * Displays the given dialog, making sure a tile is visible.
      *
@@ -2260,7 +2288,4 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
-    
-    
-    
 }
