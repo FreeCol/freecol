@@ -68,14 +68,17 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
      * @param mapViewer The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, GUI gui, Canvas canvas, MapViewer mapViewer) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.canvas = canvas;
         this.mapViewer = mapViewer;
         this.scrollThread = null;
@@ -151,7 +154,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
-                        int style = canvas.showFreeColDialog(new RiverStylePanel(freeColClient, canvas.getGUI()));
+                        int style = canvas.showFreeColDialog(new RiverStylePanel(freeColClient, gui));
                         if (style == -1) {
                             // user canceled
                         } else if (style == 0) {
@@ -163,7 +166,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         }
                     }
                     if (tile.getIndianSettlement() != null) {
-                        canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, canvas.getGUI(), tile.getIndianSettlement()));
+                        canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, gui, tile.getIndianSettlement()));
                     }
                 } else {
                     mapViewer.setSelectedTile(null, true);

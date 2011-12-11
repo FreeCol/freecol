@@ -153,7 +153,7 @@ public final class EuropePanel extends FreeColPanel {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getCanvas(), this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getGUI(), getCanvas(), this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);

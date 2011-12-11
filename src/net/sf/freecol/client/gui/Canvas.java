@@ -2379,14 +2379,5 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
-    
-    /***
-     * 
-     * This method is absolutely temporary - it will be removed.
-     */
-    
-    public GUI getGUI() {
-        return gui;
-    }
-    
+ 
 }

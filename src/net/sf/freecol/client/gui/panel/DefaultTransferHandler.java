@@ -53,6 +53,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -83,14 +84,17 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
     * The constructor to use.
      * @param freeColClient 
     * @param canvas The <code>Canvas</code>.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
-    public DefaultTransferHandler(FreeColClient freeColClient, Canvas canvas, FreeColPanel parentPanel) {
+    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui, Canvas canvas, FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.canvas = canvas;
         this.parentPanel = parentPanel;
     }
@@ -488,7 +492,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
     private int getAmount(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return canvas.showFreeColDialog(new SelectAmountDialog(freeColClient, canvas.getGUI(), goodsType, available, defaultAmount, needToPay));
+        return canvas.showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay));
     }
 
 
