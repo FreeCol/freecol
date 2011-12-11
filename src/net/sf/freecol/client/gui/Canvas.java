@@ -1850,6 +1850,10 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+    public void showStatisticsPanel() {
+        showSubPanel(new StatisticsPanel(freeColClient, this));
+    }
+
     /**
      * Shows a status message that cannot be dismissed. The panel will be
      * removed when another component is added to this <code>Canvas</code>.
@@ -1872,6 +1876,10 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, PopupPosition.CENTERED);
     }
 
+    public void showTilePanel(Tile tile) {
+        showSubPanel(new TilePanel(freeColClient, gui, tile));
+    }
+    
     /**
      * Shows a tile popup.
      *
@@ -1890,7 +1898,7 @@ public final class Canvas extends JDesktopPane {
             tp.show(this, x, y);
             tp.repaint();
         } else if (tile.isExplored()) {
-            showSubPanel(new TilePanel(freeColClient, gui, tile));
+            showTilePanel(tile);
         }
     }
 
@@ -1980,6 +1988,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     /**
      * Closes all the menus that are currently open.
      */
@@ -1993,7 +2002,6 @@ public final class Canvas extends JDesktopPane {
             frame.dispose();
         }
     }
-
 
     void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
@@ -2009,13 +2017,13 @@ public final class Canvas extends JDesktopPane {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
 
+
     /**
      * Refreshes this Canvas visually.
      */
     void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
-
 
     /**
      * Adds a component on this Canvas inside a frame. Removes the
@@ -2204,7 +2212,7 @@ public final class Canvas extends JDesktopPane {
         remove(freeColDialog);
         return response;
     }
-
+    
     /**
      * Displays the given panel, making sure a tile is visible.
      *
@@ -2214,6 +2222,7 @@ public final class Canvas extends JDesktopPane {
     private void showFreeColPanel(FreeColPanel panel, Tile tile) {
         showSubPanel(panel, getPopupPosition(tile));
     }
+    
     
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
@@ -2226,11 +2235,6 @@ public final class Canvas extends JDesktopPane {
         repaint();
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
-    }
-    
-    
-    public void showStatisticsPanel() {
-        showSubPanel(new StatisticsPanel(freeColClient, this));
     }
     
 }
