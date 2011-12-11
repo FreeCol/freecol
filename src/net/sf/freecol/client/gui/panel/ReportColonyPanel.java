@@ -126,7 +126,6 @@ public final class ReportColonyPanel extends ReportPanel
     private Color cExport;
     private Color cGood;
 
-    private GUI gui;
 
 
     /**
@@ -136,9 +135,8 @@ public final class ReportColonyPanel extends ReportPanel
      *
      * @param parent The parent of this panel.
      */
-    public ReportColonyPanel(FreeColClient freeColClient, GUI gui, Canvas parent) {
-        super(freeColClient, parent, Messages.message("reportColonyAction.name"));
-        this.gui = gui;
+    public ReportColonyPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, Messages.message("reportColonyAction.name"));
         colonies = getSortedColonies();
 
         try {

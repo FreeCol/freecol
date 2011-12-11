@@ -1083,7 +1083,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showCompactLabourReport() {
-        showSubPanel(new CompactLabourReport(freeColClient, this));
+        showSubPanel(new CompactLabourReport(freeColClient, gui));
 
     }
 
@@ -1297,7 +1297,7 @@ public final class Canvas extends JDesktopPane {
      * @param messageId An optional message to add to the high scores panel.
      */
     public void showHighScoresPanel(String messageId) {
-        showSubPanel(new ReportHighScoresPanel(freeColClient, this, messageId), PopupPosition.ORIGIN);
+        showSubPanel(new ReportHighScoresPanel(freeColClient, gui, messageId), PopupPosition.ORIGIN);
     }
 
     /**
@@ -1666,71 +1666,71 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showReportCargoPanel() {
-        showSubPanel(new ReportCargoPanel(freeColClient, this));
+        showSubPanel(new ReportCargoPanel(freeColClient, gui));
 
     }
 
     public void showReportColonyPanel() {
-        showSubPanel(new ReportColonyPanel(freeColClient, gui, this));
+        showSubPanel(new ReportColonyPanel(freeColClient, gui));
 
     }
 
     public void showReportContinentalCongressPanel() {
-        showSubPanel(new ReportContinentalCongressPanel(freeColClient, this));
+        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui));
     }
 
     public void showReportEducationPanel() {
-        showSubPanel(new ReportEducationPanel(freeColClient, this));
+        showSubPanel(new ReportEducationPanel(freeColClient, gui));
 
     }
 
     public void showReportExplorationPanel() {
-        showSubPanel(new ReportExplorationPanel(freeColClient, this));
+        showSubPanel(new ReportExplorationPanel(freeColClient, gui));
     }
 
     public void showReportForeignAffairPanel() {
-        showSubPanel(new ReportForeignAffairPanel(freeColClient, this));
+        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui));
     }
 
     public void showReportHistoryPanel() {
-        showSubPanel(new ReportHistoryPanel(freeColClient, this));
+        showSubPanel(new ReportHistoryPanel(freeColClient, gui));
     }
     
     public void showReportIndianPanel() {
-        showSubPanel(new ReportIndianPanel(freeColClient, this));
+        showSubPanel(new ReportIndianPanel(freeColClient, gui));
     }
 
     public void showReportLabourPanel() {
-        showSubPanel(new ReportLabourPanel(freeColClient, this));
+        showSubPanel(new ReportLabourPanel(freeColClient, gui));
 
     }
 
     public void showReportMilitaryPanel() {
-        showSubPanel(new ReportMilitaryPanel(freeColClient, this));
+        showSubPanel(new ReportMilitaryPanel(freeColClient, gui));
     }
 
     public void showReportNavalPanel() {
-        showSubPanel(new ReportNavalPanel(freeColClient, this));
+        showSubPanel(new ReportNavalPanel(freeColClient, gui));
 
     }
 
     public void showReportProductionPanel() {
-        showSubPanel(new ReportProductionPanel(freeColClient, this)); 
+        showSubPanel(new ReportProductionPanel(freeColClient, gui)); 
 
     }
 
     public void showReportReligiousPanel() {
-        showSubPanel(new ReportReligiousPanel(freeColClient, this));
+        showSubPanel(new ReportReligiousPanel(freeColClient, gui));
 
     }
 
     public void showReportRequirementsPanel() {
-        showSubPanel(new ReportRequirementsPanel(freeColClient, this));
+        showSubPanel(new ReportRequirementsPanel(freeColClient, gui));
     }
 
 
     public void showReportTradePanel() {
-        showSubPanel(new ReportTradePanel(freeColClient, this));
+        showSubPanel(new ReportTradePanel(freeColClient, gui));
 
     }
 
@@ -1740,7 +1740,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showSubPanel(new ReportTurnPanel(freeColClient, this, messages));
+        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages));
     }
 
     /**

@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -45,8 +45,8 @@ public final class ReportEducationPanel extends ReportPanel {
      * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ReportEducationPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent, Messages.message("reportEducationAction.name"));
+    public ReportEducationPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, Messages.message("reportEducationAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
         List<Colony> colonies = getSortedColonies();
@@ -59,7 +59,7 @@ public final class ReportEducationPanel extends ReportPanel {
                     JPanel teacherPanel = getPanel("report.education.teachers");
                     for (Unit unit : colony.getUnitList()) {
                         if (building.canAdd(unit)) {
-                            teacherPanel.add(new UnitLabel(getFreeColClient(), unit, parent, true, true));
+                            teacherPanel.add(new UnitLabel(getFreeColClient(), unit, getCanvas(), true, true));
                             maxSkill = Math.max(maxSkill, unit.getType().getSkill());
                         }
                     }
@@ -67,7 +67,7 @@ public final class ReportEducationPanel extends ReportPanel {
                     JPanel studentPanel = getPanel("report.education.students");
                     for (Unit unit : colony.getUnitList()) {
                         if (unit.getType().getEducationUnit(maxSkill) != null) {
-                            studentPanel.add(new UnitLabel(getFreeColClient(), unit, parent, true, true));
+                            studentPanel.add(new UnitLabel(getFreeColClient(), unit, getCanvas(), true, true));
                         }
                     }
                     reportPanel.add(studentPanel, "grow");

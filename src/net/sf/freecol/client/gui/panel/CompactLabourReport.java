@@ -37,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
@@ -87,8 +88,8 @@ public final class CompactLabourReport extends ReportPanel {
      *
      * @param parent The parent of this panel.
      */
-    public CompactLabourReport(FreeColClient freeColClient, Canvas parent) {
-        this(freeColClient, parent, null);
+    public CompactLabourReport(FreeColClient freeColClient, GUI gui) {
+        this(freeColClient, gui, null);
 
         labourData = new LabourData(getFreeColClient());
         initialize();
@@ -100,8 +101,8 @@ public final class CompactLabourReport extends ReportPanel {
      *
      * @param parent The parent of this panel.
      */
-    private CompactLabourReport(FreeColClient freeColClient, Canvas parent, LabourData.UnitData data) {
-        super(freeColClient, parent, data == null ? Messages.message("reportLabourAction.name")
+    private CompactLabourReport(FreeColClient freeColClient, GUI gui, LabourData.UnitData data) {
+        super(freeColClient, gui, data == null ? Messages.message("reportLabourAction.name")
               : Messages.message("report.labour.details"));
         this.unitData = data;
 
@@ -613,7 +614,7 @@ public final class CompactLabourReport extends ReportPanel {
     private JButton createUnitNameButton(String name, final LabourData.UnitData unitData) {
         JButton button = createButton(name, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CompactLabourReport details = new CompactLabourReport(getFreeColClient(), getCanvas(), unitData);
+                CompactLabourReport details = new CompactLabourReport(getFreeColClient(), getGUI(), unitData);
                 details.initialize();
                 getCanvas().addAsFrame(details);
                 details.requestFocus();

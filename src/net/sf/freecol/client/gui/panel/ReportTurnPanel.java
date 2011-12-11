@@ -22,12 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Hashtable;
 import java.util.Arrays;
 import java.util.Comparator;
-
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,9 +37,10 @@ import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -54,8 +55,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Turn Report.
@@ -73,8 +72,8 @@ public final class ReportTurnPanel extends ReportPanel {
      * @param parent The parent of this panel.
      * @param messages A variable number of ModelMessages
      */
-    public ReportTurnPanel(FreeColClient freeColClient, Canvas parent, ModelMessage... messages) {
-        super(freeColClient, parent, Messages.message("reportTurnAction.name"));
+    public ReportTurnPanel(FreeColClient freeColClient, GUI gui, ModelMessage... messages) {
+        super(freeColClient, gui, Messages.message("reportTurnAction.name"));
 
         ClientOptions options = getClientOptions();
         this._messages = messages;

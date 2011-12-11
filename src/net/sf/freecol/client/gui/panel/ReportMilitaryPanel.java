@@ -33,6 +33,7 @@ import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Ability;
@@ -94,11 +95,11 @@ public final class ReportMilitaryPanel extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      * @param freeColClient 
-     * @param parent The parent of this panel.
+     * @param gui The parent of this panel.
      */
-    public ReportMilitaryPanel(FreeColClient freeColClient, Canvas parent) {
+    public ReportMilitaryPanel(FreeColClient freeColClient, GUI gui) {
 
-        super(freeColClient, parent, Messages.message("reportMilitaryAction.name"));
+        super(freeColClient, gui, Messages.message("reportMilitaryAction.name"));
 
         gatherData();
 

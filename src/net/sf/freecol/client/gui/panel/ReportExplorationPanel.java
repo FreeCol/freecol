@@ -26,12 +26,11 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Region;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Foreign Affairs Report.
@@ -54,10 +53,10 @@ public final class ReportExplorationPanel extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      * @param freeColClient 
-     * @param parent The parent of this panel.
+     * @param gui The parent of this panel.
      */
-    public ReportExplorationPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent, Messages.message("reportExplorationAction.name"));
+    public ReportExplorationPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, Messages.message("reportExplorationAction.name"));
 
         // Display Panel
         reportPanel.removeAll();
