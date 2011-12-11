@@ -58,6 +58,7 @@ import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
@@ -1032,6 +1033,10 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+    public void showColopediaPanel(String nodeId) {
+        showSubPanel(new ColopediaPanel(freeColClient, this, nodeId));
+    }
+
     /**
      * Display a dialog to confirm a declaration of independence.
      *
@@ -1088,6 +1093,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(confirmDialog, tile);
     }
 
+
     /**
      * Displays a dialog with a text and a ok/cancel option.
      *
@@ -1107,7 +1113,6 @@ public final class Canvas extends JDesktopPane {
                                                                    Messages.message(cancelText)),
                                  tile);
     }
-
 
     /**
      * Display a dialog following declaration of independence.
@@ -1225,6 +1230,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(freeColDialog, null);
     }
 
+
     /**
      * Displays the high scores panel.
      *
@@ -1234,7 +1240,8 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ReportHighScoresPanel(freeColClient, this, messageId), PopupPosition.ORIGIN);
     }
 
-
+    
+    
     /**
      * Displays the panel of the given native settlement.
      *
@@ -1246,8 +1253,6 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(panel, indianSettlement.getTile());
     }
 
-    
-    
     /**
      * Displays the panel for trading with an <code>IndianSettlement</code>.
      *
@@ -1345,6 +1350,9 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(null, template);
     }
 
+
+    // A variety of special purpose panels/dialogs follow
+
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
@@ -1378,9 +1386,6 @@ public final class Canvas extends JDesktopPane {
         }
         return response;
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Displays a dialog where the user may choose a file. This is the same as
@@ -1573,6 +1578,7 @@ public final class Canvas extends JDesktopPane {
         vp.addVideoListener(l);
     }
 
+
     /**
      * Display a dialog to confirm a combat.
      *
@@ -1587,7 +1593,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(new PreCombatDialog(freeColClient, this, attacker, defender),
                                  tile);
     }
-
 
     /**
      * Show the new turn report.
@@ -1988,11 +1993,11 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
 
     }
-
 
     /**
      * Displays an error message.
@@ -2009,6 +2014,7 @@ public final class Canvas extends JDesktopPane {
     void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
+
 
     /**
      * Adds a component on this Canvas inside a frame. Removes the
@@ -2113,7 +2119,6 @@ public final class Canvas extends JDesktopPane {
         return f;
     }
 
-
     /**
      * Create key bindings for all actions.
      */
@@ -2208,7 +2213,7 @@ public final class Canvas extends JDesktopPane {
     private void showFreeColPanel(FreeColPanel panel, Tile tile) {
         showSubPanel(panel, getPopupPosition(tile));
     }
-
+    
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
      *

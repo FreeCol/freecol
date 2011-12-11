@@ -25,9 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.ColopediaPanel;
 
 
 /**
@@ -72,7 +70,6 @@ public class ColopediaAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = gui.getCanvas();
-        canvas.showSubPanel(new ColopediaPanel(getFreeColClient(), canvas, getId()));
+        gui.getCanvas().showColopediaPanel(getId());
     }
 }

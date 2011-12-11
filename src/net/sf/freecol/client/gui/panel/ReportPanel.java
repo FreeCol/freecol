@@ -178,7 +178,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
             } else if (object instanceof Tile) {
                 getCanvas().getMapViewer().setFocus(((Tile) object));
             } else if (object == null) {
-                getCanvas().showSubPanel(new ColopediaPanel(getFreeColClient(), getCanvas(), command));
+                getCanvas().showColopediaPanel(command);
             }
         }
     }
