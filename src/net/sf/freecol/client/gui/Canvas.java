@@ -1452,6 +1452,11 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(loadingSavegameDialog);
     }
 
+    public void showLogFilePanel() {
+        showSubPanel(new ErrorPanel(freeColClient, this));
+
+    }
+
     /**
      * Shows the <code>MainPanel</code>.
      *
@@ -1529,10 +1534,10 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(negotiationDialog, unit.getTile());
     }
 
+
     public void showNewPanel() {
         showSubPanel(new NewPanel(freeColClient, gui, this));
     }
-
 
     public void showNewPanel(Specification specification) {
         showSubPanel(new NewPanel(freeColClient, gui, this, specification));
@@ -1864,11 +1869,11 @@ public final class Canvas extends JDesktopPane {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
     }
-
+    
     public void showStatisticsPanel() {
         showSubPanel(new StatisticsPanel(freeColClient, this));
     }
-    
+
     /**
      * Shows a status message that cannot be dismissed. The panel will be
      * removed when another component is added to this <code>Canvas</code>.
@@ -1968,10 +1973,10 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? MissionaryAction.CANCEL : result;
     }
 
+
     public void showVictoryPanel() {
         showSubPanel(new VictoryPanel(freeColClient, this));
     }
-
 
     public void showWorkProductionPanel(Unit unit) {
         showSubPanel(new WorkProductionPanel(freeColClient, this, unit));
@@ -1981,11 +1986,11 @@ public final class Canvas extends JDesktopPane {
         startGamePanel.updateGameOptions();
     }
 
+
     public void updateMapGeneratorOptions() {
         startGamePanel.updateMapGeneratorOptions();
 
     }
-
 
     /**
      * Updates the sizes of the components on this Canvas.
@@ -2146,7 +2151,7 @@ public final class Canvas extends JDesktopPane {
 
         return f;
     }
-
+    
     /**
      * Create key bindings for all actions.
      */
@@ -2157,6 +2162,7 @@ public final class Canvas extends JDesktopPane {
             getActionMap().put(action.getId(), action);
         }
     }
+    
     
     /**
      * Filters out and displays the EventPanel messages.
@@ -2183,7 +2189,6 @@ public final class Canvas extends JDesktopPane {
         }
         return normal;
     }
-    
     
     /**
      * Gets the internal frame for the given component.
@@ -2217,7 +2222,7 @@ public final class Canvas extends JDesktopPane {
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
     }
-    
+
     /**
      * Displays the given dialog, making sure a tile is visible.
      *
@@ -2232,7 +2237,7 @@ public final class Canvas extends JDesktopPane {
         remove(freeColDialog);
         return response;
     }
-
+    
     /**
      * Displays the given panel, making sure a tile is visible.
      *
@@ -2255,5 +2260,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
+    
+    
     
 }

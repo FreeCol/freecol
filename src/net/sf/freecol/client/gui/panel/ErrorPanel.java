@@ -113,7 +113,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (SHOW.equals(command)) {
-            getCanvas().showSubPanel(new ErrorPanel(getFreeColClient(), getCanvas()));
+            getCanvas().showLogFilePanel();
         } else {
             super.actionPerformed(event);
         }
