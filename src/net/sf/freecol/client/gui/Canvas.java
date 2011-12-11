@@ -86,6 +86,7 @@ import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
+import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
@@ -1938,6 +1939,10 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? MissionaryAction.CANCEL : result;
     }
 
+    public void showVictoryPanel() {
+        showSubPanel(new VictoryPanel(freeColClient, this));
+    }
+
     public void updateGameOptions() {
         startGamePanel.updateGameOptions();
     }
@@ -1988,6 +1993,7 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+
     /**
      * Displays an error message.
      *
@@ -1996,7 +2002,6 @@ public final class Canvas extends JDesktopPane {
     void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
-
 
     /**
      * Refreshes this Canvas visually.
@@ -2108,6 +2113,7 @@ public final class Canvas extends JDesktopPane {
         return f;
     }
 
+
     /**
      * Create key bindings for all actions.
      */
@@ -2118,7 +2124,6 @@ public final class Canvas extends JDesktopPane {
             getActionMap().put(action.getId(), action);
         }
     }
-
 
     /**
      * Filters out and displays the EventPanel messages.
@@ -2216,7 +2221,6 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(panel, false, popupPosition);
         panel.requestFocus();
     }
-
     
     
 }
