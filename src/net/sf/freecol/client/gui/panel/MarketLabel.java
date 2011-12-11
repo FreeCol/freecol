@@ -25,7 +25,7 @@ import java.awt.Graphics;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -50,8 +50,8 @@ public final class MarketLabel extends AbstractGoodsLabel {
      *       and sell <code>Goods</code>.
      * @param parent The parent that knows more than we do.
      */
-    public MarketLabel(GoodsType type, Market market, Canvas parent) {
-        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), parent);
+    public MarketLabel(GoodsType type, Market market, GUI gui) {
+        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), gui);
         if (market == null) {
             throw new NullPointerException();
         }

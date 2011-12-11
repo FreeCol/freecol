@@ -106,7 +106,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                 }
                 AbstractGoods maximum = info.getMaximumProduction().isEmpty()
                     ? output : info.getMaximumProduction().get(0);
-                productionOutput = new ProductionLabel(freeColClient, output, maximum, parent);
+                productionOutput = new ProductionLabel(freeColClient, gui, output, maximum);
                 add(productionOutput, "span, align center");
             }
         }

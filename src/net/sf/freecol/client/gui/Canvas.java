@@ -616,16 +616,6 @@ public final class Canvas extends JDesktopPane {
         return mapControls;
     }
 
-
-    /**
-     * Returns this <code>Canvas</code>'s <code>MapViewer</code>.
-     *
-     * @return The <code>MapViewer</code>.
-     */
-    public MapViewer getMapViewer() {
-        return mapViewer;
-    }
-
     @Override
     public Dimension getMinimumSize() {
         return new Dimension(640, 480);

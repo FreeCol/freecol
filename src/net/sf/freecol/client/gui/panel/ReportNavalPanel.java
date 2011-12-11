@@ -194,7 +194,7 @@ public final class ReportNavalPanel extends ReportPanel {
         	unitLabel.setSelected(true);
         	reportPanel.add(unitLabel, "newline, sg");
         	for (Goods goods : unit.getGoodsList()) {
-        		GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+        		GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
         		reportPanel.add(goodsLabel);
         	}
         	for (Unit unitLoaded : unit.getUnitList()) {

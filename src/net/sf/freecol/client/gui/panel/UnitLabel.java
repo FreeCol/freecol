@@ -36,7 +36,6 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -258,7 +257,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             GoodsType workType = unit.getWorkType();
             int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
 
-            ProductionLabel pl = new ProductionLabel(freeColClient, workType, production, gui.getCanvas());
+            ProductionLabel pl = new ProductionLabel(freeColClient, gui, workType, production);
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);

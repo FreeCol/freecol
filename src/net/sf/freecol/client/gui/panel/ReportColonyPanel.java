@@ -217,7 +217,7 @@ public final class ReportColonyPanel extends ReportPanel
                     for (Building building : colony.getBuildingsForProducing(goodsType)) {
                         maxProduction += building.getMaximumProduction();
                     }
-                    ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), goodsType, newValue, getCanvas());
+                    ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), getGUI(), goodsType, newValue);
                     if (maxProduction > 0) {
                         productionLabel.setMaximumProduction(maxProduction);
                     }

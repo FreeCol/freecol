@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
@@ -34,11 +34,11 @@ public class AbstractGoodsLabel extends JLabel {
 
     private final AbstractGoods goods;
 
-    private final Canvas parent;
-
     private boolean partialChosen = false;
 
     private boolean toEquip = false;
+
+    private GUI gui;
 
 
     /**
@@ -47,11 +47,11 @@ public class AbstractGoodsLabel extends JLabel {
      * @param goods The AbstractGoods that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      */
-    public AbstractGoodsLabel(AbstractGoods goods, Canvas parent) {
-        super(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
+    public AbstractGoodsLabel(AbstractGoods goods, GUI gui) {
+        super(gui.getImageLibrary().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
         setToolTipText(Messages.message(goods.getNameKey()));
-        this.parent = parent;
+        this.gui = gui;
     }
 
 
@@ -91,16 +91,6 @@ public class AbstractGoodsLabel extends JLabel {
         this.toEquip = toEquip;
     }
 
-
-    /**
-     * Returns the parent Canvas object.
-     *
-     * @return This UnitLabel's Canvas.
-     */
-    public Canvas getCanvas() {
-        return parent;
-    }
-
     /**
      * Returns this GoodsLabel's goods data.
      *
@@ -124,6 +114,10 @@ public class AbstractGoodsLabel extends JLabel {
      */
     public int getAmount() {
         return goods.getAmount();
+    }
+    
+    protected GUI getGUI() {
+        return gui;
     }
 
 }

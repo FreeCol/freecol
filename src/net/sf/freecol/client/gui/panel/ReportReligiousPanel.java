@@ -52,7 +52,7 @@ public final class ReportReligiousPanel extends ReportPanel {
 
         reportPanel.add(new JLabel(Messages.message("crosses")));
         GoodsType crosses = getSpecification().getGoodsType("model.goods.crosses");
-        FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), crosses);
+        FreeColProgressBar progressBar = new FreeColProgressBar(getGUI(), crosses);
         reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = getSortedColonies();

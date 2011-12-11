@@ -24,14 +24,13 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel provides detailed information about rebels in a colony.
@@ -45,7 +44,7 @@ public class RebelToolTip extends JToolTip {
      * @param colony the colony for which to display information
      * @param parent a <code>Canvas</code> value
      */
-    public RebelToolTip(FreeColClient freeColClient, Colony colony, Canvas parent) {
+    public RebelToolTip(FreeColClient freeColClient, GUI gui, Colony colony) {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
@@ -66,11 +65,11 @@ public class RebelToolTip extends JToolTip {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(freeColClient, goodsType, production, parent), "span 2");
+            add(new ProductionLabel(freeColClient, gui, goodsType, production), "span 2");
         }
         int liberty = colony.getLiberty();
         int modulo = liberty % Colony.LIBERTY_PER_REBEL;
-        FreeColProgressBar progress = new FreeColProgressBar(parent, null, 0, Colony.LIBERTY_PER_REBEL,
+        FreeColProgressBar progress = new FreeColProgressBar(gui, null, 0, Colony.LIBERTY_PER_REBEL,
                                                              modulo, libertyProduction);
         progress.setPreferredSize(new Dimension((int) getPreferredSize().getWidth() - 32, 20));
         add(progress, "span 3");

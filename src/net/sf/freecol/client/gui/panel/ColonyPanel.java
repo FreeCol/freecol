@@ -195,7 +195,7 @@ public final class ColonyPanel extends FreeColPanel
 
         netProductionPanel.setOpaque(false);
 
-        constructionPanel = new ConstructionPanel(freeColClient, parent, colony, true);
+        constructionPanel = new ConstructionPanel(freeColClient, gui, parent, colony, true);
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
@@ -400,7 +400,7 @@ public final class ColonyPanel extends FreeColPanel
         for (GoodsType goodsType : getColony().getSpecification().getGoodsTypeList()) {
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
-                netProductionPanel.add(new ProductionLabel(getFreeColClient(), goodsType, amount, getCanvas()));
+                netProductionPanel.add(new ProductionLabel(getFreeColClient(), getGUI(), goodsType, amount));
             }
         }
 
@@ -1016,7 +1016,7 @@ public final class ColonyPanel extends FreeColPanel
         }
 
         public JToolTip createToolTip() {
-            return new RebelToolTip(getFreeColClient(), getColony(), getCanvas());
+            return new RebelToolTip(getFreeColClient(), getGUI(), getColony());
         }
 
         public void update() {
@@ -1274,7 +1274,7 @@ public final class ColonyPanel extends FreeColPanel
             for (Goods goods : container.getCompactGoods()) {
                 if (goods.getType().isStorable()
                     && goods.getAmount() >= threshold) {
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
                     if (colonyPanel.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
@@ -1467,7 +1467,7 @@ public final class ColonyPanel extends FreeColPanel
                 ProductionInfo info = colony.getProductionInfo(colonyTile);
                 if (info == null) return;
                 for (AbstractGoods goods : info.getProduction()) {
-                    add(new ProductionLabel(getFreeColClient(), goods, getCanvas()));
+                    add(new ProductionLabel(getFreeColClient(), getGUI(), goods));
                 }
             }
 

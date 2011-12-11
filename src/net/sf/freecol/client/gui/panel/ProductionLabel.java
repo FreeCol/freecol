@@ -30,7 +30,7 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
@@ -101,8 +101,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param goods a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, Canvas parent) {
-        this(freeColClient, goods, -1, parent);
+    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods) {
+        this(freeColClient, gui, goods, -1);
     }
 
     /**
@@ -112,8 +112,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param maximum an <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, AbstractGoods maximum, Canvas parent) {
-        this(freeColClient, goods, maximum.getAmount(), parent);
+    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods, AbstractGoods maximum) {
+        this(freeColClient, gui, goods, maximum.getAmount());
     }
 
     /**
@@ -123,8 +123,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param amount an <code>int</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(FreeColClient freeColClient,GoodsType goodsType, int amount, Canvas parent) {
-        this(freeColClient, new AbstractGoods(goodsType, amount), -1, parent);
+    public ProductionLabel(FreeColClient freeColClient, GUI gui, GoodsType goodsType, int amount) {
+        this(freeColClient, gui, new AbstractGoods(goodsType, amount), -1);
     }
 
     /**
@@ -134,9 +134,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param maximum a <code>AbstractGoods</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods, int maximum, Canvas parent) {
-        super(goods, parent);
-        this.maximumProduction = maximumProduction;
+    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods, int maximum) {
+        super(goods, gui);
+        this.maximumProduction = maximum;
         ClientOptions options = freeColClient.getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
@@ -148,7 +148,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             setForeground(Color.WHITE);
         }
         if (goods.getType() != null) {
-            setGoodsIcon(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
+            setGoodsIcon(getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
             updateToolTipText();
         }
     }
@@ -473,7 +473,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                     number = number + "/" + String.valueOf(maximumProduction);
                 }
                 Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-                stringImage = getCanvas().getMapViewer().createStringImage(getCanvas().getGraphics(),
+                stringImage = getGUI().getMapViewer().createStringImage(getGUI().getCanvas().getGraphics(),
                                                                      number, getForeground(), font);
             }
         }

@@ -79,7 +79,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             currentFatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
             recruitingPanel.add(currentFatherLabel);
             GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
-            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), bellsType);
+            FreeColProgressBar progressBar = new FreeColProgressBar(getGUI(), bellsType);
             int total = 0;
             for (Colony colony : player.getColonies()) {
                 total += colony.getNetProductionOf(bellsType);

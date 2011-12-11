@@ -741,7 +741,7 @@ public final class EuropePanel extends FreeColPanel {
             for (GoodsType goodsType : goodsTypes) {
                 if (goodsType.isStorable()) {
                     MarketLabel marketLabel
-                        = new MarketLabel(goodsType, market, getCanvas());
+                        = new MarketLabel(goodsType, market, getGUI());
                     marketLabel.setTransferHandler(defaultTransferHandler);
                     marketLabel.addMouseListener(pressListener);
                     add(marketLabel);

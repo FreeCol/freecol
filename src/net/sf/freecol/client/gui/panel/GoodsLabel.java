@@ -20,15 +20,16 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Image;
+
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -46,8 +47,8 @@ public final class GoodsLabel extends AbstractGoodsLabel {
      * @param goods The Goods that this JLabel will visually represent.
      * @param parent The parent that knows more than we do.
      */
-    public GoodsLabel(Goods goods, Canvas parent) {
-        super(goods, parent);
+    public GoodsLabel(Goods goods, GUI gui) {
+        super(goods, gui);
         initializeDisplay();
     }
 
@@ -105,7 +106,7 @@ public final class GoodsLabel extends AbstractGoodsLabel {
     @Override
     public void setPartialChosen(boolean partialChosen) {
         super.setPartialChosen(partialChosen);
-        Image image = getCanvas().getImageLibrary()
+        Image image = getGUI().getImageLibrary()
             .getGoodsImage(getType(), partialChosen ? 0.75f : 1f);
         setIcon(new ImageIcon(image));
     }
