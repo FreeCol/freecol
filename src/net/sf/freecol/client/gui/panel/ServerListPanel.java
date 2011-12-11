@@ -62,7 +62,6 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     private JButton connect;
 
-    private GUI gui;
     
     /**
      * The constructor that will add the items to this panel.
@@ -72,8 +71,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      *            connections.
      */
     public ServerListPanel(FreeColClient freeColClient, GUI gui, ConnectController connectController) {
-        super(freeColClient, gui.getCanvas());
-        this.gui = gui;
+        super(freeColClient, gui);
         this.connectController = connectController;
 
         JButton cancel = new JButton("Cancel");

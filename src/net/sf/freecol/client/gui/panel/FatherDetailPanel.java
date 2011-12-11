@@ -32,6 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
@@ -48,11 +49,12 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      * @param freeColClient 
+     * @param gui 
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public FatherDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.FATHERS.toString(), 0.75);
+    public FatherDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
+        super(freeColClient, gui, colopediaPanel, PanelType.FATHERS.toString(), 0.75);
     }
 
 

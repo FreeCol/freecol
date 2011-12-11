@@ -30,18 +30,17 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.ContinueAction;
 import net.sf.freecol.client.gui.action.MapEditorAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.client.gui.action.ContinueAction;
 
 /**
 * A panel filled with 'main' items.
@@ -56,8 +55,8 @@ public final class MainPanel extends FreeColPanel {
      * @param freeColClient 
     * @param parent The parent of this panel.
     */
-    public MainPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+    public MainPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 

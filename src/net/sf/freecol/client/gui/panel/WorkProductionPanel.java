@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +34,9 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.border.Border;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -51,16 +51,14 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 
-import net.miginfocom.swing.MigLayout;
-
 public class WorkProductionPanel extends FreeColPanel {
 
     private static final Border border = BorderFactory
         .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-    public WorkProductionPanel(FreeColClient freeColClient, Canvas canvas, Unit unit) {
-        super(freeColClient, canvas);
+    public WorkProductionPanel(FreeColClient freeColClient, GUI gui, Unit unit) {
+        super(freeColClient, gui);
 
         setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
 
@@ -90,7 +88,7 @@ public class WorkProductionPanel extends FreeColPanel {
             int height = getFreeColClient().getGUI().getImageLibrary()
                 .getTerrainImageHeight(tileType);
             BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            canvas.getMapViewer().displayColonyTile((Graphics2D) image.getGraphics(),
+            getGUI().getMapViewer().displayColonyTile((Graphics2D) image.getGraphics(),
                                               colonyTile.getWorkTile(), colony);
             add(new JLabel(new ImageIcon(image)));
 
@@ -115,7 +113,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
         Collections.sort(modifiers);
 
-        add(new UnitLabel(getFreeColClient(), unit, canvas, false, false), "wrap");
+        add(new UnitLabel(getFreeColClient(), unit, getCanvas(), false, false), "wrap");
 
         float result = 0;
         for (Modifier modifier : unitModifiers) {

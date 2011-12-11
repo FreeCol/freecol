@@ -53,6 +53,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -118,8 +119,8 @@ public final class EuropePanel extends FreeColPanel {
      *
      * @param parent The parent of this panel
      */
-    public EuropePanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+    public EuropePanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         setFocusCycleRoot(true);
 
@@ -140,7 +141,7 @@ public final class EuropePanel extends FreeColPanel {
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
         inPortPanel = new InPortPanel();
-        cargoPanel = new EuropeCargoPanel(freeColClient, parent);
+        cargoPanel = new EuropeCargoPanel(freeColClient, getGUI());
         cargoPanel.setParentPanel(this);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
@@ -152,7 +153,7 @@ public final class EuropePanel extends FreeColPanel {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, parent, this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getCanvas(), this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
@@ -220,7 +221,7 @@ public final class EuropePanel extends FreeColPanel {
         setLayout(new MigLayout("wrap 3, insets 20, fill",
                                 "[380:][380:][150:200:]"));
 
-        if (parent.getHeight() > 750) {
+        if (getCanvas().getHeight() > 750) {
             add(header, "span, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");
@@ -244,7 +245,7 @@ public final class EuropePanel extends FreeColPanel {
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
 
-        restoreSavedSize(1000, parent.getHeight() > 750 ? 700 : 600);
+        restoreSavedSize(1000, getCanvas().getHeight() > 750 ? 700 : 600);
     }
 
     /**
@@ -452,8 +453,8 @@ public final class EuropePanel extends FreeColPanel {
      */
     public final class EuropeCargoPanel extends CargoPanel {
 
-        public EuropeCargoPanel(FreeColClient freeColClient, Canvas canvas) {
-            super(freeColClient, canvas, true);
+        public EuropeCargoPanel(FreeColClient freeColClient, GUI gui) {
+            super(freeColClient, gui, true);
         }
 
     }

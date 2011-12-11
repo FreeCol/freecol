@@ -79,7 +79,7 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param parent The parent <code>Canvas</code>.
      */
     public FreeColDialog(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent);
+        super(freeColClient, parent.getGUI());
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);

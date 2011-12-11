@@ -29,7 +29,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -51,11 +51,11 @@ public final class VictoryPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      * 
-     * @param parent The parent of this panel.
+     * @param gui The parent of this panel.
      */
-    public VictoryPanel(FreeColClient freeColClient, Canvas parent) {
+    public VictoryPanel(FreeColClient freeColClient, GUI gui) {
 
-        super(freeColClient, parent);
+        super(freeColClient, gui);
         
         okButton.setText(Messages.message("victory.yes"));
 

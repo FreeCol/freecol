@@ -164,7 +164,6 @@ public final class ColonyPanel extends FreeColPanel
     private JButton setGoodsButton = (FreeCol.isInDebugMode())
         ? new JButton("Set Goods") : null;
 
-    private GUI gui;
 
 
     /**
@@ -174,9 +173,7 @@ public final class ColonyPanel extends FreeColPanel
      * @param parent The parent of this panel
      */
     public ColonyPanel(FreeColClient freeColClient, GUI gui, final Canvas parent, Colony colony) {
-        super(freeColClient, parent);
-        
-        this.gui = gui;
+        super(freeColClient, gui);
 
         setFocusCycleRoot(true);
 
@@ -207,11 +204,11 @@ public final class ColonyPanel extends FreeColPanel
 
         warehousePanel = new WarehousePanel(this);
 
-        tilePanel = new TilePanel(freeColClient, this);
+        tilePanel = new TilePanel(freeColClient, gui, this);
 
         buildingsPanel = new BuildingsPanel(this);
 
-        cargoPanel = new ColonyCargoPanel(freeColClient, parent);
+        cargoPanel = new ColonyCargoPanel(freeColClient, gui);
         cargoPanel.setParentPanel(this);
 
         defaultTransferHandler = new DefaultTransferHandler(freeColClient, parent, this);
@@ -717,14 +714,14 @@ public final class ColonyPanel extends FreeColPanel
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
-                Unit activeUnit = gui.getMapViewer().getActiveUnit();
+                Unit activeUnit = getGUI().getMapViewer().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                     || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    gui.getMapViewer().setActiveUnit(null);
+                    getGUI().getMapViewer().setActiveUnit(null);
                     getController().nextActiveUnit();
                 }
             }
-            gui.getMapViewer().restartBlinking();
+            getGUI().getMapViewer().restartBlinking();
         }
     }
 
@@ -814,8 +811,8 @@ public final class ColonyPanel extends FreeColPanel
      */
     public final class ColonyCargoPanel extends CargoPanel {
 
-        public ColonyCargoPanel(FreeColClient freeColClient, Canvas canvas) {
-            super(freeColClient, canvas, true);
+        public ColonyCargoPanel(FreeColClient freeColClient, GUI gui) {
+            super(freeColClient, gui, true);
             setLayout(new MigLayout("wrap 6, fill, insets 0"));
         }
 
@@ -981,7 +978,7 @@ public final class ColonyPanel extends FreeColPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    gui.errorMessage("noAddReason."
+                    getGUI().errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
@@ -1360,8 +1357,8 @@ public final class ColonyPanel extends FreeColPanel
          *
          * @param colonyPanel The panel that holds this TilePanel.
          */
-        public TilePanel(FreeColClient freeColClient, ColonyPanel colonyPanel) {
-            super(freeColClient, colonyPanel.getCanvas());
+        public TilePanel(FreeColClient freeColClient, GUI gui, ColonyPanel colonyPanel) {
+            super(freeColClient, gui);
             this.colonyPanel = colonyPanel;
             setBackground(Color.BLACK);
             setBorder(null);
@@ -1370,7 +1367,7 @@ public final class ColonyPanel extends FreeColPanel
 
         @Override
         public void paintComponent(Graphics g) {
-            MapViewer colonyTileGUI = gui.getColonyTileGUI();
+            MapViewer colonyTileGUI = getGUI().getColonyTileGUI();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -1603,7 +1600,7 @@ public final class ColonyPanel extends FreeColPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        gui.errorMessage("noClaimReason."
+                        getGUI().errorMessage("noClaimReason."
                             + claim.toString().toLowerCase(Locale.US));
                         return false;
                     }
@@ -1616,7 +1613,7 @@ public final class ColonyPanel extends FreeColPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    gui.errorMessage("noAddReason."
+                    getGUI().errorMessage("noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }

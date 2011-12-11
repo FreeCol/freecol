@@ -623,7 +623,7 @@ public final class InGameInputHandler extends InputHandler {
         List<FoundingFather> ffs = message.getFathers();
         Canvas canvas = gui.getCanvas();
         ChooseFoundingFatherDialog dialog
-            = new ChooseFoundingFatherDialog(getFreeColClient(), canvas, ffs);
+            = new ChooseFoundingFatherDialog(getFreeColClient(), gui, canvas, ffs);
         FoundingFather ff = canvas.showFreeColDialog(dialog);
         if (ff != null) {
             message.setResult(ff);

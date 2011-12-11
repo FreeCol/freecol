@@ -58,8 +58,6 @@ public final class TilePanel extends FreeColPanel {
 
     private TileType tileType;
 
-    private GUI gui;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -67,8 +65,7 @@ public final class TilePanel extends FreeColPanel {
      * @param tile a <code>Tile</code> value
      */
     public TilePanel(FreeColClient freeColClient, GUI gui, Tile tile) {
-        super(freeColClient, gui.getCanvas());
-        this.gui = gui;
+        super(freeColClient, gui);
 
         tileType = tile.getType();
 

@@ -31,6 +31,7 @@ import javax.swing.JTabbedPane;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 
@@ -61,7 +62,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      *        values identifies a <code>FoundingFather</code> to be
      *        picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(FreeColClient freeColClient, Canvas parent, List<FoundingFather> possibleFoundingFathers) {
+    public ChooseFoundingFatherDialog(FreeColClient freeColClient, GUI gui, Canvas parent, List<FoundingFather> possibleFoundingFathers) {
         super(freeColClient, parent);
         this.possibleFathers = possibleFoundingFathers;
         setLayout(new MigLayout("wrap 1", "align center"));
@@ -70,7 +71,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
         tb = new JTabbedPane(JTabbedPane.TOP);
 
-        FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(), new ColopediaPanel(getFreeColClient(), getCanvas()));
+        FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(), gui, new ColopediaPanel(getFreeColClient(), gui));
         boolean hasSelectedTab = false;
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);

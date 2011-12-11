@@ -361,11 +361,11 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        startGamePanel = new StartGamePanel(freeColClient, gui, this);
+        startGamePanel = new StartGamePanel(freeColClient, gui);
         serverListPanel = new ServerListPanel(freeColClient, gui, freeColClient.getConnectController());
-        europePanel = new EuropePanel(freeColClient, this);
-        statusPanel = new StatusPanel(freeColClient, this); 
-        chatPanel = new ChatPanel(freeColClient, gui, this);
+        europePanel = new EuropePanel(freeColClient, gui);
+        statusPanel = new StatusPanel(freeColClient, gui); 
+        chatPanel = new ChatPanel(freeColClient, gui);
         clientOptionsDialog = new ClientOptionsDialog(freeColClient, gui, this);
         loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, this);
 
@@ -839,7 +839,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showAboutPanel() {
-        showSubPanel(new AboutPanel(freeColClient, this));
+        showSubPanel(new AboutPanel(freeColClient, gui));
     }
 
     /**
@@ -898,12 +898,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showBuildQueuePanel(Colony colony) {
-        showSubPanel(new BuildQueuePanel(freeColClient, colony, this));
+        showSubPanel(new BuildQueuePanel(freeColClient, gui, colony));
 
     }
     
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
-        FreeColPanel panel = new BuildQueuePanel(freeColClient, colony, this);
+        FreeColPanel panel = new BuildQueuePanel(freeColClient, gui, colony);
         panel.addClosingCallback(callBack);
         showSubPanel(panel);
 
@@ -1079,7 +1079,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showColopediaPanel(String nodeId) {
-        showSubPanel(new ColopediaPanel(freeColClient, this, nodeId));
+        showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId));
     }
 
     public void showCompactLabourReport() {
@@ -1307,7 +1307,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         IndianSettlementPanel panel
-            = new IndianSettlementPanel(freeColClient, this, indianSettlement);
+            = new IndianSettlementPanel(freeColClient, gui, indianSettlement);
         showFreeColPanel(panel, indianSettlement.getTile());
     }
 
@@ -1516,7 +1516,7 @@ public final class Canvas extends JDesktopPane {
     public void showMainPanel() {
         closeMenus();
         gui.setupMenuBarToNull();
-        mainPanel = new MainPanel(freeColClient, this);
+        mainPanel = new MainPanel(freeColClient, gui);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
@@ -1586,11 +1586,11 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showNewPanel() {
-        showSubPanel(new NewPanel(freeColClient, gui, this));
+        showSubPanel(new NewPanel(freeColClient, gui));
     }
 
     public void showNewPanel(Specification specification) {
-        showSubPanel(new NewPanel(freeColClient, gui, this, specification));
+        showSubPanel(new NewPanel(freeColClient, gui, specification));
     }
 
     /**
@@ -1992,7 +1992,7 @@ public final class Canvas extends JDesktopPane {
     }
     
     public void showStatisticsPanel() {
-        showSubPanel(new StatisticsPanel(freeColClient, this));
+        showSubPanel(new StatisticsPanel(freeColClient, gui));
     }
     
     /**
@@ -2087,11 +2087,11 @@ public final class Canvas extends JDesktopPane {
     }
     
     public void showVictoryPanel() {
-        showSubPanel(new VictoryPanel(freeColClient, this));
+        showSubPanel(new VictoryPanel(freeColClient, gui));
     }
     
     public void showWorkProductionPanel(Unit unit) {
-        showSubPanel(new WorkProductionPanel(freeColClient, this, unit));
+        showSubPanel(new WorkProductionPanel(freeColClient, gui, unit));
     }
     
     public void updateGameOptions() {
@@ -2380,6 +2380,13 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
     
+    /***
+     * 
+     * This method is absolutely temporary - it will be removed.
+     */
     
+    public GUI getGUI() {
+        return gui;
+    }
     
 }

@@ -61,7 +61,7 @@ import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
@@ -112,9 +112,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      */
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
-    public BuildQueuePanel(FreeColClient freeColClient, Colony colony, Canvas parent) {
+    public BuildQueuePanel(FreeColClient freeColClient, GUI gui, Colony colony) {
 
-        super(freeColClient, parent, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
+        super(freeColClient, gui, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
         featureContainer = new FeatureContainer();

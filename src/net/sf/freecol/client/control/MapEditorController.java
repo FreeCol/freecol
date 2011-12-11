@@ -118,7 +118,7 @@ public final class MapEditorController {
             gui.scaleMap(2f);
             
             gui.setupMapEditorMenuBar();
-            JInternalFrame f = gui.getCanvas().addAsToolBox(new MapEditorTransformPanel(freeColClient, canvas));
+            JInternalFrame f = gui.getCanvas().addAsToolBox(new MapEditorTransformPanel(freeColClient, gui));
             f.setLocation(f.getX(), 50);
 
             canvas.repaint();

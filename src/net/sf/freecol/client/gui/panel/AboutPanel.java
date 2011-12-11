@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -55,8 +56,8 @@ public final class AboutPanel extends FreeColPanel {
     *
     * @param parent The parent of this panel.
     */
-    public AboutPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent, new MigLayout("wrap 2"));
+    public AboutPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, new MigLayout("wrap 2"));
 
         // Header with image
         Image tempImage = ResourceManager.getImage("TitleImage");

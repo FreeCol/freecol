@@ -41,6 +41,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -67,8 +68,8 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public BuildingDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.BUILDINGS.toString(), 0.75);
+    public BuildingDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
+        super(freeColClient, gui, colopediaPanel, PanelType.BUILDINGS.toString(), 0.75);
     }
 
 

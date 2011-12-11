@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
@@ -41,11 +42,12 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      * @param freeColClient 
+     * @param gui 
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public NationDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.NATIONS.toString(), 0.5);
+    public NationDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
+        super(freeColClient, gui, colopediaPanel, PanelType.NATIONS.toString(), 0.5);
     }
 
     /**

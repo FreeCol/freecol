@@ -41,7 +41,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -157,8 +157,8 @@ public final class StatisticsPanel extends FreeColPanel
     * 
     * @param parent The parent of this panel.
     */
-    public StatisticsPanel(FreeColClient freeColClient, Canvas parent) {
-        super(freeColClient, parent, new BorderLayout());
+    public StatisticsPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, new BorderLayout());
         
         // Retrieve the client and server data
         Map<String, String> serverStatistics

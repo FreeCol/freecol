@@ -30,6 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -46,11 +47,12 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      * @param freeColClient 
+     * @param gui 
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public TerrainDetailPanel(FreeColClient freeColClient, ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.TERRAIN.toString(), 0.25);
+    public TerrainDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
+        super(freeColClient, gui, colopediaPanel, PanelType.TERRAIN.toString(), 0.25);
     }
 
     /**

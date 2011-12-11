@@ -75,7 +75,6 @@ public final class InfoPanel extends FreeColPanel {
 
     private final JPanel mapEditorPanel;
 
-    private GUI gui;
 
 
     /**
@@ -84,8 +83,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param freeColClient The main controller object for the client.
      */
     public InfoPanel(final FreeColClient freeColClient, final GUI gui) {
-        super(freeColClient, gui.getCanvas());
-        this.gui = gui;
+        super(freeColClient, gui);
         
         this.endTurnPanel = new EndTurnPanel(gui);
 
@@ -205,7 +203,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = gui.getMapViewer().getViewMode().getView();
+        int viewMode = getGUI().getMapViewer().getViewMode().getView();
         if (!getFreeColClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);
@@ -281,7 +279,7 @@ public final class InfoPanel extends FreeColPanel {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                gui.getMapViewer()
+                getGUI().getMapViewer()
                     .displayTerrain(image.createGraphics(), tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");

@@ -45,8 +45,6 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     public static final int    CHAT = 1;
 
     private final JTextField        field;
-    
-    private GUI gui;
 
     /**
     * The constructor that will add the items to this panel.
@@ -54,9 +52,8 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     * 
     * @param parent The parent of this panel.
     */
-    public ChatPanel(FreeColClient freeColClient, GUI gui, Canvas parent) {
-        super(freeColClient, parent);
-        this.gui = gui;
+    public ChatPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
 
         JLabel label = new JLabel("Message: ");
 
@@ -95,7 +92,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
                 case CHAT:
                     String message = getChatText();
                     getController().sendChat(message);
-                    gui.displayChatMessage(message, false);
+                    getGUI().displayChatMessage(message, false);
                     getCanvas().remove(this);
                     break;
                 default:
