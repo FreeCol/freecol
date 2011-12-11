@@ -23,12 +23,9 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.CompactLabourReport;
-import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 
 
 /**
@@ -54,9 +51,9 @@ public class ReportLabourAction extends FreeColAction {
     public void actionPerformed(ActionEvent e) {
         if (freeColClient.getClientOptions().getInteger(ClientOptions.LABOUR_REPORT) ==
             ClientOptions.LABOUR_REPORT_CLASSIC) {
-            gui.getCanvas().showSubPanel(new ReportLabourPanel(freeColClient, gui.getCanvas()));
+            gui.getCanvas().showReportLabourPanel();
         } else {
-            gui.getCanvas().showSubPanel(new CompactLabourReport(freeColClient, gui.getCanvas()));
+            gui.getCanvas().showCompactLabourReport();
         }
     }
 }
