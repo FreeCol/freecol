@@ -83,6 +83,7 @@ import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
+import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
@@ -2227,5 +2228,9 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
     
+    
+    public void showStatisticsPanel() {
+        showSubPanel(new StatisticsPanel(freeColClient, this));
+    }
     
 }

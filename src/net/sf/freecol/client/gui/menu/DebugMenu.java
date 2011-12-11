@@ -47,7 +47,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
-import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -581,7 +580,7 @@ public class DebugMenu extends JMenu {
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showSubPanel(new StatisticsPanel(freeColClient, canvas));
+                    canvas.showStatisticsPanel();
                 }
             });
         statistics.setEnabled(true);
