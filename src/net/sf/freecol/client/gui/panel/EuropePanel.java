@@ -119,7 +119,7 @@ public final class EuropePanel extends FreeColPanel {
      *
      * @param parent The parent of this panel
      */
-    public EuropePanel(FreeColClient freeColClient, GUI gui) {
+    public EuropePanel(FreeColClient freeColClient, GUI gui, Canvas canvas) {
         super(freeColClient, gui);
 
         setFocusCycleRoot(true);
@@ -153,7 +153,7 @@ public final class EuropePanel extends FreeColPanel {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getGUI(), getCanvas(), this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getGUI(), canvas, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
@@ -221,7 +221,7 @@ public final class EuropePanel extends FreeColPanel {
         setLayout(new MigLayout("wrap 3, insets 20, fill",
                                 "[380:][380:][150:200:]"));
 
-        if (getCanvas().getHeight() > 750) {
+        if (canvas.getHeight() > 750) {
             add(header, "span, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");
@@ -245,7 +245,7 @@ public final class EuropePanel extends FreeColPanel {
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
 
-        restoreSavedSize(1000, getCanvas().getHeight() > 750 ? 700 : 600);
+        restoreSavedSize(1000, canvas.getHeight() > 750 ? 700 : 600);
     }
 
     /**
