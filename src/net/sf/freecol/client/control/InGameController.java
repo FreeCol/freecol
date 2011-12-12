@@ -1820,7 +1820,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        assignTradeRoute(unit, null);
+        if (unit.getTradeRoute() != null) assignTradeRoute(unit, null);
         clearGotoOrders(unit);
         return askServer().changeState(unit, UnitState.ACTIVE);
     }
