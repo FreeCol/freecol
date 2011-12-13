@@ -105,6 +105,48 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     // The decimal format to use for Modifiers
     protected static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
 
+    // Font to use for text areas
+    protected static final Font defaultFont = ResourceManager.getFont("NormalFont", 13f);
+
+    // Fonts to use for report headers, etc.
+    protected static final Font  smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
+
+    protected static final Font mediumHeaderFont = ResourceManager.getFont("HeaderFont", 36f);
+    protected static final Font    bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
+    // How many columns (em-widths) to use in the text area
+    protected static final int COLUMNS = 20;
+
+    // The margin to use.
+    protected static final int margin = 3;
+
+    // The color to use for things the player probably shouldn't do
+    protected static final Color WARNING_COLOR
+        = ResourceManager.getColor("lookAndFeel.warning.color");
+
+    // The color to use for links
+    protected static final Color LINK_COLOR
+        = ResourceManager.getColor("lookAndFeel.link.color");
+    
+    
+    // The color to use for borders
+    protected static final Color BORDER_COLOR
+        = ResourceManager.getColor("lookAndFeel.border.color");
+
+    // The borders to use for table cells
+    public static final Border TOPCELLBORDER =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border CELLBORDER =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border LEFTCELLBORDER =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border TOPLEFTCELLBORDER =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
     /**
      * Creates a <code>MouseListener</code> which forwards events
      * to the given <code>Component</code>.
@@ -136,6 +178,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         };
         return ml;
     }
+
 
     /**
      * Creates a <code>MouseMotionListener</code> which forwards events
@@ -173,6 +216,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         button.registerKeyboardAction(button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), JComponent.WHEN_FOCUSED);
     }
+
     /**
      * Returns the default header for panels.
      *
@@ -185,6 +229,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
+
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
      * dialogs.
@@ -260,11 +305,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         textPane.setText(text);
         return textPane;
     }
-    
-    
-    public GUI getGUI() {
-        return gui;
-    }
+
 
     /**
      * Return a button suitable for linking to another panel
@@ -296,62 +337,16 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return modifierFormat;
     }
 
-    // Font to use for text areas
-    protected static final Font defaultFont = ResourceManager.getFont("NormalFont", 13f);
-    // Fonts to use for report headers, etc.
-    protected static final Font  smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
-    protected static final Font mediumHeaderFont = ResourceManager.getFont("HeaderFont", 36f);
-
-
-    protected static final Font    bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
-
-    // How many columns (em-widths) to use in the text area
-    protected static final int COLUMNS = 20;
-
-    // The margin to use.
-    protected static final int margin = 3;
-
-    // The color to use for things the player probably shouldn't do
-    protected static final Color WARNING_COLOR
-        = ResourceManager.getColor("lookAndFeel.warning.color");
-
-    // The color to use for links
-    protected static final Color LINK_COLOR
-        = ResourceManager.getColor("lookAndFeel.link.color");
-
-    // The color to use for borders
-    protected static final Color BORDER_COLOR
-        = ResourceManager.getColor("lookAndFeel.border.color");
-
-    // The borders to use for table cells
-    public static final Border TOPCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-
-    public static final Border CELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border LEFTCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border TOPLEFTCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
     protected boolean editable = true;
 
-
     protected JButton okButton = new JButton(Messages.message("ok"));
+
 
     private FreeColClient freeColClient;
 
     private GUI gui;
 
     protected static StyleContext styleContext = new StyleContext();
-
 
     static {
         Style defaultStyle = StyleContext.getDefaultStyleContext()
@@ -377,6 +372,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public FreeColPanel(FreeColClient freeColClient, GUI gui) {
         this(freeColClient, gui, new FlowLayout());
     }
+
 
     /**
      * Default constructor.
@@ -443,24 +439,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Get the <code>Canvas</code> value.
-     *
-     * @return a <code>Canvas</code> value
-     */
-    public final Canvas getCanvas() {
-        return gui.getCanvas();
-    }
-
-    /**
-     * Describe <code>getController</code> method here.
-     *
-     * @return an <code>InGameController</code> value
-     */
-    public InGameController getController() {
-        return freeColClient.getInGameController();
-    }
-
-    /**
      * Returns the <code>Turn</code>s during which a Player's
      * FoundingFathers were elected to the Continental Congress
      *
@@ -478,44 +456,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return result;
     }
 
-
-
-    /**
-     * Gets the FreeColClient from the canvas.
-     *
-     * @return A current <code>FreeColClient</code>.
-     */
-    public FreeColClient getFreeColClient() {
-        return freeColClient;
-    }
-
-    /**
-     * Describe <code>getGame</code> method here.
-     *
-     * @return a <code>Game</code> value
-     */
-    public Game getGame() {
-        return freeColClient.getGame();
-    }
-
-    /**
-     * Returns the ImageLibrary.
-     *
-     * @return the ImageLibrary.
-     */
-    public ImageLibrary getLibrary() {
-        return gui.getImageLibrary();
-    }
-
-    /**
-     * Describe <code>getMyPlayer</code> method here.
-     *
-     * @return a <code>Player</code> value
-     */
-    public Player getMyPlayer() {
-        return freeColClient.getMyPlayer();
-    }
-
     /**
      * Returns the saved position of this panel, null by default.
      *
@@ -528,8 +468,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
             return null;
         }
     }
-
-
 
     /**
      * Returns the saved size of this panel, null by default.
@@ -545,21 +483,14 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Describe <code>getSpecification</code> method here.
-     *
-     * @return a <code>Specification</code> value
-     */
-    public Specification getSpecification() {
-        return freeColClient.getGame().getSpecification();
-    }
-
-    /**
      * Checks if this panel is editable
      * @return boolean
      */
     public boolean isEditable() {
         return editable;
     }
+
+
 
     /**
      * Return a JLabel with Messages.message(key) as text.
@@ -570,7 +501,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public JLabel localizedLabel(String key) {
         return new JLabel(Messages.message(key));
     }
-
 
     /**
      * Return a JLabel with Messages.localize(template) as text.
@@ -610,7 +540,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         okButton.requestFocus();
     }
 
-
     /**
      * Make the given button the CANCEL button.
      *
@@ -627,6 +556,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         Action cancelAction = cancelButton.getAction();
         getActionMap().put("release", cancelAction);
     }
+
+
 
     /**
      * Set the <code>Editable</code> value.
@@ -660,12 +591,72 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Get the <code>Canvas</code> value.
+     *
+     * @return a <code>Canvas</code> value
+     */
+    protected final Canvas getCanvas() {
+        return gui.getCanvas();
+    }
+
+    /**
      * Return the client's <code>ClientOptions</code>.
      *
      * @return a <code>ClientOptions</code> value
      */
     protected ClientOptions getClientOptions() {
         return freeColClient == null ? null : freeColClient.getClientOptions();
+    }
+
+
+    /**
+     * Describe <code>getController</code> method here.
+     *
+     * @return an <code>InGameController</code> value
+     */
+    protected InGameController getController() {
+        return freeColClient.getInGameController();
+    }
+
+    /**
+     * Gets the FreeColClient from the canvas.
+     *
+     * @return A current <code>FreeColClient</code>.
+     */
+    protected FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
+
+    /**
+     * Describe <code>getGame</code> method here.
+     *
+     * @return a <code>Game</code> value
+     */
+    protected Game getGame() {
+        return freeColClient.getGame();
+    }
+
+
+    protected GUI getGUI() {
+        return gui;
+    }
+
+    /**
+     * Returns the ImageLibrary.
+     *
+     * @return the ImageLibrary.
+     */
+    protected ImageLibrary getLibrary() {
+        return gui.getImageLibrary();
+    }
+
+    /**
+     * Describe <code>getMyPlayer</code> method here.
+     *
+     * @return a <code>Player</code> value
+     */
+    protected Player getMyPlayer() {
+        return freeColClient.getMyPlayer();
     }
 
     /**
@@ -677,6 +668,15 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     protected List<Colony> getSortedColonies() {
         return freeColClient.getClientOptions()
             .getSortedColonies(getMyPlayer());
+    }
+
+    /**
+     * Describe <code>getSpecification</code> method here.
+     *
+     * @return a <code>Specification</code> value
+     */
+    protected Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
     }
 
     /**
