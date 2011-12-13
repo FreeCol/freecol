@@ -54,9 +54,19 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
+    /**
+     * Returns a unit type comparator.
+     *
+     * @return A unit type comparator.
+     */
+    public static Comparator<Unit> getUnitTypeComparator() {
+        return unitTypeComparator;
+    }
+
     protected JPanel reportPanel;
 
     protected JLabel header;
+
 
     protected JScrollPane scrollPane;
 
@@ -71,7 +81,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
             }
         }
     };
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -106,59 +115,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         restoreSavedSize(850, 600);
     }
 
-    protected void setMainComponent(Component main) {
-        remove(scrollPane);
-        add(main, "cell 0 1, height 100%, width 100%");
-    }
-
-    protected Border createBorder() {
-        return new EmptyBorder(20, 20, 20, 20);
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
-        reportPanel.removeAll();
-        reportPanel.doLayout();
-    }
-
-    /**
-     * Returns a unit type comparator.
-     *
-     * @return A unit type comparator.
-     */
-    public static Comparator<Unit> getUnitTypeComparator() {
-        return unitTypeComparator;
-    }
-
-    public JLabel createUnitTypeLabel(AbstractUnit unit) {
-        return createUnitTypeLabel(unit.getUnitType(getSpecification()),
-                                   unit.getRole(), unit.getNumber());
-    }
-
-    public JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {
-        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, (count == 0), 0.66);
-        JLabel unitLabel = new JLabel(unitIcon);
-        unitLabel.setText(String.valueOf(count));
-        if (count == 0) {
-            unitLabel.setForeground(Color.GRAY);
-        }
-        unitLabel.setToolTipText(Messages.getLabel(unitType, role, count));
-        return unitLabel;
-    }
-
-    public String getLocationNameFor(Unit unit) {
-        if (unit.getDestination() instanceof Map) {
-            return Messages.message("goingToAmerica");
-        } else if (unit.getDestination() instanceof Europe) {
-            return Messages.message("goingToEurope");
-        } else {
-            return Messages.message(unit.getLocation().getLocationNameFor(unit.getOwner()));
-        }
-    }
-
-
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
@@ -181,5 +137,47 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
                 getCanvas().showColopediaPanel(command);
             }
         }
+    }
+
+    /**
+     * Prepares this panel to be displayed.
+     */
+    public void initialize() {
+        reportPanel.removeAll();
+        reportPanel.doLayout();
+    }
+
+    protected Border createBorder() {
+        return new EmptyBorder(20, 20, 20, 20);
+    }
+
+    protected JLabel createUnitTypeLabel(AbstractUnit unit) {
+        UnitType unitType = unit.getUnitType(getSpecification());
+        Role role = unit.getRole();
+        int count = unit.getNumber();
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, (count == 0), 0.66);
+        JLabel unitLabel = new JLabel(unitIcon);
+        unitLabel.setText(String.valueOf(count));
+        if (count == 0) {
+            unitLabel.setForeground(Color.GRAY);
+        }
+        unitLabel.setToolTipText(Messages.getLabel(unitType, role, count));
+        return unitLabel;
+    }
+
+    protected String getLocationNameFor(Unit unit) {
+        if (unit.getDestination() instanceof Map) {
+            return Messages.message("goingToAmerica");
+        } else if (unit.getDestination() instanceof Europe) {
+            return Messages.message("goingToEurope");
+        } else {
+            return Messages.message(unit.getLocation().getLocationNameFor(unit.getOwner()));
+        }
+    }
+
+
+    protected void setMainComponent(Component main) {
+        remove(scrollPane);
+        add(main, "cell 0 1, height 100%, width 100%");
     }
 }
