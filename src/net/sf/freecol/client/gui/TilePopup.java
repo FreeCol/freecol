@@ -135,7 +135,7 @@ public final class TilePopup extends JPopupMenu {
             if (gotoMenuItem != null) {
                 gotoMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            if (freeColClient.getGame().getCurrentPlayer() != player) {
+                            if (!freeColClient.currentPlayerIsMyPlayer()) {
                             	return;
                             }
                             Tile currTile = activeUnit.getTile();
@@ -164,8 +164,7 @@ public final class TilePopup extends JPopupMenu {
                     = new JMenuItem(Messages.message(StringTemplate.template("gotoEurope")));
                 europeMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            if (freeColClient.getGame().getCurrentPlayer()
-                                != player) {
+                            if (!freeColClient.currentPlayerIsMyPlayer()) {
                                 return;
                             }
                             freeColClient.getInGameController()

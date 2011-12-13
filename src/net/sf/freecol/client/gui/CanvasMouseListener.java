@@ -144,8 +144,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                         Unit unit = mapViewer.getActiveUnit();
                         freeColClient.getInGameController()
                             .setDestination(unit, path.getLastNode().getTile());
-                        if (freeColClient.getGame()
-                            .getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                        if (freeColClient.currentPlayerIsMyPlayer()) {
                             freeColClient.getInGameController()
                                 .moveToDestination(unit);
                         }
@@ -183,8 +182,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 InGameController ctlr = freeColClient
                     .getInGameController();
                 ctlr.setDestination(unit, temp.getLastNode().getTile());
-                if (freeColClient.getGame().getCurrentPlayer()
-                    == freeColClient.getMyPlayer()) {
+                if (freeColClient.currentPlayerIsMyPlayer()) {
                     ctlr.moveToDestination(unit);
                     boolean canStayActive = unit.getState() == UnitState.ACTIVE
                     						&& unit.getDestination() == null

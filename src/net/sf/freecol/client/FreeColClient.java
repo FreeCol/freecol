@@ -300,6 +300,10 @@ public final class FreeColClient {
     }
 
 
+    public boolean currentPlayerIsMyPlayer() {
+        return game.getCurrentPlayer().equals(player);
+    }
+
     /**
      * Gets the object responsible for keeping and updating the actions.
      *
@@ -308,6 +312,7 @@ public final class FreeColClient {
     public ActionManager getActionManager() {
         return actionManager;
     }
+
 
     /**
      * Gets the <code>Client</code> that can be used to send messages to the
@@ -319,7 +324,6 @@ public final class FreeColClient {
     public Client getClient() {
         return client;
     }
-
 
     /**
      * Returns the object keeping the current client options.
@@ -405,6 +409,7 @@ public final class FreeColClient {
         return preGameController;
     }
 
+
     /**
      * Gets the input handler that will be used before the game has been
      * started.
@@ -439,7 +444,6 @@ public final class FreeColClient {
     public boolean isHeadless() {
         return headless;
     }
-
 
     /**
      * Checks if the game has started.
@@ -476,6 +480,7 @@ public final class FreeColClient {
         return singleplayer;
     }
 
+
     /**
      * Quits the application without any questions.
      */
@@ -485,7 +490,6 @@ public final class FreeColClient {
         gui.quit();
         System.exit(0);
     }
-
 
     /**
      * Sets the <code>Client</code> that shall be used to send messages to the
@@ -559,6 +563,8 @@ public final class FreeColClient {
         this.mapEditor = mapEditor;
     }
 
+
+
     /**
      * Sets the <code>Player</code> that uses this client.
      *
@@ -570,8 +576,6 @@ public final class FreeColClient {
         this.player = player;
     }
 
-
-
     /**
      * Sets whether or not this game is a singleplayer game.
      *
@@ -582,6 +586,7 @@ public final class FreeColClient {
     public void setSingleplayer(boolean singleplayer) {
         this.singleplayer = singleplayer;
     }
+
 
     /**
      * Start the game skipping turns.
@@ -595,7 +600,6 @@ public final class FreeColClient {
         gui.closeMenus();
         askServer().startSkipping();
     }
-
 
     private void exitActions () {
        try {
@@ -623,7 +627,7 @@ public final class FreeColClient {
           e.printStackTrace();
        }
     }
-
+    
     /**
      * Loads the client options.
      * There are several sources:
@@ -677,4 +681,5 @@ public final class FreeColClient {
         if (actionManager != null)
             actionManager.update();
     }
+    
 }

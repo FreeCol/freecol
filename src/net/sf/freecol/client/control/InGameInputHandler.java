@@ -448,7 +448,7 @@ public final class InGameInputHandler extends InputHandler {
             .getFreeColGameObject(element.getAttribute("player"));
         final boolean newTurn = player.equals(newPlayer);
         if (FreeCol.isInDebugMode()
-            && player.equals(game.getCurrentPlayer())) closeMenus();
+            && fcc.currentPlayerIsMyPlayer()) closeMenus();
 
         if (FreeCol.isDebugRunComplete()
             && FreeCol.getDebugRunSaveName() != null) {
@@ -1017,7 +1017,7 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
         if (displayMessage
-            && fcc.getMyPlayer().equals(game.getCurrentPlayer())) {
+            && fcc.currentPlayerIsMyPlayer()) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         fcc.getInGameController().nextModelMessage();

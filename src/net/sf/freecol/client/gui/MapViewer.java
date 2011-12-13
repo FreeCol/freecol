@@ -1420,7 +1420,7 @@ public final class MapViewer {
         this.activeUnit = activeUnit;
 
         if (activeUnit != null) {
-            if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+            if (freeColClient.currentPlayerIsMyPlayer()) {
                 if (activeUnit.getState() != Unit.UnitState.ACTIVE) {
                     freeColClient.getInGameController().clearOrders(activeUnit);
                 }
@@ -2375,7 +2375,7 @@ public final class MapViewer {
 
         if (!freeColClient.isMapEditor()
             && freeColClient.getGame() != null
-            && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
+            && !freeColClient.currentPlayerIsMyPlayer()) {
 
             if (greyLayer == null) {
                 greyLayer = new GrayLayer(lib);

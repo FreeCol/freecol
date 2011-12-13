@@ -55,6 +55,6 @@ public abstract class MapboardAction extends FreeColAction {
         return super.shouldBeEnabled()  
             && gui.getCanvas().isMapboardActionsEnabled()
             && (getFreeColClient().getGame() == null
-                || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer());
+                || getFreeColClient().currentPlayerIsMyPlayer());
     }
 }

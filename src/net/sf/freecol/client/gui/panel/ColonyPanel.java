@@ -712,7 +712,7 @@ public final class ColonyPanel extends FreeColPanel
             cargoPanel.setCarrier(null);
             outsideColonyPanel.cleanup();
 
-            if (getGame().getCurrentPlayer() == getMyPlayer()) {
+            if (getFreeColClient().currentPlayerIsMyPlayer()) {
                 getController().nextModelMessage();
                 Unit activeUnit = getGUI().getMapViewer().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0

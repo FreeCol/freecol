@@ -200,8 +200,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if it is our turn.
      */
     private boolean requireOurTurn() {
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
+        if (!freeColClient.currentPlayerIsMyPlayer()) {
             gui.getCanvas().showInformationMessage("notYourTurn");
             return false;
         }
@@ -1332,8 +1331,7 @@ public final class InGameController implements NetworkConstants {
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
         if (askServer().assignTradeRoute(unit, tradeRoute)) {
             if ((tradeRoute = unit.getTradeRoute()) != null
-                && freeColClient.getGame().getCurrentPlayer()
-                == freeColClient.getMyPlayer()) {
+                && freeColClient.currentPlayerIsMyPlayer()) {
                 moveToDestination(unit);
             }
         }
@@ -3454,8 +3452,7 @@ public final class InGameController implements NetworkConstants {
         if (destination == null) return; // user aborted
 
         if (setDestination(unit, destination)
-            && freeColClient.getGame().getCurrentPlayer()
-                == freeColClient.getMyPlayer()) {
+            && freeColClient.currentPlayerIsMyPlayer()) {
             if (destination instanceof Europe) {
                 if (unit.getTile() != null
                     && unit.getTile().canMoveToEurope()) {
