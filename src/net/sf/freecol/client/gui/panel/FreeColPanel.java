@@ -32,9 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -147,61 +144,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     public static final Border TOPLEFTCELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    /**
-     * Creates a <code>MouseListener</code> which forwards events
-     * to the given <code>Component</code>.
-     *
-     * @param c The <code>Component</code> the events should be forwarded to.
-     * @return <code>MouseListener</code>
-     */
-    public static MouseListener createEventForwardingMouseListener(final Component c) {
-        final MouseListener ml = new MouseListener() {
-            public void mouseClicked(MouseEvent e) {
-                forward(e);
-            }
-
-            public void mouseEntered(MouseEvent e) {
-                forward(e);
-            }
-            public void mouseExited(MouseEvent e) {
-                forward(e);
-            }
-            public void mousePressed(MouseEvent e) {
-                forward(e);
-            }
-            public void mouseReleased(MouseEvent e) {
-                forward(e);
-            }
-            private void forward(MouseEvent e) {
-                c.dispatchEvent(javax.swing.SwingUtilities.convertMouseEvent(e.getComponent(), e, c));
-            }
-        };
-        return ml;
-    }
-
-
-    /**
-     * Creates a <code>MouseMotionListener</code> which forwards events
-     * to the given <code>Component</code>.
-     *
-     * @param c The <code>Component</code> the events should be forwarded to
-     * @return <code>MouseMotionListener</code>
-     */
-    public static MouseMotionListener createEventForwardingMouseMotionListener(final Component c) {
-        final MouseMotionListener ml = new MouseMotionListener() {
-            public void mouseDragged(MouseEvent e) {
-                forward(e);
-            }
-
-            public void mouseMoved(MouseEvent e) {
-                forward(e);
-            }
-            private void forward(MouseEvent e) {
-                c.dispatchEvent(javax.swing.SwingUtilities.convertMouseEvent(e.getComponent(), e, c));
-            }
-        };
-        return ml;
-    }
 
     /**
      * Registers enter key for a JButton.
