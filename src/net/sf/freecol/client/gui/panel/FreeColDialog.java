@@ -60,106 +60,43 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class FreeColDialog<T> extends FreeColPanel {
 
+    static final class FreeColFileFilter extends FileFilter {
+
+        private final String  extension1;
+        private final String  extension2;
+        private final String  description;
+
+        FreeColFileFilter( String  extension, String  descriptionMessage ) {
+
+            this.extension1 = extension;
+            this.extension2 = "....";
+            description = Messages.message(descriptionMessage);
+        }
+
+        FreeColFileFilter( String  extension1,
+                           String  extension2,
+                           String  descriptionMessage ) {
+
+            this.extension1 = extension1;
+            this.extension2 = extension2;
+            description = Messages.message(descriptionMessage);
+        }
+
+        public boolean accept(File f) {
+
+            return f.isDirectory() || f.getName().endsWith(extension1)
+                || f.getName().endsWith(extension2);
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+    }
+
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
     protected static final String CANCEL = "CANCEL";
-
-    // Stores the response from the user:
-    private T response = null;
-
-    // Whether or not the user have made the choice.
-    private boolean responseGiven = false;
-
-    protected JButton cancelButton = new JButton(Messages.message("cancel"));
-
-
-    /**
-     * Constructor.
-     *
-     * @param parent The parent <code>Canvas</code>.
-     */
-    public FreeColDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
-
-        cancelButton.setActionCommand(CANCEL);
-        cancelButton.addActionListener(this);
-        enterPressesWhenFocused(cancelButton);
-        setCancelComponent(cancelButton);
-    }
-
-    /**
-     * Sets the <code>response</code> and wakes up any thread waiting
-     * for this information.
-     *
-     * @param response The object that should be returned by
-     *      {@link #getResponse}.
-     */
-    public synchronized void setResponse(T response) {
-        this.response = response;
-        responseGiven = true;
-        logger.info("Response has been set to " + response);
-        notifyAll();
-    }
-
-    /**
-     * Returns the <code>response</code> when set by
-     * <code>setResponse(Object response)</code>.
-     * Waits the thread until then.
-     *
-     * @return The object as set by {@link #setResponse}.
-     */
-    public synchronized T getResponse() {
-        // Wait the thread until 'response' is available. Notice that
-        // we have to process the events manually if the current
-        // thread is the Event Dispatch Thread (EDT).
-
-        try {
-            if (SwingUtilities.isEventDispatchThread()) {
-                EventQueue theQueue = getToolkit().getSystemEventQueue();
-
-                while (!responseGiven) {
-                    // This is essentially the body of EventDispatchThread
-                    AWTEvent event = theQueue.getNextEvent();
-                    Object src = event.getSource();
-
-                    try {
-                        // We cannot call theQueue.dispatchEvent, so I
-                        // pasted its body here:
-                        if (event instanceof ActiveEvent) {
-                            ((ActiveEvent) event).dispatch();
-                        } else if (src instanceof Component) {
-                            ((Component) src).dispatchEvent(event);
-                        } else if (src instanceof MenuComponent) {
-                            ((MenuComponent) src).dispatchEvent(event);
-                        } else {
-                            logger.warning("unable to dispatch event: "
-                                + event);
-                        }
-                    } finally {
-                        continue;
-                    }
-                }
-            } else {
-                while (!responseGiven) {
-                    wait();
-                }
-            }
-        } catch (InterruptedException e) {}
-
-        T tempResponse = response;
-        response = null;
-        responseGiven = false;
-
-        return tempResponse;
-    }
-
-    /**
-     * Sets that no response has been given.
-     */
-    public void resetResponse() {
-        response = null;
-        responseGiven = false;
-    }
 
     /**
      * Creates a new <code>FreeColDialog</code> with a text and a
@@ -263,7 +200,6 @@ public class FreeColDialog<T> extends FreeColPanel {
         return choiceDialog;
     }
 
-
     /**
      * Creates a new <code>FreeColDialog</code> with a text and a
      * ok/cancel option.  The "ok"-option calls {@link #setResponse
@@ -278,6 +214,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     public static FreeColDialog<Boolean> createConfirmDialog(final FreeColClient freeColClient, GUI gui, String text, String okText, String cancelText) {
         return createConfirmDialog(freeColClient, gui, new String[] {text}, null, okText, cancelText);
     }
+
 
     public static FreeColDialog<Boolean> createConfirmDialog(FreeColClient freeColClient, GUI gui, String[] texts,
         ImageIcon[] icons, String okText, String cancelText) {
@@ -385,6 +322,54 @@ public class FreeColDialog<T> extends FreeColPanel {
         return inputDialog;
     }
 
+    /**
+     * Creates a new <code>FreeColDialog</code> in which the user
+     * may choose a savegame to load.
+     *
+     * @param directory The directory to display when choosing the file.
+     * @param fileFilters The available file filters in the
+     *       dialog.
+     * @return The <code>FreeColDialog</code>.
+     */
+    public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
+                                                       FileFilter[] fileFilters) {
+        final FreeColDialog<File> loadDialog
+            = new FreeColDialog<File>(freeColClient, gui);
+        final JFileChooser fileChooser = new JFileChooser(directory);
+
+        loadDialog.okButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    if (selectedFile != null) {
+                        loadDialog.setResponse(selectedFile);
+                    }
+                }
+            });
+
+        if (fileFilters.length > 0) {
+            for (FileFilter fileFilter : fileFilters) {
+                fileChooser.addChoosableFileFilter(fileFilter);
+            }
+            fileChooser.setFileFilter(fileFilters[0]);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+        }
+        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileHidingEnabled(false);
+        fileChooser.setControlButtonsAreShown(false);
+        loadDialog.setLayout(new MigLayout("fill", "", ""));
+        loadDialog.add(fileChooser, "grow");
+        loadDialog.add(loadDialog.okButton, "newline 20, split 2, tag ok");
+        loadDialog.add(loadDialog.cancelButton, "tag cancel");
+        loadDialog.cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    loadDialog.setResponse(null);
+                }
+            });
+        loadDialog.setSize(480, 320);
+
+        return loadDialog;
+    }
 
     public static FreeColDialog<Dimension> createMapSizeDialog(FreeColClient freeColClient, final GUI gui, final Canvas canvas) {
 
@@ -445,56 +430,6 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     /**
      * Creates a new <code>FreeColDialog</code> in which the user
-     * may choose a savegame to load.
-     *
-     * @param directory The directory to display when choosing the file.
-     * @param fileFilters The available file filters in the
-     *       dialog.
-     * @return The <code>FreeColDialog</code>.
-     */
-    public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
-                                                       FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog
-            = new FreeColDialog<File>(freeColClient, gui);
-        final JFileChooser fileChooser = new JFileChooser(directory);
-
-        loadDialog.okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    File selectedFile = fileChooser.getSelectedFile();
-                    if (selectedFile != null) {
-                        loadDialog.setResponse(selectedFile);
-                    }
-                }
-            });
-
-        if (fileFilters.length > 0) {
-            for (FileFilter fileFilter : fileFilters) {
-                fileChooser.addChoosableFileFilter(fileFilter);
-            }
-            fileChooser.setFileFilter(fileFilters[0]);
-            fileChooser.setAcceptAllFileFilterUsed(false);
-        }
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setFileHidingEnabled(false);
-        fileChooser.setControlButtonsAreShown(false);
-        loadDialog.setLayout(new MigLayout("fill", "", ""));
-        loadDialog.add(fileChooser, "grow");
-        loadDialog.add(loadDialog.okButton, "newline 20, split 2, tag ok");
-        loadDialog.add(loadDialog.cancelButton, "tag cancel");
-        loadDialog.cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    loadDialog.setResponse(null);
-                }
-            });
-        loadDialog.setSize(480, 320);
-
-        return loadDialog;
-    }
-
-
-    /**
-     * Creates a new <code>FreeColDialog</code> in which the user
      * may choose the destination of the savegame.
      *
      * @param directory The directory to display when choosing the name.
@@ -545,13 +480,6 @@ public class FreeColDialog<T> extends FreeColPanel {
         return saveDialog;
     }
 
-    /**
-     * Returns a filter accepting "*.fsg".
-     * @return The filter.
-     */
-    public static FileFilter getFSGFileFilter() {
-        return new FreeColFileFilter( ".fsg", "filter.savedGames" );
-    }
 
     /**
      * Returns a filter accepting "*.fgo".
@@ -559,6 +487,14 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FileFilter getFGOFileFilter() {
         return new FreeColFileFilter( ".fgo", "filter.gameOptions" );
+    }
+
+    /**
+     * Returns a filter accepting "*.fsg".
+     * @return The filter.
+     */
+    public static FileFilter getFSGFileFilter() {
+        return new FreeColFileFilter( ".fsg", "filter.savedGames" );
     }
 
     /**
@@ -573,44 +509,28 @@ public class FreeColDialog<T> extends FreeColPanel {
     }
 
 
-    static final class FreeColFileFilter extends FileFilter {
+    // Stores the response from the user:
+    private T response = null;
 
-        private final String  extension1;
-        private final String  extension2;
-        private final String  description;
+    // Whether or not the user have made the choice.
+    private boolean responseGiven = false;
 
-        FreeColFileFilter( String  extension1,
-                           String  extension2,
-                           String  descriptionMessage ) {
 
-            this.extension1 = extension1;
-            this.extension2 = extension2;
-            description = Messages.message(descriptionMessage);
-        }
-
-        FreeColFileFilter( String  extension, String  descriptionMessage ) {
-
-            this.extension1 = extension;
-            this.extension2 = "....";
-            description = Messages.message(descriptionMessage);
-        }
-
-        public boolean accept(File f) {
-
-            return f.isDirectory() || f.getName().endsWith(extension1)
-                || f.getName().endsWith(extension2);
-        }
-
-        public String getDescription() {
-
-            return description;
-        }
-    }
+    protected JButton cancelButton = new JButton(Messages.message("cancel"));
 
     /**
-     * Used for Polymorphism in Recruit, Purchase, Train Dialogs
+     * Constructor.
+     *
+     * @param parent The parent <code>Canvas</code>.
      */
-    public void initialize() {}
+    public FreeColDialog(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui);
+
+        cancelButton.setActionCommand(CANCEL);
+        cancelButton.addActionListener(this);
+        enterPressesWhenFocused(cancelButton);
+        setCancelComponent(cancelButton);
+    }
 
     /**
      * This function analyses an event and calls the right methods to
@@ -626,5 +546,85 @@ public class FreeColDialog<T> extends FreeColPanel {
         } else {
             super.actionPerformed(event);
         }
+    }
+
+    /**
+     * Returns the <code>response</code> when set by
+     * <code>setResponse(Object response)</code>.
+     * Waits the thread until then.
+     *
+     * @return The object as set by {@link #setResponse}.
+     */
+    public synchronized T getResponse() {
+        // Wait the thread until 'response' is available. Notice that
+        // we have to process the events manually if the current
+        // thread is the Event Dispatch Thread (EDT).
+
+        try {
+            if (SwingUtilities.isEventDispatchThread()) {
+                EventQueue theQueue = getToolkit().getSystemEventQueue();
+
+                while (!responseGiven) {
+                    // This is essentially the body of EventDispatchThread
+                    AWTEvent event = theQueue.getNextEvent();
+                    Object src = event.getSource();
+
+                    try {
+                        // We cannot call theQueue.dispatchEvent, so I
+                        // pasted its body here:
+                        if (event instanceof ActiveEvent) {
+                            ((ActiveEvent) event).dispatch();
+                        } else if (src instanceof Component) {
+                            ((Component) src).dispatchEvent(event);
+                        } else if (src instanceof MenuComponent) {
+                            ((MenuComponent) src).dispatchEvent(event);
+                        } else {
+                            logger.warning("unable to dispatch event: "
+                                + event);
+                        }
+                    } finally {
+                        continue;
+                    }
+                }
+            } else {
+                while (!responseGiven) {
+                    wait();
+                }
+            }
+        } catch (InterruptedException e) {}
+
+        T tempResponse = response;
+        response = null;
+        responseGiven = false;
+
+        return tempResponse;
+    }
+
+
+    /**
+     * Used for Polymorphism in Recruit, Purchase, Train Dialogs
+     */
+    public void initialize() {}
+
+    /**
+     * Sets that no response has been given.
+     */
+    public void resetResponse() {
+        response = null;
+        responseGiven = false;
+    }
+
+    /**
+     * Sets the <code>response</code> and wakes up any thread waiting
+     * for this information.
+     *
+     * @param response The object that should be returned by
+     *      {@link #getResponse}.
+     */
+    public synchronized void setResponse(T response) {
+        this.response = response;
+        responseGiven = true;
+        logger.info("Response has been set to " + response);
+        notifyAll();
     }
 }
