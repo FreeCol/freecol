@@ -309,6 +309,8 @@ public class AIGoods extends AIObject implements Transportable {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        if (goods == null) return; // Workaround for BR#3456180
+
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());

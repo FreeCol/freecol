@@ -194,8 +194,8 @@ public class GoodsWish extends Wish {
 
     @Override
     public String toString() {
-        return "GoodsWish: " + amountRequested + " " + goodsType
-            + " (" + getValue() + ")";
+        return "GoodsWish: " + getId() + " " + amountRequested
+            + " " + goodsType + " (" + getValue() + ")";
     }
 
     /**

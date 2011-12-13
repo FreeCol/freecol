@@ -133,10 +133,28 @@ public class AIMain extends FreeColObject
      *      been loaded properly.
      */
     public boolean checkIntegrity() {
+        // Workaround for BR#3456180.
+        // Remove when GoodsWishes are working properly again.
+        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
+            if (ao instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish)ao;
+                Transportable tr = gw.getTransportable();
+                if (tr != null
+                    && tr instanceof AIGoods
+                    && ((AIGoods)tr).isUninitialized()) {
+                    gw.setTransportable(null);
+                    ((AIGoods)tr).dispose();
+                    logger.warning("Dropping bad GoodsWish: " + gw);
+                    gw.dispose();                    
+                }
+            }
+        }
+
         boolean ok = true;
         for (AIObject ao : aiObjects.values()) {
             if (ao.isUninitialized()) {
-                logger.warning("Uninitialized object: " + ao.getId() + " (" + ao.getClass() + ")");
+                logger.warning("Uninitialized object: " + ao.getId()
+                    + " (" + ao.getClass() + ")");
                 ok = false;
             }
         }
