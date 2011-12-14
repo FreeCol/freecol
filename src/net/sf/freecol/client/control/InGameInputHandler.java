@@ -1416,7 +1416,7 @@ public final class InGameInputHandler extends InputHandler {
             // Check if there is a welcoming native offering land.
             boolean accept = false;
             if (welcomer != null) {
-                String messageId = (tile.getOwner() == welcomer)
+                String messageId = (welcomer.owns(tile))
                     ? "welcomeOffer.text" : "welcomeSimple.text";
                 String type = ((IndianNationType) welcomer
                     .getNationType()).getSettlementTypeKey(true);

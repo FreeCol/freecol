@@ -152,7 +152,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 } else {
                     Player enemy = defender.getOwner();
                     if (unit.getOwner().atWarWith(enemy)
-                        || ((Ownable) target).getOwner() == enemy) {
+                        || enemy.owns((Ownable) target)) {
                         AIMessage.askAttack(getAIUnit(), direction);
                     }
                 }

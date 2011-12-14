@@ -3149,12 +3149,12 @@ public final class MapViewer {
                 Direction next = d.getNextDirection();
                 Direction next2 = next.getNextDirection();
                 if (otherTile == null
-                    || (type == BorderType.COUNTRY && otherTile.getOwner() != owner)
+                    || (type == BorderType.COUNTRY && !owner.owns(otherTile))
                     || (type == BorderType.REGION && otherTile.getRegion() != region)) {
                     Tile tile1 = tile.getNeighbourOrNull(next);
                     Tile tile2 = tile.getNeighbourOrNull(next2);
                     if (tile2 == null
-                        || (type == BorderType.COUNTRY && tile2.getOwner() != owner)
+                        || (type == BorderType.COUNTRY && !owner.owns(tile2))
                         || (type == BorderType.REGION && tile2.getRegion() != region)) {
                         // small corner
                         path.lineTo(borderPoints.get(next).x,
@@ -3172,7 +3172,7 @@ public final class MapViewer {
                         case SW: dx = -halfWidth; dy = -halfHeight; break;
                         }
                         if (tile1 != null
-                            && ((type == BorderType.COUNTRY && tile1.getOwner() == owner)
+                            && ((type == BorderType.COUNTRY && owner.owns(tile1))
                                 || (type == BorderType.REGION && tile1.getRegion() == region))) {
                             // short straight line
                             path.lineTo(borderPoints.get(next).x,

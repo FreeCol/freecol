@@ -159,7 +159,7 @@ public class BuildColonyMission extends Mission {
             && unit.getMovesLeft() > 0) {
             if (target.getOwner() == null) {
                 ; // All is well
-            } else if (target.getOwner() == player) {
+            } else if (player.owns(target)) {
                 // Already ours, clear users
                 Colony colony = (Colony) target.getOwningSettlement();
                 if (colony != null

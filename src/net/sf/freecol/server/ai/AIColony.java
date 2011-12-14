@@ -490,7 +490,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (owner.atWarWith(player)) {
                 if (AIMessage.askClaimLand(getConnection(), t, colony,
                         NetworkConstants.STEAL_LAND)
-                    && t.getOwner() == player) {
+                    && player.owns(t)) {
                     logger.info(player.getName() + " stole tile " + t
                         + " from hostile " + owner.getName());
                 }
@@ -515,7 +515,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Player owner = steal.getOwner();
             if (AIMessage.askClaimLand(getConnection(), steal, colony,
                     NetworkConstants.STEAL_LAND)
-                && steal.getOwner() == player) {
+                && player.owns(steal)) {
                 logger.info(player.getName() + " stole tile " + steal
                     + " (score = " + score
                     + ") from " + owner.getName());
