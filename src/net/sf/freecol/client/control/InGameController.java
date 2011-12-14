@@ -1505,7 +1505,7 @@ public final class InGameController implements NetworkConstants {
                     + newTile.potential(entry.getKey(), null));
             }
             Player tileOwner = newTile.getOwner();
-            if (tileOwner == unit.getOwner()) {
+            if (tileOwner.owns(unit)) {
                 if (newTile.getOwningSettlement() != null) {
                     // we are using newTile
                     ownedBySelf = true;
