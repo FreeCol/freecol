@@ -1118,6 +1118,18 @@ public class ColonyPlan {
         final Role outdoorRoles[] = new Role[] { Role.PIONEER,
                                                  Role.SOLDIER,
                                                  Role.SCOUT };
+        // Prefer scouts in early game if there are very few.
+        if (aiMain.getGame().getTurn().getAge() <= 1) {
+            int nScouts = 0;
+            for (Unit u : colony.getOwner().getUnits()) {
+                if (u.getRole() == Role.SCOUT) nScouts++;
+            }
+            if (nScouts < 3) {
+                outdoorRoles[1] = Role.SCOUT;
+                outdoorRoles[2] = Role.SOLDIER;
+            }
+        }
+
         for (int i = 0; i < workers.size(); i++) {
             if (workers.size() <= 1) break;
             Unit u = workers.get(i);
