@@ -267,30 +267,14 @@ public class BuildColonyMission extends Mission {
             return null;
         }
 
-        // If no colonies, do not fail.
-        boolean noFail = player.getSettlements().size() == 0;
-        boolean gameStart = game.getTurn().getNumber() < 20;
-        final int maxNumberofTiles = 400;
-        int tileCounter = 0;
         Tile bestTile = null;
         float bestValue = 0.0f;
         Iterator<Position> it = map.getCircleIterator(startTile.getPosition(),
-                                                      true, 12);
+                                                      true, 20);
         while (it.hasNext()) {
-            // Stop after checking a fixed number of tiles unless
-            // this is the first/sole colony, in which case continue
-            // until we found *some* location, except if there is no
-            // carrier available which may mean we are marooned on
-            // land with no available sites.
-            if (++tileCounter >= maxNumberofTiles) {
-                if (!noFail || bestTile != null || carrier == null) break;
-            }
- 
             Tile tile = map.getTile(it.next());
             // No initial polar colonies
-            if (gameStart && map.isPolar(tile)) {
-                continue;
-            }
+            if (!tile.isLand() || map.isPolar(tile)) continue;
 
             // Can we acquire the tile?
             switch (player.canClaimToFoundSettlementReason(tile)) {
@@ -337,7 +321,7 @@ public class BuildColonyMission extends Mission {
         return super.isValid()
             && (target != null
                 && target.getSettlement() == null
-                && colonyValue >= getUnit().getOwner().getColonyValue(target));
+                && colonyValue <= getUnit().getOwner().getColonyValue(target));
     }
 
 
