@@ -23,7 +23,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -96,7 +95,6 @@ final class UnitAttackAnimation {
      * Do the animation.
      */
     public void animate() {
-        Map map = attacker.getGame().getMap();
         Direction direction = attacker.getTile()
             .getDirection(defender.getTile());
         SimpleZippedAnimation sza;
