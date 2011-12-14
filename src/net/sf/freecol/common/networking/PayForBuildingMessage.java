@@ -80,7 +80,7 @@ public class PayForBuildingMessage extends DOMMessage {
         } else {
             return DOMMessage.clientError("Not a colony: " + colonyId);
         }
-        if (colony.getOwner() != player) {
+        if (!player.owns(colony)) {
             return DOMMessage.clientError("Not your colony: " + colonyId);
         }
 

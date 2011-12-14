@@ -180,7 +180,7 @@ public class BuildColonyMission extends Mission {
                 if (!AIMessage.askClaimLand(connection, target, null,
                         (player.checkGold(price))
                         ? price : NetworkConstants.STEAL_LAND)
-                    || target.getOwner() != player) {
+                    || !player.owns(target)) {
                     target = null; // Claim failed, try a different tile
                     return;
                 }

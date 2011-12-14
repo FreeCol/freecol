@@ -790,7 +790,7 @@ public final class InGameController implements NetworkConstants {
 
         // Ask the server
         if (askServer().claimLand(tile, colony, price)
-            && tile.getOwner() == player) {
+            && player.owns(tile)) {
             gui.updateGoldLabel();
             return true;
         }
@@ -1267,7 +1267,7 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
 
         // Sanity check
-        if (colony == null || colony.getOwner() != player
+        if (colony == null || !player.owns(colony)
             || colony.getUnitCount() > 0) {
             throw new IllegalStateException("Abandon bogus colony");
         }
@@ -1293,11 +1293,11 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         if (!requireOurTurn()
             || student == null
-            || student.getOwner() != player
+            || !player.owns(student)
             || student.getColony() == null
             || !(student.getLocation() instanceof WorkLocation)
             || teacher == null
-            || teacher.getOwner() != player
+            || !player.owns(teacher)
             || !student.canBeStudent(teacher)
             || teacher.getColony() == null
             || student.getColony() != teacher.getColony()
@@ -1417,7 +1417,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (tile.getOwner() != null && tile.getOwner() != player) {
+        if (tile.getOwner() != null && !player.owns(tile)) {
             // Claim tile from other owners before founding a settlement.
             // Only native owners that we can steal, buy from, or use a
             // bonus center tile exception should be possible by this point.
@@ -1593,7 +1593,7 @@ public final class InGameController implements NetworkConstants {
             throw new NullPointerException("Goods type must not be null.");
         } else if (carrier == null) {
             throw new NullPointerException("Carrier must not be null.");
-        } else if (carrier.getOwner() != player) {
+        } else if (!player.owns(carrier)) {
             throw new IllegalArgumentException("Carrier owned by someone else.");
         } else if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive.");
@@ -1696,9 +1696,9 @@ public final class InGameController implements NetworkConstants {
 
         Player player = freeColClient.getMyPlayer();
         Tile tile = unit.getTile();
-        if (player != tile.getOwner()) {
+        if (!player.owns(tile)) {
             if (!claimTile(player, tile, null, player.getLandPrice(tile), 0)
-                || player != tile.getOwner()) return;
+                || !player.owns(tile)) return;
         }
 
         if (askServer().changeWorkImprovementType(unit,
@@ -3402,7 +3402,7 @@ public final class InGameController implements NetworkConstants {
     public void rename(Nameable object) {
         Player player = freeColClient.getMyPlayer();
         if (!(object instanceof Ownable)
-            || ((Ownable) object).getOwner() != player) {
+            || !player.owns((Ownable) object)) {
             return;
         }
 

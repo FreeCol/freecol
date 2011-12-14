@@ -82,7 +82,7 @@ public class UnloadCargoMessage extends DOMMessage {
             return DOMMessage.clientError("Unload from non-unit.");
         }
         Unit unit = (Unit) loc;
-        if (unit.getOwner() != player) {
+        if (!player.owns(unit)) {
             return DOMMessage.clientError("Unload from non-owned unit.");
         }
 

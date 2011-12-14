@@ -320,7 +320,7 @@ public class PioneeringMission extends Mission {
 
         Tile target = tileImprovementPlan.getTarget();
         Player player = getUnit().getOwner();
-        if (target.getOwner() != player) {
+        if (!player.owns(target)) {
             // Take control of land before proceeding with mission.
             // Decide whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
@@ -334,7 +334,7 @@ public class PioneeringMission extends Mission {
                 AIMessage.askClaimLand(connection, target, null, price);
             }
         }
-        if (target.getOwner() != player) {
+        if (!player.owns(target)) {
             // Failed to take ownership
             invalidateMission = true;
             return;

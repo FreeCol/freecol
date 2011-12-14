@@ -1421,7 +1421,7 @@ public class Unit extends FreeColGameObject
             }
         } else { // target at sea
             Unit defender = target.getFirstUnit();
-            if (defender != null && defender.getOwner() != getOwner()) {
+            if (defender != null && !getOwner().owns(defender)) {
                 return (isOffensiveUnit())
                     ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
@@ -1496,7 +1496,7 @@ public class Unit extends FreeColGameObject
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
         } else { // moving to sea, check for embarkation
-            if (defender == null || defender.getOwner() != getOwner()) {
+            if (defender == null || !getOwner().owns(defender)) {
                 return MoveType.MOVE_NO_ACCESS_EMBARK;
             }
             for (Unit unit : target.getUnitList()) {
@@ -1950,11 +1950,11 @@ public class Unit extends FreeColGameObject
         }
 
         Settlement settlement = getSettlement();
-        if(settlement != null && settlement.getOwner() != player){
+        if(settlement != null && !player.owns(settlement)){
             return false;
         }
 
-        if(isOnCarrier() && ((Unit) getLocation()).getOwner() != player){
+        if(isOnCarrier() && !player.owns((Unit) getLocation())){
             return false;
         }
 

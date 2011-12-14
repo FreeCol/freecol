@@ -208,7 +208,7 @@ public class NewLandNameMessage extends DOMMessage {
             if (!foundWelcomer) {
                 return DOMMessage.clientError("Unit is not next to welcomer.");
             }
-            if (tile.getOwner() != welcomer) {
+            if (!welcomer.owns(tile)) {
                 return DOMMessage.clientError("Welcomer offers unowned tile: "
                     + tile.getId());
             }

@@ -702,6 +702,14 @@ public class Player extends FreeColGameObject implements Nameable {
             settlements.remove(settlement);
         }
     }
+    
+    public boolean owns(Ownable ownable) {
+        if (ownable == null)
+            return false;
+        return this.equals(ownable.getOwner());
+    }
+    
+    
 
     /**
      * Returns a list of all Settlements this player owns.

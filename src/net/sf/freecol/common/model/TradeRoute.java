@@ -311,7 +311,7 @@ public class TradeRoute extends FreeColGameObject
             return location != null
                 && !((FreeColGameObject) location).isDisposed()
                 && !((location instanceof Ownable)
-                     && ((Ownable) location).getOwner() != getOwner());
+                     && (!getOwner().owns((Ownable) location)));
         }
 
         /**

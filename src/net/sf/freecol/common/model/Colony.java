@@ -238,7 +238,7 @@ public class Colony extends Settlement implements Nameable {
             } else {
                 t = wt.getScratchTile();
             }
-            if (wt.getOwner() == owner) {
+            if (owner.owns(wt)) {
                 t.setOwner(owner);
                 t.setOwningSettlement(scratch);
             }
@@ -2682,7 +2682,7 @@ public class Colony extends Settlement implements Nameable {
 
         super.writeAttributes(out);
         out.writeAttribute("established", Integer.toString(established.getNumber()));
-        if (showAll || toSavedGame || player == getOwner()) {
+        if (showAll || toSavedGame || player.owns(this)) {
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
@@ -2714,7 +2714,7 @@ public class Colony extends Settlement implements Nameable {
     protected void writeChildren(XMLStreamWriter out, Player player,
                                  boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        if (showAll || toSavedGame || player == getOwner()) {
+        if (showAll || toSavedGame || player.owns(this)) {
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
