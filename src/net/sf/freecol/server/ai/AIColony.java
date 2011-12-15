@@ -76,6 +76,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
+    private static final String LIST_ELEMENT = "ListElement";
+
     // The colony this AIColony is managing.
     private Colony colony;
 
@@ -1089,48 +1091,28 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
-        Iterator<AIGoods> aiGoodsIterator = aiGoods.iterator();
-        while (aiGoodsIterator.hasNext()) {
-            AIGoods ag = aiGoodsIterator.next();
-            if (ag == null) {
-                logger.warning("ag == null");
-                continue;
-            }
+        for (AIGoods ag : aiGoods) {
             if (ag.getId() == null) {
                 logger.warning("ag.getId() == null");
                 continue;
             }
-            out.writeStartElement(AIGoods.getXMLElementTagName() + "ListElement");
+            out.writeStartElement(ag.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, ag.getId());
             out.writeEndElement();
         }
 
-        Iterator<Wish> wishesIterator = wishes.iterator();
-        while (wishesIterator.hasNext()) {
-            Wish w = wishesIterator.next();
-            if (!w.shouldBeStored()) {
-                continue;
-            }
-            if (w instanceof WorkerWish) {
-                out.writeStartElement(WorkerWish.getXMLElementTagName() + "WishListElement");
-            } else if (w instanceof GoodsWish) {
-                out.writeStartElement(GoodsWish.getXMLElementTagName() + "WishListElement");
-            } else {
-                logger.warning("Unknown type of wish.");
-                continue;
-            }
+        for (Wish w : wishes) {
+            if (!w.shouldBeStored()) continue;
+            out.writeStartElement(w.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, w.getId());
             out.writeEndElement();
         }
 
-        Iterator<TileImprovementPlan> TileImprovementPlanIterator = tileImprovementPlans.iterator();
-        while (TileImprovementPlanIterator.hasNext()) {
-            TileImprovementPlan ti = TileImprovementPlanIterator.next();
-            out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + "ListElement");
-            out.writeAttribute(ID_ATTRIBUTE, ti.getId());
+        for (TileImprovementPlan tip : tileImprovementPlans) {
+            out.writeStartElement(tip.getXMLElementTagName() + LIST_ELEMENT);
+            out.writeAttribute(ID_ATTRIBUTE, tip.getId());
             out.writeEndElement();
         }
 
@@ -1148,38 +1130,45 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         throws XMLStreamException {
         colony = (Colony) getAIMain().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
         if (colony == null) {
-            throw new NullPointerException("Could not find Colony with ID: " + in.getAttributeValue(null, ID_ATTRIBUTE));
+            throw new NullPointerException("Could not find Colony with ID: "
+                + in.getAttributeValue(null, ID_ATTRIBUTE));
         }
 
         aiGoods.clear();
         wishes.clear();
-
         colonyPlan = new ColonyPlan(getAIMain(), colony);
-        colonyPlan.update();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + "ListElement")) {
+            if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
                 AIGoods ag = (AIGoods) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ag == null) {
                     ag = new AIGoods(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 aiGoods.add(ag);
                 in.nextTag();
-            } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
+            } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + LIST_ELEMENT)
+                //@compat 0.10.3
+                || in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT)                       
+                //@end compat
+                       ) {
                 Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
                     w = new WorkerWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 wishes.add(w);
                 in.nextTag();
-            } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + "WishListElement")) {
+            } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + LIST_ELEMENT)
+                //@compat 0.10.3
+                || in.getLocalName().equals(GoodsWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT)                       
+                //@end compat
+                       ) {
                 Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
                     w = new GoodsWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
                 }
                 wishes.add(w);
                 in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + "ListElement")) {
+            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT)) {
                 TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ti == null) {
                     ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
