@@ -328,8 +328,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
-            String destruct = "Autodestruct at " + colony.getName();
-            for (UnitWas uw : was) destruct += uw.toString();
+            String destruct = "Autodestruct at " + colony.getName() + "\n";
+            for (UnitWas uw : was) destruct += uw.toString() + "\n";
             logger.warning(destruct);
             avertAutoDestruction();
         }
@@ -660,6 +660,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         if (amountRemaining >= GoodsContainer.CARGO_SIZE) {
                             AIGoods newGoods = new AIGoods(getAIMain(), colony, g, GoodsContainer.CARGO_SIZE, getColony().getOwner()
                                                            .getEurope());
+                            logger.finest("New AIGoods: " + newGoods.getId() + " at " + colony.getName() + " type " + g);
                             if (amountRemaining >= colony.getWarehouseCapacity()) {
                                 newGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
                             } else {
@@ -796,7 +797,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (unit.getWorkType() != null
                 && unit.getWorkType() != unit.getType().getExpertProduction()) {
                 UnitType expert = colony.getSpecification().getExpertForProducing(unit.getWorkType());
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, expert, true));
+                WorkerWish ww = new WorkerWish(getAIMain(), colony, expertValue, expert, true);
+                wishes.add(ww);
+                logger.finest("New WorkerWish: " + ww.getId() + " at " + colony.getName() + " for " + expert);
             }
         }
 
@@ -900,7 +903,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 if (amount > 0) {
                     int value = colonyCouldProduce(requiredType) ?
                         goodsWishValue / 10 : goodsWishValue;
-                    wishes.add(new GoodsWish(getAIMain(), colony, value, amount, requiredType));
+                    GoodsWish gw = new GoodsWish(getAIMain(), colony, value, amount, requiredType);
+                    wishes.add(gw);
+                    logger.finest("New GoodsWish: " + gw.getId() + " at " + colony.getName() + " is " + amount + " " + requiredType);
                 }
             }
         }
