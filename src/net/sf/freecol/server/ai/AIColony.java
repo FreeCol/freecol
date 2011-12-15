@@ -213,11 +213,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public boolean rearrangeWorkers() {
         int turn = getGame().getTurn().getNumber();
         if (rearrangeWorkers.getNumber() > turn) return false;
-        int nextRearrange = Integer.MAX_VALUE;
         final AIMain aiMain = getAIMain();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
         final Specification spec = colony.getSpecification();
+
+        // For now, cap the rearrangement horizon, because confidence
+        // that we are triggering on all relevant changes is low.
+        int nextRearrange = 15;
 
         // See if there are neighbouring LCRs to explore, or tiles
         // to steal, or just unclaimed tiles (a neighbouring settlement
@@ -254,7 +257,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         build = colony.getCurrentlyBuilding();
-        if (build != null) {
+        if (build == null) {
+            logger.warning("No building at " + colony.getName() + " from "
+                + colonyPlan.getBuildableReport());
+        } else {
             colonyPlan.refine(build);
             nextRearrange = Math.min(nextRearrange,
                 Math.max(1, colony.getTurnsToComplete(build, null)));
@@ -284,20 +290,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Assign the workers according to the colony plan.
-        Colony scratch = colonyPlan.assignWorkers(workers);
         // ATM we just accept this assignment.
-        // Plan to rearrange when the warehouse hits a limit.
-        int warehouse = scratch.getWarehouseCapacity();
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (!g.isStorable() || g.limitIgnored()) continue;
-            int have = scratch.getGoodsCount(g);
-            int net = scratch.getNetProductionOf(g);
-            if (net >= 0 && have >= warehouse) continue;
-            nextRearrange = Math.max(1, Math.min(nextRearrange,
-                    (net < 0) ? (have / -net)
-                    : (net > 0) ? ((warehouse - have) / net)
-                    : Integer.MAX_VALUE));
-        }
+        Colony scratch = colonyPlan.assignWorkers(workers);
 
         // Apply the arrangement, and give suitable missions to all units.
         // For now, do a soft rearrange (that is, no c-s messaging).
@@ -338,6 +332,19 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             avertAutoDestruction();
         }
 
+        // Plan to rearrange when the warehouse hits a limit.
+        int warehouse = colony.getWarehouseCapacity();
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (!g.isStorable() || g.limitIgnored()) continue;
+            int have = colony.getGoodsCount(g);
+            int net = colony.getNetProductionOf(g);
+            if (net >= 0 && have >= warehouse) continue;
+            nextRearrange = Math.max(1, Math.min(nextRearrange,
+                    (net < 0) ? (have / -net)
+                    : (net > 0) ? ((warehouse - have) / net)
+                    : Integer.MAX_VALUE));
+        }
+
         // Argh.  We may have chosen to build something we can no
         // longer build due to a colony size limitation.  Try to find
         // something, but do not re-refine/assign as we may get caught
@@ -356,10 +363,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             AIMessage.askSetBuildQueue(this, queue);
             nextRearrange = 1;
         }
-
-        // For now, cap the rearrangement horizon, because confidence
-        // that we are triggering on all relevant changes is low.
-        nextRearrange = Math.min(nextRearrange, 15);
 
         // Log the changes.
         StringBuilder sb = new StringBuilder();
@@ -457,8 +460,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 Direction direction = tile.getDirection(t);
                 for (;;) {
                     if (explorers.isEmpty()) return;
-                    Unit u = explorers.get(0);
-                    explorers.remove(0);
+                    Unit u = explorers.remove(0);
                     if (!u.getMoveType(t).isProgress()) continue;
                     if (AIMessage.askMove(getAIUnit(u), direction)
                         && !t.hasLostCityRumour()) {
@@ -474,7 +476,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Steals neighbouring tiles but only if the colony has some
      * defence.  Grab everything if at war with the owner, otherwise
      * just take the tile that best helps with the currently required
-     * raw building materials with a lesser interest in food.
+     * raw building materials, with a lesser interest in food.
      */
     private void stealTiles() {
         final Specification spec = colony.getSpecification();
@@ -542,58 +544,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
-
-    private UnitType getNextExpert(boolean onlyFood) {
-        // some type should be returned, not null
-        UnitType bestType = colony.getSpecification().getDefaultUnitType();
-        List<WorkLocationPlan> plans = colonyPlan.getFoodPlans();
-        if (!onlyFood) plans.addAll(colonyPlan.getWorkPlans());
-        for (WorkLocationPlan plan : plans) {
-            WorkLocation location = plan.getWorkLocation();
-            if (location instanceof ColonyTile) {
-                ColonyTile colonyTile = (ColonyTile) location;
-                if (colonyTile.canBeWorked()) {
-                    bestType = colony.getSpecification()
-                        .getExpertForProducing(plan.getGoodsType());
-                    break;
-                }
-            } else if (location instanceof Building) {
-                Building building = (Building) location;
-                if (building.canBeWorked()) {
-                    bestType = building.getExpertUnitType();
-                    break;
-                }
-            }
-        }
-        return bestType;
-    }
-
-    private int getToolsRequired(BuildableType buildableType) {
-        int toolsRequiredForBuilding = 0;
-        if (buildableType != null) {
-            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == colony.getSpecification().getGoodsType("model.goods.tools")) {
-                    toolsRequiredForBuilding = goodsRequired.getAmount();
-                    break;
-                }
-            }
-        }
-        return toolsRequiredForBuilding;
-    }
-
-
-    private int getHammersRequired(BuildableType buildableType) {
-        int hammersRequiredForBuilding = 0;
-        if (buildableType != null) {
-            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == colony.getSpecification().getGoodsType("model.goods.hammers")) {
-                    hammersRequiredForBuilding = goodsRequired.getAmount();
-                    break;
-                }
-            }
-        }
-        return hammersRequiredForBuilding;
-    }
 
     /**
      * Is the colony badly defended?
@@ -809,8 +759,32 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         createGoodsWishes();
     }
 
-    private void createWorkerWishes() {
+    private UnitType getNextExpert(boolean onlyFood) {
+        // some type should be returned, not null
+        UnitType bestType = colony.getSpecification().getDefaultUnitType();
+        List<WorkLocationPlan> plans = colonyPlan.getFoodPlans();
+        if (!onlyFood) plans.addAll(colonyPlan.getWorkPlans());
+        for (WorkLocationPlan plan : plans) {
+            WorkLocation location = plan.getWorkLocation();
+            if (location instanceof ColonyTile) {
+                ColonyTile colonyTile = (ColonyTile) location;
+                if (colonyTile.canBeWorked()) {
+                    bestType = colony.getSpecification()
+                        .getExpertForProducing(plan.getGoodsType());
+                    break;
+                }
+            } else if (location instanceof Building) {
+                Building building = (Building) location;
+                if (building.canBeWorked()) {
+                    bestType = building.getExpertUnitType();
+                    break;
+                }
+            }
+        }
+        return bestType;
+    }
 
+    private void createWorkerWishes() {
         int expertValue = 100;
 
         // For every non-expert, request expert replacement. TODO:
