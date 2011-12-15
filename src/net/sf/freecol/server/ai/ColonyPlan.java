@@ -773,7 +773,7 @@ public class ColonyPlan {
 
         int maxLevel;
         switch (profileType) {
-        case OUTPOST: return; // No building in outposts
+        case OUTPOST:
         case SMALL:   maxLevel = 1; break;
         case MEDIUM:  maxLevel = 2; break;
         case LARGE:   maxLevel = 3; break;
