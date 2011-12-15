@@ -1346,14 +1346,16 @@ public class ColonyPlan {
             //    of unnecessary military units --- sort this out.
             // 2. isBadlyDefended is an AIColony routine, which ColonyPlan
             //    can not see.  Move to the Colony?
-            float defence = colony.getTotalDefencePower();
+            float defence = scratch.getTotalDefencePower();
             final float perUnit = 1.25f;
             final float offset = -2.5f;
             float wanted = perUnit * workers.size() + offset;
+
             //System.err.println("DEFENCE " + colony.getName() + " defence=" + defence + " workers=" + workers.size() + " wanted=" + wanted + " OK=" + (defence>=wanted));
-            //for (Unit z : colony.getTile().getUnitList()) {
+            //for (Unit z : scratch.getTile().getUnitList()) {
             //    if (z.isDefensiveUnit()) System.err.println("  " + z);
             //}
+
             if (defence >= wanted) break;
 
             if (equipUnit(u, Role.SOLDIER, scratch)) workers.remove(u);
@@ -1495,12 +1497,16 @@ public class ColonyPlan {
         }
         for (Unit u : tile.getUnitList()) {
             GoodsType work = u.getType().getExpertProduction();
-            if (work != null) trySwapExpert(u, scratch.getUnitList());
+            if (work != null && u.getEquipment().isEmpty()) {
+                trySwapExpert(u, scratch.getUnitList());
+            }
         }
 
         // Rearm what remains as far as possible.
         workers.clear();
-        workers.addAll(tile.getUnitList());
+        for (Unit u : tile.getUnitList()) {
+            if (u.getEquipment().isEmpty()) workers.add(u);
+        }
         Collections.sort(workers, Unit.getSkillLevelComparator());
         for (Unit u : workers) {
             equipUnit(u, Role.SOLDIER, scratch);
