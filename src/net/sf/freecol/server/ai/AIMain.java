@@ -510,7 +510,8 @@ public class AIMain extends FreeColObject
                             in.nextTag();
                         }
                     }
-                } else if (tagName.equals("colonialAIPlayer")) { // @compat 0.10.1
+                // @compat 0.10.1
+                } else if (tagName.equals("colonialAIPlayer")) {
                     new EuropeanAIPlayer(this, in);
                 // end compatibility code
                 } else if (tagName.equals(AIColony.getXMLElementTagName())) {
@@ -519,9 +520,17 @@ public class AIMain extends FreeColObject
                     new AIGoods(this, in);
                 } else if (tagName.equals(WorkerWish.getXMLElementTagName())) {
                     new WorkerWish(this, in);
-                } else if (tagName.equals(GoodsWish.getXMLElementTagName())) {
+                } else if (tagName.equals(GoodsWish.getXMLElementTagName())
+                    // @compat 0.10.3
+                    || tagName.equals("GoodsWish")
+                    // end compatibility code
+                           ) {
                     new GoodsWish(this, in);
-                } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())) {
+                } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())
+                    // @compat 0.10.3
+                    || tagName.equals("tileimprovementplan")
+                    // end compatibility code
+                           ) {
                     new TileImprovementPlan(this, in);
                 } else {
                     logger.warning("Unknown AI-object read: " + tagName + "(" + lastTag + ")");

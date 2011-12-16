@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
@@ -558,17 +559,67 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
 
-    public void removeWish(Wish w) {
-        wishes.remove(w);
+    /**
+     * Adds a <code>Wish</code> to the wishes list.
+     *
+     * @param wish The <code>Wish</code> to be added.
+     */
+    public void addWish(Wish wish) {
+        wishes.add(wish);
     }
 
     /**
-     * Add a <code>GoodsWish</code> to the wish list.
+     * Removes a wish from the wishes list.
      *
-     * @param gw The <code>GoodsWish</code> to be added.
+     * @param wish The <code>Wish</code> to remove.
      */
-    public void addGoodsWish(GoodsWish gw) {
-        wishes.add(gw);
+    public void removeWish(Wish wish) {
+        wishes.remove(wish);
+    }
+
+    /**
+     * Tries to complete any wishes for some goods that have just arrived.
+     *
+     * @param goods Some <code>Goods</code> that are arriving in this colony.
+     */
+    public void completeWish(Goods goods) {
+        int i = 0;
+        while (i < wishes.size()) {
+            if (wishes.get(i) instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish)wishes.get(i);
+                if (gw.getGoodsType() == goods.getType()
+                    && gw.getGoodsAmount() <= goods.getAmount()) {
+                    logger.finest("At " + colony.getName()
+                        + " goods wish " + gw + " completed.");
+                    wishes.remove(gw);
+                    gw.dispose();
+                    continue;
+                }
+            }
+            i++;
+        }
+    }
+
+    /**
+     * Tries to complete any wishes for a unit that has just arrived.
+     *
+     * @param unit A <code>Unit</code> that is arriving in this colony.
+     */
+    public void completeWish(Unit unit) {
+        int i = 0;
+        while (i < wishes.size()) {
+            if (wishes.get(i) instanceof WorkerWish) {
+                WorkerWish ww = (WorkerWish)wishes.get(i);
+                if (ww.getUnitType() == unit.getType()) {
+                    logger.finest("At " + colony.getName()
+                        + " worker wish " + ww + " completed.");
+                    wishes.remove(ww);
+                    ww.dispose();
+                    continue;
+                }
+            }
+            i++;
+        }
     }
 
     /**
@@ -945,6 +996,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Adds a tile improvement plan to this AI colony.
+     *
+     * @param tip The <code>TileImprovementPlan</code> to add.
+     */
+    public void addTileImprovementPlan(TileImprovementPlan tip) {
+        tileImprovementPlans.add(tip);
+    }
+
+    /**
      * Removes a <code>TileImprovementPlan</code> from the list
      * @return True if it was successfully deleted, false otherwise
      */
@@ -1110,7 +1170,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         for (Wish w : wishes) {
             if (!w.shouldBeStored()) continue;
-            out.writeStartElement(w.getXMLElementTagName() + LIST_ELEMENT);
+            String tag = (w instanceof GoodsWish) ? GoodsWish.getXMLElementTagName()
+                : (w instanceof WorkerWish) ? WorkerWish.getXMLElementTagName()
+                : null;
+            if (tag == null) continue;
+            out.writeStartElement(tag + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, w.getId());
             out.writeEndElement();
         }
@@ -1152,9 +1216,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 aiGoods.add(ag);
                 in.nextTag();
             } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + LIST_ELEMENT)
-                //@compat 0.10.3
+                // @compat 0.10.3
                 || in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT)                       
-                //@end compat
+                // end compatibility code
                        ) {
                 Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
@@ -1163,9 +1227,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 wishes.add(w);
                 in.nextTag();
             } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + LIST_ELEMENT)
-                //@compat 0.10.3
-                || in.getLocalName().equals(GoodsWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT)                       
-                //@end compat
+                // @compat 0.10.3
+                || in.getLocalName().equals("GoodsWishWish" + LIST_ELEMENT)                       
+                // end compatibility code
                        ) {
                 Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (w == null) {
@@ -1173,7 +1237,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
                 wishes.add(w);
                 in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT)) {
+            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT)
+                // @compat 0.10.3
+                || in.getLocalName().equals("tileimprovementplan" + LIST_ELEMENT)
+                // end compatibility code
+                       ) {
                 TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ti == null) {
                     ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));

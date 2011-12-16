@@ -25,9 +25,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.server.ai.AIColony;
 
 import org.w3c.dom.Element;
 
@@ -190,20 +192,22 @@ public class GoodsWish extends Wish {
         amountRequested = getAttribute(in, "amountRequested",
                                        GoodsContainer.CARGO_SIZE);
         in.nextTag();
+
+        attachToDestination();
     }
 
     @Override
     public String toString() {
-        return "GoodsWish: " + getId() + " " + amountRequested
+        return "goodsWish: " + getId() + " " + amountRequested
             + " " + goodsType + " (" + getValue() + ")";
     }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return "GoodsWish"
+     * @return "goodsWish"
      */
     public static String getXMLElementTagName() {
-        return "GoodsWish";
+        return "goodsWish";
     }
 }

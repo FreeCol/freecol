@@ -189,16 +189,19 @@ public class WorkerWish extends Wish {
         unitType = getAIMain().getGame().getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
         in.nextTag();
+
+        attachToDestination();
     }
 
     @Override
     public String toString() {
-        return "WorkerWish: " + unitType.getNameKey()
+        return "workerWish: " + unitType.getNameKey()
             + " (" + getValue() + (expertNeeded ? ", expert)" : ")");
     }
 
     /**
      * Returns the tag name of the root element representing this object.
+     *
      * @return "workerWish"
      */
     public static String getXMLElementTagName() {

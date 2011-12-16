@@ -249,7 +249,11 @@ public class WishRealizationMission extends Mission {
                 "wish"));
         if (wish == null) {
             final String wid = in.getAttributeValue(null, "wish");
-            if (wid.startsWith(GoodsWish.getXMLElementTagName())) {
+            if (wid.startsWith(GoodsWish.getXMLElementTagName())
+                // @compat 0.10.3
+                || wid.startsWith("GoodsWish")
+                // end compatibility code
+                ) {
                 wish = new GoodsWish(getAIMain(), wid);
             } else if (wid.startsWith(WorkerWish.getXMLElementTagName())) {
                 wish = new WorkerWish(getAIMain(), wid);

@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
@@ -238,9 +239,9 @@ public class TileImprovementPlan extends ValuedAIObject {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return "tileimprovementplan"
+     * @return "tileImprovementPlan"
      */
     public static String getXMLElementTagName() {
-        return "tileimprovementplan";
+        return "tileImprovementPlan";
     }    
 }

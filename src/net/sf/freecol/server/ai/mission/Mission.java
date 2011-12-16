@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -341,6 +342,12 @@ public abstract class Mission extends AIObject {
     }
 
     protected boolean unloadCargoInColony(Goods goods) {
+        Colony colony = aiUnit.getUnit().getColony();
+        AIColony ac;
+        if (colony != null
+            && (ac = getAIMain().getAIColony(colony)) != null) {
+            ac.completeWish(goods);
+        }
         return AIMessage.askUnloadCargo(aiUnit, goods);
     }
 
@@ -448,6 +455,9 @@ public abstract class Mission extends AIObject {
     protected boolean unitLeavesShip(AIUnit aiUnit) {
         Colony colony = aiUnit.getUnit().getColony();
         if (colony != null) {
+            AIColony ac = getAIMain().getAIColony(colony);
+            if (ac != null) ac.completeWish(aiUnit.getUnit());
+
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
         return AIMessage.askDisembark(aiUnit);

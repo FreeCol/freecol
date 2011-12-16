@@ -94,24 +94,23 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-    * Assigns a <code>Transportable</code> to this <code>Wish</code>.
-    * @param transportable The <code>Transportable</code> which should
-    *        realize this wish.
-    * @see #getTransportable
-    * @see net.sf.freecol.server.ai.mission.WishRealizationMission
-    */
+     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
+     * @param transportable The <code>Transportable</code> which should
+     *        realize this wish.
+     * @see #getTransportable
+     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
+     */
     public void setTransportable(Transportable transportable) {
         this.transportable = transportable;
     }
 
-
     /**
-    * Gets the <code>Transportable</code> assigned to this <code>Wish</code>.
-    * @return The <code>Transportable</code> which will realize this wish,
-    *         or <code>null</code> if none has been assigned.
-    * @see #setTransportable
-    * @see net.sf.freecol.server.ai.mission.WishRealizationMission
-    */
+     * Gets the <code>Transportable</code> assigned to this <code>Wish</code>.
+     * @return The <code>Transportable</code> which will realize this wish,
+     *         or <code>null</code> if none has been assigned.
+     * @see #setTransportable
+     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
+     */
     public Transportable getTransportable() {
         return transportable;
     }
@@ -121,8 +120,8 @@ public abstract class Wish extends ValuedAIObject {
      * any referances to this object.
      */
     public void dispose() {
-        if (destination instanceof Colony) {
-            AIColony ac = (AIColony) getAIMain().getAIColony((Colony) destination);
+        AIColony ac = getDestinationAIColony();
+        if (ac != null) {
             ac.removeWish(this);
         } else {
             logger.warning("Unknown destination: " + destination);
@@ -136,12 +135,31 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-    * Gets the destination of this <code>Wish</code>.
-    * @return The <code>Location</code> in which the
-    *       {@link #getTransportable transportable} assigned to
-    *       this <code>Wish</code> will have to reach.
-    */
+     * Gets the destination of this <code>Wish</code>.
+     * @return The <code>Location</code> in which the
+     *       {@link #getTransportable transportable} assigned to
+     *       this <code>Wish</code> will have to reach.
+     */
     public Location getDestination() {
         return destination;
+    }
+
+    /**
+     * Gets the destination AI colony, if any.
+     *
+     * @return The destination <code>AIColony</code>.
+     */
+    public AIColony getDestinationAIColony() {
+        return (destination instanceof Colony)
+            ? getAIMain().getAIColony((Colony)destination)
+            : null;
+    }
+
+    /**
+     * Attaches this wish to its destination AI colony, if any.
+     */
+    public void attachToDestination() {
+        AIColony ac = getDestinationAIColony();
+        if (ac != null) ac.addWish(this);
     }
 }
