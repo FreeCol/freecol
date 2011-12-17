@@ -208,6 +208,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Is the colony badly defended?
+     * Deliberately does not waste defenders on small colonies.
+     *
+     * @param colony The <code>Colony</code> to consider.
+     * @return True if the colony needs more defenders.
+     */
+    public static boolean isBadlyDefended(Colony colony) {
+        return colony.getTotalDefencePower()
+            < 1.25f * colony.getUnitCount() - 2.5f;
+    }
+
+    /**
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
      * TODO: Detect military threats and boost defence.
      *
@@ -233,7 +245,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         exploreLCRs();
         stealTiles();
         for (Tile t : tile.getSurroundingTiles(1)) {
-            if (player.canClaimForSettlement(t)) {
+            if (!player.owns(t) && player.canClaimForSettlement(t)) {
                 AIMessage.askClaimLand(getConnection(), t, colony, 0);
             }
         }
@@ -261,12 +273,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         build = colony.getCurrentlyBuilding();
         if (build == null) {
-            logger.warning("No building at " + colony.getName() + " from "
-                + colonyPlan.getBuildableReport());
+            if (!colonyPlan.getBuildableTypes().isEmpty()) {
+                logger.warning("No building at " + colony.getName()
+                    + " in " + turn);
+            }
         } else {
             colonyPlan.refine(build);
             nextRearrange = Math.min(nextRearrange,
-                Math.max(1, colony.getTurnsToComplete(build, null)));
+                Math.max(1, colony.getTurnsToComplete(build, null) - 1));
         }
 
         // Collect all potential workers from the colony and from the tile,
@@ -307,15 +321,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             WorkLocation wl = (WorkLocation)u.getLocation();
             wl = colony.getCorrespondingWorkLocation(wl);
             u.setLocation(wl);
-            aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
         }
         for (Unit u : scratch.getTile().getUnitList()) {
             u.setLocation(tile);
-            if (u.isArmed()) {
-                AIUnit aiU = getAIUnit(u);
-                aiU.setMission(new DefendSettlementMission(aiMain, aiU,
-                        colony));
-            }
         }            
         for (GoodsType g : spec.getGoodsTypeList()) {
             if (!g.isStorable()) continue;
@@ -329,25 +337,31 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
-            String destruct = "Autodestruct at " + colony.getName() + "\n";
+            String destruct = "Autodestruct at " + colony.getName()
+                + " in " + turn + "\n";
             for (UnitWas uw : was) destruct += uw.toString() + "\n";
             logger.warning(destruct);
             avertAutoDestruction();
         }
 
         // Plan to rearrange when the warehouse hits a limit.
+        if (colony.getNetProductionOf(spec.getPrimaryFoodType()) < 0) {
+            int net = colony.getNetProductionOf(spec.getPrimaryFoodType());
+            int when = colony.getGoodsCount(spec.getPrimaryFoodType()) / -net;
+            nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
+        }
         int warehouse = colony.getWarehouseCapacity();
         for (GoodsType g : spec.getGoodsTypeList()) {
-            if (!g.isStorable() || g.limitIgnored()) continue;
+            if (!g.isStorable() || g.isFoodType()) continue;
             int have = colony.getGoodsCount(g);
             int net = colony.getNetProductionOf(g);
-            if (net >= 0 && have >= warehouse) continue;
-            nextRearrange = Math.max(1, Math.min(nextRearrange,
-                    (net < 0) ? (have / -net)
-                    : (net > 0) ? ((warehouse - have) / net)
-                    : Integer.MAX_VALUE));
+            if (net >= 0 && (have >= warehouse || g.limitIgnored())) continue;
+            int when = (net < 0) ? (have / -net - 1)
+                : (net > 0) ? ((warehouse - have) / net - 1)
+                : Integer.MAX_VALUE;
+            nextRearrange = Math.max(1, Math.min(nextRearrange, when));
         }
-
+                    
         // Argh.  We may have chosen to build something we can no
         // longer build due to a colony size limitation.  Try to find
         // something, but do not re-refine/assign as we may get caught
@@ -368,14 +382,26 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Log the changes.
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rearrange " + colony.getName()
+        String report = "Rearrange " + colony.getName()
             + " (" + colony.getUnitCount() + ")"
             + " build=" + colony.getCurrentlyBuilding()
             + " " + getGame().getTurn()
-            + " + " + nextRearrange + "\n");
-        for (UnitWas uw : was) sb.append(uw.toString() + "\n");
-        logger.finest(sb.toString());
+            + " + " + nextRearrange + "\n";
+        for (UnitWas uw : was) report += uw.toString() + "\n";
+        logger.finest(report);
+
+        // Give suitable missions to all units.
+        for (Unit u : colony.getUnitList()) {
+            AIUnit aiU = getAIUnit(u);
+            aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
+        }
+        for (Unit u : tile.getUnitList()) {
+            if (u.isArmed()) {
+                AIUnit aiU = getAIUnit(u);
+                aiU.setMission(new DefendSettlementMission(aiMain, aiU,
+                        colony));
+            }
+        }
 
         // Change the export settings when required.
         resetExports();
@@ -383,7 +409,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // TODO: these look rational but need review.
         createTileImprovementPlans();
         createWishes();
-        checkConditionsForHorseBreed();
 
         // Set the next rearrangement turn.
         rearrangeWorkers = new Turn(turn + nextRearrange);
@@ -545,17 +570,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     + ") from " + owner.getName());
             }
         }
-    }
-
-
-    /**
-     * Is the colony badly defended?
-     * TODO: check if this heuristic makes sense.
-     *
-     * @return True if the colony needs more defenders.
-     */
-    public boolean isBadlyDefended() {
-        return colony.getTotalDefencePower() < 1.5f * colony.getUnitCount();
     }
 
 
@@ -871,11 +885,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // TODO: add missionaries
 
         // increase defense value
-        boolean badlyDefended = isBadlyDefended();
-        if (badlyDefended) {
+        if (isBadlyDefended(colony)) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, bestDefender, true));
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue,
+                                          bestDefender, true));
             }
         }
     }
@@ -927,7 +941,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // add materials required to build military equipment
-        if (isBadlyDefended()) {
+        if (isBadlyDefended(colony)) {
             for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
                 if (type.isMilitaryEquipment()) {
                     for (Unit unit : colony.getUnitList()) {
@@ -1069,43 +1083,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Collections.sort(tileImprovementPlans);
     }
 
-    /**
-     * Verifies if the <code>Colony</code> has conditions for breeding
-     * horses, and un-mounts a mounted <code>Unit</code> if available,
-     * to have horses to breed.
-     *
-     * Method is public so the test suite can call it.
-     */
-    public void checkConditionsForHorseBreed() {
-        GoodsType horsesType = colony.getSpecification().getGoodsType("model.goods.horses");
-        EquipmentType horsesEqType = colony.getSpecification().getEquipmentType("model.equipment.horses");
-        GoodsType reqGoodsType = horsesType.getRawMaterial();
-
-        // Colony already is breeding horses
-        if(colony.getGoodsCount(horsesType) >= horsesType.getBreedingNumber()){
-            return;
-        }
-
-        //int foodProdAvail = colony.getProductionOf(reqGoodsType) - colony.getConsumptionOf(reqGoodsType);
-        int foodProdAvail = colony.getFoodProduction() - colony.getConsumptionOf(reqGoodsType);
-        // no food production available for breeding anyway
-        if(foodProdAvail <= 0){
-            return;
-        }
-
-        // we will now look for any mounted unit that can be temporarily dismounted
-        for(Unit u : colony.getTile().getUnitList()){
-            int amount = u.getEquipmentCount(horsesEqType);
-            if (amount > 0
-                && AIMessage.askEquipUnit(getAIUnit(u), horsesEqType,
-                                          -amount)) {
-                if (colony.getGoodsCount(horsesType) >= horsesType.getBreedingNumber()) {
-                    return;
-                }
-            }
-        }
-    }
- 
     /**
      * Something bad happened, there is no remaining unit working in
      * the colony.

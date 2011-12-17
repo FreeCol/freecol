@@ -136,6 +136,9 @@ public class AIColonyTest extends FreeColTestCase {
         AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
 
+        // Add food so that the starvation avoidance is not triggered
+        colony.addGoods(foodType, GoodsContainer.CARGO_SIZE);
+
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers();
 
@@ -208,6 +211,9 @@ public class AIColonyTest extends FreeColTestCase {
             = colony.getBuildingForProducing(toolsType);
         AIColony aiColony = aiMain.getAIColony(colony);
         ServerPlayer player = (ServerPlayer) colony.getOwner();
+
+        // Add food so that the starvation avoidance is not triggered
+        colony.addGoods(foodType, GoodsContainer.CARGO_SIZE);
 
         // We need to ensure that there are no tiles with production of
         // the raw materials.
@@ -331,35 +337,6 @@ public class AIColonyTest extends FreeColTestCase {
         assertTrue("Lumberjack should not collect lumber, in stock",
             lumberType != lumberjack.getWorkType());
     }
-
-    public void testCheckConditionsForHorseBreed() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-        AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-
-        Colony colony = getStandardColony(1);
-        AIColony aiColony = aiMain.getAIColony(colony);
-        game.setCurrentPlayer(colony.getOwner());
-        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
-        GoodsType reqGoodsType = horsesType.getRawMaterial();
-
-        int foodSurplus = colony.getFoodProduction() - colony.getConsumptionOf(reqGoodsType);
-        assertTrue("Setup error, colony does not have food surplus", foodSurplus > 0);
-
-        final EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
-        Unit scout = new ServerUnit(getGame(), colony.getTile(), colony.getOwner(),
-                                    colonistType, horsesEqType);
-        assertTrue("Scout should be mounted", scout.isMounted());
-
-        assertEquals("Setup error, colony should not have horses in stock",
-                     0, colony.getGoodsCount(horsesType));
-
-        aiColony.checkConditionsForHorseBreed();
-
-        assertEquals("Colony should now have horses in stock",
-                     50, colony.getGoodsCount(horsesType));
-        assertFalse("Scout should not be mounted", scout.isMounted());
-    }
-
 
     public void testBestDefender() {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));

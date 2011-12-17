@@ -383,7 +383,8 @@ public abstract class AIPlayer extends AIObject {
                 for (Unit u : t.getUnitList()) {
                     if (u.getOwner() == unit.getOwner()
                         && u.isCarrier()
-                        && u.getSpaceLeft() >= unit.getSpaceTaken()) {
+                        && u.getSpaceLeft() >= unit.getSpaceTaken()
+                        && unit.getMovesLeft() > 0) {
                         AIMessage.askEmbark(getAIMain().getAIUnit(u), unit,
                             tile.getDirection(t));
                         return; // Let the carrier update its transport list.
