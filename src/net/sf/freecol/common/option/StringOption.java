@@ -82,9 +82,8 @@ public class StringOption extends AbstractOption<String> {
 
     public StringOption clone() {
         StringOption result = new StringOption(getId());
-        result.value = value;
+        result.setValues(this);
         result.choices = new ArrayList<String>(choices);
-        result.isDefined = true;
         return result;
     }
 

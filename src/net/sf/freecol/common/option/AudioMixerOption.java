@@ -95,6 +95,12 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         super(specification);
     }
 
+    public AudioMixerOption clone() {
+        AudioMixerOption result = new AudioMixerOption(getSpecification());
+        result.setValues(this);
+        return result;
+    }
+
     /**
      * Get the <code>Value</code> value.
      *

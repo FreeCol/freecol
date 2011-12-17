@@ -72,7 +72,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
         super(Messages.message(id + ".name"));
 
         this.freeColClient = freeColClient;
-        
+
         this.gui = gui;
 
         putValue(ACTION_ID, id);
@@ -90,6 +90,12 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
         }
     }
 
+    /**
+     * Don't use this method.
+     */
+    public FreeColAction clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("FreeColAction can not be cloned.");
+    }
 
     /**
      * Gets the mnemonic to be used for selecting this action

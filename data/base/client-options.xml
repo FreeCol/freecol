@@ -192,4 +192,11 @@
         <selectValue label="clientOptions.unloadOverflowResponse.always" value="2"/>
       </selectOption>
     </optionGroup>
+    <optionGroup id="clientOptions.mods">
+      <modListOption id="userMods">
+        <template>
+          <modOption id="model.option.mod" />
+        </template>
+      </modListOption>
+    </optionGroup>
 </clientOptions>

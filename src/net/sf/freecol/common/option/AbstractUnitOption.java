@@ -87,10 +87,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
     public AbstractUnitOption clone() {
-        AbstractUnitOption result = new AbstractUnitOption(getId(), getSpecification());
-        if (getValue() == null) {
-            result.setValue(null);
-        } else {
+        AbstractUnitOption result = new AbstractUnitOption(getId());
+        result.setValues(this);
+        if (getValue() != null) {
             result.setValue(getValue().clone());
         }
         result.unitType = unitType.clone();

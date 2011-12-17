@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -119,10 +118,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.name = name;
 
         Specification spec = getSpecification();
-        List<AbstractUnitOption> ref =
-            ((UnitListOption) spec.getOption("model.option.refSize")).getValue();
-        for (AbstractUnitOption unitOption : ref) {
-            AbstractUnit unit = unitOption.getValue();
+        List<AbstractUnit> ref =
+            ((UnitListOption) spec.getOption("model.option.refSize")).getOptionValues();
+        for (AbstractUnit unit : ref) {
             UnitType unitType = unit.getUnitType(spec);
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)) {

@@ -22,17 +22,21 @@ package net.sf.freecol.client.gui.option;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.ListOption;
+import net.sf.freecol.common.option.ModListOption;
+import net.sf.freecol.common.option.ModOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
@@ -163,6 +167,15 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      */
     public abstract void reset();
 
+    /**
+     * Returns a ListCellRenderer suitable for the Option wrapped.
+     *
+     * @return a ListCellRenderer
+     */
+    public ListCellRenderer getListCellRenderer() {
+        return null;
+    }
+
 
     @SuppressWarnings("unchecked")
     public static OptionUI getOptionUI(FreeColClient freeColClient, GUI gui, Option option, boolean editable) {
@@ -172,8 +185,6 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
             return new FileOptionUI(gui, (FileOption) option, editable);
         } else if (option instanceof PercentageOption) {
             return new PercentageOptionUI(gui, (PercentageOption) option, editable);
-        } else if (option instanceof ListOption<?>) {
-            return new ListOptionUI(freeColClient, gui, (ListOption) option, editable);
         } else if (option instanceof RangeOption) {
             return new RangeOptionUI(gui, (RangeOption) option, editable);
         } else if (option instanceof SelectOption) {
@@ -188,8 +199,14 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
             return new AudioMixerOptionUI(gui, (AudioMixerOption) option, editable);
         } else if (option instanceof FreeColAction) {
             return new FreeColActionUI(gui, (FreeColAction) option, editable);
+        } else if (option instanceof AbstractUnitOption) {
+            return new AbstractUnitOptionUI(gui, (AbstractUnitOption) option, editable);
+        } else if (option instanceof ModOption) {
+            return new ModOptionUI(gui, (ModOption) option, editable);
         } else if (option instanceof UnitListOption) {
-            return new UnitListOptionUI(freeColClient, gui, (UnitListOption) option, editable);
+            return new ListOptionUI(freeColClient, gui, (UnitListOption) option, editable);
+        } else if (option instanceof ModListOption) {
+            return new ListOptionUI(freeColClient, gui, (ModListOption) option, editable);
         } else {
             return null;
         }

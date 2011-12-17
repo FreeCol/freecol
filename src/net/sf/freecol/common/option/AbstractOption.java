@@ -85,6 +85,16 @@ abstract public class AbstractOption<T> extends FreeColObject
         setSpecification(specification);
     }
 
+    public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
+
+    protected void setValues(AbstractOption<T> source) {
+        setId(source.getId());
+        setSpecification(source.getSpecification());
+        setValue(source.getValue());
+        setGroup(source.getGroup());
+        isDefined = source.isDefined;
+    }
+
     /**
      * Returns the string prefix that identifies the group of this
      * <code>Option</code>.
@@ -186,6 +196,54 @@ abstract public class AbstractOption<T> extends FreeColObject
 
         setValue(value, defaultValue);
     }
+
+    protected AbstractOption readOption(XMLStreamReader in) throws XMLStreamException {
+        String optionType = in.getLocalName();
+        AbstractOption option = null;
+        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
+            option = new OptionGroup(getSpecification());
+        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+            option = new IntegerOption(getSpecification());
+        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+            option = new BooleanOption(getSpecification());
+        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+            option = new RangeOption(getSpecification());
+        } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
+            option = new SelectOption(getSpecification());
+        } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
+            option = new LanguageOption(getSpecification());
+        } else if (FileOption.getXMLElementTagName().equals(optionType)) {
+            option = new FileOption(getSpecification());
+        } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
+            option = new PercentageOption(getSpecification());
+        } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
+            option = new AudioMixerOption(getSpecification());
+        } else if (StringOption.getXMLElementTagName().equals(optionType)) {
+            option = new StringOption(getSpecification());
+        } else if (UnitTypeOption.getXMLElementTagName().equals(optionType)) {
+            option = new UnitTypeOption(getSpecification());
+        } else if (AbstractUnitOption.getXMLElementTagName().equals(optionType)) {
+            option = new AbstractUnitOption(getSpecification());
+        } else if (ModOption.getXMLElementTagName().equals(optionType)) {
+            option = new ModOption(getSpecification());
+        } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
+            option = new UnitListOption(getSpecification());
+        } else if (ModListOption.getXMLElementTagName().equals(optionType)) {
+            option = new ModListOption(getSpecification());
+        } else if ("action".equals(optionType)) {
+            logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
+            // TODO: load FreeColActions from client options?
+            in.nextTag();
+            return null;
+        } else {
+            logger.finest("Parsing of option type '" + optionType + "' is not implemented yet");
+            in.nextTag();
+            return null;
+        }
+        option.readFromXML(in);
+        return option;
+    }
+
 
 
 }

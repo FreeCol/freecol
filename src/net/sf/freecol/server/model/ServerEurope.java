@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.Game;
@@ -31,7 +32,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
@@ -80,11 +80,11 @@ public class ServerEurope extends Europe implements ServerModelObject {
         List<RandomChoice<UnitType>> recruits
             = player.generateRecruitablesList();
         if (spec.hasOption("model.option.immigrants")) {
-            List<AbstractUnitOption> immigrants =
-                ((UnitListOption) spec.getOption("model.option.immigrants")).getValue();
+            List<AbstractUnit> immigrants =
+                ((UnitListOption) spec.getOption("model.option.immigrants")).getOptionValues();
             for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                 UnitType immigrant = (index < immigrants.size())
-                    ? immigrants.get(index).getUnitType().getValue()
+                    ? immigrants.get(index).getUnitType(getSpecification())
                     : RandomChoice.getWeightedRandom(null, null, random, recruits);
                 setRecruitable(index, immigrant);
             }

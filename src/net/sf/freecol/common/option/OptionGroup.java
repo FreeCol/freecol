@@ -62,6 +62,14 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         super(id, specification);
     }
 
+    public OptionGroup clone() throws CloneNotSupportedException {
+        OptionGroup result = new OptionGroup(getId());
+        result.setValues(this);
+        result.options = new ArrayList<Option>(options);
+        result.optionMap = new HashMap<String, Option>(optionMap);
+        return result;
+    }
+
     /**
      * Adds the given <code>Option</code>.
      * @param option The <code>Option</code> that should be
@@ -261,55 +269,16 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             String optionId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
             Option option = getOption(optionId);
             if (option == null) {
-                addNewOption(in);
+                AbstractOption abstractOption = readOption(in);
+                if (abstractOption != null) {
+                    add(abstractOption);
+                    abstractOption.setGroup(this.getId());
+                }
             } else {
                 option.readFromXML(in);
             }
         }
     }
-
-    private void addNewOption(XMLStreamReader in) throws XMLStreamException {
-        String optionType = in.getLocalName();
-        AbstractOption option = null;
-        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-            option = new OptionGroup(getSpecification());
-        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
-            option = new IntegerOption(getSpecification());
-        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
-            option = new BooleanOption(getSpecification());
-        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
-            option = new RangeOption(getSpecification());
-        } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
-            option = new SelectOption(getSpecification());
-        } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
-            option = new LanguageOption(getSpecification());
-        } else if (FileOption.getXMLElementTagName().equals(optionType)) {
-            option = new FileOption(getSpecification());
-        } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-            option = new PercentageOption(getSpecification());
-        } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-            option = new AudioMixerOption(getSpecification());
-        } else if (StringOption.getXMLElementTagName().equals(optionType)) {
-            option = new StringOption(getSpecification());
-        } else if (UnitTypeOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitTypeOption(getSpecification());
-        } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitListOption(getSpecification());
-        } else if ("action".equals(optionType)) {
-            logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
-            // TODO: load FreeColActions from client options?
-            in.nextTag();
-            return;
-        } else {
-            logger.finest("Parsing of option type '" + optionType + "' is not implemented yet");
-            in.nextTag();
-            return;
-        }
-        option.readFromXML(in);
-        add(option);
-        option.setGroup(this.getId());
-    }
-
 
     /**
      * Returns the name of this <code>Option</code>.

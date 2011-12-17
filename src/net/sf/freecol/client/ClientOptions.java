@@ -27,9 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +44,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ListOption;
-import net.sf.freecol.common.option.ListOptionSelector;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -502,43 +499,6 @@ public class ClientOptions extends OptionGroup {
     private void addDefaultOptions() {
         loadOptions(new File(new File(FreeCol.getDataDirectory(), "base"),
                 "client-options.xml"));
-
-        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
-        final ListOptionSelector<FreeColModFile> selector
-            = new ListOptionSelector<FreeColModFile>() {
-
-            private final Map<String, FreeColModFile> mods
-                = new HashMap<String, FreeColModFile>();
-
-            private void init() {
-                mods.clear();
-                for (FreeColModFile f : Mods.getAllMods()) {
-                    if (f.getId() != null) {
-                        mods.put(f.getId(), f);
-                    }
-                }
-            }
-
-            public String getId(FreeColModFile t) {
-                return t.getId();
-            }
-
-            public FreeColModFile getObject(String id) {
-                init();
-                return mods.get(id);
-            }
-
-            public List<FreeColModFile> getOptions() {
-                init();
-                return new ArrayList<FreeColModFile>(mods.values());
-            }
-
-            public String toString(FreeColModFile t) {
-                return t.getId();
-            }
-        };
-        new ListOption<FreeColModFile>(selector, USER_MODS, modsGroup);
-        add(modsGroup);
     }
 
     /**
@@ -546,17 +506,20 @@ public class ClientOptions extends OptionGroup {
      *
      * @return A list of active mods.
      */
+    @SuppressWarnings("unchecked")
     public List<FreeColModFile> getActiveMods() {
         final Collection<FreeColModFile> fcmfs = Mods.getAllMods();
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
-        ListOption<?> options = (ListOption<?>) getOption(ClientOptions.USER_MODS);
-        for (Object o : options.getValue()) {
-            FreeColModFile modInfo = (FreeColModFile) o;
-            if (modInfo == null) continue;
-            for (FreeColModFile f : fcmfs) {
-                if (modInfo.getId().equals(f.getId())) {
-                    active.add(f);
-                    break;
+        ListOption<FreeColModFile> options = (ListOption<FreeColModFile>) getOption(ClientOptions.USER_MODS);
+        if (options != null) {
+            for (FreeColModFile modInfo : options.getOptionValues()) {
+                if (modInfo != null) {
+                    for (FreeColModFile f : fcmfs) {
+                        if (modInfo.getId().equals(f.getId())) {
+                            active.add(f);
+                            break;
+                        }
+                    }
                 }
             }
         }

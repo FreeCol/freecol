@@ -19,99 +19,145 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.BorderLayout;
+import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.ListCellRenderer;
 
-
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
-import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
-import net.sf.freecol.common.option.ListOptionSelector;
+import net.sf.freecol.common.option.Option;
 
 /**
- * This class provides visualization for a {@link
- * net.sf.freecol.common.option.ListOption}. In order to enable values
- * to be both seen and changed.
+ * This class provides visualization for a List of {@link
+ * net.sf.freecol.common.option.AbstractOption<T>}s. In order to
+ * enable values to be both seen and changed.
+ *
  */
-public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
+public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
+    implements ListSelectionListener {
+
+    private static Logger logger = Logger.getLogger(ListOptionUI.class.getName());
 
     private JPanel panel = new JPanel();
-    private final JList list;
-    private final DefaultListModel listModel;
+    private JList list;
+    private DefaultListModel model;
 
+    private JButton editButton = new JButton(Messages.message("list.edit"));
     private JButton addButton = new JButton(Messages.message("list.add"));
     private JButton removeButton = new JButton(Messages.message("list.remove"));
     private JButton upButton = new JButton(Messages.message("list.up"));
     private JButton downButton = new JButton(Messages.message("list.down"));
-    private FreeColClient freeColClient;
 
+    private JButton[] buttons = new JButton[] {
+        editButton, addButton, removeButton, upButton, downButton
+    };
+    private FreeColClient freeColClient;
 
 
     /**
      * Creates a new <code>ListOptionUI</code> for the given
      * <code>ListOption</code>.
      *
-     * @param option The <code>ListOption</code> to make a user interface
-     *            for.
+     * @param option
      * @param editable boolean whether user can modify the setting
      */
-    public ListOptionUI(FreeColClient freeColClient, GUI gui, final ListOption<T> option, boolean editable) {
+    public ListOptionUI(FreeColClient freeColClient, final GUI gui, final ListOption<T> option, boolean editable) {
         super(gui, option, editable);
-        this.freeColClient = freeColClient;
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          super.getLabel().getText()));
 
-        this.listModel = new DefaultListModel();
-        for (ListOptionElement<T> e : createElementList(option.getValue())) {
-            this.listModel.addElement(e);
+        panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
+
+        model = new DefaultListModel();
+        for (AbstractOption<T> o : option.getValue()) {
+            try {
+                model.addElement(o.clone());
+            } catch(CloneNotSupportedException e) {
+                logger.warning(e.toString());
+            }
         }
+        list = new JList(model);
+        AbstractOption<T> o = option.getValue().isEmpty()
+            ? option.getTemplate()
+            : option.getValue().get(0);
+        if (o != null) {
+            OptionUI ui = OptionUI.getOptionUI(freeColClient, gui, o, editable);
+            if (ui != null && ui.getListCellRenderer() != null) {
+                list.setCellRenderer(ui.getListCellRenderer());
+            }
+        }
+        list.setVisibleRowCount(4);
+        JScrollPane pane = new JScrollPane(list);
+        panel.add(pane, "grow, spany 5");
 
-        list = new JList(listModel);
-        final JScrollPane sp = new JScrollPane(list);
-        list.setEnabled(editable);
-        panel.add(sp, BorderLayout.CENTER);
-
-        final JPanel buttonPanel = new JPanel(new GridLayout(4, 1));
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(addButton);
-        buttonPanel.add(removeButton);
-        buttonPanel.add(upButton);
-        buttonPanel.add(downButton);
-        panel.add(buttonPanel, BorderLayout.EAST);
-        sp.setPreferredSize(new Dimension(500, buttonPanel.getPreferredSize().height));
+        for (JButton button : buttons) {
+            button.setEnabled(editable);
+            panel.add(button);
+        }
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showAddElementDialog();
+                Option oldValue = (Option) list.getSelectedValue();
+                if (oldValue == null) {
+                    oldValue = getOption().getTemplate();
+                }
+                try {
+                    Option value = oldValue.clone();
+                    if (showEditDialog(gui, value)) {
+                        model.addElement(value);
+                        list.setSelectedValue(value, true);
+                        list.repaint();
+                    }
+                } catch(CloneNotSupportedException ex) {
+                    logger.warning(ex.toString());
+                }
+            }
+        });
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Object object = list.getSelectedValue();
+                if (object != null) {
+                    if (showEditDialog(gui, (Option) object)) {
+                        list.repaint();
+                    }
+                }
             }
         });
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                listModel.removeElementAt(list.getSelectedIndex());
+                model.removeElementAt(list.getSelectedIndex());
             }
         });
         upButton.addActionListener(new ActionListener() {
@@ -120,95 +166,67 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
                     return;
                 }
                 final int index = list.getSelectedIndex();
-                final Object temp = listModel.getElementAt(index);
-                listModel.setElementAt(listModel.getElementAt(index-1), index);
-                listModel.setElementAt(temp, index-1);
+                final Object temp = model.getElementAt(index);
+                model.setElementAt(model.getElementAt(index-1), index);
+                model.setElementAt(temp, index-1);
                 list.setSelectedIndex(index-1);
             }
         });
         downButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() == listModel.getSize() - 1) {
+                if (list.getSelectedIndex() == model.getSize() - 1) {
                     return;
                 }
                 final int index = list.getSelectedIndex();
-                final Object temp = listModel.getElementAt(index);
-                listModel.setElementAt(listModel.getElementAt(index+1), index);
-                listModel.setElementAt(temp, index+1);
+                final Object temp = model.getElementAt(index);
+                model.setElementAt(model.getElementAt(index+1), index);
+                model.setElementAt(temp, index+1);
                 list.setSelectedIndex(index+1);
             }
         });
 
-        list.getModel().addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) {}
-            public void intervalAdded(ListDataEvent e) {}
-            public void intervalRemoved(ListDataEvent e) {}
-        });
-
+        editButton.setEnabled(false);
+        removeButton.setEnabled(false);
+        upButton.setEnabled(false);
+        downButton.setEnabled(false);
+        list.addListSelectionListener(this);
         initialize();
     }
 
-    private void showAddElementDialog() {
-        final Canvas canvas = gui.getCanvas();
-        final JButton addButton = new JButton(Messages.message("list.add"));
-        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(freeColClient, gui) {
-            @Override
-            public void requestFocus() {
-                addButton.requestFocus();
-            }
-        };
-        addElementDialog.setLayout(new BorderLayout());
-        final JPanel buttons = new JPanel(new FlowLayout());
-        buttons.add(addButton);
-        final JButton cancelButton = new JButton(Messages.message("cancel"));
-        buttons.add(cancelButton);
-        addElementDialog.setCancelComponent(cancelButton);
-        addElementDialog.add(buttons, BorderLayout.SOUTH);
-
-        final JComboBox mods = new JComboBox(getOption().getListOptionSelector().getOptions().toArray());
-        mods.setRenderer(new ChoiceRenderer());
-        addElementDialog.add(mods, BorderLayout.CENTER);
-
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addElementDialog.setResponse(mods.getSelectedItem());
-            }
-        });
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addElementDialog.setResponse(null);
-            }
-        });
-
-        canvas.addAsFrame(addElementDialog);
-        addElementDialog.requestFocus();
-
-        @SuppressWarnings("unchecked")
-        T response = (T) addElementDialog.getResponse();
-        canvas.remove(addElementDialog);
-
-        if (response != null) {
-            listModel.addElement(new ListOptionElement<T>(response, getOption().getListOptionSelector().toString(response)));
-        }
+    private boolean showEditDialog(GUI gui, Option option) {
+        final EditDialog editDialog = new EditDialog(freeColClient, gui, option);
+        boolean result = gui.getCanvas().showFreeColDialog(editDialog);
+        editDialog.requestFocus();
+        return result;
     }
 
-    private List<ListOptionElement<T>> createElementList(List<T> list) {
-        final List<ListOptionElement<T>> elementList = new ArrayList<ListOptionElement<T>>();
-        for (T o : list) {
-            if (o == null) continue;
-            final ListOptionSelector<T> los = getOption().getListOptionSelector();
-            final ListOptionElement<T> e = new ListOptionElement<T>(o, los.toString(o));
-            elementList.add(e);
-        }
-        return elementList;
-    }
+    private class EditDialog extends FreeColDialog<Boolean> {
 
-    private List<T> createNormalList(List<ListOptionElement<T>> elementList) {
-        final List<T> list = new ArrayList<T>(elementList.size());
-        for (ListOptionElement<T> o : elementList) {
-            list.add(o.object);
+        private OptionUI ui;
+
+        public EditDialog(FreeColClient freeColClient, GUI gui, Option option) {
+            super(freeColClient, gui);
+            setLayout(new MigLayout());
+            ui = OptionUI.getOptionUI(freeColClient, gui, option, editable);
+            if (ui.getLabel() == null) {
+                add(ui.getLabel(), "split 2");
+            }
+            add(ui.getComponent());
+
+            add(okButton, "newline, split 2, tag ok");
+            add(cancelButton, "tag cancel");
         }
-        return list;
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String command = event.getActionCommand();
+            if (OK.equals(command)) {
+                ui.updateOption();
+                setResponse(true);
+            } else {
+                setResponse(false);
+            }
+        }
     }
 
     /**
@@ -237,52 +255,34 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<T> getValue() {
-        final List<ListOptionElement<T>> l = new ArrayList<ListOptionElement<T>>();
-        for (int i=0; i<listModel.getSize(); i++) {
-            l.add((ListOptionElement<T>) listModel.getElementAt(i));
+    private List<AbstractOption<T>> getValue() {
+        List<AbstractOption<T>> result = new ArrayList<AbstractOption<T>>();
+        for (Enumeration e = model.elements(); e.hasMoreElements();) {
+            result.add((AbstractOption<T>) e.nextElement());
         }
-        return createNormalList(l);
+        return result;
     }
 
     /**
      * Reset with the value from the Option.
      */
     public void reset() {
-        listModel.clear();
-        for (Object o : createElementList(getOption().getValue())) {
-            listModel.addElement(o);
+        model.clear();
+        for (AbstractOption<T> o : getOption().getValue()) {
+            model.addElement(o);
         }
     }
 
-    private static class ListOptionElement<T> {
-        private final T object;
-        private final String text;
-
-        private ListOptionElement(final T object, final String text) {
-            this.object = object;
-            this.text = text;
-        }
-
-        @Override
-        public String toString() {
-            return text;
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting() == false) {
+            boolean enabled = (isEditable() && list.getSelectedValue() != null);
+            editButton.setEnabled(enabled);
+            removeButton.setEnabled(enabled);
+            upButton.setEnabled(enabled);
+            downButton.setEnabled(enabled);
         }
     }
 
-    private class ChoiceRenderer extends FreeColComboBoxRenderer {
 
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            if (value instanceof FreeColModFile) {
-                String key = "mod." + ((FreeColModFile) value).getId();
-                label.setText(Messages.message(key + ".name"));
-                if (Messages.containsKey(key + ".shortDescription")) {
-                    label.setToolTipText(Messages.message(key + ".shortDescription"));
-                }
-            } else {
-                label.setText(value.toString());
-            }
-        }
-    }
+
 }

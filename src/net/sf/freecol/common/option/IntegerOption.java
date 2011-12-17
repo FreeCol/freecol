@@ -74,10 +74,9 @@ public class IntegerOption extends AbstractOption<Integer> {
 
     public IntegerOption clone() {
         IntegerOption result = new IntegerOption(getId());
-        result.value = value;
+        result.setValues(this);
         result.minimumValue = minimumValue;
         result.maximumValue = maximumValue;
-        result.isDefined = true;
         return result;
     }
 

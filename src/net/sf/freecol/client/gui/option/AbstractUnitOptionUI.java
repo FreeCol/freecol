@@ -19,6 +19,12 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Locale;
@@ -26,7 +32,9 @@ import java.util.Locale;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
@@ -36,6 +44,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.StringOption;
@@ -145,5 +154,74 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             label.setText(Messages.message("model.unit.role." + ((String) value).toLowerCase(Locale.US)));
         }
     }
+
+    public ListCellRenderer getListCellRenderer() {
+        return new AbstractUnitRenderer();
+    }
+
+    private class AbstractUnitRenderer implements ListCellRenderer {
+
+        private final JPanel normal = new JPanel();
+        private final JPanel selected = new JPanel() {
+                public void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g;
+                    Composite oldComposite = g2d.getComposite();
+                    Color oldColor = g2d.getColor();
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
+                    g2d.setColor(Color.BLACK);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                    g2d.setComposite(oldComposite);
+                    g2d.setColor(oldColor);
+
+                    super.paintComponent(g);
+                }
+            };
+
+        public AbstractUnitRenderer() {
+            super();
+            normal.setOpaque(false);
+            normal.setLayout(new MigLayout("", "[40, align right][]"));
+            selected.setOpaque(false);
+            selected.setLayout(new MigLayout("", "[40, align right][]"));
+        }
+
+
+        /**
+         * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+         *
+         * @param list The <code>JList</code>.
+         * @param value The list cell.
+         * @param index The index in the list.
+         * @param isSelected <code>true</code> if the given list cell is selected.
+         * @param hasFocus <code>false</code> if the given list cell has the focus.
+         * @return The <code>ListCellRenderer</code>
+         */
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                      boolean isSelected, boolean hasFocus) {
+
+            JPanel c = isSelected ? selected : normal;
+            c.removeAll();
+            c.setForeground(list.getForeground());
+            c.setFont(list.getFont());
+            AbstractUnit unit = (AbstractUnit) ((AbstractUnitOption) value).getValue();
+            String key = unit.getId();
+            if (unit.getUnitType(getOption().getSpecification())
+                .hasAbility(Ability.CAN_BE_EQUIPPED)
+                && unit.getRole() != Role.DEFAULT) {
+                key = "model.unit." + unit.getRole().toString().toLowerCase(Locale.US);
+            }
+            StringTemplate template = StringTemplate.template(key + ".name")
+                .addAmount("%number%", unit.getNumber())
+                .add("%unit%", unit.getId() + ".name");
+            /*
+            c.add(new JLabel(new ImageIcon(ResourceManager.getImage(unit.getId() + ".image", 0.5))),
+                  "width 80, align center");
+            */
+            c.add(new JLabel(Integer.toString(unit.getNumber())));
+            c.add(new JLabel(Messages.message(template)));
+            return c;
+        }
+    }
+
 
 }

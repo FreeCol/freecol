@@ -82,6 +82,13 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         super(id, specification);
     }
 
+    public ModOption clone() {
+        ModOption result = new ModOption(getId());
+        result.setValues(this);
+        result.choices = new ArrayList<FreeColModFile>(choices);
+        return result;
+    }
+
     /**
      * Gets the current value of this <code>ModOption</code>.
      * @return The value.
@@ -139,6 +146,16 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     }
 
     /**
+     * Returns whether <code>null</code> is an acceptable value for
+     * this Option. This method always returns <code>true</code>.
+     *
+     * @return true
+     */
+    public boolean isNullValueOK() {
+        return true;
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
@@ -161,7 +178,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute(VALUE_TAG, value.getId());
+        if (value != null) {
+            out.writeAttribute(VALUE_TAG, value.getId());
+        }
     }
 
     /**

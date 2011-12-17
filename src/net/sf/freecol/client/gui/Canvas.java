@@ -435,6 +435,7 @@ public final class Canvas extends JDesktopPane {
             }
         } catch(Exception e) {
             logger.warning("add component failed with layer " + i);
+            e.printStackTrace();
         }
 
         if (update) {

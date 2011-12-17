@@ -22,33 +22,33 @@ package net.sf.freecol.common.option;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.model.Specification;
 
 /**
  * Represents an option where the valid choice is a list of
- * AbstractUnits, e.g. the units of the REF.
+ * FreeColModFiles.
  *
  */
-public class UnitListOption extends ListOption<AbstractUnit> {
+public class ModListOption extends ListOption<FreeColModFile> {
 
     /**
-     * Creates a new <code>UnitListOption</code>.
+     * Creates a new <code>ModListOption</code>.
      *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
      */
-    public UnitListOption(String id) {
+    public ModListOption(String id) {
         super(id);
     }
 
     /**
-     * Creates a new <code>UnitListOption</code>.
+     * Creates a new <code>ModListOption</code>.
      *
      * @param specification The specification this option belongs
      *     to. May be null.
      */
-    public UnitListOption(Specification specification) {
+    public ModListOption(Specification specification) {
         super(specification);
     }
 
@@ -59,9 +59,9 @@ public class UnitListOption extends ListOption<AbstractUnit> {
    /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "unitListOption".
+     * @return "modListOption".
      */
     public static String getXMLElementTagName() {
-        return "unitListOption";
+        return "modListOption";
     }
 }

@@ -46,24 +46,28 @@ import net.sf.freecol.common.model.Specification;
  */
 public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
-    private static Logger logger = Logger.getLogger(LanguageOption.class.getName());
+    public static final String AUTO = "automatic";
+
+    private static final Logger logger = Logger.getLogger(LanguageOption.class.getName());
 
     private static final Map<String, Language> languages = new HashMap<String, Language>();
 
-    public static final String AUTO = "automatic";
+    private static final Map<String, String> languageNames = new HashMap<String, String>();
 
     private Language DEFAULT = new Language(AUTO, getLocale(AUTO));
 
-    private Map<String, String> languageNames = new HashMap<String, String>();
+    private Language value;
 
-    private static final String[][] languageNamesHelper = {
-        {"arz", "\u0645\u0635\u0631\u064A"},
-        {"hsb", "Serb\u0161\u0107ina"},
-        {"nds", "Plattd\u00fc\u00fctsch"},
-        {"pms", "Piemont\u00e9s"},
-        {"be-tarask", "\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f "
-         + "(\u0442\u0430\u0440\u0430\u0448\u043a\u0435\u0432\u0456\u0446\u0430)" }
-    };
+    static {
+        // add non-standard language names here
+        languageNames.put("arz", "\u0645\u0635\u0631\u064A");
+        languageNames.put("hsb", "Serb\u0161\u0107ina");
+        languageNames.put("nds", "Plattd\u00fc\u00fctsch");
+        languageNames.put("pms", "Piemont\u00e9s");
+        languageNames.put("be-tarask", "\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f "
+                          + "(\u0442\u0430\u0440\u0430\u0448\u043a\u0435\u0432\u0456\u0446\u0430)");
+        findLanguages();
+    }
 
 
     private static Comparator<Language> languageComparator = new Comparator<Language>() {
@@ -83,7 +87,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     };
 
 
-    private Language value;
 
     /**
      * Creates a new <code>LanguageOption</code>.
@@ -93,15 +96,14 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      */
     public LanguageOption(Specification specification) {
         super(specification);
-        if (languages.size() == 0) {
-            prepareLanguages();
-        }
+        languages.put(AUTO, DEFAULT);
     }
 
-    private void prepareLanguages() {
-        for (String[] pair : languageNamesHelper) {
-            languageNames.put(pair[0], pair[1]);
-        }
+
+    public LanguageOption clone() throws CloneNotSupportedException {
+        LanguageOption result = new LanguageOption(getSpecification());
+        result.setValues(this);
+        return result;
     }
 
     /**
@@ -146,7 +148,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * @return The available languages in a human readable format.
      */
     public Language[] getOptions() {
-        findLanguages();
         List<Language> names = new ArrayList<Language>(languages.values());
         Collections.sort(names, languageComparator);
         return names.toArray(new Language[0]);
@@ -155,9 +156,8 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * Finds the languages available in the default directory.
      */
-    private void findLanguages() {
+    private static void findLanguages() {
 
-        languages.put(AUTO, DEFAULT);
         File i18nDirectory = new File(FreeCol.getDataDirectory(), Messages.STRINGS_DIRECTORY);
         File[] files = i18nDirectory.listFiles();
         if (files == null) {
@@ -229,7 +229,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         }
     }
 
-    public class Language {
+    public static class Language {
 
         /**
          * Describe key here.
@@ -331,14 +331,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         super.writeAttributes(out);
 
         out.writeAttribute(VALUE_TAG, getValue().getKey());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        findLanguages();
-        super.readAttributes(in);
     }
 
     /**

@@ -57,6 +57,12 @@ public class BooleanOption extends AbstractOption<Boolean> {
         super(specification);
     }
 
+    public BooleanOption clone() {
+        BooleanOption result = new BooleanOption(getId());
+        result.setValues(this);
+        return result;
+    }
+
     /**
      * Gets the current value of this <code>BooleanOption</code>.
      * @return The value.

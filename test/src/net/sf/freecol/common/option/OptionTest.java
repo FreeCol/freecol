@@ -62,8 +62,7 @@ public class OptionTest extends FreeColTestCase {
 
         UnitListOption refOption = (UnitListOption) spec().getOption("model.option.refSize");
 
-        for (AbstractUnitOption unitOption : refOption.getValue()) {
-            AbstractUnit unit = unitOption.getValue();
+        for (AbstractUnit unit : refOption.getOptionValues()) {
             assertTrue(unit.getNumber() > 0);
             assertTrue(unit.getNumber() < Integer.MAX_VALUE);
         }

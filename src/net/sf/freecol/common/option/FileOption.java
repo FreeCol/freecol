@@ -48,6 +48,12 @@ public class FileOption extends AbstractOption<File> {
         super(specification);
     }
 
+    public FileOption clone() {
+        FileOption result = new FileOption(getSpecification());
+        result.setValues(this);
+        return result;
+    }
+
     /**
      * Gets the current value of this <code>FileOption</code>.
      *

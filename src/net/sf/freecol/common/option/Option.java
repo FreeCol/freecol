@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
  *
  * @see net.sf.freecol.common.model.GameOptions
  */
-public interface Option<T> {
+public interface Option<T> extends Cloneable {
 
     /**
     * Returns a textual representation of this object.
@@ -60,6 +60,8 @@ public interface Option<T> {
      * @param value the value of this Option
      */
     public void setValue(T value);
+
+    public Option<T> clone() throws CloneNotSupportedException;
 
     /**
      * Initializes this object from an XML-representation of this object.
