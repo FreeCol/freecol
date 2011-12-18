@@ -34,7 +34,6 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.ModOption;
 import net.sf.freecol.common.option.Option;
