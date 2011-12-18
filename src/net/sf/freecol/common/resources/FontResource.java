@@ -20,6 +20,8 @@
 package net.sf.freecol.common.resources;
 
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -62,12 +64,21 @@ public class FontResource extends Resource {
             font = Font.decode(name.substring(SCHEME.length()));
         }
 
-        /** registerFont was only introduced in Java 1.6
+        // @compat java 1.5
+        // registerFont was only introduced in Java 1.6
         if (font != null) {
-            GraphicsEnvironment.getLocalGraphicsEnvironment()
-                .registerFont(font);
+            try {
+                GraphicsEnvironment environment =
+                    GraphicsEnvironment.getLocalGraphicsEnvironment();
+                Method registerFont = environment
+                    .getClass().getMethod("registerFont", Font.class);
+                registerFont.invoke(environment, font);
+            } catch(Exception e) {
+                logger.warning("Failed to register font " + font.getName()
+                               + ": " + e.toString());
+            }
         }
-        */
+        // end @compat
 
         logger.info("Loaded font: "
                     + ((font==null) ? "(null)" : font.getFontName())
