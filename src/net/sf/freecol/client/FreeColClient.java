@@ -301,7 +301,7 @@ public final class FreeColClient {
 
 
     public boolean currentPlayerIsMyPlayer() {
-        return game.getCurrentPlayer().equals(player);
+        return inGame && game.getCurrentPlayer().equals(player);
     }
 
     /**
