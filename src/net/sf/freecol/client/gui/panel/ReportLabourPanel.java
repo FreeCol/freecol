@@ -78,7 +78,9 @@ public final class ReportLabourPanel extends ReportPanel {
             }
 
             Location location = unit.getLocation();
-            if (location.getSettlement() != null) {
+            if (location == null) {
+                logger.warning("Unit has null location: " + unit.toString());
+            } else if (location.getSettlement() != null) {
                 location = location.getSettlement();
             } else if (unit.isInEurope()) {
                 location = getMyPlayer().getEurope();
