@@ -269,7 +269,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
-                    if (u == mapViewer.getActiveUnit()) mapViewer.setActiveUnit(null);
+                    if (u == gui.getActiveUnit()) mapViewer.setActiveUnit(null);
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
                 }

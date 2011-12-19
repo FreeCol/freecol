@@ -1072,7 +1072,7 @@ public final class InGameController implements NetworkConstants {
         boolean result = false;
         gui.getCanvas().showStatusPanel(Messages.message("status.savingGame"));
         try {
-            server.setActiveUnit(gui.getMapViewer().getActiveUnit());
+            server.setActiveUnit(gui.getActiveUnit());
             server.saveGame(file, freeColClient.getMyPlayer().getName(),
                 freeColClient.getClientOptions());
             lastSaveGameFile = file;
@@ -1389,7 +1389,7 @@ public final class InGameController implements NetworkConstants {
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
         MapViewer mapViewer = gui.getMapViewer();
-        Unit unit = mapViewer.getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit == null) {
             return;
         } else if (!unit.canBuildColony()) {
@@ -1913,8 +1913,7 @@ public final class InGameController implements NetworkConstants {
     public void disbandActiveUnit() {
         if (!requireOurTurn()) return;
 
-        MapViewer mapViewer = gui.getMapViewer();
-        Unit unit = mapViewer.getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit == null) return;
         Tile tile = (gui.getCanvas().isShowingSubPanel()) ? null
             : unit.getTile();
@@ -2185,7 +2184,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        Unit unit = gui.getMapViewer().getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit != null && requireOurTurn()) {
             clearGotoOrders(unit);
             move(unit, direction);
@@ -3265,7 +3264,7 @@ public final class InGameController implements NetworkConstants {
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
         MapViewer mapViewer = gui.getMapViewer();
-        Unit unit = mapViewer.getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {
             return; // Current active unit has more moves to do.
@@ -3629,7 +3628,7 @@ public final class InGameController implements NetworkConstants {
      * Skip a unit.
      */
     public void skipActiveUnit() {
-        changeState(gui.getMapViewer().getActiveUnit(), UnitState.SKIPPED);
+        changeState(gui.getActiveUnit(), UnitState.SKIPPED);
     }
 
     /**

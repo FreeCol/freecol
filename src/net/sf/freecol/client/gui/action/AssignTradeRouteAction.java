@@ -54,7 +54,7 @@ public class AssignTradeRouteAction extends UnitAction {
         if (super.shouldBeEnabled()) {
             MapViewer mapViewer = gui.getMapViewer();
             if (mapViewer != null) {
-                Unit unit = gui.getMapViewer().getActiveUnit();
+                Unit unit = gui.getActiveUnit();
                 return (unit != null && unit.isCarrier());
             }
         }
@@ -67,7 +67,7 @@ public class AssignTradeRouteAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getMapViewer().getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit != null) {
             getFreeColClient().getInGameController().assignTradeRoute(unit);
         }

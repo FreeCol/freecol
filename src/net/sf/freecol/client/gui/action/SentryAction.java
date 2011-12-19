@@ -50,7 +50,7 @@ public class SentryAction extends UnitAction {
      */
     public void actionPerformed(ActionEvent actionEvent) {
         getFreeColClient().getInGameController()
-            .changeState(gui.getMapViewer().getActiveUnit(),
+            .changeState(gui.getActiveUnit(),
                 Unit.UnitState.SENTRY);
     }
 

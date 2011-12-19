@@ -49,7 +49,7 @@ public class TilePopupAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         MapViewer mapViewer = gui.getMapViewer();
-        gui.getCanvas().showTilePopup(mapViewer.getSelectedTile(),
+        gui.getCanvas().showTilePopup(gui.getSelectedTile(),
                                                  mapViewer.getCursor().getCanvasX(),
                                                  mapViewer.getCursor().getCanvasY());
     }

@@ -275,11 +275,11 @@ public final class MapControls {
         int viewMode = gui.getMapViewer().getViewMode().getView();
         switch (viewMode) {
         case ViewMode.MOVE_UNITS_MODE:
-            infoPanel.update(gui.getMapViewer().getActiveUnit());
+            infoPanel.update(gui.getActiveUnit());
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            if (gui.getMapViewer().getSelectedTile() != null) {
-                Tile selectedTile = gui.getMapViewer().getSelectedTile();
+            if (gui.getSelectedTile() != null) {
+                Tile selectedTile = gui.getSelectedTile();
                 if (infoPanel.getTile() != selectedTile) {
                     infoPanel.update(selectedTile);
                 }

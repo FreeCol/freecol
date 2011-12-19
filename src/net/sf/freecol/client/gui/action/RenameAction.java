@@ -48,6 +48,6 @@ public class RenameAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().rename(gui.getMapViewer().getActiveUnit());
+        getFreeColClient().getInGameController().rename(gui.getActiveUnit());
     }
 }

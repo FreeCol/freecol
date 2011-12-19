@@ -107,7 +107,7 @@ public final class TilePopup extends JPopupMenu {
         this.mapViewer = gui.getMapViewer();
 
         final Player player = freeColClient.getMyPlayer();
-        final Unit activeUnit = mapViewer.getActiveUnit();
+        final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
             Tile unitTile = activeUnit.getTile();
             JMenuItem gotoMenuItem = null;

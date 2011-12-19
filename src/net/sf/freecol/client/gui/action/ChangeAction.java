@@ -69,7 +69,7 @@ public class ChangeAction extends UnitAction {
 
         MapViewer mapViewer = gui.getMapViewer();
         if (mapViewer != null) {
-            Unit unit = mapViewer.getActiveUnit();
+            Unit unit = gui.getActiveUnit();
             if (unit != null && unit.getTile() != null) {
                 if (unit.getColony() != null) {
                     putValue(NAME, Messages.message("changeAction.enterColony.name"));
@@ -90,7 +90,7 @@ public class ChangeAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && gui.getMapViewer().getActiveUnit().getTile() != null;
+            && gui.getActiveUnit().getTile() != null;
     }
 
     /**
@@ -98,7 +98,7 @@ public class ChangeAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getMapViewer().getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {

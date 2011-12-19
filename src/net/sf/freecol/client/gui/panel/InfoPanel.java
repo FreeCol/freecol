@@ -116,7 +116,7 @@ public final class InfoPanel extends FreeColPanel {
            @Override
            public void mousePressed(MouseEvent e) {
               MapViewer mapViewer = gui.getMapViewer();
-              Unit activeUnit = mapViewer.getActiveUnit();
+              Unit activeUnit = gui.getActiveUnit();
               if (activeUnit != null && activeUnit.getTile() != null) {
                   mapViewer.setFocus(activeUnit.getTile());
               }

@@ -58,7 +58,7 @@ public class LoadAction extends MapboardAction {
         if (super.shouldBeEnabled()) {
             MapViewer mapViewer = gui.getMapViewer();
             if (mapViewer != null) {
-                Unit unit = gui.getMapViewer().getActiveUnit();
+                Unit unit = gui.getActiveUnit();
                 return (unit != null && unit.isCarrier()
                         && unit.getGoodsCount() > 0
                         && unit.getColony() != null);
@@ -72,7 +72,7 @@ public class LoadAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getMapViewer().getActiveUnit();
+        Unit unit = gui.getActiveUnit();
         if (unit != null) {
             Colony colony = unit.getColony();
             if (colony != null) {

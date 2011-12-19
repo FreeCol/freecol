@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -217,6 +218,14 @@ public class GUI {
 
     public MapViewer getMapViewer() {
         return mapViewer;
+    }
+    
+    public Unit getActiveUnit() {
+        return mapViewer.getActiveUnit();
+    }
+    
+    public Tile getSelectedTile() {
+        return mapViewer.getSelectedTile();
     }
     
     public SoundPlayer getSoundPlayer() {

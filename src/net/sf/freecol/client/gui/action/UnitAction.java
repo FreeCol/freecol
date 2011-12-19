@@ -44,7 +44,7 @@ public abstract class UnitAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && gui.getMapViewer().getActiveUnit() != null;
+        return super.shouldBeEnabled() && gui.getActiveUnit() != null;
     }
 
 }
