@@ -1185,7 +1185,7 @@ public final class MapViewer {
             + "." + Integer.toHexString(backgroundColor.getRGB());
         Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
         if (img == null) {
-            img = createChip(occupationString, Color.BLACK, backgroundColor, foregroundColor);
+            img = lib.createChip(occupationString, Color.BLACK, backgroundColor, foregroundColor);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;
@@ -1774,37 +1774,6 @@ public final class MapViewer {
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
-
-    /**
-     * Create a "chip" with the given text and colors.
-     *
-     * @param text a <code>String</code> value
-     * @param border a <code>Color</code> value
-     * @param background a <code>Color</code> value
-     * @param foreground a <code>Color</code> value
-     * @return an <code>Image</code> value
-     */
-    private Image createChip(String text, Color border, Color background, Color foreground) {
-        // Draw it and put it in the cache
-        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
-                (float) Math.rint(12 * lib.getScalingFactor()));
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font, g2.getFontRenderContext());
-        float padding = 6 * lib.getScalingFactor();
-        int width = (int) (label.getBounds().getWidth() + padding);
-        int height = (int) (label.getAscent() + label.getDescent() + padding);
-        g2.setColor(border);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(background);
-        g2.fillRect(1, 1, width - 2, height - 2);
-        g2.setColor(foreground);
-        label.draw(g2, (float) (padding/2 - label.getBounds().getX()), label.getAscent() + padding/2);
-        g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
-    }
-
 
     /**
      * Creates an Image that shows the given text centred on a
@@ -2543,7 +2512,7 @@ public final class MapViewer {
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the color chip for the settlement.
                     text = indianSettlement.getType().isCapital() ? "*" : "-";
-                    chip = createChip(text, Color.BLACK, background, foreground);
+                    chip = lib.createChip(text, Color.BLACK, background, foreground);
                     g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                     xOffset += chip.getWidth(null) + 2;
 
@@ -2553,7 +2522,7 @@ public final class MapViewer {
                         boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
                         Color mission = (expert ? Color.BLACK : Color.GRAY);
                         Color cross = lib.getColor(missionary.getOwner());
-                        chip = createChip("\u271D", Color.BLACK, mission, cross);
+                        chip = lib.createChip("\u271D", Color.BLACK, mission, cross);
                         g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
                     }
@@ -2563,7 +2532,7 @@ public final class MapViewer {
                 Player player = freeColClient.getMyPlayer();
                 if (player != null && indianSettlement.hasContactedSettlement(player)) {
                     final boolean visited = indianSettlement.hasSpokenToChief(player);
-                    chip = createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
+                    chip = lib.createChip((visited ? "!" : "?"), Color.BLACK, background, foreground);
                     g.drawImage(chip, (int) xOffset, (int) yOffset, null);
                 }
             } else {
@@ -3457,4 +3426,7 @@ public final class MapViewer {
         leftSpace = (size.width - tileWidth) / 2;
         rightSpace = leftSpace;
     }
+    
+    
+    
 }

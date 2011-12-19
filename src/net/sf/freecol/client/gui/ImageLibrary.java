@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -27,6 +28,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Transparency;
+import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -868,6 +870,38 @@ public final class ImageLibrary {
             return "wagon";
         }
     }
+    
+    
+    /**
+     * Create a "chip" with the given text and colors.
+     *
+     * @param text a <code>String</code> value
+     * @param border a <code>Color</code> value
+     * @param background a <code>Color</code> value
+     * @param foreground a <code>Color</code> value
+     * @return an <code>Image</code> value
+     */
+    public Image createChip(String text, Color border, Color background, Color foreground) {
+        // Draw it and put it in the cache
+        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
+                (float) Math.rint(12 * getScalingFactor()));
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font, g2.getFontRenderContext());
+        float padding = 6 * getScalingFactor();
+        int width = (int) (label.getBounds().getWidth() + padding);
+        int height = (int) (label.getAscent() + label.getDescent() + padding);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        g2.setColor(foreground);
+        label.draw(g2, (float) (padding/2 - label.getBounds().getX()), label.getAscent() + padding/2);
+        g2.dispose();
+        return bi.getSubimage(0, 0, width, height);
+    }
+
 
 
 }
