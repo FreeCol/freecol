@@ -24,10 +24,8 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -67,17 +65,14 @@ public class ChangeAction extends UnitAction {
     public void update() {
         super.update();
 
-        MapViewer mapViewer = gui.getMapViewer();
-        if (mapViewer != null) {
-            Unit unit = gui.getActiveUnit();
-            if (unit != null && unit.getTile() != null) {
-                if (unit.getColony() != null) {
-                    putValue(NAME, Messages.message("changeAction.enterColony.name"));
-                } else if (unit.isOnCarrier()) {
-                    putValue(NAME, Messages.message("changeAction.selectCarrier.name"));
-                } else {
-                    putValue(NAME, Messages.message("changeAction.nextUnitOnTile.name"));
-                }
+        Unit unit = gui.getActiveUnit();
+        if (unit != null && unit.getTile() != null) {
+            if (unit.getColony() != null) {
+                putValue(NAME, Messages.message("changeAction.enterColony.name"));
+            } else if (unit.isOnCarrier()) {
+                putValue(NAME, Messages.message("changeAction.selectCarrier.name"));
+            } else {
+                putValue(NAME, Messages.message("changeAction.nextUnitOnTile.name"));
             }
         }
     }

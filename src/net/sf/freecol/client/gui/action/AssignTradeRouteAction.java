@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -52,11 +51,8 @@ public class AssignTradeRouteAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            MapViewer mapViewer = gui.getMapViewer();
-            if (mapViewer != null) {
-                Unit unit = gui.getActiveUnit();
-                return (unit != null && unit.isCarrier());
-            }
+            Unit unit = gui.getActiveUnit();
+            return (unit != null && unit.isCarrier());
         }
         return false;
     }

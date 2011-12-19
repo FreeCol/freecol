@@ -22,10 +22,8 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -56,13 +54,10 @@ public class LoadAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            MapViewer mapViewer = gui.getMapViewer();
-            if (mapViewer != null) {
-                Unit unit = gui.getActiveUnit();
-                return (unit != null && unit.isCarrier()
-                        && unit.getGoodsCount() > 0
-                        && unit.getColony() != null);
-            }
+            Unit unit = gui.getActiveUnit();
+            return (unit != null && unit.isCarrier()
+                    && unit.getGoodsCount() > 0
+                    && unit.getColony() != null);
         }
         return false;
     }    

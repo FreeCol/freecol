@@ -220,6 +220,10 @@ public class GUI {
         return imageLibrary;
     }
 
+    public float getMapScale() {
+        return mapViewer.getMapScale();
+    }
+    
     public MapViewer getMapViewer() {
         return mapViewer;
     }

@@ -84,7 +84,7 @@ final class UnitMoveAnimation {
         
         if (srcP == null || dstP == null || movementSpeed <= 0) return;
 
-        float scale = mapViewer.getMapScale();
+        float scale = gui.getMapScale();
         final int movementRatio = (int)(Math.pow(2, movementSpeed + 1) * scale);
         final Rectangle r1 = mapViewer.getTileBounds(sourceTile);
         final Rectangle r2 = mapViewer.getTileBounds(destinationTile);
