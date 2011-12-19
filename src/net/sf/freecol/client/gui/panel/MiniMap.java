@@ -428,7 +428,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int tileX = ((x - adjustX) / tileSize) + firstColumn;
         int tileY = ((y - adjustY) / tileSize * 4) + firstRow;
 
-        gui.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
+        gui.setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
     }
 
     private void focus(MouseEvent e) {

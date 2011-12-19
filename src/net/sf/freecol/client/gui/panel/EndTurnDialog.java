@@ -180,7 +180,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
     public void valueChanged(ListSelectionEvent e) {
         Unit unit = ((UnitWrapper) unitList.getSelectedValue()).unit;
         if (unit != null && unit.getTile() != null) {
-            getGUI().getMapViewer().setFocus(unit.getTile());
+            getGUI().setFocus(unit.getTile());
         }
     }
 

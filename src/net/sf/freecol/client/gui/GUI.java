@@ -316,6 +316,10 @@ public class GUI {
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
+    
+    public void setFocus(Tile tileToFocus) {
+        mapViewer.setFocus(tileToFocus);
+    }
 
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);

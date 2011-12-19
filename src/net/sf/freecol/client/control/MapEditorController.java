@@ -192,7 +192,7 @@ public final class MapEditorController {
                 game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
             }
             mapGenerator.createMap(game);
-            gui.getMapViewer().setFocus(game.getMap().getTile(1,1));
+            gui.setFocus(game.getMap().getTile(1,1));
             freeColClient.getActionManager().update();
             gui.refresh();
         } catch (FreeColException e) {
@@ -318,7 +318,7 @@ public final class MapEditorController {
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             canvas.closeStatusPanel();
-                            gui.getMapViewer().setFocus(freeColClient.getGame().getMap().getTile(1,1));
+                            gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
                             freeColClient.getActionManager().update();
                             gui.refresh();
                         }

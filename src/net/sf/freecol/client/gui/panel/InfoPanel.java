@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -115,10 +114,9 @@ public final class InfoPanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
            @Override
            public void mousePressed(MouseEvent e) {
-              MapViewer mapViewer = gui.getMapViewer();
               Unit activeUnit = gui.getActiveUnit();
               if (activeUnit != null && activeUnit.getTile() != null) {
-                  mapViewer.setFocus(activeUnit.getTile());
+                  gui.setFocus(activeUnit.getTile());
               }
           }
             });
