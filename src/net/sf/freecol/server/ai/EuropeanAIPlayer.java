@@ -1950,12 +1950,10 @@ public class EuropeanAIPlayer extends AIPlayer {
         Iterator<AIColony> aci = getAIColonyIterator();
         while (aci.hasNext()) {
             AIColony ac = aci.next();
-            Iterator<AIGoods> agi = ac.getAIGoodsIterator();
-            while (agi.hasNext()) {
-                AIGoods ag = agi.next();
-                if (ag.getTransportDestination() != null
-                    && ag.getTransport() == null) {
-                    transportables.add(ag);
+            for (AIGoods aig : ac.getAIGoods()) {
+                if (aig.getTransportDestination() != null
+                    && aig.getTransport() == null) {
+                    transportables.add(aig);
                 }
             }
         }

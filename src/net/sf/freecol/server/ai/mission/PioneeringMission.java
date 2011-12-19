@@ -396,28 +396,22 @@ public class PioneeringMission extends Mission {
     }
 
 
-    private void equipUnitWithTools(Connection connection) {
+    public void equipUnitWithTools(Connection connection) {
+        final EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
         Unit unit = getUnit();
-        logger.finest("About to equip " + unit + " in " + colonyWithTools.getName());
-        AIColony ac = getAIMain().getAIColony(colonyWithTools);
-        EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
-        int amount = toolsType.getMaximumCount();
-        for (AbstractGoods materials : toolsType.getGoodsRequired()) {
-            int availableAmount = ac.getAvailableGoods(materials.getType());
-            int requiredAmount = materials.getAmount();
-            if (availableAmount < requiredAmount) {
-                invalidateMission = true;
-                return;
-            }
-            amount = Math.min(amount, availableAmount / requiredAmount);
+        if (!colonyWithTools.canProvideEquipment(toolsType)) {
+            invalidateMission = true;
+            return;
         }
 
-        logger.finest("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
-        AIMessage.askEquipUnit(getAIUnit(), toolsType, amount);
-
-        // Unit is now equipped, get to work
-        if(unit.getEquipmentCount(toolsType) > 0){
+        if (AIMessage.askEquipUnit(getAIUnit(), toolsType, 1)
+            && unit.getEquipmentCount(toolsType) > 0) {
             state = PioneeringMissionState.IMPROVING;
+            logger.finest("Equipped " + unit
+                + " at " + colonyWithTools.getName() + " with tools");
+        } else {
+            logger.warning("Equip with tools failed for " + unit
+                + " at " + colonyWithTools.getName());
         }
     }
 

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.Comparator;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -45,6 +46,12 @@ public class AIGoods extends AIObject implements Transportable {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
+    private static final Comparator<AIGoods> aiGoodsPriorityComparator
+        = new Comparator<AIGoods>() {
+            public int compare(AIGoods g1, AIGoods g2) {
+                return g2.getTransportPriority() - g1.getTransportPriority();
+            }
+        };
 
     public static final int IMPORTANT_DELIVERY = 110;
     public static final int FULL_DELIVERY = 100;
@@ -138,7 +145,17 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
+     * Gets a comparator that sorts by priority.
+     *
+     * @return A priority comparator.
+     */
+    public static Comparator<AIGoods> getAIGoodsPriorityComparator() {
+        return aiGoodsPriorityComparator;
+    }
+
+    /**
      * Aborts the given <code>Wish</code>.
+     *
      * @param w The <code>Wish</code> to be aborted.
      */
     public void abortWish(Wish w) {
@@ -151,46 +168,44 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-    * Returns the source for this <code>Transportable</code>.
-    * This is normally the location of the
-    * {@link #getTransportLocatable locatable}.
-    *
-    * @return The source for this <code>Transportable</code>.
-    */
+     * Returns the source for this <code>Transportable</code>.
+     * This is normally the location of the
+     * {@link #getTransportLocatable locatable}.
+     *
+     * @return The source for this <code>Transportable</code>.
+     */
     public Location getTransportSource() {
         return goods.getLocation();
     }
 
 
     /**
-    * Returns the destination for this <code>Transportable</code>.
-    * This can either be the target {@link Tile} of the transport
-    * or the target for the entire <code>Transportable</code>'s
-    * mission. The target for the tansport is determined by
-    * {@link TransportMission} in the latter case.
-    *
-    * @return The destination for this <code>Transportable</code>.
-    */
+     * Returns the destination for this <code>Transportable</code>.
+     * This can either be the target {@link Tile} of the transport
+     * or the target for the entire <code>Transportable</code>'s
+     * mission. The target for the tansport is determined by
+     * {@link TransportMission} in the latter case.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
     public Location getTransportDestination() {
         return destination;
     }
 
-
     /**
-    * Gets the <code>Locatable</code> which should be transported.
-    * @return The <code>Locatable</code>.
-    */
+     * Gets the <code>Locatable</code> which should be transported.
+     * @return The <code>Locatable</code>.
+     */
     public Locatable getTransportLocatable() {
         return getGoods();
     }
 
-
     /**
-    * Gets the priority of transporting this <code>Transportable</code>
-    * to it's destination.
-    *
-    * @return The priority of the transport.
-    */
+     * Gets the priority of transporting this <code>Transportable</code>
+     * to it's destination.
+     *
+     * @return The priority of the transport.
+     */
     public int getTransportPriority() {
         if (goods.getAmount() <= GoodsContainer.CARGO_SIZE) {
             return goods.getAmount();
@@ -199,25 +214,25 @@ public class AIGoods extends AIObject implements Transportable {
         }
     }
 
-
     /**
-    * Increases the transport priority of this <code>Transportable</code>.
-    * This method gets called every turn the <code>Transportable</code>
-    * have not been put on a carrier's transport list.
-    */
+     * Increases the transport priority of this <code>Transportable</code>.
+     * This method gets called every turn the <code>Transportable</code>
+     * have not been put on a carrier's transport list.
+     */
     public void increaseTransportPriority() {
         transportPriority++;
     }
 
-
     /**
-    * Gets the carrier responsible for transporting this <code>Transportable</code>.
-    *
-    * @return The <code>AIUnit</code> which has this <code>Transportable</code>
-    *         in it's transport list. This <code>Transportable</code> has not been
-    *         scheduled for transport if this value is <code>null</code>.
-    *
-    */
+     * Gets the carrier responsible for transporting this
+     * <code>Transportable</code>.
+     *
+     * @return The <code>AIUnit</code> which has this
+     *         <code>Transportable</code> in it's transport list. This
+     *         <code>Transportable</code> has not been scheduled for
+     *         transport if this value is <code>null</code>.
+     *
+     */
     public AIUnit getTransport() {
         return transport;
     }
@@ -240,13 +255,15 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-    * Sets the carrier responsible for transporting this <code>Transportable</code>.
-    *
-    * @param transport The <code>AIUnit</code> which has this <code>Transportable</code>
-    *         in it's transport list. This <code>Transportable</code> has not been
-    *         scheduled for transport if this value is <code>null</code>.
-    *
-    */
+     * Sets the carrier responsible for transporting this
+     * <code>Transportable</code>.
+     *
+     * @param transport The <code>AIUnit</code> which has this
+     *         <code>Transportable</code> in it's transport list. This
+     *         <code>Transportable</code> has not been scheduled for
+     *         transport if this value is <code>null</code>.
+     *
+     */
     public void setTransport(AIUnit transport) {
         AIUnit oldTransport = this.transport;
         this.transport = transport;
@@ -272,7 +289,9 @@ public class AIGoods extends AIObject implements Transportable {
 
 
     /**
-     * Sets the priority of getting the goods to the {@link #getTransportDestination}.
+     * Sets the priority of getting the goods to the {@link
+     * #getTransportDestination}.
+     *
      * @param transportPriority The priority.
      */
     public void setTransportPriority(int transportPriority) {
@@ -281,9 +300,10 @@ public class AIGoods extends AIObject implements Transportable {
 
 
     /**
-    * Gets the goods this <code>AIGoods</code> is controlling.
-    * @return The <code>Goods</code>.
-    */
+     * Gets the goods this <code>AIGoods</code> is controlling.
+     *
+     * @return The <code>Goods</code>.
+     */
     public Goods getGoods() {
         return goods;
     }
@@ -291,6 +311,7 @@ public class AIGoods extends AIObject implements Transportable {
 
     /**
      * Sets the goods this <code>AIGoods</code> is controlling.
+     *
      * @param goods The <code>Goods</code>.
      */
     public void setGoods(Goods goods) {

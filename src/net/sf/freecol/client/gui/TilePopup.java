@@ -316,9 +316,8 @@ public final class TilePopup extends JPopupMenu {
                             info.append("\n");
                         }
                         info.append("\n\nEXPORT GOODS:\n");
-                        Iterator<AIGoods> goodsIterator = ac.getAIGoodsIterator();
-                        while (goodsIterator.hasNext()) {
-                            info.append(goodsIterator.next().toString());
+                        for (AIGoods aig : ac.getAIGoods()) {
+                            info.append(aig.toString());
                             info.append("\n");
                         }
                         canvas.showInformationMessage(info.toString());
