@@ -169,7 +169,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, gui, tile.getIndianSettlement()));
                     }
                 } else {
-                    mapViewer.setSelectedTile(null, true);
+                    gui.setSelectedTile(null, true);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 startPoint = e.getPoint();
@@ -204,7 +204,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         	oldPoint = e.getPoint();
         }
         drawBox(component, startPoint, oldPoint);
-        if (mapViewer.getFocus() != null) {
+        if (gui.getFocus() != null) {
             Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
             Tile end = start;
             //Optimization, only check if the points are different
@@ -214,7 +214,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
 
             // no option selected, just center map
             if(!isTransformActive){
-            	mapViewer.setFocus(end);
+            	gui.setFocus(end);
             	return;
             }
 
