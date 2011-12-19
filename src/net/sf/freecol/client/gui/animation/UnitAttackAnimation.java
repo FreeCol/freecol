@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.animation;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Map.Direction;
@@ -34,7 +33,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 final class UnitAttackAnimation {
 
-    private final Canvas canvas;
     private final Unit attacker;
     private final Unit defender;
     private final boolean success;
@@ -49,11 +47,10 @@ final class UnitAttackAnimation {
      * @param defender The <code>Unit</code> that is defending.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit attacker, Unit defender,
+    public UnitAttackAnimation(FreeColClient freeColClient, GUI gui, Unit attacker, Unit defender,
                                boolean success) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.canvas = canvas;
         this.attacker = attacker;
         this.defender = defender;
         this.success = success;
@@ -62,7 +59,6 @@ final class UnitAttackAnimation {
     /**
      * Find the animation for a unit attack.
      *
-     * @param canvas The <code>Canvas</code> to draw the animation on.
      * @param unit The <code>Unit</code> to animate.
      * @param direction The <code>Direction</code> of the attack.
      * @return An animation, if available.
@@ -101,14 +97,14 @@ final class UnitAttackAnimation {
 
         if (Animations.getAnimationSpeed(freeColClient, attacker) > 0) {
             if ((sza = getAnimation(attacker, direction)) != null) {
-                new UnitImageAnimation(gui, canvas, attacker, sza).animate();
+                new UnitImageAnimation(gui, attacker, sza).animate();
             }
         }
 
         if (!success && Animations.getAnimationSpeed(freeColClient, defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
-                new UnitImageAnimation(gui, canvas, defender, sza).animate();
+                new UnitImageAnimation(gui, defender, sza).animate();
             }
         }
     }

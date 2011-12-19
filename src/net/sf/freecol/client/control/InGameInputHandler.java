@@ -1586,7 +1586,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(unit.getTile())) {
                 mapViewer.setFocusImmediately(unit.getTile());
             }
-            Animations.unitAttack(getFreeColClient(), gui, canvas, unit, defender, success);
+            Animations.unitAttack(getFreeColClient(), gui, unit, defender, success);
             gui.refresh();
         }
     }

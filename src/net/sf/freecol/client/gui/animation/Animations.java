@@ -34,9 +34,9 @@ public class Animations {
      * @param defender The <code>Unit</code> that is defending.
      * @param success Did the attack succeed?
      */
-    public static void unitAttack(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit attacker, Unit defender,
+    public static void unitAttack(FreeColClient freeColClient, GUI gui, Unit attacker, Unit defender,
                                   boolean success) {
-        new UnitAttackAnimation(freeColClient, gui, canvas, attacker, defender, success).animate();
+        new UnitAttackAnimation(freeColClient, gui, attacker, defender, success).animate();
     }
 
 
