@@ -656,7 +656,7 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning("Settlement omitted from diplomacy message.");
             return null;
         }
-        Player other = (unit.getOwner() == player) ? settlement.getOwner()
+        Player other = (player.owns(unit)) ? settlement.getOwner()
             : unit.getOwner();
         String nation = Messages.message(other.getNationName());
         DiplomaticTrade agreement = message.getAgreement();
@@ -711,7 +711,7 @@ public final class InGameInputHandler extends InputHandler {
         if (colony == null) {
             logger.warning("IndianDemand with null colony: " + element.getAttribute("colony"));
             return null;
-        } else if (colony.getOwner() != player) {
+        } else if (!player.owns(colony)) {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
         Goods goods = message.getGoods();

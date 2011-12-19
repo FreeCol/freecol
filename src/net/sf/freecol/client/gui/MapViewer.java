@@ -1155,7 +1155,7 @@ public final class MapViewer {
         Color backgroundColor = lib.getColor(unit.getOwner());
         Color foregroundColor = getForegroundColor(backgroundColor);
         String occupationString;
-        if (unit.getOwner() != freeColClient.getMyPlayer()
+        if (!freeColClient.getMyPlayer().owns(unit)
                 && unit.isNaval()) {
             occupationString = Integer.toString(unit.getVisibleGoodsCount());
         } else {
@@ -1408,7 +1408,7 @@ public final class MapViewer {
         // The user might what to check the status of a unit - SG
         boolean ret = false;
 
-        if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
+        if (activeUnit != null && !freeColClient.getMyPlayer().owns(activeUnit)) {
             gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
             return ret;
         }
@@ -2312,7 +2312,7 @@ public final class MapViewer {
                                 String size = Integer.toString(((Colony) settlement).getDisplayUnitCount());
                                 leftImage = createLabel(g, size, font, backgroundColor);
 
-                                if (settlement.getOwner() == clientPlayer) {
+                                if (clientPlayer.owns(settlement)) {
                                     int bonusProduction = ((Colony) settlement).getProductionBonus();
                                     if (bonusProduction != 0) {
                                         String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
