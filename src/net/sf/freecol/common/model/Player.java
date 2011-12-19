@@ -1275,7 +1275,7 @@ public class Player extends FreeColGameObject implements Nameable {
     	}
     	
     	// make sure the owner of the unit is set first, before adding it to the list
-    	if(newUnit.getOwner() != null && newUnit.getOwner() != this){
+    	if(newUnit.getOwner() != null && !this.owns(newUnit)){
     		throw new IllegalStateException(this + " adding another players unit=" + newUnit);
     	}
 
@@ -2453,7 +2453,7 @@ public class Player extends FreeColGameObject implements Nameable {
                             GoodsType type = production.getType();
                             int potential = market.getSalePrice(type, tile.potential(type, null));
                             if (tile.getOwner() != null &&
-                                tile.getOwner() != getGame().getCurrentPlayer()) {
+                                !getGame().getCurrentPlayer().owns(tile)) {
                                 // tile is already owned by someone (and not by us!)
                                 if (tile.getOwner().isEuropean()) {
                                     continue;
@@ -2599,7 +2599,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     //no settlement on neighbouring tile
                     } else {
                         //apply penalty for owned neighbouring tiles
-                        if (tile.getOwner() != null && tile.getOwner() != this) {
+                        if (tile.getOwner() != null && !this.owns(tile)) {
                             if (tile.getOwner().isEuropean()) {
                                 advantage *= MOD_OWNED_EUROPEAN;
                             } else {

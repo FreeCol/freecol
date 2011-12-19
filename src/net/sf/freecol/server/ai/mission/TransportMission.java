@@ -198,7 +198,7 @@ public class TransportMission extends Mission {
                     || ((FreeColGameObject)dst).isDisposed()
                     || ((dst instanceof Settlement)
                         && ((Settlement)dst).getOwner() != null
-                        && ((Settlement)dst).getOwner() != owner)) {
+                        && !owner.owns((Settlement)dst))) {
                     removeFromTransportList(t);
                 }
             } else {
@@ -207,7 +207,7 @@ public class TransportMission extends Mission {
                     || ((FreeColGameObject)src).isDisposed()
                     || ((src instanceof Settlement)
                         && ((Settlement)src).getOwner() != null
-                        && ((Settlement)src).getOwner() != owner)) {
+                        && !owner.owns((Settlement)src))) { 
                     removeFromTransportList(t);
                 }
             }

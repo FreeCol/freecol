@@ -1279,7 +1279,7 @@ public class IndianSettlement extends Settlement {
             }
         } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
             Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
-            if (unit.getOwner() != null && unit.getOwner() != owner) {
+            if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
                                + " does not belong to settlement " + getId());
             } else {
