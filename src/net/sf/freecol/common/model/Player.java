@@ -2453,7 +2453,7 @@ public class Player extends FreeColGameObject implements Nameable {
                             GoodsType type = production.getType();
                             int potential = market.getSalePrice(type, tile.potential(type, null));
                             if (tile.getOwner() != null &&
-                                !getGame().getCurrentPlayer().owns(tile)) {
+                                !this.owns(tile)) {
                                 // tile is already owned by someone (and not by us!)
                                 if (tile.getOwner().isEuropean()) {
                                     continue;
