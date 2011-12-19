@@ -87,17 +87,17 @@ public class ClientOptions extends OptionGroup {
     /**
      * If this option is enabled, the display will recenter in order to display
      * the active unit if it is not
-     * {@link net.sf.freecol.client.gui.MapViewer#onScreen(Tile)}).
+     * {@link net.sf.freecol.client.gui.GUI#onScreen(Tile)}).
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.GUI
      */
     public static final String JUMP_TO_ACTIVE_UNIT = "model.option.jumpToActiveUnit";
 
     /**
      * Selected tiles always gets centered if this option is enabled (even if
-     * the tile is {@link net.sf.freecol.client.gui.MapViewer#onScreen(Tile)}).
+     * the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Tile)}).
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.GUI
      */
     public static final String ALWAYS_CENTER = "model.option.alwaysCenter";
 
@@ -105,7 +105,7 @@ public class ClientOptions extends OptionGroup {
      * Used by GUI, this is the minimum number of goods a colony must possess for
      * the goods to show up at the bottom of the colony panel.
      *
-     * @see net.sf.freecol.client.gui.MapViewer
+     * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS = "model.option.guiMinNumberToDisplayGoods";
 

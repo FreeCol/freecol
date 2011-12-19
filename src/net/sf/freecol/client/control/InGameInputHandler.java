@@ -1529,7 +1529,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             MapViewer mapViewer = gui.getMapViewer();
-            if (focus || !mapViewer.onScreen(sourceTile)) {
+            if (focus || !gui.onScreen(sourceTile)) {
                 mapViewer.setFocusImmediately(sourceTile);
             }
             Animations.unitMove(getFreeColClient(), gui, canvas, unit, sourceTile, destinationTile);
@@ -1583,7 +1583,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             MapViewer mapViewer = gui.getMapViewer();
-            if (focus || !mapViewer.onScreen(unit.getTile())) {
+            if (focus || !gui.onScreen(unit.getTile())) {
                 mapViewer.setFocusImmediately(unit.getTile());
             }
             Animations.unitAttack(getFreeColClient(), gui, canvas, unit, defender, success);

@@ -212,6 +212,10 @@ public class GUI {
         return colonyTileGUI;
     }
     
+    public Tile getFocus() {
+        return mapViewer.getFocus();
+    }
+    
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
@@ -497,5 +501,8 @@ public class GUI {
         }
     }
 
-    
+    public boolean onScreen(Tile tileToCheck) {
+        return mapViewer.onScreen(tileToCheck);
+    }
+     
 }

@@ -2740,7 +2740,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
-                if (!gui.getMapViewer().onScreen(tile)) 
+                if (!gui.onScreen(tile)) 
                     gui.setSelectedTile(tile, false);
             }
         }

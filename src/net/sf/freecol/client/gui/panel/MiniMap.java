@@ -272,7 +272,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         g.setColor(ResourceManager.getColor("miniMapBackground.color"));
         g.fillRect(0, 0, width, height);
 
-        if (gui.getMapViewer() == null || gui.getMapViewer().getFocus() == null) {
+        if (gui.getMapViewer() == null || gui.getFocus() == null) {
             return;
         }
 
@@ -282,8 +282,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int ySize = (height / tileSize) * 4;
 
         /* Center the mini map correctly based on the map's focus */
-        firstColumn = gui.getMapViewer().getFocus().getX() - (xSize / 2);
-        firstRow = gui.getMapViewer().getFocus().getY() - (ySize / 2);
+        firstColumn = gui.getFocus().getX() - (xSize / 2);
+        firstRow = gui.getFocus().getY() - (ySize / 2);
 
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
@@ -384,8 +384,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * x/yTiles are the number of tiles that fit on the large map */
         if (getParent() != null) {
             TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
-            int miniRectX = (gui.getMapViewer().getFocus().getX() - firstColumn) * tileSize;
-            int miniRectY = (gui.getMapViewer().getFocus().getY() - firstRow) * tileSize / 4;
+            int miniRectX = (gui.getFocus().getX() - firstColumn) * tileSize;
+            int miniRectY = (gui.getFocus().getY() - firstRow) * tileSize / 4;
             int miniRectWidth = (getParent().getWidth() / library.getTerrainImageWidth(tileType) + 1) * tileSize;
             int miniRectHeight = (getParent().getHeight() / library.getTerrainImageHeight(tileType) + 1) * tileSize / 2;
             if (miniRectX + miniRectWidth / 2 > width) {
