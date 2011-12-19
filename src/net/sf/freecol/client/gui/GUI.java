@@ -312,6 +312,10 @@ public class GUI {
         mapViewer.scaleMap(delta);
         refresh();
     }
+    
+    public void setActiveUnit(Unit unitToActivate) {
+        mapViewer.setActiveUnit(unitToActivate);
+    }
 
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);

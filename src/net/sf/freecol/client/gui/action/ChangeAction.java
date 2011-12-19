@@ -104,7 +104,7 @@ public class ChangeAction extends UnitAction {
         if (tile.getColony() != null) {
             gui.getCanvas().showColonyPanel(tile.getColony());
         } else if (unit.isOnCarrier()) {
-            gui.getMapViewer().setActiveUnit(((Unit) unit.getLocation()));
+            gui.setActiveUnit(((Unit) unit.getLocation()));
         } else {
             Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
@@ -115,7 +115,7 @@ public class ChangeAction extends UnitAction {
                 } else if (activeUnitFound
                     && u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    gui.getMapViewer().setActiveUnit(u);
+                    gui.setActiveUnit(u);
                     return;
                 }
             }
@@ -126,7 +126,7 @@ public class ChangeAction extends UnitAction {
                     return;
                 } else if (u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    gui.getMapViewer().setActiveUnit(u);
+                    gui.setActiveUnit(u);
                     return;
                 }
             }

@@ -717,7 +717,7 @@ public final class ColonyPanel extends FreeColPanel
                 Unit activeUnit = getGUI().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                     || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    getGUI().getMapViewer().setActiveUnit(null);
+                    getGUI().setActiveUnit(null);
                     getController().nextActiveUnit();
                 }
             }

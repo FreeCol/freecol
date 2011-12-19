@@ -38,7 +38,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
@@ -339,10 +338,9 @@ public final class InGameController implements NetworkConstants {
         // Process all units.
         boolean result = true;
         Player player = freeColClient.getMyPlayer();
-        MapViewer mapViewer = gui.getMapViewer();
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
-            mapViewer.setActiveUnit(unit);
+            gui.setActiveUnit(unit);
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
@@ -355,7 +353,7 @@ public final class InGameController implements NetworkConstants {
             if (moveToDestination(unit)) result = false;
             nextModelMessage();
         }
-        mapViewer.setActiveUnit(null);
+        gui.setActiveUnit(null);
         return result;
     }
 
@@ -364,8 +362,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void doEndTurn() {
         // Clear active unit if any.
-        MapViewer mapViewer = gui.getMapViewer();
-        mapViewer.setActiveUnit(null);
+        gui.setActiveUnit(null);
 
         // Unskip all skipped, some may have been faked in-client.
         // Server-side skipped units are set active in csNewTurn.
@@ -1277,8 +1274,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().abandonColony(colony)
             && tile.getSettlement() == null) {
             player.invalidateCanSeeTiles();
-            MapViewer mapViewer = gui.getMapViewer();
-            mapViewer.setActiveUnit(null);
+            gui.setActiveUnit(null);
             gui.setSelectedTile(tile, false);
         }
     }
@@ -1388,7 +1384,6 @@ public final class InGameController implements NetworkConstants {
 
         // Check unit can build, and is on the map.
         // Show the colony warnings if required.
-        MapViewer mapViewer = gui.getMapViewer();
         Unit unit = gui.getActiveUnit();
         if (unit == null) {
             return;
@@ -1451,7 +1446,7 @@ public final class InGameController implements NetworkConstants {
             && tile.getSettlement() != null) {
             player.invalidateCanSeeTiles();
             gui.playSound("sound.event.buildingComplete");
-            mapViewer.setActiveUnit(null);
+            gui.setActiveUnit(null);
             gui.setSelectedTile(tile, false);
 
             // Check units present for treasure cash-in as they are now
@@ -2222,8 +2217,7 @@ public final class InGameController implements NetworkConstants {
     public boolean moveToDestination(Unit unit) {
         if (!requireOurTurn()) return false;
         if (unit.getTradeRoute() != null) return followTradeRoute(unit);
-        MapViewer mapViewer = gui.getMapViewer();
-        mapViewer.setActiveUnit(unit);
+        gui.setActiveUnit(unit);
         Player player = freeColClient.getMyPlayer();
 
         Location destination;
@@ -2277,7 +2271,7 @@ public final class InGameController implements NetworkConstants {
                     if (!checkCashInTreasureTrain(unit)
                         && unit.getMovesLeft() > 0
                         && unit.getState() != UnitState.SKIPPED) {
-                        gui.getMapViewer().setActiveUnit(unit);
+                        gui.setActiveUnit(unit);
                         return true;
                     }
                 }
@@ -2583,7 +2577,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().embark(unit, carrier, direction)
             && unit.getLocation() == carrier) {
             if (carrier.getMovesLeft() > 0) {
-                gui.getMapViewer().setActiveUnit(carrier);
+                gui.setActiveUnit(carrier);
             } else {
                 nextActiveUnit();
             }
@@ -2746,8 +2740,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
-                MapViewer mapViewer = gui.getMapViewer();
-                if (!mapViewer.onScreen(tile)) 
+                if (!gui.getMapViewer().onScreen(tile)) 
                     gui.setSelectedTile(tile, false);
             }
         }
@@ -3004,7 +2997,7 @@ public final class InGameController implements NetworkConstants {
 
         askServer().closeTransactionSession(unit, settlement);
         if (unit.getMovesLeft() > 0) { // May have been restored if no trade
-            gui.getMapViewer().setActiveUnit(unit);
+            gui.setActiveUnit(unit);
         } else {
             nextActiveUnit();
         }
@@ -3263,14 +3256,13 @@ public final class InGameController implements NetworkConstants {
 
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
-        MapViewer mapViewer = gui.getMapViewer();
         Unit unit = gui.getActiveUnit();
         if (unit != null && !unit.isDisposed() && unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {
             return; // Current active unit has more moves to do.
         }
         if (player.hasNextActiveUnit()) {
-            mapViewer.setActiveUnit(player.getNextActiveUnit());
+            gui.setActiveUnit(player.getNextActiveUnit());
             return; // Successfully found a unit to display
         }
 
@@ -3280,7 +3272,7 @@ public final class InGameController implements NetworkConstants {
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
         // just select nothing and wait.
-        mapViewer.setActiveUnit(null);
+        gui.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
         if (moveMode >= MODE_END_TURN) {
             endTurn();
@@ -3747,8 +3739,7 @@ public final class InGameController implements NetworkConstants {
      * Tell a unit to wait.
      */
     public void waitActiveUnit() {
-        MapViewer mapViewer = gui.getMapViewer();
-        mapViewer.setActiveUnit(null);
+        gui.setActiveUnit(null);
         nextActiveUnit();
     }
 

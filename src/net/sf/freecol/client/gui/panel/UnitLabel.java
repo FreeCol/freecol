@@ -345,7 +345,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             break;
         case ACTIVATE_UNIT:
             inGameController.changeState(unit, Unit.UnitState.ACTIVE);
-            gui.getMapViewer().setActiveUnit(unit);
+            gui.setActiveUnit(unit);
             break;
         case FORTIFY:
             inGameController.changeState(unit, Unit.UnitState.FORTIFYING);

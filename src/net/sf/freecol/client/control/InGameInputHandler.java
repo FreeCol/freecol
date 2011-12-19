@@ -265,11 +265,10 @@ public final class InGameInputHandler extends InputHandler {
                     player.divertModelMessages(fcgo, divert);
                 }
                 // Deselect the object if it is the current active unit.
-                MapViewer mapViewer = gui.getMapViewer();
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
-                    if (u == gui.getActiveUnit()) mapViewer.setActiveUnit(null);
+                    if (u == gui.getActiveUnit()) gui.setActiveUnit(null);
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
                 }

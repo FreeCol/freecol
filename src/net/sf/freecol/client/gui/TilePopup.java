@@ -226,7 +226,7 @@ public final class TilePopup extends JPopupMenu {
                             freeColClient.getInGameController().clearOrders(unit);
                             lastUnit = unit;
                         }
-                        mapViewer.setActiveUnit(lastUnit);
+                        gui.setActiveUnit(lastUnit);
                     }
                 });
             add(activateAllItem);
@@ -460,7 +460,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    mapViewer.setActiveUnit(unit);
+                    gui.setActiveUnit(unit);
                 }
             });
         int lineCount = 1;
@@ -642,7 +642,7 @@ public final class TilePopup extends JPopupMenu {
         } else {
             ((Unit)game.getFreeColGameObject(carrier.getId())).add(unit);
         }
-        mapViewer.setActiveUnit(unit);
+        gui.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
         gui.refresh();
     }
@@ -660,7 +660,7 @@ public final class TilePopup extends JPopupMenu {
             u.setMovesLeft(u.getInitialMovesLeft());
             su.setMovesLeft(su.getInitialMovesLeft());
             if (first) {
-                mapViewer.setActiveUnit(u);
+                gui.setActiveUnit(u);
                 first = false;
             }
         }

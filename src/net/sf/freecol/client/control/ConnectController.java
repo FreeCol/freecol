@@ -298,7 +298,7 @@ public final class ConnectController {
                             if (active != null) {
                                 active.getOwner().resetIterators();
                                 active.getOwner().setNextActiveUnit(active);
-                                gui.getMapViewer().setActiveUnit(active);
+                                gui.setActiveUnit(active);
                             }
                             
                         } else {
