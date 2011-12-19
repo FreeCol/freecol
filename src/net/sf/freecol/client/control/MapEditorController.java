@@ -108,7 +108,6 @@ public final class MapEditorController {
             gui.playSound(null);
 
             final Canvas canvas = gui.getCanvas();
-            final MapViewer mapViewer = gui.getMapViewer();
 
             canvas.closeMainPanel();
             gui.closeMenus();
@@ -122,7 +121,7 @@ public final class MapEditorController {
             f.setLocation(f.getX(), 50);
 
             canvas.repaint();
-            CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, gui, canvas, mapViewer);
+            CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, gui, canvas);
             canvas.addMouseListener(listener);
             canvas.addMouseMotionListener(listener);
         } catch (NoRouteToServerException e) {

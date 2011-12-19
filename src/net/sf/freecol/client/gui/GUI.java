@@ -508,5 +508,9 @@ public class GUI {
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }
+    
+    public void setFocusImmediately(Tile tileToFocus) {
+        mapViewer.setFocusImmediately(tileToFocus);
+    }
      
 }

@@ -93,7 +93,7 @@ public final class TilePopup extends JPopupMenu {
      * @param freeColClient The main controller object for the client.
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
-     * @param canvas The component containing the map.
+     * @param gui The GUI frontend.
      * @param gui An object with methods used for making the popup.
      */
     public TilePopup(final FreeColClient freeColClient, final GUI gui, final Tile tile) {

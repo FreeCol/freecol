@@ -62,7 +62,6 @@ public class UnloadAction extends MapboardAction {
 
     private Unit getUnit() {
         return (unit != null) ? unit
-            : (gui.getMapViewer() == null) ? null
             : gui.getActiveUnit();
     }
 

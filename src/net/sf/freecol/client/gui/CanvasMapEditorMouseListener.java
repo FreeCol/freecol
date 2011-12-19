@@ -76,11 +76,11 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
      * @param canvas The component this object gets created for.
      * @param mapViewer The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient, GUI gui, Canvas canvas, MapViewer mapViewer) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, GUI gui, Canvas canvas) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.canvas = canvas;
-        this.mapViewer = mapViewer;
+        this.mapViewer = gui.getMapViewer();
         this.scrollThread = null;
     }
 

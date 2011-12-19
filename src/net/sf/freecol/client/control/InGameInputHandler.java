@@ -34,7 +34,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
@@ -1528,11 +1527,10 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer mapViewer = gui.getMapViewer();
             if (focus || !gui.onScreen(sourceTile)) {
-                mapViewer.setFocusImmediately(sourceTile);
+                gui.setFocusImmediately(sourceTile);
             }
-            Animations.unitMove(getFreeColClient(), gui, canvas, unit, sourceTile, destinationTile);
+            Animations.unitMove(getFreeColClient(), gui, unit, sourceTile, destinationTile);
             gui.refresh();
         }
     }
@@ -1582,9 +1580,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            MapViewer mapViewer = gui.getMapViewer();
             if (focus || !gui.onScreen(unit.getTile())) {
-                mapViewer.setFocusImmediately(unit.getTile());
+                gui.setFocusImmediately(unit.getTile());
             }
             Animations.unitAttack(getFreeColClient(), gui, unit, defender, success);
             gui.refresh();

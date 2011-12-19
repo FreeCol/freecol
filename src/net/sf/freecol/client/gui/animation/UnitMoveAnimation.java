@@ -25,7 +25,6 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
@@ -44,7 +43,6 @@ final class UnitMoveAnimation {
      */
     private static final int ANIMATION_DELAY = 33;
 
-    private final Canvas canvas;
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
@@ -62,11 +60,10 @@ final class UnitMoveAnimation {
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(FreeColClient freeColClient, GUI gui, Canvas canvas, Unit unit, Tile sourceTile,
+    public UnitMoveAnimation(FreeColClient freeColClient, GUI gui, Unit unit, Tile sourceTile,
                              Tile destinationTile) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.canvas = canvas;
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
@@ -106,7 +103,7 @@ final class UnitMoveAnimation {
                     
                     // Painting the whole screen once to get rid of
                     // disposed dialog-boxes.
-                    canvas.paintImmediately(canvas.getBounds());
+                    gui.getCanvas().paintImmediately(gui.getCanvas().getBounds());
                     
                     int dropFrames = 0;
                     Point point = srcPoint;
@@ -125,7 +122,7 @@ final class UnitMoveAnimation {
                         }
                         if (dropFrames <= 0) {
                             unitLabel.setLocation(point);
-                            canvas.paintImmediately(bounds);
+                            gui.getCanvas().paintImmediately(bounds);
                             
                             int timeTaken = (int)(System.currentTimeMillis()
                                 - time);
