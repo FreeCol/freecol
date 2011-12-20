@@ -47,6 +47,6 @@ public class CenterAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getMapViewer().centerActiveUnit();
+        gui.centerActiveUnit();
     }
 }

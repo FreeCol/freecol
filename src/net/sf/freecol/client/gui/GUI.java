@@ -98,6 +98,10 @@ public class GUI {
         return soundPlayer != null;
     }
 
+    public void centerActiveUnit() {
+        mapViewer.centerActiveUnit();
+    }
+
     /**
      * Change the windowed mode.
      * @param windowed Use <code>true</code> for windowed mode
@@ -202,16 +206,20 @@ public class GUI {
         canvas.errorMessage(messageID, message);
         
     }
+    
 
+    public Unit getActiveUnit() {
+        return mapViewer.getActiveUnit();
+    }
+    
     public Canvas getCanvas() {
         return canvas;
     }
     
-
     public MapViewer getColonyTileGUI() {
         return colonyTileGUI;
     }
-    
+
     public Tile getFocus() {
         return mapViewer.getFocus();
     }
@@ -219,17 +227,13 @@ public class GUI {
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-
+    
     public float getMapScale() {
         return mapViewer.getMapScale();
     }
     
     public MapViewer getMapViewer() {
         return mapViewer;
-    }
-    
-    public Unit getActiveUnit() {
-        return mapViewer.getActiveUnit();
     }
     
     public Tile getSelectedTile() {
@@ -239,10 +243,11 @@ public class GUI {
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
-    
+
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
+    
 
     public void hideSplashScreen() {
         if (splash != null) {
@@ -251,10 +256,14 @@ public class GUI {
         }
     }
     
-
     public boolean isWindowed() {
         return windowed;
     }
+    
+    public boolean onScreen(Tile tileToCheck) {
+        return mapViewer.onScreen(tileToCheck);
+    }
+
     
     /**
      * Plays some sound. Parameter == null stops playing a sound.
@@ -275,7 +284,7 @@ public class GUI {
             }
         }
     }
-    
+
     public void quit() {
         if (!isWindowed()) {
             try {
@@ -288,16 +297,15 @@ public class GUI {
         }
     }
 
-    
     public void refresh() { 
         mapViewer.forceReposition();
         canvas.refresh();
     }
-
+    
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
-
+    
     /**
      * Refreshes the screen at the specified Tile.
      *
@@ -320,7 +328,7 @@ public class GUI {
         mapViewer.scaleMap(delta);
         refresh();
     }
-    
+
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
@@ -328,15 +336,19 @@ public class GUI {
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
+    
+    
+    public void setFocusImmediately(Tile tileToFocus) {
+        mapViewer.setFocusImmediately(tileToFocus);
+    }
 
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
-    
+
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
-    
     
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
@@ -356,6 +368,7 @@ public class GUI {
         this.windowed = windowed;
         
     }
+    
 
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
@@ -481,11 +494,12 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
+    
 
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-    
+
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -493,24 +507,14 @@ public class GUI {
         frame.getJMenuBar().repaint();
     }
     
-
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
     
-
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
-    }
-
-    public boolean onScreen(Tile tileToCheck) {
-        return mapViewer.onScreen(tileToCheck);
-    }
-    
-    public void setFocusImmediately(Tile tileToFocus) {
-        mapViewer.setFocusImmediately(tileToFocus);
     }
      
 }
