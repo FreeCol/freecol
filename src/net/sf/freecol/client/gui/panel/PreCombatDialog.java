@@ -82,7 +82,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
             attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getGUI(), false, true);
             defenderName = settlement.getName();
-            defenderLabel = new JLabel(gui.getImageLibrary().getImageIcon(settlement, false));
+            defenderLabel = new JLabel(gui.getImageIcon(settlement, false));
         } else {
             throw new IllegalStateException("Bogus attack");
         }

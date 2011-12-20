@@ -552,4 +552,9 @@ public class GUI {
         mapViewer.getViewMode().toggleViewMode();    
     }
      
+    public ImageIcon getImageIcon(Object display, boolean small) {
+        return imageLibrary.getImageIcon(display, small);
+    }
+    
+    
 }

@@ -1119,7 +1119,7 @@ public final class Canvas extends JDesktopPane {
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
             texts[i] = Messages.message(messages[i]);
-            images[i] = gui.getImageLibrary().getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
+            images[i] = gui.getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
         }
 
         FreeColDialog<Boolean> confirmDialog
@@ -1352,7 +1352,7 @@ public final class Canvas extends JDesktopPane {
         String text = Messages.message(template);
         ImageIcon icon = null;
         if (displayObject != null) {
-            icon = gui.getImageLibrary().getImageIcon(displayObject, false);
+            icon = gui.getImageIcon(displayObject, false);
         }
         Tile tile = null;
         if (displayObject instanceof Tile) {
@@ -1520,7 +1520,7 @@ public final class Canvas extends JDesktopPane {
         ImageIcon[] messageIcon = new ImageIcon[messages.size()];
         for (int i = 0; i < messages.size(); i++) {
             messageText[i] = Messages.message(messages.get(i));
-            messageIcon[i] = gui.getImageLibrary().getImageIcon(game
+            messageIcon[i] = gui.getImageIcon(game
                 .getMessageDisplay(messages.get(i)), false);
         }
 
