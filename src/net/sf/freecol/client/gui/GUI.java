@@ -545,5 +545,9 @@ public class GUI {
         }
         
     }
+
+    public void toggleViewMode() {
+        mapViewer.getViewMode().toggleViewMode();    
+    }
      
 }
