@@ -37,6 +37,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -1072,42 +1074,22 @@ public class Unit extends FreeColGameObject
 
     /**
      * Finds a shortest path from the current <code>Tile</code> to the one
-     * specified. Only paths on water are allowed if <code>isNaval()</code>
+     * specified.  Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.
-     *
-     * <br>
-     * <br>
      *
      * The <code>Tile</code> at the <code>end</code> will not be checked
      * against the legal moves of this <code>Unit</code>.
      *
      * @param end The <code>Tile</code> in which the path ends.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see Map#findPath(Unit, Tile , Tile)
+     * @return A <code>PathNode</code> for the first tile in the path.
      * @exception IllegalArgumentException if <code>end == null</code>
      */
     public PathNode findPath(Tile end) {
         if (getTile() == null) {
-            logger.warning("getTile() == null for " + toString() + " at location: " + getLocation());
+            logger.warning("getTile() == null for " + toString()
+                + " at location: " + getLocation());
         }
-        return findPath(getTile(), end);
-    }
-
-    /**
-     * Convenience wrapper to find a path to Europe for this unit.
-     *
-     * @return A path to Europe, or null if none found.
-     */
-    public PathNode findPathToEurope() {
-        Location loc = getLocation();
-        return (loc instanceof Tile)
-            ? getGame().getMap().findPathToEurope(this, (Tile) loc)
-            : null;
+        return this.findPath(getTile(), end);
     }
 
     /**
@@ -1118,14 +1100,48 @@ public class Unit extends FreeColGameObject
      * @param start The <code>Tile</code> in which the path starts.
      * @param end The <code>Tile</code> in which the path ends.
      * @return A <code>PathNode</code> for the first tile in the path.
-     * @see #findPath(Tile)
      */
     public PathNode findPath(Tile start, Tile end) {
+        return this.findPath(start, end, null);
+    }
+
+    /**
+     * Finds a shortest path from the current <code>Tile</code> to the one
+     * specified. Only paths on water are allowed if <code>isNaval()</code>
+     * and only paths on land if not.
+     *
+     * @param start The <code>Tile</code> in which the path starts.
+     * @param end The <code>Tile</code> in which the path ends.
+     * @param carrier An optional <code>Unit</code> to carry the unit.
+     * @return A <code>PathNode</code> for the first tile in the path.
+     */
+    public PathNode findPath(Tile start, Tile end, Unit carrier) {
         Location dest = getDestination();
         setDestination(end);
-        PathNode path = getGame().getMap().findPath(this, start, end);
+        PathNode path = getGame().getMap().findPath(this, start, end,
+                                                    carrier, null);
         setDestination(dest);
         return path;
+    }
+
+    /**
+     * Convenience wrapper to find a path to Europe for this unit.
+     *
+     * @return A path to Europe, or null if none found.
+     */
+    public PathNode findPathToEurope() {
+        Location loc = getLocation();
+        return (loc instanceof Tile) ? this.findPathToEurope((Tile)loc) : null;
+    }
+
+    /**
+     * Convenience wrapper to find a path to Europe for this unit.
+     *
+     * @param start The <code>Tile</code> to start from.
+     * @return A path to Europe, or null if none found.
+     */
+    public PathNode findPathToEurope(Tile start) {
+        return getGame().getMap().findPathToEurope(this, start, null);
     }
 
     /**
@@ -1146,10 +1162,10 @@ public class Unit extends FreeColGameObject
             Location dest = getDestination();
             setDestination(end);
             final Unit carrier = (Unit) getLocation();
-            p = getGame().getMap().findPath(this, start, end, carrier);
+            p = getGame().getMap().findPath(this, start, end, carrier, null);
             setDestination(dest);
         } else {
-            p = findPath(start, end);
+            p = this.findPath(start, end);
         }
         return (p != null) ? p.getTotalTurns() : INFINITY;
     }
@@ -1187,8 +1203,8 @@ public class Unit extends FreeColGameObject
         }
         if (isInEurope()) {
             if (isNaval()) {
-                p = map.findPath(this, getFullEntryLocation(),
-                                 destination.getTile());
+                p = this.findPath(getFullEntryLocation(),
+                                  destination.getTile());
             } else {
                 if (carrier == null) {
                     // Pick a carrier.  If none found the unit is stuck!
@@ -1202,21 +1218,21 @@ public class Unit extends FreeColGameObject
                 }
                 if (carrier.getFullEntryLocation().getTile()
                     == destination.getTile()) return carrier.getSailTurns();
-                p = map.findPath(this, carrier.getFullEntryLocation(),
-                                 destination.getTile(), carrier);
+                p = this.findPath(carrier.getFullEntryLocation(),
+                                  destination.getTile(), carrier);
             }
             return (p == null) ? INFINITY
                 : p.getTotalTurns() + carrier.getSailTurns();
         }
         if (isAtSea()) {
             if (isNaval()) {
-                p = map.findPath(this, getFullEntryLocation(),
-                                 destination.getTile());
+                p = this.findPath(getFullEntryLocation(),
+                                  destination.getTile());
                 carrier = this;
             } else {
                 if (carrier == null) return INFINITY;
-                p = map.findPath(this, carrier.getFullEntryLocation(),
-                                 destination.getTile(), carrier);
+                p = this.findPath(carrier.getFullEntryLocation(),
+                                  destination.getTile(), carrier);
             }
             return (p == null) ? INFINITY : p.getTotalTurns()
                 + carrier.getWorkLeft();
@@ -1226,6 +1242,29 @@ public class Unit extends FreeColGameObject
         // a well defined start and end tile.
         Tile start = (carrier == null) ? getTile() : carrier.getTile();
         return getTurnsToReach(start, destination.getTile());
+    }
+
+    /**
+     * Convenience wrapper for the
+     * {@link net.sf.freecol.common.model.Map#search} function.
+     *
+     * @param startTile The <code>Tile</code> to start the search from.
+     * @param gd The object responsible for determining whether a
+     *        given <code>PathNode</code> is a goal or not.
+     * @param costDecider An optional <code>CostDecider</code>
+     *        responsible for determining the path cost.
+     * @param maxTurns The maximum number of turns the given
+     *        <code>Unit</code> is allowed to move.
+     * @param carrier The carrier the <code>unit</code> is currently
+     *        onboard or <code>null</code> if the <code>unit</code> is
+     *        either not onboard a carrier or should not use the
+     *        carrier while finding the path.
+     * @return The path to a goal determined by the given
+     *        <code>GoalDecider</code>.
+     */
+    public PathNode search(Tile start, GoalDecider gd, CostDecider cd,
+                           int maxTurns, Unit carrier) {
+        return getGame().getMap().search(this, start, gd, cd, maxTurns, carrier);
     }
 
     /**
@@ -1744,7 +1783,7 @@ public class Unit extends FreeColGameObject
                 // Tile.getDistanceTo(Tile) doesn't care about
                 // connectivity, so we need to check for an available
                 // path to target colony instead
-                PathNode pn = findPath(colony.getTile());
+                PathNode pn = this.findPath(colony.getTile());
                 if (pn != null
                     && (distance = pn.getTotalTurns()) < shortestDistance) {
                     closestLocation = colony;

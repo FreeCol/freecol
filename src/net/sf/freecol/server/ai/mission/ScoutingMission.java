@@ -164,8 +164,9 @@ public class ScoutingMission extends Mission {
                     return target;
                 }
             };
-            PathNode bestPath = map.search(getUnit(), getUnit().getTile(), destinationDecider, CostDeciders
-                    .avoidIllegal(), Integer.MAX_VALUE);
+            PathNode bestPath = getUnit().search(getUnit().getTile(),
+                destinationDecider, CostDeciders.avoidIllegal(),
+                Integer.MAX_VALUE, null);
 
             if (bestPath != null) {
                 transportDestination = null;
@@ -231,8 +232,10 @@ public class ScoutingMission extends Mission {
                 }
             };
             Unit carrier = (Unit) getUnit().getLocation();
-            PathNode bestPath = getGame().getMap().search(getUnit(), carrier.getTile(), destinationDecider,
-                    CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
+            PathNode bestPath = getUnit().search(carrier.getTile(),
+                                                 destinationDecider,
+                                                 CostDeciders.avoidIllegal(),
+                                                 INFINITY, carrier);
             if (bestPath != null) {
                 transportDestination = bestPath.getLastNode().getTile();
                 debugAction = "Transport to: " + transportDestination.getPosition();

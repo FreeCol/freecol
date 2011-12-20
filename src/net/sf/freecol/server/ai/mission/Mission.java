@@ -272,8 +272,8 @@ public abstract class Mission extends AIObject {
                 return false;
             }
         };
-        return getGame().getMap().search(getUnit(), getUnit().getTile(), gd,
-                CostDeciders.avoidIllegal(), maxTurns);
+        return getUnit().search(getUnit().getTile(), gd,
+                                CostDeciders.avoidIllegal(), maxTurns, null);
     }
 
 
@@ -316,14 +316,10 @@ public abstract class Mission extends AIObject {
                 return hasOurSettlement;
             }
         };
-        PathNode path = getGame().getMap().search(carrier, carrier.getTile(),
-                gd, CostDeciders.avoidSettlementsAndBlockingUnits(),
-                Integer.MAX_VALUE);
-        if (path != null) {
-            return path.getLastNode().getTile();
-        } else {
-            return null;
-        }
+        PathNode path = carrier.search(carrier.getTile(), gd,
+            CostDeciders.avoidSettlementsAndBlockingUnits(),
+            Integer.MAX_VALUE, null);
+        return (path != null) ? path.getLastNode().getTile() : null;
     }
 
 

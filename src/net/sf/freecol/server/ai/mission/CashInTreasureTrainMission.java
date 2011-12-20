@@ -128,10 +128,9 @@ public class CashInTreasureTrainMission extends Mission {
                     return false;
                 }
             };
-            PathNode bestPath = map.search(unit, unit.getTile(),
-                    destinationDecider,
-                    CostDeciders.avoidSettlementsAndBlockingUnits(),
-                    Integer.MAX_VALUE);
+            PathNode bestPath = unit.search(unit.getTile(), destinationDecider,
+                CostDeciders.avoidSettlementsAndBlockingUnits(),
+                Integer.MAX_VALUE, null);
             if (bestPath != null) {
                 Direction r = moveTowards(bestPath);
                 if (r == null || !moveButDontAttack(r)) return;

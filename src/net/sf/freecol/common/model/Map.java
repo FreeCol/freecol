@@ -429,125 +429,46 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against the <code>unit</code>'s
-     * legal moves.
+     * Finds a shortest path between the given tiles.  The tile at the
+     * end will not be checked for validity.
      *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see Unit#findPath(Tile)
-     * @exception IllegalArgumentException
-     *                if either <code>unit</code>, <code>start</code> or
-     *                <code>end</code> are <code>null</code>.
-     */
-    public PathNode findPath(Unit unit, Tile start, Tile end) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-        return findPath(unit, start, end, null,
-            CostDeciders.defaultCostDeciderFor(unit));
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against the <code>unit</code>'s
-     * legal moves.
+     * Using A* with the Manhatten distance as the heuristics.
      *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param carrier
-     *            A carrier that currently holds the <code>unit</code>, or
-     *            <code>null</code> if the <code>unit</code> is not
-     *            presently on a carrier.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @see Unit#findPath(Tile)
-     * @exception IllegalArgumentException
-     *                if either <code>unit</code>, <code>start</code> or
-     *                <code>end</code> are <code>null</code>.
-     */
-    public PathNode findPath(Unit unit, Tile start, Tile end, Unit carrier) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-        return findPath(unit, start, end, carrier,
-            CostDeciders.defaultCostDeciderFor(unit));
-    }
-
-    /**
-     * Finds a shortest path between the given tiles. The <code>Tile</code> at
-     * the <code>end</code> will not be checked against validity (neither the
-     * <code>options</code> nor allowed movement by the <code>unit</code>.
+     * The data structure for the open list is a combined structure: using a
+     * HashMap for membership tests and a PriorityQueue for getting the node
+     * with the minimal f (cost+heuristics). This gives O(1) on membership
+     * test and O(log N) for remove-best and insertions.
      *
-     * @param unit an <code>Unit</code> value
-     * @param start
-     *            The <code>Tile</code> in which the path starts from.
-     * @param end
-     *            The end of the path.
-     * @param carrier
-     *            A carrier that currently holds the <code>unit</code>, or
-     *            <code>null</code> if the <code>unit</code> is not
-     *            presently on a carrier.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @return A <code>PathNode</code> for the first tile in the path. Calling
-     *         {@link PathNode#getTile} on this object, will return the
-     *         <code>Tile</code> right after the specified starting tile, and
-     *         {@link PathNode#getDirection} will return the direction you need
-     *         to take in order to reach that tile. This method returns
-     *         <code>null</code> if no path is found.
-     * @exception IllegalArgumentException
-     *                if either <code>start</code> or <code>end</code> are
-     *                <code>null</code>.
-     * @exception IllegalArgumentException
-     *                if either <code>start</code> or <code>end</code> are
-     *                <code>null</code>.
+     * The data structure for the closed list is simply a HashMap.
+     *
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param start The <code>Tile</code> in which the path starts from.
+     * @param end The <code>Tile</code> at the end of the path.
+     * @param carrier An optional carrier <code>Unit</code> that
+     *        currently holds the <code>unit</code>, or null if it is
+     *        not presently on a carrier.
+     * @param costDecider An optional <code>CostDecider</code> for
+     *        determining the movement costs (uses default cost deciders
+     *        for the unit/s if not provided).
+     * @return A <code>PathNode</code> for the first tile in the
+     *        path, or null if none found.
+     * @exception IllegalArgumentException 
+     *        If <code>start</code>, <code>end</code>, or <code>unit</code
+     *        are <code>null</code>, or start equals end.
      */
     public PathNode findPath(final Unit unit, final Tile start, final Tile end,
-                             final Unit carrier,
-                             final CostDecider costDecider) {
-        /*
-         * Using A* with the Manhatten distance as the heuristics.
-         *
-         * The data structure for the open list is a combined structure: using a
-         * HashMap for membership tests and a PriorityQueue for getting the node
-         * with the minimal f (cost+heuristics). This gives O(1) on membership
-         * test and O(log N) for remove-best and insertions.
-         *
-         * The data structure for the closed list is simply a HashMap.
-         */
-
+                             final Unit carrier, CostDecider costDecider) {
+        if (unit == null) {
+            throw new IllegalArgumentException("unit must not be null.");
+        }
         if (start == null) {
-            throw new IllegalArgumentException("Argument 'start' must not be 'null'.");
+            throw new IllegalArgumentException("start must not be null.");
         }
         if (end == null) {
-            throw new IllegalArgumentException("Argument 'end' must not be 'null'.");
+            throw new IllegalArgumentException("end must not be null.");
         }
-        if (start.equals(end)) {
+        if (start == end) {
             throw new IllegalArgumentException("start == end");
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
         // What unit starts the path?
@@ -555,8 +476,7 @@ public class Map extends FreeColGameObject implements Location {
 
         final PathNode firstNode;
         if (currentUnit != null) {
-            firstNode = new PathNode(start, 0,
-                start.getDistanceTo(end),
+            firstNode = new PathNode(start, 0, start.getDistanceTo(end),
                 Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
@@ -609,69 +529,73 @@ public class Map extends FreeColGameObject implements Location {
                 }
             }
 
+            // Collect the parameters for the current node.
+            final int currentCost = currentNode.getCost();
+            final int currentMoves = currentNode.getMovesLeft();
+            final int currentTurns = currentNode.getTurns();
+            final boolean currentOnCarrier = currentNode.isOnCarrier();
+
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-                final Tile newTile = currentTile.getNeighbourOrNull(direction);
-                if (newTile == null) continue;
+                final Tile moveTile = currentTile.getNeighbourOrNull(direction);
+                if (moveTile == null) continue;
 
                 // If the new tile is the tile we just visited, skip
                 // it. We can use == because PathNode.getTile() and
                 // getNeighborOrNull both return references to the
                 // actual Tile in tiles[][].
                 if (currentNode.previous != null
-                    && currentNode.previous.getTile() == newTile) {
+                    && currentNode.previous.getTile() == moveTile) {
                     continue;
                 }
-                if (closedList.containsKey(newTile.getId())) {
+                if (closedList.containsKey(moveTile.getId())) {
                     continue;
                 }
-
-                // Collect the parameters for the current node.
-                int cost = currentNode.getCost();
-                int movesLeft = currentNode.getMovesLeft();
-                int turns = currentNode.getTurns();
-                boolean onCarrier = currentNode.isOnCarrier();
-                Unit moveUnit;
 
                 // Check for disembarkation on new tile, setting
                 // moveUnit to the unit that would actually move.
-                if (carrier != null
-                    && onCarrier
-                    && newTile.isLand()
-                    && (newTile.getSettlement() == null
-                        || newTile.getSettlement().getOwner() == currentUnit.getOwner())) {
-                    moveUnit = unit;
-                    movesLeft = unit.getInitialMovesLeft();
-                } else {
-                    moveUnit = (onCarrier) ? carrier : unit;
-                }
+                boolean moveOnCarrier = carrier != null
+                    && currentOnCarrier
+                    && (!moveTile.isLand()
+                        || (moveTile.getSettlement() != null
+                            && moveTile.getSettlement().getOwner()
+                            == currentUnit.getOwner()));
+                Unit moveUnit = (moveOnCarrier) ? carrier : unit;
+                int moveCost = currentCost;
+                int moveMoves = (currentOnCarrier && !moveOnCarrier)
+                    ? moveUnit.getInitialMovesLeft()
+                    : currentMoves;
+                int moveTurns = currentTurns;
+                CostDecider moveDecider = (costDecider != null) ? costDecider
+                    : CostDeciders.defaultCostDeciderFor(moveUnit);
 
                 // Update parameters for the new tile.
-                int extraCost = costDecider.getCost(moveUnit,
-                    currentTile, newTile, movesLeft);
+                int extraCost = moveDecider.getCost(moveUnit,
+                    currentTile, moveTile, moveMoves);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     // Do not let the CostDecider (which may be
                     // conservative) block the final destination if it
                     // is still a legal move.
-                    if (newTile == end
-                        && moveUnit.getSimpleMoveType(currentTile,
-                            newTile).isLegal()) {
-                        cost += moveUnit.getInitialMovesLeft();
-                        movesLeft = 0;
+                    if (moveTile == end
+                        && moveUnit.getSimpleMoveType(currentTile, moveTile)
+                        .isLegal()) {
+                        moveCost += moveUnit.getInitialMovesLeft();
+                        moveMoves = 0;
                     } else {
                         continue;
                     }
                 } else {
-                    cost += extraCost;
-                    movesLeft = costDecider.getMovesLeft();
-                    if (costDecider.isNewTurn()) turns++;
+                    moveCost += extraCost;
+                    moveMoves = moveDecider.getMovesLeft();
+                    if (moveDecider.isNewTurn()) moveTurns++;
                 }
 
                 // Is this an improvement?  If not, ignore.
-                final int f = cost + newTile.getDistanceTo(end);
-                PathNode successor = openList.get(newTile.getId());
+                PathNode successor = openList.get(moveTile.getId());
                 if (successor != null) {
-                    if (successor.getF() <= f) {
+                    if (successor.getTurns() < moveTurns
+                        || (successor.getTurns() == moveTurns
+                            && successor.getCost() <= moveCost)) {
                         continue;
                     }
                     openList.remove(successor.getTile().getId());
@@ -679,11 +603,13 @@ public class Map extends FreeColGameObject implements Location {
                 }
 
                 // Queue new node with updated parameters.
-                successor = new PathNode(newTile, cost, f, direction,
-                    movesLeft, turns);
+                final int f = moveTurns * 100
+                    + moveCost + moveTile.getDistanceTo(end);
+                successor = new PathNode(moveTile, moveCost, f, direction,
+                                         moveMoves, moveTurns);
                 successor.previous = currentNode;
                 successor.setOnCarrier(carrier != null && moveUnit == carrier);
-                openList.put(newTile.getId(), successor);
+                openList.put(moveTile.getId(), successor);
                 openListQueue.offer(successor);
             }
         }
@@ -692,220 +618,124 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
+     * Finds the best path to <code>Europe</code>.
      *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param unit
-     *            The <code>Unit</code> to find the path for.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
+     * @param unit The <code>Unit</code> that should be used to determine
+     *             whether or not a path is legal.
+     * @param start The starting <code>Tile</code>.
+     * @param costDecider An optional <code>CostDecider</code>
+     *        responsible for determining the path cost.
+     * @return The path to Europe, or null if not found.
+     * @see Europe
      */
-    public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
-        return search(unit, unit.getTile(), gd,
-            CostDeciders.defaultCostDeciderFor(unit), maxTurns);
+    public PathNode findPathToEurope(Unit unit, Tile start,
+                                     CostDecider costDecider) {
+        GoalDecider gd = new GoalDecider() {
+            private PathNode goal = null;
+
+            public PathNode getGoal() {
+                return goal;
+            }
+
+            public boolean hasSubGoals() {
+                return false;
+            }
+
+            public boolean check(Unit u, PathNode pathNode) {
+                if (pathNode.getTile().canMoveToEurope()) {
+                    goal = pathNode;
+                    return true;
+                }
+                return false;
+            }
+        };
+        return search(unit, start, gd, costDecider, INFINITY, null);
+    }
+
+    /**
+     * Finds the best path to <code>Europe</code> independently of any
+     * unit.  This method is meant to be executed by the server/AI
+     * code, with complete knowledge of the map
+     *
+     * @param start The starting <code>Tile</code>.
+     * @return The path to the target or <code>null</code> if no target can be
+     *         found.
+     * @see Europe
+     */
+    public PathNode findPathToEurope(Tile start) {
+        final GoalDecider gd = new GoalDecider() {
+            private PathNode goal = null;
+
+            public PathNode getGoal() {
+                return goal;
+            }
+
+            public boolean hasSubGoals() {
+                return false;
+            }
+
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile t = pathNode.getTile();
+                if (t.canMoveToEurope()) {
+                    goal = pathNode;
+                    return true;
+                }
+                return false;
+            }
+        };
+        final CostDecider cd = new CostDecider() {
+            public int getCost(Unit unit, Tile oldTile, Tile newTile,
+                               int movesLeft) {
+                if (newTile.isLand()) {
+                    return ILLEGAL_MOVE;
+                } else {
+                    return 1;
+                }
+            }
+            public int getMovesLeft() {
+                return 0;
+            }
+            public boolean isNewTurn() {
+                return false;
+            }
+        };
+        return search(null, start, gd, cd, INFINITY, null);
     }
 
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
      *
-     * <br />
-     * <br />
-     *
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
      *
-     * @param unit
-     *            The <code>Unit</code> to find the path for.
-     * @param startTile
-     *            The <code>Tile</code> to start the search from.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
+     * Using Dijkstra's algorithm with a closedList for marking the
+     * visited nodes and using a PriorityQueue for getting the next
+     * edge with the least cost. This implementation could be improved
+     * by having the visited attribute stored on each Tile in order to
+     * avoid both of the HashMaps currently being used to serve this
+     * purpose.
+     *
+     * @param unit The <code>Unit</code> to find a path for.
+     * @param startTile The <code>Tile</code> to start the search from.
+     * @param gd The object responsible for determining whether a
+     *        given <code>PathNode</code> is a goal or not.
+     * @param costDecider An optional <code>CostDecider</code>
+     *        responsible for determining the path cost.
+     * @param maxTurns The maximum number of turns the given
+     *        <code>Unit</code> is allowed to move. This is the
+     *        maximum search range for a goal.
+     * @param carrier The carrier the <code>unit</code> is currently
+     *        onboard or <code>null</code> if the <code>unit</code> is
+     *        either not onboard a carrier or should not use the
+     *        carrier while finding the path.
      * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
-     */
-    public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
-            int maxTurns) {
-        return search(unit, startTile, gd,
-            CostDeciders.defaultCostDeciderFor(unit), maxTurns);
-    }
-
-    /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param unit
-     *            The <code>Unit</code> to find the path for.
-     * @param gd
-     *            The object responsible for determining wether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @param carrier
-     *            The carrier the <code>unit</code> is currently onboard or
-     *            <code>null</code> if the <code>unit</code> is either not
-     *            onboard a carrier or should not use the carrier while finding
-     *            the path.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
-     */
-    public PathNode search(Unit unit, GoalDecider gd,
-            int maxTurns, Unit carrier) {
-        return search(unit, unit.getTile(), gd,
-            CostDeciders.defaultCostDeciderFor(unit), maxTurns,
-            carrier);
-    }
-
-    /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param startTile
-     *            The <code>Tile</code> to start the search from.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
-     */
-    public PathNode search(Tile startTile, GoalDecider gd,
-            CostDecider costDecider, int maxTurns) {
-        return search(null, startTile, gd, costDecider, maxTurns);
-    }
-
-    /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param unit
-     *            The <code>Unit</code> to find the path for.
-     * @param startTile
-     *            The <code>Tile</code> to start the search from.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
-     */
-    public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
-            CostDecider costDecider, int maxTurns) {
-        return search(unit, startTile, gd, costDecider, maxTurns, null);
-    }
-
-    /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param unit an <code>Unit</code> value
-     * @param startTile
-     *            The <code>Tile</code> to start the search from.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @param carrier
-     *            The carrier the <code>unit</code> is currently onboard or
-     *            <code>null</code> if the <code>unit</code> is either not
-     *            onboard a carrier or should not use the carrier while finding
-     *            the path.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
+     *        <code>GoalDecider</code>.
      */
     public PathNode search(final Unit unit, final Tile startTile,
-            final GoalDecider gd, final int maxTurns,
-            final Unit carrier) {
-        return search(unit, startTile, gd,
-            CostDeciders.defaultCostDeciderFor(unit), maxTurns, carrier);
-    }
-
-    /**
-     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
-     *
-     * <br />
-     * <br />
-     *
-     * A <code>GoalDecider</code> is typically defined inline to serve a
-     * specific need.
-     *
-     * @param unit an <code>Unit</code> value
-     * @param startTile
-     *            The <code>Tile</code> to start the search from.
-     * @param gd
-     *            The object responsible for determining whether a given
-     *            <code>PathNode</code> is a goal or not.
-     * @param costDecider
-     *            The object responsible for determining the cost.
-     * @param maxTurns
-     *            The maximum number of turns the given <code>Unit</code> is
-     *            allowed to move. This is the maximum search range for a goal.
-     * @param carrier
-     *            The carrier the <code>unit</code> is currently onboard or
-     *            <code>null</code> if the <code>unit</code> is either not
-     *            onboard a carrier or should not use the carrier while finding
-     *            the path.
-     * @return The path to a goal determined by the given
-     *         <code>GoalDecider</code>.
-     */
-    public PathNode search(final Unit unit, final Tile startTile,
-            final GoalDecider gd, final CostDecider costDecider,
-            final int maxTurns, final Unit carrier) {
-        /*
-         * Using Dijkstra's algorithm with a closedList for marking the visited
-         * nodes and using a PriorityQueue for getting the next edge with the
-         * least cost. This implementation could be improved by having the
-         * visited attribute stored on each Tile in order to avoid both of the
-         * HashMaps currently being used to serve this purpose.
-         */
-
+                           final GoalDecider gd, final CostDecider costDecider,
+                           final int maxTurns, final Unit carrier) {
         if (startTile == null) {
-            throw new IllegalArgumentException("startTile must not be 'null'.");
+            throw new IllegalArgumentException("startTile must not be null.");
         }
 
         // What unit starts the path?
@@ -956,64 +786,65 @@ public class Map extends FreeColGameObject implements Location {
                 && currentNode.previous != null) {
                 Tile previousTile = currentNode.previous.getTile();
                 if (!currentUnit.getSimpleMoveType(previousTile,
-                        currentTile).isProgress()) {
+                                                   currentTile).isProgress()) {
                     continue;
                 }
             }
 
+            // Collect the parameters for the current node.
+            int currentCost = currentNode.getCost();
+            int currentMoves = currentNode.getMovesLeft();
+            int currentTurns = currentNode.getTurns();
+            boolean currentOnCarrier = currentNode.isOnCarrier();
+
             // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-                final Tile newTile = currentTile.getNeighbourOrNull(direction);
-                if (newTile == null) {
-                    continue;
-                }
+                final Tile moveTile = currentTile.getNeighbourOrNull(direction);
+                if (moveTile == null) continue;
 
                 // If the new tile is the tile we just visited, skip
-                // it. We can use == because PathNode.getTile() and
+                // it.  We can use == because PathNode.getTile() and
                 // getNeighborOrNull both return references to the
                 // actual Tile in tiles[][].
                 if (currentNode.previous != null
-                    && currentNode.previous.getTile() == newTile) {
+                    && currentNode.previous.getTile() == moveTile) {
                     continue;
                 }
-                if (closedList.containsKey(newTile.getId())) {
+                if (closedList.containsKey(moveTile.getId())) {
                     continue;
                 }
-
-                // Collect the parameters for the current node.
-                int cost = currentNode.getCost();
-                int movesLeft = currentNode.getMovesLeft();
-                int turns = currentNode.getTurns();
-                boolean onCarrier = currentNode.isOnCarrier();
-                Unit moveUnit;
 
                 // Check for disembarkation on new tile, setting
                 // moveUnit to the unit that would actually move.
-                if (carrier != null
-                    && onCarrier
-                    && newTile.isLand()
-                    && (newTile.getSettlement() == null
-                        || newTile.getSettlement().getOwner() == currentUnit.getOwner())) {
-                    moveUnit = unit;
-                    movesLeft = moveUnit.getInitialMovesLeft();
-                } else {
-                    moveUnit = (onCarrier) ? carrier : unit;
-                }
+                boolean moveOnCarrier = carrier != null
+                    && currentOnCarrier
+                    && (!moveTile.isLand()
+                        || (moveTile.getSettlement() != null
+                            && moveTile.getSettlement().getOwner()
+                            == currentUnit.getOwner()));
+                Unit moveUnit = (moveOnCarrier) ? carrier : unit;
+                int moveCost = currentCost;
+                int moveMoves = (currentOnCarrier && !moveOnCarrier)
+                    ? moveUnit.getInitialMovesLeft()
+                    : currentMoves;
+                int moveTurns = currentTurns;
+                CostDecider moveDecider = (costDecider != null) ? costDecider
+                    : CostDeciders.defaultCostDeciderFor(moveUnit);
 
                 // Update parameters for the new tile.
-                int extraCost = costDecider.getCost(moveUnit,
-                        currentTile, newTile, movesLeft);
+                int extraCost = moveDecider.getCost(moveUnit, currentTile,
+                                                    moveTile, moveMoves);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) continue;
-                cost += extraCost;
-                movesLeft = costDecider.getMovesLeft();
-                if (costDecider.isNewTurn()) {
-                    turns++;
-                }
+                moveCost += extraCost;
+                moveMoves = moveDecider.getMovesLeft();
+                if (moveDecider.isNewTurn()) moveTurns++;
 
                 // Is this an improvement?  If not, ignore.
-                PathNode successor = openList.get(newTile.getId());
+                PathNode successor = openList.get(moveTile.getId());
                 if (successor != null) {
-                    if (successor.getCost() <= cost) {
+                    if (successor.getTurns() < moveTurns
+                        || (successor.getTurns() == moveTurns
+                            && successor.getCost() <= moveCost)) {
                         continue;
                     }
                     openList.remove(successor.getTile().getId());
@@ -1021,11 +852,12 @@ public class Map extends FreeColGameObject implements Location {
                 }
 
                 // Queue new node with updated parameters.
-                successor = new PathNode(newTile, cost, cost, direction,
-                    movesLeft, turns);
+                final int f = moveTurns * 100 + moveCost;
+                successor = new PathNode(moveTile, moveCost, f, direction,
+                                         moveMoves, moveTurns);
                 successor.previous = currentNode;
                 successor.setOnCarrier(carrier != null && moveUnit == carrier);
-                openList.put(newTile.getId(), successor);
+                openList.put(moveTile.getId(), successor);
                 openListQueue.offer(successor);
             }
         }
@@ -1039,108 +871,6 @@ public class Map extends FreeColGameObject implements Location {
             return bestTarget.next;
         }
         return null;
-    }
-
-    /**
-     * Finds the best path to <code>Europe</code>.
-     *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The starting <code>Tile</code>.
-     * @return The path to the target or <code>null</code> if no target can be
-     *         found.
-     * @see Europe
-     */
-    public PathNode findPathToEurope(Unit unit, Tile start) {
-        return findPathToEurope(unit, start,
-            CostDeciders.defaultCostDeciderFor(unit));
-    }
-
-    /**
-     * Finds the best path to <code>Europe</code>.
-     *
-     * @param unit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal.
-     * @param start
-     *            The starting <code>Tile</code>.
-     * @return The path to the target or <code>null</code> if no target can be
-     *         found.
-     * @see Europe
-     */
-    public PathNode findPathToEurope(Unit unit, Tile start, CostDecider costDecider) {
-        GoalDecider gd = new GoalDecider() {
-            private PathNode goal = null;
-
-            public PathNode getGoal() {
-                return goal;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit u, PathNode pathNode) {
-                if (pathNode.getTile().canMoveToEurope()) {
-                    goal = pathNode;
-                    return true;
-                }
-                return false;
-            }
-        };
-        return search(unit, start, gd, costDecider, INFINITY);
-    }
-
-    /**
-     * Finds the best path to <code>Europe</code> independently of any
-     * unit.  This method is meant to be executed by the server/AI
-     * code, with complete knowledge of the map
-     *
-     * @param start The starting <code>Tile</code>.
-     * @return The path to the target or <code>null</code> if no target can be
-     *         found.
-     * @see Europe
-     */
-    public PathNode findPathToEurope(Tile start) {
-        final GoalDecider gd = new GoalDecider() {
-            private PathNode goal = null;
-
-            public PathNode getGoal() {
-                return goal;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit u, PathNode pathNode) {
-                Tile t = pathNode.getTile();
-                if (t.canMoveToEurope()) {
-                    goal = pathNode;
-                    return true;
-                }
-                return false;
-            }
-        };
-        final CostDecider cd = new CostDecider() {
-            public int getCost(Unit unit, Tile oldTile, Tile newTile,
-                               int movesLeft) {
-                if (newTile.isLand()) {
-                    return ILLEGAL_MOVE;
-                } else {
-                    return 1;
-                }
-            }
-            public int getMovesLeft() {
-                return 0;
-            }
-            public boolean isNewTurn() {
-                return false;
-            }
-        };
-        return search(start, gd, cd, INFINITY);
     }
 
     /**
@@ -1674,7 +1404,7 @@ public class Map extends FreeColGameObject implements Location {
             this.radius = radius;
 
             if (center == null) {
-                throw new IllegalArgumentException("center must not be 'null'.");
+                throw new IllegalArgumentException("center must not be null.");
             }
 
             n = 0;

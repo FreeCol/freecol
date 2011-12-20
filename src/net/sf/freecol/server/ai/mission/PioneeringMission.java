@@ -200,7 +200,7 @@ public class PioneeringMission extends Mission {
                 PathNode path = null;
                 int value;
                 if (startTile != ti.getTarget()) {
-                    path = getGame().getMap().findPath(getUnit(), startTile, ti.getTarget(), carrier);
+                    path = getUnit().findPath(startTile, ti.getTarget(), carrier);
                     if (path != null) {
                         value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
 

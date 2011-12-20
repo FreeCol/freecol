@@ -292,9 +292,7 @@ public class BuildColonyMission extends Mission {
             // Work out the number of turns to the target tile.
             float len = 1.0f;
             if (tile != startTile) {
-                PathNode path = (carrier == null)
-                    ? map.findPath(unit, startTile, tile)
-                    : map.findPath(unit, startTile, tile, carrier);
+                PathNode path = unit.findPath(startTile, tile, carrier);
                 if (path == null) continue;
                 len += path.getTotalTurns();
             }

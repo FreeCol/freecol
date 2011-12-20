@@ -29,8 +29,8 @@ import net.sf.freecol.common.model.Unit;
  * <br /><br />
  * 
  * This {@link CostDecider} is used as a default by
- * {@link net.sf.freecol.common.model.Map#findPath(Unit, Tile, Tile) findPath} and 
- * {@link net.sf.freecol.common.model.Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search} 
+ * {@link net.sf.freecol.common.model.Map#findPath} and 
+ * {@link net.sf.freecol.common.model.Map#search} 
  * if no other <code>CostDecider</code> has been specified.
  */
 class BaseCostDecider implements CostDecider {

@@ -312,7 +312,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNull("No path should be available",path);
     }
 
@@ -340,7 +340,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNull("No path should be available",path);
     }
 
@@ -416,7 +416,7 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNotNull("A path should be available",path);
     }
 

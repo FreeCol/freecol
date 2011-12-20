@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -192,7 +191,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         //
         // TODO: pick the tile with the best defence and try to avoid
         // hostile fortifications.
-        Map map = getGame().getMap();
         GoalDecider gd = new GoalDecider() {
                 private PathNode goal = null;
 
@@ -215,7 +213,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        PathNode path = map.search(unit, tile, gd, 10, null);
+        PathNode path = unit.search(tile, gd, null, 10, null);
         if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + target);
@@ -235,7 +233,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // Unit should be aboard a man-o-war which we can use to find a
         // path to Europe.  Use the end of that path.
         if (unit.getLocation() instanceof Unit) {
-            path = map.findPathToEurope((Unit) unit.getLocation(), tile);
+            path = ((Unit)unit).findPathToEurope(tile);
             if (path == null) {
                 logger.warning("Can not find path to Europe from: " + tile);
                 return null;

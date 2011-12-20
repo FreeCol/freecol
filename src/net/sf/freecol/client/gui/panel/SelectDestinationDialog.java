@@ -209,7 +209,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         for (Player p : game.getPlayers()) {
             for (Settlement s : p.getSettlements()) {
                 if (!s.isConnected()) continue;
-                PathNode path = map.findPathToEurope(unit, s.getTile());
+                PathNode path = unit.findPathToEurope(s.getTile());
                 if (path != null) {
                     String extras = (s.getOwner() != unit.getOwner())
                         ? getExtras(unit, s, goodsTypes) : "";
@@ -231,7 +231,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final List<GoodsType> goodsTypes) {
         final Settlement inSettlement = unit.getSettlement();
 
-        getGame().getMap().search(unit, unit.getTile(), new GoalDecider() {
+        unit.search(unit.getTile(), new GoalDecider() {
                 public PathNode getGoal() {
                     return null;
                 }
@@ -249,7 +249,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 public boolean hasSubGoals() {
                     return false;
                 }
-            }, CostDeciders.avoidIllegal(), Integer.MAX_VALUE);
+            }, CostDeciders.avoidIllegal(), Integer.MAX_VALUE, null);
 
         if (destinationComparator == null) {
             destinationComparator = new DestinationComparator(getMyPlayer());

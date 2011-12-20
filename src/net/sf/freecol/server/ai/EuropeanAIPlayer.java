@@ -1725,7 +1725,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         final AIMain aiMain = getAIMain();
 
         final Unit unit = aiUnit.getUnit();
-        final Map map = aiMain.getGame().getMap();
         final Unit carrier = (!unit.isOnCarrier()) ? null
             : (Unit) unit.getLocation();
         Ownable bestTarget = null;         // The best target for a mission.
@@ -1787,10 +1786,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             };
         final int MAXIMUM_TURNS_TO_SETTLEMENT = 10;
-        PathNode bestPath = map.search(unit, startTile, gd,
-                                       CostDeciders.avoidIllegal(),
-                                       MAXIMUM_TURNS_TO_SETTLEMENT,
-                                       carrier);
+        PathNode bestPath = unit.search(startTile, gd,
+                                        CostDeciders.avoidIllegal(),
+                                        MAXIMUM_TURNS_TO_SETTLEMENT,
+                                        carrier);
         if (bestPath != null) {
             PathNode last = bestPath.getLastNode();
             Colony colony = last.getTile().getColony();
@@ -1863,9 +1862,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     return false;
                 }
             };
-        PathNode newTarget = map.search(unit, startTile, targetDecider,
-                                        CostDeciders.avoidIllegal(),
-                                        Integer.MAX_VALUE, carrier);
+        PathNode newTarget = unit.search(startTile, targetDecider,
+                                         CostDeciders.avoidIllegal(),
+                                         INFINITY, carrier);
         if (newTarget != null) {
             Tile targetTile = newTarget.getLastNode().getTile();
             int value = getUnitSeekAndDestroyMissionValue(unit,

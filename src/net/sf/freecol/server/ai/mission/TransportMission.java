@@ -82,40 +82,40 @@ public class TransportMission extends Mission {
 
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
-    private ArrayList<Transportable> transportList = new ArrayList<Transportable>();
+    private final List<Transportable> transportList
+        = new ArrayList<Transportable>();
 
-    class Destination{
-    	private boolean atDestination;
-    	private boolean moveToEurope;
-    	private PathNode path;
+    class Destination {
+        private boolean atDestination;
+        private boolean moveToEurope;
+        private PathNode path;
 
-    	/*
-    	 * Returns an "Already at destination"
-    	 */
-    	public Destination(){
+        /*
+         * Returns an "Already at destination"
+         */
+        public Destination() {
             this.atDestination = true;
             this.moveToEurope = false;
             this.path = null;
-    	}
+        }
 
-
-    	public Destination(boolean moveToEurope,PathNode path){
+        public Destination(boolean moveToEurope, PathNode path) {
             this.atDestination = false;
             this.moveToEurope = moveToEurope;
             this.path = path;
-    	}
+        }
 
-    	public boolean moveToEurope(){
+        public boolean moveToEurope() {
             return moveToEurope;
-    	}
-
-    	public PathNode getPath(){
+        }
+        
+        public PathNode getPath() {
             return path;
-    	}
+        }
 
-    	public boolean isAtDestination(){
+        public boolean isAtDestination() {
             return atDestination;
-    	}
+        }
     }
 
     /**
@@ -154,7 +154,8 @@ public class TransportMission extends Mission {
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public TransportMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public TransportMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
@@ -232,30 +233,26 @@ public class TransportMission extends Mission {
      * Disposes this <code>Mission</code>.
      */
     public void dispose() {
-    	// a new list must be created as the first one may be changed
-    	//elsewhere in between loop calls
-    	List<Transportable> cargoList = new ArrayList<Transportable>();
-    	List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
+        // a new list must be created as the first one may be changed
+        //elsewhere in between loop calls
+        List<Transportable> cargoList = new ArrayList<Transportable>();
+        List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
 
-    	Iterator<Transportable> ti = transportList.iterator();
+        Iterator<Transportable> ti = transportList.iterator();
         while (ti.hasNext()) {
             Transportable t = ti.next();
             // the cargo is on board, add to list to be disposed of
             if (isCarrying(t)) {
-            	cargoList.add(t);
+                cargoList.add(t);
             } else {
-            	// the cargo was scheduled to be transported
-            	// cancel order
-            	scheduledCargoList.add(t);
+                // the cargo was scheduled to be transported
+                // cancel order
+                scheduledCargoList.add(t);
             }
         }
 
-        for (Transportable t : cargoList)
-            ((AIObject) t).dispose();
-
-        for (Transportable t : scheduledCargoList)
-            t.setTransport(null);
-
+        for (Transportable t : cargoList) ((AIObject) t).dispose();
+        for (Transportable t : scheduledCargoList) t.setTransport(null);
         super.dispose();
     }
 
@@ -449,22 +446,16 @@ public class TransportMission extends Mission {
      *         or destination of the given <code>Transportable</code>.
      */
     private int getDistanceTo(Transportable t, Location start, boolean source) {
-        // TODO: This takes to much resources - find another method:
+        // TODO: This is too expensive - find another method:
         PathNode path = getPath(t, start, source);
-
-        if(path == null){
-            return Map.COST_INFINITY;
-        }
-
-        return path.getTotalTurns();
+        return (path == null) ? Map.COST_INFINITY : path.getTotalTurns();
     }
 
     private boolean canAttackEnemyShips() {
         final Unit carrier = getUnit();
-        return (carrier.getTile() != null)
+        return carrier.getTile() != null
             && carrier.isNaval()
             && carrier.isOffensiveUnit();
-
     }
 
     private boolean hasCargo() {
@@ -570,11 +561,9 @@ public class TransportMission extends Mission {
                     return true;
                 }
             };
-        return getGame().getMap().search(getUnit(),
-                                         getUnit().getTile(),
-                                         gd,
-                                         CostDeciders.avoidSettlements(),
-                                         maxTurns);
+        return getUnit().search(getUnit().getTile(), gd,
+                                CostDeciders.avoidSettlements(),
+                                maxTurns, null);
     }
 
     /**
@@ -583,19 +572,17 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-    	logger.finest("Doing transport mission for unit " + getUnit() + "(" + getUnit().getId() + ")");
+        logger.finest("Doing transport mission for unit " + getUnit()
+            + "(" + getUnit().getId() + ")");
         if (transportList == null || transportList.size() <= 0) {
             updateTransportList();
         }
 
         Unit carrier = getUnit();
-        if(carrier.getMovesLeft() == 0){
-            return;
-        }
-        if (carrier.isAtSea()) {
-            return; // Going to/from Europe, do nothing
-        } else if (carrier.isInEurope()) {
-            inEurope(connection); // Actually in Europe
+        if (carrier.getMovesLeft() == 0) return;
+        if (carrier.isAtSea()) return; // Going to/from Europe, do nothing
+        if (carrier.isInEurope()) { // Actually in Europe
+            inEurope(connection);
             return;
         }
 
@@ -606,53 +593,52 @@ public class TransportMission extends Mission {
         boolean transportListChanged = false;
         boolean moreWork = true;
         for (int i = 0; i < transportList.size() && moreWork || i == 0; i++) {
-            if(carrier.getMovesLeft() == 0){
-            	return;
-            }
+            if (carrier.getMovesLeft() == 0) return;
 
             moreWork = false;
-
             if (transportListChanged) {
                 i = 0;
                 transportListChanged = false;
             }
 
+            // Special case, already on a tile which gives direct
+            // access to Europe path will be null.
             Destination destination = getNextStop();
-
-            // Special case, already on a tile which gives direct access to Europe
-            //path will be null
             boolean canMoveToEurope = destination != null
                 && destination.moveToEurope()
                 && carrier.canMoveToEurope();
 
-            if(destination == null || (destination.getPath() == null && !canMoveToEurope)){
-            	String carrierLoc = "";
-            	if(carrier.getLocation() instanceof Europe){
+            if (destination == null
+                || (destination.getPath() == null && !canMoveToEurope)) {
+                String carrierLoc = "";
+                if (carrier.getLocation() instanceof Europe) {
                     carrierLoc = "Europe";
-            	}
-            	else{
+                } else {
                     Tile carrierTile = carrier.getTile();
                     carrierLoc = carrierTile.toString();
-                    if(carrierTile.getColony() != null){
-                        carrierLoc += " (" + carrierTile.getColony().getName() + ")";
+                    if (carrierTile.getColony() != null) {
+                        carrierLoc += " (" + carrierTile.getColony().getName()
+                            + ")";
                     }
-            	}
+                }
 
-            	logger.info("Could not get a next move for unit " + carrier
-                            + "(" + carrier.getId() + "), staying put at " + carrierLoc);
-            	//carrier.setMovesLeft(0);
-            	return;
+                logger.info("Could not get a next move for unit " + carrier
+                    + "(" + carrier.getId()
+                    + "), staying put at " + carrierLoc);
+                //carrier.setMovesLeft(0);
+                return;
             }
 
-            if(destination.isAtDestination()){
+            if (destination.isAtDestination()) {
                 transportListChanged = restockCargoAtDestination(connection);
                 continue;
             }
 
-            //Already on a tile which gives direct access to Europe, just make the move
-            if(canMoveToEurope){
-            	moveUnitToEurope();
-            	return;
+            // Already on a tile which gives direct access to Europe,
+            // just make the move
+            if (canMoveToEurope) {
+                moveUnitToEurope();
+                return;
             }
 
             // Move towards the next target:
@@ -660,7 +646,8 @@ public class TransportMission extends Mission {
             boolean moveToEurope = destination.moveToEurope();
             Direction r = moveTowards(path);
             if (r != null && carrier.getMoveType(r).isProgress()) {
-                if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
+                if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS
+                    && moveToEurope) {
                     moveUnitToEurope();
                 } else {
                     if (!moveButDontAttack(r)) return;
@@ -680,8 +667,9 @@ public class TransportMission extends Mission {
 
     public Destination getNextStop() {
         Unit unit = getUnit();
-        if(transportList.size() == 0 && !hasCargo()){
-            logger.info(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
+        if (transportList.size() == 0 && !hasCargo()) {
+            logger.info(unit + "(" + unit.getId()
+                + ") has nothing to transport, moving to default destination");
             return getDefaultDestination();
         }
 
@@ -690,15 +678,14 @@ public class TransportMission extends Mission {
         for(Transportable transportable : transportList){
             Location destLoc = null;
             PathNode path = null;
-            if(isCarrying(transportable)){
+            if (isCarrying(transportable)) {
                 destLoc = transportable.getTransportDestination();
-            }
-            else{
+            } else {
                 destLoc = transportable.getTransportLocatable().getLocation();
             }
 
-            //check if we already found this destination to be unaccessible
-            if(destLoc == null || unavailLoc.contains(destLoc)){
+            // Check if we already found this destination to be unaccessible
+            if (destLoc == null || unavailLoc.contains(destLoc)) {
                 continue;
             }
 
@@ -713,12 +700,12 @@ public class TransportMission extends Mission {
             path = (destLoc instanceof Europe) ? unit.findPathToEurope()
                 : getPath(transportable);
             // add unavailable location to tabu list
-            if(path == null){
+            if (path == null) {
                 unavailLoc.add(destLoc);
                 continue;
             }
             logger.finest("Transporting " + transportable.getId()
-                          + " to " + destLoc);
+                + " to " + destLoc);
             boolean moveToEurope = destLoc instanceof Europe;
             return new Destination(moveToEurope,path);
         }
@@ -795,24 +782,25 @@ public class TransportMission extends Mission {
          * be removed after a proper implementation has been created.
          */
         if (aiPlayer.hasFewColonies()) {
-            // since we are in Europe, use the carrier entry point to search for a good settlement spot.
+            // since we are in Europe, use the carrier entry point to
+            // search for a good settlement spot.
             Unit carrier = getUnit();
             Tile colonyTile = BuildColonyMission.findColonyLocation(carrier);
             int space = getAvailableSpace();
-            while (colonyTile!=null && space > 0) {
+            while (colonyTile != null && space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
-                if (newUnit != null) {
-                    if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()
-                        && !newUnit.getUnit().isMounted() && newUnit.getUnit().getRole() != Role.PIONEER) {
-                        // send the colonist to build the new colony
-                        int colonyValue = aiPlayer.getPlayer().getColonyValue(colonyTile);
-                        newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit, colonyTile, colonyValue));
-                    }
-                    addToTransportList(newUnit);
-                    space--;
-                } else {
-                    return;
+                if (newUnit == null) return;
+                if (newUnit.getUnit().isColonist()
+                    && !newUnit.getUnit().isArmed()
+                    && !newUnit.getUnit().isMounted()
+                    && newUnit.getUnit().getRole() != Role.PIONEER) {
+                    // send the colonist to build the new colony
+                    newUnit.setMission(new BuildColonyMission(getAIMain(),
+                            newUnit, colonyTile,
+                            aiPlayer.getPlayer().getColonyValue(colonyTile)));
                 }
+                addToTransportList(newUnit);
+                space--;
             }
         }
 
@@ -820,10 +808,11 @@ public class TransportMission extends Mission {
          * Add colonies containing wishes with the same destination as an item
          * in the transport list to the "aiColonies"-list:
          */
-        ArrayList<AIColony> aiColonies = new ArrayList<AIColony>();
+        List<AIColony> aiColonies = new ArrayList<AIColony>();
         for (int i = 0; i < transportList.size(); i++) {
             Transportable t = transportList.get(i);
-            if (t.getTransportDestination() != null && t.getTransportDestination().getTile() != null
+            if (t.getTransportDestination() != null
+                && t.getTransportDestination().getTile() != null
                 && t.getTransportDestination().getTile().getColony() != null
                 && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
                 AIColony ac = getAIMain().getAIColony(t.getTransportDestination().getTile().getColony());
@@ -930,16 +919,12 @@ public class TransportMission extends Mission {
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
 
-        if (player.checkGold(market.getBidPrice(type, amount))) {
-            boolean success = AIMessage.askBuyGoods(getAIUnit(), type, amount);
-            if(!success){
-                return null;
-            }
-            AIGoods ag = new AIGoods(getAIMain(), getUnit(), type, amount, destination);
-            return ag;
-        } else {
-            return null;
-        }
+        if (!player.checkGold(market.getBidPrice(type, amount))) return null;
+
+        boolean success = AIMessage.askBuyGoods(getAIUnit(), type, amount);
+        return (success)
+            ? new AIGoods(getAIMain(), getUnit(), type, amount, destination)
+            : null;
     }
 
     /**
@@ -1070,7 +1055,8 @@ public class TransportMission extends Mission {
      * @return The path.
      */
     public PathNode getPath(Transportable transportable) {
-        return getPath(transportable, getUnit().getTile(), !isCarrying(transportable));
+        return getPath(transportable, getUnit().getTile(),
+            !isCarrying(transportable));
     }
 
     /**
@@ -1082,53 +1068,38 @@ public class TransportMission extends Mission {
      *            <code>start == null</code> or
      *            <code>start.getTile() == null</code> then the carrier's
      *            {@link Unit#getEntryLocation entry location} is used instead.
-     * @param source
+     * @param source True if the transportable must be collected.
      * @return The path.
      */
-    private PathNode getPath(Transportable transportable, Location start, boolean source) {
+    private PathNode getPath(Transportable transportable, Location start,
+                             boolean source) {
         Unit carrier = getUnit();
+        if (start == null || start.getTile() == null) {
+            start = carrier.getFullEntryLocation();
+        }
 
-        if (isCarrying(transportable) && source) {
-            throw new IllegalStateException(
-                                            "Cannot find the path to the source while the transportable is on the carrier.");
+        Locatable locatable = transportable.getTransportLocatable();
+        Location destination = (source) ? locatable.getLocation()
+            : transportable.getTransportDestination();
+        if (destination == null) return null;
+        if (destination.getTile() == null) {
+            return (destination instanceof Europe) 
+                ? findPathToEurope(start.getTile())
+                : null;
         }
 
         PathNode path;
-        Locatable locatable = transportable.getTransportLocatable();
-
-        if (start == null || start.getTile() == null) {
-            start = getUnit().getFullEntryLocation();
-        }
-
-        Location destination;
-        if (source) {
-            destination = locatable.getLocation();
-        } else {
-            destination = transportable.getTransportDestination();
-        }
-
-        if (destination == null) {
-            return null;
-        }
-
-        if (destination.getTile() == null) {
-            if (destination instanceof Europe) {
-                path = findPathToEurope(start.getTile());
-            } else {
-                return null;
-            }
-        } else if (locatable instanceof Unit && isCarrying(transportable)) {
-            path = getGame().getMap().findPath((Unit) locatable, start.getTile(), destination.getTile(), carrier);
+        if (locatable instanceof Unit && isCarrying(transportable)) {
+            path = ((Unit)locatable).findPath(start.getTile(),
+                                              destination.getTile(), carrier);
             if (path == null || path.getTransportDropNode().previous == null) {
                 path = null;
             } else {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
-            path = getGame().getMap().findPath(carrier, start.getTile(),
-                                               destination.getTile());
+            path = carrier.findPath(start.getTile(), destination.getTile());
         }
-
         return path;
     }
 
@@ -1141,12 +1112,11 @@ public class TransportMission extends Mission {
      *         {@link Transportable#getTransportDestination destination}.
      */
     public int getAvailableSpace(Transportable t) {
-        if (t.getTransportLocatable() instanceof Unit) {
-            Unit u = (Unit) t.getTransportLocatable();
-            return getAvailableSpace(u.getType(), t.getTransportSource(), t.getTransportDestination());
-        } else {
-            return getAvailableSpace(null, t.getTransportSource(), t.getTransportDestination());
-        }
+        UnitType type = (t.getTransportLocatable() instanceof Unit)
+            ? ((Unit)t.getTransportLocatable()).getType()
+            : null;
+        return getAvailableSpace(type, t.getTransportSource(),
+                                 t.getTransportDestination());
     }
 
     /**
@@ -1160,7 +1130,8 @@ public class TransportMission extends Mission {
      * @param destination The destination for the unit.
      * @return The space available
      */
-    public int getAvailableSpace(UnitType unitType, Location source, Location destination) {
+    public int getAvailableSpace(UnitType unitType, Location source,
+                                 Location destination) {
         // TODO: Implement this method properly:
         return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
     }
@@ -1242,8 +1213,8 @@ public class TransportMission extends Mission {
                         // Unload at destination tile
                         unload = true;
                         reason = "Arrived at " + destTile;
-                    } else if ((p = map.findPath(u, carrier.getTile(), destTile,
-                                                 carrier)) != null) {
+                    } else if ((p = u.findPath(carrier.getTile(), destTile,
+                                               carrier)) != null) {
                         final PathNode dropNode = p.getTransportDropNode();
                         int d;
                         if (dropNode != null && dropNode.getTile() != null
@@ -1431,14 +1402,16 @@ public class TransportMission extends Mission {
     /**
      * Returns the priority of getting the unit to the transport destination.
      *
-     * @return o
+     * @return 0.
      */
     public int getTransportPriority() {
         return 0;
     }
 
     /**
-     * unit is in Europe, unload cargo on board, buy required goods and board unit
+     * Unit is in Europe, unload cargo on board, buy required goods
+     * and board unit.
+     *
      * @param connection  The <code>Connection</code> to the server.
      */
     private void inEurope(Connection connection){
@@ -1463,7 +1436,7 @@ public class TransportMission extends Mission {
      * @see Europe
      */
     protected PathNode findPathToEurope(Tile start) {
-        return getGame().getMap().findPathToEurope(getUnit(), start);
+        return getUnit().findPathToEurope(start);
     }
 
     /**
@@ -1502,7 +1475,6 @@ public class TransportMission extends Mission {
     public String getDebuggingInfo() {
         return this.toString();
     }
-
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
