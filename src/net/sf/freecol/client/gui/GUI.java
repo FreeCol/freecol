@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -515,6 +516,34 @@ public class GUI {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
+    }
+
+    public void activateGotoPath() {
+        Unit unit = getActiveUnit();
+ 
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null) 
+            return;
+        
+        // Enter "goto mode" if not already activated; otherwise cancel it
+        if (mapViewer.isGotoStarted()) {
+            mapViewer.stopGoto();
+        } else {
+            mapViewer.startGoto();
+
+            // Draw the path to the current mouse position, if the
+            // mouse is over the screen; see also
+            // CanvaseMouseMotionListener
+            Point pt = canvas.getMousePosition();
+            if (pt != null) {
+                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
+                if (tile != null && unit.getTile() != tile) {
+                    PathNode dragPath = unit.findPath(tile);
+                    mapViewer.setGotoPath(dragPath);
+                }
+            }
+        }
+        
     }
      
 }
