@@ -1238,13 +1238,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
-
-            if (aiUnit.hasMission()) {
-                continue;
-            }
+            if (aiUnit.hasMission()) continue;
 
             Unit unit = aiUnit.getUnit();
-
             if (unit.isUninitialized()) {
                 logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
                 continue;
@@ -1412,6 +1408,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Mission carrierMission = carrier.getMission();
                 if (carrierMission == null) {
                     carrierMission = new TransportMission(getAIMain(), carrier);
+                    carrier.setMission(carrierMission);
                 } else if (!(carrierMission instanceof TransportMission)) {
                     throw new IllegalStateException("Carrier carrying unit not on a transport mission");
                 }
@@ -1922,8 +1919,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     private void createTransportLists() {
         logger.finest("Entering method createTransportLists");
         if (!getPlayer().isEuropean()) return;
-        ArrayList<Transportable> transportables
-            = new ArrayList<Transportable>();
+        List<Transportable> transportables = new ArrayList<Transportable>();
 
         // Collect non-naval units needing transport.
         for (AIUnit au : getAIUnits()) {
