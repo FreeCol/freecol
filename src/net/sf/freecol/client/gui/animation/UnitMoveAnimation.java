@@ -26,7 +26,6 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -86,7 +85,7 @@ final class UnitMoveAnimation {
         final Rectangle r2 = gui.getTileBounds(destinationTile);
         final Rectangle bounds = r1.union(r2);
 
-        gui.getMapViewer().executeWithUnitOutForAnimation(unit, sourceTile,
+        gui.executeWithUnitOutForAnimation(unit, sourceTile,
             new OutForAnimationCallback() {
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                     final Point srcPoint

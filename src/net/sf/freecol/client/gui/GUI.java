@@ -580,4 +580,11 @@ public class GUI {
     public Rectangle getTileBounds(Tile tile) {
         return mapViewer.getTileBounds(tile);
     }
+    
+    public void executeWithUnitOutForAnimation(final Unit unit,
+            final Tile sourceTile,
+            final OutForAnimationCallback r) {
+        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+    }
+    
 }
