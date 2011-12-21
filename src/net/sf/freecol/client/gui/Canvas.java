@@ -1052,7 +1052,7 @@ public final class Canvas extends JDesktopPane {
      * @param t a <code>Tile</code> value
      */
     public void showColonyPanel(Tile t) {
-        if (mapViewer.getViewMode().getView() == ViewMode.MOVE_UNITS_MODE) {
+        if (gui.getCurrentViewMode() == ViewMode.MOVE_UNITS_MODE) {
             if (t != null && t.getColony() != null
                 && freeColClient.getMyPlayer().owns(t.getColony())) {
                 mapViewer.setFocus(t);

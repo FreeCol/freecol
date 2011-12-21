@@ -64,7 +64,7 @@ public class MoveAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        switch(gui.getMapViewer().getViewMode().getView()) {
+        switch(gui.getCurrentViewMode()) {
         case ViewMode.MOVE_UNITS_MODE:
             getFreeColClient().getInGameController().moveActiveUnit(direction);
             break;

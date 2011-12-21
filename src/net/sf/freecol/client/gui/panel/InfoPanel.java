@@ -201,7 +201,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics graphics) {
-        int viewMode = getGUI().getMapViewer().getViewMode().getView();
+        int viewMode = getGUI().getCurrentViewMode();
         if (!getFreeColClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);

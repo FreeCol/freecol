@@ -272,7 +272,7 @@ public final class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
-        int viewMode = gui.getMapViewer().getViewMode().getView();
+        int viewMode = gui.getCurrentViewMode();
         switch (viewMode) {
         case ViewMode.MOVE_UNITS_MODE:
             infoPanel.update(gui.getActiveUnit());
