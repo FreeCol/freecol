@@ -91,6 +91,34 @@ public class GUI {
         this.imageLibrary = new ImageLibrary();
     }
 
+    public void activateGotoPath() {
+        Unit unit = getActiveUnit();
+ 
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null) 
+            return;
+        
+        // Enter "goto mode" if not already activated; otherwise cancel it
+        if (mapViewer.isGotoStarted()) {
+            mapViewer.stopGoto();
+        } else {
+            mapViewer.startGoto();
+
+            // Draw the path to the current mouse position, if the
+            // mouse is over the screen; see also
+            // CanvaseMouseMotionListener
+            Point pt = canvas.getMousePosition();
+            if (pt != null) {
+                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
+                if (tile != null && unit.getTile() != tile) {
+                    PathNode dragPath = unit.findPath(tile);
+                    mapViewer.setGotoPath(dragPath);
+                }
+            }
+        }
+        
+    }
+
     /**
      * Verifies if the client can play sounds.
      * @return boolean <b>true</b> if and only if client sound player has an instance
@@ -202,13 +230,13 @@ public class GUI {
     public void errorMessage(String messageId) {
         canvas.errorMessage(messageId);
     }
+    
 
     public void errorMessage(String messageID, String message) {
         canvas.errorMessage(messageID, message);
         
     }
     
-
     public Unit getActiveUnit() {
         if (mapViewer == null)
             return null;
@@ -218,13 +246,17 @@ public class GUI {
     public Canvas getCanvas() {
         return canvas;
     }
-    
+
     public MapViewer getColonyTileGUI() {
         return colonyTileGUI;
     }
-
+    
     public Tile getFocus() {
         return mapViewer.getFocus();
+    }
+    
+    public ImageIcon getImageIcon(Object display, boolean small) {
+        return imageLibrary.getImageIcon(display, small);
     }
     
     public ImageLibrary getImageLibrary() {
@@ -238,36 +270,36 @@ public class GUI {
     public MapViewer getMapViewer() {
         return mapViewer;
     }
-    
+
     public Tile getSelectedTile() {
         return mapViewer.getSelectedTile();
     }
     
+
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
-
+    
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
     
-
     public void hideSplashScreen() {
         if (splash != null) {
             splash.setVisible(false);
             splash.dispose();
         }
     }
+
     
     public boolean isWindowed() {
         return windowed;
     }
-    
+
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }
 
-    
     /**
      * Plays some sound. Parameter == null stops playing a sound.
      *
@@ -287,7 +319,7 @@ public class GUI {
             }
         }
     }
-
+    
     public void quit() {
         if (!isWindowed()) {
             try {
@@ -299,7 +331,7 @@ public class GUI {
             }
         }
     }
-
+    
     public void refresh() { 
         mapViewer.forceReposition();
         canvas.refresh();
@@ -319,7 +351,7 @@ public class GUI {
             canvas.repaint(mapViewer.getTileBounds(t));
         }
     }
-    
+
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
@@ -331,20 +363,20 @@ public class GUI {
         mapViewer.scaleMap(delta);
         refresh();
     }
-
+    
+    
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
-    
+
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
-    
-    
+
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocusImmediately(tileToFocus);
     }
-
+    
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
@@ -352,14 +384,15 @@ public class GUI {
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
-    
+
     public void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-
+    
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
+    
 
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
@@ -367,12 +400,18 @@ public class GUI {
                  freeColClient.getGame().getMap()));
     }
     
+
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
     }
-    
 
+    public void showTilePopUpAtSelectedTile() {
+        canvas.showTilePopup(getSelectedTile(),
+                mapViewer.getCursor().getCanvasX(),
+                mapViewer.getCursor().getCanvasY());
+    }
+    
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -498,6 +537,9 @@ public class GUI {
         mapViewer.startCursorBlinking();
     }
     
+    public void toggleViewMode() {
+        mapViewer.getViewMode().toggleViewMode();    
+    }
 
     public void updateGameOptions() {
         canvas.updateGameOptions();
@@ -509,7 +551,7 @@ public class GUI {
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-    
+     
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
@@ -519,42 +561,5 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-
-    public void activateGotoPath() {
-        Unit unit = getActiveUnit();
- 
-        // Action should be disabled if there is no active unit, but make sure
-        if (unit == null) 
-            return;
-        
-        // Enter "goto mode" if not already activated; otherwise cancel it
-        if (mapViewer.isGotoStarted()) {
-            mapViewer.stopGoto();
-        } else {
-            mapViewer.startGoto();
-
-            // Draw the path to the current mouse position, if the
-            // mouse is over the screen; see also
-            // CanvaseMouseMotionListener
-            Point pt = canvas.getMousePosition();
-            if (pt != null) {
-                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
-                if (tile != null && unit.getTile() != tile) {
-                    PathNode dragPath = unit.findPath(tile);
-                    mapViewer.setGotoPath(dragPath);
-                }
-            }
-        }
-        
-    }
-
-    public void toggleViewMode() {
-        mapViewer.getViewMode().toggleViewMode();    
-    }
-     
-    public ImageIcon getImageIcon(Object display, boolean small) {
-        return imageLibrary.getImageIcon(display, small);
-    }
-    
     
 }
