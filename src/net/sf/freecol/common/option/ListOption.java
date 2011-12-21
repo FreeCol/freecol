@@ -107,7 +107,9 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
     public List<T> getOptionValues() {
         List<T> result = new ArrayList<T>();
         for (AbstractOption<T> option : value) {
-            result.add(option.getValue());
+            if (option != null) {
+                result.add(option.getValue());
+            }
         }
         return result;
     }
@@ -193,6 +195,14 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
                 in.nextTag();
                 template = readOption(in);
                 in.nextTag();
+            } else if ("optionValue".equals(in.getLocalName())) {
+                // @compat 0.10.4
+                String modId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                logger.finest("found old-style mod value: " + modId);
+                ModOption modOption = new ModOption(modId);
+                modOption.setValue(net.sf.freecol.common.io.Mods.getModFile(modId));
+                value.add((AbstractOption<T>) modOption);
+                // end @compat
             } else {
                 value.add(readOption(in));
             }
