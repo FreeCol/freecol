@@ -436,6 +436,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             for (GoodsType g : spec.getGoodsTypeList()) {
                 if (g.isStorable()
                     && !g.isFoodType()
+                    && !g.isBuildingMaterial()
+                    && !g.isMilitaryGoods()
                     && !g.isTradeGoods()) {
                     if (g.isRawMaterial() && produce.contains(g)) {
                         partExport.add(g);
