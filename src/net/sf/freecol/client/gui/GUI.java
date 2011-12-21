@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -256,6 +257,8 @@ public class GUI {
     }
     
     public Tile getFocus() {
+        if (mapViewer == null)
+            return null;
         return mapViewer.getFocus();
     }
     
@@ -564,6 +567,10 @@ public class GUI {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
+    }
+    
+    public void moveTileCursor(Direction direction) {
+        mapViewer.moveTileCursor(direction);
     }
     
 }

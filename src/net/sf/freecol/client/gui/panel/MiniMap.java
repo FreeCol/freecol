@@ -272,7 +272,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         g.setColor(ResourceManager.getColor("miniMapBackground.color"));
         g.fillRect(0, 0, width, height);
 
-        if (gui.getMapViewer() == null || gui.getFocus() == null) {
+        if (gui.getFocus() == null) {
             return;
         }
 

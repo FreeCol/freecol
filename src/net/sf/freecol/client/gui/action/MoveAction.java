@@ -69,7 +69,7 @@ public class MoveAction extends MapboardAction {
             getFreeColClient().getInGameController().moveActiveUnit(direction);
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            gui.getMapViewer().moveTileCursor(direction);
+            gui.moveTileCursor(direction);
             break;
         }
     }
