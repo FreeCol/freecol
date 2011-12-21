@@ -105,7 +105,8 @@ public class AIColonyTest extends FreeColTestCase {
     private BuildableType getToolsBuilder(AIColony aiColony) {
         Colony colony = aiColony.getColony();
         for (BuildableType b : aiColony.getColonyPlan().getBuildableTypes()) {
-            if (b.getAmountRequiredOf(toolsType) > 0) return b;
+            if (colony.canBuild(b)
+                && b.getAmountRequiredOf(toolsType) > 0) return b;
             if (b instanceof BuildingType) {
                 colony.addBuilding(new ServerBuilding(colony.getGame(), colony,
                         (BuildingType)b));
@@ -157,6 +158,8 @@ public class AIColonyTest extends FreeColTestCase {
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers();
 
+        assertEquals("Colony should be building lumber mill",
+            lumberMillType, colony.getCurrentlyBuilding());
         assertEquals("Colony does not need a carpenter", 0,
             carpenterHouse.getUnitCount());
         assertTrue("Colony should be producing sugar",
@@ -178,9 +181,13 @@ public class AIColonyTest extends FreeColTestCase {
             colony.getNetProductionOf(rumType) > 0);
 
         // Change to building something that needs tools.
-        BuildableType toolsBuild = getToolsBuilder(aiColony);
-        aiColony.propertyChange(null); // force rearranging workers
-        aiColony.rearrangeWorkers();
+        for (;;) {
+            BuildableType toolsBuild = getToolsBuilder(aiColony);
+            assertNotNull(toolsBuild);
+            aiColony.propertyChange(null); // force rearranging workers
+            aiColony.rearrangeWorkers();
+            if (colony.getCurrentlyBuilding() == toolsBuild) break;
+        }
 
         assertEquals("Colony does not need a carpenter", 0,
             carpenterHouse.getUnitCount());
@@ -188,8 +195,6 @@ public class AIColonyTest extends FreeColTestCase {
             colony.getProductionOf(oreType) > 0);
         assertTrue("Colony should be producing tools",
             colony.getProductionOf(toolsType) > 0);
-        assertEquals("Colony should be building tools-requirer", toolsBuild,
-            colony.getCurrentlyBuilding());
     }
 
     /**
@@ -247,6 +252,8 @@ public class AIColonyTest extends FreeColTestCase {
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers();
 
+        assertEquals("Colony should be building lumber mill",
+            lumberMillType, colony.getCurrentlyBuilding());
         assertFalse("Colony can not have a lumberjack, no lumber",
             colony.getNetProductionOf(lumberType) > 0);
         assertTrue("Colony should have a carpenter, has lumber in stock",

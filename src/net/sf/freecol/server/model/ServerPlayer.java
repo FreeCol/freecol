@@ -1431,6 +1431,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         colony.addBuilding(new ServerBuilding(game, colony, type));
                         colony.getBuildQueue().remove(type);
                         cs.add(See.only(this), colony);
+                        if (isAI()) {
+                            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+                        }
                     }
                 }
 
@@ -2954,6 +2957,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 colony.removeBuilding(building);
             } else if (building.canBeDamaged()) {
                 building.damage();
+            }
+            if (isAI()) {
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         } else if (pillage < buildingList.size() + shipList.size()) {
             Unit ship = shipList.get(pillage - buildingList.size());

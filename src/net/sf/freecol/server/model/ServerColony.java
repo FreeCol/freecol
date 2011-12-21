@@ -126,7 +126,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                 addBuilding(building);
             }
         }
-
     }
 
 
@@ -536,16 +535,14 @@ public class ServerColony extends Colony implements ServerModelObject {
             success = true;
         } else {
             Building building = getBuilding(from);
-            if (building.upgrade()) {
-                success = true;
-            } else {
+            success = building.upgrade();
+            if (!success) {
                 cs.addMessage(See.only((ServerPlayer) owner),
                     new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
                                      "colonyPanel.unbuildable",
                                      this)
                         .addName("%colony%", getName())
                         .add("%object%", type.getNameKey()));
-                success = false;
             }
         }
         if (success) {
@@ -563,6 +560,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      this)
                         .addName("%colony%", getName())
                         .add("%building%", type.getNameKey()));
+            }
+            if (owner.isAI()) {
+                firePropertyChange(REARRANGE_WORKERS, true, false);
             }
         }
         return success;

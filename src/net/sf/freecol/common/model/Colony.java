@@ -351,9 +351,6 @@ public class Colony extends Settlement implements Nameable {
         buildingMap.put(buildingType.getId(), building);
         getFeatureContainer().add(building.getType().getFeatureContainer());
         invalidateCache();
-        if (owner.isAI()) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-        }
     }
 
     /**
@@ -367,9 +364,6 @@ public class Colony extends Settlement implements Nameable {
         boolean result = buildingMap.remove(buildingType.getId()) != null;
         getFeatureContainer().remove(building.getType().getFeatureContainer());
         invalidateCache();
-        if (owner.isAI()) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-        }
         return result;
     }
 

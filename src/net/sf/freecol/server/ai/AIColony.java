@@ -231,6 +231,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public boolean rearrangeWorkers() {
         int turn = getGame().getTurn().getNumber();
+        if (colony.getCurrentlyBuilding() == null
+            && colonyPlan.getBestBuildableType() != null
+            && rearrangeWorkers.getNumber() > turn) {
+            logger.warning(colony.getName() + " could be building but"
+                + " is asleep until turn: " + rearrangeWorkers.getNumber()
+                + "( > " + turn + ")");
+        }
         if (rearrangeWorkers.getNumber() > turn) return false;
         final AIMain aiMain = getAIMain();
         final Tile tile = colony.getTile();
@@ -264,26 +271,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // the colony plan in case the required building materials
         // have changed.
         BuildableType build = colony.getCurrentlyBuilding();
-        if (!colony.canBuild(build)) build = null;
-        for (BuildableType b : colonyPlan.getBuildableTypes()) {
-            if (colony.canBuild(b)) {
-                if (b != build) {
-                    List<BuildableType> queue = new ArrayList<BuildableType>();
-                    queue.add(b);
-                    AIMessage.askSetBuildQueue(this, queue);
-                }
-                break;
-            }
+        BuildableType toBuild = colonyPlan.getBestBuildableType();
+        if (build != toBuild) {
+            List<BuildableType> queue = new ArrayList<BuildableType>();
+            if (toBuild != null) queue.add(toBuild);
+            AIMessage.askSetBuildQueue(this, queue);
         }
-        build = colony.getCurrentlyBuilding();
-        if (build == null) {
-            if (!colonyPlan.getBuildableTypes().isEmpty()) {
-                logger.warning("No building at " + colony.getName()
-                    + " in " + turn);
-            }
-        } else {
-            colonyPlan.refine(build);
-        }
+        colonyPlan.refine(colony.getCurrentlyBuilding());
 
         // Collect all potential workers from the colony and from the tile,
         // being careful not to disturb existing non-colony missions.
@@ -370,14 +364,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // in an infinite loop.  Just rearrange next turn.
         build = colony.getCurrentlyBuilding();
         if (!colony.canBuild(build)) {
-            build = null;
-            for (BuildableType b : colonyPlan.getBuildableTypes()) {
-                if (colony.canBuild(b)) {
-                    build = b;
-                    break;
-                }
-            }
             List<BuildableType> queue = new ArrayList<BuildableType>();
+            build = colonyPlan.getBestBuildableType();
             if (build != null) queue.add(build);
             AIMessage.askSetBuildQueue(this, queue);
             nextRearrange = 1;
