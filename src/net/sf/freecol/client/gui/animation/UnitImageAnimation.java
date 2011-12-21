@@ -92,6 +92,6 @@ public final class UnitImageAnimation {
     }
     
     protected Rectangle getDirtyAnimationArea() {
-        return gui.getMapViewer().getTileBounds(currentLocation.getTile());
+        return gui.getTileBounds(currentLocation.getTile());
     }
 }

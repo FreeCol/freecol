@@ -82,8 +82,8 @@ final class UnitMoveAnimation {
 
         float scale = gui.getMapScale();
         final int movementRatio = (int)(Math.pow(2, movementSpeed + 1) * scale);
-        final Rectangle r1 = gui.getMapViewer().getTileBounds(sourceTile);
-        final Rectangle r2 = gui.getMapViewer().getTileBounds(destinationTile);
+        final Rectangle r1 = gui.getTileBounds(sourceTile);
+        final Rectangle r2 = gui.getTileBounds(destinationTile);
         final Rectangle bounds = r1.union(r2);
 
         gui.getMapViewer().executeWithUnitOutForAnimation(unit, sourceTile,

@@ -577,4 +577,7 @@ public class GUI {
         return mapViewer.getTilePosition(tile);
     }
     
+    public Rectangle getTileBounds(Tile tile) {
+        return mapViewer.getTileBounds(tile);
+    }
 }
