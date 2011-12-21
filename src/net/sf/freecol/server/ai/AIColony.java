@@ -283,8 +283,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         } else {
             colonyPlan.refine(build);
-            nextRearrange = Math.min(nextRearrange,
-                Math.max(1, colony.getTurnsToComplete(build, null) - 1));
         }
 
         // Collect all potential workers from the colony and from the tile,
