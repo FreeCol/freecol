@@ -265,6 +265,7 @@ public class AIGoods extends AIObject implements Transportable {
      *
      */
     public void setTransport(AIUnit transport) {
+        if (this.transport == transport) return;
         AIUnit oldTransport = this.transport;
         this.transport = transport;
 
