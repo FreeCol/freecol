@@ -74,28 +74,27 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer mapViewer = gui.getMapViewer();
         final int movementSpeed = Animations.getAnimationSpeed(freeColClient, unit);
-        final Point srcP = mapViewer.getTilePosition(sourceTile);
-        final Point dstP = mapViewer.getTilePosition(destinationTile);
+        final Point srcP = gui.getTilePosition(sourceTile);
+        final Point dstP = gui.getTilePosition(destinationTile);
         
         if (srcP == null || dstP == null || movementSpeed <= 0) return;
 
         float scale = gui.getMapScale();
         final int movementRatio = (int)(Math.pow(2, movementSpeed + 1) * scale);
-        final Rectangle r1 = mapViewer.getTileBounds(sourceTile);
-        final Rectangle r2 = mapViewer.getTileBounds(destinationTile);
+        final Rectangle r1 = gui.getMapViewer().getTileBounds(sourceTile);
+        final Rectangle r2 = gui.getMapViewer().getTileBounds(destinationTile);
         final Rectangle bounds = r1.union(r2);
 
-        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile,
+        gui.getMapViewer().executeWithUnitOutForAnimation(unit, sourceTile,
             new OutForAnimationCallback() {
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                     final Point srcPoint
-                        = mapViewer.getUnitLabelPositionInTile(unitLabel, srcP);
+                        = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, srcP);
                     final Point dstPoint
-                        = mapViewer.getUnitLabelPositionInTile(unitLabel, dstP);
-                    final double xratio = mapViewer.getTileWidth()
-                        / mapViewer.getTileHeight();
+                        = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, dstP);
+                    final double xratio = gui.getMapViewer().getTileWidth()
+                        / gui.getMapViewer().getTileHeight();
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
                     final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0

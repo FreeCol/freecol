@@ -62,13 +62,12 @@ public final class UnitImageAnimation {
      * Do the animation.
      */
     public void animate() {
-        final MapViewer mapViewer = gui.getMapViewer();
-        if (mapViewer.getTilePosition(unit.getTile()) == null) {
+        if (gui.getTilePosition(unit.getTile()) == null) {
             return;
-        }
+        } 
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         gui.getCanvas().paintImmediately(gui.getCanvas().getBounds());
-        mapViewer.executeWithUnitOutForAnimation(unit, unit.getTile(), new OutForAnimationCallback() {
+        gui.getMapViewer().executeWithUnitOutForAnimation(unit, unit.getTile(), new OutForAnimationCallback() {
             public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                 for (AnimationEvent event : animation) {
                     long time = System.nanoTime();

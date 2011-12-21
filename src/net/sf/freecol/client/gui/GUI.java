@@ -573,4 +573,8 @@ public class GUI {
         mapViewer.moveTileCursor(direction);
     }
     
+    public Point getTilePosition(Tile tile) {
+        return mapViewer.getTilePosition(tile);
+    }
+    
 }
