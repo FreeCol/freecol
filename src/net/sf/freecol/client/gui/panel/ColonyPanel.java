@@ -1367,8 +1367,6 @@ public final class ColonyPanel extends FreeColPanel
 
         @Override
         public void paintComponent(Graphics g) {
-            MapViewer colonyTileGUI = getGUI().getColonyTileGUI();
-
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
 
@@ -1382,7 +1380,7 @@ public final class ColonyPanel extends FreeColPanel
                             int xx = ((2 - x) + y) * tileWidth;
                             int yy = (x + y) * tileHeight;
                             g.translate(xx, yy);
-                            colonyTileGUI.displayColonyTile((Graphics2D) g, tiles[x][y], getColony());
+                            getGUI().getColonyTileGUI().displayColonyTile((Graphics2D) g, tiles[x][y], getColony());
                             g.translate(-xx, -yy);
                         }
                     }
