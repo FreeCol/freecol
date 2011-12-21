@@ -722,19 +722,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void rearrangeWorkersInColonies() {
         logger.finest("Entering method rearrangeWorkersInColonies");
-
-        Iterator<AIColony> ci = getAIColonyIterator();
-        while (ci.hasNext()) {
-            AIColony c = ci.next();
-            if (c.getColony().getOwner() != getPlayer()) continue;
-            ArrayList<Tile> oldWorkTiles = new ArrayList<Tile>();
-            for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
-                if (!colonyTile.isEmpty()) {
-                    oldWorkTiles.add(colonyTile.getWorkTile());
-                }
-            }
-
-            c.rearrangeWorkers();
+        for (Colony colony : getPlayer().getColonies()) {
+            getAIMain().getAIColony(colony).rearrangeWorkers();
         }
     }
 
