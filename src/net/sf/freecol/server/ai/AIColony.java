@@ -270,14 +270,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // If a buildable is chosen, refine the worker allocation in
         // the colony plan in case the required building materials
         // have changed.
-        BuildableType build = colony.getCurrentlyBuilding();
-        BuildableType toBuild = colonyPlan.getBestBuildableType();
-        if (build != toBuild) {
+        BuildableType oldBuild = colony.getCurrentlyBuilding();
+        BuildableType build = colonyPlan.getBestBuildableType();
+        if (build != oldBuild) {
             List<BuildableType> queue = new ArrayList<BuildableType>();
-            if (toBuild != null) queue.add(toBuild);
+            if (build != null) queue.add(build);
             AIMessage.askSetBuildQueue(this, queue);
+            build = colony.getCurrentlyBuilding();
         }
-        colonyPlan.refine(colony.getCurrentlyBuilding());
+        colonyPlan.refine(build);
 
         // Collect all potential workers from the colony and from the tile,
         // being careful not to disturb existing non-colony missions.
@@ -341,11 +342,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Argh.  We may have chosen to build something we can no
-        // longer build due to a colony size limitation.  Try to find
-        // something, but do not re-refine/assign as we may get caught
-        // in an infinite loop.  Just rearrange next turn.
-        build = colony.getCurrentlyBuilding();
-        if (!colony.canBuild(build)) {
+        // longer build due to some limitation.  Try to find a
+        // replacement, but do not re-refine/assign as that process is
+        // sufficiently complex that we can not be confident that this
+        // will not loop indefinitely.  The compromise is to just
+        // rearrange next turn until we get out of this state.
+        if (build != null && !colony.canBuild(build)) {
+            logger.warning(colony.getName() + " reneged building " + build);
             List<BuildableType> queue = new ArrayList<BuildableType>();
             build = colonyPlan.getBestBuildableType();
             if (build != null) queue.add(build);
@@ -373,9 +376,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
                     
         // Log the changes.
+        build = colony.getCurrentlyBuilding();
+        String buildStr = (build != null) ? build.toString()
+            : ((build = colonyPlan.getBestBuildableType()) != null)
+            ? "unexpected-null(" + build.toString() + ")"
+            : "expected-null";
         String report = "Rearrange " + colony.getName()
             + " (" + colony.getUnitCount() + ")"
-            + " build=" + colony.getCurrentlyBuilding()
+            + " build=" + buildStr
             + " " + getGame().getTurn()
             + " + " + nextRearrange + "\n";
         for (UnitWas uw : was) report += uw.toString() + "\n";
