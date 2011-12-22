@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -774,7 +775,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 if (gw.getGoodsType() == goods.getType()
                     && gw.getGoodsAmount() <= goods.getAmount()) {
                     logger.finest(colony.getName()
-                        + " completes wish: " + gw);
+                        + " completes goods wish: " + gw);
                     wishes.remove(gw);
                     gw.dispose();
                     continue;
@@ -796,7 +797,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 WorkerWish ww = (WorkerWish)wishes.get(i);
                 if (ww.getUnitType() == unit.getType()) {
                     logger.finest(colony.getName()
-                        + " completes wish: " + ww);
+                        + " completes worker wish: " + ww);
                     wishes.remove(ww);
                     ww.dispose();
                     continue;
@@ -807,6 +808,30 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
  
+    /**
+     * Gets the wishes this colony has.
+     *
+     * @return A copy of the wishes list.
+     */
+    public List<Wish> getWishes() {
+        return new ArrayList<Wish>(wishes);
+    }
+
+    /**
+     * Gets the worker wishes this colony has.
+     *
+     * @return A copy of the wishes list with non-worker wishes removed.
+     */
+    public List<WorkerWish> getWorkerWishes() {
+        List<WorkerWish> result = new ArrayList<WorkerWish>();
+        for (Wish wish : wishes) {
+            if (wish instanceof WorkerWish) {
+                result.add((WorkerWish) wish);
+            }
+        }
+        return result;
+    }
+
     /**
      * Gets an <code>Iterator</code> for every <code>Wish</code> the
      * <code>Colony</code> has.
@@ -820,16 +845,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return wishes.iterator();
     }
 
-    public List<WorkerWish> getWorkerWishes() {
-        List<WorkerWish> result = new ArrayList<WorkerWish>();
-        for (Wish wish : wishes) {
-            if (wish instanceof WorkerWish) {
-                result.add((WorkerWish) wish);
-            }
-        }
-        return result;
-    }
-
     /**
      * Creates the wishes for the <code>Colony</code>.
      */
@@ -839,58 +854,78 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         createGoodsWishes();
     }
 
-    private UnitType getNextExpert(boolean onlyFood) {
-        // some type should be returned, not null
-        UnitType bestType = colony.getSpecification().getDefaultUnitType();
-        List<WorkLocationPlan> plans = colonyPlan.getFoodPlans();
-        if (!onlyFood) plans.addAll(colonyPlan.getWorkPlans());
-        for (WorkLocationPlan plan : plans) {
-            WorkLocation location = plan.getWorkLocation();
-            if (location instanceof ColonyTile) {
-                ColonyTile colonyTile = (ColonyTile) location;
-                if (colonyTile.canBeWorked()) {
-                    bestType = colony.getSpecification()
-                        .getExpertForProducing(plan.getGoodsType());
-                    break;
-                }
-            } else if (location instanceof Building) {
-                Building building = (Building) location;
-                if (building.canBeWorked()) {
-                    bestType = building.getExpertUnitType();
-                    break;
-                }
-            }
-        }
-        return bestType;
-    }
-
+    /**
+     * Creates the worker wishes.
+     */
     private void createWorkerWishes() {
-        int expertValue = 100;
+        final Specification spec = colony.getSpecification();
+        final int baseValue = 50;
+        final int priorityMax = 100;
+        final int priorityDecay = 10;
+        final int multipleBonus = 20;
 
-        // For every non-expert, request expert replacement. TODO:
-        // value should depend on how urgently the unit is needed, and
-        // possibly on skill, too.
-        for (Unit unit : colony.getUnitList()) {
-            if (unit.getWorkType() != null
-                && unit.getWorkType() != unit.getType().getExpertProduction()) {
-                UnitType expert = colony.getSpecification().getExpertForProducing(unit.getWorkType());
-                WorkerWish ww = new WorkerWish(getAIMain(), colony, expertValue, expert, true);
-                wishes.add(ww);
-                logger.finest("New WorkerWish: " + ww.getId() + " at " + colony.getName() + " for " + expert);
+        // For every non-expert, request expert replacement.
+        // Prioritize by lowest net production among the goods that are
+        // being produced by units (note that we have to traverse the work
+        // locations/unit-lists, rather than just check for non-zero
+        // production because it could be in balance).
+        // Add some weight when multiple cases of the same expert are
+        // needed, rather than generating heaps of wishes.
+        List<GoodsType> producing = new ArrayList<GoodsType>();
+        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+            for (Unit u : wl.getUnitList()) {
+                GoodsType work = u.getWorkType();
+                if (work != null) {
+                    work = work.getStoredAs();
+                    if (!producing.contains(work)) producing.add(work);
+                }
             }
         }
-
-        // request population increase
-        if (wishes.isEmpty()) {
-            int newPopulation = colony.getUnitCount() + 1;
-            if (colony.governmentChange(newPopulation) >= 0) {
-                // population increase incurs no penalty
-                boolean needFood = colony.getFoodProduction()
-                    <= colony.getFoodConsumption() + colony.getOwner().getMaximumFoodConsumption();
-                // choose expert for best work location plan
-                UnitType expert = getNextExpert(needFood);
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
+        Collections.sort(producing, new Comparator<GoodsType>() {
+                public int compare(GoodsType g1, GoodsType g2) {
+                    return colony.getAdjustedNetProductionOf(g1)
+                        - colony.getAdjustedNetProductionOf(g2);
+                }
+            });
+        TypeCountMap<UnitType> experts = new TypeCountMap<UnitType>();
+        for (Unit unit : colony.getUnitList()) {
+            GoodsType goods = unit.getWorkType();
+            UnitType expert = (goods == null
+                || goods == unit.getType().getExpertProduction()) ? null
+                : spec.getExpertForProducing(goods);
+            if (expert != null) {
+                experts.incrementCount(expert, 1);
             }
+        }
+        for (UnitType expert : experts.keySet()) {
+            GoodsType goods = expert.getExpertProduction();
+            int value = baseValue
+                + Math.max(priorityMax - priorityDecay * producing.indexOf(goods), 0)
+                + multipleBonus * (experts.getCount(expert) - 1);
+            WorkerWish ww = new WorkerWish(getAIMain(), colony, value, expert,
+                true);
+            wishes.add(ww);
+            logger.finest("New WorkerWish: " + ww.getId()
+                + " at " + colony.getName() + " for " + expert);
+        }
+
+        // Request population increase if no worker wishes and the bonus
+        // can take it.
+        if (experts.isEmpty()
+            && colony.governmentChange(colony.getUnitCount() + 1) >= 0) {
+            boolean needFood = colony.getFoodProduction()
+                <= colony.getFoodConsumption()
+                + colony.getOwner().getMaximumFoodConsumption();
+            // Choose expert for best work location plan
+            UnitType expert = spec.getDefaultUnitType();
+            for (WorkLocationPlan plan : (needFood) ? colonyPlan.getFoodPlans()
+                     : colonyPlan.getWorkPlans()) {
+                WorkLocation location = plan.getWorkLocation();
+                if (!location.canBeWorked()) continue;
+                expert = spec.getExpertForProducing(plan.getGoodsType());
+                break;
+            }
+            wishes.add(new WorkerWish(getAIMain(), colony, 50, expert, false));
         }
 
         // TODO: check for students
@@ -900,33 +935,38 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (isBadlyDefended(colony)) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue,
+                wishes.add(new WorkerWish(getAIMain(), colony, 100,
                                           bestDefender, true));
             }
         }
     }
 
+    /**
+     * Creates the goods wishes.
+     */
     private void createGoodsWishes() {
+        final Specification spec = colony.getSpecification();
         int goodsWishValue = 50;
 
         // request goods
         // TODO: improve heuristics
-        TypeCountMap<GoodsType> requiredGoods = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> required = new TypeCountMap<GoodsType>();
 
         // add building materials
         if (colony.getCurrentlyBuilding() != null) {
-            for (AbstractGoods goods : colony.getCurrentlyBuilding().getGoodsRequired()) {
-                if (colony.getAdjustedNetProductionOf(goods.getType()) == 0) {
-                    requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+            for (AbstractGoods ag : colony.getCurrentlyBuilding()
+                     .getGoodsRequired()) {
+                if (colony.getAdjustedNetProductionOf(ag.getType()) <= 0) {
+                    required.incrementCount(ag.getType(), ag.getAmount());
                 }
             }
         }
 
         // add materials required to improve tiles
         for (TileImprovementPlan plan : tileImprovementPlans) {
-            for (AbstractGoods goods : plan.getType().getExpendedEquipmentType()
+            for (AbstractGoods ag : plan.getType().getExpendedEquipmentType()
                      .getGoodsRequired()) {
-                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                required.incrementCount(ag.getType(), ag.getAmount());
             }
         }
 
@@ -940,49 +980,51 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     && info != null
                     && !info.hasMaximumProduction()) {
                     // TODO: find better heuristics
-                    requiredGoods.incrementCount(inputType, 100);
+                    required.incrementCount(inputType, 100);
                 }
             }
         }
 
         // add breedable goods
-        for (GoodsType goodsType : colony.getSpecification().getGoodsTypeList()) {
-            if (goodsType.isBreedable()) {
-                requiredGoods.incrementCount(goodsType, goodsType.getBreedingNumber());
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (g.isBreedable()) {
+                required.incrementCount(g, g.getBreedingNumber());
             }
         }
 
-        // add materials required to build military equipment
+        // Add materials required to build military equipment
         if (isBadlyDefended(colony)) {
-            for (EquipmentType type : colony.getSpecification().getEquipmentTypeList()) {
-                if (type.isMilitaryEquipment()) {
-                    for (Unit unit : colony.getUnitList()) {
-                        if (unit.canBeEquippedWith(type)) {
-                            for (AbstractGoods goods : type.getGoodsRequired()) {
-                                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
-                            }
-                            break;
-                        }
+            for (EquipmentType type : spec.getEquipmentTypeList()) {
+                if (!type.isMilitaryEquipment()) continue;
+                for (Unit unit : colony.getUnitList()) {
+                    if (!unit.canBeEquippedWith(type)) continue;
+                    for (AbstractGoods ag : type.getGoodsRequired()) {
+                        required.incrementCount(ag.getType(), ag.getAmount());
                     }
+                    break;
                 }
             }
         }
 
-        for (GoodsType type : requiredGoods.keySet()) {
+        for (GoodsType type : required.keySet()) {
             GoodsType requiredType = type;
-            while (requiredType != null && !requiredType.isStorable()) {
+            while (requiredType != null) {
+                if (requiredType.isStorable()) break;
                 requiredType = requiredType.getRawMaterial();
             }
             if (requiredType != null) {
-                int amount = Math.min((requiredGoods.getCount(requiredType)
-                                       - colony.getGoodsCount(requiredType)),
-                                      colony.getWarehouseCapacity());
+                int amount = Math.min(colony.getWarehouseCapacity(),
+                    (required.getCount(requiredType)
+                        - colony.getGoodsCount(requiredType)));
                 if (amount > 0) {
-                    int value = colonyCouldProduce(requiredType) ?
-                        goodsWishValue / 10 : goodsWishValue;
-                    GoodsWish gw = new GoodsWish(getAIMain(), colony, value, amount, requiredType);
+                    int value = goodsWishValue;
+                    if (colonyCouldProduce(requiredType)) value /= 10;
+                    GoodsWish gw = new GoodsWish(getAIMain(), colony, value,
+                        amount, requiredType);
                     wishes.add(gw);
-                    logger.finest("New GoodsWish: " + gw.getId() + " at " + colony.getName() + " is " + amount + " " + requiredType);
+                    logger.finest("New GoodsWish: " + gw.getId()
+                        + " at " + colony.getName()
+                        + " is " + amount + " " + requiredType);
                 }
             }
         }

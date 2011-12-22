@@ -310,9 +310,8 @@ public final class TilePopup extends JPopupMenu {
                             info.append("\n");
                         }
                         info.append("\n\nWISHES:\n");
-                        Iterator<Wish> wishIterator = ac.getWishIterator();
-                        while (wishIterator.hasNext()) {
-                            info.append(wishIterator.next().toString());
+                        for (Wish w : ac.getWishes()) {
+                            info.append(w.toString());
                             info.append("\n");
                         }
                         info.append("\n\nEXPORT GOODS:\n");

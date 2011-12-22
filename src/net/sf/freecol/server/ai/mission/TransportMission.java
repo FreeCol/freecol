@@ -854,12 +854,9 @@ public class TransportMission extends Mission {
             // Assuming that all colonists which can be bought in Europe take
             // the same space: TODO: fix this
             int space = getAvailableSpace(getUnit().getType(), getUnit().getOwner().getEurope(), ac.getColony());
-            Iterator<Wish> wishIterator = ac.getWishIterator();
-            while (space > 0 && wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
-                if (w.getTransportable() != null) {
-                    continue;
-                }
+            for (Wish w : ac.getWishes()) {
+                if (space <= 0) break;
+                if (w.getTransportable() != null) continue;
                 if (w instanceof WorkerWish) {
                     WorkerWish ww = (WorkerWish) w;
                     AIUnit newUnit = getUnitInEurope(connection, ww.getUnitType());
