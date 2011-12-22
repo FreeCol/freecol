@@ -631,7 +631,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<AIGoods> newAIGoods = new ArrayList<AIGoods>();
         List<AIGoods> oldAIGoods = new ArrayList<AIGoods>();
         for (GoodsType g : colony.getSpecification().getGoodsTypeList()) {
-            if (colony.getNetProductionOf(g) < 0) continue;
+            if (colony.getAdjustedNetProductionOf(g) < 0) continue;
             int count = colony.getGoodsCount(g);
             int exportAmount = (fullExport.contains(g))
                 ? count
