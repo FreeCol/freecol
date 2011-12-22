@@ -2200,14 +2200,7 @@ public class Colony extends Settlement implements Nameable {
             : (tories > veryBadGovernment) ? -2
             : (tories > badGovernment) ? -1
             : 0;
-        if (getOwner().isAI()) {
-            // TODO: Remove this when the ai can handle production penalties
-            newBonus = Math.max(0, newBonus);
-        }
-
-        if (productionBonus != newBonus) {
-            invalidateCache();
-        }
+        if (productionBonus != newBonus) invalidateCache();
         productionBonus = newBonus;
     }
 
