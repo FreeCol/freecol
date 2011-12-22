@@ -285,9 +285,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return <code>true</code> if the AI should build more colonies.
      */
     public boolean hasFewColonies() {
-        if (!getPlayer().canBuildColonies()) {
-            return false;
-        }
+        if (!getPlayer().canBuildColonies()) return false;
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
         for (Settlement settlement : getPlayer().getSettlements()) {
@@ -298,7 +296,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         boolean result = numberOfColonies <= 2
             || (numberOfColonies >= 3
                 && numberOfWorkers / numberOfColonies > numberOfColonies - 2);
-        logger.finest("hasFewColonies = " + result);
+        logger.finest("hasFewColonies (" + numberOfColonies
+            + " : " + numberOfWorkers + "): " + result);
         return result;
     }
 
