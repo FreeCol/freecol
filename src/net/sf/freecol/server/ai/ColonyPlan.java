@@ -415,8 +415,8 @@ public class ColonyPlan {
     }
 
     /**
-     * Gets the goods types required to complete a build.  The list
-     * includes the prerequisite raw materials as well as the direct
+     * Gets the goods required to complete a build.  The list includes
+     * the prerequisite raw materials as well as the direct
      * requirements (i.e. hammers, tools).  If enough of a required
      * goods is present in the colony, then that type is not returned.
      * Take care to order types with raw materials first so that we
@@ -427,7 +427,7 @@ public class ColonyPlan {
      * @param buildable The <code>BuildableType</code> to consider.
      * @return A list of required abstract goods.
      */
-    public List<AbstractGoods> getRequiredGoodsTypes(BuildableType buildable) {
+    public List<AbstractGoods> getRequiredGoods(BuildableType buildable) {
         List<AbstractGoods> required = new ArrayList<AbstractGoods>();
         if (buildable != null && buildable.getGoodsRequired() != null) {
             for (AbstractGoods ag : buildable.getGoodsRequired()) {
@@ -451,7 +451,7 @@ public class ColonyPlan {
      */
     public void refine(BuildableType build) {
         List<GoodsType> required = new ArrayList<GoodsType>();
-        for (AbstractGoods ag : getRequiredGoodsTypes(build)) {
+        for (AbstractGoods ag : getRequiredGoods(build)) {
             required.add(ag.getType());
         }
         Map<GoodsType, List<WorkLocationPlan>> suppressed
@@ -1374,6 +1374,9 @@ public class ColonyPlan {
         }
 
         // Greedy assignment of other workers to plans.
+        List<AbstractGoods> buildGoods = new ArrayList<AbstractGoods>();
+        BuildableType build = colony.getCurrentlyBuilding();
+        if (build != null) buildGoods.addAll(build.getGoodsRequired());
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
         boolean done = false;
@@ -1474,11 +1477,17 @@ public class ColonyPlan {
                 }
 
                 // Check if placing the worker will soon exhaust the
-                // raw material.
+                // raw material.  Do not reduce raw materials below
+                // what is needed for a building--- e.g. prevent
+                // musket production from hogging the tools.
                 GoodsType raw = goodsType.getRawMaterial();
+                int rawNeeded = 0;
+                for (AbstractGoods ag : buildGoods) {
+                    if (raw == ag.getType()) rawNeeded += ag.getAmount();
+                }
                 if (raw == null
                     || scratch.getAdjustedNetProductionOf(raw) >= 0
-                    || ((scratch.getGoodsCount(raw)
+                    || (((scratch.getGoodsCount(raw) - rawNeeded)
                             / -scratch.getAdjustedNetProductionOf(raw))
                         >= PRODUCTION_TURNOVER_TURNS)) {
                     // No raw material problems, the placement

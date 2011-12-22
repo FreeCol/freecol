@@ -340,24 +340,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             avertAutoDestruction();
         }
 
-        // Plan to rearrange when the warehouse hits a limit.
-        if (colony.getNetProductionOf(spec.getPrimaryFoodType()) < 0) {
-            int net = colony.getNetProductionOf(spec.getPrimaryFoodType());
-            int when = colony.getGoodsCount(spec.getPrimaryFoodType()) / -net;
-            nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
-        }
-        int warehouse = colony.getWarehouseCapacity();
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (!g.isStorable() || g.isFoodType()) continue;
-            int have = colony.getGoodsCount(g);
-            int net = colony.getNetProductionOf(g);
-            if (net >= 0 && (have >= warehouse || g.limitIgnored())) continue;
-            int when = (net < 0) ? (have / -net - 1)
-                : (net > 0) ? ((warehouse - have) / net - 1)
-                : Integer.MAX_VALUE;
-            nextRearrange = Math.max(1, Math.min(nextRearrange, when));
-        }
-                    
         // Argh.  We may have chosen to build something we can no
         // longer build due to a colony size limitation.  Try to find
         // something, but do not re-refine/assign as we may get caught
@@ -371,6 +353,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = 1;
         }
 
+        // Now that all production has been stabilized, plan to
+        // rearrange when the warehouse hits a limit.
+        if (colony.getNetProductionOf(spec.getPrimaryFoodType()) < 0) {
+            int net = colony.getNetProductionOf(spec.getPrimaryFoodType());
+            int when = colony.getGoodsCount(spec.getPrimaryFoodType()) / -net;
+            nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
+        }
+        int warehouse = colony.getWarehouseCapacity();
+        for (GoodsType g : spec.getGoodsTypeList()) {
+            if (!g.isStorable() || g.isFoodType()) continue;
+            int have = colony.getGoodsCount(g);
+            int net = colony.getAdjustedNetProductionOf(g);
+            if (net >= 0 && (have >= warehouse || g.limitIgnored())) continue;
+            int when = (net < 0) ? (have / -net - 1)
+                : (net > 0) ? ((warehouse - have) / net - 1)
+                : Integer.MAX_VALUE;
+            nextRearrange = Math.max(1, Math.min(nextRearrange, when));
+        }
+                    
         // Log the changes.
         String report = "Rearrange " + colony.getName()
             + " (" + colony.getUnitCount() + ")"
