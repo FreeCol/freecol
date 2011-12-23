@@ -833,19 +833,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Gets an <code>Iterator</code> for every <code>Wish</code> the
-     * <code>Colony</code> has.
-     *
-     * @return The <code>Iterator</code>. The items with the
-     *         {@link Wish#getValue highest value} appears first in the
-     *         <code>Iterator</code>
-     * @see Wish
-     */
-    public Iterator<Wish> getWishIterator() {
-        return wishes.iterator();
-    }
-
-    /**
      * Creates the wishes for the <code>Colony</code>.
      */
     private void createWishes() {

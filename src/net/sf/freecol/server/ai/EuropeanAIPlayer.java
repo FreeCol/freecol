@@ -313,12 +313,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         ArrayList<Wish> wishList = new ArrayList<Wish>();
         Iterator<AIColony> ai = getAIColonyIterator();
         while (ai.hasNext()) {
-            AIColony ac = ai.next();
-            Iterator<Wish> wishIterator = ac.getWishIterator();
-            while (wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
-                wishList.add(w);
-            }
+            wishList.addAll(ai.next().getWishes());
         }
         Collections.sort(wishList);
         return wishList.iterator();
@@ -1223,9 +1218,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         Iterator<AIColony> aIterator = getAIColonyIterator();
         while (aIterator.hasNext()) {
-            Iterator<Wish> wIterator = aIterator.next().getWishIterator();
-            while (wIterator.hasNext()) {
-                Wish w = wIterator.next();
+            for (Wish w : aIterator.next().getWishes()) {
                 if (w instanceof WorkerWish && w.getTransportable() == null) {
                     workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
                 }
