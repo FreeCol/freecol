@@ -200,7 +200,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);
         }
     }
-
+ 
     public void actionPerformed(ActionEvent timerEvent){
         doubleClickTimer.stop();
         mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY), true);

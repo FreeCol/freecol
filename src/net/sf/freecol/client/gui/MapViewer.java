@@ -1575,7 +1575,7 @@ public final class MapViewer {
                 }
             } else {
                 // Clear goto order when unit is already active
-                if (clearGoToOrders && activeUnit.getDestination() != null) {
+                if (clearGoToOrders) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
                     updateGotoPathForActiveUnit();
                 }
