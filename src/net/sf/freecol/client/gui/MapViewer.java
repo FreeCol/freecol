@@ -1573,8 +1573,7 @@ public final class MapViewer {
                     setFocus(selectedTile);
                     ret = true;
                 }
-            } else if (activeUnit.getTile() != null
-                       && activeUnit.getTile().equals(selectedTile)) {
+            } else {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders && activeUnit.getDestination() != null) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
