@@ -859,10 +859,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void createWorkerWishes() {
         final Specification spec = colony.getSpecification();
-        final int baseValue = 50;
-        final int priorityMax = 100;
-        final int priorityDecay = 10;
-        final int multipleBonus = 20;
+        final int baseValue = 25;
+        final int priorityMax = 50;
+        final int priorityDecay = 5;
+        final int multipleBonus = 5;
+        final int multipleMax = 5;
 
         // For every non-expert, request expert replacement.
         // Prioritize by lowest net production among the goods that are
@@ -900,13 +901,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (UnitType expert : experts.keySet()) {
             GoodsType goods = expert.getExpertProduction();
             int value = baseValue
-                + Math.max(priorityMax - priorityDecay * producing.indexOf(goods), 0)
-                + multipleBonus * (experts.getCount(expert) - 1);
+                + Math.max(0, priorityMax
+                    - priorityDecay * producing.indexOf(goods))
+                + (Math.min(multipleMax, experts.getCount(expert) - 1)
+                    * multipleBonus);
             WorkerWish ww = new WorkerWish(getAIMain(), colony, value, expert,
                 true);
             wishes.add(ww);
-            logger.finest("New WorkerWish: " + ww.getId()
-                + " at " + colony.getName() + " for " + expert);
+            logger.finest("New WorkerWish at " + colony.getName()
+                + ": " + ww.getId() + " " + ww);
         }
 
         // Request population increase if no worker wishes and the bonus
@@ -925,18 +928,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 expert = spec.getExpertForProducing(plan.getGoodsType());
                 break;
             }
-            wishes.add(new WorkerWish(getAIMain(), colony, 50, expert, false));
+            WorkerWish ww = new WorkerWish(getAIMain(), colony, 50, expert,
+                false);
+            wishes.add(ww);
+            logger.finest("New WorkerWish at " + colony.getName()
+                + ": " + ww.getId() + " " + ww);
         }
 
         // TODO: check for students
         // TODO: add missionaries
 
-        // increase defense value
+        // Improve defence.
         if (isBadlyDefended(colony)) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
-                wishes.add(new WorkerWish(getAIMain(), colony, 100,
-                                          bestDefender, true));
+                WorkerWish ww = new WorkerWish(getAIMain(), colony, 100,
+                                               bestDefender, true);
+                wishes.add(ww);
+                logger.finest("New WorkerWish at " + colony.getName()
+                    + ": " + ww.getId() + " " + ww);
             }
         }
     }
@@ -985,18 +995,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
-        // add breedable goods
+        // Add breedable goods
         for (GoodsType g : spec.getGoodsTypeList()) {
-            if (g.isBreedable()) {
+            if (g.isBreedable()
+                && colony.getGoodsCount(g) < g.getBreedingNumber()) {
                 required.incrementCount(g, g.getBreedingNumber());
             }
         }
 
-        // Add materials required to build military equipment
+        // Add materials required to build military equipment,
+        // but make sure there is a unit present that can use it.
         if (isBadlyDefended(colony)) {
             for (EquipmentType type : spec.getEquipmentTypeList()) {
                 if (!type.isMilitaryEquipment()) continue;
-                for (Unit unit : colony.getUnitList()) {
+                for (Unit unit : colony.getTile().getUnitList()) {
                     if (!unit.canBeEquippedWith(type)) continue;
                     for (AbstractGoods ag : type.getGoodsRequired()) {
                         required.incrementCount(ag.getType(), ag.getAmount());
@@ -1022,19 +1034,26 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     GoodsWish gw = new GoodsWish(getAIMain(), colony, value,
                         amount, requiredType);
                     wishes.add(gw);
-                    logger.finest("New GoodsWish: " + gw.getId()
-                        + " at " + colony.getName()
-                        + " is " + amount + " " + requiredType);
+                    logger.finest("New GoodsWish at " + colony.getName()
+                        + ": " + gw.getId() + " " + gw);
                 }
             }
         }
         Collections.sort(wishes);
     }
 
+    /**
+     * Can a colony produce certain goods?
+     *
+     * @param goodsType The <code>GoodsType</code> to check production of.
+     * @return True if the colony can produce such goods.
+     */
     private boolean colonyCouldProduce(GoodsType goodsType) {
         if (goodsType.isBreedable()) {
-            return colony.getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
-        } else if (goodsType.isFarmed()) {
+            return colony.getGoodsCount(goodsType)
+                >= goodsType.getBreedingNumber();
+        }
+        if (goodsType.isFarmed()) {
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
                 if (colonyTile.getWorkTile().potential(goodsType, null) > 0) {
                     return true;
@@ -1042,11 +1061,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         } else {
             if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
-                if (goodsType.getRawMaterial() == null) {
-                    return true;
-                } else {
-                    return colonyCouldProduce(goodsType.getRawMaterial());
-                }
+                return (goodsType.getRawMaterial() == null) ? true
+                    : colonyCouldProduce(goodsType.getRawMaterial());
             }
         }
         return false;
