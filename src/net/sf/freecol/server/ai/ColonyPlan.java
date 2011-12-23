@@ -362,25 +362,6 @@ public class ColonyPlan {
     }
 
     /**
-     * Gets the work location plans associated with this
-     * <code>ColonyPlan</code> that use a tile that could be improved.
-     *
-     * @return A copy of the nonfood producing plan list.
-     */
-    public List<WorkLocationPlan> getTilePlans() {
-        List<WorkLocationPlan> plans = new ArrayList<WorkLocationPlan>();
-        for (WorkLocationPlan wlp : workPlans) {
-            if (wlp.getWorkLocation() instanceof ColonyTile
-                && !((ColonyTile)wlp.getWorkLocation()).isColonyCenterTile()
-                && ((ColonyTile)wlp.getWorkLocation()).getWorkTile().getOwner()
-                    == colony.getOwner()) {
-                plans.add(wlp);
-            }
-        }
-        return plans;
-    }
-
-    /**
      * Recreates the buildables and work location plans for this
      * colony.
      */

@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +53,7 @@ import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -81,6 +81,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final String LIST_ELEMENT = "ListElement";
 
+    // Do not perform tile improvements that would leave less than
+    // this amount of forested work locations available to the colony.
+    private static final int FOREST_MINIMUM = 1;
+
     // Do not bother trying to ship out less than this amount of goods.
     private static final int EXPORT_MINIMUM = 10;
 
@@ -94,14 +98,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private final List<AIGoods> aiGoods = new ArrayList<AIGoods>();
 
     // Useful things for the colony.
-    private ArrayList<Wish> wishes = new ArrayList<Wish>();
+    private final List<Wish> wishes = new ArrayList<Wish>();
 
     // Plans to improve neighbouring tiles.
-    private ArrayList<TileImprovementPlan> tileImprovementPlans
+    private final List<TileImprovementPlan> tileImprovementPlans
         = new ArrayList<TileImprovementPlan>();
 
     // When should the workers in this Colony be rearranged?
-    private Turn rearrangeWorkers = new Turn(0);
+    private Turn rearrangeTurn = new Turn(0);
 
     // Goods that should be completely exported and only exported to
     // prevent the warehouse filling.
@@ -234,12 +238,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int turn = getGame().getTurn().getNumber();
         if (colony.getCurrentlyBuilding() == null
             && colonyPlan.getBestBuildableType() != null
-            && rearrangeWorkers.getNumber() > turn) {
+            && rearrangeTurn.getNumber() > turn) {
             logger.warning(colony.getName() + " could be building but"
-                + " is asleep until turn: " + rearrangeWorkers.getNumber()
+                + " is asleep until turn: " + rearrangeTurn.getNumber()
                 + "( > " + turn + ")");
         }
-        if (rearrangeWorkers.getNumber() > turn) return false;
+        if (rearrangeTurn.getNumber() > turn) return false;
         final AIMain aiMain = getAIMain();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
@@ -406,12 +410,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Change the export settings when required.
         resetExports();
 
-        // TODO: these look rational but need review.
         createTileImprovementPlans();
         createWishes();
 
         // Set the next rearrangement turn.
-        rearrangeWorkers = new Turn(turn + nextRearrange);
+        rearrangeTurn = new Turn(turn + nextRearrange);
         return true;
     }
 
@@ -576,7 +579,41 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Something bad happened, there is no remaining unit working in
+     * the colony.
+     *
+     * Throwing an exception stalls the AI and wrecks the colony in a
+     * weird way.  Try to recover by hopefully finding a unit outside
+     * the colony and stuffing it into the town hall.
+     */
+    private void avertAutoDestruction() {
+        List<GoodsType> libertyGoods = colony.getSpecification()
+            .getLibertyGoodsTypeList();
+        for (Unit u : colony.getTile().getUnitList()) {
+            if (!u.isPerson()) continue;
+            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+                if (!wl.canAdd(u)) continue;
+                for (GoodsType type : libertyGoods) {
+                    if (wl.getPotentialProduction(u.getType(), type) > 0
+                        && AIMessage.askWork(getAIUnit(u), wl)
+                        && u.getLocation() == wl) {
+                        AIMessage.askChangeWorkType(getAIUnit(u), type);
+                        logger.warning("Colony " + colony.getName()
+                            + " autodestruct averted.");
+                        break;
+                    }
+                }
+            }
+        }
+        // No good, no choice but to fail.
+        if (colony.getUnitCount() <= 0) {
+            throw new IllegalStateException("Colony " + colony.getName()
+                + " rearrangement leaves no units!");
+        }
+    }
 
+    
     /**
      * Gets the goods to be exported from this AI colony.
      *
@@ -1055,24 +1092,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return false;
     }
 
-    /**
-     * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovementPlan</code>s needed by this colony.
-     *
-     * @return The <code>Iterator</code>.
-     * @see TileImprovementPlan
-     */
-    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
-        return tileImprovementPlans.iterator();
-    }
 
     /**
-     * Adds a tile improvement plan to this AI colony.
+     * Gets the tile improvements planned for this colony.
      *
-     * @param tip The <code>TileImprovementPlan</code> to add.
+     * @return A copy of the tile improvement plan list.
      */
-    public void addTileImprovementPlan(TileImprovementPlan tip) {
-        tileImprovementPlans.add(tip);
+    public List<TileImprovementPlan> getTileImprovementPlans() {
+        return new ArrayList<TileImprovementPlan>(tileImprovementPlans);
     }
 
     /**
@@ -1084,99 +1111,100 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
+     * Gets the first plan for a specified tile from a list of tile
+     * improvement plans.
+     *
+     * @param tile The <code>Tile</code> to look for.
+     * @param plans A list of <code>TileImprovementPlan</code>s to search.
+     * @return A matching plan, or null if not found.
+     */
+    private TileImprovementPlan getPlanFor(Tile tile,
+                                           List<TileImprovementPlan> plans) {
+        for (TileImprovementPlan tip : plans) {
+            if (tip.getTarget() == tile) return tip;
+        }
+        return null;
+    }
+        
+    /**
      * Creates a list of the <code>Tile</code>-improvements which will
      * increase the production by this <code>Colony</code>.
      *
      * @see TileImprovementPlan
      */
     public void createTileImprovementPlans() {
-        Map<Tile, TileImprovementPlan> plans
-            = new HashMap<Tile, TileImprovementPlan>();
-        for (TileImprovementPlan plan : tileImprovementPlans) {
-            plans.put(plan.getTarget(), plan);
-        }
-        for (WorkLocationPlan wlp : colonyPlan.getTilePlans()) {
-            ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
-            Tile target = colonyTile.getWorkTile();
-            boolean others = target.getOwningSettlement() != colony
-                && target.getOwner() == colony.getOwner();
-            TileImprovementPlan plan = plans.get(target);
-            if (plan == null) {
-                if (others) continue; // owned by another of our colonies
-                plan = wlp.createTileImprovementPlan();
-                if (plan != null) {
-                    int value = plan.getValue();
-                    if (!colonyTile.isEmpty()) value *= 2;
-                    value -= colony.getOwner().getLandPrice(target);
-                    plan.setValue(value);
-                    tileImprovementPlans.add(plan);
-                    plans.put(target, plan);
-                }
-            } else if (wlp.updateTileImprovementPlan(plan) == null
-                || others) {
-                tileImprovementPlans.remove(plan);
-                plan.dispose();
-            }
-        }
+        List<TileImprovementPlan> newPlans
+            = new ArrayList<TileImprovementPlan>();
+        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+            if (!(wl instanceof ColonyTile)) continue;
+            ColonyTile colonyTile = (ColonyTile) wl;
+            Tile workTile = colonyTile.getWorkTile();
+            if (workTile.getOwningSettlement() != colony
+                || getPlanFor(workTile, newPlans) != null) continue;
 
-        Tile centerTile = colony.getTile();
-        TileImprovementPlan centerPlan = plans.get(centerTile);
-        TileImprovementType type = WorkLocationPlan
-            .findBestTileImprovementType(centerTile, colony.getSpecification()
-                                         .getGoodsType("model.goods.grain"));
-        if (type == null) {
-            if (centerPlan != null) {
-                tileImprovementPlans.remove(centerPlan);
-            }
-        } else {
-            if (centerPlan == null) {
-                centerPlan = new TileImprovementPlan(getAIMain(), colony.getTile(), type, 30);
-                tileImprovementPlans.add(0, centerPlan);
-            } else {
-                centerPlan.setType(type);
-            }
-        }
-
-        Collections.sort(tileImprovementPlans);
-    }
-
-    /**
-     * Something bad happened, there is no remaining unit working in
-     * the colony.
-     *
-     * Throwing an exception stalls the AI and wrecks the colony in a
-     * weird way.  Try to recover by hopefully finding a unit outside
-     * the colony and stuffing it into the town hall.
-     */
-    private void avertAutoDestruction() {
-        List<GoodsType> libertyGoods = colony.getSpecification()
-            .getLibertyGoodsTypeList();
-        for (Unit u : colony.getTile().getUnitList()) {
-            if (!u.isPerson()) continue;
-            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-                if (!wl.canAdd(u)) continue;
-                for (GoodsType type : libertyGoods) {
-                    if (wl.getPotentialProduction(u.getType(), type) > 0
-                        && AIMessage.askWork(getAIUnit(u), wl)
-                        && u.getLocation() == wl) {
-                        AIMessage.askChangeWorkType(getAIUnit(u), type);
-                        logger.warning("Colony " + colony.getName()
-                            + " autodestruct averted.");
+            // Require food for the center tile, but otherwise insist
+            // the tile is being used, and try to improve the
+            // production that is underway.
+            GoodsType goodsType = null;
+            if (colonyTile.isColonyCenterTile()) {
+                for (AbstractGoods ag : colonyTile.getProduction()) {
+                    if (ag.getType().isFoodType()) {
+                        goodsType = ag.getType();
                         break;
                     }
                 }
+            } else {
+                if (colonyTile.isEmpty()) continue;
+                goodsType = colonyTile.getUnitList().get(0).getWorkType();
+            }
+            if (goodsType == null) continue;
+
+            TileImprovementPlan plan = getPlanFor(workTile,
+                                                  tileImprovementPlans);
+            if (plan == null) {
+                TileImprovementType type = TileImprovementPlan
+                    .getBestTileImprovementType(workTile, goodsType);
+                if (type != null) {
+                    plan = new TileImprovementPlan(getAIMain(), workTile,
+                        type, type.getImprovementValue(workTile, goodsType));
+                }
+            } else {
+                if (!plan.update(goodsType)) plan = null;
+            }
+            if (plan != null) {
+                // Defend against clearing the last forested tile, but
+                // otherwise add the plan.
+                TileType change = plan.getType().getChange(workTile.getType());
+                if (change != null && !change.isForested()) {
+                    int forest = 0;
+                    for (WorkLocation f : colony.getAvailableWorkLocations()) {
+                        if (f instanceof ColonyTile
+                            && ((ColonyTile)f).getWorkTile().isForested())
+                            forest++;
+                    }
+                    if (forest <= FOREST_MINIMUM) continue;
+                }
+                newPlans.add(plan);
+                logger.info(colony.getName()
+                    + " new tile improvement plan: " + plan);
             }
         }
-        // No good, no choice but to fail.
-        if (colony.getUnitCount() <= 0) {
-            throw new IllegalStateException("Colony " + colony.getName()
-                + " rearrangement leaves no units!");
-        }
+        tileImprovementPlans.clear();
+        tileImprovementPlans.addAll(newPlans);
+        Collections.sort(tileImprovementPlans);
     }
 
+
+    /**
+     * Handle REARRANGE_WORKERS property change events, by setting
+     * the rearrangeTurn variable such that rearrangeWorkers will
+     * run fully next time it is invoked.
+     *
+     * @param event The <code>PropertyChangeEvent</code>.
+     */
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("Property change REARRANGE_WORKERS fired.");
-        rearrangeWorkers = new Turn(0);
+        rearrangeTurn = new Turn(0);
     }
 
     // Serialization

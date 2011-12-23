@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -82,123 +81,15 @@ public class WorkLocationPlan extends ValuedAIObject {
         setValue(getProductionOf(goodsType));
     }
 
-
     /**
-     * Gets a <code>TileImprovementPlan</code> which will improve
-     * the production of the goods type specified by this
-     * <code>WorkLocationPlan</code>.
+     * Gets the <code>WorkLocation</code> this
+     * <code>WorkLocationPlan</code> controls.
      *
-     * @return The <code>TileImprovementPlan</code> if there is an
-     *      improvement, plow or build road, which will increase
-     *      the production of the goods type specified by this
-     *      plan. <code>null</code> gets returned if this plan is
-     *      for a <code>Building</code> or that the <code>Tile</code>
-     *      does not have an improvement.
+     * @return The <code>WorkLocation</code>.
      */
-    public TileImprovementPlan createTileImprovementPlan() {
-        return updateTileImprovementPlan(null);
-    }
-
-    /**
-     * Updates the given <code>TileImprovementPlan</code>.
-     *
-     * @param tip The <code>TileImprovementPlan</code> to update.
-     * @return The same <code>TileImprovementPlan</code>-object
-     *      as provided to the method or <code>null</code> if
-     *      there is no more need for the improvement.
-     */
-    public TileImprovementPlan updateTileImprovementPlan(TileImprovementPlan tip) {
-        if (workLocation instanceof ColonyTile) {
-            Tile tile = ((ColonyTile) workLocation).getWorkTile();
-
-            if (tip != null && tip.getTarget() != tile) {
-                throw new IllegalArgumentException("The given TileImprovementPlan was not created for this Tile.");
-            }
-
-            // Update to find the best thing to do now
-            TileImprovementType impType = findBestTileImprovementType(tile, goodsType);
-            if (impType != null) {
-                int value = getImprovementValue(tile, goodsType, impType);
-                if (tip == null) {
-                    return new TileImprovementPlan(getAIMain(), tile, impType, value);
-                } else {
-                    tip.setType(impType);
-                    tip.setValue(value);
-                    return tip;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the increase in production of the given GoodsType this
-     * TileImprovementType would yield.
-     *
-     * @param tile The <code>Tile</code> to be considered
-     * @param goodsType A preferred <code>GoodsType</code> or <code>null</code>
-     * @param improvementType a <code>TileImprovementType</code> value
-     * @return the increase in production
-     */
-    public static int getImprovementValue(Tile tile, GoodsType goodsType,
-                                          TileImprovementType improvementType) {
-        int value = 0;
-        if (goodsType.isFarmed()) {
-            TileType newTileType = improvementType.getChange(tile.getType());
-            if (newTileType == null) {
-                // simple bonus
-                int production = tile.potential(goodsType, null);
-                if (production > 0) {
-                    float change = improvementType.getFeatureContainer()
-                        .applyModifier(production, goodsType.getId());
-                    value = (int) (change - production);
-                }
-            } else {
-                // tile type change
-                int change = newTileType.getProductionOf(goodsType, null)
-                    - tile.getType().getProductionOf(goodsType, null);
-                value = change;
-            }
-        }
-        return value;
-    }
-
-    /**
-     * Method for returning the 'most effective' TileImprovementType
-     * allowed for a given <code>Tile</code>.  Useful for AI in
-     * deciding the Improvements to prioritize.
-     *
-     * @param tile The <code>Tile</code> that will be improved
-     * @param goodsType The <code>GoodsType</code> to be prioritized.
-     * @return The best TileImprovementType available to be done.
-     */
-    public static TileImprovementType findBestTileImprovementType(Tile tile, GoodsType goodsType) {
-        int bestValue = 0;
-        TileImprovementType bestType = null;
-        for (TileImprovementType impType : tile.getSpecification().getTileImprovementTypeList()) {
-            if (!impType.isNatural()
-                && impType.isTileTypeAllowed(tile.getType())
-                && tile.findTileImprovementType(impType) == null) {
-                int value = getImprovementValue(tile, goodsType, impType);
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestType = impType;
-                }
-            }
-        }
-        return bestType;
-    }
-
-    /**
-    * Gets the <code>WorkLocation</code> this
-    * <code>WorkLocationPlan</code> controls.
-    *
-    * @return The <code>WorkLocation</code>.
-    */
     public WorkLocation getWorkLocation() {
         return workLocation;
     }
-
 
     /**
      * Gets the production of the given type of goods according to

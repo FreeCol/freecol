@@ -25,8 +25,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 
 import org.w3c.dom.Element;
@@ -66,8 +68,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param target The target <code>Tile</code> for the improvement.
      * @param type The type of improvement.
      * @param value The value identifying the importance of
-    *         this <code>TileImprovementPlan</code> - a higher value 
-    *         signals a higher importance.
+     *        this <code>TileImprovementPlan</code> - a higher value 
+     *        signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target, TileImprovementType type, int value) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
@@ -76,9 +78,10 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         setValue(value);
     }
-    
+
     /**
-     * Creates a new <code>TileImprovementPlan</code> from the given XML-representation.
+     * Creates a new <code>TileImprovementPlan</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param element The root element for the XML-representation 
@@ -90,7 +93,8 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
     
     /**
-     * Creates a new <code>TileImprovementPlan</code> from the given XML-representation.
+     * Creates a new <code>TileImprovementPlan</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -182,7 +186,51 @@ public class TileImprovementPlan extends ValuedAIObject {
         return target;
     }
 
-    
+    /**
+     * Gets the 'most effective' TileImprovementType allowed for a
+     * given tile and goods type.  Useful for AI in deciding the
+     * Improvements to prioritize.
+     *
+     * @param tile The <code>Tile</code> that will be improved.
+     * @param goodsType The <code>GoodsType</code> to be prioritized.
+     * @return The best TileImprovementType available to be done.
+     */
+    public static TileImprovementType getBestTileImprovementType(Tile tile,
+        GoodsType goodsType) {
+        int bestValue = 0;
+        TileImprovementType bestType = null;
+        for (TileImprovementType impType
+                 : tile.getSpecification().getTileImprovementTypeList()) {
+            if (!impType.isNatural()
+                && impType.isTileTypeAllowed(tile.getType())
+                && tile.findTileImprovementType(impType) == null) {
+                int value = impType.getImprovementValue(tile, goodsType);
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestType = impType;
+                }
+            }
+        }
+        return bestType;
+    }
+
+    /**
+     * Updates this tile improvement plan to the best available for its
+     * tile and the specified goods type.
+     *
+     * @param goodsType The <code>GoodsType</code> to be prioritized.
+     * @return True if the plan is still viable.
+     */
+    public boolean update(GoodsType goodsType) {
+        TileImprovementType type = getBestTileImprovementType(target,
+                                                              goodsType);
+        if (type == null) return false;
+        setType(type);
+        setValue(type.getImprovementValue(target, goodsType));
+        return true;
+    }
+
+
     /**
      * Writes this object to an XML stream.
      *

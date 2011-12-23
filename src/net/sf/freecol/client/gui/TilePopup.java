@@ -304,9 +304,8 @@ public final class TilePopup extends JPopupMenu {
                             .getAIMain().getAIColony(serverTile.getColony());
                         StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());
                         info.append("\n\nTILE IMPROVEMENTS:\n");
-                        Iterator<TileImprovementPlan> tipIt = ac.getTileImprovementPlanIterator();
-                        while (tipIt.hasNext()) {
-                            info.append(tipIt.next().toString());
+                        for (TileImprovementPlan tip : ac.getTileImprovementPlans()) {
+                            info.append(tip.toString());
                             info.append("\n");
                         }
                         info.append("\n\nWISHES:\n");

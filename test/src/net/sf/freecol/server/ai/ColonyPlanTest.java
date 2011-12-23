@@ -375,38 +375,38 @@ public class ColonyPlanTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
 
         tile1.setType(savannah);
-        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
-        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+        assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
+        assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, oreType));
 
         tile1.setType(marsh);
-        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
-        assertEquals(plow, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
-        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+        assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));
+        assertEquals(plow, TileImprovementPlan.getBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, lumberType));
+        assertEquals(road, TileImprovementPlan.getBestTileImprovementType(tile1, oreType));
 
         tile1.setType(savannahForest);
-        assertEquals(clearForest, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
-        assertEquals(clearForest, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
-        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+        assertEquals(clearForest, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
+        assertEquals(clearForest, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(road, TileImprovementPlan.getBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, oreType));
 
         tile1.setType(hills);
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
-        assertEquals(road, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, lumberType));
+        assertEquals(road, TileImprovementPlan.getBestTileImprovementType(tile1, oreType));
 
         tile1.setType(arctic);
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, grainType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, sugarType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, tobaccoType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, lumberType));
-        assertEquals(null, WorkLocationPlan.findBestTileImprovementType(tile1, oreType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, grainType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, sugarType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, tobaccoType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, lumberType));
+        assertEquals(null, TileImprovementPlan.getBestTileImprovementType(tile1, oreType));
     }
 }

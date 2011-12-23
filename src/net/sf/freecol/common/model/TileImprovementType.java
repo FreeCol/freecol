@@ -261,6 +261,33 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return exposeResourcePercent;
     }
 
+    /**
+     * Gets the increase in production of the given GoodsType
+     * this tile improvement type would yield at a specified tile.
+     *
+     * @param tile The <code>Tile</code> to be considered.
+     * @param goodsType A preferred <code>GoodsType</code> or <code>null</code>
+     * @return The increase in production
+     */
+    public int getImprovementValue(Tile tile, GoodsType goodsType) {
+        int value = 0;
+        if (goodsType.isFarmed()) {
+            TileType newTileType = getChange(tile.getType());
+            if (newTileType == null) { // simple bonus
+                int production = tile.potential(goodsType, null);
+                if (production > 0) {
+                    float change = getFeatureContainer()
+                        .applyModifier(production, goodsType.getId());
+                    value = (int) (change - production);
+                }
+            } else { // tile type change
+                int change = newTileType.getProductionOf(goodsType, null)
+                    - tile.getType().getProductionOf(goodsType, null);
+                value = change;
+            }
+        }
+        return value;
+    }
 
     /**
      * Makes an XML-representation of this object.

@@ -195,11 +195,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();
         Iterator<AIColony> acIterator = getAIColonyIterator();
         while (acIterator.hasNext()) {
-            AIColony ac = acIterator.next();
-            Iterator<TileImprovementPlan> it = ac.getTileImprovementPlanIterator();
-            while (it.hasNext()) {
-                tileImprovements.add(it.next());
-            }
+            tileImprovements.addAll(acIterator.next().getTileImprovementPlans());
         }
         return tileImprovements.iterator();
     }
