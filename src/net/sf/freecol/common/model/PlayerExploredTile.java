@@ -129,8 +129,10 @@ public class PlayerExploredTile extends FreeColGameObject {
             missionary = is.getMissionary();
             if (full) {
                 skill = is.getLearnableSkill();
-                wantedGoods = is.getWantedGoods();
             }
+            // Do not hide.  Has to be visible for the pre-speak-to-chief
+            // dialog message.  Yes this is odd.
+            wantedGoods = is.getWantedGoods();
         }
     }
 
