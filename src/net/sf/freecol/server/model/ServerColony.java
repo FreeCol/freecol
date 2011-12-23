@@ -198,7 +198,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     int complete = getTurnsToComplete(build, needed);
                     // Warn if about to fail, or if no useful progress
                     // towards completion is possible.
-                    if (complete == -1 || complete == UNDEFINED) {
+                    if (complete == -1 && needed.getType() != null) {
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                 "model.colony.buildableNeedsGoods",
