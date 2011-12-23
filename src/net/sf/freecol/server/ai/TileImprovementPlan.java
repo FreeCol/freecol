@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 
 import org.w3c.dom.Element;

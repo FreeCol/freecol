@@ -161,7 +161,7 @@ public final class EuropePanel extends FreeColPanel {
         docksPanel.setTransferHandler(defaultTransferHandler);
         marketPanel.setTransferHandler(defaultTransferHandler);
 
-        pressListener = new DragListener(freeColClient, this);
+        pressListener = new DragListener(freeColClient, gui, this);
         MouseListener releaseListener = new DropListener();
         toAmericaPanel.addMouseListener(releaseListener);
         toEuropePanel.addMouseListener(releaseListener);

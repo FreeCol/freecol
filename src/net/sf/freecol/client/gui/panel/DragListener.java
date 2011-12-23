@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,7 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
@@ -55,8 +55,8 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -76,6 +76,8 @@ public final class DragListener extends MouseAdapter {
 
     private FreeColClient freeColClient;
 
+    private GUI gui;
+
     /**
      * The constructor to use.
      * @param freeColClient 
@@ -83,8 +85,9 @@ public final class DragListener extends MouseAdapter {
      * @param parentPanel The layered pane that contains the components to which
      *            a DragListener might be attached.
      */
-    public DragListener(FreeColClient freeColClient, FreeColPanel parentPanel) {
+    public DragListener(FreeColClient freeColClient, GUI gui, FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         this.parentPanel = parentPanel;
         this.canvas = parentPanel.getCanvas();
     }
@@ -124,7 +127,7 @@ public final class DragListener extends MouseAdapter {
                         if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
                             menu.remove(lastIndex);
                         }
-                        if (freeColClient.getGUI().isWindowed()
+                        if (gui.isWindowed()
                             && System.getProperty("os.name").startsWith("Windows")) {
                             // work-around: JRE on Windows is unable
                             // to display popup menus that extend

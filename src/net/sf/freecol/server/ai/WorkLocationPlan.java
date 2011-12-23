@@ -20,13 +20,13 @@
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 

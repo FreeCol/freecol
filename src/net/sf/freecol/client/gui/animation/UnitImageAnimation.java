@@ -25,7 +25,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;

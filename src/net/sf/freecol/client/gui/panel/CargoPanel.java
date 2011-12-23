@@ -74,7 +74,7 @@ public class CargoPanel extends FreeColPanel
 
         carrier = null;
         defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, gui.getCanvas(), this);
-        pressListener = new DragListener(getFreeColClient(), this);
+        pressListener = new DragListener(getFreeColClient(), gui, this);
 
         if (withTitle) {
             border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),

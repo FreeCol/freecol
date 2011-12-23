@@ -35,7 +35,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
