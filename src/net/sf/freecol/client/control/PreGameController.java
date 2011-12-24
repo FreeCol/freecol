@@ -226,15 +226,19 @@ public final class PreGameController {
         if (freeColClient.currentPlayerIsMyPlayer()) {
             igc.nextActiveUnit();
         }
-        
+
         gui.setUpMouseListenersForCanvas();
 
         if (FreeCol.isInDebugMode() && FreeCol.getDebugRunTurns() > 0) {
             freeColClient.skipTurns(FreeCol.getDebugRunTurns());
         } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
-            myPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                                      "tutorial.startGame",
-                                                      myPlayer));
+            ModelMessage message =
+                new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                 "tutorial.startGame", myPlayer);
+            String direction = myPlayer.getNation().startsOnEastCoast()
+                ? "direction.W" : "direction.E";
+            message.add("%direction%", direction);
+            myPlayer.addModelMessage(message);
             // force view of tutorial message
             igc.nextModelMessage();
         }
