@@ -42,8 +42,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Logger;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -52,7 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -79,7 +78,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
 
-    private final Canvas canvas;
+
     private final FreeColPanel parentPanel;
 
     private FreeColClient freeColClient;
@@ -92,10 +91,9 @@ public final class DefaultTransferHandler extends TransferHandler {
     * @param canvas The <code>Canvas</code>.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
-    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui, Canvas canvas, FreeColPanel parentPanel) {
+    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui, FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.canvas = canvas;
         this.parentPanel = parentPanel;
     }
 
@@ -304,7 +302,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                                             .addName("%object%", modifier.getSource()))
                                     + "\n";
                             }
-                            canvas.showInformationMessage(message);
+                            gui.getCanvas().showInformationMessage(message);
                         }
                     } else if (comp instanceof CargoPanel) {
                         ((CargoPanel)comp).add(data, true);
@@ -492,7 +490,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
     private int getAmount(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return canvas.showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay));
+        return gui.getCanvas().showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay));
     }
 
 

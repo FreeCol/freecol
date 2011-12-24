@@ -73,7 +73,7 @@ public class CargoPanel extends FreeColPanel
         super(freeColClient, gui);
 
         carrier = null;
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, gui.getCanvas(), this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, this);
         pressListener = new DragListener(getFreeColClient(), gui, this);
 
         if (withTitle) {
