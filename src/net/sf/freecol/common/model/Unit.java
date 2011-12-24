@@ -2477,7 +2477,8 @@ public class Unit extends FreeColGameObject
         if (role != Role.DEFAULT) {
             result = StringTemplate.template("model.unit." + role.getId()
                                              + ".name")
-                .addStringTemplate("%unit%", result);
+                .addAmount("%number%", 1)
+                .add("%unit%", getType().getNameKey());
         }
         return result;
     }
