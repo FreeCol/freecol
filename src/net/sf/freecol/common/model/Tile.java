@@ -183,7 +183,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * is by Colony.getScratchColony() which needs to change these fields
      * anyway.
      * Note that the following fields are shared--- do not mutate them!
-     *   + The tile item container
+     *   + The tile item container.
      *   + The player explored tiles.
      * Colony.getCorrespondingWorkLocation() depends on the tics being shared.
      *
@@ -205,6 +205,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         scratch.moveToEurope = moveToEurope;
         scratch.style = style;
         return scratch;
+    }
+
+    /**
+     * Special handling on dispose to avoid mutating the shared fields.
+     */
+    public void disposeScratchTile() {
+        tileItemContainer = null;
+        playerExploredTiles = null;
+        dispose();
     }
 
     public boolean isViewShared() {

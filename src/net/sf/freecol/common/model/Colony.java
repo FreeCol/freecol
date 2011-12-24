@@ -267,6 +267,19 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Dispose of this scratch colony.  Special handling to avoid mutating
+     * the shared fields on dispose.
+     */
+    public void disposeScratchColony() {
+        populationQueue = null;
+        for (ColonyTile ct : colonyTiles) {
+            ct.getWorkTile().disposeScratchTile();
+        }
+        colonyTiles.clear();
+        dispose();
+    }
+
+    /**
      * Finds the corresponding work location in a scratch colony.
      *
      * @param wl The <code>WorkLocation</code> in the original colony.
@@ -2393,10 +2406,9 @@ public class Colony extends Settlement implements Nameable {
         for (WorkLocation workLocation : getCurrentWorkLocations()) {
             objects.addAll(((FreeColGameObject) workLocation).disposeList());
         }
-        TileItemContainer container = getTile().getTileItemContainer();
-        TileImprovement road = container.getRoad();
+        TileImprovement road = getTile().getRoad();
         if (road != null && road.isVirtual()) {
-            container.removeTileItem(road);
+            getTile().getTileItemContainer().removeTileItem(road);
         }
         objects.addAll(super.disposeList());
         return objects;

@@ -335,7 +335,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 colony.getGoodsContainer().addGoods(g, newCount - oldCount);
             }
         }
-        scratch.dispose();
+        scratch.disposeScratchColony();
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
