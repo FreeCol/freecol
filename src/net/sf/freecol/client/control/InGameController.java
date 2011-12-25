@@ -987,7 +987,7 @@ public final class InGameController implements NetworkConstants {
      * loads the game.
      */
     public void loadGame() {
-        File file = gui.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
             gui.errorMessage("fileNotFound");

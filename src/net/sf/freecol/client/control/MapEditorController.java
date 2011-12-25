@@ -267,9 +267,7 @@ public final class MapEditorController {
      * game.
      */
     public void loadGame() {
-        Canvas canvas = gui.getCanvas();
-
-        File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
 
         if (file == null) {
             return;

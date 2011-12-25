@@ -28,10 +28,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -616,4 +615,10 @@ public class GUI {
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
         return canvas.showConfirmDialog(text, okText, cancelText);
     }
+    
+    public File showLoadDialog(File directory) {
+        return canvas.showLoadDialog(directory);
+    }
+
+    
 }

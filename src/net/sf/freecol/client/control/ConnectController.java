@@ -196,7 +196,6 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     */
     public void joinMultiplayerGame(String username, String host, int port) {
-        final Canvas canvas = gui.getCanvas();
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) {
@@ -218,7 +217,7 @@ public final class ConnectController {
 
         freeColClient.setSingleplayer(false);
         if (login(username, host, port) && !freeColClient.isInGame()) {
-            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
+            gui.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
 
@@ -358,7 +357,7 @@ public final class ConnectController {
     * and loads the game.
     */
     public void loadGame() {
-        File file = gui.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
         if (file != null) {
             //FreeCol.setSaveDirectory(file.getParentFile());
             loadGame(file);
