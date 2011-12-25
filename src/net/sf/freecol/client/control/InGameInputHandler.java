@@ -1419,7 +1419,7 @@ public final class InGameInputHandler extends InputHandler {
                     ? "welcomeOffer.text" : "welcomeSimple.text";
                 String type = ((IndianNationType) welcomer
                     .getNationType()).getSettlementTypeKey(true);
-                accept = canvas.showConfirmDialog(tile,
+                accept = gui.showConfirmDialog(tile,
                     StringTemplate.template(messageId)
                         .addStringTemplate("%nation%", welcomer.getNationName())
                         .addName("%camps%", camps)
@@ -1690,8 +1690,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = gui.getCanvas();
-            boolean choice = canvas.showConfirmDialog(tile, text, okText,
+            boolean choice = gui.showConfirmDialog(tile, text, okText,
                 cancelText);
             return Boolean.valueOf(choice);
         }

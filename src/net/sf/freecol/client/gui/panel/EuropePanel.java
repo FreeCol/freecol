@@ -553,7 +553,7 @@ public final class EuropePanel extends FreeColPanel {
                     && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
                     && unit.getSpaceLeft() > 0) {
-                    boolean leave = canvas.showConfirmDialog(null,
+                    boolean leave = getGUI().showConfirmDialog(null,
                         StringTemplate.template("europe.leaveColonists")
                             .addStringTemplate("%newWorld%",
                                 destination.getLocationNameFor(unit.getOwner())),

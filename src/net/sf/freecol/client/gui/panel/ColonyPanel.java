@@ -680,7 +680,7 @@ public final class ColonyPanel extends FreeColPanel
     public void closeColonyPanel() {
         Canvas canvas = getCanvas();
         if (getColony().getUnitCount() == 0) {
-            if (canvas.showConfirmDialog("abandonColony.text",
+            if (getGUI().showConfirmDialog("abandonColony.text",
                                          "abandonColony.yes",
                                          "abandonColony.no")) {
                 canvas.remove(this);
@@ -690,7 +690,7 @@ public final class ColonyPanel extends FreeColPanel
             BuildableType buildable = getColony().getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getPopulationRequired() > getColony().getUnitCount()
-                && !canvas.showConfirmDialog(null, StringTemplate.template("colonyPanel.reducePopulation")
+                && !getGUI().showConfirmDialog(null, StringTemplate.template("colonyPanel.reducePopulation")
                                              .addName("%colony%", getColony().getName())
                                              .addAmount("%number%", buildable.getPopulationRequired())
                                              .add("%buildable%", buildable.getNameKey()),

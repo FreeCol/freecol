@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.FreeColObject;
@@ -606,6 +607,13 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-        
     
+    public boolean showConfirmDialog(Tile tile, StringTemplate text,
+            String okText, String cancelText) {
+        return canvas.showConfirmDialog(tile, text, okText, cancelText);
+    }
+        
+    public boolean showConfirmDialog(String text, String okText, String cancelText) {
+        return canvas.showConfirmDialog(text, okText, cancelText);
+    }
 }

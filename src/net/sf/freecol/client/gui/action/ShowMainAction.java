@@ -50,7 +50,7 @@ public class ShowMainAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (!gui.getCanvas().showConfirmDialog("stopCurrentGame.text",
+        if (!gui.showConfirmDialog("stopCurrentGame.text",
                                                               "stopCurrentGame.yes",
                                                               "stopCurrentGame.no")) {
             return;

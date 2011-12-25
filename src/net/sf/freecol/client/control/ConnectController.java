@@ -108,7 +108,7 @@ public final class ConnectController {
 
         if (freeColClient.getFreeColServer() != null &&
             freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (gui.getCanvas().showConfirmDialog("stopServer.text",
+            if (gui.showConfirmDialog("stopServer.text",
                                                             "stopServer.yes",
                                                             "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -152,7 +152,7 @@ public final class ConnectController {
 
         if (freeColClient.getFreeColServer() != null
             && freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (gui.getCanvas().showConfirmDialog("stopServer.text",
+            if (gui.showConfirmDialog("stopServer.text",
                                                             "stopServer.yes",
                                                             "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -453,7 +453,7 @@ public final class ConnectController {
         }
 
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
-            if (gui.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
+            if (gui.showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
             } else {
                 return;

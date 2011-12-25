@@ -409,7 +409,7 @@ public class DebugMenu extends JMenu {
                     boolean more = true;
                     while (more) {
                         int val = igc.stepRandom();
-                        more = canvas.showConfirmDialog(null,
+                        more = gui.showConfirmDialog(null,
                             StringTemplate.template("menuBar.debug.randomValue")
                             .addAmount("%value%", val), "more", "ok");
                     }
