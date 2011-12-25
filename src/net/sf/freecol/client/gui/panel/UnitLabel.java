@@ -354,7 +354,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             inGameController.changeState(unit, Unit.UnitState.SENTRY);
             break;
         case COLOPEDIA:
-            gui.getCanvas().showColopediaPanel(unit.getId());
+            gui.getCanvas().showColopediaPanel(unit.getType().getId());
             break;
         case LEAVE_TOWN:
             inGameController.putOutsideColony(unit);
