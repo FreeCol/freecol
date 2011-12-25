@@ -138,7 +138,7 @@ public final class PreGameController {
         Element requestLaunchElement = DOMMessage.createNewRootElement("requestLaunch");
         freeColClient.getClient().send(requestLaunchElement);
 
-        gui.getCanvas().showStatusPanel( Messages.message("status.startingGame") );
+        gui.showStatusPanel( Messages.message("status.startingGame") );
     }
 
 

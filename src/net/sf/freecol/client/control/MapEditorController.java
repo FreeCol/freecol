@@ -219,7 +219,7 @@ public final class MapEditorController {
     public void saveGame(final File file) {
         final Canvas canvas = gui.getCanvas();
 
-        canvas.showStatusPanel(Messages.message("status.savingGame"));
+        gui.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
             @Override
             public void run() {
@@ -302,7 +302,7 @@ public final class MapEditorController {
             }
         }
 
-        canvas.showStatusPanel(Messages.message("status.loadingGame"));
+        gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = new Runnable() {
             public void run() {

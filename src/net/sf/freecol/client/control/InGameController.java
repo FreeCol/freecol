@@ -1067,7 +1067,7 @@ public final class InGameController implements NetworkConstants {
     public boolean saveGame(final File file) {
         FreeColServer server = freeColClient.getFreeColServer();
         boolean result = false;
-        gui.getCanvas().showStatusPanel(Messages.message("status.savingGame"));
+        gui.showStatusPanel(Messages.message("status.savingGame"));
         try {
             server.setActiveUnit(gui.getActiveUnit());
             server.saveGame(file, freeColClient.getMyPlayer().getName(),

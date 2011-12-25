@@ -459,7 +459,7 @@ public final class ConnectController {
             }
         }
 
-        canvas.showStatusPanel(Messages.message("status.loadingGame"));
+        gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = new Runnable() {
             public void run() {
