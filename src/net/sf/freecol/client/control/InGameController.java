@@ -1073,7 +1073,7 @@ public final class InGameController implements NetworkConstants {
             server.saveGame(file, freeColClient.getMyPlayer().getName(),
                 freeColClient.getClientOptions());
             lastSaveGameFile = file;
-            gui.getCanvas().closeStatusPanel();
+            gui.closeStatusPanel();
             result = true;
         } catch (IOException e) {
             gui.errorMessage("couldNotSaveGame");

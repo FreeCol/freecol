@@ -474,7 +474,7 @@ public final class ConnectController {
                         public void run() {
                             ResourceManager.setScenarioMapping(savegame.getResourceMapping());
                             login(username, "127.0.0.1", FreeCol.getDefaultPort());
-                            gui.getCanvas().closeStatusPanel();
+                            gui.closeStatusPanel();
                         }
                     } );
                 } catch (NoRouteToServerException e) {

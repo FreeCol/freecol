@@ -634,4 +634,9 @@ public class GUI {
         canvas.showMainPanel();
     }
     
+    public void closeStatusPanel() {
+        canvas.closeStatusPanel();
+    }
+
+    
 }

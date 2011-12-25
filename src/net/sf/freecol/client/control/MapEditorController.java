@@ -246,7 +246,7 @@ public final class MapEditorController {
                     freeColClient.getFreeColServer().saveGame(file, "mapEditor", null, scaledImage);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            canvas.closeStatusPanel();
+                            gui.closeStatusPanel();
                             canvas.requestFocusInWindow();
                         }
                     });
@@ -286,7 +286,6 @@ public final class MapEditorController {
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
-        final Canvas canvas = gui.getCanvas();
         final File theFile = file;
 
         freeColClient.setMapEditor(true);
@@ -313,7 +312,7 @@ public final class MapEditorController {
                     freeColClient.setGame(freeColServer.getGame());
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            canvas.closeStatusPanel();
+                            gui.closeStatusPanel();
                             gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
                             freeColClient.getActionManager().update();
                             gui.refresh();

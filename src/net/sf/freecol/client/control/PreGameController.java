@@ -209,7 +209,7 @@ public final class PreGameController {
         if (!freeColClient.isHeadless()) {
             gui.closeMainPanel();
             gui.closeMenus();
-            gui.getCanvas().closeStatusPanel();
+            gui.closeStatusPanel();
             gui.playSound(null); // Stop the long introduction sound
             gui.playSound("sound.intro." + myPlayer.getNationID());
         }
