@@ -779,7 +779,7 @@ public final class ColonyPanel extends FreeColPanel
             FreeColGameObject object = (FreeColGameObject) event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
             UnitType newType = (UnitType) event.getNewValue();
-            getCanvas().showInformationMessage(object,
+            getGUI().showInformationMessage(object,
                 StringTemplate.template("model.colony.unitChange")
                     .add("%oldType%", oldType.getNameKey())
                     .add("%newType%", newType.getNameKey()));

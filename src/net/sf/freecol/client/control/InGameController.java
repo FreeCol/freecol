@@ -1388,7 +1388,7 @@ public final class InGameController implements NetworkConstants {
         if (unit == null) {
             return;
         } else if (!unit.canBuildColony()) {
-            gui.getCanvas().showInformationMessage(unit,
+            gui.showInformationMessage(unit,
                 StringTemplate.template("buildColony.badUnit")
                 .addName("%unit%", unit.getName()));
             return;
@@ -1436,7 +1436,7 @@ public final class InGameController implements NetworkConstants {
 
         if (player.getSettlement(name) != null) {
             // Colony name must be unique.
-            gui.getCanvas().showInformationMessage(tile,
+            gui.showInformationMessage(tile,
                 StringTemplate.template("nameColony.notUnique")
                 .addName("%name%", name));
             return;
@@ -1830,7 +1830,7 @@ public final class InGameController implements NetworkConstants {
         UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
                                                  unit.getOwner());
         if (newType == null) {
-            gui.getCanvas().showInformationMessage(unit,
+            gui.showInformationMessage(unit,
                 StringTemplate.template("clearSpeciality.impossible")
                 .addStringTemplate("%unit%", Messages.getLabel(unit)));
             return;
@@ -2244,7 +2244,7 @@ public final class InGameController implements NetworkConstants {
             // No path, give up.
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("selectDestination.failed")
                     .addStringTemplate("%destination%", dest));
                 break;
@@ -2334,7 +2334,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessBeached")
                     .addStringTemplate("%nation%", nation));
             }
@@ -2343,7 +2343,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessContact")
                     .addStringTemplate("%nation%", nation));
             }
@@ -2352,7 +2352,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessGoods")
                     .addStringTemplate("%nation%", nation)
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
@@ -2369,7 +2369,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSettlement")
                     .addStringTemplate("%unit%", Messages.getLabel(unit))
                     .addStringTemplate("%nation%", nation));
@@ -2378,7 +2378,7 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_SKILL:
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSkill")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
@@ -2387,7 +2387,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessTrade")
                     .addStringTemplate("%nation%", nation));
             }
@@ -2396,7 +2396,7 @@ public final class InGameController implements NetworkConstants {
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWar")
                     .addStringTemplate("%nation%", nation));
             }
@@ -2404,7 +2404,7 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_WATER:
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
@@ -2412,7 +2412,7 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ATTACK_MARINE:
             if (interactive) {
                 gui.playSound("sound.event.illegalMove");
-                gui.getCanvas().showInformationMessage(unit,
+                gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAttackWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
@@ -2660,7 +2660,7 @@ public final class InGameController implements NetworkConstants {
             gui.showInformationMessage(settlement,
                                           "indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            gui.getCanvas().showInformationMessage(settlement,
+            gui.showInformationMessage(settlement,
                 StringTemplate.template("indianSettlement.cantLearnSkill")
                 .addStringTemplate("%unit%", Messages.getLabel(unit))
                 .add("%skill%", skill.getNameKey()));
@@ -2816,7 +2816,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit(unitTile);
                 return;
             } else if ("expert".equals(result)) {
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.expertScout")
                     .add("%unit%", unit.getType().getNameKey()));
             } else if ("tales".equals(result)) {
@@ -2824,11 +2824,11 @@ public final class InGameController implements NetworkConstants {
                     "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
                 gui.updateGoldLabel();
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.speakBeads")
                     .addAmount("%amount%", player.getGold() - oldGold));
             } else if ("nothing".equals(result)) {
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.speakNothing")
                     .addStringTemplate("%nation%", player.getNationName()));
             } else {
@@ -3083,7 +3083,7 @@ public final class InGameController implements NetworkConstants {
                     goods, gold);
 
                 if (gold == NO_NEED_FOR_THE_GOODS) {
-                    gui.getCanvas().showInformationMessage(settlement,
+                    gui.showInformationMessage(settlement,
                         StringTemplate.template("trade.noNeedForTheGoods")
                         .add("%goods%", goods.getNameKey()));
                     return;
@@ -3196,7 +3196,7 @@ public final class InGameController implements NetworkConstants {
             if (gold < 0) {
                 // protocol fail
             } else if (!player.checkGold(gold)) {
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     StringTemplate.template("missionarySettlement.inciteGoldFail")
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold));
@@ -3411,7 +3411,7 @@ public final class InGameController implements NetworkConstants {
                 return;
             } else if (player.getSettlement(name) != null) {
                 // Colony name must be unique.
-                gui.getCanvas().showInformationMessage((Colony) object,
+                gui.showInformationMessage((Colony) object,
                     StringTemplate.template("nameColony.notUnique")
                     .addName("%name%", name));
                 return;

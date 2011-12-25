@@ -436,6 +436,10 @@ public class GUI {
         canvas.showInformationMessage(displayObject, messageId);
     }
     
+    public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
+        canvas.showInformationMessage(displayObject, template);
+    }
+    
     public void showTilePopUpAtSelectedTile() {
         canvas.showTilePopup(getSelectedTile(),
                 mapViewer.getCursor().getCanvasX(),

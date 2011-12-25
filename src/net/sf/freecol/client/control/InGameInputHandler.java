@@ -1824,8 +1824,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = gui.getCanvas();
-            canvas.showInformationMessage(null, message);
+            gui.showInformationMessage(null, message);
             return null;
         }
     }
