@@ -451,6 +451,10 @@ public class GUI {
         return canvas.showConfirmDialog(tile, text, okText, cancelText);
     }
     
+    public boolean showEndTurnDialog(List<Unit> units) {
+        return canvas.showEndTurnDialog(units);
+    }
+    
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
     }
@@ -484,11 +488,11 @@ public class GUI {
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-    
+        
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
-        
+    
     public void showTilePopUpAtSelectedTile() {
         canvas.showTilePopup(getSelectedTile(),
                 mapViewer.getCursor().getCanvasX(),
@@ -631,22 +635,22 @@ public class GUI {
         canvas.repaint();
         setupMouseListenerForMapEditor();
     }
-    
+
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-    
+
     /**
      * Updates the label displaying the current amount of gold.
      */
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-
+    
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
@@ -666,5 +670,6 @@ public class GUI {
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
+
     
 }

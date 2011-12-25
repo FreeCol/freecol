@@ -40,7 +40,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1940,9 +1939,8 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if (units.size() > 0) {
-                EndTurnDialog dialog
-                    = new EndTurnDialog(freeColClient, gui, units);
-                if (!gui.getCanvas().showFreeColDialog(dialog)) return;
+                if (!gui.showEndTurnDialog(units)) 
+                    return;
             }
         }
 
