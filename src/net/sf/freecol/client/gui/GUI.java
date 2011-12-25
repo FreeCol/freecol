@@ -467,6 +467,12 @@ public class GUI {
         canvas.showInformationMessage(messageId);
     }
     
+    public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
+            String okText, String cancelText,
+            boolean rejectEmptyString) {
+        return canvas.showInputDialog(tile, text, defaultValue, okText, cancelText, rejectEmptyString);
+    }
+    
     public File showLoadDialog(File directory) {
         return canvas.showLoadDialog(directory);
     }
@@ -484,11 +490,11 @@ public class GUI {
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
     }
-    
+        
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-        
+    
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
@@ -623,7 +629,7 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-    
+
     public void startMapEditorGUI() {
         // We may need to reset the zoom value to the default value
         scaleMap(2f);
@@ -635,15 +641,15 @@ public class GUI {
         canvas.repaint();
         setupMouseListenerForMapEditor();
     }
-
+    
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-    
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-
+    
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -664,12 +670,11 @@ public class GUI {
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-    
+
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-
     
 }

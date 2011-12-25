@@ -472,7 +472,7 @@ public final class ColonyPanel extends FreeColPanel
         GoodsType goodsType = canvas.showChoiceDialog(null, "Select Goods Type",
                                                       "Cancel", gtl);
         if (goodsType == null) return;
-        String amount = canvas.showInputDialog(null,
+        String amount = getGUI().showInputDialog(null,
                 StringTemplate.name("Select Goods Amount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel", true);

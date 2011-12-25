@@ -251,7 +251,7 @@ public class DebugMenu extends JMenu {
                         igc.setSkippedTurns(0);
                         return;
                     }
-                    String response = canvas.showInputDialog(null,
+                    String response = gui.showInputDialog(null,
                         StringTemplate.key("menuBar.debug.skipTurns"),
                         Integer.toString(10),
                         "ok", "cancel", true);
@@ -334,7 +334,7 @@ public class DebugMenu extends JMenu {
         this.add(addGold);
         addGold.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response = canvas.showInputDialog(null,
+                    String response = gui.showInputDialog(null,
                         StringTemplate.key("menuBar.debug.addGold"),
                         Integer.toString(1000), "ok", "cancel", true);
                     int gold;
@@ -357,7 +357,7 @@ public class DebugMenu extends JMenu {
         this.add(addCrosses);
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response = canvas.showInputDialog(null,
+                    String response = gui.showInputDialog(null,
                         StringTemplate.key("menuBar.debug.addImmigration"),
                         Integer.toString(100), "ok", "cancel", true);
                     int crosses;
@@ -379,7 +379,7 @@ public class DebugMenu extends JMenu {
         this.add(giveBells);
         giveBells.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String response = canvas.showInputDialog(null,
+                    String response = gui.showInputDialog(null,
                         StringTemplate.key("menuBar.debug.addLiberty"),
                         Integer.toString(100), "ok", "cancel", true);
                     int liberty;

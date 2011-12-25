@@ -1408,7 +1408,7 @@ public final class InGameInputHandler extends InputHandler {
         protected void doWork(Canvas canvas) {
             // Player names the land.
             Tile tile = unit.getTile();
-            String name = canvas.showInputDialog(tile,
+            String name = gui.showInputDialog(tile,
                 StringTemplate.template("newLand.text"), defaultName,
                 "newLand.yes", null, true);
 
@@ -1467,7 +1467,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            String name = canvas.showInputDialog((unit == null) ? null
+            String name = gui.showInputDialog((unit == null) ? null
                 : unit.getTile(),
                 StringTemplate.template("nameRegion.text")
                     .addName("%type%", Messages.message(region.getLabel())),
@@ -1755,8 +1755,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = gui.getCanvas();
-            String choice = canvas.showInputDialog(tile, text, defaultValue,
+            String choice = gui.showInputDialog(tile, text, defaultValue,
                 okText, cancelText, rejectEmpty);
             return choice;
         }

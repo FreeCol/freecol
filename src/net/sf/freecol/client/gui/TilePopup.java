@@ -682,7 +682,7 @@ public final class TilePopup extends JPopupMenu {
         GoodsType goodsType = gui.getCanvas()
             .showChoiceDialog(null, "Select Goods Type", "Cancel", gtl);
         if (goodsType == null) return;
-        String amount = canvas.showInputDialog(null,
+        String amount = gui.showInputDialog(null,
             StringTemplate.name("Select Goods Amount"), "20",
             "ok", "cancel", true);
         if (amount == null) return;

@@ -1428,7 +1428,7 @@ public final class InGameController implements NetworkConstants {
                                           null);
             name = player.getSettlementName();
         }
-        name = gui.getCanvas().showInputDialog(tile,
+        name = gui.showInputDialog(tile,
             StringTemplate.key("nameColony.text"), name,
             "nameColony.yes", "nameColony.no", true);
         if (name == null) return; // User cancelled, 0-length invalid.
@@ -3398,7 +3398,7 @@ public final class InGameController implements NetworkConstants {
         String name = null;
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
-            name = gui.getCanvas().showInputDialog(colony.getTile(),
+            name = gui.showInputDialog(colony.getTile(),
                 StringTemplate.key("renameColony.text"), colony.getName(),
                 "renameColony.yes", "renameColony.no", true);
             if (name == null) {
@@ -3416,7 +3416,7 @@ public final class InGameController implements NetworkConstants {
             }
         } else if (object instanceof Unit) {
             Unit unit = (Unit) object;
-            name = gui.getCanvas().showInputDialog(unit.getTile(),
+            name = gui.showInputDialog(unit.getTile(),
                 StringTemplate.key("renameUnit.text"), unit.getName(),
                 "renameUnit.yes", "renameUnit.no", false);
             if (name == null) return; // User cancelled, 0-length clears name.
