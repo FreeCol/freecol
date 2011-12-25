@@ -294,8 +294,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     .getMapGeneratorOptions();
                 FileOption importFile = (FileOption) mgo.getOption(MapGeneratorOptions.IMPORT_FILE);
                 boolean loadCustomOptions = (importFile.getValue() == null);
-                getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(getFreeColClient(), getGUI(), mgo, getFreeColClient().isAdmin(),
-                                                                            loadCustomOptions));
+                getGUI().showMapGeneratorOptionsDialog(mgo, getFreeColClient().isAdmin(),
+                                                                            loadCustomOptions);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

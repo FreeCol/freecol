@@ -79,6 +79,7 @@ import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
@@ -1505,6 +1506,10 @@ public final class Canvas extends JDesktopPane {
         mainPanel.requestFocus();
     }
 
+    public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, mgo, editable, loadCustomOptions));
+    }
+
     /**
      * Displays a number of ModelMessages.
      *
@@ -1675,11 +1680,11 @@ public final class Canvas extends JDesktopPane {
     public void showReportForeignAffairPanel() {
         showSubPanel(new ReportForeignAffairPanel(freeColClient, gui));
     }
-
+    
     public void showReportHistoryPanel() {
         showSubPanel(new ReportHistoryPanel(freeColClient, gui));
     }
-    
+
     public void showReportIndianPanel() {
         showSubPanel(new ReportIndianPanel(freeColClient, gui));
     }
@@ -1708,10 +1713,10 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+
     public void showReportRequirementsPanel() {
         showSubPanel(new ReportRequirementsPanel(freeColClient, gui));
     }
-
 
     public void showReportTradePanel() {
         showSubPanel(new ReportTradePanel(freeColClient, gui));
@@ -1726,6 +1731,7 @@ public final class Canvas extends JDesktopPane {
     public void showReportTurnPanel(ModelMessage... messages) {
         showSubPanel(new ReportTurnPanel(freeColClient, gui, messages));
     }
+
 
     /**
      * Displays a dialog where the user may choose a filename. This is the same
@@ -1746,7 +1752,6 @@ public final class Canvas extends JDesktopPane {
     public File showSaveDialog(File directory, String defaultName) {
         return showSaveDialog(directory, ".fsg", new FileFilter[] { FreeColDialog.getFSGFileFilter() }, defaultName);
     }
-
 
     /**
      * Displays a dialog where the user may choose a filename.
@@ -1916,7 +1921,7 @@ public final class Canvas extends JDesktopPane {
         serverListPanel.initialize(username, serverList);
         showSubPanel(serverListPanel);
     }
-
+    
     public void showSettlement(Settlement s) {
         if (s instanceof Colony) {
             if (s.getOwner().equals(freeColClient.getMyPlayer())) {
@@ -1930,6 +1935,7 @@ public final class Canvas extends JDesktopPane {
             throw new IllegalStateException("Bogus settlement");
         }
     }
+    
     
     /**
      * Displays a dialog with a text and a cancel-button, in addition
@@ -1954,7 +1960,6 @@ public final class Canvas extends JDesktopPane {
                                 choices);
     }
     
-    
     /**
      * Displays the <code>StartGamePanel</code>.
      *
@@ -1978,7 +1983,7 @@ public final class Canvas extends JDesktopPane {
     public void showStatisticsPanel() {
         showSubPanel(new StatisticsPanel(freeColClient, gui));
     }
-    
+
     /**
      * Shows a status message that cannot be dismissed. The panel will be
      * removed when another component is added to this <code>Canvas</code>.
@@ -1992,7 +1997,7 @@ public final class Canvas extends JDesktopPane {
         statusPanel.setStatusMessage(message);
         addCentered(statusPanel, STATUS_LAYER);
     }
-
+    
     public void showTilePanel(Tile tile) {
         showSubPanel(new TilePanel(freeColClient, gui, tile));
     }
@@ -2136,14 +2141,14 @@ public final class Canvas extends JDesktopPane {
     void errorMessage(String messageID) {
         errorMessage(messageID, "Unspecified error: " + messageID);
     }
-    
+   
     /**
      * Refreshes this Canvas visually.
      */
     void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
-   
+    
     /**
      * Adds a component on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
@@ -2342,6 +2347,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, getPopupPosition(tile));
     }
     
+    
     /**
      * Displays a <code>FreeColPanel</code>.
      * @param panel <code>FreeColPanel</code>, panel to show
@@ -2349,7 +2355,6 @@ public final class Canvas extends JDesktopPane {
     private void showSubPanel(FreeColPanel panel) {
         showSubPanel(panel, PopupPosition.CENTERED);
     }
-    
     
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
