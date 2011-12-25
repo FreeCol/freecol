@@ -370,7 +370,6 @@ public final class ConnectController {
      * @param file The <code>File</code>.
      */
     public void loadGame(File file) {
-        final Canvas canvas = gui.getCanvas();
         final File theFile = file;
 
         freeColClient.setMapEditor(false);
@@ -417,8 +416,8 @@ public final class ConnectController {
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
-                if (canvas.showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
-                    LoadingSavegameDialog lsd = canvas.getLoadingSavegameDialog();
+                if (gui.getCanvas().showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
+                    LoadingSavegameDialog lsd = gui.getCanvas().getLoadingSavegameDialog();
                     singleplayer = lsd.isSingleplayer();
                     name = lsd.getName();
                     port = lsd.getPort();
@@ -475,13 +474,13 @@ public final class ConnectController {
                         public void run() {
                             ResourceManager.setScenarioMapping(savegame.getResourceMapping());
                             login(username, "127.0.0.1", FreeCol.getDefaultPort());
-                            canvas.closeStatusPanel();
+                            gui.getCanvas().closeStatusPanel();
                         }
                     } );
                 } catch (NoRouteToServerException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            gui.getCanvas().closeMainPanel();
+                            gui.closeMainPanel();
                             gui.getCanvas().showMainPanel();
                         }
                     });
@@ -489,7 +488,7 @@ public final class ConnectController {
                 } catch (FileNotFoundException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            gui.getCanvas().closeMainPanel();
+                            gui.closeMainPanel();
                             gui.getCanvas().showMainPanel();
                         }
                     });
@@ -497,7 +496,7 @@ public final class ConnectController {
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            gui.getCanvas().closeMainPanel();
+                            gui.closeMainPanel();
                             gui.getCanvas().showMainPanel();
                         }
                     });
@@ -505,7 +504,7 @@ public final class ConnectController {
                 } catch (FreeColException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            gui.getCanvas().closeMainPanel();
+                            gui.closeMainPanel();
                             gui.getCanvas().showMainPanel();
                         }
                     });

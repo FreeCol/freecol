@@ -207,7 +207,7 @@ public final class PreGameController {
 
         Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
-            gui.getCanvas().closeMainPanel();
+            gui.closeMainPanel();
             gui.closeMenus();
             gui.getCanvas().closeStatusPanel();
             gui.playSound(null); // Stop the long introduction sound

@@ -108,7 +108,7 @@ public final class MapEditorController {
 
             final Canvas canvas = gui.getCanvas();
 
-            canvas.closeMainPanel();
+            gui.closeMainPanel();
             gui.closeMenus();
             freeColClient.setInGame(true);
 
@@ -341,7 +341,7 @@ public final class MapEditorController {
     {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                gui.getCanvas().closeMainPanel();
+                gui.closeMainPanel();
                 gui.getCanvas().showMainPanel();
                 gui.playSound("sound.intro.general");
             }
