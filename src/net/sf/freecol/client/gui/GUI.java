@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -440,6 +441,16 @@ public class GUI {
         canvas.showInformationMessage(displayObject, template);
     }
     
+    public void showInformationMessage(String messageId) {
+        canvas.showInformationMessage(messageId);
+    }
+    
+    public <T> T showSimpleChoiceDialog(Tile tile,
+            String text, String cancelText,
+            List<T> objects) {
+        return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
+    }
+    
     public void showTilePopUpAtSelectedTile() {
         canvas.showTilePopup(getSelectedTile(),
                 mapViewer.getCursor().getCanvasX(),
@@ -595,5 +606,6 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
+        
     
 }

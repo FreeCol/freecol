@@ -205,7 +205,7 @@ public final class ConnectController {
 
         List<String> vacantPlayers = getVacantPlayers(host, port);
         if (vacantPlayers != null) {
-            String choice = canvas.showSimpleChoiceDialog(null,
+            String choice = gui.showSimpleChoiceDialog(null,
                                                           "connectController.choicePlayer",
                                                           "cancel",
                                                           vacantPlayers);

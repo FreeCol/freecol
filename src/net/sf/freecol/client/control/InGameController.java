@@ -200,7 +200,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean requireOurTurn() {
         if (!freeColClient.currentPlayerIsMyPlayer()) {
-            gui.getCanvas().showInformationMessage("notYourTurn");
+            gui.showInformationMessage("notYourTurn");
             return false;
         }
         return true;
@@ -1401,7 +1401,7 @@ public final class InGameController implements NetworkConstants {
         NoClaimReason reason = player.canClaimToFoundSettlementReason(tile);
         if (reason != NoClaimReason.NONE
             && reason != NoClaimReason.NATIVES) {
-            gui.getCanvas().showInformationMessage("badTileUse."
+            gui.showInformationMessage("badTileUse."
                 + reason.toString().toLowerCase(Locale.US));
             return;
         }
@@ -3025,7 +3025,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Choose goods to buy
-            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+            goods = gui.showSimpleChoiceDialog(unit.getTile(),
                 "buyProposition.text", "buyProposition.nothing", forSale);
             if (goods == null) break; // Trade aborted by the player
 
@@ -3072,7 +3072,7 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
-            goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+            goods = gui.showSimpleChoiceDialog(unit.getTile(),
                 "sellProposition.text", "sellProposition.nothing",
                 unit.getGoodsList());
             if (goods == null) break; // Trade aborted by the player
@@ -3123,7 +3123,7 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
-        Goods goods = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+        Goods goods = gui.showSimpleChoiceDialog(unit.getTile(),
             "gift.text", "cancel", unit.getGoodsList());
         if (goods != null) {
             askServer().deliverGiftToSettlement(unit, settlement, goods);
@@ -3187,7 +3187,7 @@ public final class InGameController implements NetworkConstants {
                 .getGame().getLiveEuropeanPlayers());
             Player player = freeColClient.getMyPlayer();
             enemies.remove(player);
-            Player enemy = gui.getCanvas().showSimpleChoiceDialog(unit.getTile(),
+            Player enemy = gui.showSimpleChoiceDialog(unit.getTile(),
                 "missionarySettlement.inciteQuestion",
                 "missionarySettlement.cancel",
                 enemies);
@@ -3756,8 +3756,7 @@ public final class InGameController implements NetworkConstants {
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             if (tile.hasLostCityRumour()) {
-                gui.getCanvas()
-                    .showInformationMessage("tileHasRumour");
+                gui.showInformationMessage("tileHasRumour");
                 return;
             }
             if (tile.getOwner() != unit.getOwner()) {

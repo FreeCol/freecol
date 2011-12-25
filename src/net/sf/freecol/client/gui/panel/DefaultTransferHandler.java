@@ -302,7 +302,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                                             .addName("%object%", modifier.getSource()))
                                     + "\n";
                             }
-                            gui.getCanvas().showInformationMessage(message);
+                            gui.showInformationMessage(message);
                         }
                     } else if (comp instanceof CargoPanel) {
                         ((CargoPanel)comp).add(data, true);

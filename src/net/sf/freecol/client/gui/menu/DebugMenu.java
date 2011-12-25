@@ -567,7 +567,7 @@ public class DebugMenu extends JMenu {
                         }
                         builder.append("\n");
                     }
-                    canvas.showInformationMessage(builder.toString());
+                    gui.showInformationMessage(builder.toString());
                 }
             });
         showResourceKeys.setEnabled(true);
@@ -630,7 +630,7 @@ public class DebugMenu extends JMenu {
                 fails++;
             }
         }
-        canvas.showInformationMessage(Utils.join(", ", results));
+        gui.showInformationMessage(Utils.join(", ", results));
         if (fails < serverPlayer.getNumberOfSettlements()) {
             // Brutally resynchronize
             freeColClient.getConnectController().reconnect();
@@ -708,7 +708,7 @@ public class DebugMenu extends JMenu {
             }
         }
 
-        canvas.showInformationMessage((problemDetected)
+        gui.showInformationMessage((problemDetected)
             ? "menuBar.debug.compareMaps.problem"
             : "menuBar.debug.compareMaps.checkComplete");
     }
@@ -767,6 +767,6 @@ public class DebugMenu extends JMenu {
                 }
             }
         }
-        canvas.showInformationMessage(sb.toString());
+        gui.showInformationMessage(sb.toString());
     }
 }
