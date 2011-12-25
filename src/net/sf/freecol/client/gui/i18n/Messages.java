@@ -445,7 +445,8 @@ public class Messages {
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
-            if (template.getReplacements() == null) {
+            if (template.getReplacements() == null
+                || template.getReplacements().isEmpty()) {
                 return message(template.getId());
             } else {
                 for (StringTemplate other : template.getReplacements()) {
@@ -454,7 +455,7 @@ public class Messages {
                 if (result.length() > template.getId().length()) {
                     return result.substring(template.getId().length());
                 } else {
-                    logger.warning("Incorrect use of template with id " + template.getId());
+                    logger.warning("incorrect use of template " + template.toString());
                     return result;
                 }
             }

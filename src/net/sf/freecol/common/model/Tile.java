@@ -282,13 +282,26 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The description label for this tile
      */
     public StringTemplate getLabel() {
-        if (tileItemContainer == null) {
-            return StringTemplate.key(type.getNameKey());
-        } else {
-            return StringTemplate.label("/")
-                .add(type.getNameKey())
-                .addStringTemplate(tileItemContainer.getLabel());
+        StringTemplate label = StringTemplate.key(type.getNameKey());
+        if (tileItemContainer != null) {
+            List<String> keys = new ArrayList<String>();
+            for (TileItem item : tileItemContainer.getTileItems()) {
+                if (item instanceof Resource) {
+                    keys.add(((Resource) item).getType().getNameKey());
+                } else if (item instanceof TileImprovement
+                           && ((TileImprovement) item).isComplete()) {
+                    keys.add(((TileImprovement) item).getType().getNameKey());
+                }
+            }
+            if (!keys.isEmpty()) {
+                label = StringTemplate.label("/")
+                    .add(type.getNameKey());
+                for (String key : keys) {
+                    label.add(key);
+                }
+            }
         }
+        return label;
     }
 
     /**

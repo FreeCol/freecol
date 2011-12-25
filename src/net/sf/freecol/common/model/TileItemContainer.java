@@ -354,25 +354,6 @@ public class TileItemContainer extends FreeColGameObject {
         return moveCost;
     }
 
-    /**
-     * Returns a description of the tile, with the name of the tile
-     * and any improvements made to it (road/plow)
-     *
-     * @return The description label for this tile
-     */
-    public StringTemplate getLabel() {
-        StringTemplate label = StringTemplate.label("/");
-        for (TileItem item : tileItems) {
-            if (item instanceof Resource) {
-                label.add(((Resource) item).getType().getNameKey());
-            } else if (item instanceof TileImprovement
-                       && ((TileImprovement) item).isComplete()) {
-                label.add(((TileImprovement) item).getType().getNameKey());
-            }
-        }
-        return label;
-    }
-
     // ------------------------------------------------------------ add/remove from container
 
     /**
