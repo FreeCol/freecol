@@ -1049,7 +1049,7 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.canSaveCurrentGame()) {
             final File file
-                = gui.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), fileName);
+                = gui.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
                 FreeCol.setSaveDirectory(file.getParentFile());
                 return saveGame(file);

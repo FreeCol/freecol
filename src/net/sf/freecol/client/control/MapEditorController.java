@@ -175,12 +175,11 @@ public final class MapEditorController {
      * @see MapGeneratorOptions
      */
     public void newMap() {
-        final Canvas canvas = gui.getCanvas();
         final Game game = freeColClient.getGame();
         final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
 
         OptionGroup group = freeColClient.getGame().getMapGeneratorOptions();
-        group = canvas.showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, group, true, true));
+        group = gui.getCanvas().showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, group, true, true));
         if (group == null) {
             return;
         }
@@ -204,9 +203,8 @@ public final class MapEditorController {
      * and saves the game.
      */
     public void saveGame() {
-        final Canvas canvas = gui.getCanvas();
         String fileName = "my_map.fsg";
-        final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
+        final File file = gui.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
         if (file != null) {
             saveGame(file);
         }
