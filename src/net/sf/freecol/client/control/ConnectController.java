@@ -181,7 +181,7 @@ public final class ConnectController {
 
         if (login(username, "127.0.0.1", port)) {
             freeColClient.getPreGameController().setReady(true);
-            gui.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
+            gui.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
                                                          true);
 
         }
@@ -217,7 +217,7 @@ public final class ConnectController {
 
         freeColClient.setSingleplayer(false);
         if (login(username, host, port) && !freeColClient.isInGame()) {
-            gui.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
+            gui.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
 

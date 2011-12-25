@@ -31,7 +31,9 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -433,6 +435,15 @@ public class GUI {
         
     }
      
+    public boolean showConfirmDialog(String text, String okText, String cancelText) {
+        return canvas.showConfirmDialog(text, okText, cancelText);
+    }
+    
+    public boolean showConfirmDialog(Tile tile, StringTemplate text,
+            String okText, String cancelText) {
+        return canvas.showConfirmDialog(tile, text, okText, cancelText);
+    }
+    
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
     }
@@ -445,10 +456,18 @@ public class GUI {
         canvas.showInformationMessage(messageId);
     }
     
+    public File showLoadDialog(File directory) {
+        return canvas.showLoadDialog(directory);
+    }
+    
     public <T> T showSimpleChoiceDialog(Tile tile,
             String text, String cancelText,
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
+    }
+    
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
+        canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
     
     public void showTilePopUpAtSelectedTile() {
@@ -589,7 +608,7 @@ public class GUI {
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-    
+        
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -605,19 +624,6 @@ public class GUI {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
-    }
-    
-    public boolean showConfirmDialog(Tile tile, StringTemplate text,
-            String okText, String cancelText) {
-        return canvas.showConfirmDialog(tile, text, okText, cancelText);
-    }
-        
-    public boolean showConfirmDialog(String text, String okText, String cancelText) {
-        return canvas.showConfirmDialog(text, okText, cancelText);
-    }
-    
-    public File showLoadDialog(File directory) {
-        return canvas.showLoadDialog(directory);
     }
 
     
