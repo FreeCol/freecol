@@ -2657,7 +2657,7 @@ public final class InGameController implements NetworkConstants {
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            gui.getCanvas().showInformationMessage(settlement,
+            gui.showInformationMessage(settlement,
                                           "indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             gui.getCanvas().showInformationMessage(settlement,
@@ -2670,12 +2670,12 @@ public final class InGameController implements NetworkConstants {
                 "learnSkill.yes", "learnSkill.no")) {
             if (askServer().learnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
-                    gui.getCanvas().showInformationMessage(settlement, "learnSkill.die");
+                    gui.showInformationMessage(settlement, "learnSkill.die");
                     nextActiveUnit(unit.getTile());
                     return;
                 }
                 if (unit.getType() != skill) {
-                    gui.getCanvas().showInformationMessage(settlement, "learnSkill.leave");
+                    gui.showInformationMessage(settlement, "learnSkill.leave");
                 }
             }
         }
@@ -2811,7 +2811,7 @@ public final class InGameController implements NetworkConstants {
             if (result == null) {
                 return; // Fail
             } else if ("die".equals(result)) {
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     "scoutSettlement.speakDie");
                 nextActiveUnit(unitTile);
                 return;
@@ -2820,7 +2820,7 @@ public final class InGameController implements NetworkConstants {
                     StringTemplate.template("scoutSettlement.expertScout")
                     .add("%unit%", unit.getType().getNameKey()));
             } else if ("tales".equals(result)) {
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
                 gui.updateGoldLabel();
@@ -3019,7 +3019,7 @@ public final class InGameController implements NetworkConstants {
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
-                gui.getCanvas().showInformationMessage(settlement,
+                gui.showInformationMessage(settlement,
                     "trade.nothingToSell");
                 return;
             }
@@ -3034,7 +3034,7 @@ public final class InGameController implements NetworkConstants {
                 gold = askServer().buyProposition(unit, settlement,
                     goods, gold);
                 if (gold == NO_TRADE) { // Proposal was refused
-                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
+                    gui.showInformationMessage(settlement, "trade.noTrade");
                     return;
                 } else if (gold < 0) {
                     return; // Server fail
@@ -3088,7 +3088,7 @@ public final class InGameController implements NetworkConstants {
                         .add("%goods%", goods.getNameKey()));
                     return;
                 } else if (gold == NO_TRADE) {
-                    gui.getCanvas().showInformationMessage(settlement, "trade.noTrade");
+                    gui.showInformationMessage(settlement, "trade.noTrade");
                     return;
                 }
 

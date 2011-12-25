@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -238,16 +239,22 @@ public class GUI {
         
     }
     
+    public void executeWithUnitOutForAnimation(final Unit unit,
+            final Tile sourceTile,
+            final OutForAnimationCallback r) {
+        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+    }
+    
     public Unit getActiveUnit() {
         if (mapViewer == null)
             return null;
         return mapViewer.getActiveUnit();
     }
-    
+
     public Canvas getCanvas() {
         return canvas;
     }
-
+    
     public MapViewer getColonyTileGUI() {
         return colonyTileGUI;
     }
@@ -269,16 +276,16 @@ public class GUI {
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-    
+
     public float getMapScale() {
         return mapViewer.getMapScale();
     }
+    
 
     public MapViewer getMapViewer() {
         return mapViewer;
     }
     
-
     public Tile getSelectedTile() {
         return mapViewer.getSelectedTile();
     }
@@ -286,11 +293,19 @@ public class GUI {
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
+
     
+    public Rectangle getTileBounds(Tile tile) {
+        return mapViewer.getTileBounds(tile);
+    }
+
+    public Point getTilePosition(Tile tile) {
+        return mapViewer.getTilePosition(tile);
+    }
+
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
-
     
     public void hideSplashScreen() {
         if (splash != null) {
@@ -298,15 +313,19 @@ public class GUI {
             splash.dispose();
         }
     }
-
+    
     public boolean isWindowed() {
         return windowed;
     }
-
+    
+    public void moveTileCursor(Direction direction) {
+        mapViewer.moveTileCursor(direction);
+    }
+    
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }
-    
+
     /**
      * Plays some sound. Parameter == null stops playing a sound.
      *
@@ -339,11 +358,12 @@ public class GUI {
         }
     }
     
+    
     public void refresh() { 
         mapViewer.forceReposition();
         canvas.refresh();
     }
-    
+
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
@@ -365,8 +385,7 @@ public class GUI {
             ((FreeColMenuBar) menuBar).reset();
         }
     }
-    
-    
+
     public void scaleMap(float delta) {
         mapViewer.scaleMap(delta);
         refresh();
@@ -375,14 +394,16 @@ public class GUI {
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
-
+    
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
     
+
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocusImmediately(tileToFocus);
     }
+    
 
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
@@ -396,11 +417,9 @@ public class GUI {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
     
-
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-    
 
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
@@ -411,6 +430,10 @@ public class GUI {
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
+    }
+     
+    public void showInformationMessage(FreeColObject displayObject, String messageId) {
+        canvas.showInformationMessage(displayObject, messageId);
     }
     
     public void showTilePopUpAtSelectedTile() {
@@ -543,15 +566,15 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-
+    
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-     
+    
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -567,24 +590,6 @@ public class GUI {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
-    }
-    
-    public void moveTileCursor(Direction direction) {
-        mapViewer.moveTileCursor(direction);
-    }
-    
-    public Point getTilePosition(Tile tile) {
-        return mapViewer.getTilePosition(tile);
-    }
-    
-    public Rectangle getTileBounds(Tile tile) {
-        return mapViewer.getTileBounds(tile);
-    }
-    
-    public void executeWithUnitOutForAnimation(final Unit unit,
-            final Tile sourceTile,
-            final OutForAnimationCallback r) {
-        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
     }
     
 }
