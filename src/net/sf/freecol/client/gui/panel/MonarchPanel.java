@@ -43,16 +43,6 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
     /**
      * The constructor that will add the items to this panel.
-     *
-     * @param parent The parent panel.
-     * @param action The MonarchAction
-     */
-    public MonarchPanel(FreeColClient freeColClient, GUI gui, MonarchAction action) {
-        this(freeColClient, gui, action, null);
-    }
-
-    /**
-     * The constructor that will add the items to this panel.
      * @param freeColClient 
      *
      * @param parent The parent panel.

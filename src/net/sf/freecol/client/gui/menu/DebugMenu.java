@@ -46,7 +46,6 @@ import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -427,8 +426,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayMonarchPanel"));
         monarchPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    canvas.showFreeColDialog(new MonarchPanel(freeColClient, gui,
-                            Monarch.MonarchAction.RAISE_TAX_WAR));
+                    canvas.showMonarchPanelDialog(Monarch.MonarchAction.RAISE_TAX_WAR, null);
                 }
             });
         panelMenu.add(monarchPanel);
