@@ -52,7 +52,6 @@ import javax.swing.plaf.PanelUI;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
@@ -113,7 +112,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      *
      * @param parent The parent of this panel.
      */
-    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui, final Canvas parent, TradeRoute newRoute) {
+    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui, TradeRoute newRoute) {
         super(freeColClient, gui);
         originalRoute = newRoute;
 

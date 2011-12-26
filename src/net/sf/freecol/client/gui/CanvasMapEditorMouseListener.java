@@ -36,9 +36,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
-import net.sf.freecol.client.gui.panel.EditSettlementDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
-import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -154,7 +152,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
-                        int style = canvas.showFreeColDialog(new RiverStylePanel(freeColClient, gui));
+                        int style = canvas.showRiverStyleDialog();
                         if (style == -1) {
                             // user canceled
                         } else if (style == 0) {
@@ -166,7 +164,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                         }
                     }
                     if (tile.getIndianSettlement() != null) {
-                        canvas.showFreeColDialog(new EditSettlementDialog(freeColClient, gui, tile.getIndianSettlement()));
+                        canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 } else {
                     gui.setSelectedTile(null, true);

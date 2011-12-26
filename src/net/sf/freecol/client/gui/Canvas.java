@@ -58,6 +58,7 @@ import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
@@ -66,6 +67,7 @@ import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
+import net.sf.freecol.client.gui.panel.EditSettlementDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
@@ -81,6 +83,7 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
+import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
@@ -102,6 +105,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
@@ -109,6 +113,7 @@ import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
+import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
@@ -119,6 +124,7 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -128,6 +134,7 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -1064,6 +1071,13 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+    
+    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {      
+    
+        return showFreeColDialog(new ChooseFoundingFatherDialog(freeColClient, gui, ffs));
+    }
+
+    
     public void showColopediaPanel(String nodeId) {
         showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId));
     }
@@ -1562,7 +1576,27 @@ public final class Canvas extends JDesktopPane {
             }
         }
     }
+    
+    public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
+        return showFreeColDialog(new MonarchPanel(freeColClient, gui, action, replace));
+    }
 
+    public OptionGroup showDifficultyDialog(Specification specification) {
+        return showFreeColDialog(new DifficultyDialog(freeColClient, gui, specification));
+    }
+    
+    public int showRiverStyleDialog() {
+        return showFreeColDialog(new RiverStylePanel(freeColClient, gui));
+    }
+    
+    public void showEditSettlementDialog(IndianSettlement settlement) {
+        showFreeColDialog(new EditSettlementDialog(freeColClient, gui, settlement));
+    }
+    
+    public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
+        return showFreeColDialog(new TradeRouteInputDialog(freeColClient,  gui, newRoute));
+    }
+    
     /**
      * Displays the <code>NegotiationDialog</code>.
      *
@@ -2036,7 +2070,7 @@ public final class Canvas extends JDesktopPane {
      * @return A trade route, or null.
      */
     public TradeRoute showTradeRouteDialog(Unit unit) {
-        return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, this, unit.getTradeRoute()),
+        return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, unit.getTradeRoute()),
                                  unit.getTile());
     }
     

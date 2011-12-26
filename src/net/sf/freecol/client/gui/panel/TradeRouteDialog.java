@@ -39,7 +39,6 @@ import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
@@ -70,7 +69,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
-    public TradeRouteDialog(FreeColClient freeColClient, final GUI gui, final Canvas parent, TradeRoute selectedRoute) {
+    public TradeRouteDialog(FreeColClient freeColClient, final GUI gui, TradeRoute selectedRoute) {
 
         super(freeColClient, gui);
 
@@ -91,7 +90,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                     Player player = getMyPlayer();
                     TradeRoute newRoute = getController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
-                    if (parent.showFreeColDialog(new TradeRouteInputDialog(getFreeColClient(),  gui, parent, newRoute))) {
+                    if (getCanvas().showTradeRouteInputDialog(newRoute)) {
                         listModel.addElement(newRoute);
                         tradeRoutes.setSelectedValue(newRoute, true);
                     }
@@ -101,8 +100,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         // button for editing TradeRoute
         editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    parent.showFreeColDialog(new TradeRouteInputDialog(getFreeColClient(), gui, parent,
-                        (TradeRoute) tradeRoutes.getSelectedValue()));
+                    getCanvas().showTradeRouteInputDialog((TradeRoute) tradeRoutes.getSelectedValue());
                 }
             });
 

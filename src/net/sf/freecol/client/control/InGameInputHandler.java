@@ -37,8 +37,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
-import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
-import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -620,10 +618,7 @@ public final class InGameInputHandler extends InputHandler {
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(getGame(), element);
         List<FoundingFather> ffs = message.getFathers();
-        Canvas canvas = gui.getCanvas();
-        ChooseFoundingFatherDialog dialog
-            = new ChooseFoundingFatherDialog(getFreeColClient(), gui, ffs);
-        FoundingFather ff = canvas.showFreeColDialog(dialog);
+        FoundingFather ff = gui.getCanvas().showChooseFoundingFatherDialog(ffs);
         if (ff != null) {
             message.setResult(ff);
             getFreeColClient().getMyPlayer().setCurrentFather(ff);
@@ -1918,9 +1913,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            Canvas canvas = gui.getCanvas();
-            boolean choice = canvas.showFreeColDialog(new MonarchPanel(getFreeColClient(), gui,
-                    action, replace));
+            boolean choice = gui.getCanvas().showMonarchPanelDialog(action, replace);
             return Boolean.valueOf(choice);
         }
     }
