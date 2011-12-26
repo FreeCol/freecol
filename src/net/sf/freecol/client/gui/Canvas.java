@@ -2072,9 +2072,9 @@ public final class Canvas extends JDesktopPane {
      * @param unit The <code>Unit</code> to select a trade route for.
      * @return A trade route, or null.
      */
-    public TradeRoute showTradeRouteDialog(Unit unit) {
-        return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, unit.getTradeRoute()),
-                                 unit.getTile());
+    public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
+        return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, tradeRoute),
+                                 tile);
     }
     
     public boolean showTradeRouteInputDialog(TradeRoute newRoute) {

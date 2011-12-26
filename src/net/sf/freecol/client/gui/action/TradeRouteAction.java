@@ -22,9 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 
 /**
  * An action for editing trade routes.
@@ -48,6 +46,6 @@ public class TradeRouteAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showFreeColDialog(new TradeRouteDialog(freeColClient, gui, null));
+        gui.getCanvas().showTradeRouteDialog(null, null);
     }
 }
