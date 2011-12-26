@@ -199,7 +199,7 @@ public final class ReportTurnPanel extends ReportPanel {
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
                 filterButton.setToolTipText(Messages.message(StringTemplate.template("model.message.filter")
-                                                             .addName("%type%", message.getMessageTypeName())));
+                                                             .add("%type%", message.getMessageTypeName())));
                 filterButton.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent event) {
