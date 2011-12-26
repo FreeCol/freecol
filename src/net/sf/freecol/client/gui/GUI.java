@@ -179,7 +179,7 @@ public class GUI {
     }
 
     public void closeMainPanel() {
-        canvas.showMainPanel();
+        canvas.closeMainPanel();
     }
 
     public void closeMenus() {
