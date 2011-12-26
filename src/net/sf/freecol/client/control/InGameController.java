@@ -1869,7 +1869,7 @@ public final class InGameController implements NetworkConstants {
             .getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
             if (!limit.evaluate(player)) {
-                gui.getCanvas().showInformationMessage(StringTemplate
+                gui.showInformationMessage(StringTemplate
                     .template(limit.getDescriptionKey())
                     .addAmount("%limit%",
                         limit.getRightHandSide().getValue(game)));
@@ -3294,7 +3294,7 @@ public final class InGameController implements NetworkConstants {
         int arrears = player.getArrears(type);
         if (arrears <= 0) return false;
         if (!player.checkGold(arrears)) {
-            gui.getCanvas().showInformationMessage(StringTemplate.template("model.europe.cantPayArrears")
+            gui.showInformationMessage(StringTemplate.template("model.europe.cantPayArrears")
                 .addAmount("%amount%", arrears));
             return false;
         }

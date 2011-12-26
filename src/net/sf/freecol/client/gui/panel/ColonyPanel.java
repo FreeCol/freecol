@@ -1650,7 +1650,7 @@ public final class ColonyPanel extends FreeColPanel
                             .addStringTemplate("%unit%", Messages.getLabel(unit))
                             .add("%goods%", workType.getNameKey())
                             .addStringTemplate("%tile%", best.getLabel());
-                        canvas.showInformationMessage(template);
+                        getGUI().showInformationMessage(template);
                     }
                 }
                 return true;

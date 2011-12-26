@@ -230,7 +230,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
                     logger.warning(e.toString());
                     StringTemplate t = StringTemplate.template("failedToSave")
                         .addName("%name%", saveFile.getPath());
-                    getCanvas().showInformationMessage(t);
+                    getGUI().showInformationMessage(t);
                 }
             }
         } else if (LOAD.equals(command)) {

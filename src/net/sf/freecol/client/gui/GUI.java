@@ -677,4 +677,8 @@ public class GUI {
         canvas.addMouseMotionListener(listener);
     }
     
+    public void showInformationMessage(StringTemplate template) {
+        canvas.showInformationMessage(template);
+    }
+    
 }

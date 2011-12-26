@@ -88,7 +88,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
                 logger.warning(e.toString());
                 StringTemplate t = StringTemplate.template("failedToSave")
                     .addName("%name%", file.getPath());
-                getCanvas().showInformationMessage(t);
+                getGUI().showInformationMessage(t);
             }
         }
     }
