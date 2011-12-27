@@ -49,7 +49,6 @@ import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -371,7 +370,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         return loadDialog;
     }
 
-    public static FreeColDialog<Dimension> createMapSizeDialog(FreeColClient freeColClient, final GUI gui, final Canvas canvas) {
+    public static FreeColDialog<Dimension> createMapSizeDialog(FreeColClient freeColClient, final GUI gui) {
 
         final int defaultHeight = 100;
         final int defaultWidth = 40;

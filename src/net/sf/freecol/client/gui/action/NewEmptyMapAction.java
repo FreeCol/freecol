@@ -23,9 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.generator.MapGenerator;
 
@@ -65,10 +63,9 @@ public class NewEmptyMapAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        final Canvas canvas = gui.getCanvas();
         final Game game = freeColClient.getGame();
 
-        Dimension size = canvas.showFreeColDialog(FreeColDialog.createMapSizeDialog(freeColClient, gui, canvas));
+        Dimension size = gui.getCanvas().showMapSizeDialog();
         if (size == null) {
             return;
         }
