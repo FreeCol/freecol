@@ -420,6 +420,26 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
+        // If the build queue is empty, check that we are not
+        // producing any building goods types, except if that type is
+        // the input to some other form of production.  Such
+        // production probably means we forgot to reset the build
+        // queue.  Thus, if hammers are being produced it is worth
+        // warning about, but not if producing tools.
+        if (buildQueue.size() == 0) {
+            for (GoodsType g : spec.getGoodsTypeList()) {
+                if (g.isBuildingMaterial() && !g.isRawMaterial()
+                    && getAdjustedNetProductionOf(g) > 0) {
+                    cs.addMessage(See.only((ServerPlayer) owner),
+                        new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                            "model.colony.notBuildingAnything",
+                            this)
+                            .addName("%colony%", getName()));
+                    break;
+                }
+            }
+        }
+
         // Update SoL.
         updateSoL();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
@@ -553,14 +573,6 @@ public class ServerColony extends Colony implements ServerModelObject {
                                  this)
                     .addName("%colony%", getName())
                     .add("%building%", type.getNameKey()));
-            if (buildQueue.size() == 1) {
-                cs.addMessage(See.only((ServerPlayer) owner),
-                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                     "model.colony.notBuildingAnything",
-                                     this)
-                        .addName("%colony%", getName())
-                        .add("%building%", type.getNameKey()));
-            }
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
