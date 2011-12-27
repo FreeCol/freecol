@@ -315,11 +315,8 @@ public class DebugMenu extends JMenu {
                     for (MonarchAction action : MonarchAction.values()) {
                         actions.add(new ChoiceItem<MonarchAction>(action));
                     }
-                    ChoiceDialog<MonarchAction> choiceDialog
-                        = new ChoiceDialog<MonarchAction>(freeColClient, gui, monarchTitle,
-                                                          "Cancel", actions);
                     MonarchAction action
-                        = canvas.showFreeColDialog(choiceDialog);
+                        = gui.getCanvas().showChoiceMonarchActionDialog(monarchTitle, actions);
                     server.getInGameController()
                         .setMonarchAction(serverPlayer, action);
                 }

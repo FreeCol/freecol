@@ -57,6 +57,7 @@ import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.ChatPanel;
+import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -320,7 +321,7 @@ public final class Canvas extends JDesktopPane {
     private GUI gui;
 
     private MainPanel mainPanel;
-
+ 
     private final StartGamePanel startGamePanel;
 
     private final EuropePanel europePanel;
@@ -988,6 +989,12 @@ public final class Canvas extends JDesktopPane {
         return (response == null) ? null : response.getObject();
     }
 
+    public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
+        ChoiceDialog<MonarchAction> choiceDialog= new ChoiceDialog<MonarchAction>(freeColClient, gui, monarchTitle,
+                                          "Cancel", actions);
+        return showFreeColDialog(choiceDialog);
+    }
+
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {      
     
         return showFreeColDialog(new ChooseFoundingFatherDialog(freeColClient, gui, ffs));
@@ -1021,7 +1028,7 @@ public final class Canvas extends JDesktopPane {
                              choices);
         return (result == null) ? ClaimAction.CANCEL : result;
     }
-
+    
     /**
      * Displays a dialog for setting client options.
      *
@@ -1036,7 +1043,7 @@ public final class Canvas extends JDesktopPane {
         freeColClient.getActionManager().update();
         return group;
     }
-    
+
     /**
      * Displays the colony panel of the given <code>Colony</code>.
      * Defends against duplicates as this can duplicate messages
@@ -1056,6 +1063,7 @@ public final class Canvas extends JDesktopPane {
         return panel;
     }
 
+    
     public void showColonyPanel(Colony colony, Runnable callback) {
         FreeColPanel panel = new ColonyPanel(freeColClient, gui, this, colony);
         panel.addClosingCallback(callback);
@@ -1079,16 +1087,15 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    
     public void showColopediaPanel(String nodeId) {
         showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId));
     }
+
 
     public void showCompactLabourReport() {
         showSubPanel(new CompactLabourReport(freeColClient, gui));
 
     }
-
 
     /**
      * Display a dialog to confirm a declaration of independence.
@@ -1192,11 +1199,13 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(dumpDialog, unit.getTile());
     }
 
+
     public void showEditSettlementDialog(IndianSettlement settlement) {
         showFreeColDialog(new EditSettlementDialog(freeColClient, gui, settlement));
     }
 
-
+    
+    
     /**
      * Shows the panel that allows the user to choose which unit will emigrate
      * from Europe. This method may only be called if the user has William
@@ -1211,8 +1220,6 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(emigrationPanel);
     }
 
-    
-    
     public boolean showEndTurnDialog(List<Unit> units) {
         return showFreeColDialog(new EndTurnDialog(freeColClient, gui, units));
     }
@@ -1301,12 +1308,12 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(freeColDialog, null);
     }
 
+
+    // A variety of special purpose panels/dialogs follow
+
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions));
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Displays the high scores panel.
@@ -1425,6 +1432,7 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(null, template);
     }
 
+
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
@@ -1458,7 +1466,6 @@ public final class Canvas extends JDesktopPane {
         }
         return response;
     }
-
 
     /**
      * Displays a dialog where the user may choose a file. This is the same as
@@ -1521,7 +1528,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ErrorPanel(freeColClient, gui));
 
     }
-
+    
     /**
      * Shows the <code>MainPanel</code>.
      *
@@ -1534,11 +1541,11 @@ public final class Canvas extends JDesktopPane {
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
-    
+
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
         return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, mgo, editable, loadCustomOptions));
     }
-
+    
     /**
      * Displays a number of ModelMessages.
      *
@@ -1611,11 +1618,11 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new NewPanel(freeColClient, gui));
     }
     
+    
     public void showNewPanel(Specification specification) {
         showSubPanel(new NewPanel(freeColClient, gui, specification));
     }
-    
-    
+
     /**
      * Shows the <code>OpenGamePanel</code>.
      */
@@ -1718,11 +1725,11 @@ public final class Canvas extends JDesktopPane {
     public void showReportHistoryPanel() {
         showSubPanel(new ReportHistoryPanel(freeColClient, gui));
     }
-
+    
     public void showReportIndianPanel() {
         showSubPanel(new ReportIndianPanel(freeColClient, gui));
     }
-    
+
     public void showReportLabourPanel() {
         showSubPanel(new ReportLabourPanel(freeColClient, gui));
 
@@ -1750,14 +1757,10 @@ public final class Canvas extends JDesktopPane {
     public void showReportRequirementsPanel() {
         showSubPanel(new ReportRequirementsPanel(freeColClient, gui));
     }
-
+    
     public void showReportTradePanel() {
         showSubPanel(new ReportTradePanel(freeColClient, gui));
 
-    }
-    
-    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay));
     }
 
 
@@ -1898,6 +1901,10 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
     }
 
+    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
+        return showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay));
+    }
+
     /**
      * Display a dialog allowing the user to select a destination for
      * a given unit.
@@ -1963,7 +1970,7 @@ public final class Canvas extends JDesktopPane {
         serverListPanel.initialize(username, serverList);
         showSubPanel(serverListPanel);
     }
-
+    
     public void showSettlement(Settlement s) {
         if (s instanceof Colony) {
             if (s.getOwner().equals(freeColClient.getMyPlayer())) {
@@ -1977,6 +1984,7 @@ public final class Canvas extends JDesktopPane {
             throw new IllegalStateException("Bogus settlement");
         }
     }
+    
     
     /**
      * Displays a dialog with a text and a cancel-button, in addition
@@ -2001,7 +2009,6 @@ public final class Canvas extends JDesktopPane {
                                 choices);
     }
     
-    
     /**
      * Displays the <code>StartGamePanel</code>.
      *
@@ -2025,7 +2032,7 @@ public final class Canvas extends JDesktopPane {
     public void showStatisticsPanel() {
         showSubPanel(new StatisticsPanel(freeColClient, gui));
     }
-    
+
     /**
      * Shows a status message that cannot be dismissed. The panel will be
      * removed when another component is added to this <code>Canvas</code>.
@@ -2039,7 +2046,7 @@ public final class Canvas extends JDesktopPane {
         statusPanel.setStatusMessage(message);
         addCentered(statusPanel, STATUS_LAYER);
     }
-
+    
     public void showTilePanel(Tile tile) {
         showSubPanel(new TilePanel(freeColClient, gui, tile));
     }
@@ -2178,12 +2185,12 @@ public final class Canvas extends JDesktopPane {
             frame.dispose();
         }
     }
-    
+   
     void displayChat(String senderNme, String message, boolean privateChat) {
         startGamePanel.displayChat(senderNme, message, privateChat);
 
     }
-   
+    
     /**
      * Displays an error message.
      *
@@ -2373,6 +2380,7 @@ public final class Canvas extends JDesktopPane {
             : PopupPosition.CENTERED;
     }
     
+    
     /**
      * Displays the given dialog, making sure a tile is visible.
      *
@@ -2387,7 +2395,6 @@ public final class Canvas extends JDesktopPane {
         remove(freeColDialog);
         return response;
     }
-    
     
     /**
      * Displays the given panel, making sure a tile is visible.
