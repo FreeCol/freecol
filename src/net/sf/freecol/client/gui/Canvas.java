@@ -2427,4 +2427,11 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
  
+    
+    public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
+        ChoiceDialog<FoundingFather> choiceDialog
+        = new ChoiceDialog<FoundingFather>(freeColClient, gui, fatherTitle, "Cancel",
+            fathers);
+        return showFreeColDialog(choiceDialog);
+    }
 }

@@ -44,7 +44,6 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -646,10 +645,8 @@ public class DebugMenu extends JMenu {
                 fathers.add(choice);
             }
         }
-        ChoiceDialog<FoundingFather> choiceDialog
-            = new ChoiceDialog<FoundingFather>(freeColClient, gui, fatherTitle, "Cancel",
-                fathers);
-        FoundingFather father = canvas.showFreeColDialog(choiceDialog);
+
+        FoundingFather father = gui.getCanvas().showChooseFoundingFatherDialog(fathers, fatherTitle);
         if (father != null) {
             server.getInGameController()
                 .addFoundingFather((ServerPlayer) serverPlayer,
