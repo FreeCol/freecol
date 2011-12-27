@@ -374,30 +374,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
             });
     }
 
-    public JButton createColonyButton(Colony colony) {
-        JButton button = getLinkButton(colony.getName(), null, colony.getId());
-        button.addActionListener(this);
-        return button;
-    }
-
-    /**
-     * Returns the <code>Turn</code>s during which a Player's
-     * FoundingFathers were elected to the Continental Congress
-     *
-     * @return a <code>Turn</code> value
-     */
-    public Map<String, Turn> getElectionTurns() {
-        Map<String, Turn> result = new HashMap<String, Turn>();
-        if (!getMyPlayer().getFathers().isEmpty()) {
-            for (HistoryEvent event : getMyPlayer().getHistory()) {
-                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
-                    result.put(event.getReplacement("%father%").getId(), event.getTurn());
-                }
-            }
-        }
-        return result;
-    }
-
     /**
      * Returns the saved position of this panel, null by default.
      *
@@ -409,49 +385,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         } catch(Exception e) {
             return null;
         }
-    }
-
-    /**
-     * Returns the saved size of this panel, null by default.
-     *
-     * @return a <code>Dimension</code> value
-     */
-    public final Dimension getSavedSize() {
-        try {
-            return new Dimension(getInteger(".w"), getInteger(".h"));
-        } catch(Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Checks if this panel is editable
-     * @return boolean
-     */
-    public boolean isEditable() {
-        return editable;
-    }
-
-
-
-    /**
-     * Return a JLabel with Messages.message(key) as text.
-     *
-     * @param key a <code>String</code> value
-     * @return a <code>JLabel</code> value
-     */
-    public JLabel localizedLabel(String key) {
-        return new JLabel(Messages.message(key));
-    }
-
-    /**
-     * Return a JLabel with Messages.localize(template) as text.
-     *
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>JLabel</code> value
-     */
-    public JLabel localizedLabel(StringTemplate template) {
-        return new JLabel(Messages.message(template));
     }
 
     /**
@@ -499,38 +432,13 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         getActionMap().put("release", cancelAction);
     }
 
-
-
-    /**
-     * Set the <code>Editable</code> value.
-     *
-     * @param newEditable boolean, the new Editable value
-     */
-    public void setEditable(boolean newEditable) {
-        this.editable = newEditable;
+    protected JButton createColonyButton(Colony colony) {
+        JButton button = getLinkButton(colony.getName(), null, colony.getId());
+        button.addActionListener(this);
+        return button;
     }
 
-    /**
-     * Sort the given modifiers according to type.
-     *
-     * @param result Set of <code>Modifier</code>
-     * @return a sorted Set of <code>Modifier</code>
-     */
-    public Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
-    }
+
 
     /**
      * Get the <code>Canvas</code> value.
@@ -550,7 +458,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return freeColClient == null ? null : freeColClient.getClientOptions();
     }
 
-
     /**
      * Describe <code>getController</code> method here.
      *
@@ -558,6 +465,24 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     protected InGameController getController() {
         return freeColClient.getInGameController();
+    }
+
+    /**
+     * Returns the <code>Turn</code>s during which a Player's
+     * FoundingFathers were elected to the Continental Congress
+     *
+     * @return a <code>Turn</code> value
+     */
+    protected Map<String, Turn> getElectionTurns() {
+        Map<String, Turn> result = new HashMap<String, Turn>();
+        if (!getMyPlayer().getFathers().isEmpty()) {
+            for (HistoryEvent event : getMyPlayer().getHistory()) {
+                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
+                    result.put(event.getReplacement("%father%").getId(), event.getTurn());
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -569,6 +494,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return freeColClient;
     }
 
+
+
     /**
      * Describe <code>getGame</code> method here.
      *
@@ -577,7 +504,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     protected Game getGame() {
         return freeColClient.getGame();
     }
-
 
     protected GUI getGUI() {
         return gui;
@@ -601,6 +527,20 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return freeColClient.getMyPlayer();
     }
 
+
+    /**
+     * Returns the saved size of this panel, null by default.
+     *
+     * @return a <code>Dimension</code> value
+     */
+    protected final Dimension getSavedSize() {
+        try {
+            return new Dimension(getInteger(".w"), getInteger(".h"));
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
     /**
      * Return the player's Colonies, sorted according to player's
      * <code>ClientOptions</code>.
@@ -619,6 +559,35 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     protected Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
+    }
+
+
+    /**
+     * Checks if this panel is editable
+     * @return boolean
+     */
+    protected boolean isEditable() {
+        return editable;
+    }
+
+    /**
+     * Return a JLabel with Messages.message(key) as text.
+     *
+     * @param key a <code>String</code> value
+     * @return a <code>JLabel</code> value
+     */
+    protected JLabel localizedLabel(String key) {
+        return new JLabel(Messages.message(key));
+    }
+
+    /**
+     * Return a JLabel with Messages.localize(template) as text.
+     *
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>JLabel</code> value
+     */
+    protected JLabel localizedLabel(StringTemplate template) {
+        return new JLabel(Messages.message(template));
     }
 
     /**
@@ -650,6 +619,37 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     protected void restoreSavedSize(int w, int h) {
         restoreSavedSize(new Dimension(w, h));
+    }
+
+    /**
+     * Set the <code>Editable</code> value.
+     *
+     * @param newEditable boolean, the new Editable value
+     */
+    protected void setEditable(boolean newEditable) {
+        this.editable = newEditable;
+    }
+
+    /**
+     * Sort the given modifiers according to type.
+     *
+     * @param result Set of <code>Modifier</code>
+     * @return a sorted Set of <code>Modifier</code>
+     */
+    protected Set<Modifier> sortModifiers(Set<Modifier> result) {
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
     }
 
     /**
