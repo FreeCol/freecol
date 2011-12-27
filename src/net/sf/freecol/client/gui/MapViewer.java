@@ -1910,17 +1910,19 @@ public final class MapViewer {
      */
     private void displayBaseTile(Graphics2D g, Tile tile, boolean drawUnexploredBorders) {
         if (tile != null) {
+            int x = tile.getX();
+            int y = tile.getY();
             // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), 0, 0, null);
+            g.drawImage(lib.getTerrainImage(tile.getType(), x, y), 0, 0, null);
             if (tile.isExplored()) {
                 if (!tile.isLand() && tile.getStyle() > 0) {
                     int edgeStyle = tile.getStyle() >> 4;
                     if (edgeStyle > 0) {
-                        g.drawImage(lib.getBeachEdgeImage(edgeStyle), 0, 0, null);
+                        g.drawImage(lib.getBeachEdgeImage(edgeStyle, x, y), 0, 0, null);
                     }
                     int cornerStyle = tile.getStyle() & 15;
                     if (cornerStyle > 0) {
-                        g.drawImage(lib.getBeachCornerImage(cornerStyle), 0, 0, null);
+                        g.drawImage(lib.getBeachCornerImage(cornerStyle, x, y), 0, 0, null);
                     }
                 }
 
@@ -1944,15 +1946,15 @@ public final class MapViewer {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
                             g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                           tile.getX(), tile.getY()), 0, 0, null);
+                                                           x, y), 0, 0, null);
                             TileImprovement river = borderingTile.getRiver();
                             if (river != null && (direction == Direction.SE || direction == Direction.SW ||
                                                   direction == Direction.NE || direction == Direction.NW)) {
                                 int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
                                 if (branches[direction.getReverseDirection().ordinal()] > 0) {
                                     g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver()
-                                                                       .getMagnitude(), tile.getX(),
-                                                                       tile.getY()), 0, 0, null);
+                                                                       .getMagnitude(), x,
+                                                                       y), 0, 0, null);
                                 }
                             }
                         } else if (borderingTile.isExplored()) {
@@ -1963,7 +1965,7 @@ public final class MapViewer {
                             } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                                 // Draw land terrain with bordering land type, or ocean/high seas limit
                                 g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                               tile.getX(), tile.getY()), 0, 0, null);
+                                                               x, y), 0, 0, null);
                             }
                         }
                     }
@@ -3380,7 +3382,7 @@ public final class MapViewer {
         borderPoints.put(Direction.S,  new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
         borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
         borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
-        
+
         // road pairs to skip drawing when doing 3 or 4 exit point tiles
         //  don't put more than two directions in each list,
         //  otherwise a 3-point tile may not draw any roads at all!
@@ -3393,7 +3395,7 @@ public final class MapViewer {
         prohibitedRoads.put(Direction.W,  Arrays.asList(Direction.SW, Direction.NW));
         prohibitedRoads.put(Direction.NW, Arrays.asList(Direction.W, Direction.N));
 
-        
+
         borderStroke = new BasicStroke(dy);
         roadStroke = new BasicStroke(dy/2);
         gridStroke = new BasicStroke(lib.getScalingFactor());
@@ -3425,7 +3427,7 @@ public final class MapViewer {
         leftSpace = (size.width - tileWidth) / 2;
         rightSpace = leftSpace;
     }
-    
-    
-    
+
+
+
 }

@@ -160,20 +160,26 @@ public final class ImageLibrary {
      * Returns the beach corner image at the given index.
      *
      * @param index The index of the image to return.
+     * @param x an <code>int</code> value
+     * @param y an <code>int</code> value
      * @return The image at the given index.
      */
-    public Image getBeachCornerImage(int index) {
-        return ResourceManager.getImage("model.tile.beach.corner" + index, scalingFactor);
+    public Image getBeachCornerImage(int index, int x, int y) {
+        return ResourceManager.getImage("model.tile.beach.corner" + index
+                                        + (isEven(x, y) ? "_even" : "_odd"), scalingFactor);
     }
 
     /**
      * Returns the beach edge image at the given index.
      *
      * @param index The index of the image to return.
+     * @param x an <code>int</code> value
+     * @param y an <code>int</code> value
      * @return The image at the given index.
      */
-    public Image getBeachEdgeImage(int index) {
-        return ResourceManager.getImage("model.tile.beach.edge" + index, scalingFactor);
+    public Image getBeachEdgeImage(int index, int x, int y) {
+        return ResourceManager.getImage("model.tile.beach.edge" + index
+                                        + (isEven(x, y) ? "_even" : "_odd"), scalingFactor);
     }
 
     public Image getBonusImage(ResourceType type) {
@@ -221,11 +227,24 @@ public final class ImageLibrary {
      */
     public Image getBorderImage(TileType type, Direction direction, int x, int y) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
-        // the pattern is mostly visible on ocean tiles this is an
-        // attempt to break it up so it doesn't create big stripes or
-        // chess-board effect
-        String index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? "_even" : "_odd";
-        return ResourceManager.getImage(key + ".border_" + direction + index + ".image", scalingFactor);
+        return ResourceManager.getImage(key + ".border_" + direction
+                                        + (isEven(x, y) ?  "_even" : "_odd")
+                                        + ".image", scalingFactor);
+    }
+
+
+    /**
+     * Returns true if the tile with the given coordinates is to be
+     * considered "even". This is useful to select different images
+     * for the same tile type in order to prevent big stripes or
+     * a checker-board effect.
+     *
+     * @param x an <code>int</code> value
+     * @param y an <code>int</code> value
+     * @return a <code>boolean</code> value
+     */
+    private boolean isEven(int x, int y) {
+        return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
     }
 
     /**
@@ -694,11 +713,8 @@ public final class ImageLibrary {
 
     public Image getTerrainImage(TileType type, int x, int y, double scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
-        // the pattern is mostly visible on ocean tiles this is an
-        // attempt to break it up so it doesn't create big stripes or
-        // chess-board effect
-        int index = (( y % 8 <= 2) || ((x+y) % 2 == 0 )) ? 0 : 1;
-        return ResourceManager.getImage(key + ".center" + index + ".image", scale);
+        return ResourceManager.getImage(key + ".center" + (isEven(x, y) ? "0" : "1")
+                                        + ".image", scale);
     }
 
     /**
