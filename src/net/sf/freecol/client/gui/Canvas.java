@@ -1555,8 +1555,6 @@ public final class Canvas extends JDesktopPane {
         List<ModelMessage> messages = filterEventPanels(modelMessages);
         if (messages.size() <= 0) return;
         Game game = freeColClient.getGame();
-        String okText = Messages.message("ok");
-        String cancelText = Messages.message("display");
         String[] messageText = new String[messages.size()];
         ImageIcon[] messageIcon = new ImageIcon[messages.size()];
         for (int i = 0; i < messages.size(); i++) {
@@ -1571,7 +1569,7 @@ public final class Canvas extends JDesktopPane {
             || (source instanceof Colony || source instanceof WorkLocation)) {
             FreeColDialog<Boolean> confirmDialog
                 = FreeColDialog.createConfirmDialog(freeColClient, gui, messageText, messageIcon,
-                    okText, cancelText);
+                    Messages.message("ok"), Messages.message("display"));
             if (showFreeColDialog(confirmDialog)) {
                 if (!isShowingSubPanel()) {
                     freeColClient.getInGameController().nextModelMessage();
