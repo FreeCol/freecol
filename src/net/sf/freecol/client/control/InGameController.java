@@ -2902,8 +2902,7 @@ public final class InGameController implements NetworkConstants {
         DiplomaticTrade agreement = null;
         TradeStatus status;
         for (;;) {
-            ourAgreement = gui.getCanvas()
-                .showNegotiationDialog(unit, settlement, agreement);
+            ourAgreement = gui.showNegotiationDialog(unit, settlement, agreement);
             if (ourAgreement == null) {
                 if (agreement == null) break;
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
