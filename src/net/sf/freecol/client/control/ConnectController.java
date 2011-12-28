@@ -415,8 +415,8 @@ public final class ConnectController {
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
-                if (gui.getCanvas().showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
-                    LoadingSavegameDialog lsd = gui.getCanvas().getLoadingSavegameDialog();
+                if (gui.showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
+                    LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
                     singleplayer = lsd.isSingleplayer();
                     name = lsd.getName();
                     port = lsd.getPort();

@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.FreeColObject;
@@ -716,6 +717,14 @@ public class GUI {
     public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
             List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
+    }
+    
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
+        return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
+    }
+
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        return canvas.getLoadingSavegameDialog();
     }
     
 }
