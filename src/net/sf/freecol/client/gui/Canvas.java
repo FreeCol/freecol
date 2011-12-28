@@ -1144,9 +1144,6 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
                                      String okText, String cancelText) {
-        okText = Messages.message(okText);
-        cancelText = Messages.message(cancelText);
-
         String[] texts = new String[messages.length];
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
@@ -1156,7 +1153,7 @@ public final class Canvas extends JDesktopPane {
 
         FreeColDialog<Boolean> confirmDialog
             = FreeColDialog.createConfirmDialog(freeColClient, gui, texts, images,
-                                                okText, cancelText);
+                    Messages.message(okText), Messages.message(cancelText));
         return showFreeColDialog(confirmDialog, tile);
     }
 
@@ -1297,7 +1294,7 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(EventType type) {
-        showFreeColPanel(new EventPanel(freeColClient, gui, type), null);
+        showSubPanel(new EventPanel(freeColClient, gui, type), PopupPosition.CENTERED);
     }
 
     public void showFindSettlementDialog() {
