@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -45,8 +44,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This panel represents a single building in a Colony.
  */
 public class ConstructionPanel extends JPanel implements PropertyChangeListener {
-
-    private final Canvas parent;
 
     private final boolean openBuildQueue;
 
@@ -70,11 +67,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      * @param parent a <code>Canvas</code> value
      * @param colony a <code>Colony</code> value
      */
-    public ConstructionPanel(FreeColClient freeColClient, GUI gui, final Canvas parent, Colony colony, boolean openBuildQueue) {
+    public ConstructionPanel(FreeColClient freeColClient, GUI gui, Colony colony, boolean openBuildQueue) {
 
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.parent = parent;
         this.openBuildQueue = openBuildQueue;
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
         setColony(colony);
@@ -98,7 +94,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             {
                 addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        parent.showBuildQueuePanel(colony);
+                        gui.getCanvas().showBuildQueuePanel(colony);
                         }
                     });
             }

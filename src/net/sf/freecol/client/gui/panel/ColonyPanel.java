@@ -171,7 +171,7 @@ public final class ColonyPanel extends FreeColPanel
      *
      * @param parent The parent of this panel
      */
-    public ColonyPanel(FreeColClient freeColClient, GUI gui, final Canvas parent, Colony colony) {
+    public ColonyPanel(FreeColClient freeColClient, GUI gui, Colony colony) {
         super(freeColClient, gui);
 
         setFocusCycleRoot(true);
@@ -194,7 +194,7 @@ public final class ColonyPanel extends FreeColPanel
 
         netProductionPanel.setOpaque(false);
 
-        constructionPanel = new ConstructionPanel(freeColClient, gui, parent, colony, true);
+        constructionPanel = new ConstructionPanel(freeColClient, gui, colony, true);
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();

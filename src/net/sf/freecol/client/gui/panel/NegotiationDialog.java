@@ -92,7 +92,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
      *
-     * @param parent a <code>Canvas</code> value
      * @param unit an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
      */
@@ -104,7 +103,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * Creates a new <code>NegotiationDialog</code> instance.
      * @param freeColClient 
      *
-     * @param parent a <code>Canvas</code> value
      * @param unit an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
      * @param agreement a <code>DiplomaticTrade</code> with the offer

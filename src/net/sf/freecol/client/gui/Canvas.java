@@ -1066,14 +1066,14 @@ public final class Canvas extends JDesktopPane {
         ColonyPanel panel = getColonyPanel(colony);
         if (panel != null) 
             return panel;
-        panel = new ColonyPanel(freeColClient, gui, this, colony);
+        panel = new ColonyPanel(freeColClient, gui, colony);
         showFreeColPanel(panel, colony.getTile());
         return panel;
     }
 
     
     public void showColonyPanel(Colony colony, Runnable callback) {
-        FreeColPanel panel = new ColonyPanel(freeColClient, gui, this, colony);
+        FreeColPanel panel = new ColonyPanel(freeColClient, gui, colony);
         panel.addClosingCallback(callback);
         showSubPanel(panel);
     }
