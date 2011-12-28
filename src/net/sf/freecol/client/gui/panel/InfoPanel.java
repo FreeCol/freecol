@@ -66,7 +66,7 @@ public final class InfoPanel extends FreeColPanel {
 
     public static final int PANEL_HEIGHT = 128;
 
-    private final EndTurnPanel endTurnPanel; 
+    private final EndTurnPanel endTurnPanel;
 
     private final UnitInfoPanel unitInfoPanel;
 
@@ -74,16 +74,30 @@ public final class InfoPanel extends FreeColPanel {
 
     private final JPanel mapEditorPanel;
 
+    private boolean useSkin = true;
 
 
     /**
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The main controller object for the client.
+     * @param gui a <code>GUI</code> value
      */
     public InfoPanel(final FreeColClient freeColClient, final GUI gui) {
+        this(freeColClient, gui, true);
+    }
+
+
+    /**
+     * The constructor that will add the items to this panel.
+     *
+     * @param freeColClient The main controller object for the client.
+     * @param gui a <code>GUI</code> value
+     * @param useSkin a <code>boolean</code> value
+     */
+    public InfoPanel(final FreeColClient freeColClient, final GUI gui, boolean useSkin) {
         super(freeColClient, gui);
-        
+        this.useSkin = useSkin;
         this.endTurnPanel = new EndTurnPanel(gui);
 
         unitInfoPanel = new UnitInfoPanel();
@@ -92,7 +106,7 @@ public final class InfoPanel extends FreeColPanel {
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
         Image skin = ResourceManager.getImage("InfoPanel.skin");
-        if (skin == null) {
+        if (!useSkin || skin == null) {
             setSize(PANEL_WIDTH, PANEL_HEIGHT);
         } else {
             setBorder(null);
@@ -238,7 +252,7 @@ public final class InfoPanel extends FreeColPanel {
         }
 
         Image skin = ResourceManager.getImage("InfoPanel.skin");
-        if (skin != null) {
+        if (useSkin && skin != null) {
             graphics.drawImage(skin, 0, 0, null);
         }
 

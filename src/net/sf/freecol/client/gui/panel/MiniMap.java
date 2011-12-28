@@ -79,6 +79,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private final JButton miniMapZoomOutButton;
     private final JButton miniMapZoomInButton;
     private Color backgroundColor;
+    private boolean useSkin = true;
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
@@ -100,10 +101,22 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * The constructor that will initialize this component.
      *
      * @param freeColClient The main controller object for the client
+     * @param gui a <code>GUI</code> value
      */
     public MiniMap(FreeColClient freeColClient, GUI gui) {
+        this(freeColClient, gui, true);
+    }
+
+    /**
+     * The constructor that will initialize this component.
+     *
+     * @param freeColClient The main controller object for the client
+     * @param gui a <code>GUI</code> value
+     */
+    public MiniMap(FreeColClient freeColClient, GUI gui, boolean useSkin) {
         this.freeColClient = freeColClient;
         this.gui = gui;
+        this.useSkin = useSkin;
         backgroundColor = Color.BLACK;
 
         tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
@@ -113,7 +126,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         setLayout(null);
 
         Image skin = ResourceManager.getImage("MiniMap.skin");
-        if (skin == null) {
+        if (!useSkin || skin == null) {
             try {
                 BevelBorder border = new BevelBorder(BevelBorder.RAISED);
                 setBorder(border);
@@ -234,7 +247,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     	this.setBackgroundColor(newBackground);
 
-        if (skin == null) {
+        if (!useSkin || skin == null) {
             paintMap(graphics, getWidth(), getHeight());
         } else {
             graphics.drawImage(back, 0, 0, null);
@@ -422,7 +435,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
         g.setTransform(originTransform);
     }
-
+    
 
     private void focus(int x, int y) {
         int tileX = ((x - adjustX) / tileSize) + firstColumn;

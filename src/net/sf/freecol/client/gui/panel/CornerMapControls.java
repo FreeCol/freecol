@@ -20,32 +20,16 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ViewMode;
-import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.action.DisbandUnitAction;
-import net.sf.freecol.client.gui.action.FortifyAction;
-import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.action.SentryAction;
-import net.sf.freecol.client.gui.action.SkipUnitAction;
-import net.sf.freecol.client.gui.action.WaitAction;
-import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -68,7 +52,7 @@ public final class CornerMapControls extends MapControls {
      * @param gui
      */
     public CornerMapControls(final FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+        super(freeColClient, gui, true);
         compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());

@@ -21,15 +21,11 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -43,10 +39,8 @@ import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -62,8 +56,8 @@ public abstract class MapControls {
 
     protected final FreeColClient freeColClient;
 
-    protected final InfoPanel        infoPanel;
-    protected final MiniMap          miniMap;
+    protected final InfoPanel infoPanel;
+    protected final MiniMap miniMap;
     protected final UnitButton[]     unitButton;
 
     protected GUI gui;
@@ -75,12 +69,12 @@ public abstract class MapControls {
      * @param freeColClient The main controller object for the client
      * @param gui
      */
-    public MapControls(final FreeColClient freeColClient, GUI gui) {
+    public MapControls(final FreeColClient freeColClient, GUI gui, boolean useSkin) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        infoPanel = new InfoPanel(freeColClient, gui);
-        miniMap = new MiniMap(freeColClient, gui);
 
+        infoPanel = new InfoPanel(freeColClient, gui, useSkin);
+        miniMap = new MiniMap(freeColClient, gui, useSkin);
         final ActionManager am = freeColClient.getActionManager();
 
         List<UnitButton> ubList = new ArrayList<UnitButton>();
