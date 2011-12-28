@@ -703,5 +703,9 @@ public class GUI {
         canvas.addMouseMotionListener(listener);
     }
 
+    public boolean isShowingSubPanel() {
+        return canvas.isShowingSubPanel();
+    }
+
     
 }

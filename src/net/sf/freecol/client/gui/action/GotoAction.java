@@ -54,7 +54,7 @@ public class GotoAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && !gui.getCanvas().isShowingSubPanel();
+            && !gui.isShowingSubPanel();
     }
 
     /**

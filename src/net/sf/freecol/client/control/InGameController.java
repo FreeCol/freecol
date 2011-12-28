@@ -343,7 +343,7 @@ public final class InGameController implements NetworkConstants {
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
-            if (gui.getCanvas().isShowingSubPanel()) {
+            if (gui.isShowingSubPanel()) {
                 gui.getCanvas().getShowingSubPanel().requestFocus();
                 return false;
             }
@@ -1662,7 +1662,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (askServer().changeState(unit, state)) {
-            if (!gui.getCanvas().isShowingSubPanel()
+            if (!gui.isShowingSubPanel()
                 && (unit.getMovesLeft() == 0
                     || unit.getState() == UnitState.SENTRY
                     || unit.getState() == UnitState.SKIPPED)) {
@@ -1835,7 +1835,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Tile tile = (gui.getCanvas().isShowingSubPanel()) ? null : unit.getTile();
+        Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
         if (!gui.showConfirmDialog(tile,
                 StringTemplate.template("clearSpeciality.areYouSure")
                 .addStringTemplate("%oldUnit%", Messages.getLabel(unit))
@@ -1909,7 +1909,7 @@ public final class InGameController implements NetworkConstants {
 
         Unit unit = gui.getActiveUnit();
         if (unit == null) return;
-        Tile tile = (gui.getCanvas().isShowingSubPanel()) ? null
+        Tile tile = (gui.isShowingSubPanel()) ? null
             : unit.getTile();
         if (!gui.showConfirmDialog(tile,
                 StringTemplate.key("disbandUnit.text"),
