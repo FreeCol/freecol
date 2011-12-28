@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -49,7 +48,6 @@ public class ShowMapGeneratorOptionsAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Canvas canvas = gui.getCanvas();
         OptionGroup mgo = freeColClient.getGame().getMapGeneratorOptions();
         gui.showMapGeneratorOptionsDialog(mgo, false, false);
     }

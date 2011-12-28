@@ -82,7 +82,6 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
-    private final Canvas canvas;
     private final MapViewer mapViewer;
 
     private boolean hasAnItem = false;
@@ -102,7 +101,6 @@ public final class TilePopup extends JPopupMenu {
 
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.canvas = gui.getCanvas();
         this.mapViewer = gui.getMapViewer();
 
         final Player player = freeColClient.getMyPlayer();
@@ -266,7 +264,7 @@ public final class TilePopup extends JPopupMenu {
                         JMenuItem menuItem = new JMenuItem(currentUnit.toString());
                         menuItem.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
-                                    canvas.showInformationMessage(au.getMission().toString());
+                                    gui.showInformationMessage(au.getMission().toString());
                                 }
                             });
                         transportLists.add(menuItem);
@@ -317,7 +315,7 @@ public final class TilePopup extends JPopupMenu {
                             info.append(aig.toString());
                             info.append("\n");
                         }
-                        canvas.showInformationMessage(info.toString());
+                        gui.showInformationMessage(info.toString());
                     }
                 });
                 add(displayColonyPlan);
@@ -329,7 +327,7 @@ public final class TilePopup extends JPopupMenu {
                         public void actionPerformed(ActionEvent event) {
                             final IndianSettlement sis = (IndianSettlement)
                                 serverGame.getFreeColGameObject(is.getId());
-                            canvas.showInformationMessage(
+                            gui.showInformationMessage(
                                 debugSummarizeSettlement(serverGame, sis));
                         }
                     });
@@ -532,7 +530,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(name));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showIndianSettlementPanel(settlement);
+                    gui.getCanvas().showIndianSettlementPanel(settlement);
                 }
             });
         add(menuItem);
@@ -548,7 +546,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showTilePanel(tile);
+                    gui.getCanvas().showTilePanel(tile);
                 }
             });
 

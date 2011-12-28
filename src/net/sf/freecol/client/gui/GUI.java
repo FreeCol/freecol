@@ -632,11 +632,11 @@ public class GUI {
             o.addPropertyChangeListener(new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent e) {
                         if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                            canvas.showInformationMessage("autodetectLanguageSelected");
+                            showInformationMessage("autodetectLanguageSelected");
                         } else {
                             Locale l = ((Language) e.getNewValue()).getLocale();
                             Messages.setMessageBundle(l);
-                            canvas.showInformationMessage(StringTemplate.template("newLanguageSelected")
+                            showInformationMessage(StringTemplate.template("newLanguageSelected")
                                 .addName("%language%", l.getDisplayName()));
                         }
                     }
@@ -735,6 +735,8 @@ public class GUI {
         canvas.showBuildQueuePanel(colony);
     }
 
+    
+        
 
     
 }
