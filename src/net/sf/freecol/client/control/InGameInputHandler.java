@@ -1598,7 +1598,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doNoResultWork() {
             final Tile tile = colony.getTile();
-            gui.getCanvas().showColonyPanel(colony)
+            gui.showColonyPanel(colony)
                 .addClosingCallback(new Runnable() {
                         public void run() {
                             tile.readFromXMLElement(normalTile);

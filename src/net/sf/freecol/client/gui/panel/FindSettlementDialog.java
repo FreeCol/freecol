@@ -140,7 +140,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
             canvas.remove(FindSettlementDialog.this);
-            canvas.showColonyPanel((Colony) settlement);
+            getGUI().showColonyPanel((Colony) settlement);
         } else if (settlement instanceof IndianSettlement) {
             canvas.remove(FindSettlementDialog.this);
             canvas.showIndianSettlementPanel((IndianSettlement) settlement);

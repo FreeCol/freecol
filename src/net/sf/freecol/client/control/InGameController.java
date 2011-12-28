@@ -2732,7 +2732,7 @@ public final class InGameController implements NetworkConstants {
                 && unit.getTradeRoute() == null
                 && (unit.getDestination() == null
                     || unit.getDestination().getTile() == tile.getTile())) {
-                gui.getCanvas().showColonyPanel(tile.getColony());
+                gui.showColonyPanel(tile.getColony());
             }
             if (unit.getMovesLeft() == 0) {
                 nextActiveUnit();

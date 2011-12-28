@@ -605,7 +605,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         return createButton(text, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                getCanvas().showColonyPanel(colony);
+                getGUI().showColonyPanel(colony);
             }
         });
     }

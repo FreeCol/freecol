@@ -29,10 +29,12 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -684,5 +686,12 @@ public class GUI {
     public void showMainPanel() {
         canvas.showMainPanel();
     }
+    
+    public ColonyPanel showColonyPanel(Colony colony) {
+        return canvas.showColonyPanel(colony);
+    }
+    
+
+        
     
 }

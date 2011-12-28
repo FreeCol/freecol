@@ -128,7 +128,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         } else {
             FreeColGameObject object = getGame().getFreeColGameObject(command);
             if (object instanceof Colony) {
-                getCanvas().showColonyPanel((Colony) object);
+                getGUI().showColonyPanel((Colony) object);
             } else if (object instanceof Europe) {
                 getCanvas().showEuropePanel();
             } else if (object instanceof Tile) {
