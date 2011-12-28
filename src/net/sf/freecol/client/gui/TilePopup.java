@@ -585,8 +585,7 @@ public final class TilePopup extends JPopupMenu {
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
         }
 
-        RumourType rumourChoice = gui.getCanvas()
-            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
+        RumourType rumourChoice = gui.showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
                               rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
         final Tile serverTile = (Tile) serverGame
@@ -608,8 +607,7 @@ public final class TilePopup extends JPopupMenu {
             uts.add(new ChoiceItem<UnitType>(Messages.message(t.toString()
                                                               + ".name"), t));
         }
-        UnitType unitChoice = gui.getCanvas()
-            .showChoiceDialog(null, "Select Unit Type", "Cancel", uts);
+        UnitType unitChoice = gui.showChoiceDialog(null, "Select Unit Type", "Cancel", uts);
         if (unitChoice == null) return;
 
         Player player = freeColClient.getMyPlayer();
@@ -679,8 +677,7 @@ public final class TilePopup extends JPopupMenu {
             gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
                                               t));
         }
-        GoodsType goodsType = gui.getCanvas()
-            .showChoiceDialog(null, "Select Goods Type", "Cancel", gtl);
+        GoodsType goodsType = gui.showChoiceDialog(null, "Select Goods Type", "Cancel", gtl);
         if (goodsType == null) return;
         String amount = gui.showInputDialog(null,
             StringTemplate.name("Select Goods Amount"), "20",

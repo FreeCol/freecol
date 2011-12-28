@@ -441,7 +441,7 @@ public final class ColonyPanel extends FreeColPanel
                     fill();
                     break;
                 case SETGOODS:
-                    debugSetGoods(canvas, colony);
+                    debugSetGoods(colony);
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -459,7 +459,7 @@ public final class ColonyPanel extends FreeColPanel
      * @param canvas The <code>Canvas</code> to use.
      * @param colony The <code>Colony</code> to set goods amounts in.
      */
-    private void debugSetGoods(Canvas canvas, Colony colony) {
+    private void debugSetGoods(Colony colony) {
         Specification spec = getSpecification();
         List<ChoiceItem<GoodsType>> gtl
             = new ArrayList<ChoiceItem<GoodsType>>();
@@ -468,7 +468,7 @@ public final class ColonyPanel extends FreeColPanel
             gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
                                               t));
         }
-        GoodsType goodsType = canvas.showChoiceDialog(null, "Select Goods Type",
+        GoodsType goodsType = getGUI().showChoiceDialog(null, "Select Goods Type",
                                                       "Cancel", gtl);
         if (goodsType == null) return;
         String amount = getGUI().showInputDialog(null,

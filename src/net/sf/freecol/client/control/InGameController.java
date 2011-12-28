@@ -2513,7 +2513,7 @@ public final class InGameController implements NetworkConstants {
             // destination tile is known to be clear of other player
             // units or settlements, it may have a rumour or need
             // other special handling.
-            Unit u = gui.getCanvas().showChoiceDialog(unit.getTile(),
+            Unit u = gui.showChoiceDialog(unit.getTile(),
                 Messages.message("disembark.text"),
                 Messages.message("disembark.cancel"),
                 choices);
@@ -2564,7 +2564,7 @@ public final class InGameController implements NetworkConstants {
         } else if (choices.size() == 1) {
             // Use the default
         } else {
-            carrier = gui.getCanvas().showChoiceDialog(unit.getTile(),
+            carrier = gui.showChoiceDialog(unit.getTile(),
                 Messages.message("embark.text"),
                 Messages.message("embark.cancel"),
                 choices);

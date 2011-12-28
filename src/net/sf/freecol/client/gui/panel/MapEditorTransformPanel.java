@@ -358,7 +358,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         String name = Messages.message(resType.getNameKey());
                         choices.add(new ChoiceItem<ResourceType>(name, resType));
                     }
-                    ResourceType choice = getCanvas().showChoiceDialog(null,
+                    ResourceType choice = getGUI().showChoiceDialog(null,
                                                                        Messages.message("ok"),
                                                                        Messages.message("cancel"),
                                                                        choices);

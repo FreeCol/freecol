@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
@@ -711,4 +712,10 @@ public class GUI {
     public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
         return canvas.showTradeRouteDialog(tradeRoute, tile);
     }
+    
+    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
+            List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(tile, text, cancelText, choices);
+    }
+    
 }

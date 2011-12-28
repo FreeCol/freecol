@@ -598,7 +598,7 @@ public class DebugMenu extends JMenu {
                     b));
         }
         BuildingType buildingType
-            = gui.getCanvas().showChoiceDialog(null, buildingTitle, "Cancel",
+            = gui.showChoiceDialog(null, buildingTitle, "Cancel",
                 buildings);
         if (buildingType == null) return;
         Game sGame = server.getGame();
