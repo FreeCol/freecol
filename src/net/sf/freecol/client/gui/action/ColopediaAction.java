@@ -70,6 +70,6 @@ public class ColopediaAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showColopediaPanel(getId());
+        gui.showColopediaPanel(getId());
     }
 }

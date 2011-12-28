@@ -113,7 +113,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         } else if (CANCEL.equals(command)) {
             setResponse(Boolean.FALSE);
         } else if (HELP.equals(command)) {
-            getCanvas().showColopediaPanel("colopedia.concepts.taxes");
+            getGUI().showColopediaPanel("colopedia.concepts.taxes");
         } else {
             logger.warning("Invalid action command: " + command);
         }

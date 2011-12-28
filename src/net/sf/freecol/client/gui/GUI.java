@@ -727,4 +727,9 @@ public class GUI {
         return canvas.getLoadingSavegameDialog();
     }
     
+    public void showColopediaPanel(String nodeId) {
+        canvas.showColopediaPanel(nodeId);
+    }
+
+    
 }
