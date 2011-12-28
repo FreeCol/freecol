@@ -160,53 +160,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Returns the default header for panels.
-     *
-     * @param text a <code>String</code> value
-     * @return a <code>JLabel</code> value
-     */
-    public static JLabel getDefaultHeader(String text) {
-        JLabel header = new JLabel(text, JLabel.CENTER);
-        header.setFont(bigHeaderFont);
-        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        return header;
-    }
-
-    /**
-     * Returns a text area with standard settings suitable for use in FreeCol
-     * dialogs.
-     *
-     * @param text The text to display in the text area.
-     * @return a text area with standard settings suitable for use in FreeCol
-     *         dialogs.
-     */
-    public static JTextArea getDefaultTextArea(String text) {
-        return getDefaultTextArea(text, COLUMNS);
-    }
-
-    /**
-     * Returns a text area with standard settings suitable for use in FreeCol
-     * dialogs.
-     *
-     * @param text The text to display in the text area.
-     * @param columns an <code>int</code> value
-     * @return a text area with standard settings suitable for use in FreeCol
-     *         dialogs.
-     */
-    public static JTextArea getDefaultTextArea(String text, int columns) {
-        JTextArea textArea = new JTextArea(text);
-        textArea.setColumns(columns);
-        textArea.setOpaque(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFocusable(false);
-        textArea.setFont(defaultFont);
-        // necessary because of resizing
-        textArea.setSize(textArea.getPreferredSize());
-        return textArea;
-    }
-
-    /**
      * Get a JTextPane with default styles.
      *
      * @return a <code>JTextPane</code> value
@@ -248,7 +201,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return textPane;
     }
 
-
     /**
      * Return a button suitable for linking to another panel
      * (e.g. ColopediaPanel).
@@ -277,6 +229,54 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     public static final DecimalFormat getModifierFormat() {
         return modifierFormat;
+    }
+
+    /**
+     * Returns the default header for panels.
+     *
+     * @param text a <code>String</code> value
+     * @return a <code>JLabel</code> value
+     */
+    protected static JLabel getDefaultHeader(String text) {
+        JLabel header = new JLabel(text, JLabel.CENTER);
+        header.setFont(bigHeaderFont);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        return header;
+    }
+
+
+    /**
+     * Returns a text area with standard settings suitable for use in FreeCol
+     * dialogs.
+     *
+     * @param text The text to display in the text area.
+     * @return a text area with standard settings suitable for use in FreeCol
+     *         dialogs.
+     */
+    protected static JTextArea getDefaultTextArea(String text) {
+        return getDefaultTextArea(text, COLUMNS);
+    }
+
+    /**
+     * Returns a text area with standard settings suitable for use in FreeCol
+     * dialogs.
+     *
+     * @param text The text to display in the text area.
+     * @param columns an <code>int</code> value
+     * @return a text area with standard settings suitable for use in FreeCol
+     *         dialogs.
+     */
+    protected static JTextArea getDefaultTextArea(String text, int columns) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setColumns(columns);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFocusable(false);
+        textArea.setFont(defaultFont);
+        // necessary because of resizing
+        textArea.setSize(textArea.getPreferredSize());
+        return textArea;
     }
 
     protected boolean editable = true;
