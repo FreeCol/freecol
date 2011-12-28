@@ -695,5 +695,8 @@ public class GUI {
         return canvas.requestFocusInWindow();
     }
         
+    public void removeInGameComponents() {
+        canvas.removeInGameComponents();
+    }
     
 }

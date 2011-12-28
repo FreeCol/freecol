@@ -344,7 +344,7 @@ public final class ConnectController {
         final String host = freeColClient.getClient().getHost();
         final int port = freeColClient.getClient().getPort();
 
-        gui.getCanvas().removeInGameComponents();
+        gui.removeInGameComponents();
         logout(true);
         login(username, host, port);
         freeColClient.getInGameController().nextModelMessage();

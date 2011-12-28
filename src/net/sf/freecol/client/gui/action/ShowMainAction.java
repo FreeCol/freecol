@@ -56,7 +56,7 @@ public class ShowMainAction extends FreeColAction {
             return;
         }
         getFreeColClient().getConnectController().quitGame(true);
-        gui.getCanvas().removeInGameComponents();
+        gui.removeInGameComponents();
         getFreeColClient().setMapEditor(false);
         getFreeColClient().setGame(null);
         gui.getCanvas().returnToTitle();

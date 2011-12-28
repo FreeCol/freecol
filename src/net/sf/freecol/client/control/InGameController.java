@@ -999,7 +999,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         freeColClient.getConnectController().quitGame(true);
-        gui.getCanvas().removeInGameComponents();
+        gui.removeInGameComponents();
         freeColClient.getConnectController().loadGame(file);
     }
 
@@ -1022,7 +1022,7 @@ public final class InGameController implements NetworkConstants {
                 // perform loading game state if answer == ok
                 if (ok) {
                     freeColClient.getConnectController().quitGame(true);
-                    gui.getCanvas().removeInGameComponents();
+                    gui.removeInGameComponents();
                     freeColClient.getConnectController().loadGame(file);
                     return true;
                 }

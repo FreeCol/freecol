@@ -94,7 +94,7 @@ public abstract class InputHandler implements MessageHandler {
                     if (freeColClient.getFreeColServer() == null) {
                         gui.getCanvas().returnToTitle();
                     } else {
-                        gui.getCanvas().removeInGameComponents();
+                        gui.removeInGameComponents();
                     }
                 }
             }
