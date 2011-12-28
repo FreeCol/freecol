@@ -395,6 +395,15 @@ public class GUI {
         }
     }
 
+    public void removeInGameComponents() {
+        canvas.removeInGameComponents();
+    }
+    
+    public boolean requestFocusInWindow() {
+        return canvas.requestFocusInWindow();
+    }
+    
+
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
@@ -402,17 +411,20 @@ public class GUI {
         }
     }
     
+
+    public void returnToTitle() {
+        canvas.returnToTitle();
+    }
+
     public void scaleMap(float delta) {
         mapViewer.scaleMap(delta);
         refresh();
     }
     
-
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
     
-
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
@@ -420,28 +432,32 @@ public class GUI {
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocusImmediately(tileToFocus);
     }
-    
+
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
-    
+     
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
-
+    
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-
+    
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
                  freeColClient.getGame().getMap()));
     }
-     
+    
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
         
+    }
+    
+    public ColonyPanel showColonyPanel(Colony colony) {
+        return canvas.showColonyPanel(colony);
     }
     
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
@@ -469,6 +485,10 @@ public class GUI {
         canvas.showInformationMessage(messageId);
     }
     
+    public void showInformationMessage(StringTemplate template) {
+        canvas.showInformationMessage(template);
+    }
+        
     public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
             String okText, String cancelText,
             boolean rejectEmptyString) {
@@ -479,10 +499,14 @@ public class GUI {
         return canvas.showLoadDialog(directory);
     }
     
+    public void showMainPanel() {
+        canvas.showMainPanel();
+    }
+    
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){
         return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustomOptions);
     }
-    
+
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, defaultName);
     }
@@ -492,7 +516,7 @@ public class GUI {
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
     }
-        
+
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
@@ -631,7 +655,7 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-
+    
     public void startMapEditorGUI() {
         // We may need to reset the zoom value to the default value
         scaleMap(2f);
@@ -643,11 +667,11 @@ public class GUI {
         canvas.repaint();
         setupMouseListenerForMapEditor();
     }
-    
+
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
@@ -668,35 +692,16 @@ public class GUI {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-    
+        
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-
+    
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-    
-    public void showInformationMessage(StringTemplate template) {
-        canvas.showInformationMessage(template);
-    }
-    
-    public void showMainPanel() {
-        canvas.showMainPanel();
-    }
-    
-    public ColonyPanel showColonyPanel(Colony colony) {
-        return canvas.showColonyPanel(colony);
-    }
-    
-    public boolean requestFocusInWindow() {
-        return canvas.requestFocusInWindow();
-    }
-        
-    public void removeInGameComponents() {
-        canvas.removeInGameComponents();
-    }
+
     
 }

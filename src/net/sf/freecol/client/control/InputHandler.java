@@ -92,7 +92,7 @@ public abstract class InputHandler implements MessageHandler {
             public void run() {
                 if (gui.getCanvas().containsInGameComponents()) {
                     if (freeColClient.getFreeColServer() == null) {
-                        gui.getCanvas().returnToTitle();
+                        gui.returnToTitle();
                     } else {
                         gui.removeInGameComponents();
                     }
