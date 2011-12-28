@@ -65,7 +65,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -417,7 +416,6 @@ public final class ColonyPanel extends FreeColPanel
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        Canvas canvas = getCanvas();
         Colony colony = getColony();
         String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -429,7 +427,7 @@ public final class ColonyPanel extends FreeColPanel
                     unload();
                     break;
                 case WAREHOUSE:
-                    if (canvas.showWarehouseDialog(colony)) {
+                    if (getCanvas().showWarehouseDialog(colony)) {
                         updateWarehousePanel();
                     }
                     break;
@@ -677,12 +675,11 @@ public final class ColonyPanel extends FreeColPanel
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        Canvas canvas = getCanvas();
         if (getColony().getUnitCount() == 0) {
             if (getGUI().showConfirmDialog("abandonColony.text",
                                          "abandonColony.yes",
                                          "abandonColony.no")) {
-                canvas.remove(this);
+                getCanvas().remove(this);
                 getController().abandonColony(getColony());
             }
         } else {
@@ -696,7 +693,7 @@ public final class ColonyPanel extends FreeColPanel
                                              "ok", "cancel")) {
                 return;
             }
-            canvas.remove(this);
+            getCanvas().remove(this);
 
             // remove property listeners
             removePropertyChangeListeners();
