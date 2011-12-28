@@ -58,36 +58,29 @@ import net.sf.freecol.common.resources.ResourceManager;
  * The MapControls are useless by themselves, this object needs to
  * be placed on a JComponent in order to be usable.
  */
-public final class MapControls {
+public abstract class MapControls {
 
-    private final FreeColClient freeColClient;
+    protected final FreeColClient freeColClient;
 
-    private final InfoPanel        infoPanel;
-    private final MiniMap          miniMap;
-    private final UnitButton[]     unitButton;
-    private final JLabel compassRose;
+    protected final InfoPanel        infoPanel;
+    protected final MiniMap          miniMap;
+    protected final UnitButton[]     unitButton;
 
-    private GUI gui;
+    protected GUI gui;
 
-    private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
+    public static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
     /**
      * The basic constructor.
      * @param freeColClient The main controller object for the client
-     * @param gui 
+     * @param gui
      */
     public MapControls(final FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-
-        //
-        // Create GUI Objects
-        //
-
         infoPanel = new InfoPanel(freeColClient, gui);
         miniMap = new MiniMap(freeColClient, gui);
-        compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
- 
+
         final ActionManager am = freeColClient.getActionManager();
 
         List<UnitButton> ubList = new ArrayList<UnitButton>();
@@ -95,7 +88,6 @@ public final class MapControls {
         ubList.add(new UnitButton(am, SkipUnitAction.id));
         ubList.add(new UnitButton(am, SentryAction.id));
         ubList.add(new UnitButton(am, FortifyAction.id));
-//        if ( freeColClient.getGame() != null )  // ** DOUBTFUL !! just for testing
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
             FreeColAction action = am.getFreeColAction(type.getShortId()
@@ -107,33 +99,17 @@ public final class MapControls {
         }
         ubList.add(new UnitButton(am, BuildColonyAction.id));
         ubList.add(new UnitButton(am, DisbandUnitAction.id));
-        unitButton = (ubList.toArray(new UnitButton[0]));
+        unitButton = (ubList.toArray(new UnitButton[ubList.size()]));
 
         //
         // Don't allow them to gain focus
         //
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
-        compassRose.setFocusable(false);
 
         for(int i=0; i<unitButton.length; i++) {
             unitButton[i].setFocusable(false);
         }
-
-        compassRose.setSize(compassRose.getPreferredSize());
-        compassRose.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    int x = e.getX() - compassRose.getWidth()/2;
-                    int y = e.getY() - compassRose.getHeight()/2;
-                    double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
-                    if (theta < 0) {
-                        theta += 2*Math.PI;
-                    }
-                    Direction direction = Direction.values()[(int) Math.floor(theta / (Math.PI/4))];
-                    freeColClient.getInGameController().moveActiveUnit(direction);
-                }
-            });
 
     }
 
@@ -152,50 +128,7 @@ public final class MapControls {
      * Adds the map controls to the given component.
      * @param component The component to add the map controls to.
      */
-    public void addToComponent(Canvas component) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
-            return;
-        }
-
-        //
-        // Relocate GUI Objects
-        //
-
-        infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
-        miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
-        compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
-
-        final int WIDTH = unitButton[0].getWidth();
-        final int SPACE = 5;
-
-        for(int i=0; i<unitButton.length; i++) {
-            int x = miniMap.getWidth() + 1 +
-                    ((infoPanel.getX() - miniMap.getWidth() -
-                      unitButton.length * WIDTH -
-                      (unitButton.length-1) * SPACE - WIDTH) / 2) +
-                    i * (WIDTH + SPACE);
-            int y = component.getHeight() - 40;
-
-            unitButton[i].setLocation(x, y);
-        }
-
-        //
-        // Add the GUI Objects to the container
-        //
-        component.add(infoPanel, CONTROLS_LAYER, false);
-        component.add(miniMap, CONTROLS_LAYER, false);
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
-            component.add(compassRose, CONTROLS_LAYER, false);
-        }
-
-        if (!freeColClient.isMapEditor()) {
-            for(int i=0; i<unitButton.length; i++) {
-                component.add(unitButton[i], CONTROLS_LAYER, false);
-                unitButton[i].refreshAction();
-            }
-        }
-    }
+    public abstract void addToComponent(Canvas component);
 
     /**
      * Returns the width of the InfoPanel.
@@ -221,16 +154,7 @@ public final class MapControls {
      *
      * @param canvas <code>Canvas</code> parent
      */
-    public void removeFromComponent(Canvas canvas) {
-        canvas.remove(infoPanel, false);
-        canvas.remove(miniMap, false);
-        canvas.remove(compassRose, false);
-
-        for(int i=0; i<unitButton.length; i++) {
-            canvas.remove(unitButton[i], false);
-        }
-    }
-
+    public abstract void removeFromComponent(Canvas canvas);
 
     public boolean isShowing() {
         return infoPanel.getParent() != null;

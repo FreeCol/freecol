@@ -44,7 +44,7 @@ public final class UnitButton extends JButton {
 
 	private String actionId;
 	private ActionManager am;
-	
+
     /**
     * The basic constructor.
     * @param am The action manager which holds all FreeColAction.
@@ -55,7 +55,7 @@ public final class UnitButton extends JButton {
         this.actionId = actionId;
         this.am = am;
     }
-    
+
     /**
      * Refreshes the the reference to the FreeColAction stored in the
      * action manager.
@@ -64,7 +64,7 @@ public final class UnitButton extends JButton {
         setAction(null);
         setAction(am.getFreeColAction(actionId));
     }
-    
+
 
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);

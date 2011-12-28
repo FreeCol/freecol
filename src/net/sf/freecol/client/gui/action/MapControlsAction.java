@@ -27,6 +27,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.CornerMapControls;
 
 /**
  * An action for displaying the map controls.
@@ -44,7 +45,7 @@ public class MapControlsAction extends SelectableAction {
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param gui
      */
     MapControlsAction(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, id, ClientOptions.DISPLAY_MAP_CONTROLS);
@@ -83,7 +84,7 @@ public class MapControlsAction extends SelectableAction {
     private void showMapControls(boolean value) {
         if (value && getFreeColClient().isInGame()) {
             if (mapControls == null) {
-                mapControls = new MapControls(getFreeColClient(), gui);
+                mapControls = new CornerMapControls(getFreeColClient(), gui);
             }
             mapControls.update();
         }
