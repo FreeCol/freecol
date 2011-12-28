@@ -46,6 +46,6 @@ public class TradeRouteAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showTradeRouteDialog(null, null);
+        gui.showTradeRouteDialog(null, null);
     }
 }

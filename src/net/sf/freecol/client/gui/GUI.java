@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -707,5 +708,7 @@ public class GUI {
         return canvas.isShowingSubPanel();
     }
 
-    
+    public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
+        return canvas.showTradeRouteDialog(tradeRoute, tile);
+    }
 }
