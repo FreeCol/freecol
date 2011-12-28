@@ -227,7 +227,7 @@ public final class MapEditorController {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeStatusPanel();
-                            gui.getCanvas().requestFocusInWindow();
+                            gui.requestFocusInWindow();
                         }
                     });
                 } catch (IOException e) {

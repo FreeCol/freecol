@@ -1077,7 +1077,7 @@ public final class InGameController implements NetworkConstants {
         } catch (IOException e) {
             gui.errorMessage("couldNotSaveGame");
         }
-        gui.getCanvas().requestFocusInWindow();
+        gui.requestFocusInWindow();
         return result;
     }
 

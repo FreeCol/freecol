@@ -1339,7 +1339,7 @@ public final class InGameInputHandler extends InputHandler {
             gui.refresh();
 
             if (requestFocus && !gui.getCanvas().isShowingSubPanel()) {
-                gui.getCanvas().requestFocusInWindow();
+                gui.requestFocusInWindow();
             }
         }
     }

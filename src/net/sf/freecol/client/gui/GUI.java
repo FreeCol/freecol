@@ -691,7 +691,9 @@ public class GUI {
         return canvas.showColonyPanel(colony);
     }
     
-
+    public boolean requestFocusInWindow() {
+        return canvas.requestFocusInWindow();
+    }
         
     
 }
