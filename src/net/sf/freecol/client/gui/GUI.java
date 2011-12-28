@@ -623,7 +623,7 @@ public class GUI {
             });
         } else {
             if (!loadGame) {
-                canvas.showMainPanel();
+                showMainPanel();
             }
             playSound("sound.intro.general");
         }
@@ -679,6 +679,10 @@ public class GUI {
     
     public void showInformationMessage(StringTemplate template) {
         canvas.showInformationMessage(template);
+    }
+    
+    public void showMainPanel() {
+        canvas.showMainPanel();
     }
     
 }

@@ -480,7 +480,7 @@ public final class ConnectController {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeMainPanel();
-                            gui.getCanvas().showMainPanel();
+                            gui.showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
@@ -488,7 +488,7 @@ public final class ConnectController {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeMainPanel();
-                            gui.getCanvas().showMainPanel();
+                            gui.showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
@@ -496,7 +496,7 @@ public final class ConnectController {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeMainPanel();
-                            gui.getCanvas().showMainPanel();
+                            gui.showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
@@ -504,7 +504,7 @@ public final class ConnectController {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             gui.closeMainPanel();
-                            gui.getCanvas().showMainPanel();
+                            gui.showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );

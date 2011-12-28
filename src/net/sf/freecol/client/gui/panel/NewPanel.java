@@ -327,7 +327,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 break;
             case CANCEL:
                 getCanvas().remove(this);
-                getCanvas().showMainPanel();
+                getGUI().showMainPanel();
                 break;
             case SINGLE:
             case JOIN:
