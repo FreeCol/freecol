@@ -730,6 +730,11 @@ public class GUI {
     public void showColopediaPanel(String nodeId) {
         canvas.showColopediaPanel(nodeId);
     }
+    
+    public void showBuildQueuePanel(Colony colony) {
+        canvas.showBuildQueuePanel(colony);
+    }
+
 
     
 }
