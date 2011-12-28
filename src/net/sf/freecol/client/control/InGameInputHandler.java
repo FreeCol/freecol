@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1078,12 +1077,11 @@ public final class InGameInputHandler extends InputHandler {
         if (n > 0) {
             // Without Brewster, the migrants have already been selected
             // and were updated to the European docks by the server.
-            final Canvas canvas = gui.getCanvas();
             final int m = n;
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < m; i++) {
-                            int index = canvas.showEmigrationPanel(true);
+                            int index = gui.getCanvas().showEmigrationPanel(true);
                             getFreeColClient().askServer().emigrate(index + 1);
                         }
                     }
@@ -1305,11 +1303,12 @@ public final class InGameInputHandler extends InputHandler {
     abstract class NoResultCanvasSwingTask extends SwingTask {
 
         protected Object doWork() {
-            doWork(gui.getCanvas());
+            doNoResultWork();
             return null;
         }
+        
+        abstract void doNoResultWork();
 
-        abstract void doWork(Canvas canvas);
     }
 
     /**
@@ -1336,11 +1335,11 @@ public final class InGameInputHandler extends InputHandler {
             this.requestFocus = requestFocus;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             gui.refresh();
 
-            if (requestFocus && !canvas.isShowingSubPanel()) {
-                canvas.requestFocusInWindow();
+            if (requestFocus && !gui.getCanvas().isShowingSubPanel()) {
+                gui.getCanvas().requestFocusInWindow();
             }
         }
     }
@@ -1367,8 +1366,8 @@ public final class InGameInputHandler extends InputHandler {
             this.goods = goods;
         }
 
-        protected void doWork(Canvas canvas) {
-            goods = canvas.showCaptureGoodsDialog(unit, goods);
+        protected void doNoResultWork() {
+            goods = gui.getCanvas().showCaptureGoodsDialog(unit, goods);
             if (!goods.isEmpty()) {
                 getFreeColClient().askServer().loot(unit, defenderId, goods);
             }
@@ -1400,7 +1399,7 @@ public final class InGameInputHandler extends InputHandler {
             this.camps = camps;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             // Player names the land.
             Tile tile = unit.getTile();
             String name = gui.showInputDialog(tile,
@@ -1461,7 +1460,7 @@ public final class InGameInputHandler extends InputHandler {
             this.defaultName = defaultName;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             String name = gui.showInputDialog((unit == null) ? null
                 : unit.getTile(),
                 StringTemplate.template("nameRegion.text")
@@ -1480,7 +1479,7 @@ public final class InGameInputHandler extends InputHandler {
             _newTile = newTile;
         }
 
-        void doWork(Canvas canvas) {
+        void doNoResultWork() {
             gui.refreshTile(_oldTile);
             gui.refreshTile(_newTile);
         }
@@ -1522,7 +1521,7 @@ public final class InGameInputHandler extends InputHandler {
             this.focus = focus;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             if (focus || !gui.onScreen(sourceTile)) {
                 gui.setFocusImmediately(sourceTile);
             }
@@ -1575,7 +1574,7 @@ public final class InGameInputHandler extends InputHandler {
             this.focus = focus;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             if (focus || !gui.onScreen(unit.getTile())) {
                 gui.setFocusImmediately(unit.getTile());
             }
@@ -1597,9 +1596,9 @@ public final class InGameInputHandler extends InputHandler {
             this.normalTile = normalTile;
         }
 
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             final Tile tile = colony.getTile();
-            canvas.showColonyPanel(colony)
+            gui.getCanvas().showColonyPanel(colony)
                 .addClosingCallback(new Runnable() {
                         public void run() {
                             tile.readFromXMLElement(normalTile);
@@ -1622,7 +1621,7 @@ public final class InGameInputHandler extends InputHandler {
      * This task updates the menu bar.
      */
     class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
-        protected void doWork(Canvas canvas) {
+        protected void doNoResultWork() {
             gui.updateMenuBar();
         }
     }
@@ -1631,8 +1630,8 @@ public final class InGameInputHandler extends InputHandler {
      * This task shows the victory panel.
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
-        protected void doWork(Canvas canvas) {
-            canvas.showVictoryPanel();
+        protected void doNoResultWork() {
+            gui.getCanvas().showVictoryPanel();
         }
     }
 
