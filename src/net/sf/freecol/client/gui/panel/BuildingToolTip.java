@@ -27,7 +27,6 @@ import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -60,7 +59,7 @@ public class BuildingToolTip extends JToolTip {
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingToolTip(FreeColClient freeColClient, Building building, GUI gui, Canvas parent) {
+    public BuildingToolTip(FreeColClient freeColClient, Building building, GUI gui) {
         this.gui = gui;
 
         int workplaces = building.getUnitCapacity();

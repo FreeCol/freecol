@@ -908,7 +908,7 @@ public final class ColonyPanel extends FreeColPanel
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(getFreeColClient(), building, getGUI(), getCanvas());
+                super(getFreeColClient(), building, getGUI());
             }
 
             public void autoscroll(Point p) {
@@ -1575,7 +1575,6 @@ public final class ColonyPanel extends FreeColPanel
                 Tile tile = colonyTile.getWorkTile();
                 Colony colony = getColony();
                 Player player = unit.getOwner();
-                Canvas canvas = getCanvas();
 
                 if (tile.getOwningSettlement() != colony) {
                     // Need to acquire the tile before working it.
