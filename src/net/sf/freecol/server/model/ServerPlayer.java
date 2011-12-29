@@ -2215,8 +2215,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
         }
 
-        // Hand over the colony
+        // Hand over the colony.
         colony.changeOwner(attackerPlayer);
+        // Remove goods party modifiers as they apply to a different monarch.
+        FeatureContainer fc = colony.getFeatureContainer();
+        for (Modifier m : fc.getModifiers()) {
+            if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
+                fc.removeModifier(m);
+            }
+        }
 
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.

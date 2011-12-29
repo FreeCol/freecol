@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
@@ -46,6 +47,8 @@ import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -604,20 +607,41 @@ public class EuropeanAIPlayer extends AIPlayer {
 
 
     /**
-     * Cheats for the AI :-)
+     * Cheats for the AI.  Please try to centralize cheats here.
+     *
+     * TODO: Remove when the AI is good enough.
      */
     private void cheat() {
         logger.finest("Entering method cheat");
-        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-        for (GoodsType goodsType : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
-            getPlayer().getMarket().setArrears(goodsType, 0);
+        Specification spec = getAIMain().getGame().getSpecification();
+        Market market = getPlayer().getMarket();
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+            if (market.getArrears(goodsType) > 0
+                && getAIRandom().nextInt(5) == 0) {
+                market.setArrears(goodsType, 0);
+                // Just remove one goods party modifier (we can not
+                // currently identify which modifier applies to which
+                // goods type, but that is not worth fixing for the
+                // benefit of `temporary' cheat code).  If we do not
+                // do this, AI colonies accumulate heaps of party
+                // modifiers because of the cheat boycott removal.
+                findOne: for (Colony c : getPlayer().getColonies()) {
+                    FeatureContainer fc = c.getFeatureContainer();
+                    for (Modifier m : fc.getModifiers()) {
+                        if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
+                            fc.removeModifier(m);
+                            break findOne;
+                        }
+                    }
+                }
+            }
         }
 
         //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
         if (getAIMain().getFreeColServer().isSingleplayer()
             && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
-            List<UnitType> unitTypes = getAIMain().getGame().getSpecification().getUnitTypeList();
+            List<UnitType> unitTypes = spec.getUnitTypeList();
 
             if (getAIRandom().nextInt(10) == 1) {
                 List<WorkerWish> workerWishes = new ArrayList<WorkerWish>();
@@ -638,7 +662,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                             if (unit != null && unit.isColonist()) {
                                 // no need to equip artillery units with muskets or horses
                                 // TODO: cleanup magic numbers 50 and 1
-                                Specification spec = getAIMain().getGame().getSpecification();
                                 GoodsType muskets = spec.getGoodsType("model.goods.muskets");
                                 GoodsType horses = spec.getGoodsType("model.goods.horses");
                                 getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
