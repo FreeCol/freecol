@@ -82,7 +82,7 @@ public final class VictoryPanel extends FreeColPanel {
         setSize(getPreferredSize());
 
         boolean high = getFreeColClient().askServer().checkHighScore();
-        getCanvas().showHighScoresPanel((high) ? "highscores.yes"
+        getGUI().showHighScoresPanel((high) ? "highscores.yes"
             : "highscores.no");
     }
 

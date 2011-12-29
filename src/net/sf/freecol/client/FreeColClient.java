@@ -492,6 +492,22 @@ public final class FreeColClient {
     }
 
     /**
+     * Quits the application. This method uses {@link #showConfirmDialog} in
+     * order to get a "Are you sure"-confirmation from the user.
+     */
+    public void retire() {
+        if (gui.showConfirmDialog("retireDialog.areYouSure.text",
+                              "ok", "cancel")) {
+            setIsRetired(true);
+            if (askServer().retire()) {
+                // Panel exit calls quit.
+                gui.showHighScoresPanel(null);
+            }
+            quit();
+        }
+    }
+
+    /**
      * Sets the <code>Client</code> that shall be used to send messages to the
      * server.
      *
@@ -559,11 +575,11 @@ public final class FreeColClient {
         this.loggedIn = loggedIn;
     }
 
+
+
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;
     }
-
-
 
     /**
      * Sets the <code>Player</code> that uses this client.
@@ -576,6 +592,7 @@ public final class FreeColClient {
         this.player = player;
     }
 
+
     /**
      * Sets whether or not this game is a singleplayer game.
      *
@@ -586,7 +603,6 @@ public final class FreeColClient {
     public void setSingleplayer(boolean singleplayer) {
         this.singleplayer = singleplayer;
     }
-
 
     /**
      * Start the game skipping turns.
@@ -600,7 +616,7 @@ public final class FreeColClient {
         gui.closeMenus();
         askServer().startSkipping();
     }
-
+    
     private void exitActions () {
        try {
           // action: delete outdated autosave files

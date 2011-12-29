@@ -802,21 +802,7 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-    /**
-     * Quits the application. This method uses {@link #showConfirmDialog} in
-     * order to get a "Are you sure"-confirmation from the user.
-     */
-    public void retire() {
-        if (showConfirmDialog("retireDialog.areYouSure.text",
-                              "ok", "cancel")) {
-            freeColClient.setIsRetired(true);
-            if (freeColClient.askServer().retire()) {
-                // Panel exit calls quit.
-                showHighScoresPanel(null);
-            }
-            freeColClient.quit();
-        }
-    }
+
 
     /**
      * Closes all panels, changes the background and shows the main menu.

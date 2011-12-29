@@ -299,15 +299,19 @@ public class GUI {
         return imageLibrary;
     }
     
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        return canvas.getLoadingSavegameDialog();
+    }
+    
     public float getMapScale() {
         return mapViewer.getMapScale();
     }
+
     
     public MapViewer getMapViewer() {
         return mapViewer;
     }
 
-    
     public Tile getSelectedTile() {
         return mapViewer.getSelectedTile();
     }
@@ -315,7 +319,7 @@ public class GUI {
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
-
+    
     public Rectangle getTileBounds(Tile tile) {
         return mapViewer.getTileBounds(tile);
     }
@@ -334,20 +338,24 @@ public class GUI {
             splash.dispose();
         }
     }
+
+    public boolean isShowingSubPanel() {
+        return canvas.isShowingSubPanel();
+    }
     
     public boolean isWindowed() {
         return windowed;
     }
-
+    
+    
     public void moveTileCursor(Direction direction) {
         mapViewer.moveTileCursor(direction);
     }
-    
+
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }
-    
-    
+
     /**
      * Plays some sound. Parameter == null stops playing a sound.
      *
@@ -367,7 +375,7 @@ public class GUI {
             }
         }
     }
-
+    
     public void quit() {
         if (!isWindowed()) {
             try {
@@ -384,11 +392,11 @@ public class GUI {
         mapViewer.forceReposition();
         canvas.refresh();
     }
-    
+
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
-
+    
     /**
      * Refreshes the screen at the specified Tile.
      *
@@ -399,15 +407,16 @@ public class GUI {
             canvas.repaint(mapViewer.getTileBounds(t));
         }
     }
+    
 
     public void removeInGameComponents() {
         canvas.removeInGameComponents();
     }
     
+
     public boolean requestFocusInWindow() {
         return canvas.requestFocusInWindow();
     }
-    
 
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
@@ -416,32 +425,31 @@ public class GUI {
         }
     }
     
-
     public void returnToTitle() {
         canvas.returnToTitle();
     }
-
+    
     public void scaleMap(float delta) {
         mapViewer.scaleMap(delta);
         refresh();
     }
-    
+
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
-    
+
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
-
+     
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocusImmediately(tileToFocus);
     }
-
+    
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
-     
+    
     public void setupInGameMenuBar() {
         frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
     }
@@ -461,8 +469,21 @@ public class GUI {
         
     }
     
+    public void showBuildQueuePanel(Colony colony) {
+        canvas.showBuildQueuePanel(colony);
+    }
+    
+    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
+            List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(tile, text, cancelText, choices);
+    }
+    
     public ColonyPanel showColonyPanel(Colony colony) {
         return canvas.showColonyPanel(colony);
+    }
+    
+    public void showColopediaPanel(String nodeId) {
+        canvas.showColopediaPanel(nodeId);
     }
     
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
@@ -473,15 +494,23 @@ public class GUI {
             String okText, String cancelText) {
         return canvas.showConfirmDialog(tile, text, okText, cancelText);
     }
-    
+        
     public boolean showEndTurnDialog(List<Unit> units) {
         return canvas.showEndTurnDialog(units);
+    }
+    
+    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
+        canvas.showGameOptionsDialog(editable, loadCustomOptions);
+    }
+    
+    public void showHighScoresPanel(String messageId) {
+        canvas.showHighScoresPanel(messageId);
     }
     
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
     }
-    
+
     public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
         canvas.showInformationMessage(displayObject, template);
     }
@@ -489,11 +518,11 @@ public class GUI {
     public void showInformationMessage(String messageId) {
         canvas.showInformationMessage(messageId);
     }
-    
+
     public void showInformationMessage(StringTemplate template) {
         canvas.showInformationMessage(template);
     }
-        
+    
     public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
             String okText, String cancelText,
             boolean rejectEmptyString) {
@@ -504,14 +533,22 @@ public class GUI {
         return canvas.showLoadDialog(directory);
     }
     
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
+        return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
+    }
+    
     public void showMainPanel() {
         canvas.showMainPanel();
     }
-    
+
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){
         return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustomOptions);
     }
-
+    
+    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
+        return canvas.showNegotiationDialog(unit, settlement, agreement);
+    }
+    
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, defaultName);
     }
@@ -521,11 +558,11 @@ public class GUI {
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
     }
-
+    
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-    
+        
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
@@ -535,7 +572,11 @@ public class GUI {
                 mapViewer.getCursor().getCanvasX(),
                 mapViewer.getCursor().getCanvasY());
     }
-    
+
+    public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
+        return canvas.showTradeRouteDialog(tradeRoute, tile);
+    }
+
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -672,11 +713,11 @@ public class GUI {
         canvas.repaint();
         setupMouseListenerForMapEditor();
     }
-
+    
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-    
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
@@ -691,58 +732,21 @@ public class GUI {
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-    
+
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-        
+    
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-    
+
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
-    }
-
-    public boolean isShowingSubPanel() {
-        return canvas.isShowingSubPanel();
-    }
-
-    public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
-        return canvas.showTradeRouteDialog(tradeRoute, tile);
-    }
-    
-    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
-            List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(tile, text, cancelText, choices);
-    }
-    
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
-        return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
-    }
-
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
-        return canvas.getLoadingSavegameDialog();
-    }
-    
-    public void showColopediaPanel(String nodeId) {
-        canvas.showColopediaPanel(nodeId);
-    }
-    
-    public void showBuildQueuePanel(Colony colony) {
-        canvas.showBuildQueuePanel(colony);
-    }
-
-    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
-        return canvas.showNegotiationDialog(unit, settlement, agreement);
-    }
-    
-    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        canvas.showGameOptionsDialog(editable, loadCustomOptions);
     }
         
 
