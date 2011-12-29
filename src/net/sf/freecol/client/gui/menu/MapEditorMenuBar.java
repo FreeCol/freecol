@@ -116,7 +116,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
                     FileOption fileOption = (FileOption) options.getOption(MapGeneratorOptions.IMPORT_FILE);
                     fileOption.setValue(saveGameFile);
                     freeColClient.getMapEditorController().saveGame(saveGameFile);
-                    gui.getCanvas().newGame();
+                    freeColClient.newGame();
                 }
             });
         menu.add(playItem);

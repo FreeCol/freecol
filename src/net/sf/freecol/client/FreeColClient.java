@@ -48,6 +48,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -275,6 +276,16 @@ public final class FreeColClient {
     }
 
     /**
+     * Quits the application. This method uses {@link #showConfirmDialog} in
+     * order to get a "Are you sure"-confirmation from the user.
+     */
+    public void askToQuit() {
+        if (gui.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+            quit();
+        }
+    }
+
+    /**
      *  Verifies if this client can save the current game
      *  Clients that do not have the server running, or that have not the required permissions
      *cannot save and should have the menu entry disabled
@@ -292,6 +303,7 @@ public final class FreeColClient {
         return true;
     }
 
+
     /**
      * Continue playing after winning the game.
      */
@@ -299,10 +311,10 @@ public final class FreeColClient {
         client.send(DOMMessage.createNewRootElement("continuePlaying"));
     }
 
-
     public boolean currentPlayerIsMyPlayer() {
         return inGame && game.getCurrentPlayer().equals(player);
     }
+
 
     /**
      * Gets the object responsible for keeping and updating the actions.
@@ -312,7 +324,6 @@ public final class FreeColClient {
     public ActionManager getActionManager() {
         return actionManager;
     }
-
 
     /**
      * Gets the <code>Client</code> that can be used to send messages to the
@@ -400,6 +411,7 @@ public final class FreeColClient {
         return player;
     }
 
+
     /**
      * Gets the controller that will be used before the game has been started.
      *
@@ -435,7 +447,6 @@ public final class FreeColClient {
         return getMyPlayer().isAdmin();
     }
 
-
     /**
      * Get the <code>Headless</code> value.
      *
@@ -469,6 +480,7 @@ public final class FreeColClient {
         return mapEditor;
     }
 
+
     /**
      * Is the user playing in singleplayer mode.
      *
@@ -480,6 +492,28 @@ public final class FreeColClient {
         return singleplayer;
     }
 
+    /**
+     * Displays a quit dialog and, if desired, logs out of the current game and
+     * shows the new game panel.
+     */
+    public void newGame() {
+        Specification specification = null;
+        if (getGame() != null) {
+            if (isMapEditor()) {
+                specification = getGame().getSpecification();
+            } else if (gui.showConfirmDialog("stopCurrentGame.text",
+                                         "stopCurrentGame.yes",
+                                         "stopCurrentGame.no")) {
+                getConnectController().quitGame(true);
+                FreeCol.incrementFreeColSeed();
+            } else {
+                return;
+            }
+            gui.removeInGameComponents();
+        }
+
+        gui.showNewPanel(specification);
+    }
 
     /**
      * Quits the application without any questions.
@@ -556,6 +590,8 @@ public final class FreeColClient {
         this.inGame = inGame;
     }
 
+
+
     /**
      * Sets whether or not the user has retired the game.
      *
@@ -576,7 +612,6 @@ public final class FreeColClient {
     }
 
 
-
     public void setMapEditor(boolean mapEditor) {
         this.mapEditor = mapEditor;
     }
@@ -591,8 +626,7 @@ public final class FreeColClient {
     public void setMyPlayer(Player player) {
         this.player = player;
     }
-
-
+    
     /**
      * Sets whether or not this game is a singleplayer game.
      *
@@ -603,7 +637,7 @@ public final class FreeColClient {
     public void setSingleplayer(boolean singleplayer) {
         this.singleplayer = singleplayer;
     }
-
+    
     /**
      * Start the game skipping turns.
      *
@@ -617,6 +651,7 @@ public final class FreeColClient {
         askServer().startSkipping();
     }
     
+
     private void exitActions () {
        try {
           // action: delete outdated autosave files
@@ -644,6 +679,7 @@ public final class FreeColClient {
        }
     }
     
+
     /**
      * Loads the client options.
      * There are several sources:
@@ -696,17 +732,6 @@ public final class FreeColClient {
         // Update the actions, resources may have changed.
         if (actionManager != null)
             actionManager.update();
-    }
-    
-
-    /**
-     * Quits the application. This method uses {@link #showConfirmDialog} in
-     * order to get a "Are you sure"-confirmation from the user.
-     */
-    public void askToQuit() {
-        if (gui.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
-            quit();
-        }
     }
     
 }

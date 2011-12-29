@@ -675,28 +675,6 @@ public final class Canvas extends JDesktopPane {
         return getShowingSubPanel() != null;
     }
 
-    /**
-     * Displays a quit dialog and, if desired, logs out of the current game and
-     * shows the new game panel.
-     */
-    public void newGame() {
-        Specification specification = null;
-        if (freeColClient.getGame() != null) {
-            if (freeColClient.isMapEditor()) {
-                specification = freeColClient.getGame().getSpecification();
-            } else if (showConfirmDialog("stopCurrentGame.text",
-                                         "stopCurrentGame.yes",
-                                         "stopCurrentGame.no")) {
-                freeColClient.getConnectController().quitGame(true);
-                FreeCol.incrementFreeColSeed();
-            } else {
-                return;
-            }
-            removeInGameComponents();
-        }
-
-        showNewPanel(specification);
-    }
 
     /**
      * Paints this component. This method will use {@link MapViewer#display} to draw

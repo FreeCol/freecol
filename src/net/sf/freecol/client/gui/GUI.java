@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -549,6 +550,10 @@ public class GUI {
         return canvas.showNegotiationDialog(unit, settlement, agreement);
     }
     
+    public void showNewPanel(Specification specification) {
+        canvas.showNewPanel(specification);
+    }
+    
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, defaultName);
     }
@@ -558,15 +563,15 @@ public class GUI {
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
     }
-    
+        
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-        
+    
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
-    
+
     public void showTilePopUpAtSelectedTile() {
         canvas.showTilePopup(getSelectedTile(),
                 mapViewer.getCursor().getCanvasX(),
@@ -576,7 +581,7 @@ public class GUI {
     public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
         return canvas.showTradeRouteDialog(tradeRoute, tile);
     }
-
+    
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
@@ -713,11 +718,11 @@ public class GUI {
         canvas.repaint();
         setupMouseListenerForMapEditor();
     }
-    
+
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-
+    
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
@@ -728,27 +733,27 @@ public class GUI {
     public void updateGoldLabel() {
         frame.getJMenuBar().repaint();
     }
-    
+
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-
+    
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-    
+
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-
+        
+    
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-        
 
     
 }
