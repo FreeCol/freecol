@@ -698,4 +698,15 @@ public final class FreeColClient {
             actionManager.update();
     }
     
+
+    /**
+     * Quits the application. This method uses {@link #showConfirmDialog} in
+     * order to get a "Are you sure"-confirmation from the user.
+     */
+    public void askToQuit() {
+        if (gui.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+            quit();
+        }
+    }
+    
 }

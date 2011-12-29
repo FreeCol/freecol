@@ -27,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -66,9 +67,9 @@ public final class WindowedFrame extends JFrame {
     
     
 
-    public void setCanvas(Canvas canvas) {
+    public void setCanvas(FreeColClient freeColClient, Canvas canvas) {
         this.canvas = canvas;
-        addWindowListener(new WindowedFrameListener(canvas));
+        addWindowListener(new WindowedFrameListener(freeColClient));
     }
 
 

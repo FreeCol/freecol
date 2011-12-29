@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 
 /**
  * The fullscreen frame that contains everything. If full screen mode is not
@@ -62,9 +63,9 @@ public final class FullScreenFrame extends JFrame {
         logger.info("FullScreenFrame created.");
     }
 
-    public void setCanvas(Canvas canvas) {
+    public void setCanvas(FreeColClient freeColClient, Canvas canvas) {
         this.canvas = canvas;
-        addWindowListener(new WindowedFrameListener(canvas));
+        addWindowListener(new WindowedFrameListener(freeColClient));
     }
 
     /**

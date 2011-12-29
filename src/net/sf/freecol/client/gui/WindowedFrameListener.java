@@ -23,19 +23,21 @@ package net.sf.freecol.client.gui;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import net.sf.freecol.client.FreeColClient;
+
 /**
 * The WindowListener for the WindowedFrame class.
 */
 public final class WindowedFrameListener implements WindowListener {
 
-    private final Canvas parent;
-    
+    private FreeColClient freeColClient;
+
     /**
     * Constructs this WindowListener.
     * @param canvas The <code>Canvas</code>.
     */
-    public WindowedFrameListener(Canvas canvas) {
-        parent = canvas;
+    public WindowedFrameListener(FreeColClient freeColClient) {
+        this.freeColClient = freeColClient;
     }
     
     /**
@@ -57,7 +59,7 @@ public final class WindowedFrameListener implements WindowListener {
     * @param event The event that has information on the action.
     */
     public void windowClosing(WindowEvent event) {
-        parent.askToQuit();
+        freeColClient.askToQuit();
     }
     
     /**

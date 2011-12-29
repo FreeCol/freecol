@@ -169,7 +169,7 @@ public class GUI {
         }
         frame.setJMenuBar(menuBar);
         if (frame instanceof WindowedFrame) {
-            ((WindowedFrame) frame).setCanvas(canvas);
+            ((WindowedFrame) frame).setCanvas(freeColClient, canvas);
             frame.getContentPane().add(canvas);
             if (getWindowBounds() != null) {
                 frame.setBounds(getWindowBounds());
@@ -177,7 +177,7 @@ public class GUI {
                 frame.pack();
             }
         } else if (frame instanceof FullScreenFrame) {
-            ((FullScreenFrame) frame).setCanvas(canvas);
+            ((FullScreenFrame) frame).setCanvas(freeColClient, canvas);
             frame.getContentPane().add(canvas);
         }
         mapViewer.forceReposition();
