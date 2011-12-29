@@ -31,6 +31,8 @@ public interface NetworkConstants {
     public static final int STEAL_LAND = -1;
 
     // Trade
-    public static final int NO_TRADE = -1,
-                            NO_NEED_FOR_THE_GOODS = 0;
+    public static final int NO_TRADE_GOODS = 0,
+                            NO_TRADE = -1,
+                            NO_TRADE_HAGGLE = -2,
+                            NO_TRADE_HOSTILE = -3;
 }

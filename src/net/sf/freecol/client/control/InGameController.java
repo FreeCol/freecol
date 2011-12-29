@@ -3000,6 +3000,33 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Displays an appropriate trade failure message.
+     *
+     * @param fail The failure state.
+     * @param settlement The <code>Settlement</code> that failed to trade.
+     * @param goods The <code>Goods</code> that failed to trade.
+     */
+    private void showTradeFail(int fail, Settlement settlement, Goods goods) {
+        switch (fail) {
+        case NO_TRADE_GOODS:
+            gui.showInformationMessage(settlement,
+                StringTemplate.template("trade.noNeedForTheGoods")
+                .add("%goods%", goods.getNameKey()));
+            return;
+        case NO_TRADE_HAGGLE:
+            gui.showInformationMessage(settlement, "trade.noTradeHaggle");
+            break;
+        case NO_TRADE_HOSTILE:
+            gui.showInformationMessage(settlement, "trade.noTradeHostile");
+            break;
+        case NO_TRADE: // Proposal was refused
+        default:
+            gui.showInformationMessage(settlement, "trade.noTrade");
+            break;
+        }
+    }
+
+    /**
      * User interaction for buying from the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
@@ -3029,11 +3056,9 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askServer().buyProposition(unit, settlement,
                     goods, gold);
-                if (gold == NO_TRADE) { // Proposal was refused
-                    gui.showInformationMessage(settlement, "trade.noTrade");
+                if (gold <= 0) {
+                    showTradeFail(gold, settlement, goods);
                     return;
-                } else if (gold < 0) {
-                    return; // Server fail
                 }
 
                 // Show dialog for buy proposal
@@ -3078,13 +3103,8 @@ public final class InGameController implements NetworkConstants {
                 gold = askServer().sellProposition(unit, settlement,
                     goods, gold);
 
-                if (gold == NO_NEED_FOR_THE_GOODS) {
-                    gui.showInformationMessage(settlement,
-                        StringTemplate.template("trade.noNeedForTheGoods")
-                        .add("%goods%", goods.getNameKey()));
-                    return;
-                } else if (gold == NO_TRADE) {
-                    gui.showInformationMessage(settlement, "trade.noTrade");
+                if (gold <= 0) {
+                    showTradeFail(gold, settlement, goods);
                     return;
                 }
 

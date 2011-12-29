@@ -530,7 +530,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         String goldKey = "tradeGold#" + goods.getType().getId() + "#" + goods.getAmount()
             + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
-
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
             int price = ((IndianSettlement) settlement).getPriceToSell(goods)
@@ -564,7 +563,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     return gold;
                 } else {
                     sessionRegister.put(goldKey, new Integer(-1));
-                    return NetworkConstants.NO_TRADE;
+                    return NetworkConstants.NO_TRADE_HAGGLE;
                 }
             }
         }
@@ -585,10 +584,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         logger.finest("Entering method sellProposition");
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
-        // the client should have prevented this
-        if (getPlayer().atWarWith(otherPlayer)) {
-            return NetworkConstants.NO_TRADE;
-        }
         // don't pay for more than fits in the warehouse
         int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
         amount = Math.min(amount, goods.getAmount());

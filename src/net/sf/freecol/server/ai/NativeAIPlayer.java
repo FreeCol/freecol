@@ -325,7 +325,7 @@ public class NativeAIPlayer extends AIPlayer {
                 price *= 2;
                 break;
             default:
-                return NetworkConstants.NO_TRADE;
+                return NetworkConstants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<Modifier>();
             Unit missionary = is.getMissionary(buyer);
@@ -355,7 +355,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
         if (getAIRandom().nextInt(3 + haggling) >= 3) {
             sessionRegister.put(goldKey, new Integer(-1));
-            return NetworkConstants.NO_TRADE;
+            return NetworkConstants.NO_TRADE_HAGGLE;
         }
         sessionRegister.put(goldKey, new Integer(gold));
         sessionRegister.put(hagglingKey, new Integer(haggling + 1));
@@ -371,7 +371,7 @@ public class NativeAIPlayer extends AIPlayer {
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
+     *         {@link NetworkConstants#NO_TRADE*}.
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
@@ -394,11 +394,11 @@ public class NativeAIPlayer extends AIPlayer {
                 break;
             case ANGRY:
                 if (!goods.getType().isMilitaryGoods())
-                    return NetworkConstants.NO_TRADE;
+                    return NetworkConstants.NO_TRADE_HOSTILE;
                 price /= 2;
                 break;
             default:
-                return NetworkConstants.NO_TRADE;
+                return NetworkConstants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<Modifier>();
             Unit missionary = is.getMissionary(seller);
@@ -426,7 +426,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
         if (getAIRandom().nextInt(3 + haggling) >= 3) {
             sessionRegister.put(goldKey, new Integer(-1));
-            return NetworkConstants.NO_TRADE;
+            return NetworkConstants.NO_TRADE_HAGGLE;
         }
         sessionRegister.put(goldKey, new Integer(gold));
         sessionRegister.put(hagglingKey, new Integer(haggling + 1));
