@@ -320,6 +320,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             if (!sales.isEmpty()) {
                 return "[" + Utils.join(", ", sales) + "]";
             }
+        } else if (loc instanceof Settlement
+            && ((Settlement)loc).getOwner().atWarWith(unit.getOwner())) {
+            return "[" + Messages.message("model.stance.war") + "]";
         } else if (loc instanceof Settlement && !goodsTypes.isEmpty()) {
             List<String> sales = new ArrayList<String>();
             for (GoodsType goodsType : goodsTypes) {
