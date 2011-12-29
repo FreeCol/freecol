@@ -287,7 +287,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 }
                 break;
             case GAME_OPTIONS:
-                getGUI().getCanvas().showGameOptionsDialog(getFreeColClient().isAdmin(), true);
+                getGUI().showGameOptionsDialog(getFreeColClient().isAdmin(), true);
                 break;
             case MAP_GENERATOR_OPTIONS:
                 OptionGroup mgo = getFreeColClient().getGame()

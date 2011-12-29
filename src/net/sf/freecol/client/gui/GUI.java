@@ -741,6 +741,9 @@ public class GUI {
         return canvas.showNegotiationDialog(unit, settlement, agreement);
     }
     
+    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
+        canvas.showGameOptionsDialog(editable, loadCustomOptions);
+    }
         
 
     

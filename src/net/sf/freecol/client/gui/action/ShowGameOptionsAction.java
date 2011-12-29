@@ -47,6 +47,6 @@ public class ShowGameOptionsAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showGameOptionsDialog(false, false);
+        gui.showGameOptionsDialog(false, false);
     }
 }
