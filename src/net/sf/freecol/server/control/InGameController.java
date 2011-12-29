@@ -1487,13 +1487,17 @@ public final class InGameController extends Controller {
         if (!session.getBuy()) {
             return DOMMessage.clientError("Proposing to buy in a session where buying is not allowed.");
         }
+        ChangeSet cs = new ChangeSet();
+        if (settlement instanceof IndianSettlement) {
+            csSpeakToChief(serverPlayer, (IndianSettlement)settlement,
+                           false, cs);
+        }
 
         // AI considers the proposition, return with a gold value
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int gold = ai.buyProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        ChangeSet cs = new ChangeSet();
         cs.addAttribute(See.only(serverPlayer),
                         "gold", Integer.toString(gold));
         return cs.build(serverPlayer);
@@ -1520,13 +1524,17 @@ public final class InGameController extends Controller {
         if (!session.getSell()) {
             return DOMMessage.clientError("Proposing to sell in a session where selling is not allowed.");
         }
+        ChangeSet cs = new ChangeSet();
+        if (settlement instanceof IndianSettlement) {
+            csSpeakToChief(serverPlayer, (IndianSettlement)settlement,
+                           false, cs);
+        }
 
         // AI considers the proposition, return with a gold value
         AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
         int gold = ai.sellProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        ChangeSet cs = new ChangeSet();
         cs.addAttribute(See.only(serverPlayer),
                         "gold", Integer.toString(gold));
         return cs.build(serverPlayer);
