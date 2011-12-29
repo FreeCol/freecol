@@ -2716,7 +2716,7 @@ public final class InGameController implements NetworkConstants {
         ClientOptions options = freeColClient.getClientOptions();
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
-            gui.getCanvas().paintImmediately(gui.getCanvas().getBounds());
+            gui.paintImmediatelyCanvasInItsBounds();
             try {
                 Thread.sleep(UNIT_LAST_MOVE_DELAY);
             } catch (InterruptedException e) {} // Ignore

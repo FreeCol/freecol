@@ -754,6 +754,9 @@ public class GUI {
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-
+    
+    public void paintImmediatelyCanvasInItsBounds() {
+        canvas.paintImmediately(canvas.getBounds());
+    }
     
 }

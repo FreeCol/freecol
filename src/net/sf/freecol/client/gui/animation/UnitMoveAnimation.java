@@ -101,7 +101,7 @@ final class UnitMoveAnimation {
                     
                     // Painting the whole screen once to get rid of
                     // disposed dialog-boxes.
-                    gui.getCanvas().paintImmediately(gui.getCanvas().getBounds());
+                    gui.paintImmediatelyCanvasInItsBounds();
                     
                     int dropFrames = 0;
                     Point point = srcPoint;

@@ -65,7 +65,7 @@ public final class UnitImageAnimation {
             return;
         } 
         // Painting the whole screen once to get rid of disposed dialog-boxes.
-        gui.getCanvas().paintImmediately(gui.getCanvas().getBounds());
+        gui.paintImmediatelyCanvasInItsBounds();
         gui.executeWithUnitOutForAnimation(unit, unit.getTile(), new OutForAnimationCallback() {
             public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                 for (AnimationEvent event : animation) {
