@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
@@ -95,14 +94,7 @@ public class ScaleMapAction extends FreeColAction {
          */
         final int COLUMNS = 5;
 
-        final Game game = freeColClient.getGame();
-        final Map oldMap = game.getMap();
-
-        final Canvas canvas = gui.getCanvas();
-        final String okText = Messages.message("ok");
-        final String cancelText = Messages.message("cancel");
-        final String widthText = Messages.message("width");
-        final String heightText = Messages.message("height");
+        final Map oldMap = freeColClient.getGame().getMap();
 
         final JTextField inputWidth = new JTextField(Integer.toString(oldMap.getWidth()), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(oldMap.getHeight()), COLUMNS);
@@ -133,10 +125,10 @@ public class ScaleMapAction extends FreeColAction {
                 }
             }
         };
-        JButton okButton = new JButton(okText);
+        JButton okButton = new JButton(Messages.message("ok"));
         buttons.add(okButton);
 
-        JButton cancelButton = new JButton(cancelText);
+        JButton cancelButton = new JButton(Messages.message("cancel"));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 inputDialog.setResponse(null);
@@ -149,9 +141,9 @@ public class ScaleMapAction extends FreeColAction {
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);
 
-        JLabel widthLabel = new JLabel(widthText);
+        JLabel widthLabel = new JLabel(Messages.message("width"));
         widthLabel.setLabelFor(inputWidth);
-        JLabel heightLabel = new JLabel(heightText);
+        JLabel heightLabel = new JLabel(Messages.message("height"));
         heightLabel.setLabelFor(inputHeight);
 
         JPanel widthPanel = new JPanel(new FlowLayout());
@@ -169,7 +161,7 @@ public class ScaleMapAction extends FreeColAction {
 
         inputDialog.setSize(inputDialog.getPreferredSize());
 
-        return canvas.showFreeColDialog(inputDialog);
+        return gui.getCanvas().showFreeColDialog(inputDialog);
     }
 
     private class MapSize {
