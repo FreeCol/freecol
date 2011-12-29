@@ -3277,6 +3277,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addName("%colony%", colony.getName())
                 .addName("%amount%", Integer.toString(amount))
                 .add("%goods%", goodsType.getNameKey()));
+            cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
             logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);
         }

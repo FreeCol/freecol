@@ -92,6 +92,7 @@ public final class InGameInputHandler extends InputHandler {
         super(freeColClient, gui);
     }
 
+
     /**
      * Deals with incoming messages that have just been received.
      *
@@ -102,75 +103,84 @@ public final class InGameInputHandler extends InputHandler {
      */
     @Override
     public Element handle(Connection connection, Element element) {
-        Element reply = null;
+        if (element == null) {
+            throw new RuntimeException("Received empty (null) message!");
+        }
 
-        if (element != null) {
-            String type = element.getTagName();
+        Element reply;
+        String type = element.getTagName();
+        logger.log(Level.FINEST, "Received message: " + type);
 
-            logger.log(Level.FINEST, "Received message " + type);
-
-            if (type.equals("update")) {
-                reply = update(element);
-            } else if (type.equals("remove")) {
-                reply = remove(element);
-            } else if (type.equals("animateMove")) {
-                reply = animateMove(element);
-            } else if (type.equals("animateAttack")) {
-                reply = animateAttack(element);
-            } else if (type.equals("setCurrentPlayer")) {
-                reply = setCurrentPlayer(element);
-            } else if (type.equals("newTurn")) {
-                reply = newTurn(element);
-            } else if (type.equals("setDead")) {
-                reply = setDead(element);
-            } else if (type.equals("gameEnded")) {
-                reply = gameEnded(element);
-            } else if (type.equals("chat")) {
-                reply = chat(element);
-            } else if (type.equals("disconnect")) {
-                reply = disconnect(element);
-            } else if (type.equals("error")) {
-                reply = error(element);
-            } else if (type.equals("chooseFoundingFather")) {
-                reply = chooseFoundingFather(element);
-            } else if (type.equals("indianDemand")) {
-                reply = indianDemand(element);
-            } else if (type.equals("spyResult")) {
-                reply = spyResult(element);
-            } else if (type.equals("reconnect")) {
-                reply = reconnect(element);
-            } else if (type.equals("setAI")) {
-                reply = setAI(element);
-            } else if (type.equals("monarchAction")) {
-                reply = monarchAction(element);
-            } else if (type.equals("setStance")) {
-                reply = setStance(element);
-            } else if (type.equals("diplomacy")) {
-                reply = diplomacy(element);
-            } else if (type.equals("addPlayer")) {
-                reply = addPlayer(element);
-            } else if (type.equals("addObject")) {
-                reply = addObject(element);
-            } else if (type.equals("newLandName")) {
-                reply = newLandName(element);
-            } else if (type.equals("newRegionName")) {
-                reply = newRegionName(element);
-            } else if (type.equals("fountainOfYouth")) {
-                reply = fountainOfYouth(element);
-            } else if (type.equals("lootCargo")) {
-                reply = lootCargo(element);
-            } else if (type.equals("closeMenus")) {
-                reply = closeMenus();
-            } else if (type.equals("multiple")) {
-                reply = multiple(connection, element);
-            } else {
-                logger.warning("Message is of unsupported type \"" + type + "\".");
-            }
-            logger.log(Level.FINEST, "Handled message " + type
-                       + " replying with "
-                       + ((reply == null) ? "null" : reply.getTagName()));
+        if (type.equals("update")) {
+            reply = update(element);
+        } else if (type.equals("remove")) {
+            reply = remove(element);
+        } else if (type.equals("animateMove")) {
+            reply = animateMove(element);
+        } else if (type.equals("animateAttack")) {
+            reply = animateAttack(element);
+        } else if (type.equals("setCurrentPlayer")) {
+            reply = setCurrentPlayer(element);
+        } else if (type.equals("newTurn")) {
+            reply = newTurn(element);
+        } else if (type.equals("setDead")) {
+            reply = setDead(element);
+        } else if (type.equals("gameEnded")) {
+            reply = gameEnded(element);
+        } else if (type.equals("chat")) {
+            reply = chat(element);
+        } else if (type.equals("disconnect")) {
+            reply = disconnect(element);
+        } else if (type.equals("error")) {
+            reply = error(element);
+        } else if (type.equals("chooseFoundingFather")) {
+            reply = chooseFoundingFather(element);
+        } else if (type.equals("indianDemand")) {
+            reply = indianDemand(element);
+        } else if (type.equals("spyResult")) {
+            reply = spyResult(element);
+        } else if (type.equals("reconnect")) {
+            reply = reconnect(element);
+        } else if (type.equals("setAI")) {
+            reply = setAI(element);
+        } else if (type.equals("monarchAction")) {
+            reply = monarchAction(element);
+        } else if (type.equals("setStance")) {
+            reply = setStance(element);
+        } else if (type.equals("diplomacy")) {
+            reply = diplomacy(element);
+        } else if (type.equals("addPlayer")) {
+            reply = addPlayer(element);
+        } else if (type.equals("addObject")) {
+            reply = addObject(element);
+        } else if (type.equals("newLandName")) {
+            reply = newLandName(element);
+        } else if (type.equals("newRegionName")) {
+            reply = newRegionName(element);
+        } else if (type.equals("fountainOfYouth")) {
+            reply = fountainOfYouth(element);
+        } else if (type.equals("lootCargo")) {
+            reply = lootCargo(element);
+        } else if (type.equals("closeMenus")) {
+            reply = closeMenus();
+        } else if (type.equals("multiple")) {
+            reply = multiple(connection, element);
         } else {
-            throw new RuntimeException("Received empty (null) message! - should never happen");
+            logger.warning("Unsupported message type: " + type);
+            return null;
+        }
+        logger.log(Level.FINEST, "Handled message: " + type
+            + " replying with: "
+            + ((reply == null) ? "null" : reply.getTagName()));
+        
+        final FreeColClient fcc = getFreeColClient();
+        if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
+            && fcc.currentPlayerIsMyPlayer()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        fcc.getInGameController().displayModelMessages(false);
+                    }
+                });
         }
 
         return reply;
@@ -968,7 +978,6 @@ public final class InGameInputHandler extends InputHandler {
     public Element addObject(Element element) {
         final FreeColClient fcc = getFreeColClient();
         Game game = getGame();
-        boolean displayMessage = false;
         Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -1000,21 +1009,12 @@ public final class InGameInputHandler extends InputHandler {
                 ModelMessage m = new ModelMessage();
                 m.readFromXMLElement(e);
                 player.addModelMessage(m);
-                displayMessage = true;
             } else if (tag == TradeRoute.getXMLElementTagName()) {
                 TradeRoute t = new TradeRoute(game, e);
                 player.getTradeRoutes().add(t);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }
-        }
-        if (displayMessage
-            && fcc.currentPlayerIsMyPlayer()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        fcc.getInGameController().nextModelMessage();
-                    }
-                });
         }
         return null;
     }
