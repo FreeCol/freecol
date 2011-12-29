@@ -74,7 +74,7 @@ public final class UnitImageAnimation {
                         final ImageAnimationEvent ievent = (ImageAnimationEvent) event;
                         final ImageIcon icon = (ImageIcon) unitLabel.getIcon();
                         icon.setImage(ievent.getImage());
-                        gui.getCanvas().paintImmediately(getDirtyAnimationArea());
+                        gui.paintImmediatelyCanvasIn(getDirtyAnimationArea());
 
                         time = ievent.getDurationInMs() - (System.nanoTime() - time) / 1000000;
                         if (time > 0) {

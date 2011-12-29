@@ -120,7 +120,7 @@ final class UnitMoveAnimation {
                         }
                         if (dropFrames <= 0) {
                             unitLabel.setLocation(point);
-                            gui.getCanvas().paintImmediately(bounds);
+                            gui.paintImmediatelyCanvasIn(bounds);
                             
                             int timeTaken = (int)(System.currentTimeMillis()
                                 - time);

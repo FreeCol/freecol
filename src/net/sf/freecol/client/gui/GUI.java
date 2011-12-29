@@ -759,4 +759,8 @@ public class GUI {
         canvas.paintImmediately(canvas.getBounds());
     }
     
+    public void paintImmediatelyCanvasIn(Rectangle rectangle) {
+        canvas.paintImmediately(rectangle);
+    }
+    
 }
