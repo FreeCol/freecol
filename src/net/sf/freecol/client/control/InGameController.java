@@ -3010,7 +3010,7 @@ public final class InGameController implements NetworkConstants {
         switch (fail) {
         case NO_TRADE_GOODS:
             gui.showInformationMessage(settlement,
-                StringTemplate.template("trade.noNeedForTheGoods")
+                StringTemplate.template("trade.noTradeGoods")
                 .add("%goods%", goods.getNameKey()));
             return;
         case NO_TRADE_HAGGLE:
