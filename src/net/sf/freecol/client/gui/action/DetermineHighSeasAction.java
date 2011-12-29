@@ -101,11 +101,6 @@ public class DetermineHighSeasAction extends FreeColAction {
         final int DEFAULT_maxDistanceToEdge = 12;
 
         final Canvas canvas = gui.getCanvas();
-        final String okText = Messages.message("ok");
-        final String cancelText = Messages.message("cancel");
-        final String dText = Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas");
-        final String mText = Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge");
-
         final JTextField inputD = new JTextField(Integer.toString(DEFAULT_distToLandFromHighSeas), COLUMNS);
         final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
@@ -135,10 +130,10 @@ public class DetermineHighSeasAction extends FreeColAction {
                 }
             }
         };
-        JButton okButton = new JButton(okText);
+        JButton okButton = new JButton(Messages.message("ok"));
         buttons.add(okButton);
 
-        JButton cancelButton = new JButton(cancelText);
+        JButton cancelButton = new JButton(Messages.message("cancel"));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 inputDialog.setResponse(null);
@@ -151,9 +146,9 @@ public class DetermineHighSeasAction extends FreeColAction {
         inputD.addActionListener(al);
         inputM.addActionListener(al);
 
-        JLabel widthLabel = new JLabel(dText);
+        JLabel widthLabel = new JLabel(Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas"));
         widthLabel.setLabelFor(inputD);
-        JLabel heightLabel = new JLabel(mText);
+        JLabel heightLabel = new JLabel(Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge"));
         heightLabel.setLabelFor(inputM);
 
         JPanel widthPanel = new JPanel(new FlowLayout());
