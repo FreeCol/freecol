@@ -74,6 +74,8 @@ public final class InfoPanel extends FreeColPanel {
 
     private final JPanel mapEditorPanel;
 
+    private Image skin = ResourceManager.getImage("InfoPanel.skin");
+
     private boolean useSkin = true;
 
 
@@ -105,7 +107,6 @@ public final class InfoPanel extends FreeColPanel {
 
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
-        Image skin = ResourceManager.getImage("InfoPanel.skin");
         if (!useSkin || skin == null) {
             setSize(PANEL_WIDTH, PANEL_HEIGHT);
         } else {
@@ -251,7 +252,6 @@ public final class InfoPanel extends FreeColPanel {
             }
         }
 
-        Image skin = ResourceManager.getImage("InfoPanel.skin");
         if (useSkin && skin != null) {
             graphics.drawImage(skin, 0, 0, null);
         }

@@ -79,6 +79,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private final JButton miniMapZoomOutButton;
     private final JButton miniMapZoomInButton;
     private Color backgroundColor;
+    private Image back = ResourceManager.getImage("MiniMap.back");
+    private Image skin = ResourceManager.getImage("MiniMap.skin");
+    private Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     private boolean useSkin = true;
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
@@ -125,7 +128,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
         setLayout(null);
 
-        Image skin = ResourceManager.getImage("MiniMap.skin");
         if (!useSkin || skin == null) {
             try {
                 BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -241,10 +243,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-        Image back = ResourceManager.getImage("MiniMap.back");
-        Image skin = ResourceManager.getImage("MiniMap.skin");
-
-    	Color newBackground = ResourceManager.getColor("miniMapBackground.color");
     	this.setBackgroundColor(newBackground);
 
         if (!useSkin || skin == null) {
