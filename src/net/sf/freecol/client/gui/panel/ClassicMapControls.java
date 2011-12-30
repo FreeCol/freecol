@@ -20,12 +20,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-
+import java.awt.Font;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -41,6 +44,8 @@ import net.miginfocom.swing.MigLayout;
 public final class ClassicMapControls extends MapControls {
 
     private JPanel panel;
+    private Font arrowFont;
+    private ActionManager am;
 
     /**
      * The basic constructor.
@@ -49,18 +54,37 @@ public final class ClassicMapControls extends MapControls {
      */
     public ClassicMapControls(final FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, false);
-        panel = new JPanel();
-        panel.setLayout(new MigLayout("wrap 4"));
+
+        am = freeColClient.getActionManager();
+        arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
+
+        panel = new JPanel(new MigLayout("debug, wrap 3"));
 
         panel.add(miniMap, "span, width " + miniMap.getWidth()
                   + ", height " + miniMap.getHeight());
-        panel.add(infoPanel, "span, width " + infoPanel.getWidth()
-                  + ", height " + infoPanel.getHeight());
+
+        panel.add(makeButton("NW", "\u2196"), "newline 20");
+        panel.add(makeButton("N",  "\u2191"));
+        panel.add(makeButton("NE", "\u2197"));
+        panel.add(makeButton("W",  "\u2190"));
+        panel.add(makeButton("E",  "\u2192"), "skip");
+        panel.add(makeButton("SW", "\u2199"));
+        panel.add(makeButton("S",  "\u2193"));
+        panel.add(makeButton("SE", "\u2198"), "wrap 20");
 
         for (UnitButton button : unitButton) {
             panel.add(button);
         }
-        panel.setSize(panel.getPreferredSize());
+
+        panel.add(infoPanel, "newline push, span, width " + infoPanel.getWidth()
+                  + ", height " + infoPanel.getHeight());
+    }
+
+    private JButton makeButton(String direction, String arrow) {
+        JButton button = new JButton(am.getFreeColAction("moveAction." + direction));
+        button.setFont(arrowFont);
+        button.setText(arrow);
+        return button;
     }
 
     /**
@@ -72,7 +96,9 @@ public final class ClassicMapControls extends MapControls {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-        panel.setLocation(component.getWidth() - panel.getWidth(), 0);
+        int width = (int) panel.getPreferredSize().getWidth();
+        panel.setSize(width, component.getHeight());
+        panel.setLocation(component.getWidth() - width, 0);
         component.add(panel, CONTROLS_LAYER, false);
     }
 
