@@ -217,39 +217,19 @@ public final class InfoPanel extends FreeColPanel {
     @Override
     public void paintComponent(Graphics graphics) {
         int viewMode = getGUI().getCurrentViewMode();
-        if (!getFreeColClient().isMapEditor()) {
-            if (mapEditorPanel.isVisible()) {
-                mapEditorPanel.setVisible(false);
-            }
-            switch (viewMode) {
-            case ViewMode.MOVE_UNITS_MODE:
-                if (unitInfoPanel.getUnit() != null) {
-                    if (!unitInfoPanel.isVisible()) {
-                        unitInfoPanel.setVisible(true);
-                        endTurnPanel.setVisible(false);
-                    }
-                } else if (getMyPlayer() != null
-                        && !getMyPlayer().hasNextActiveUnit()) {
-                    if (!endTurnPanel.isVisible()) {
-                        endTurnPanel.setVisible(true);
-                        unitInfoPanel.setVisible(false);
-                    }
-                }
-                tileInfoPanel.setVisible(false);
-                break;
-            case ViewMode.VIEW_TERRAIN_MODE:
-                unitInfoPanel.setVisible(false);
-                endTurnPanel.setVisible(false);
-                tileInfoPanel.setVisible(true);
-                break;
-            }
-        } else {
-            if (!mapEditorPanel.isVisible()) {
-                mapEditorPanel.setVisible(true);
-                unitInfoPanel.setVisible(false);
-                endTurnPanel.setVisible(false);
-                tileInfoPanel.setVisible(false);
-            }
+        mapEditorPanel.setVisible(false);
+        unitInfoPanel.setVisible(false);
+        endTurnPanel.setVisible(false);
+        tileInfoPanel.setVisible(false);
+        if (getFreeColClient().isMapEditor()) {
+            mapEditorPanel.setVisible(true);
+        } else if (viewMode == ViewMode.VIEW_TERRAIN_MODE) {
+            tileInfoPanel.setVisible(true);
+        } else if (unitInfoPanel.getUnit() != null) {
+            unitInfoPanel.setVisible(true);
+        } else if (getMyPlayer() != null
+                   && !getMyPlayer().hasNextActiveUnit()) {
+            endTurnPanel.setVisible(true);
         }
 
         if (useSkin && skin != null) {
