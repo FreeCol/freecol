@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -107,14 +108,14 @@ public final class InfoPanel extends FreeColPanel {
 
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
-        if (!useSkin || skin == null) {
-            setSize(PANEL_WIDTH, PANEL_HEIGHT);
-        } else {
+        if (useSkin && skin != null) {
             setBorder(null);
             setSize(skin.getWidth(null), skin.getHeight(null));
             setOpaque(false);
             internalPanelTop = 75;
-            internalPanelHeight = 100;
+            internalPanelHeight = 128;
+        } else {
+            setSize(PANEL_WIDTH, PANEL_HEIGHT);
         }
 
         mapEditorPanel = new JPanel(null);
@@ -251,9 +252,9 @@ public final class InfoPanel extends FreeColPanel {
         public TileInfoPanel() {
             super(null);
 
-            setSize(226, 100);
+            setSize(226, 128);
             setOpaque(false);
-            setLayout(new MigLayout("fill, wrap 2, gap 0 0", "", "[][][][][nogrid]"));
+            setLayout(new MigLayout("fill, wrap 5, gap 2 2"));
         }
 
         /**
@@ -270,9 +271,11 @@ public final class InfoPanel extends FreeColPanel {
             if (tile != null) {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
-                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                getGUI().getMapViewer()
-                    .displayTerrain(image.createGraphics(), tile);
+                int compoundHeight = getLibrary().getCompoundTerrainImageHeight(tile.getType());
+                BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = image.createGraphics();
+                g.translate(0, compoundHeight - height);
+                getGUI().getMapViewer().displayTerrain(g, tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.add(tile.getNameKey());
@@ -281,13 +284,11 @@ public final class InfoPanel extends FreeColPanel {
                     }
                     add(new JLabel(Messages.message(items)), "span, align center");
 
-                    add(new JLabel(new ImageIcon(image)), "span 1 3");
-                    if (tile.getOwner() == null) {
-                        add(new JLabel());
-                    } else {
+                    add(new JLabel(new ImageIcon(image)), "spany");
+                    if (tile.getOwner() != null) {
                         JLabel ownerLabel = localizedLabel(tile.getOwner().getNationName());
                         ownerLabel.setFont(font);
-                        add(ownerLabel);
+                        add(ownerLabel, "span 4");
                     }
 
                     int defenceBonus = (int) tile.getType().getFeatureContainer()
@@ -295,11 +296,11 @@ public final class InfoPanel extends FreeColPanel {
                     JLabel defenceLabel = new JLabel(Messages.message("colopedia.terrain.defenseBonus") +
                                                      " " + defenceBonus + "%");
                     defenceLabel.setFont(font);
-                    add(defenceLabel);
+                    add(defenceLabel, "span 4");
                     JLabel moveLabel = new JLabel(Messages.message("colopedia.terrain.movementCost") +
                                                   " " + String.valueOf(tile.getType().getBasicMoveCost()/3));
                     moveLabel.setFont(font);
-                    add(moveLabel);
+                    add(moveLabel, "span 4");
 
                     List<AbstractGoods> production = tile.getType().getProduction();
                     for (AbstractGoods goods : production) {
