@@ -27,6 +27,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.ClassicMapControls;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 
 /**
@@ -84,7 +85,16 @@ public class MapControlsAction extends SelectableAction {
     private void showMapControls(boolean value) {
         if (value && getFreeColClient().isInGame()) {
             if (mapControls == null) {
-                mapControls = new CornerMapControls(getFreeColClient(), gui);
+                try {
+                    String className = freeColClient.getClientOptions()
+                        .getString(ClientOptions.MAP_CONTROLS);
+                    Class<?> controls = Class.forName("net.sf.freecol.client.gui.panel." + className);
+                    mapControls = (MapControls) controls.getConstructor(FreeColClient.class, GUI.class)
+                        .newInstance(getFreeColClient(), gui);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                    mapControls = new CornerMapControls(getFreeColClient(), gui);
+                }
             }
             mapControls.update();
         }

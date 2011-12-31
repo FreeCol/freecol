@@ -58,7 +58,7 @@ public final class ClassicMapControls extends MapControls {
         am = freeColClient.getActionManager();
         arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
 
-        panel = new JPanel(new MigLayout("debug, wrap 3"));
+        panel = new JPanel(new MigLayout("wrap 3"));
 
         panel.add(miniMap, "span, width " + miniMap.getWidth()
                   + ", height " + miniMap.getHeight());
@@ -85,6 +85,10 @@ public final class ClassicMapControls extends MapControls {
         button.setFont(arrowFont);
         button.setText(arrow);
         return button;
+    }
+
+    public boolean isShowing() {
+        return panel.getParent() != null;
     }
 
     /**

@@ -125,34 +125,13 @@ public abstract class MapControls {
     public abstract void addToComponent(Canvas component);
 
     /**
-     * Returns the width of the InfoPanel.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getInfoPanelWidth() {
-        return infoPanel.getWidth();
-    }
-
-    /**
-     * Returns the height of the InfoPanel.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getInfoPanelHeight() {
-        return infoPanel.getHeight();
-    }
-
-
-    /**
      * Removes the map controls from the parent canvas component.
      *
      * @param canvas <code>Canvas</code> parent
      */
     public abstract void removeFromComponent(Canvas canvas);
 
-    public boolean isShowing() {
-        return infoPanel.getParent() != null;
-    }
+    public abstract boolean isShowing();
 
 
     /**

@@ -3274,13 +3274,10 @@ public final class MapViewer {
     }
 
     private void redrawMapControls() {
-        int x = 0, y = 0;
         MapControls mapControls = gui.getCanvas().getMapControls();
         if (mapControls != null) {
-            x = getWidth() - mapControls.getInfoPanelWidth();
-            y = getHeight() - mapControls.getInfoPanelHeight();
+            mapControls.update();
         }
-        gui.getCanvas().repaint(x, y, getWidth(), getHeight());
     }
 
 

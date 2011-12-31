@@ -380,6 +380,13 @@ public class ClientOptions extends OptionGroup {
     public static final int COLONY_LABELS_CLASSIC = 1;
     public static final int COLONY_LABELS_MODERN = 2;
 
+    /**
+     * Style of map controls.
+     */
+    public static final String MAP_CONTROLS = "model.option.mapControls";
+    public static final String MAP_CONTROLS_CORNERS = "CornerMapControls";
+    public static final String MAP_CONTROLS_CLASSIC = "ClassicMapControls";
+
 
     /**
      * Comparators for sorting colonies.

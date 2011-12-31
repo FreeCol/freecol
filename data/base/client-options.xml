@@ -51,6 +51,33 @@
       <booleanOption id="model.option.usePixmaps" defaultValue="true"/>
       <!-- Remember panel positions? -->
       <booleanOption id="model.option.rememberPanelPositions" defaultValue="false"/>
+      <!-- Map controls -->
+      <stringOption id="model.option.mapControls" defaultValue="CornerMapControls">
+        <choice value="CornerMapControls"/>
+        <choice value="ClassicMapControls"/>
+      </stringOption>
+      <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
+      <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
+      <!-- The color to fill in around the actual map on the minimap. -->
+      <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.minimap.color.background.black" value="0"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.dark.very" value="1"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.dark" value="2"/>
+        <selectValue label="clientOptions.minimap.color.background.gray" value="3"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.light" value="4"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.light.very" value="5"/>
+        <selectValue label="clientOptions.minimap.color.background.blue.light" value="6"/>
+      </selectOption>
+      <!-- Type of colony report. -->
+      <selectOption id="model.option.colonyReport" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.colonyReport.classic" value="0"/>
+        <selectValue label="clientOptions.colonyReport.compact" value="1"/>
+      </selectOption>
+      <!-- Type of labour report. -->
+      <selectOption id="model.option.labourReport" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.labourReport.classic" value="0"/>
+        <selectValue label="clientOptions.labourReport.compact" value="1"/>
+      </selectOption>
       <!-- Option for in tile text display -->
       <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
@@ -74,6 +101,12 @@
         <selectValue label="clientOptions.gui.colonyComparator.bySize" value="3"/>
         <selectValue label="clientOptions.gui.colonyComparator.bySoL" value="4"/>
       </selectOption>
+      <rangeOption id="model.option.defaultZoomLevel" defaultValue="2" localizedLabels="false">
+        <rangeValue label="1" value="1"/>
+        <rangeValue label="2" value="2"/>
+        <rangeValue label="3" value="3"/>
+        <rangeValue label="4" value="4"/>
+      </rangeOption>
       <!-- Animation speed for friendly units. -->
       <rangeOption id="model.option.moveAnimationSpeed" defaultValue="0" localizedLabels="true">
         <rangeValue label="clientOptions.gui.moveAnimationSpeed.off" value="0"/>
@@ -116,34 +149,6 @@
       <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
       <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
       <booleanOption id="model.option.guiShowNotBestTile" defaultValue="true"/>
-      <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
-      <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
-      <!-- The color to fill in around the actual map on the minimap. -->
-      <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.minimap.color.background.black" value="0"/>
-        <selectValue label="clientOptions.minimap.color.background.gray.dark.very" value="1"/>
-        <selectValue label="clientOptions.minimap.color.background.gray.dark" value="2"/>
-        <selectValue label="clientOptions.minimap.color.background.gray" value="3"/>
-        <selectValue label="clientOptions.minimap.color.background.gray.light" value="4"/>
-        <selectValue label="clientOptions.minimap.color.background.gray.light.very" value="5"/>
-        <selectValue label="clientOptions.minimap.color.background.blue.light" value="6"/>
-      </selectOption>
-      <rangeOption id="model.option.defaultZoomLevel" defaultValue="2" localizedLabels="false">
-        <rangeValue label="1" value="1"/>
-        <rangeValue label="2" value="2"/>
-        <rangeValue label="3" value="3"/>
-        <rangeValue label="4" value="4"/>
-      </rangeOption>
-      <!-- Type of colony report. -->
-      <selectOption id="model.option.colonyReport" defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.colonyReport.classic" value="0"/>
-        <selectValue label="clientOptions.colonyReport.compact" value="1"/>
-      </selectOption>
-      <!-- Type of labour report. -->
-      <selectOption id="model.option.labourReport" defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.labourReport.classic" value="0"/>
-        <selectValue label="clientOptions.labourReport.compact" value="1"/>
-      </selectOption>
     </optionGroup>
 
     <optionGroup id="clientOptions.savegames" >
