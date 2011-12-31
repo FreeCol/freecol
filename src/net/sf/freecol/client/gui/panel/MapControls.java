@@ -20,7 +20,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,13 +53,13 @@ import net.sf.freecol.common.model.TileImprovementType;
  */
 public abstract class MapControls {
 
-    protected final FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
-    protected final InfoPanel infoPanel;
-    protected final MiniMap miniMap;
-    protected final UnitButton[]     unitButton;
+    private final InfoPanel infoPanel;
+    private final MiniMap miniMap;
+    private final List<UnitButton> unitButtons;
 
-    protected GUI gui;
+    private GUI gui;
 
     public static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
@@ -77,23 +76,22 @@ public abstract class MapControls {
         miniMap = new MiniMap(freeColClient, gui, useSkin);
         final ActionManager am = freeColClient.getActionManager();
 
-        List<UnitButton> ubList = new ArrayList<UnitButton>();
-        ubList.add(new UnitButton(am, WaitAction.id));
-        ubList.add(new UnitButton(am, SkipUnitAction.id));
-        ubList.add(new UnitButton(am, SentryAction.id));
-        ubList.add(new UnitButton(am, FortifyAction.id));
+        unitButtons = new ArrayList<UnitButton>();
+        unitButtons.add(new UnitButton(am, WaitAction.id));
+        unitButtons.add(new UnitButton(am, SkipUnitAction.id));
+        unitButtons.add(new UnitButton(am, SentryAction.id));
+        unitButtons.add(new UnitButton(am, FortifyAction.id));
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
             FreeColAction action = am.getFreeColAction(type.getShortId()
                                                        + "Action");
             if (!type.isNatural() && action != null
                 && action.hasOrderButtons()) {
-                ubList.add(new UnitButton(am, type.getShortId() + "Action"));
+                unitButtons.add(new UnitButton(am, type.getShortId() + "Action"));
             }
         }
-        ubList.add(new UnitButton(am, BuildColonyAction.id));
-        ubList.add(new UnitButton(am, DisbandUnitAction.id));
-        unitButton = (ubList.toArray(new UnitButton[ubList.size()]));
+        unitButtons.add(new UnitButton(am, BuildColonyAction.id));
+        unitButtons.add(new UnitButton(am, DisbandUnitAction.id));
 
         //
         // Don't allow them to gain focus
@@ -101,10 +99,46 @@ public abstract class MapControls {
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
 
-        for(int i=0; i<unitButton.length; i++) {
-            unitButton[i].setFocusable(false);
+        for (UnitButton button : unitButtons) {
+            button.setFocusable(false);
         }
 
+    }
+
+    /**
+     * Returns the mini map.
+     *
+     * @return a <code>MiniMap</code> value
+     */
+    public MiniMap getMiniMap() {
+        return miniMap;
+    }
+
+    /**
+     * Returns the info panel.
+     *
+     * @return an <code>InfoPanel</code> value
+     */
+    public InfoPanel getInfoPanel() {
+        return infoPanel;
+    }
+
+    /**
+     * Returns a list of unit buttons.
+     *
+     * @return an <code>List</code> value
+     */
+    public List<UnitButton> getUnitButtons() {
+        return unitButtons;
+    }
+
+    /**
+     * Returns the FreeColClient.
+     *
+     * @return a <code>FreeColClient</code> value
+     */
+    public FreeColClient getFreeColClient() {
+        return freeColClient;
     }
 
     /**
@@ -132,38 +166,6 @@ public abstract class MapControls {
     public abstract void removeFromComponent(Canvas canvas);
 
     public abstract boolean isShowing();
-
-
-    /**
-     * Zooms in the mini map.
-     */
-    public void zoomIn() {
-        miniMap.zoomIn();
-    }
-
-
-    /**
-     * Zooms out the mini map.
-     */
-    public void zoomOut() {
-        miniMap.zoomOut();
-    }
-
-    public boolean canZoomIn() {
-        return miniMap.canZoomIn();
-    }
-
-    public boolean canZoomOut() {
-        return miniMap.canZoomOut();
-    }
-
-    /**
-     *
-     * @param newColor
-     */
-    public void changeBackgroundColor(Color newColor) {
-    	miniMap.setBackgroundColor(newColor);
-    }
 
     /**
      * Updates this <code>MapControls</code>.

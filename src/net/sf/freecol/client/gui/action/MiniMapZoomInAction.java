@@ -66,7 +66,8 @@ public class MiniMapZoomInAction extends MapboardAction {
             .getFreeColAction(MapControlsAction.id);
         return super.shouldBeEnabled()
             && mca.getMapControls() != null
-            && mca.getMapControls().canZoomIn();
+            && mca.getMapControls().getMiniMap() != null
+            && mca.getMapControls().getMiniMap().canZoomIn();
     }
 
     /**
@@ -76,7 +77,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
             .getFreeColAction(MapControlsAction.id);
-        mca.getMapControls().zoomIn();
+        mca.getMapControls().getMiniMap().zoomIn();
         update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id).update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id + ".secondary").update();

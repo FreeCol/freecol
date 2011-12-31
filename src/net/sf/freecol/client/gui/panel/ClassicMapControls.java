@@ -60,6 +60,7 @@ public final class ClassicMapControls extends MapControls {
 
         panel = new JPanel(new MigLayout("wrap 3"));
 
+        MiniMap miniMap = getMiniMap();
         panel.add(miniMap, "span, width " + miniMap.getWidth()
                   + ", height " + miniMap.getHeight());
 
@@ -72,10 +73,11 @@ public final class ClassicMapControls extends MapControls {
         panel.add(makeButton("S",  "\u2193"));
         panel.add(makeButton("SE", "\u2198"), "wrap 20");
 
-        for (UnitButton button : unitButton) {
+        for (UnitButton button : getUnitButtons()) {
             panel.add(button);
         }
 
+        InfoPanel infoPanel = getInfoPanel();
         panel.add(infoPanel, "newline push, span, width " + infoPanel.getWidth()
                   + ", height " + infoPanel.getHeight());
     }
@@ -96,8 +98,8 @@ public final class ClassicMapControls extends MapControls {
      * @param component The component to add the map controls to.
      */
     public void addToComponent(Canvas component) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
+        if (getFreeColClient().getGame() == null
+            || getFreeColClient().getGame().getMap() == null) {
             return;
         }
         int width = (int) panel.getPreferredSize().getWidth();

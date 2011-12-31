@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JLabel;
 
@@ -73,7 +74,7 @@ public final class CornerMapControls extends MapControls {
     }
 
     public boolean isShowing() {
-        return infoPanel.getParent() != null;
+        return getInfoPanel().getParent() != null;
     }
 
     /**
@@ -81,8 +82,8 @@ public final class CornerMapControls extends MapControls {
      * @param component The component to add the map controls to.
      */
     public void addToComponent(Canvas component) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
+        if (getFreeColClient().getGame() == null
+            || getFreeColClient().getGame().getMap() == null) {
             return;
         }
 
@@ -90,22 +91,28 @@ public final class CornerMapControls extends MapControls {
         // Relocate GUI Objects
         //
 
+        MiniMap miniMap = getMiniMap();
+        InfoPanel infoPanel = getInfoPanel();
+
         infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
         miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
         compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
 
-        final int WIDTH = unitButton[0].getWidth();
-        final int SPACE = 5;
-
-        for(int i=0; i<unitButton.length; i++) {
+        List<UnitButton> unitButtons = getUnitButtons();
+        if (!unitButtons.isEmpty()) {
+            final int WIDTH = unitButtons.get(0).getWidth();
+            final int SPACE = 5;
+            int length = unitButtons.size();
             int x = miniMap.getWidth() + 1 +
-                    ((infoPanel.getX() - miniMap.getWidth() -
-                      unitButton.length * WIDTH -
-                      (unitButton.length-1) * SPACE - WIDTH) / 2) +
-                    i * (WIDTH + SPACE);
+                ((infoPanel.getX() - miniMap.getWidth() -
+                  length * WIDTH - (length - 1) * SPACE - WIDTH) / 2);
             int y = component.getHeight() - 40;
+            int step = WIDTH + SPACE;
 
-            unitButton[i].setLocation(x, y);
+            for (UnitButton button : unitButtons) {
+                button.setLocation(x, y);
+                x += step;
+            }
         }
 
         //
@@ -113,14 +120,15 @@ public final class CornerMapControls extends MapControls {
         //
         component.add(infoPanel, CONTROLS_LAYER, false);
         component.add(miniMap, CONTROLS_LAYER, false);
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
+        if (getFreeColClient().getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
             component.add(compassRose, CONTROLS_LAYER, false);
         }
 
-        if (!freeColClient.isMapEditor()) {
-            for(int i=0; i<unitButton.length; i++) {
-                component.add(unitButton[i], CONTROLS_LAYER, false);
-                unitButton[i].refreshAction();
+        if (!getFreeColClient().isMapEditor()) {
+            for (UnitButton button : unitButtons) {
+                component.add(button, CONTROLS_LAYER, false);
+                button.refreshAction();
             }
         }
     }
@@ -131,12 +139,12 @@ public final class CornerMapControls extends MapControls {
      * @param canvas <code>Canvas</code> parent
      */
     public void removeFromComponent(Canvas canvas) {
-        canvas.remove(infoPanel, false);
-        canvas.remove(miniMap, false);
+        canvas.remove(getInfoPanel(), false);
+        canvas.remove(getMiniMap(), false);
         canvas.remove(compassRose, false);
 
-        for(int i=0; i<unitButton.length; i++) {
-            canvas.remove(unitButton[i], false);
+        for (UnitButton button : getUnitButtons()) {
+            canvas.remove(button, false);
         }
     }
 
