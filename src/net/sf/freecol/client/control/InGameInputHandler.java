@@ -1362,7 +1362,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            goods = gui.getCanvas().showCaptureGoodsDialog(unit, goods);
+            goods = gui.showCaptureGoodsDialog(unit, goods);
             if (!goods.isEmpty()) {
                 getFreeColClient().askServer().loot(unit, defenderId, goods);
             }
@@ -1626,7 +1626,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
         protected void doNoResultWork() {
-            gui.getCanvas().showVictoryPanel();
+            gui.showVictoryPanel();
         }
     }
 
@@ -1785,7 +1785,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            gui.getCanvas().showModelMessages(_modelMessage);
+            gui.showModelMessages(_modelMessage);
             return null;
         }
 
@@ -1907,7 +1907,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = gui.getCanvas().showMonarchPanelDialog(action, replace);
+            boolean choice = gui.showMonarchPanelDialog(action, replace);
             return Boolean.valueOf(choice);
         }
     }

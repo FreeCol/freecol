@@ -415,7 +415,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayMonarchPanel"));
         monarchPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getCanvas().showMonarchPanelDialog(Monarch.MonarchAction.RAISE_TAX_WAR, null);
+                    gui.showMonarchPanelDialog(Monarch.MonarchAction.RAISE_TAX_WAR, null);
                 }
             });
         panelMenu.add(monarchPanel);
@@ -424,7 +424,7 @@ public class DebugMenu extends JMenu {
             = new JMenuItem(Messages.message("menuBar.debug.displayVictoryPanel"));
         victoryPanel.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getCanvas().showVictoryPanel();
+                    gui.showVictoryPanel();
                 }
             });
         panelMenu.add(victoryPanel);

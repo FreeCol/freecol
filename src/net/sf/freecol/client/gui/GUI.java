@@ -36,10 +36,13 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -775,4 +778,22 @@ public class GUI {
     public int showEmigrationPanel(boolean fountainOfYouth) {
         return canvas.showEmigrationPanel(fountainOfYouth);
     }
+    
+    public void showVictoryPanel() {
+        canvas.showVictoryPanel();
+    }
+    
+    public void showModelMessages(ModelMessage... modelMessages) {
+        canvas.showModelMessages(modelMessages);
+    }
+
+    public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
+        return canvas.showCaptureGoodsDialog(winner, loot);
+    }
+    
+    public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
+        return canvas.showMonarchPanelDialog(action, replace);
+    }
+
+    
 }

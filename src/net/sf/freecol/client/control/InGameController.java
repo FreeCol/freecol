@@ -1222,7 +1222,7 @@ public final class InGameController implements NetworkConstants {
                         if (endOfTurn) {
                             gui.getCanvas().showReportTurnPanel(a);
                         } else {
-                            gui.getCanvas().showModelMessages(a);
+                            gui.showModelMessages(a);
                         }
                     }
                 };
