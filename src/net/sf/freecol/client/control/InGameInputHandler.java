@@ -448,7 +448,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setCurrentPlayer(Element element) {
         final FreeColClient fcc = getFreeColClient();
-        final Game game = getGame();
+        final Game game = getGame(); 
         final Player player = fcc.getMyPlayer();
         final Player newPlayer = (Player) game
             .getFreeColGameObject(element.getAttribute("player"));

@@ -90,7 +90,7 @@ public abstract class InputHandler implements MessageHandler {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (gui.getCanvas().containsInGameComponents()) {
+                if (gui.containsInGameComponents()) {
                     if (freeColClient.getFreeColServer() == null) {
                         gui.returnToTitle();
                     } else {

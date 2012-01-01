@@ -763,4 +763,7 @@ public class GUI {
         canvas.paintImmediately(rectangle);
     }
     
+    public boolean containsInGameComponents() {
+        return canvas.containsInGameComponents();
+    }
 }
