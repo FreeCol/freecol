@@ -279,16 +279,6 @@ public abstract class AIPlayer extends AIObject {
         return false;
     }
 
-    /**
-     * Returns an <code>Iterator</code> for all the wishes. The items are
-     * sorted by the {@link Wish#getValue value}, with the item having the
-     * highest value appearing first in the <code>Iterator</code>.
-     *
-     * @return The <code>Iterator</code>.
-     * @see Wish
-     */
-    //public abstract Iterator<Wish> getWishIterator();
-
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
 
     /**

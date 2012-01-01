@@ -825,12 +825,8 @@ public class TransportMission extends Mission {
          * "aiColonies"-list:
          */
         EuropeanAIPlayer player = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-        Iterator<Wish> highValueWishIterator = player.getWishIterator();
-        while (highValueWishIterator.hasNext()) {
-            Wish w = highValueWishIterator.next();
-            if (w.getTransportable() != null) {
-                continue;
-            }
+        for (Wish w : player.getWishes()) {
+            if (w.getTransportable() != null) continue;
             if (w instanceof WorkerWish && w.getDestination() instanceof Colony) {
                 WorkerWish ww = (WorkerWish) w;
                 Colony c = (Colony) ww.getDestination();

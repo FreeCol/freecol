@@ -289,21 +289,19 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Returns an <code>Iterator</code> for all the wishes. The items are
-     * sorted by the {@link Wish#getValue value}, with the item having the
-     * highest value appearing first in the <code>Iterator</code>.
+     * Gets the wishes for all this player's colonies, sorted by the
+     * {@link Wish#getValue value}.
      *
-     * @return The <code>Iterator</code>.
-     * @see Wish
+     * @return A list of wishes.
      */
-    public Iterator<Wish> getWishIterator() {
-        ArrayList<Wish> wishList = new ArrayList<Wish>();
+    public List<Wish> getWishes() {
+        List<Wish> wishes = new ArrayList<Wish>();
         Iterator<AIColony> ai = getAIColonyIterator();
         while (ai.hasNext()) {
-            wishList.addAll(ai.next().getWishes());
+            wishes.addAll(ai.next().getWishes());
         }
-        Collections.sort(wishList);
-        return wishList.iterator();
+        Collections.sort(wishes);
+        return wishes;
     }
 
     /**
