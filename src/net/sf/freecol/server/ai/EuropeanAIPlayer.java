@@ -186,31 +186,30 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovement</code>s needed by all of this player's colonies.
+     * Gets a list of all the player's tile improvement plans required by
+     * the colonies.
      *
-     * @return The <code>Iterator</code>.
+     * @return A list of tile improvements.
      * @see net.sf.freecol.common.model.TileImprovement
      */
-    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
-        ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();
+    public List<TileImprovementPlan> getTileImprovementPlans() {
+        List<TileImprovementPlan> tileImprovements
+            = new ArrayList<TileImprovementPlan>();
         Iterator<AIColony> acIterator = getAIColonyIterator();
         while (acIterator.hasNext()) {
             tileImprovements.addAll(acIterator.next().getTileImprovementPlans());
         }
-        return tileImprovements.iterator();
+        return tileImprovements;
     }
-
+        
     /**
-     * Remove a <code>TileImprovementPlan</code> from the list
+     * Remove a <code>TileImprovementPlan</code> from the relevant colony.
      */
-    public void removeTileImprovementPlan(TileImprovementPlan plan){
-    	Iterator<AIColony> colonyIter = getAIColonyIterator();
+    public void removeTileImprovementPlan(TileImprovementPlan plan) {
+        Iterator<AIColony> colonyIter = getAIColonyIterator();
         while (colonyIter.hasNext()) {
             AIColony colony = colonyIter.next();
-            if(colony.removeTileImprovementPlan(plan)){
-            	return;
-            }
+            if (colony.removeTileImprovementPlan(plan)) return;
         }
         logger.warning("Not found given TileImprovementPlan to remove");
     }

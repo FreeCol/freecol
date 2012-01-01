@@ -185,9 +185,7 @@ public class PioneeringMission extends Mission {
 
         TileImprovementPlan bestChoice = null;
         int bestValue = 0;
-        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
-        while (tiIterator.hasNext()) {
-            TileImprovementPlan ti = tiIterator.next();
+        for (TileImprovementPlan ti : aiPlayer.getTileImprovementPlans()) {
             if (ti.getPioneer() == null) {
                 // invalid tileImprovementPlan, remove and get a new valid one
                 if (ti.getTarget() == null) {
@@ -496,18 +494,15 @@ public class PioneeringMission extends Mission {
 
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiUnit.getAIMain()
             .getAIPlayer(aiUnit.getUnit().getOwner());
-        Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();
-
-
         boolean foundImprovementPlan = false;
-        while (tiIterator.hasNext()) {
-            TileImprovementPlan ti = tiIterator.next();
+        for (TileImprovementPlan ti : aiPlayer.getTileImprovementPlans()) {
             if (ti.getPioneer() == null) {
                 foundImprovementPlan = true;
+                break;
             }
         }
-        if(!foundImprovementPlan){
-            logger.finest("No Improvement plan found, PioneeringMission not valid");
+        if (!foundImprovementPlan) {
+            logger.finest("No plan found, PioneeringMission not valid");
             return false;
         }
 
