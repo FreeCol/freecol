@@ -229,12 +229,10 @@ public final class InGameInputHandler extends InputHandler {
      * @param nodeList The list of nodes from the message
      */
     private void updateGameObjects(NodeList nodeList) {
-        Game game = getGame();
-
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(id);
+            FreeColGameObject fcgo = getGame().getFreeColGameObjectSafely(id);
             if (fcgo == null) {
                 logger.warning("Object in update not present in client: " + id);
             } else {
@@ -353,7 +351,7 @@ public final class InGameInputHandler extends InputHandler {
                     + " missing newTile: " + newTileId);
             }
 
-            // All is well, queue the animation.
+            // All is well, queue the animation.g
             // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
                 new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
@@ -448,9 +446,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setCurrentPlayer(Element element) {
         final FreeColClient fcc = getFreeColClient();
-        final Game game = getGame(); 
         final Player player = fcc.getMyPlayer();
-        final Player newPlayer = (Player) game
+        final Player newPlayer = (Player) getGame()
             .getFreeColGameObject(element.getAttribute("player"));
         final boolean newTurn = player.equals(newPlayer);
         if (FreeCol.isInDebugMode()
@@ -627,7 +624,7 @@ public final class InGameInputHandler extends InputHandler {
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(getGame(), element);
         List<FoundingFather> ffs = message.getFathers();
-        FoundingFather ff = gui.getCanvas().showChooseFoundingFatherDialog(ffs);
+        FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
         if (ff != null) {
             message.setResult(ff);
             getFreeColClient().getMyPlayer().setCurrentFather(ff);
@@ -646,9 +643,8 @@ public final class InGameInputHandler extends InputHandler {
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
-        Game game = getGame();
         Player player = getFreeColClient().getMyPlayer();
-        DiplomacyMessage message = new DiplomacyMessage(game, element);
+        DiplomacyMessage message = new DiplomacyMessage(getGame(), element);
         Unit unit = message.getUnit();
         if (unit == null) {
             logger.warning("Unit omitted from diplomacy message.");
@@ -1080,7 +1076,7 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < m; i++) {
-                            int index = gui.getCanvas().showEmigrationPanel(true);
+                            int index = gui.showEmigrationPanel(true);
                             getFreeColClient().askServer().emigrate(index + 1);
                         }
                     }
