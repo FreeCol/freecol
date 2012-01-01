@@ -168,6 +168,44 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Gets the AI colony corresponding to a given colony, if any.
+     *
+     * @param colony The <code>Colony</code> to look up.
+     * @return The corresponding AI colony or null if not found.
+     */
+    protected AIColony getAIColony(Colony colony) {
+        return getAIMain().getAIColony(colony);
+    }
+
+    /**
+     * Gets a list of the players AI colonies.
+     *
+     * @return A list of AI colonies.
+     */
+    protected List<AIColony> getAIColonies() {
+        List<AIColony> ac = new ArrayList<AIColony>();
+        for (Colony colony : getPlayer().getColonies()) {
+            AIColony a = getAIColony(colony);
+            if (a != null) {
+                ac.add(a);
+            } else {
+                logger.warning("Could not find the AIColony for: " + colony);
+            }
+        }
+        return ac;
+    }
+        
+    /**
+     * Gets the AI unit corresponding to a given unit, if any.
+     *
+     * @param unit The <code>Unit</code> to look up.
+     * @return The corresponding AI unit or null if not found.
+     */
+    protected AIUnit getAIUnit(Unit unit) {
+        return getAIMain().getAIUnit(unit);
+    }
+
+    /**
      * Gets a list of AIUnits for the player.
      *
      * @return A list of AIUnits.
@@ -186,45 +224,6 @@ public abstract class AIPlayer extends AIObject {
     protected Iterator<AIUnit> getAIUnitIterator() {
         if (aiUnits.size() == 0) createAIUnits();
         return aiUnits.iterator();
-    }
-
-    /**
-     * Returns an iterator over all the <code>AIColony</code>s owned by this
-     * player.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    protected Iterator<AIColony> getAIColonyIterator() {
-        ArrayList<AIColony> ac = new ArrayList<AIColony>();
-        for (Colony colony : getPlayer().getColonies()) {
-            AIColony a = getAIColony(colony);
-            if (a != null) {
-                ac.add(a);
-            } else {
-                logger.warning("Could not find the AIColony for: " + colony);
-            }
-        }
-        return ac.iterator();
-    }
-
-    /**
-     * Gets the AI colony corresponding to a given colony, if any.
-     *
-     * @param colony The <code>Colony</code> to look up.
-     * @return The corresponding AI colony or null if not found.
-     */
-    protected AIColony getAIColony(Colony colony) {
-        return getAIMain().getAIColony(colony);
-    }
-
-    /**
-     * Gets the AI unit corresponding to a given unit, if any.
-     *
-     * @param unit The <code>Unit</code> to look up.
-     * @return The corresponding AI unit or null if not found.
-     */
-    protected AIUnit getAIUnit(Unit unit) {
-        return getAIMain().getAIUnit(unit);
     }
 
 

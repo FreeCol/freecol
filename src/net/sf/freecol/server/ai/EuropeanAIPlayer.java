@@ -195,9 +195,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     public List<TileImprovementPlan> getTileImprovementPlans() {
         List<TileImprovementPlan> tileImprovements
             = new ArrayList<TileImprovementPlan>();
-        Iterator<AIColony> acIterator = getAIColonyIterator();
-        while (acIterator.hasNext()) {
-            tileImprovements.addAll(acIterator.next().getTileImprovementPlans());
+        for (AIColony aic : getAIColonies()) {
+            tileImprovements.addAll(aic.getTileImprovementPlans());
         }
         return tileImprovements;
     }
@@ -206,10 +205,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Remove a <code>TileImprovementPlan</code> from the relevant colony.
      */
     public void removeTileImprovementPlan(TileImprovementPlan plan) {
-        Iterator<AIColony> colonyIter = getAIColonyIterator();
-        while (colonyIter.hasNext()) {
-            AIColony colony = colonyIter.next();
-            if (colony.removeTileImprovementPlan(plan)) return;
+        for (AIColony aic : getAIColonies()) {
+            if (aic.removeTileImprovementPlan(plan)) return;
         }
         logger.warning("Not found given TileImprovementPlan to remove");
     }
@@ -296,9 +293,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public List<Wish> getWishes() {
         List<Wish> wishes = new ArrayList<Wish>();
-        Iterator<AIColony> ai = getAIColonyIterator();
-        while (ai.hasNext()) {
-            wishes.addAll(ai.next().getWishes());
+        for (AIColony aic : getAIColonies()) {
+            wishes.addAll(aic.getWishes());
         }
         Collections.sort(wishes);
         return wishes;
@@ -628,9 +624,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (getAIRandom().nextInt(10) == 1) {
                 List<WorkerWish> workerWishes = new ArrayList<WorkerWish>();
-                for (Colony colony : getPlayer().getColonies()) {
-                    AIColony aiColony = getAIMain().getAIColony(colony);
-                    workerWishes.addAll(aiColony.getWorkerWishes());
+                for (AIColony aic : getAIColonies()) {
+                    workerWishes.addAll(aic.getWorkerWishes());
                 }
                 if (!workerWishes.isEmpty()) {
                     Collections.sort(workerWishes);
@@ -716,9 +711,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void rearrangeWorkersInColonies() {
         logger.finest("Entering method rearrangeWorkersInColonies");
-        for (Colony colony : getPlayer().getColonies()) {
-            getAIMain().getAIColony(colony).rearrangeWorkers();
-        }
+        for (AIColony aic : getAIColonies()) aic.rearrangeWorkers();
     }
 
     /**
@@ -1216,12 +1209,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (UnitType unitType : getAIMain().getGame().getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
-        Iterator<AIColony> aIterator = getAIColonyIterator();
-        while (aIterator.hasNext()) {
-            for (Wish w : aIterator.next().getWishes()) {
-                if (w instanceof WorkerWish && w.getTransportable() == null) {
-                    workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
-                }
+        for (Wish w : getWishes()) {
+            if (w instanceof WorkerWish && w.getTransportable() == null) {
+                workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
             }
         }
 
@@ -1565,11 +1555,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void createAIGoodsInColonies() {
         logger.finest("Entering method createAIGoodsInColonies");
-        Iterator<AIColony> ci = getAIColonyIterator();
-        while (ci.hasNext()) {
-            AIColony c = ci.next();
-            c.createAIGoods();
-        }
+        for (AIColony aic : getAIColonies()) aic.createAIGoods();
     }
 
     /**
@@ -1923,10 +1909,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         // Add goods to transport
-        Iterator<AIColony> aci = getAIColonyIterator();
-        while (aci.hasNext()) {
-            AIColony ac = aci.next();
-            for (AIGoods aig : ac.getAIGoods()) {
+        for (AIColony aic : getAIColonies()) {
+            for (AIGoods aig : aic.getAIGoods()) {
                 if (aig.getTransportDestination() != null
                     && aig.getTransport() == null) {
                     transportables.add(aig);
