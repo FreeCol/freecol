@@ -215,34 +215,25 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Helper function for server communication - Ask the server
-     * to recruit a unit in Europe on behalf of the AIGetPlayer().
+     * Asks the server to recruit a unit in Europe on behalf of the AIPlayer.
      *
      * TODO: Move this to a specialized Handler class (AIEurope?)
      * TODO: Give protected access?
      *
-     * @param index The index of the unit to recruit in the recruitables list.
-     * @return the new AIUnit created by this action. May be null.
+     * @param index The index of the unit to recruit in the recruitables list,
+     *     (if not a valid index, recruit a random unit).
+     * @return The new AIUnit created by this action or null on failure.
      */
     public AIUnit recruitAIUnitInEurope(int index) {
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         int n = europe.getUnitCount();
-
-        // CHEAT: give the AI a selection ability
         final String selectAbility = "model.ability.selectRecruit";
-        boolean canSelect = getPlayer().hasAbility(selectAbility);
-        Ability ability = null;
-        if (!canSelect) {
-            ability = new Ability(selectAbility);
-            getPlayer().getFeatureContainer().addAbility(ability);
-        }
-        if (AIMessage.askEmigrate(getConnection(), index+1)
+        int slot = (index >= 0 && index < Europe.RECRUIT_COUNT
+            && getPlayer().hasAbility(selectAbility)) ? (index + 1) : 0;
+        if (AIMessage.askEmigrate(getConnection(), slot)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
-        }
-        if (ability != null) {
-            getPlayer().getFeatureContainer().removeAbility(ability);
         }
         return aiUnit;
     }

@@ -970,12 +970,13 @@ public class TransportMission extends Mission {
         if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0) {
             price = europe.getUnitPrice(unitType);
         }
-        // Try recruiting the unit, unless it would be cheaper to
-        // train
+
+        // Try recruiting the unit, unless it would be cheaper to train.
+        final String selectAbility = "model.ability.selectRecruit";
         if (player.checkGold(player.getRecruitPrice())
-            && price > player.getRecruitPrice()) {
+            && price > player.getRecruitPrice()
+            && player.hasAbility(selectAbility)) {
             for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                // Note, used to be 1-3 but the method expects 0-2
                 if (europe.getRecruitable(i) == unitType) {
                     return aiPlayer.recruitAIUnitInEurope(i);
                 }
@@ -1028,12 +1029,12 @@ public class TransportMission extends Mission {
             	priceTrained = price;
             }
         }
-        // Try recruiting the unit:
+        // Recruit a random unit.
         if (player.checkGold(player.getRecruitPrice())
             && cheapestTrained != null
             && player.getRecruitPrice() < priceTrained) {
             // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc)
-            return aiPlayer.recruitAIUnitInEurope(1);
+            return aiPlayer.recruitAIUnitInEurope(-1);
         }
 
         // Try training the unit:
