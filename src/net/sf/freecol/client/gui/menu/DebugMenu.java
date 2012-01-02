@@ -308,7 +308,7 @@ public class DebugMenu extends JMenu {
                         actions.add(new ChoiceItem<MonarchAction>(action));
                     }
                     MonarchAction action
-                        = gui.getCanvas().showChoiceMonarchActionDialog(monarchTitle, actions);
+                        = gui.showChoiceMonarchActionDialog(monarchTitle, actions);
                     server.getInGameController()
                         .setMonarchAction(serverPlayer, action);
                 }
@@ -434,7 +434,7 @@ public class DebugMenu extends JMenu {
                 + " panel");
             mItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        gui.getCanvas().showEventPanel(eventType);
+                        gui.showEventPanel(eventType);
                     }
                 });
             panelMenu.add(mItem);
@@ -567,7 +567,7 @@ public class DebugMenu extends JMenu {
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.getCanvas().showStatisticsPanel();
+                    gui.showStatisticsPanel();
                 }
             });
         statistics.setEnabled(true);
@@ -639,7 +639,7 @@ public class DebugMenu extends JMenu {
             }
         }
 
-        FoundingFather father = gui.getCanvas().showChooseFoundingFatherDialog(fathers, fatherTitle);
+        FoundingFather father = gui.showChooseFoundingFatherDialog(fathers, fatherTitle);
         if (father != null) {
             server.getInGameController()
                 .addFoundingFather((ServerPlayer) serverPlayer,
