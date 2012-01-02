@@ -769,7 +769,7 @@ public final class InGameController implements NetworkConstants {
                 price = NetworkConstants.STEAL_LAND;
             } else {
                 boolean canAccept = player.checkGold(price);
-                switch (gui.getCanvas().showClaimDialog(tile, player, price,
+                switch (gui.showClaimDialog(tile, player, price,
                         owner, canAccept)) {
                 case CANCEL:
                     return false;
