@@ -46,6 +46,6 @@ public class ReportCargoAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showReportCargoPanel();
+        gui.showReportCargoPanel();
     }
 }

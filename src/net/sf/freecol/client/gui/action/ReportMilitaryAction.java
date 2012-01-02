@@ -48,6 +48,6 @@ public class ReportMilitaryAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showReportMilitaryPanel();
+        gui.showReportMilitaryPanel();
     }
 }
