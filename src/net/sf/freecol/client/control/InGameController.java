@@ -3177,7 +3177,7 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
 
         // Offer the choices.
-        switch (gui.getCanvas().showUseMissionaryDialog(unit, settlement,
+        switch (gui.showUseMissionaryDialog(unit, settlement,
                 canEstablish, canDenounce)) {
         case CANCEL:
             return;
@@ -3454,8 +3454,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
-        Location destination = gui.getCanvas()
-            .showSelectDestinationDialog(unit);
+        Location destination = gui.showSelectDestinationDialog(unit);
         if (destination == null) return; // user aborted
 
         if (setDestination(unit, destination)

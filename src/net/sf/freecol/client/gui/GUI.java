@@ -27,6 +27,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.Canvas.ClaimAction;
+import net.sf.freecol.client.gui.Canvas.MissionaryAction;
 import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
@@ -46,6 +47,8 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -828,6 +831,17 @@ public class GUI {
     
     public List<Goods> showDumpCargoDialog(Unit unit) {
         return canvas.showDumpCargoDialog(unit);
+    }
+    
+    public Location showSelectDestinationDialog(Unit unit) {
+        return canvas.showSelectDestinationDialog(unit);
+    }
+    
+    public MissionaryAction showUseMissionaryDialog(Unit unit,
+            IndianSettlement settlement,
+            boolean canEstablish,
+            boolean canDenounce) {
+        return canvas.showUseMissionaryDialog(unit, settlement, canEstablish, canDenounce);
     }
     
 }
