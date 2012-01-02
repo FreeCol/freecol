@@ -43,7 +43,6 @@ import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -136,14 +135,13 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
 
     private void selectSettlement() {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
-        Canvas canvas = getCanvas();
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
-            canvas.remove(FindSettlementDialog.this);
+            getGUI().removeFromCanvas(FindSettlementDialog.this);
             getGUI().showColonyPanel((Colony) settlement);
         } else if (settlement instanceof IndianSettlement) {
-            canvas.remove(FindSettlementDialog.this);
-            canvas.showIndianSettlementPanel((IndianSettlement) settlement);
+            getGUI().removeFromCanvas(FindSettlementDialog.this);
+            getCanvas().showIndianSettlementPanel((IndianSettlement) settlement);
         }
     }
 

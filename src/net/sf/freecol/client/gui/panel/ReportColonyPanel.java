@@ -40,7 +40,6 @@ import javax.swing.SwingConstants;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -300,15 +299,13 @@ public final class ReportColonyPanel extends ReportPanel
      */
     public void actionPerformed(ActionEvent event) {
         if (useCompact) {
-            Canvas canvas = getCanvas();
             String command = event.getActionCommand();
-            FreeColPanel panel = null;
             if (command.startsWith(BUILDQUEUE)) {
                 command = command.substring(BUILDQUEUE.length());
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    canvas.showBuildQueuePanel((Colony) fcgo, new Runnable() {
+                    getCanvas().showBuildQueuePanel((Colony) fcgo, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }
@@ -319,7 +316,7 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    canvas.showColonyPanel((Colony) fcgo, new Runnable() {
+                    getCanvas().showColonyPanel((Colony) fcgo, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }

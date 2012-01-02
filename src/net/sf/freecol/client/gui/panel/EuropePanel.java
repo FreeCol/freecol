@@ -538,12 +538,11 @@ public final class EuropePanel extends FreeColPanel {
                     logger.warning("Invalid component dropped on this DestinationPanel.");
                     return null;
                 }
-                final Canvas canvas = getCanvas();
                 final Unit unit = ((UnitLabel) comp).getUnit();
 
                 Location dest = destination;
                 if (unit.isInEurope()) {
-                    dest = canvas.showSelectDestinationDialog(unit);
+                    dest = getCanvas().showSelectDestinationDialog(unit);
                     if (dest == null) return null; // user aborted
                 }
 

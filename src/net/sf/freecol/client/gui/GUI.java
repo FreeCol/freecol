@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
@@ -906,5 +907,10 @@ public class GUI {
     public void removeFromCanvas(Component component) {
         canvas.remove(component);
     }
+    
+    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
+        return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
+    }
+
     
 }
