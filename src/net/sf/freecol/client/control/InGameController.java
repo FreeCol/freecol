@@ -1563,7 +1563,7 @@ public final class InGameController implements NetworkConstants {
         if (messages.isEmpty()) return true;
         ModelMessage[] modelMessages
             = messages.toArray(new ModelMessage[messages.size()]);
-        return gui.getCanvas().showConfirmDialog(unit.getTile(),
+        return gui.showConfirmDialog(unit.getTile(),
             modelMessages, "buildColony.yes", "buildColony.no");
     }
 

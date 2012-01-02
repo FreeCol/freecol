@@ -807,6 +807,10 @@ public class GUI {
             Goods goods, int gold) {
         return canvas.showSellDialog(unit, settlement, goods, gold);
     }
-    
+
+    public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
+            String okText, String cancelText) {
+        return canvas.showConfirmDialog(tile, messages, okText, cancelText);
+    }
     
 }
