@@ -912,5 +912,29 @@ public class GUI {
         return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
     }
 
+    public void showAboutPanel() {
+        canvas.showAboutPanel();
+    }
+
+    public void showChatPanel() {
+        canvas.showChatPanel();
+    }
+    
+    public void showEuropePanel() {
+        canvas.showEuropePanel();
+    }
+    
+    public void showFindSettlementDialog() {
+        canvas.showFindSettlementDialog();
+    }
+
+    public void showDifficultyDialog() {
+        canvas.showDifficultyDialog();
+    }
+
+
+
+    
+
     
 }

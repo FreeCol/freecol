@@ -62,6 +62,6 @@ public class ChatAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showChatPanel();
+        gui.showChatPanel();
     }
 }

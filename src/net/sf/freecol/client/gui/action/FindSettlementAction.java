@@ -48,6 +48,6 @@ public class FindSettlementAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.getCanvas().showFindSettlementDialog();
+        gui.showFindSettlementDialog();
     }
 }
