@@ -826,4 +826,8 @@ public class GUI {
         return canvas.showPreCombatDialog(attacker, defender, tile);
     }
     
+    public List<Goods> showDumpCargoDialog(Unit unit) {
+        return canvas.showDumpCargoDialog(unit);
+    }
+    
 }

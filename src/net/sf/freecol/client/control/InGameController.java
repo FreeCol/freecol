@@ -3695,7 +3695,7 @@ public final class InGameController implements NetworkConstants {
             // Goods left here must be dumped.
             if (unit.getGoodsCount() > 0) {
                 List<Goods> goodsList
-                    = gui.getCanvas().showDumpCargoDialog(unit);
+                    = gui.showDumpCargoDialog(unit);
                 if (goodsList != null) {
                     for (Goods goods : goodsList) {
                         unloadCargo(goods, true);
