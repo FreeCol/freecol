@@ -344,7 +344,7 @@ public final class InGameController implements NetworkConstants {
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
             if (gui.isShowingSubPanel()) {
-                gui.getCanvas().getShowingSubPanel().requestFocus();
+                gui.requestFocusForSubPanel();
                 return false;
             }
 
@@ -1881,7 +1881,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Confirm intention, and collect nation+country names.
-        List<String> names = gui.getCanvas().showConfirmDeclarationDialog();
+        List<String> names = gui.showConfirmDeclarationDialog();
         if (names == null
             || names.get(0) == null || names.get(0).length() == 0
             || names.get(1) == null || names.get(1).length() == 0) {
@@ -1894,7 +1894,7 @@ public final class InGameController implements NetworkConstants {
         String countryName = names.get(1);
         if (askServer().declareIndependence(nationName, countryName)
             && player.getPlayerType() == PlayerType.REBEL) {
-            gui.getCanvas().showDeclarationDialog();
+            gui.showDeclarationDialog();
             freeColClient.getActionManager().update();
             nextModelMessage();
         }
@@ -2442,7 +2442,7 @@ public final class InGameController implements NetworkConstants {
         Tile target = tile.getNeighbourOrNull(direction);
         IndianSettlement is = target.getIndianSettlement();
         if (is != null && unit.isArmed()) {
-            switch (gui.getCanvas().showArmedUnitIndianSettlementDialog(is)) {
+            switch (gui.showArmedUnitIndianSettlementDialog(is)) {
             case CANCEL:
                 return;
             case INDIAN_SETTLEMENT_ATTACK:
@@ -2757,7 +2757,7 @@ public final class InGameController implements NetworkConstants {
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         clearGotoOrders(unit);
 
-        switch (gui.getCanvas().showScoutForeignColonyDialog(colony, unit, canNeg)) {
+        switch (gui.showScoutForeignColonyDialog(colony, unit, canNeg)) {
         case CANCEL:
             break;
         case FOREIGN_COLONY_ATTACK:
