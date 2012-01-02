@@ -53,7 +53,7 @@ public class ZoomOutAction extends FreeColAction {
             return false;
         }
 
-        if (gui.getCanvas() == null || !gui.getCanvas().isMapboardActionsEnabled())
+        if (!gui.isMapboardActionsEnabled())
         	return false;
 
         float oldScaling = gui.getMapScale();

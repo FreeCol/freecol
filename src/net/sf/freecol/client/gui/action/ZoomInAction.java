@@ -21,9 +21,7 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -56,7 +54,7 @@ public class ZoomInAction extends FreeColAction {
             return false;
         }
 
-        if (gui.getCanvas() == null || !gui.getCanvas().isMapboardActionsEnabled())
+        if (!gui.isMapboardActionsEnabled())
         	return false;
 
         float oldScaling = gui.getMapScale();
