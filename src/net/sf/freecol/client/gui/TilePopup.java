@@ -530,7 +530,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(name));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    gui.getCanvas().showIndianSettlementPanel(settlement);
+                    gui.showIndianSettlementPanel(settlement);
                 }
             });
         add(menuItem);
@@ -546,7 +546,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    gui.getCanvas().showTilePanel(tile);
+                    gui.showTilePanel(tile);
                 }
             });
 

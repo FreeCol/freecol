@@ -945,7 +945,14 @@ public class GUI {
         return canvas != null && canvas.isMapboardActionsEnabled();
     }
 
-    
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+        canvas.showIndianSettlementPanel(indianSettlement);
+    }
+
+    public void showTilePanel(Tile tile) {
+        canvas.showTilePanel(tile);
+    }
+
 
     
 }
