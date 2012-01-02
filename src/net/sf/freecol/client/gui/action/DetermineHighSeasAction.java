@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
@@ -100,7 +99,6 @@ public class DetermineHighSeasAction extends FreeColAction {
         final int DEFAULT_distToLandFromHighSeas = 4;
         final int DEFAULT_maxDistanceToEdge = 12;
 
-        final Canvas canvas = gui.getCanvas();
         final JTextField inputD = new JTextField(Integer.toString(DEFAULT_distToLandFromHighSeas), COLUMNS);
         final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
@@ -166,7 +164,7 @@ public class DetermineHighSeasAction extends FreeColAction {
 
         inputDialog.setSize(inputDialog.getPreferredSize());
 
-        return canvas.showFreeColDialog(inputDialog);
+        return gui.getCanvas().showFreeColDialog(inputDialog);
     }
 
     private class Parameters {
