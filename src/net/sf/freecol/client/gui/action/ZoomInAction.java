@@ -56,9 +56,7 @@ public class ZoomInAction extends FreeColAction {
             return false;
         }
 
-        Canvas canvas = gui.getCanvas();
-
-        if (canvas == null || !canvas.isMapboardActionsEnabled())
+        if (gui.getCanvas() == null || !gui.getCanvas().isMapboardActionsEnabled())
         	return false;
 
         float oldScaling = gui.getMapScale();
