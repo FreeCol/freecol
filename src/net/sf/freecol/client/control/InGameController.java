@@ -3109,7 +3109,7 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
-                switch (gui.getCanvas().showSellDialog(unit, settlement, goods, gold)) {
+                switch (gui.showSellDialog(unit, settlement, goods, gold)) {
                 case CANCEL:
                     return;
                 case SELL: // Accepted price, make the sale

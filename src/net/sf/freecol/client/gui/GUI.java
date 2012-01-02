@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.BuyAction;
+import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -801,5 +802,11 @@ public class GUI {
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
+    
+    public SellAction showSellDialog(Unit unit, Settlement settlement,
+            Goods goods, int gold) {
+        return canvas.showSellDialog(unit, settlement, goods, gold);
+    }
+    
     
 }
