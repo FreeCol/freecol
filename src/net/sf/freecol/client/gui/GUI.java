@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.ModelMessage;
@@ -817,6 +818,12 @@ public class GUI {
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
             Player owner, boolean canAccept) {
         return canvas.showClaimDialog(tile, player, price, owner, canAccept);
+    }
+    
+    public boolean showPreCombatDialog(FreeColGameObject attacker,
+            FreeColGameObject defender,
+            Tile tile) {
+        return canvas.showPreCombatDialog(attacker, defender, tile);
     }
     
 }
