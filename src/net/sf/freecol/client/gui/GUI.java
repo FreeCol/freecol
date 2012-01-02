@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas.BuyAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -490,15 +491,20 @@ public class GUI {
         canvas.showBuildQueuePanel(colony);
     }
     
+    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
+            Goods goods, int gold, boolean canBuy) {
+        return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
+    }
+    
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
         return canvas.showCaptureGoodsDialog(winner, loot);
     }
-    
+        
     public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
             List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
     }
-        
+    
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
         return canvas.showChooseFoundingFatherDialog(ffs);
     }
@@ -510,20 +516,20 @@ public class GUI {
     public void showColopediaPanel(String nodeId) {
         canvas.showColopediaPanel(nodeId);
     }
-    
+
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
         return canvas.showConfirmDialog(text, okText, cancelText);
     }
-
+    
     public boolean showConfirmDialog(Tile tile, StringTemplate text,
             String okText, String cancelText) {
         return canvas.showConfirmDialog(tile, text, okText, cancelText);
     }
-    
+
     public int showEmigrationPanel(boolean fountainOfYouth) {
         return canvas.showEmigrationPanel(fountainOfYouth);
     }
-
+    
     public boolean showEndTurnDialog(List<Unit> units) {
         return canvas.showEndTurnDialog(units);
     }
@@ -539,11 +545,11 @@ public class GUI {
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
     }
-    
+
     public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
         canvas.showInformationMessage(displayObject, template);
     }
-
+    
     public void showInformationMessage(String messageId) {
         canvas.showInformationMessage(messageId);
     }
@@ -561,15 +567,15 @@ public class GUI {
     public File showLoadDialog(File directory) {
         return canvas.showLoadDialog(directory);
     }
-    
+        
     public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
         return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
     }
-        
+    
     public void showMainPanel() {
         canvas.showMainPanel();
     }
-    
+
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){
         return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustomOptions);
     }
@@ -577,7 +583,7 @@ public class GUI {
     public void showModelMessages(ModelMessage... modelMessages) {
         canvas.showModelMessages(modelMessages);
     }
-
+    
     public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
         return canvas.showMonarchPanelDialog(action, replace);
     }
@@ -585,11 +591,11 @@ public class GUI {
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         return canvas.showNegotiationDialog(unit, settlement, agreement);
     }
-    
+
     public void showNewPanel(Specification specification) {
         canvas.showNewPanel(specification);
     }
-
+    
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, defaultName);
     }
@@ -599,25 +605,25 @@ public class GUI {
             List<T> objects) {
         return canvas.showSimpleChoiceDialog(tile, text, cancelText, objects);
     }
-    
+
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-
+    
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
-    
+
     public void showTilePopUpAtSelectedTile() {
         canvas.showTilePopup(getSelectedTile(),
                 mapViewer.getCursor().getCanvasX(),
                 mapViewer.getCursor().getCanvasY());
     }
-
+        
+    
     public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
         return canvas.showTradeRouteDialog(tradeRoute, tile);
     }
-        
     
     public void showVictoryPanel() {
         canvas.showVictoryPanel();
@@ -763,11 +769,11 @@ public class GUI {
     public void toggleViewMode() {
         mapViewer.getViewMode().toggleViewMode();    
     }
-    
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }
-
+    
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -778,22 +784,22 @@ public class GUI {
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-    
+
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
         }
     }
-
+    
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
+
     
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-
     
 }

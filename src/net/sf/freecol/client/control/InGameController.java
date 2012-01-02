@@ -3063,7 +3063,7 @@ public final class InGameController implements NetworkConstants {
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
-                switch (gui.getCanvas().showBuyDialog(unit, settlement, goods, gold,
+                switch (gui.showBuyDialog(unit, settlement, goods, gold,
                         canBuy)) {
                 case CANCEL: // User cancelled
                     return;
