@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas.BuyAction;
+import net.sf.freecol.client.gui.Canvas.ClaimAction;
 import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
@@ -811,6 +812,11 @@ public class GUI {
     public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
             String okText, String cancelText) {
         return canvas.showConfirmDialog(tile, messages, okText, cancelText);
+    }
+    
+    public ClaimAction showClaimDialog(Tile tile, Player player, int price,
+            Player owner, boolean canAccept) {
+        return canvas.showClaimDialog(tile, player, price, owner, canAccept);
     }
     
 }
