@@ -1220,7 +1220,7 @@ public final class InGameController implements NetworkConstants {
             Runnable uiTask = new Runnable() {
                     public void run() {
                         if (endOfTurn) {
-                            gui.getCanvas().showReportTurnPanel(a);
+                            gui.showReportTurnPanel(a);
                         } else {
                             gui.showModelMessages(a);
                         }
