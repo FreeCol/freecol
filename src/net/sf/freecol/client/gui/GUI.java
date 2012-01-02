@@ -953,6 +953,19 @@ public class GUI {
         canvas.showTilePanel(tile);
     }
 
+    public void showReportTradePanel() {
+        canvas.showReportTradePanel();
+    }
+    
+    public void showReportRequirementsPanel() {
+        canvas.showReportRequirementsPanel();
+    }
+    
+    public void showReportReligiousPanel() {
+        canvas.showReportReligiousPanel();
+    }
+
+
 
     
 }
