@@ -2793,7 +2793,7 @@ public final class InGameController implements NetworkConstants {
         // Offer the choices.
         NationSummary ns = getNationSummary(settlement.getOwner());
         String number = (ns == null) ? "many" : ns.getNumberOfSettlements();
-        switch (gui.getCanvas().showScoutIndianSettlementDialog(settlement, number)) {
+        switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
             return;
         case INDIAN_SETTLEMENT_ATTACK:
@@ -2972,7 +2972,7 @@ public final class InGameController implements NetworkConstants {
             boolean gif = results[2] && unit.getGoodsCount() > 0;
             if (!buy && !sel && !gif) break;
 
-            switch (gui.getCanvas().showIndianSettlementTradeDialog(settlement,
+            switch (gui.showIndianSettlementTradeDialog(settlement,
                     buy, sel, gif)) {
             case CANCEL:
                 done = true;
