@@ -294,7 +294,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         String command = event.getActionCommand();
         if (OK.equals(command)) {
             if (verifyNewTradeRoute()) {
-                getCanvas().remove(this);
+                getGUI().removeFromCanvas(this);
                 originalRoute.setName(tradeRouteName.getText());
                 ArrayList<Stop> stops = new ArrayList<Stop>();
                 for (int index = 0; index < listModel.getSize(); index++) {
@@ -306,7 +306,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 setResponse(Boolean.TRUE);
             }
         } else if (CANCEL.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
         } else {
             super.actionPerformed(event);

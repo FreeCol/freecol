@@ -109,7 +109,7 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
 
         Action quitAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    getCanvas().remove(FindSettlementDialog.this);
+                    getGUI().removeFromCanvas(FindSettlementDialog.this);
                 }
             };
 

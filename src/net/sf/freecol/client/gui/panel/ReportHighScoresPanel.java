@@ -129,6 +129,6 @@ public final class ReportHighScoresPanel extends ReportPanel {
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        getCanvas().remove(this);
+        getGUI().removeFromCanvas(this);
     }
 }

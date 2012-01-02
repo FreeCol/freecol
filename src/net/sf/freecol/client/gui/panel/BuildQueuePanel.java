@@ -579,7 +579,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 logger.warning("Unsupported command " + command);
             }
         }
-        getCanvas().remove(this);
+        getGUI().removeFromCanvas(this);
     }
 
     public void itemStateChanged(ItemEvent event) {

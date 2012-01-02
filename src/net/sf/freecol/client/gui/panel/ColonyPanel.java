@@ -679,7 +679,7 @@ public final class ColonyPanel extends FreeColPanel
             if (getGUI().showConfirmDialog("abandonColony.text",
                                          "abandonColony.yes",
                                          "abandonColony.no")) {
-                getCanvas().remove(this);
+                getGUI().removeFromCanvas(this);
                 getController().abandonColony(getColony());
             }
         } else {
@@ -693,7 +693,7 @@ public final class ColonyPanel extends FreeColPanel
                                              "ok", "cancel")) {
                 return;
             }
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
 
             // remove property listeners
             removePropertyChangeListeners();

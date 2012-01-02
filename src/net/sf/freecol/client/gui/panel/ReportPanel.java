@@ -124,7 +124,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
         } else {
             FreeColGameObject object = getGame().getFreeColGameObject(command);
             if (object instanceof Colony) {

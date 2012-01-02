@@ -216,7 +216,7 @@ public final class ColopediaPanel extends FreeColPanel
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
         } else {
             select(command);
         }

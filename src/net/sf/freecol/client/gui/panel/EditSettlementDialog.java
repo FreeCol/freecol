@@ -207,6 +207,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         	t.setSettlement(null);
           settlement.dispose();
         }
-        getCanvas().remove(this);
+        getGUI().removeFromCanvas(this);
     }
 }

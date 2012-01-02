@@ -166,7 +166,7 @@ public final class TilePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
         } else {
             getGUI().showColopediaPanel(command);
         }

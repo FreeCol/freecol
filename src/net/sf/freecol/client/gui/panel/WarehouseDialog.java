@@ -104,7 +104,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
                 }
             }
         } else if (CANCEL.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
         } else {
             logger.warning("Invalid ActionCommand: " + command);

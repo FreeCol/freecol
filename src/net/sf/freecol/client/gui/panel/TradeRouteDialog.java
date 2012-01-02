@@ -199,7 +199,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         if (unit != null && route != null) {
             switch (action) {
             case OK:
-                getCanvas().remove(this);
+                getGUI().removeFromCanvas(this);
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));
@@ -209,7 +209,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 setResponse(route);
                 return;
             case DEASSIGN:
-                getCanvas().remove(this);
+                getGUI().removeFromCanvas(this);
                 getController().clearOrders(unit);
                 setResponse(route);
                 return;
@@ -227,7 +227,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 break;
             }
         }
-        getCanvas().remove(this);
+        getGUI().removeFromCanvas(this);
         setResponse(null);
     }
 }

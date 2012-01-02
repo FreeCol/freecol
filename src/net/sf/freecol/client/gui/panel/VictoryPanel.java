@@ -98,7 +98,7 @@ public final class VictoryPanel extends FreeColPanel {
             getFreeColClient().quit();
         } else {
             getFreeColClient().continuePlaying();
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
         }
     }
 }

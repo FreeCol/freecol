@@ -389,7 +389,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         while (uc != null) {
             if (uc instanceof ColonyPanel) {
                 if (unit.getColony() == null) {
-                    gui.getCanvas().remove(uc);
+                    gui.removeFromCanvas(uc);
                     freeColClient.getActionManager().update();
                 } else {
                     // ((ColonyPanel) uc).reinitialize();

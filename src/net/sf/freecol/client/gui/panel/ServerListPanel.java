@@ -188,7 +188,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                 connectController.joinMultiplayerGame(username, si.getAddress(), si.getPort());
                 break;
             case CANCEL:
-                getCanvas().remove(this);
+                getGUI().removeFromCanvas(this);
                 getCanvas().showNewPanel();
                 break;
             default:

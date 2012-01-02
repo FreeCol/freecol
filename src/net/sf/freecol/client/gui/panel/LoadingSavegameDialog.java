@@ -165,10 +165,10 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
             setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {
-            getCanvas().remove(this);
+            getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
         } else {
             logger.warning("Invalid ActionCommand: " + command);

@@ -83,7 +83,7 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
 
         Action quitAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    getCanvas().remove(ChoiceDialog.this);
+                    getGUI().removeFromCanvas(ChoiceDialog.this);
                 }
             };
 

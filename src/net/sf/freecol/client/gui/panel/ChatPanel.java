@@ -92,7 +92,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
                     String message = getChatText();
                     getController().sendChat(message);
                     getGUI().displayChatMessage(message, false);
-                    getCanvas().remove(this);
+                    getGUI().removeFromCanvas(this);
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

@@ -375,7 +375,7 @@ public final class EuropePanel extends FreeColPanel {
      */
     private void exitAction() {
         cleanup();
-        getCanvas().remove(this);
+        getGUI().removeFromCanvas(this);
         getController().nextModelMessage();
     }
 

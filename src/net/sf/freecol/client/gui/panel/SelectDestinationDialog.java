@@ -138,13 +138,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     if (d != null) {
                         setResponse((Location) d.location);
                     }
-                    getCanvas().remove(SelectDestinationDialog.this);
+                    getGUI().removeFromCanvas(SelectDestinationDialog.this);
                 }
             };
 
         Action quitAction = new AbstractAction(Messages.message("selectDestination.cancel")) {
                 public void actionPerformed(ActionEvent e) {
-                    getCanvas().remove(SelectDestinationDialog.this);
+                    getGUI().removeFromCanvas(SelectDestinationDialog.this);
                     setResponse(null);
                 }
             };
@@ -161,7 +161,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         if (d != null) {
                             setResponse((Location) d.location);
                         }
-                        getCanvas().remove(SelectDestinationDialog.this);
+                        getGUI().removeFromCanvas(SelectDestinationDialog.this);
                     }
                 }
             };
