@@ -427,7 +427,7 @@ public final class EuropePanel extends FreeColPanel {
         String command = event.getActionCommand();
         // Close any open Europe Dialog, and show new one if required
         EuropeAction act = EuropeAction.valueOf(command);
-        getCanvas().showEuropeDialog(act);
+        getGUI().showEuropeDialog(act);
         switch (act) {
         case EXIT:
             exitAction();

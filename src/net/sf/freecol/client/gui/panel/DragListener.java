@@ -329,7 +329,7 @@ public final class DragListener extends MouseAdapter {
             JMenuItem menuItem = new JMenuItem(Messages.message("showProduction"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        canvas.showWorkProductionPanel(tempUnit);
+                        gui.showWorkProductionPanel(tempUnit);
                     }
                 });
             menu.add(menuItem);
@@ -338,7 +338,7 @@ public final class DragListener extends MouseAdapter {
             JMenuItem menuItem = new JMenuItem(Messages.message("showProductivity"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        canvas.showWorkProductionPanel(tempUnit);
+                        gui.showWorkProductionPanel(tempUnit);
                     }
                 });
             menu.add(menuItem);

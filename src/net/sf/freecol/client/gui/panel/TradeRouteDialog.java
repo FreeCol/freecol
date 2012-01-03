@@ -90,7 +90,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                     Player player = getMyPlayer();
                     TradeRoute newRoute = getController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
-                    if (getCanvas().showTradeRouteInputDialog(newRoute)) {
+                    if (getGUI().showTradeRouteInputDialog(newRoute)) {
                         listModel.addElement(newRoute);
                         tradeRoutes.setSelectedValue(newRoute, true);
                     }
@@ -100,7 +100,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         // button for editing TradeRoute
         editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    getCanvas().showTradeRouteInputDialog((TradeRoute) tradeRoutes.getSelectedValue());
+                    getGUI().showTradeRouteInputDialog((TradeRoute) tradeRoutes.getSelectedValue());
                 }
             });
 

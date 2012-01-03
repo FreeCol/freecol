@@ -100,7 +100,7 @@ public final class CompactLabourReport extends ReportPanel {
      *
      * @param parent The parent of this panel.
      */
-    private CompactLabourReport(FreeColClient freeColClient, GUI gui, LabourData.UnitData data) {
+    public CompactLabourReport(FreeColClient freeColClient, GUI gui, LabourData.UnitData data) {
         super(freeColClient, gui, data == null ? Messages.message("reportLabourAction.name")
               : Messages.message("report.labour.details"));
         this.unitData = data;
@@ -110,36 +110,29 @@ public final class CompactLabourReport extends ReportPanel {
         scrollPane.setColumnHeaderView(headerRow);
     }
 
-    @Override
-    protected Border createBorder() {
-        return new EmptyBorder(0, 20, 20, 20);
-    }
+    public JButton createColonyButton(final Colony colony) {
+        String text = colony.getName();
+        if (!unitData.isSummary()) {
+//            int unitIndex = unitData.getUnitType().getIndex();
+//
+//            int skillLevel = Unit.getSkillLevel(unitIndex);
+//            if (skillLevel <= 0 && skillLevel > -2) {
+//                //settlers and servants can be trained anywwhere a farmer can
+//                unitIndex = Unit.EXPERT_FARMER;
+//            }
 
-
-    /**
-     * @return if this is the location summary, grouped by unit type
-     */
-    private boolean isOverview() {
-        return unitData == null;
-    }
-
-    /**
-     * @return if we are any summary
-     */
-    private boolean isSummary() {
-        return isOverview() || unitData.isSummary();
-    }
-
-    private ImageIcon getUnitIcon(UnitType unit) {
-        Unit.Role role = Unit.Role.DEFAULT;
-        if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
-            role = Unit.Role.PIONEER;
-        } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            role = Unit.Role.MISSIONARY;
+            if (colony.canTrain(unitData.getUnitType())) {
+                text = text + "*";
+            }
         }
 
-        return getLibrary().getUnitImageIcon(unit, role);
+        return createButton(text, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getGUI().showColonyPanel(colony);
+            }
+        });
     }
+
 
     @Override
     public void initialize() {
@@ -183,99 +176,9 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    private void addUnitTypes() {
-        int row = 1;
-
-        JButton allColonistsButton = createUnitNameButton(Messages.message("report.labour.allColonists"), labourData.getSummary());
-        reportPanel.add(allColonistsButton, "cell " + COLONY_COLUMN + " " + row + " 1 " + labourData.getSummary().getUnitSummaryRowCount());
-
-        row = addLocationData(labourData.getSummary().getTotal(), null, row);
-
-        for (UnitType unitType : LabourData.getLabourTypes(getMyPlayer())) {
-            LabourData.UnitData unitData = labourData.getUnitData(unitType);
-
-            JButton unitButton = createUnitNameButton(unitData.getUnitName(), unitData);
-            int rows = unitData.getUnitSummaryRowCount();
-            reportPanel.add(unitButton, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
-
-            if (unitData.hasDetails()) {
-                row = addLocationData(unitData.getTotal(), null, row);
-            } else {
-                unitButton.setEnabled(false);
-                unitButton.setDisabledIcon(unitButton.getIcon());
-                unitButton.setForeground(Color.GRAY);
-
-                reportPanel.add(createEmptyLabel(), "cell " + UNIT_TYPE_COLUMN + " " + row + " " + (COLUMNS - 1) + " 1");
-                row++;
-            }
-        }
-    }
-
-    /*
-     * distributes {@code value}, amount the number of {@code pocketCount}
-     *
-     * @param value
-     * @param pocketCount
-     * @return distribution of {@code value}
-     */
-    /*
-    private int[] distribute(int value, int pocketCount) {
-        int[] pockets = new int[pocketCount];
-
-        int pocketIndex = 0;
-        for (int i = value; i > 0; i--) {
-            pockets[pocketIndex]++;
-
-            pocketIndex++;
-            pocketIndex = pocketIndex % pocketCount;
-        }
-        return pockets;
-    }
-     */
-
-    private JLabel createEmptyLabel() {
-        JLabel empty = new JLabel("");
-        empty.setBorder(CELLBORDER);
-        return empty;
-    }
-
-    private void addLocations() {
-        LabourData.LocationData unitTotal = unitData.getTotal();
-
-        int row = 1;
-        JLabel summaryLabel = new JLabel(Messages.message("report.labour.summary"));
-        summaryLabel.setBorder(LEFTCELLBORDER);
-        reportPanel.add(summaryLabel, "cell " + COLONY_COLUMN + " " + row + " 1 " + unitTotal.getRowCount());
-
-        row = addLocationData(unitTotal, null, row);
-
-        for (Colony colony : getSortedColonies()) {
-            LabourData.LocationData colonyData = unitData.getDetails().get(colony);
-            if (colonyData != null) {
-                reportPanel.add(createColonyButton(colony), "cell " + COLONY_COLUMN + " "
-                                + row + " 1 " + colonyData.getRowCount());
-                row = addLocationData(colonyData, colony, row);
-            }
-        }
-        LabourData.LocationData europe = unitData.getUnitsInEurope();
-        if (europe.getRowCount() > 0) {
-            JButton button = createButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
-                                          new ActionListener() {
-                                              public void actionPerformed(ActionEvent e) {
-                                                  getGUI().showEuropePanel();
-                                              }
-                                          });
-            reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row + " 1 " + europe.getRowCount());
-            row = addLocationData(europe, null, row);
-        }
-        row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.onLand", row);
-        row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.atSea", row);
-
-        reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")), "cell 1 " + row + " " + COLUMNS + " 1");
-    }
-
-    private GoodsType getGoodsType() {
-        return isSummary() ? null : unitData.getUnitType().getExpertProduction();
+    @Override
+    protected Border createBorder() {
+        return new EmptyBorder(0, 20, 20, 20);
     }
 
     /**
@@ -333,18 +236,6 @@ public final class CompactLabourReport extends ReportPanel {
             header.setIcon(icon);
             header.setIconTextGap(20);
         }
-    }
-
-    private int addNonLinkedLocation(LabourData.LocationData data, String messageKey, int row) {
-        int rows = data.getRowCount();
-        if (rows > 0) {
-            JLabel label = new JLabel(Messages.message(messageKey));
-            label.setBorder(LEFTCELLBORDER);
-            label.setForeground(Color.GRAY);
-            reportPanel.add(label, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
-            return addLocationData(data, null, row);
-        }
-        return row;
     }
 
     /**
@@ -490,6 +381,63 @@ public final class CompactLabourReport extends ReportPanel {
         return row;
     }
 
+    private void addLocations() {
+        LabourData.LocationData unitTotal = unitData.getTotal();
+
+        int row = 1;
+        JLabel summaryLabel = new JLabel(Messages.message("report.labour.summary"));
+        summaryLabel.setBorder(LEFTCELLBORDER);
+        reportPanel.add(summaryLabel, "cell " + COLONY_COLUMN + " " + row + " 1 " + unitTotal.getRowCount());
+
+        row = addLocationData(unitTotal, null, row);
+
+        for (Colony colony : getSortedColonies()) {
+            LabourData.LocationData colonyData = unitData.getDetails().get(colony);
+            if (colonyData != null) {
+                reportPanel.add(createColonyButton(colony), "cell " + COLONY_COLUMN + " "
+                                + row + " 1 " + colonyData.getRowCount());
+                row = addLocationData(colonyData, colony, row);
+            }
+        }
+        LabourData.LocationData europe = unitData.getUnitsInEurope();
+        if (europe.getRowCount() > 0) {
+            JButton button = createButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
+                                          new ActionListener() {
+                                              public void actionPerformed(ActionEvent e) {
+                                                  getGUI().showEuropePanel();
+                                              }
+                                          });
+            reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row + " 1 " + europe.getRowCount());
+            row = addLocationData(europe, null, row);
+        }
+        row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.onLand", row);
+        row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.atSea", row);
+
+        reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")), "cell 1 " + row + " " + COLUMNS + " 1");
+    }
+
+    /*
+     * distributes {@code value}, amount the number of {@code pocketCount}
+     *
+     * @param value
+     * @param pocketCount
+     * @return distribution of {@code value}
+     */
+    /*
+    private int[] distribute(int value, int pocketCount) {
+        int[] pockets = new int[pocketCount];
+
+        int pocketIndex = 0;
+        for (int i = value; i > 0; i--) {
+            pockets[pocketIndex]++;
+
+            pocketIndex++;
+            pocketIndex = pocketIndex % pocketCount;
+        }
+        return pockets;
+    }
+     */
+
     private void addLocationSummary(LabourData.LocationData data, int row) {
         int rows = data.getRowCount();
 
@@ -545,20 +493,16 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    private JLabel createNonCountedLabel(int otherAmateurs) {
-        JLabel label = createNumberLabel(otherAmateurs, "report.labour.notCounted.tooltip");
-        label.setForeground(Color.GRAY);
-        return label;
-    }
-
-    private JLabel createNumberLabel(int number, String toolTipKey) {
-        JLabel label = new JLabel(String.valueOf(number));
-        label.setHorizontalAlignment(SwingConstants.TRAILING);
-        label.setBorder(CELLBORDER);
-        if (toolTipKey != null) {
-            label.setToolTipText(Messages.message(toolTipKey));
+    private int addNonLinkedLocation(LabourData.LocationData data, String messageKey, int row) {
+        int rows = data.getRowCount();
+        if (rows > 0) {
+            JLabel label = new JLabel(Messages.message(messageKey));
+            label.setBorder(LEFTCELLBORDER);
+            label.setForeground(Color.GRAY);
+            reportPanel.add(label, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
+            return addLocationData(data, null, row);
         }
-        return label;
+        return row;
     }
 
     private int addRow(LabourData.LocationData data, String typeName, String activity, int colonists, int production, int row) {
@@ -587,44 +531,32 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    public JButton createColonyButton(final Colony colony) {
-        String text = colony.getName();
-        if (!unitData.isSummary()) {
-//            int unitIndex = unitData.getUnitType().getIndex();
-//
-//            int skillLevel = Unit.getSkillLevel(unitIndex);
-//            if (skillLevel <= 0 && skillLevel > -2) {
-//                //settlers and servants can be trained anywwhere a farmer can
-//                unitIndex = Unit.EXPERT_FARMER;
-//            }
+    private void addUnitTypes() {
+        int row = 1;
 
-            if (colony.canTrain(unitData.getUnitType())) {
-                text = text + "*";
+        JButton allColonistsButton = createUnitNameButton(Messages.message("report.labour.allColonists"), labourData.getSummary());
+        reportPanel.add(allColonistsButton, "cell " + COLONY_COLUMN + " " + row + " 1 " + labourData.getSummary().getUnitSummaryRowCount());
+
+        row = addLocationData(labourData.getSummary().getTotal(), null, row);
+
+        for (UnitType unitType : LabourData.getLabourTypes(getMyPlayer())) {
+            LabourData.UnitData unitData = labourData.getUnitData(unitType);
+
+            JButton unitButton = createUnitNameButton(unitData.getUnitName(), unitData);
+            int rows = unitData.getUnitSummaryRowCount();
+            reportPanel.add(unitButton, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
+
+            if (unitData.hasDetails()) {
+                row = addLocationData(unitData.getTotal(), null, row);
+            } else {
+                unitButton.setEnabled(false);
+                unitButton.setDisabledIcon(unitButton.getIcon());
+                unitButton.setForeground(Color.GRAY);
+
+                reportPanel.add(createEmptyLabel(), "cell " + UNIT_TYPE_COLUMN + " " + row + " " + (COLUMNS - 1) + " 1");
+                row++;
             }
         }
-
-        return createButton(text, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getGUI().showColonyPanel(colony);
-            }
-        });
-    }
-
-    private JButton createUnitNameButton(String name, final LabourData.UnitData unitData) {
-        JButton button = createButton(name, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                CompactLabourReport details = new CompactLabourReport(getFreeColClient(), getGUI(), unitData);
-                details.initialize();
-                getCanvas().addAsFrame(details);
-                details.requestFocus();
-            }
-        });
-
-        if (!unitData.isSummary()) {
-            button.setIcon(getUnitIcon(unitData.getUnitType()));
-        }
-
-        return button;
     }
 
     private JButton createButton(String name, ActionListener listener) {
@@ -636,6 +568,71 @@ public final class CompactLabourReport extends ReportPanel {
         button.setBorder(LEFTCELLBORDER);
         button.addActionListener(listener);
         return button;
+    }
+
+    private JLabel createEmptyLabel() {
+        JLabel empty = new JLabel("");
+        empty.setBorder(CELLBORDER);
+        return empty;
+    }
+
+    private JLabel createNonCountedLabel(int otherAmateurs) {
+        JLabel label = createNumberLabel(otherAmateurs, "report.labour.notCounted.tooltip");
+        label.setForeground(Color.GRAY);
+        return label;
+    }
+
+    private JLabel createNumberLabel(int number, String toolTipKey) {
+        JLabel label = new JLabel(String.valueOf(number));
+        label.setHorizontalAlignment(SwingConstants.TRAILING);
+        label.setBorder(CELLBORDER);
+        if (toolTipKey != null) {
+            label.setToolTipText(Messages.message(toolTipKey));
+        }
+        return label;
+    }
+
+    private JButton createUnitNameButton(String name, final LabourData.UnitData unitData) {
+        JButton button = createButton(name, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                getGUI().showCompactLabourReport(unitData);
+            }
+        });
+
+        if (!unitData.isSummary()) {
+            button.setIcon(getUnitIcon(unitData.getUnitType()));
+        }
+
+        return button;
+    }
+
+    private GoodsType getGoodsType() {
+        return isSummary() ? null : unitData.getUnitType().getExpertProduction();
+    }
+
+    private ImageIcon getUnitIcon(UnitType unit) {
+        Unit.Role role = Unit.Role.DEFAULT;
+        if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
+            role = Unit.Role.PIONEER;
+        } else if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
+            role = Unit.Role.MISSIONARY;
+        }
+
+        return getLibrary().getUnitImageIcon(unit, role);
+    }
+
+    /**
+     * @return if this is the location summary, grouped by unit type
+     */
+    private boolean isOverview() {
+        return unitData == null;
+    }
+
+    /**
+     * @return if we are any summary
+     */
+    private boolean isSummary() {
+        return isOverview() || unitData.isSummary();
     }
 
 

@@ -80,6 +80,7 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationDialog;
+import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
@@ -1019,6 +1020,13 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+    public void showCompactLabourReport(UnitData unitData) {
+        CompactLabourReport details = new CompactLabourReport(freeColClient, gui, unitData);
+        details.initialize();
+        addAsFrame(details);
+        details.requestFocus();
+    }
+    
 
     /**
      * Display a dialog to confirm a declaration of independence.

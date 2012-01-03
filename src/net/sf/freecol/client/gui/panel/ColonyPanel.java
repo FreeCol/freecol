@@ -427,7 +427,7 @@ public final class ColonyPanel extends FreeColPanel
                     unload();
                     break;
                 case WAREHOUSE:
-                    if (getCanvas().showWarehouseDialog(colony)) {
+                    if (getGUI().showWarehouseDialog(colony)) {
                         updateWarehousePanel();
                     }
                     break;
@@ -768,7 +768,7 @@ public final class ColonyPanel extends FreeColPanel
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
             if (msg != null) {
-                getCanvas().showInformationMessage(msg);
+                getGUI().showInformationMessage(msg);
             }
             populationPanel.update();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
