@@ -287,7 +287,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                                      group.getSelection().getActionCommand());
                 switch(action) {
                 case SINGLE:
-                    OptionGroup level = getCanvas()
+                    OptionGroup level = getGUI()
                         .showDifficultyDialog(getSpecification());
                     Advantages advantages;
                     if (level != null) {
@@ -308,7 +308,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case START:
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
-                        level = getCanvas()
+                        level = getGUI()
                             .showDifficultyDialog(getSpecification());
                         getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
@@ -321,7 +321,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case META_SERVER:
                     ArrayList<ServerInfo> serverList = connectController.getServerList();
                     if (serverList != null) {
-                        getCanvas().showServerListPanel(name.getText(), serverList);
+                        getGUI().showServerListPanel(name.getText(), serverList);
                     }
                 }
                 break;

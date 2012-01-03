@@ -542,7 +542,7 @@ public final class EuropePanel extends FreeColPanel {
 
                 Location dest = destination;
                 if (unit.isInEurope()) {
-                    dest = getCanvas().showSelectDestinationDialog(unit);
+                    dest = getGUI().showSelectDestinationDialog(unit);
                     if (dest == null) return null; // user aborted
                 }
 
@@ -773,7 +773,7 @@ public final class EuropePanel extends FreeColPanel {
                 if (getMyPlayer().canTrade(goods)) {
                     getController().sellGoods(goods);
                 } else {
-                    switch (getCanvas().showBoycottedGoodsDialog(goods, europe)) {
+                    switch (getGUI().showBoycottedGoodsDialog(goods, europe)) {
                     case PAY_ARREARS:
                         getController().payArrears(goods.getType());
                         break;

@@ -305,7 +305,7 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    getCanvas().showBuildQueuePanel((Colony) fcgo, new Runnable() {
+                    getGUI().showBuildQueuePanel((Colony) fcgo, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }
@@ -316,7 +316,7 @@ public final class ReportColonyPanel extends ReportPanel
                 FreeColGameObject fcgo
                     = getGame().getFreeColGameObject(command);
                 if (fcgo instanceof Colony) {
-                    getCanvas().showColonyPanel((Colony) fcgo, new Runnable() {
+                    getGUI().showColonyPanel((Colony) fcgo, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }
