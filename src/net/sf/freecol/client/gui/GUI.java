@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -1017,7 +1018,17 @@ public class GUI {
     }
 
 
+    public void showReportLabourPanel() {
+        canvas.showReportLabourPanel();
+    }
 
+    public void showCompactLabourReport() {
+        canvas.showCompactLabourReport();
+    }
+
+    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
+        return canvas.showLoadDialog(directory, fileFilters);
+    }
 
 
     

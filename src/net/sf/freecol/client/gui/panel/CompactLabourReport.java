@@ -262,7 +262,7 @@ public final class CompactLabourReport extends ReportPanel {
             JButton button = createButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
                                           new ActionListener() {
                                               public void actionPerformed(ActionEvent e) {
-                                                  getCanvas().showEuropePanel();
+                                                  getGUI().showEuropePanel();
                                               }
                                           });
             reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row + " 1 " + europe.getRowCount());

@@ -130,7 +130,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
             if (object instanceof Colony) {
                 getGUI().showColonyPanel((Colony) object);
             } else if (object instanceof Europe) {
-                getCanvas().showEuropePanel();
+                getGUI().showEuropePanel();
             } else if (object instanceof Tile) {
                 getGUI().setFocus(((Tile) object));
             } else if (object == null) {

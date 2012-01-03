@@ -234,7 +234,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
                 }
             }
         } else if (LOAD.equals(command)) {
-            File loadFile = getCanvas().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
+            File loadFile = getGUI().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
             }
