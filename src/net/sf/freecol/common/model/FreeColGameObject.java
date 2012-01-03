@@ -65,7 +65,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     public FreeColGameObject(Game game) {
         this.game = game;
 
-        if (game != null && game instanceof ServerGame) {
+        if (game != null && game instanceof Game) {
             setDefaultId(game);
         } else if (this instanceof Game) {
             setId("0");

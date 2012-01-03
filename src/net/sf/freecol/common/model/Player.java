@@ -3525,6 +3525,9 @@ public class Player extends FreeColGameObject implements Nameable {
                     sale.toXMLImpl(out);
                 }
             }
+            if (market != null) {
+                market.toXML(out, player, showAll, toSavedGame);
+            }
         }
 
     }
@@ -3658,7 +3661,11 @@ public class Player extends FreeColGameObject implements Nameable {
                            + "found instead: " + in.getLocalName());
         }
 
+        // TODO: This should no longer happen.  Remove soon (early 2012)
+        // if further testing never triggers the following warning.
         if (market == null) {
+            logger.warning("Null market for " + getName());
+            Thread.dumpStack();
             market = new Market(getGame(), this);
         }
 
