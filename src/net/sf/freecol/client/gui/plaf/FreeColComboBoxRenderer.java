@@ -32,6 +32,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.client.gui.i18n.Messages;
+
 /**
  * A <code>ListCellRenderer</code> to be used by <code>FreeColListUI</code>.
  */
@@ -65,7 +68,10 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
 
     public void setLabelValues(JLabel c, Object value) {
         if (value instanceof Icon) {
+            // TODO: does this even make sense? Value should never be an icon!
             c.setIcon((Icon) value);
+        } else if (value instanceof FreeColObject) {
+            c.setText(Messages.getName((FreeColObject) value));
         } else {
             c.setText((value == null) ? null : value.toString());
         }
