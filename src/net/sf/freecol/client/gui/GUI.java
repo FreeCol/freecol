@@ -369,7 +369,7 @@ public class GUI {
     }
     
     public boolean isClientOptionsDialogShowing() {
-        return canvas != null && canvas.isClientOptionsDialogShowing();
+        return canvas != null && !canvas.isClientOptionsDialogShowing();
     }
     
     
