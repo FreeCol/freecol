@@ -1625,6 +1625,7 @@ public final class InGameController implements NetworkConstants {
                 l.logPurchase(type, toBuy, price);
             }
             gui.updateGoldLabel();
+            nextModelMessage();
             return true;
         }
 
@@ -2460,6 +2461,7 @@ public final class InGameController implements NetworkConstants {
         if (confirmHostileAction(unit, target)
             && confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
+            nextModelMessage();
         }
     }
 
@@ -3519,6 +3521,7 @@ public final class InGameController implements NetworkConstants {
                 l.logSale(type, amount, price, tax);
             }
             gui.updateGoldLabel();
+            nextModelMessage();
             return true;
         }
 

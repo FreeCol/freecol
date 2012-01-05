@@ -905,7 +905,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                           market.makePriceChangeMessage(type));
             market.flushPriceChange(type);
             cs.add(See.only(this), market.getMarketData(type));
-            cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
         }
     }
 
