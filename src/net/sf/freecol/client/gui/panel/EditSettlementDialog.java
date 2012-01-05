@@ -106,13 +106,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         add(capital);
 
         add(new JLabel(Messages.message("report.indian.skillTaught")));
-        DefaultComboBoxModel skillModel = new DefaultComboBoxModel();
-        IndianNationType ownerType = (IndianNationType)
-            ((Nation) owner.getSelectedItem()).getType();
-        for (RandomChoice<UnitType> skill : ownerType.getSkills()) {
-            skillModel.addElement(skill.getObject());
-        }
-        skill = new JComboBox(skillModel);
+        skill = new JComboBox(getSkillModel());
         skill.setSelectedItem(settlement.getLearnableSkill());
         skill.setRenderer(new FreeColComboBoxRenderer());
         add(skill);
@@ -134,15 +128,18 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         setSize(getPreferredSize());
     }
 
-    public void itemStateChanged(ItemEvent e) {
+    private DefaultComboBoxModel getSkillModel() {
         IndianNationType ownerType = (IndianNationType)
             ((Nation) owner.getSelectedItem()).getType();
-        UnitType[] skills = new UnitType[ownerType.getSkills().size()];
-        for (int index = 0; index < skills.length; index++) {
-            skills[index] = ownerType.getSkills().get(index).getObject();
+        DefaultComboBoxModel skillModel = new DefaultComboBoxModel();
+        for (RandomChoice<UnitType> skill : ownerType.getSkills()) {
+            skillModel.addElement(skill.getObject());
         }
-        DefaultComboBoxModel model = new DefaultComboBoxModel(skills);
-        skill.setModel(model);
+        return skillModel;
+    }
+
+    public void itemStateChanged(ItemEvent e) {
+        skill.setModel(getSkillModel());
         skill.setSelectedItem(settlement.getLearnableSkill());
     }
 
