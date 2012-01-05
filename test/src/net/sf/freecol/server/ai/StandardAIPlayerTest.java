@@ -19,19 +19,14 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class StandardAIPlayerTest extends FreeColTestCase {
