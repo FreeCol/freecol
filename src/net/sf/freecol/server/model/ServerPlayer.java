@@ -1799,10 +1799,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         : attackerUnit).isNaval();
                 if (ok) {
                     if (result == CombatResult.WIN) {
-                        csDamageShipAttack(attackerUnit, defenderUnit, cs);
+                        csDamageShipAttack(attackerUnit, defenderUnit,
+                            null, cs);
                         defenderTileDirty = true;
                     } else {
-                        csDamageShipAttack(defenderUnit, attackerUnit, cs);
+                        csDamageShipAttack(defenderUnit, attackerUnit,
+                            null, cs);
                         attackerTileDirty = true;
                     }
                 }
@@ -2394,7 +2396,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Damages all ships in a colony.
+     * Damages all ships in a colony in preparation for capture.
      *
      * @param attacker The <code>Unit</code> that is damaging.
      * @param colony The <code>Colony</code> to damage ships in.
@@ -2403,10 +2405,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
         List<Unit> units = colony.getTile().getUnitList();
+        List<Colony> exclude = new ArrayList<Colony>();
+        exclude.add(colony);
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
             if (unit.isNaval()) {
-                csDamageShipAttack(attacker, unit, cs);
+                csDamageShipAttack(attacker, unit, exclude, cs);
             }
         }
     }
@@ -2416,14 +2420,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param attacker The attacker <code>Unit</code>.
      * @param ship The <code>Unit</code> which is a ship to damage.
+     * @param exclude An optional list of colonies to exclude.
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csDamageShipAttack(Unit attacker, Unit ship,
-                                    ChangeSet cs) {
+                                    List<Colony> exclude, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location repair = ship.getRepairLocation(null);
+        Location repair = ship.getRepairLocation(exclude);
         StringTemplate repairLoc = repair.getLocationNameFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
@@ -2973,7 +2978,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (ship.getRepairLocation(null) == null) {
                 csSinkShipAttack(attacker, ship, cs);
             } else {
-                csDamageShipAttack(attacker, ship, cs);
+                csDamageShipAttack(attacker, ship, null, cs);
             }
         } else if (pillage < buildingList.size() + shipList.size()
                    + goodsList.size()) {
