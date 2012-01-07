@@ -51,6 +51,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1155,37 +1156,40 @@ public final class MapViewer {
         Color backgroundColor = lib.getColor(unit.getOwner());
         Color foregroundColor = getForegroundColor(backgroundColor);
         String occupationString;
-        if (!freeColClient.getMyPlayer().owns(unit)
-                && unit.isNaval()) {
-            occupationString = Integer.toString(unit.getVisibleGoodsCount());
+        if (!freeColClient.getMyPlayer().owns(unit)) {
+            occupationString = (unit.isNaval())
+                ? Integer.toString(unit.getVisibleGoodsCount())
+                : Messages.message("model.unit.occupation.activeNoMovesLeft");
         } else {
-            if (unit.getDestination() != null) {
-                if(unit.getTradeRoute() != null)
-                    occupationString = "model.unit.occupation.inTradeRoute";
-                else
-                    occupationString = "model.unit.occupation.goingSomewhere";
-            } else if (unit.getState() == Unit.UnitState.IMPROVING
-                       && unit.getWorkImprovement() != null) {
-                occupationString = unit.getWorkImprovement().getType().getId() + ".occupationString";
-            } else if (unit.getState() == Unit.UnitState.ACTIVE
-                && unit.getMovesLeft() == 0) {
-                if(unit.isUnderRepair())
-                    occupationString = "model.unit.occupation.underRepair";
-                else
-                    occupationString = "model.unit.occupation.activeNoMovesLeft";
-            } else {
-                occupationString = "model.unit.occupation." + unit.getState().toString().toLowerCase();
-            }
+            occupationString = (unit.isUnderRepair())
+                ? "model.unit.occupation.underRepair"
+                : (unit.getTradeRoute() != null)
+                ? "model.unit.occupation.inTradeRoute"
+                : (unit.getDestination() != null)
+                ? "model.unit.occupation.goingSomewhere"
+                : (unit.getState() == Unit.UnitState.IMPROVING
+                    && unit.getWorkImprovement() != null)
+                ? (unit.getWorkImprovement().getType().getId()
+                    + ".occupationString")
+                : (unit.getState() == Unit.UnitState.ACTIVE
+                    && unit.getMovesLeft() == 0)
+                ? "model.unit.occupation.activeNoMovesLeft"
+                : ("model.unit.occupation."
+                    + unit.getState().toString().toLowerCase(Locale.US));
             occupationString = Messages.message(occupationString);
-            if (unit.getState() == Unit.UnitState.FORTIFIED)
+            if (unit.getState() == Unit.UnitState.FORTIFIED) {
                 foregroundColor = Color.GRAY;
+            }
         }
+
         // Lookup in the cache if the image has been generated already
         String key = "dynamic.occupationIndicator." + occupationString
             + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image img = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        Image img = (Image) ResourceManager.getImage(key,
+                                                     lib.getScalingFactor());
         if (img == null) {
-            img = lib.createChip(occupationString, Color.BLACK, backgroundColor, foregroundColor);
+            img = lib.createChip(occupationString, Color.BLACK,
+                                 backgroundColor, foregroundColor);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;
