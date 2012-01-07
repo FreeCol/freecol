@@ -58,7 +58,7 @@ public class InstallerTranslations {
         { "ms", "mys", "Malaysian" },
         { "nl", "ned", "Nederlands" },
         { "nn", "nor", "Norwegian" },
-        { "pl", "pol", "Polnish" },
+        { "pl", "pol", "Polish" },
         { "pt_BR", "por", "Portuguese (Brazilian)" },
         { "pt_PT", "prt", "Portuguese (European)" },
         { "ro", "rom", "Romanian" },

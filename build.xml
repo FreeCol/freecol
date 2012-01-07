@@ -739,6 +739,13 @@
               classpath="build/" />
     </target>
 
+    <!-- Creates '.desktop' file. -->
+    <target name="desktop-entry" depends="build"
+            description="Creates '.desktop' file.">
+        <java classname="net.sf.freecol.tools.DesktopEntry"
+              classpath="build/" />
+    </target>
+
     <target name="pmd">
       <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
                classpath="./pmd-4.1/lib/pmd-4.1.jar"/>
