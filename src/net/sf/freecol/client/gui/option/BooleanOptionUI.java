@@ -44,6 +44,7 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
     */
     public BooleanOptionUI(GUI gui, final BooleanOption option, boolean editable) {
         super(gui, option, editable);
+        setValue(option.getValue());
         initialize();
     }
 
