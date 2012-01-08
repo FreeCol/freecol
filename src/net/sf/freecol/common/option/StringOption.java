@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -187,6 +188,16 @@ public class StringOption extends AbstractOption<String> {
                 out.writeAttribute(VALUE_TAG, choice);
                 out.writeEndElement();
             }
+        }
+    }
+
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readAttributes(in);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+        if (choices.isEmpty()) {
+            choices.add(value);
         }
     }
 
