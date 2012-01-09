@@ -299,13 +299,17 @@ public class ServerUnit extends Unit implements ServerModelObject {
                        random, cs);
             } else if (getDestination() instanceof Settlement) {
                 Settlement settlement = (Settlement) getDestination();
-                setDestination(null);
+                // Used to setDestination(null) due to bugs with uncleared
+                // destinations.  In this case though the unit is not yet
+                // at the destination, and perhaps the bugs are now sorted.
                 PathNode path = map.findPathToEurope(this,
                     settlement.getTile(), CostDeciders.serverAvoidIllegal());
-                csMove(path.getLastNode().getTile(), random, cs);
+                Tile entry = (path == null) ? getFullEntryLocation()
+                    : path.getLastNode().getTile();
+                csMove(entry, random, cs);
                 logger.info(toString() + " arrives in America"
                     + ", sailing for" + settlement.getName()
-                    + " from " + path.getLastNode().getTile());
+                    + " from " + entry);
             } else {
                 logger.warning(toString() + " has unsupported destination "
                                + getDestination());
