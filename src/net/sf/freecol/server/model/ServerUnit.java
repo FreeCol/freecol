@@ -518,7 +518,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         cs.add(See.only(serverPlayer), indianPlayer);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                "lostCityRumour.BurialGround", serverPlayer, this)
+                "lostCityRumour.burialGround", serverPlayer, this)
             .addStringTemplate("%nation%", indianPlayer.getNationName()));
     }
 
@@ -598,7 +598,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addDispose(See.perhaps().always(serverPlayer), tile, this);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.ExpeditionVanishes", serverPlayer));
+                    "lostCityRumour.expeditionVanishes", serverPlayer));
             break;
         case NOTHING:
             if (game.getTurn().getYear() % 100 == 12
@@ -609,12 +609,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         "lostCityRumour.mayans", serverPlayer, this)
                     .add("%years%", Integer.toString(years)));
                 break;
+            } else if (mounds) {
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                        "lostCityRumour.moundsNothing", serverPlayer, this));
+                break;
             }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    ((mounds) ? "lostCityRumour.moundsNothing"
-                        : "lostCityRumour.Nothing"),
-                    serverPlayer, this));
+                    "lostCityRumour.nothing", serverPlayer, this));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
@@ -624,7 +627,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             setType(unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.Learn", serverPlayer, this)
+                    "lostCityRumour.learn", serverPlayer, this)
                 .addStringTemplate("%unit%", oldName)
                 .add("%type%", getType().getNameKey()));
             break;
@@ -636,7 +639,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     ((mounds) ? "lostCityRumour.moundsTrinkets"
-                        : "lostCityRumour.TribalChief"),
+                        : "lostCityRumour.tribalChief"),
                     serverPlayer, this)
                 .addAmount("%money%", chiefAmount));
             break;
@@ -647,7 +650,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.Colonist", serverPlayer, newUnit));
+                    "lostCityRumour.colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
             String cityName = game.getCityOfCibola();
@@ -660,7 +663,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                        "lostCityRumour.Cibola", serverPlayer, newUnit)
+                        "lostCityRumour.cibola", serverPlayer, newUnit)
                     .add("%city%", cityName)
                     .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
@@ -688,7 +691,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addMessage(See.only(serverPlayer),
                  new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                   ((mounds) ? "lostCityRumour.moundsTreasure"
-                                   : "lostCityRumour.Ruins"),
+                                   : "lostCityRumour.ruins"),
                                   serverPlayer, ((newUnit != null) ? newUnit
                                                  : this))
                      .addAmount("%money%", ruinsAmount));
@@ -698,8 +701,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (europe == null) {
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                      "lostCityRumour.FountainOfYouthWithoutEurope",
-                                      serverPlayer, this));
+                         "lostCityRumour.fountainOfYouthWithoutEurope",
+                         serverPlayer, this));
             } else {
                 if (serverPlayer.hasAbility("model.ability.selectRecruit")
                     && !serverPlayer.isAI()) { // TODO: let the AI select
@@ -721,7 +724,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 }
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                         "lostCityRumour.FountainOfYouth", serverPlayer, this));
+                         "lostCityRumour.fountainOfYouth", serverPlayer, this));
             }
             cs.addAttribute(See.only(serverPlayer),
                 "sound", "sound.event.fountainOfYouth");
