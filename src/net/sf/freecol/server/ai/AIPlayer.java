@@ -371,7 +371,7 @@ public abstract class AIPlayer extends AIObject {
             for (Tile t : tile.getSurroundingTiles(1)) {
                 for (Unit u : t.getUnitList()) {
                     if (u.getOwner() == unit.getOwner()
-                        && u.isCarrier()
+                        && u.isCarrier() && u.canCarryUnits()
                         && u.getSpaceLeft() >= unit.getSpaceTaken()
                         && unit.getMovesLeft() > 0) {
                         AIMessage.askEmbark(getAIMain().getAIUnit(u), unit,
