@@ -84,6 +84,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerUnit.class.getName());
 
+    // How many `nothing' rumours are there.
+    private static int rumourNothing = -1;
+
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -615,9 +618,18 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         "lostCityRumour.moundsNothing", serverPlayer, this));
                 break;
             }
+            if (rumourNothing < 0) {
+                int i;
+                for (i = 0; Messages.containsKey("lostCityRumour.nothing."
+                                                 + Integer.toString(i)); i++);
+                rumourNothing = i;
+            }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.nothing", serverPlayer, this));
+                    "lostCityRumour.nothing."
+                    + Integer.toString(Utils.randomInt(logger,
+                            "Nothing rumour", random, rumourNothing)),
+                    serverPlayer, this));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
