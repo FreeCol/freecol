@@ -601,6 +601,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "lostCityRumour.ExpeditionVanishes", serverPlayer));
             break;
         case NOTHING:
+            if (game.getTurn().getYear() % 100 == 12
+                && Utils.randomInt(logger, "Mayans?", random, 4) == 0) {
+                int years = 2012 - game.getTurn().getYear();
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                        "lostCityRumour.mayans", serverPlayer, this)
+                    .add("%years%", Integer.toString(years)));
+                break;
+            }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     ((mounds) ? "lostCityRumour.moundsNothing"
