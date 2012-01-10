@@ -2997,12 +2997,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
 
         } else {
-            int plunder = colony.getPlunder(attacker, random) / 10;
-            if (plunder > 0) {
-                colonyPlayer.modifyGold(-plunder);
-                attackerPlayer.modifyGold(plunder);
-                cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
-            }
+            int plunder = Math.max(1, colony.getPlunder(attacker, random) / 5);
+            colonyPlayer.modifyGold(-plunder);
+            attackerPlayer.modifyGold(plunder);
+            cs.addPartial(See.only(colonyPlayer), colonyPlayer, "gold");
             cs.addMessage(See.only(colonyPlayer),
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                     "model.unit.indianPlunder", colony)
