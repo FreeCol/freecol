@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,6 +71,9 @@ public abstract class AIPlayer extends AIObject {
      */
     private ServerPlayer player;
 
+    // A PRNG to use for this AI player.
+    private Random aiRandom = null;
+
     /**
      * Temporary variable, used for debugging purposes only.
      * See setDebuggingConnection()
@@ -87,6 +91,7 @@ public abstract class AIPlayer extends AIObject {
 
     public AIPlayer(AIMain aiMain, String id) {
         super(aiMain, id);
+        aiRandom = new Random(aiMain.getRandomSeed("Seed for " + id));
     }
 
     /**
@@ -116,6 +121,15 @@ public abstract class AIPlayer extends AIObject {
     @Override
     public String getId() {
         return player.getId();
+    }
+
+    /**
+     * Gets the PRNG to use for this player.
+     *
+     * @return A <code>Random<code> to use for this player.
+     */
+    public Random getAIRandom() {
+        return aiRandom;
     }
 
     /**

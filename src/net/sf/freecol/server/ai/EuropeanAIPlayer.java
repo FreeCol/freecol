@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -536,7 +537,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (sessionRegister.containsKey(hagglingKey)) {
                     haggling = sessionRegister.get(hagglingKey).intValue();
                 }
-                if (getAIRandom().nextInt(3 + haggling) <= 3) {
+                if (Utils.randomInt(logger, "Buy gold", getAIRandom(),
+                        3 + haggling) <= 3) {
                     sessionRegister.put(goldKey, new Integer(gold));
                     sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;
@@ -591,7 +593,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         Market market = getPlayer().getMarket();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
-                && getAIRandom().nextInt(5) == 0) {
+                && Utils.randomInt(logger, "Cheat boycott",
+                    getAIRandom(), 5) == 0) {
                 market.setArrears(goodsType, 0);
                 // Just remove one goods party modifier (we can not
                 // currently identify which modifier applies to which
@@ -617,7 +620,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = spec.getUnitTypeList();
 
-            if (getAIRandom().nextInt(10) == 1) {
+            if (Utils.randomInt(logger, "Cheat buy unit",
+                    getAIRandom(), 10) == 1) {
                 List<WorkerWish> workerWishes = new ArrayList<WorkerWish>();
                 for (AIColony aic : getAIColonies()) {
                     workerWishes.addAll(aic.getWorkerWishes());
@@ -650,7 +654,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             // TODO: better heuristics to determine which ship to buy
-            if (getAIRandom().nextInt(40) == 21) {
+            if (Utils.randomInt(logger, "Cheat buy ship",
+                    getAIRandom(), 40) == 21) {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
@@ -661,11 +666,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
 
                 UnitType unitToPurchase = null;
-                int random = getAIRandom().nextInt(total);
+                int r = Utils.randomInt(logger, "Cheat which ship",
+                    getAIRandom(), total);
                 total = 0;
                 for (UnitType unitType : navalUnits) {
                     total += unitType.getPrice();
-                    if (random < total) {
+                    if (r < total) {
                         unitToPurchase = unitType;
                         break;
                     }

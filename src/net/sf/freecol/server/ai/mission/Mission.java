@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -433,6 +434,15 @@ public abstract class Mission extends AIObject {
      */
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
+    }
+
+    /**
+     * Convenience accessor for the unit/player PRNG.
+     *
+     * @return A <code>Random</code> to use.
+     */
+    public Random getAIRandom() {
+        return aiUnit.getAIRandom();
     }
 
     /**

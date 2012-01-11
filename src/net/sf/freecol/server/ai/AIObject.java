@@ -87,16 +87,6 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Gets the random number generator to use in the AI.
-     *
-     * @return The AI random number generator.
-     */
-    protected Random getAIRandom() {
-        return aiMain.getAIRandom();
-    }
-
-
-    /**
      * Disposes this <code>AIObject</code> by removing
      * any referances to this object.
      */

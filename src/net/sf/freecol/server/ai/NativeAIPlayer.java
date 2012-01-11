@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
@@ -353,7 +354,8 @@ public class NativeAIPlayer extends AIPlayer {
         if (sessionRegister.containsKey(hagglingKey)) {
             haggling = sessionRegister.get(hagglingKey).intValue();
         }
-        if (getAIRandom().nextInt(3 + haggling) >= 3) {
+        if (Utils.randomInt(logger, "Haggle-buy",
+                getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, new Integer(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
@@ -424,7 +426,8 @@ public class NativeAIPlayer extends AIPlayer {
         if (sessionRegister.containsKey(hagglingKey)) {
             haggling = sessionRegister.get(hagglingKey).intValue();
         }
-        if (getAIRandom().nextInt(3 + haggling) >= 3) {
+        if (Utils.randomInt(logger, "Haggle-sell",
+                getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, new Integer(-1));
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
@@ -446,7 +449,8 @@ public class NativeAIPlayer extends AIPlayer {
         for (IndianSettlement is : settlements) {
             // Spread arms and horses between camps
             // TODO: maybe make this dependent on difficulty level?
-            int n = getAIRandom().nextInt(settlements.size());
+            int n = Utils.randomInt(logger, "Secure",
+                getAIRandom(), settlements.size());
             IndianSettlement settlement = settlements.get(n);
             if (settlement != is) {
                 is.tradeGoodsWithSetlement(settlement);
@@ -671,7 +675,7 @@ public class NativeAIPlayer extends AIPlayer {
         logger.finest("Entering method bringGifts");
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not bring gifts all the time:
-            if (getAIRandom().nextInt(10) != 1) {
+            if (Utils.randomInt(logger, "BringGifts", getAIRandom(), 10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -693,7 +697,8 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = nearbyColonies.get(getAIRandom().nextInt(nearbyColonies.size()));
+                Colony target = nearbyColonies.get(Utils.randomInt(logger,
+                        "Choose colony", getAIRandom(), nearbyColonies.size()));
                 Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -722,7 +727,8 @@ public class NativeAIPlayer extends AIPlayer {
         logger.finest("Entering method demandTribute");
         for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not demand goods all the time:
-            if (getAIRandom().nextInt(10) != 1) {
+            if (Utils.randomInt(logger, "DemandTribute",
+                    getAIRandom(), 10) != 1) {
                 continue;
             }
             int alreadyAssignedUnits = 0;
@@ -755,7 +761,8 @@ public class NativeAIPlayer extends AIPlayer {
                     }
                     int tension = 1 + getPlayer().getTension(to).getValue()
                         + indianSettlement.getAlarm(to).getValue();
-                    tension = getAIRandom().nextInt(tension);
+                    tension = Utils.randomInt(logger, "Tension",
+                        getAIRandom(), tension);
                     if (tension > targetTension) {
                         targetTension = tension;
                         target = t;
@@ -779,7 +786,8 @@ public class NativeAIPlayer extends AIPlayer {
                                 Player tp = target.getOwner();
                                 int tension = 1 + getPlayer().getTension(tp).getValue()
                                     + indianSettlement.getAlarm(tp).getValue();
-                                if (getAIRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
+                                if (Utils.randomInt(logger, "Unhappy?",
+                                        getAIRandom(), tension) > Tension.Level.HAPPY.getLimit()) {
                                     chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne,
                                                                                  target));
                                     break;

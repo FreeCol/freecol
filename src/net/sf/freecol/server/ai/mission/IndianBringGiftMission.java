@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -137,15 +138,18 @@ public class IndianBringGiftMission extends Mission {
                 GoodsContainer gc = is.getGoodsContainer();
                 for (GoodsType goodsType : getAIMain().getGame().getSpecification().getNewWorldGoodsTypeList()) {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        goodsList.add(new Goods(getGame(), is, goodsType,
-                                                getAIRandom().nextInt(15) + 10));
+                        Goods goods = new Goods(getGame(), is, goodsType,
+                            Utils.randomInt(logger, "Gift amount",
+                                getAIRandom(), 15) + 10);
+                        goodsList.add(goods);
                     }
                 }
 
                 if (goodsList.size() == 0) {
                     completed = true;
                 } else {
-                    Goods goods = goodsList.get(getAIRandom().nextInt(goodsList.size()));
+                    Goods goods = goodsList.get(Utils.randomInt(logger,
+                            "Gift amount", getAIRandom(), goodsList.size()));
                     AIMessage.askLoadCargo(getAIUnit(), goods);
                 }
             }

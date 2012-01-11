@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -158,6 +159,15 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public Unit getUnit() {
         return unit;
+    }
+
+    /**
+     * Gets the PRNG to use with this unit.
+     *
+     * @return A <code>Random</code> instance.
+     */
+    public Random getAIRandom() {
+        return getAIMain().getAIPlayer(unit.getOwner()).getAIRandom();
     }
 
     /**

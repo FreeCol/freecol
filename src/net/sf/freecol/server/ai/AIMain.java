@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -123,6 +124,18 @@ public class AIMain extends FreeColObject
     }
 
     /**
+     * Gets a random value from the server to use for individual AI player
+     * PRNG seeds.
+     *
+     * @param logMe A logging string.
+     * @return A random seed.
+     */
+    public int getRandomSeed(String logMe) {
+        return Utils.randomInt(logger, logMe, freeColServer.getServerRandom(),
+            Integer.MAX_VALUE);
+    }
+
+    /**
      * Checks the integrity of this <code>AIMain</code>
      * by checking if there are any
      * {@link AIObject#isUninitialized() uninitialized objects}.
@@ -183,16 +196,6 @@ public class AIMain extends FreeColObject
     */
     public Game getGame() {
         return freeColServer.getGame();
-    }
-
-
-    /**
-     * Gets the random number generator to be used in the AI.
-     *
-     * @return The AI random number generator.
-     */
-    public Random getAIRandom() {
-        return freeColServer.getServerRandom();
     }
 
 

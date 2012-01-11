@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -173,7 +174,8 @@ public class BuildColonyMission extends Mission {
                     return;
                 }
                 if (price > 0 && !player.checkGold(price)
-                    && getAIRandom().nextInt(4) == 0) {
+                    && Utils.randomInt(logger, "Cheat gold",
+                        getAIRandom(), 4) == 0) {
                     // CHEAT: add gold so player can buy the land
                     player.modifyGold(price);
                 }
