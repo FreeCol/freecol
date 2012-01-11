@@ -1505,7 +1505,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             == tm.getUnit().getTile()) {
             return 0;
         }
-        PathNode path = tm.getPath(t);
+        PathNode path = tm.getTransportPath(t);
         return (path == null) ? -1 : path.getTotalTurns();
     }
 

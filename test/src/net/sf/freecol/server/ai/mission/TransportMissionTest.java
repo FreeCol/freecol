@@ -140,7 +140,7 @@ public class TransportMissionTest extends FreeColTestCase {
         mission.addToTransportList(goods);
 
         // Exercise
-        Destination dest = mission.getNextStop();
+        Destination dest = mission.getNextDestination();
 
         // Test
         assertNotNull("Unit should have a destination",dest);
@@ -173,7 +173,7 @@ public class TransportMissionTest extends FreeColTestCase {
         mission.addToTransportList(goods);
 
         // Exercise
-        Destination dest = mission.getNextStop();
+        Destination dest = mission.getNextDestination();
 
         // Test
         assertNotNull("Unit should have a destination",dest);
@@ -208,7 +208,7 @@ public class TransportMissionTest extends FreeColTestCase {
         mission.addToTransportList(goods);
 
         // Exercise
-        Destination dest = mission.getNextStop();
+        Destination dest = mission.getNextDestination();
 
         // Test
         assertNotNull("Unit should have a destination",dest);
@@ -301,7 +301,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIGoods goods = new AIGoods(aiMain, two, horsesType, 20, one);
         mission.addToTransportList(goods);
         assertEquals("Destination should now be colony two.",
-                     mission.getNextStop().getPath().getLastNode().getTile(), two.getTile());
+                     mission.getNextDestination().getPath().getLastNode().getTile(), two.getTile());
 
     }
 

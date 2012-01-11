@@ -447,7 +447,7 @@ public class TransportMission extends Mission {
      */
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This is too expensive - find another method:
-        PathNode path = getPath(t, start, source);
+        PathNode path = getTransportPath(t, start, source);
         return (path == null) ? Map.COST_INFINITY : path.getTotalTurns();
     }
 
@@ -603,7 +603,7 @@ public class TransportMission extends Mission {
 
             // Special case, already on a tile which gives direct
             // access to Europe path will be null.
-            Destination destination = getNextStop();
+            Destination destination = getNextDestination();
             boolean canMoveToEurope = destination != null
                 && destination.moveToEurope()
                 && carrier.canMoveToEurope();
@@ -665,52 +665,58 @@ public class TransportMission extends Mission {
         }
     }
 
-    public Destination getNextStop() {
-        Unit unit = getUnit();
-        if (transportList.size() == 0 && !hasCargo()) {
-            logger.info(unit + "(" + unit.getId()
-                + ") has nothing to transport, moving to default destination");
+    /**
+     * Works out the next destination the carrier should go to to
+     * make progress with its transport list.
+     *
+     * @return A new <code>Destination</code>, which may be null if none
+     *     is available.
+     */
+    public Destination getNextDestination() {
+        final Unit carrier = getUnit();
+        if (transportList.isEmpty() && !hasCargo()) {
+            logger.finest("Next destination for " + carrier + ": default");
             return getDefaultDestination();
         }
 
-        // Cash unavailable destinations to avoid find path duplication
-        List<Location> unavailLoc = new ArrayList<Location>();
-        for(Transportable transportable : transportList){
-            Location destLoc = null;
-            PathNode path = null;
-            if (isCarrying(transportable)) {
-                destLoc = transportable.getTransportDestination();
+        // Cache unavailable destinations to avoid unnecessary path finding.
+        List<Location> unavailable = new ArrayList<Location>();
+        for (Transportable t : transportList) {
+            Location dst = (isCarrying(t))
+                ? t.getTransportDestination()
+                : t.getTransportLocatable().getLocation();
+
+            // Check if we already found this destination to be inaccessible.
+            if (dst == null || unavailable.contains(dst)) continue;
+            
+            PathNode path;
+            if (dst.getTile() == null) {
+                if (dst instanceof Europe
+                    && (path = carrier.findPathToEurope()) != null) {
+                    logger.finest("Next destination for " + carrier
+                        + ": " + dst
+                        + " (" + ((isCarrying(t)) ? "transport" : "collect") 
+                        + " " + t + ")");
+                    return new Destination(true, path);
+                }
             } else {
-                destLoc = transportable.getTransportLocatable().getLocation();
+                if (dst.getTile() == carrier.getTile()) {
+                    logger.finest("Next destination for " + carrier
+                        + ": already at " + dst
+                        + " (for " + t + ")");
+                    return new Destination(); // Already at dst!
+                }
+                if ((path = getTransportPath(t)) != null) {
+                    logger.finest("Next destination for " + carrier
+                        + ": " + dst
+                        + " (" + ((isCarrying(t)) ? "transport" : "collect") 
+                        + " " + t + ")");
+                    return new Destination(false, path);
+                }
             }
-
-            // Check if we already found this destination to be unaccessible
-            if (destLoc == null || unavailLoc.contains(destLoc)) {
-                continue;
-            }
-
-            // unit already at location
-            if (destLoc == unit.getLocation()
-                || (destLoc instanceof Colony
-                    && destLoc.getTile() == unit.getTile())) {
-                return new Destination();
-            }
-
-            // find path for destination location
-            path = (destLoc instanceof Europe) ? unit.findPathToEurope()
-                : getPath(transportable);
-            // add unavailable location to tabu list
-            if (path == null) {
-                unavailLoc.add(destLoc);
-                continue;
-            }
-            logger.finest("Transporting " + transportable.getId()
-                + " to " + destLoc);
-            boolean moveToEurope = destLoc instanceof Europe;
-            return new Destination(moveToEurope,path);
+            unavailable.add(dst);
         }
-
-        logger.warning("No destination available, stay put");
+        logger.finest("Next destination for " + carrier + ": none found");
         return null;
     }
 
@@ -1048,8 +1054,8 @@ public class TransportMission extends Mission {
      * @param transportable The <code>Transportable</code>.
      * @return The path.
      */
-    public PathNode getPath(Transportable transportable) {
-        return getPath(transportable, getUnit().getTile(),
+    public PathNode getTransportPath(Transportable transportable) {
+        return getTransportPath(transportable, getUnit().getTile(),
             !isCarrying(transportable));
     }
 
@@ -1062,18 +1068,18 @@ public class TransportMission extends Mission {
      *            <code>start == null</code> or
      *            <code>start.getTile() == null</code> then the carrier's
      *            {@link Unit#getEntryLocation entry location} is used instead.
-     * @param source True if the transportable must be collected.
+     * @param collect True if the transportable must be collected.
      * @return The path.
      */
-    private PathNode getPath(Transportable transportable, Location start,
-                             boolean source) {
+    private PathNode getTransportPath(Transportable transportable,
+                                      Location start, boolean collect) {
         Unit carrier = getUnit();
         if (start == null || start.getTile() == null) {
             start = carrier.getFullEntryLocation();
         }
 
         Locatable locatable = transportable.getTransportLocatable();
-        Location destination = (source) ? locatable.getLocation()
+        Location destination = (collect) ? locatable.getLocation()
             : transportable.getTransportDestination();
         if (destination == null) return null;
         if (destination.getTile() == null) {
