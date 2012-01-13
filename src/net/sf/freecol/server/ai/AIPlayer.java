@@ -133,6 +133,19 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Gets the advantage of this AI player from the nation type.
+     *
+     * @return A short string stating the national advantage.
+     */
+    protected String getAIAdvantage() {
+        final String prefix = "model.nationType.";
+        String id = (player == null || player.getNationType() == null) ? ""
+            : player.getNationType().getId();
+        return (id.startsWith(prefix)) ? id.substring(prefix.length())
+            : "";
+    }
+
+    /**
      * Gets the connection to the server.
      *
      * @return The connection that can be used when communication with the

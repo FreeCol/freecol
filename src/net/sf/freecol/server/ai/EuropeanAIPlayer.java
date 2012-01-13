@@ -96,11 +96,6 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
-    private static enum AIStrategy { NONE, TRADE, IMMIGRATION, COOPERATION, CONQUEST }
-
-    /** The strategy of this player. */
-    private AIStrategy strategy = AIStrategy.NONE;
-
     /**
      * Stores temporary information for sessions (trading with another player
      * etc).
@@ -156,7 +151,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         logger.finest("Entering method startWorking: "
                       + player + ", year " + getGame().getTurn());
-        this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         clearAIUnits();
         cheat();
@@ -392,7 +386,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                                 Goods goods, int gold) {
         // TODO: make a better choice, check whether the colony is
         // well defended
-        return strategy != AIStrategy.CONQUEST;
+        return !"conquest".equals(getAIAdvantage());
     }
 
     /**
@@ -402,7 +396,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return True if the mercenaries are accepted.
      */
     public boolean acceptMercenaries() {
-        return strategy == AIStrategy.CONQUEST || getPlayer().isAtWar();
+        return getPlayer().isAtWar() || "conquest".equals(getAIAdvantage());
     }
 
 
