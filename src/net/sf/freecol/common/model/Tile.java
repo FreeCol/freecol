@@ -372,6 +372,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Are two locations non-null and either the same or at the same tile.
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if this location is the same or at the same tile.
+     */
+    public static boolean isSameTile(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : l1.getTile() == l2.getTile();
+    }
+
+    /**
      * Gets the distance in tiles between this <code>Tile</code> and the
      * specified one.
      *
