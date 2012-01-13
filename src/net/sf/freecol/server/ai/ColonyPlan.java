@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
@@ -593,7 +594,9 @@ public class ColonyPlan {
      * @param production The production map.
      */
     private void updateRawMaterials(Map<GoodsType, Map<WorkLocation, Integer>> production) {
-        Market market = colony.getOwner().getMarket();
+        Player player = colony.getOwner();
+        Market market = player.getMarket();
+        NationType nationType = player.getNationType();
         GoodsType primaryRawMaterial = null;
         GoodsType secondaryRawMaterial = null;
         int primaryValue = -1;
@@ -624,6 +627,9 @@ public class ColonyPlan {
                     value *= (market.getSalePrice(g, 1)
                         + market.getSalePrice(g.getProducedMaterial(), 1)) / 2;
                 }
+            }
+            if (!nationType.getModifierSet(g.getId()).isEmpty()) {
+                value = (value * 12) / 10; // Bonus for national advantages
             }
             if (value > secondaryValue && secondaryRawMaterial != null) {
                 production.remove(secondaryRawMaterial);
@@ -665,7 +671,7 @@ public class ColonyPlan {
     // BuildableTypes that improve breeding.
     private static final double BREEDING_WEIGHT    = 0.1;
     // BuildableTypes that improve building production.
-    private static final double BUILDING_WEIGHT    = 1.0;
+    private static final double BUILDING_WEIGHT    = 0.9;
     // BuildableTypes that produce defensive units.
     private static final double DEFENCE_WEIGHT     = 0.1;
     // BuildableTypes that provide export ability.
@@ -685,7 +691,7 @@ public class ColonyPlan {
     // BuildableTypes that improve colony storage.
     private static final double REPAIR_WEIGHT      = 0.1;
     // BuildableTypes that improve colony storage.
-    private static final double STORAGE_WEIGHT     = 0.9;
+    private static final double STORAGE_WEIGHT     = 0.85;
     // BuildableTypes that improve education.
     private static final double TEACH_WEIGHT       = 0.2;
     // BuildableTypes that improve transport.
@@ -738,20 +744,31 @@ public class ColonyPlan {
      */
     private boolean prioritizeProduction(BuildableType type,
                                          GoodsType goodsType) {
+        Player player = colony.getOwner();
+        NationType nationType = player.getNationType();
+        String advantage = getAIMain().getAIPlayer(player).getAIAdvantage();
         boolean ret = false;
+        double factor = 1.0;
+        if (!nationType.getModifierSet(goodsType.getId()).isEmpty()) {
+            // Handles building, agriculture, furTrapping advantages
+            factor *= 1.2;
+        }
         if (goodsType.isMilitaryGoods()) {
-            ret = prioritize(type, MILITARY_WEIGHT,
+            if ("conquest".equals(advantage)) factor = 1.2;
+            ret = prioritize(type, MILITARY_WEIGHT * factor,
                 1.0/*FIXME: amount present wrt amount to equip*/);
         } else if (goodsType.isBuildingMaterial()) {
-            ret = prioritize(type, BUILDING_WEIGHT,
+            ret = prioritize(type, BUILDING_WEIGHT * factor,
                 1.0/*FIXME: need for this type*/);
         } else if (goodsType.isLibertyType()) {
             ret = prioritize(type, LIBERTY_WEIGHT,
                 (colony.getSoL() >= 100) ? 0.01 : 1.0);
         } else if (goodsType.isImmigrationType()) {
-            ret = prioritize(type, IMMIGRATION_WEIGHT,
+            if ("immigration".equals(advantage)) factor = 1.2;
+            ret = prioritize(type, IMMIGRATION_WEIGHT * factor,
                 1.0/*FIXME: Brewster?*/);
         } else if (produce.contains(goodsType)) {
+            if ("trade".equals(advantage)) factor = 1.2;
             double f = 0.1 * colony.getProductionOf(goodsType.getRawMaterial());
             ret = prioritize(type, PRODUCTION_WEIGHT,
                 f/*FIXME: improvement?*/);
@@ -763,6 +780,8 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
+        String advantage = getAIMain().getAIPlayer(colony.getOwner())
+            .getAIAdvantage();
         buildPlans.clear();
 
         int maxLevel;
@@ -784,11 +803,15 @@ public class ColonyPlan {
 
             // Exempt defence and export from the level check.
             if (!type.getModifierSet(Modifier.DEFENCE).isEmpty()) {
-                prioritize(type, FORTIFY_WEIGHT,
+                double factor = 1.0;
+                if ("conquest".equals(advantage)) factor = 1.1;
+                prioritize(type, FORTIFY_WEIGHT * factor,
                     1.0/*FIXME: 0 if FF underway*/);
             }
             if (type.hasAbility(Ability.EXPORT)) {
-                prioritize(type, EXPORT_WEIGHT,
+                double factor = 1.0;
+                if ("trade".equals(advantage)) factor = 1.1;
+                prioritize(type, EXPORT_WEIGHT * factor,
                     1.0/*FIXME: weigh production v transport*/);
             }
 
@@ -821,12 +844,14 @@ public class ColonyPlan {
             }
 
             if (type.hasAbility(Ability.BUILD)) {
+                double factor = 1.0;
+                if ("building".equals(advantage)) factor = 1.1;
                 double support = 1.0;
                 for (Ability a : type.getFeatureContainer().getAbilitySet(Ability.BUILD)) {
                     List<Scope> scopes = a.getScopes();
                     if (scopes != null && !scopes.isEmpty()) support = 0.1;
                 }
-                prioritize(type, BUILDING_WEIGHT,
+                prioritize(type, BUILDING_WEIGHT * factor,
                     support/*FIXME: need for the thing now buildable*/);
             }
 
@@ -836,7 +861,9 @@ public class ColonyPlan {
             }
 
             if (type.hasAbility(Ability.REPAIR_UNITS)) {
-                prioritize(type, REPAIR_WEIGHT,
+                double factor = 1.0;
+                if ("naval".equals(advantage)) factor = 1.1;
+                prioritize(type, REPAIR_WEIGHT * factor,
                     1.0/*FIXME: #units-to-repair, has-Europe etc*/);
             }
 
@@ -857,7 +884,9 @@ public class ColonyPlan {
                 // Hacks.  No good way to make this really generic.
                 if (!type.getModifierSet("model.modifier.warehouseStorage")
                     .isEmpty()) {
-                    prioritize(type, STORAGE_WEIGHT,
+                    double factor = 1.0;
+                    if ("trade".equals(advantage)) factor = 1.1;
+                    prioritize(type, STORAGE_WEIGHT * factor,
                         1.0/*FIXME: amount of goods*/);
                 }
                 if (!type.getModifierSet("model.modifier.breedingDivisor")
@@ -898,7 +927,9 @@ public class ColonyPlan {
                 }
             } else if (unitType.hasAbility(Ability.CARRY_GOODS)) {
                 if (wagonNeed > 0.0) {
-                    prioritize(unitType, TRANSPORT_WEIGHT,
+                    double factor = 1.0;
+                    if ("trade".equals(advantage)) factor = 1.1;
+                    prioritize(unitType, TRANSPORT_WEIGHT * factor,
                         wagonNeed/*FIXME: type.getSpace()*/);
                 }
             }
