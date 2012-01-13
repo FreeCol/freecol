@@ -480,7 +480,7 @@ public class SimpleCombatModel extends CombatModel {
 
                 // Sink the defender on great wins or lack of repair
                 // location, otherwise just damage.
-                if (great || defenderUnit.getRepairLocation(null) == null) {
+                if (great || defenderUnit.getRepairLocation() == null) {
                     crs.add(CombatResult.SINK_SHIP_BOMBARD);
                 } else {
                     crs.add(CombatResult.DAMAGE_SHIP_BOMBARD);
@@ -537,7 +537,7 @@ public class SimpleCombatModel extends CombatModel {
                 crs.add(CombatResult.LOOT_SHIP);
             }
             if (great
-                || loser.getRepairLocation(null) == null
+                || loser.getRepairLocation() == null
                 || isBeached(loser)) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
@@ -580,10 +580,8 @@ public class SimpleCombatModel extends CombatModel {
                 if (colonyResult == CombatResult.CAPTURE_COLONY
                     || colonyResult == CombatResult.DESTROY_COLONY) {
                     CombatResult shipResult = null;
-                    List<Colony> exclude = new ArrayList<Colony>();
-                    exclude.add(colony);
                     shipResult = (colony.getShipList().isEmpty()) ? null
-                        : (colony.getShipList().get(0).getRepairLocation(exclude) == null)
+                        : (colony.getShipList().get(0).getRepairLocation() == null)
                         ? CombatResult.SINK_COLONY_SHIPS
                         : CombatResult.DAMAGE_COLONY_SHIPS;
                     if (shipResult != null) crs.add(shipResult);

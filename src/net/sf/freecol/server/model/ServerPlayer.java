@@ -1799,12 +1799,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         : attackerUnit).isNaval();
                 if (ok) {
                     if (result == CombatResult.WIN) {
-                        csDamageShipAttack(attackerUnit, defenderUnit,
-                            null, cs);
+                        csDamageShipAttack(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
                     } else {
-                        csDamageShipAttack(defenderUnit, attackerUnit,
-                            null, cs);
+                        csDamageShipAttack(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
                     }
                 }
@@ -2405,13 +2403,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
         List<Unit> units = colony.getTile().getUnitList();
-        List<Colony> exclude = new ArrayList<Colony>();
-        exclude.add(colony);
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
-            if (unit.isNaval()) {
-                csDamageShipAttack(attacker, unit, exclude, cs);
-            }
+            if (unit.isNaval()) csDamageShipAttack(attacker, unit, cs);
         }
     }
 
@@ -2420,15 +2414,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param attacker The attacker <code>Unit</code>.
      * @param ship The <code>Unit</code> which is a ship to damage.
-     * @param exclude An optional list of colonies to exclude.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDamageShipAttack(Unit attacker, Unit ship,
-                                    List<Colony> exclude, ChangeSet cs) {
+    private void csDamageShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location repair = ship.getRepairLocation(exclude);
+        Location repair = ship.getRepairLocation();
         StringTemplate repairLoc = repair.getLocationNameFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
@@ -2460,7 +2452,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                      ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        Location repair = ship.getRepairLocation(null);
+        Location repair = ship.getRepairLocation();
         StringTemplate repairLoc = repair.getLocationNameFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
@@ -2975,10 +2967,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         } else if (pillage < buildingList.size() + shipList.size()) {
             Unit ship = shipList.get(pillage - buildingList.size());
-            if (ship.getRepairLocation(null) == null) {
+            if (ship.getRepairLocation() == null) {
                 csSinkShipAttack(attacker, ship, cs);
             } else {
-                csDamageShipAttack(attacker, ship, null, cs);
+                csDamageShipAttack(attacker, ship, cs);
             }
         } else if (pillage < buildingList.size() + shipList.size()
                    + goodsList.size()) {

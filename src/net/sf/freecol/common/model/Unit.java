@@ -1767,17 +1767,15 @@ public class Unit extends FreeColGameObject
      * Finds the closest <code>Location</code> to this tile where
      * this ship can be repaired.
      *
-     * @param exclude An optional list of colonies to exclude.
      * @return The closest <code>Location</code> where a ship can be repaired.
      */
-    public Location getRepairLocation(List<Colony> exclude) {
+    public Location getRepairLocation() {
         Location closestLocation = null;
         int shortestDistance = INFINITY;
         Player player = getOwner();
         Tile tile = getTile();
         for (Colony colony : player.getColonies()) {
-            if (colony == null
-                || (exclude != null && exclude.contains(colony))) continue;
+            if (colony == null || colony == tile.getColony()) continue;
             int distance;
             if (colony.hasAbility("model.ability.repairUnits")) {
                 // Tile.getDistanceTo(Tile) doesn't care about
