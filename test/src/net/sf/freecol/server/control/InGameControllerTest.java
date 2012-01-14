@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
@@ -423,11 +424,11 @@ public class InGameControllerTest extends FreeColTestCase {
         colony.addBuilding(school);
         Unit teacher = new ServerUnit(game, school, colony.getOwner(),
                                       hardyPioneerType);
-        assertTrue("Unit should be a hardy pioneer",
-                   teacher.getType() == hardyPioneerType);
+        assertEquals("Unit should be a hardy pioneer",
+                     hardyPioneerType, teacher.getType());
         igc.clearSpeciality((ServerPlayer) dutch, teacher);
-        assertTrue("Teacher specialty cannot be cleared",
-                   teacher.getType() == hardyPioneerType);
+        assertEquals("Teacher specialty cannot be cleared",
+                     hardyPioneerType, teacher.getType());
     }
 
     public void testAtackedNavalUnitIsDamaged() {
@@ -526,19 +527,42 @@ public class InGameControllerTest extends FreeColTestCase {
                      Unit.MoveType.MOVE_NO_ATTACK_CIVILIAN,
                      colonial.getMoveType(tile2));
 
-        // Veteran attacks and captures the Colonial Regular
+        // Colonial regulars should never be unarmed
+        TypeCountMap<EquipmentType> equipment = new TypeCountMap<EquipmentType>();
+        equipment.incrementCount(muskets, 1);
+        colonial.setEquipment(equipment);
+
+        // Veteran attacks and demotes the Colonial Regular
         crs = fakeAttackResult(CombatResult.WIN, soldier, colonial);
-        assertTrue("Soldier v Colonial failed", crs.size() == 2
-                   && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.CAPTURE_UNIT);
+        assertEquals("Soldier v Colonial failed",
+                     3, crs.size());
+        assertEquals("Soldier v Colonial failed",
+                     CombatResult.WIN, crs.get(0));
+        assertEquals("Soldier v Colonial failed",
+                     CombatResult.LOSE_EQUIP, crs.get(1));
+        assertEquals("Soldier v Colonial failed",
+                     CombatResult.DEMOTE_UNIT, crs.get(2));
         igc.combat((ServerPlayer) french, soldier, colonial, crs);
 
+        assertEquals("Colonial Regular is demoted",
+                     veteranType, colonial.getType());
+
+        // Veteran attacks and captures the Colonial Regular
+        crs = fakeAttackResult(CombatResult.WIN, soldier, colonial);
+        assertEquals("Soldier v Colonial failed",
+                     2, crs.size());
+        assertEquals("Soldier v Colonial failed",
+                     CombatResult.WIN, crs.get(0));
+        assertEquals("Soldier v Colonial failed",
+                     CombatResult.CAPTURE_UNIT, crs.get(1));
+        igc.combat((ServerPlayer) french, soldier, colonial, crs);
+
+        assertEquals("Colonial Regular is demoted",
+                     colonistType, colonial.getType());
         assertEquals("Colonial Regular should be captured",
                      french, colonial.getOwner());
         assertEquals("Colonial Regular is moved to the Veterans tile",
                      tile2, colonial.getTile());
-        assertEquals("Colonial Regular is demoted",
-                     colonistType, colonial.getType());
     }
 
     public void testAttackColonyWithVeteran() {
@@ -659,7 +683,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Colony should be owned by the attacker",
                      attacker.getOwner(), colony.getOwner());
         assertEquals("Colony colonist should be demoted",
-                     colonist.getType(), colonistType);
+                     colonist.getType(), veteranType);
     }
 
     public void testAttackColonyWithBrave() {

@@ -20,9 +20,16 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -57,8 +64,6 @@ public class CombatTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType veteranType
         = spec().getUnitType("model.unit.veteranSoldier");
-    private static final UnitType colonialType
-        = spec().getUnitType("model.unit.colonialRegular");
     private static final UnitType artilleryType
         = spec().getUnitType("model.unit.artillery");
     private static final UnitType damagedArtilleryType
@@ -452,6 +457,83 @@ public class CombatTest extends FreeColTestCase {
 
         assertEquals(Unit.MoveType.MOVE_NO_ACCESS_EMBARK,
                      brave.getMoveType(tile1, tile2, 3));
+
+    }
+
+    public void testRegulars() {
+        Random random = new Random(1);
+        // these are the first ten values the RNG will produce
+        float[] values = new float[] {
+            0.7308782f,
+            0.100473166f,
+            0.4100808f,
+            0.40743977f,
+            0.2077148f,
+            0.036235332f,
+            0.332717f,
+            0.6588672f,
+            0.96775585f,
+            0.7107396f
+        };
+
+        Map map = getTestMap(plains, true);
+        Game game = ServerTestHelper.startServerGame(map);
+        InGameController igc = ServerTestHelper.getInGameController();
+
+        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        french.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        ServerPlayer refPlayer = igc.createREFPlayer(french);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel();
+
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+
+        Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType, muskets, horses);
+        Unit regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+
+        // (regular + muskets + horses) * attack bonus
+        float offence = (4 + 2 + 1) * 1.5f;
+        assertEquals(offence, combatModel.getOffencePower(regular, colonial));
+        // colonial + muskets + horses + defence bonus
+        float defence = 3 + 1 + 1 + 1;
+        assertEquals(defence, combatModel.getDefencePower(regular, colonial));
+
+        List<CombatResult> result = combatModel.generateAttackResult(random, regular, colonial);
+        assertEquals(CombatResult.LOSE, result.get(0));
+        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
+
+        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+
+        // (regular + muskets) * attack bonus
+        offence = (4 + 2) * 1.5f;
+        assertEquals(offence, combatModel.getOffencePower(regular, colonial));
+
+        // slaughter King's Regular
+        result = combatModel.generateAttackResult(random, colonial, regular);
+        assertEquals(CombatResult.WIN, result.get(0));
+        assertEquals("King's Regular should be slaughtered upon losing all equipment.",
+                     CombatResult.SLAUGHTER_UNIT, result.get(1));
+
+        regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+
+        result = combatModel.generateAttackResult(random, regular, colonial);
+        assertEquals(CombatResult.WIN, result.get(0));
+        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
+        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+
+        result = combatModel.generateAttackResult(random, regular, colonial);
+        assertEquals(CombatResult.WIN, result.get(0));
+        assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
+        assertEquals(CombatResult.DEMOTE_UNIT, result.get(2));
+        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
+        assertFalse(colonial.isArmed());
+        assertEquals(veteranType, colonial.getType());
+
+        result = combatModel.generateAttackResult(random, regular, colonial);
+        assertEquals(CombatResult.WIN, result.get(0));
+        assertEquals(CombatResult.CAPTURE_UNIT, result.get(1));
+        refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
 
     }
 

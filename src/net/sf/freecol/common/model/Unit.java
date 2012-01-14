@@ -3224,6 +3224,22 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Does losing a piece of equipment mean the demotion of this unit?
+     *
+     * @param lose The <code>EquipmentType</code> to lose.
+     * @return True if the unit is to be demoted.
+     */
+    public boolean losingEquipmentDemotesUnit(EquipmentType lose) {
+        if (hasAbility("model.ability.demoteOnAllEquipLost")) {
+            for (EquipmentType equip : getEquipment().keySet()) {
+                if (equip != lose) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Gets the probability that an attack by this unit will provoke a
      * native to convert.
      *

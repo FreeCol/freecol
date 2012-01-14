@@ -851,7 +851,8 @@
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
                skillTaught="model.unit.veteranSoldier" skill="3">
-      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
+      <downgrade unit="model.unit.veteranSoldier" demotion="100" capture="100" clearSkill="100"/>
+      <ability id="model.ability.demoteOnAllEquipLost" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="additive" value="3"/>
@@ -859,9 +860,8 @@
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular" extends="colonist" skill="4">
-      <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.refUnit" value="true"/>
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
+      <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="additive" value="4"/>
       <modifier id="model.modifier.defence" type="additive" value="4"/>

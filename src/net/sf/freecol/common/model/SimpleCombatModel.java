@@ -634,6 +634,9 @@ public class SimpleCombatModel extends CombatModel {
                         : (winner.canCaptureEquipment(equip, loser) != null)
                         ? CombatResult.CAPTURE_EQUIP
                         : CombatResult.LOSE_EQUIP);
+                if (loser.losingEquipmentDemotesUnit(equip)) {
+                    crs.add(CombatResult.DEMOTE_UNIT);
+                }
 
             // Consume autoequipment.
             } else if (settlement instanceof Colony && autoEquip != null) {
