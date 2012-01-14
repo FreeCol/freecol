@@ -80,7 +80,7 @@ import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 
 public class GUI {
-    
+
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
@@ -89,20 +89,20 @@ public class GUI {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
-    
+
 
     /**
      * The space not being used in windowed mode.
      */
     private static final int DEFAULT_WINDOW_SPACE = 100;
-    
+
 
     private FreeColClient freeColClient;
 
-    
+
     // GUI:
     private GraphicsDevice gd;
-    
+
     private JFrame frame;
 
     private Canvas canvas;
@@ -115,7 +115,7 @@ public class GUI {
      * with the default MapViewer.
      */
     private MapViewer colonyTileGUI;
-    
+
     private ImageLibrary imageLibrary;
 
     private SoundPlayer soundPlayer;
@@ -125,7 +125,7 @@ public class GUI {
     private Rectangle windowBounds;
 
     private JWindow splash;
-    
+
     public GUI(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.imageLibrary = new ImageLibrary();
@@ -133,11 +133,11 @@ public class GUI {
 
     public void activateGotoPath() {
         Unit unit = getActiveUnit();
- 
+
         // Action should be disabled if there is no active unit, but make sure
-        if (unit == null) 
+        if (unit == null)
             return;
-        
+
         // Enter "goto mode" if not already activated; otherwise cancel it
         if (mapViewer.isGotoStarted()) {
             mapViewer.stopGoto();
@@ -156,7 +156,7 @@ public class GUI {
                 }
             }
         }
-        
+
     }
 
     /**
@@ -227,7 +227,7 @@ public class GUI {
     }
 
     public Dimension determineWindowSize() {
-        
+
         Rectangle bounds = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getMaximumWindowBounds();
         Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
@@ -239,9 +239,9 @@ public class GUI {
 
     public void displayChat(String senderNme, String message, boolean privateChat) {
         canvas.displayChat(senderNme, message, privateChat);
-    
+
     }
-    
+
 
     /**
      * Tells the map controls that a chat message was received.
@@ -258,7 +258,7 @@ public class GUI {
 
         canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
     }
-    
+
     public void displaySpashScreen(final String splashFilename) {
         splash = null;
         if (splashFilename != null) {
@@ -279,36 +279,36 @@ public class GUI {
             }
         }
     }
-    
+
     public void errorMessage(String messageId) {
         canvas.errorMessage(messageId);
     }
 
     public void errorMessage(String messageID, String message) {
         canvas.errorMessage(messageID, message);
-        
+
     }
-    
+
     public void executeWithUnitOutForAnimation(final Unit unit,
             final Tile sourceTile,
             final OutForAnimationCallback r) {
         mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
     }
-    
+
     public Unit getActiveUnit() {
         if (mapViewer == null)
             return null;
         return mapViewer.getActiveUnit();
     }
-    
+
     public Canvas getCanvas() {
         return canvas;
     }
-    
+
     public MapViewer getColonyTileGUI() {
         return colonyTileGUI;
     }
-    
+
     public int getCurrentViewMode() {
         return mapViewer.getViewMode().getView();
     }
@@ -318,21 +318,21 @@ public class GUI {
             return null;
         return mapViewer.getFocus();
     }
-    
+
 
     public ImageIcon getImageIcon(Object display, boolean small) {
         return imageLibrary.getImageIcon(display, small);
     }
-    
+
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-    
+
     public LoadingSavegameDialog getLoadingSavegameDialog() {
         return canvas.getLoadingSavegameDialog();
     }
 
-    
+
     public float getMapScale() {
         return mapViewer.getMapScale();
     }
@@ -344,19 +344,19 @@ public class GUI {
     public Tile getSelectedTile() {
         return mapViewer.getSelectedTile();
     }
-    
+
     public SoundPlayer getSoundPlayer() {
         return soundPlayer;
     }
-    
+
     public Rectangle getTileBounds(Tile tile) {
         return mapViewer.getTileBounds(tile);
     }
-    
+
     public Point getTilePosition(Tile tile) {
         return mapViewer.getTilePosition(tile);
     }
-    
+
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
@@ -367,12 +367,12 @@ public class GUI {
             splash.dispose();
         }
     }
-    
+
     public boolean isClientOptionsDialogShowing() {
         return canvas != null && !canvas.isClientOptionsDialogShowing();
     }
-    
-    
+
+
     public boolean isMapboardActionsEnabled() {
         return canvas != null && canvas.isMapboardActionsEnabled();
     }
@@ -384,7 +384,7 @@ public class GUI {
     public boolean isWindowed() {
         return windowed;
     }
-    
+
     public void moveTileCursor(Direction direction) {
         mapViewer.moveTileCursor(direction);
     }
@@ -396,11 +396,11 @@ public class GUI {
     public void paintImmediatelyCanvasIn(Rectangle rectangle) {
         canvas.paintImmediately(rectangle);
     }
-    
+
     public void paintImmediatelyCanvasInItsBounds() {
         canvas.paintImmediately(canvas.getBounds());
     }
-    
+
 
     /**
      * Plays some sound. Parameter == null stops playing a sound.
@@ -421,7 +421,7 @@ public class GUI {
             }
         }
     }
-    
+
 
     public void quit() {
         if (!isWindowed()) {
@@ -435,16 +435,16 @@ public class GUI {
         }
     }
 
-    public void refresh() { 
+    public void refresh() {
         frame.paintAll(canvas.getGraphics());
         mapViewer.forceReposition();
         canvas.refresh();
     }
-    
+
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
-    
+
     /**
      * Refreshes the screen at the specified Tile.
      *
@@ -463,74 +463,74 @@ public class GUI {
     public void removeInGameComponents() {
         canvas.removeInGameComponents();
     }
-     
+
     public void requestFocusForSubPanel() {
         canvas.getShowingSubPanel().requestFocus();
     }
-    
+
     public boolean requestFocusInWindow() {
         return canvas.requestFocusInWindow();
     }
-    
+
     public void resetMenuBar() {
         JMenuBar menuBar = frame.getJMenuBar();
         if (menuBar != null) {
             ((FreeColMenuBar) menuBar).reset();
         }
     }
-    
+
     public void returnToTitle() {
         canvas.returnToTitle();
     }
-    
+
     public void scaleMap(float delta) {
         mapViewer.scaleMap(delta);
         refresh();
     }
-    
+
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
     }
-    
+
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
     }
-    
+
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocusImmediately(tileToFocus);
     }
-    
+
     public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
         return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
     }
-    
+
     public void setupInGameMenuBar() {
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));        
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));
     }
-    
+
     public void setupMenuBarToNull() {
         frame.setJMenuBar(null);
     }
-    
+
     public void setUpMouseListenersForCanvas(){
         canvas.addMouseListener(new CanvasMouseListener(freeColClient, canvas, mapViewer));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer,
                  freeColClient.getGame().getMap()));
     }
-        
+
     public void setWindowed(boolean windowed) {
         this.windowed = windowed;
-        
+
     }
-    
+
     public void showAboutPanel() {
         canvas.showAboutPanel();
     }
-    
+
     public ScoutIndianSettlementAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
         return canvas.showArmedUnitIndianSettlementDialog(settlement);
     }
-    
+
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
         return canvas.showBoycottedGoodsDialog(goods, europe);
     }
@@ -538,7 +538,7 @@ public class GUI {
     public void showBuildQueuePanel(Colony colony) {
         canvas.showBuildQueuePanel(colony);
     }
-    
+
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
         canvas.showBuildQueuePanel(colony, callBack);
     }
@@ -547,20 +547,20 @@ public class GUI {
             Goods goods, int gold, boolean canBuy) {
         return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
-    
+
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
         return canvas.showCaptureGoodsDialog(winner, loot);
     }
-    
+
     public void showChatPanel() {
         canvas.showChatPanel();
     }
-    
+
     public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
             List<ChoiceItem<T>> choices) {
         return canvas.showChoiceDialog(tile, text, cancelText, choices);
     }
-    
+
     public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
         return canvas.showChoiceMonarchActionDialog(monarchTitle, actions);
     }
@@ -568,28 +568,28 @@ public class GUI {
     public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
         return canvas.showChooseFoundingFatherDialog(fathers, fatherTitle);
     }
-    
+
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
         return canvas.showChooseFoundingFatherDialog(ffs);
     }
-    
+
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
             Player owner, boolean canAccept) {
         return canvas.showClaimDialog(tile, player, price, owner, canAccept);
     }
-    
+
     public OptionGroup showClientOptionsDialog() {
         return canvas.showClientOptionsDialog();
     }
-    
+
     public ColonyPanel showColonyPanel(Colony colony) {
         return canvas.showColonyPanel(colony);
     }
-        
+
     public void showColonyPanel(Colony colony, Runnable callback) {
         canvas.showColonyPanel(colony, callback);
     }
-    
+
     public void showColopediaPanel(String nodeId) {
         canvas.showColopediaPanel(nodeId);
     }
@@ -601,11 +601,11 @@ public class GUI {
     public void showCompactLabourReport(UnitData unitData) {
         canvas.showCompactLabourReport(unitData);
     }
-    
+
     public List<String> showConfirmDeclarationDialog() {
         return canvas.showConfirmDeclarationDialog();
     }
-    
+
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
         return canvas.showConfirmDialog(text, okText, cancelText);
     }
@@ -614,12 +614,12 @@ public class GUI {
             String okText, String cancelText) {
         return canvas.showConfirmDialog(tile, messages, okText, cancelText);
     }
-    
+
     public boolean showConfirmDialog(Tile tile, StringTemplate text,
             String okText, String cancelText) {
         return canvas.showConfirmDialog(tile, text, okText, cancelText);
     }
-    
+
     public void showDeclarationDialog() {
         canvas.showDeclarationDialog();
     }
@@ -627,7 +627,7 @@ public class GUI {
     public void showDifficultyDialog() {
         canvas.showDifficultyDialog();
     }
-    
+
     public OptionGroup showDifficultyDialog(Specification specification) {
         return canvas.showDifficultyDialog(specification);
     }
@@ -635,24 +635,24 @@ public class GUI {
     public List<Goods> showDumpCargoDialog(Unit unit) {
         return canvas.showDumpCargoDialog(unit);
     }
-        
-    
+
+
     public int showEmigrationPanel(boolean fountainOfYouth) {
         return canvas.showEmigrationPanel(fountainOfYouth);
     }
-    
+
     public boolean showEndTurnDialog(List<Unit> units) {
         return canvas.showEndTurnDialog(units);
     }
-    
+
     public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
         return canvas.showEuropeDialog(europeAction);
     }
-    
+
     public void showEuropePanel() {
         canvas.showEuropePanel();
     }
-    
+
     public void showEventPanel(EventType type) {
         canvas.showEventPanel(type);
     }
@@ -660,11 +660,11 @@ public class GUI {
     public void showFindSettlementDialog() {
         canvas.showFindSettlementDialog();
     }
-    
+
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         canvas.showGameOptionsDialog(editable, loadCustomOptions);
     }
-    
+
     public void showHighScoresPanel(String messageId) {
         canvas.showHighScoresPanel(messageId);
     }
@@ -672,7 +672,7 @@ public class GUI {
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         canvas.showIndianSettlementPanel(indianSettlement);
     }
-    
+
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
             boolean canBuy,
             boolean canSell,
@@ -680,11 +680,11 @@ public class GUI {
         return canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
     }
 
-    
+
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
     }
-    
+
     public void showInformationMessage(FreeColObject displayObject, StringTemplate template) {
         canvas.showInformationMessage(displayObject, template);
     }
@@ -692,29 +692,29 @@ public class GUI {
     public void showInformationMessage(ModelMessage message) {
         canvas.showInformationMessage(message);
     }
-    
+
     public void showInformationMessage(String messageId) {
         canvas.showInformationMessage(messageId);
     }
-    
+
     public void showInformationMessage(StringTemplate template) {
         canvas.showInformationMessage(template);
     }
-    
+
     public String showInputDialog(Tile tile, StringTemplate text, String defaultValue,
             String okText, String cancelText,
             boolean rejectEmptyString) {
         return canvas.showInputDialog(tile, text, defaultValue, okText, cancelText, rejectEmptyString);
     }
-    
+
     public File showLoadDialog(File directory) {
         return canvas.showLoadDialog(directory);
     }
-    
+
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         return canvas.showLoadDialog(directory, fileFilters);
     }
-    
+
     public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
         return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
     }
@@ -722,40 +722,40 @@ public class GUI {
     public void showLogFilePanel() {
         canvas.showLogFilePanel();
     }
-    
-    
+
+
     public void showMainPanel() {
         canvas.showMainPanel();
     }
-    
+
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions){
         return canvas.showMapGeneratorOptionsDialog(mgo, editable, loadCustomOptions);
     }
-        
+
     public Dimension showMapSizeDialog() {
         return canvas.showMapSizeDialog();
     }
-    
+
     public void showModelMessages(ModelMessage... modelMessages) {
         canvas.showModelMessages(modelMessages);
     }
-    
+
     public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
         return canvas.showMonarchPanelDialog(action, replace);
     }
-    
+
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         return canvas.showNegotiationDialog(unit, settlement, agreement);
     }
-    
+
     public void showNewPanel() {
         canvas.showNewPanel();
     }
-    
+
     public void showNewPanel(Specification specification) {
         canvas.showNewPanel(specification);
     }
-    
+
     public boolean showPreCombatDialog(FreeColGameObject attacker,
             FreeColGameObject defender,
             Tile tile) {
@@ -769,7 +769,7 @@ public class GUI {
     public void showReportColonyPanel() {
         canvas.showReportColonyPanel();
     }
-    
+
     public void showReportContinentalCongressPanel() {
         canvas.showReportContinentalCongressPanel();
     }
@@ -781,11 +781,11 @@ public class GUI {
     public void showReportExplorationPanel() {
         canvas.showReportExplorationPanel();
     }
-    
+
     public void showReportForeignAffairPanel() {
         canvas.showReportForeignAffairPanel();
     }
-    
+
     public void showReportHistoryPanel() {
         canvas.showReportHistoryPanel();
     }
@@ -793,7 +793,7 @@ public class GUI {
     public void showReportIndianPanel() {
         canvas.showReportIndianPanel();
     }
-    
+
     public void showReportLabourPanel() {
         canvas.showReportLabourPanel();
     }
@@ -818,23 +818,23 @@ public class GUI {
     public void showReportRequirementsPanel() {
         canvas.showReportRequirementsPanel();
     }
-    
+
     public void showReportTradePanel() {
         canvas.showReportTradePanel();
     }
-    
+
     public void showReportTurnPanel(ModelMessage... messages) {
         canvas.showReportTurnPanel(messages);
     }
-    
+
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, defaultName);
     }
-    
+
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
         return canvas.showSaveDialog(directory, standardName, fileFilters, defaultName);
     }
-    
+
     public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
             Unit unit,
             boolean canNegotiate) {
@@ -844,14 +844,14 @@ public class GUI {
     public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
         return canvas.showScoutIndianSettlementDialog(settlement, number);
     }
-    
+
     public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
         return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
     }
 
 
 
-    
+
     public Location showSelectDestinationDialog(Unit unit) {
         return canvas.showSelectDestinationDialog(unit);
     }
@@ -860,10 +860,10 @@ public class GUI {
             Goods goods, int gold) {
         return canvas.showSellDialog(unit, settlement, goods, gold);
     }
-    
+
     public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
         canvas.showServerListPanel(username, serverList);
-        
+
     }
 
     public <T> T showSimpleChoiceDialog(Tile tile,
@@ -875,7 +875,7 @@ public class GUI {
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
-    
+
     public void showStatisticsPanel() {
         canvas.showStatisticsPanel();
     }
@@ -902,22 +902,22 @@ public class GUI {
     public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
         return canvas.showTradeRouteInputDialog(newRoute);
     }
-    
+
     public MissionaryAction showUseMissionaryDialog(Unit unit,
             IndianSettlement settlement,
             boolean canEstablish,
             boolean canDenounce) {
         return canvas.showUseMissionaryDialog(unit, settlement, canEstablish, canDenounce);
     }
-    
+
     public void showVictoryPanel() {
         canvas.showVictoryPanel();
     }
-       
+
     public boolean showWarehouseDialog(Colony colony) {
         return canvas.showWarehouseDialog(colony);
     }
-    
+
     public void showWorkProductionPanel(Unit unit) {
         canvas.showWorkProductionPanel(unit);
     }
@@ -1046,11 +1046,11 @@ public class GUI {
         }
         mapViewer.startCursorBlinking();
     }
-    
+
     public void startMapEditorGUI() {
         // We may need to reset the zoom value to the default value
         scaleMap(2f);
-        
+
         setupMapEditorMenuBar();
         JInternalFrame f = canvas.addAsToolBox(new MapEditorTransformPanel(freeColClient, this));
         f.setLocation(f.getX(), 50);
@@ -1060,7 +1060,7 @@ public class GUI {
     }
 
     public void toggleViewMode() {
-        mapViewer.getViewMode().toggleViewMode();    
+        mapViewer.getViewMode().toggleViewMode();
     }
 
     public void updateGameOptions() {
@@ -1077,7 +1077,7 @@ public class GUI {
     public void updateMapGeneratorOptions() {
         canvas.updateMapGeneratorOptions();
     }
-    
+
     public void updateMenuBar() {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar) frame.getJMenuBar()).update();
@@ -1097,5 +1097,5 @@ public class GUI {
 
 
 
-    
+
 }
