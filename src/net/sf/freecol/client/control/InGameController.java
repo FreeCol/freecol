@@ -745,7 +745,7 @@ public final class InGameController implements NetworkConstants {
             .add("%goods%", type.getNameKey());
     }
 
-    
+
     // Server access routines called from multiple places.
 
     /**
@@ -960,7 +960,7 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    /** 
+    /**
      * Gets the most recently saved game file, or <b>null</b>.  (This
      * may be either from a recent arbitrary user operation or an
      * autosave function.)
@@ -999,6 +999,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         freeColClient.getConnectController().quitGame(true);
+        gui.setActiveUnit(null);
         gui.removeInGameComponents();
         freeColClient.getConnectController().loadGame(file);
     }
@@ -1018,7 +1019,7 @@ public final class InGameController implements NetworkConstants {
             if (file.isFile()) {
                 // ask user to confirm reload action
                 boolean ok = true; // canvas.showConfirmDialog(gid, gid, filename);
-                
+
                 // perform loading game state if answer == ok
                 if (ok) {
                     freeColClient.getConnectController().quitGame(true);
@@ -1939,7 +1940,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if (units.size() > 0) {
-                if (!gui.showEndTurnDialog(units)) 
+                if (!gui.showEndTurnDialog(units))
                     return;
             }
         }
@@ -2739,7 +2740,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             } else {
                 displayModelMessages(false);
-                if (!gui.onScreen(tile)) 
+                if (!gui.onScreen(tile))
                     gui.setSelectedTile(tile, false);
             }
         }
