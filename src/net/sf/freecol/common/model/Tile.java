@@ -762,7 +762,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void setSettlement(Settlement s) {
         settlement = s;
-        owningSettlement = s;
+        changeOwningSettlement(s);
     }
 
     /**
@@ -809,10 +809,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Sets the owner of this tile. A <code>Settlement</code> become an owner
-     * of a <code>Tile</code> when having workers placed on it.
+     * Gets the owning settlement for this tile.
      *
-     * @param owner The Settlement that owns this tile.
+     * @return The <code>Settlement</code> that owns this tile.
+     * @see #setOwner
+     */
+    public Settlement getOwningSettlement() {
+        return owningSettlement;
+    }
+
+    /**
+     * Sets the settlement that owns this tile.
+     *
+     * @param owner The <code>Settlement</code> to own this tile.
      * @see #getOwner
      */
     public void setOwningSettlement(Settlement owner) {
@@ -820,13 +829,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets the owner of this tile.
+     * Changes the owning settlement for this tile.
      *
-     * @return The Settlement that owns this tile.
-     * @see #setOwner
+     * @param settlement The new owning <code>Settlement</code> for this tile.
      */
-    public Settlement getOwningSettlement() {
-        return owningSettlement;
+    public void changeOwningSettlement(Settlement settlement) {
+        if (owningSettlement != null) {
+            owningSettlement.removeTile(this);
+        }
+        setOwningSettlement(settlement);
+        if (settlement != null) {
+            settlement.addTile(this);
+        }
     }
 
     /**
@@ -839,7 +853,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void changeOwnership(Player player, Settlement settlement) {
         Player old = getOwner();
         setOwner(player);
-        setOwningSettlement(settlement);
+        changeOwningSettlement(settlement);
         updatePlayerExploredTiles(old);
     }
 
@@ -1531,8 +1545,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Unit getOccupyingUnit() {
         Unit unit = getFirstUnit();
         Player owner = null;
-        if (owningSettlement != null) {
-            owner = owningSettlement.getOwner();
+        if (getOwningSettlement() != null) {
+            owner = getOwningSettlement().getOwner();
         }
         if (owner != null && unit != null && unit.getOwner() != owner
             && owner.getStance(unit.getOwner()) != Stance.ALLIANCE) {
@@ -1880,20 +1894,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         final String owningSettlementStr
             = in.getAttributeValue(null, "owningSettlement");
+        Settlement newOwningSettlement = null;
         if (owningSettlementStr != null) {
-            owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
-            if (owningSettlement == null) {
+            newOwningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
+            if (newOwningSettlement == null) {
                 if (owningSettlementStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    owningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
+                    newOwningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
                 } else if (owningSettlementStr.startsWith(Colony.getXMLElementTagName())) {
-                    owningSettlement = new Colony(getGame(), owningSettlementStr);
+                    newOwningSettlement = new Colony(getGame(), owningSettlementStr);
                 } else {
                     logger.warning("Unknown type of Settlement.");
                 }
             }
         } else {
-            owningSettlement = null;
+            newOwningSettlement = null;
         }
+        changeOwningSettlement(newOwningSettlement);
     }
 
     /**

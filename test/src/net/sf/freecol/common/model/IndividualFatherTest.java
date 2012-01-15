@@ -122,8 +122,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         for (Unit u : colonyTile.getUnitList()) {
             u.setLocation(colony.getTile());
         }
-        disputedTile.setOwner(iroquois);
-        disputedTile.setOwningSettlement(indianSettlement);
+        disputedTile.changeOwnership(iroquois, indianSettlement);
 
         assertNotNull(settlementTile.getSettlement());
         assertTrue(player.getLandPrice(disputedTile) > 0);

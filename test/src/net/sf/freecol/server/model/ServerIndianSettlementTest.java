@@ -126,7 +126,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         // Simulate that only the center tile is owned by camp 1
         // Does not matter where camp 2 is, so we put it in the same tile as camp1
         for (Tile t: camp1.getTile().getSurroundingTiles(camp1.getRadius())) {
-            t.setOwningSettlement(camp2);
+            t.changeOwnership(camp2.getOwner(), camp2);
         }
 
 

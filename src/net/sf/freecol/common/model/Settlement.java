@@ -52,10 +52,11 @@ abstract public class Settlement extends GoodsLocation
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
 
-    /**
-     * Contains the abilities and modifiers of this Colony.
-     */
+    /** Contains the abilities and modifiers of this Settlement. */
     private FeatureContainer featureContainer;
+
+    /** The tiles this settlement owns. */
+    private List<Tile> ownedTiles = new ArrayList<Tile>();
 
     /**
      * Describe type here.
@@ -370,28 +371,29 @@ abstract public class Settlement extends GoodsLocation
 
     /**
      * Get the tiles this settlement owns.
-     * Exploits the fact that the map generator only grows connected tiles.
      *
      * @return A list of tiles.
      */
     public List<Tile> getOwnedTiles() {
-        Tile settlementTile = getTile();
-        List<Tile> tiles = new ArrayList<Tile>();
-        tiles.add(settlementTile);
-        for (Tile t : settlementTile.getSurroundingTiles(getRadius())) {
-            if (t.getOwningSettlement() == this) tiles.add(t);
-        }
-        List<Tile> todo = new ArrayList<Tile>(tiles);
-        while (!todo.isEmpty()) {
-            Tile t = todo.remove(0);
-            for (Tile s : t.getSurroundingTiles(1)) {
-                if (s.getOwningSettlement() == this && !tiles.contains(s)) {
-                    tiles.add(s);
-                    todo.add(s);
-                }
-            }
-        }
-        return tiles;
+        return new ArrayList<Tile>(ownedTiles);
+    }
+
+    /**
+     * Adds a tile to this settlement.
+     *
+     * @param tile The <code>Tile</code> to add.
+     */
+    public void addTile(Tile tile) {
+        ownedTiles.add(tile);
+    }
+
+    /**
+     * Removes a tile from this settlement.
+     *
+     * @param tile The <code>Tile</code> to remove.
+     */
+    public void removeTile(Tile tile) {
+        ownedTiles.remove(tile);
     }
 
     /**

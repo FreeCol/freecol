@@ -1019,7 +1019,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (unit.isColonist()) {
-                giveColonistMission(aiUnit, fewColonies, workerWishes);
+                try {
+                    giveColonistMission(aiUnit, fewColonies, workerWishes);
+                } catch (Exception e) {
+                    throw new IllegalStateException("GCM: " + unit);
+                }
             }
 
             if (!aiUnit.hasMission()) {

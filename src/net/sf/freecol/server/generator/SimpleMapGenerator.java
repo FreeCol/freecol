@@ -479,8 +479,7 @@ public class SimpleMapGenerator implements MapGenerator {
                      i > 0; i--) {
                     Tile tile = findFreeNeighbouringTile(is, tiles, random);
                     if (tile == null) break;
-                    tile.setOwner(is.getOwner());
-                    tile.setOwningSettlement(is);
+                    tile.changeOwnership(is.getOwner(), is);
                     tiles.add(tile);
                 }
             }
@@ -899,8 +898,7 @@ public class SimpleMapGenerator implements MapGenerator {
             if (tile.getSettlement() == null
                 && (tile.getOwner() == null
                     || !tile.getOwner().isEuropean())) {
-                tile.setOwner(player);
-                tile.setOwningSettlement(colony);
+                tile.changeOwnership(player, colony);
                 if (tile.hasLostCityRumour()) {
                     tile.removeLostCityRumour();
                 }
