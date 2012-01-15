@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -101,69 +102,77 @@ public class DefendSettlementMission extends Mission {
      }
 
     /**
-    * Performs this mission.
-    * @param connection The <code>Connection</code> to the server.
-    */
+     * Performs this mission.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
     public void doMission(Connection connection) {
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
+        if (!isValid() || unit.getTile() == null) return;
+        final Tile settlementTile = settlement.getTile();
 
-        if (!isValid()) {
+        if (unit.getTile() != settlementTile) { // Go home!
+            Direction r = moveTowards(settlementTile);
+            if (r == null || !moveButDontAttack(r)) return;
+        }
+
+        int defenderCount = 0, fortifiedCount = 0;
+        List<Unit> units = settlement.getUnitList();
+        units.addAll(settlementTile.getUnitList());
+        for (Unit u : units) {
+            if (unit.isOffensiveUnit()) {
+                defenderCount++;
+                if (unit.getState() == UnitState.FORTIFIED) {
+                    fortifiedCount++;
+                }
+            }
+        }
+        if (defenderCount <= 2 || fortifiedCount <= 1) {
+            // The settlement is badly defended, go straight home if not
+            // there, otherwise fortify if not already.
+            if (unit.getTile() == settlementTile
+                && unit.getState() != UnitState.FORTIFIED
+                && unit.getState() != UnitState.FORTIFYING
+                && unit.checkSetState(UnitState.FORTIFYING)) {
+                AIMessage.askChangeState(getAIUnit(), UnitState.FORTIFYING);
+            }
             return;
         }
 
-        if (unit.getTile() == null) {
-            return;
-        }
-
-        if (unit.isOffensiveUnit()) {
-            CombatModel combatModel = unit.getGame().getCombatModel();
-            Unit bestTarget = null;
-            float bestDifference = Float.MIN_VALUE;
-            Direction bestDirection = null;
-
-            Direction[] directions = Direction.getRandomDirectionArray(getAIRandom());
-            for (Direction direction : directions) {
-                Tile t = unit.getTile().getNeighbourOrNull(direction);
-                if (t == null) continue;
-                Unit defender = t.getFirstUnit();
-                if (defender != null
-                    && defender.getOwner().atWarWith(unit.getOwner())
-                    && unit.getMoveType(direction).isAttack()) {
-                    Unit enemyUnit = t.getDefendingUnit(unit);
-                    float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
-                    float weAttack = combatModel.getOffencePower(unit, enemyUnit);
-                    float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);
-                    float weDefend = combatModel.getDefencePower(enemyUnit, unit);
-
-                    float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);
-                    if (difference > bestDifference) {
-                        if (difference > 0 || weAttack > enemyDefend) {
-                            bestDifference = difference;
-                            bestTarget = enemyUnit;
-                            bestDirection = direction;
-                        }
+        // The settlement is well enough defended.  (must prevent a
+        // sole unit losing an offensive combat because the combat
+        // model does not understand that).
+        if (!unit.isOffensiveUnit()) return;
+        CombatModel combatModel = unit.getGame().getCombatModel();
+        Unit bestTarget = null;
+        float bestDifference = Float.MIN_VALUE;
+        Direction bestDirection = null;
+        for (Direction direction : Direction.getRandomDirectionArray(getAIRandom())) {
+            Tile t = unit.getTile().getNeighbourOrNull(direction);
+            if (t == null) continue;
+            Unit defender = t.getFirstUnit();
+            if (defender != null
+                && defender.getOwner().atWarWith(unit.getOwner())
+                && unit.getMoveType(direction).isAttack()) {
+                Unit enemyUnit = t.getDefendingUnit(unit);
+                float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
+                float weAttack = combatModel.getOffencePower(unit, enemyUnit);
+                float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);
+                float weDefend = combatModel.getDefencePower(enemyUnit, unit);
+                
+                float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);
+                if (difference > bestDifference) {
+                    if (difference > 0 || weAttack > enemyDefend) {
+                        bestDifference = difference;
+                        bestTarget = enemyUnit;
+                        bestDirection = direction;
                     }
                 }
             }
-
-            if (bestTarget != null) {
-                // this must be true, since it is the only way to get
-                // a bestTarget
-                AIMessage.askAttack(getAIUnit(), bestDirection);
-                return;
-            }
         }
 
-        if (unit.getTile() != settlement.getTile()) {
-            // Move towards the target.
-            Direction r = moveTowards(settlement.getTile());
-            if (r == null || !moveButDontAttack(r)) return;
-        } else {
-            if (unit.getState() != UnitState.FORTIFIED
-                    && unit.getState() != UnitState.FORTIFYING
-                    && unit.checkSetState(UnitState.FORTIFYING)) {
-                AIMessage.askChangeState(getAIUnit(), UnitState.FORTIFYING);
-            }
+        if (bestTarget != null) {
+            AIMessage.askAttack(getAIUnit(), bestDirection);
         }
     }
 
