@@ -24,8 +24,12 @@ import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.server.model.ServerUnit;
 
 public class MessagesTest extends FreeColTestCase {
 
@@ -248,6 +252,65 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("Ruoka", Messages.message(StringTemplate.key("key3")));
         assertEquals("Ruoka", Messages.message("key3"));
+
+    }
+
+
+    public void testLabels() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+        EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+        EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
+        EquipmentType bible = spec().getEquipmentType("model.equipment.missionary");
+
+        // King's regulars
+        Unit unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.kingsRegular"));
+        assertEquals("King's Regular", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Infantry", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(horses, 1);
+        assertEquals("Cavalry", Messages.message(Messages.getLabel(unit)));
+
+        // Colonial regulars
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.colonialRegular"));
+        assertEquals("Colonial Regular", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Continental Army", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(horses, 1);
+        assertEquals("Continental Cavalry", Messages.message(Messages.getLabel(unit)));
+
+        // Veteran Soldiers
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.veteranSoldier"));
+        assertEquals(1, unit.getEquipment().getCount(muskets));
+        assertEquals("Veteran Soldier", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(muskets, -1);
+        assertEquals("Veteran Soldier (no muskets)", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(horses, 1);
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Veteran Dragoon", Messages.message(Messages.getLabel(unit)));
+
+        // Hardy Pioneers
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.hardyPioneer"));
+        assertEquals(5, unit.getEquipment().getCount(tools));
+        assertEquals("Hardy Pioneer", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(tools, -5);
+        assertEquals("Hardy Pioneer (no tools)", Messages.message(Messages.getLabel(unit)));
+
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.jesuitMissionary"));
+        assertEquals(1, unit.getEquipment().getCount(bible));
+        assertEquals("Jesuit Missionary", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(bible, -1);
+        assertEquals("Jesuit Missionary (not commissioned)", Messages.message(Messages.getLabel(unit)));
 
     }
 
