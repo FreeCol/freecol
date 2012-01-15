@@ -178,6 +178,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 if (pathNode.getTile().getSettlement() == null) {
                     for (Direction direction : Direction.values()) {
                         Tile attackTile = pathNode.getTile().getNeighbourOrNull(direction);
+                        if (attackTile == null) continue;
                         if (end == attackTile
                                 && attackTile.getSettlement() != null
                                 && pathNode.getTile().isLand()) {
