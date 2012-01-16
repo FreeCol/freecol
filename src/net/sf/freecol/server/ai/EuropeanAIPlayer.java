@@ -616,34 +616,41 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (Utils.randomInt(logger, "Cheat buy unit",
                     getAIRandom(), 10) == 1) {
-                List<WorkerWish> workerWishes = new ArrayList<WorkerWish>();
+                WorkerWish bestWish = null;
+                int bestValue = Integer.MIN_VALUE;
                 for (AIColony aic : getAIColonies()) {
-                    workerWishes.addAll(aic.getWorkerWishes());
-                }
-                if (!workerWishes.isEmpty()) {
-                    Collections.sort(workerWishes);
-                    UnitType unitToTrain = workerWishes.get(0).getUnitType();
-                    int unitPrice = europe.getUnitPrice(unitToTrain);
-                    if (unitPrice >= 0) {
-                        // add the necessary amount of money
-                        getPlayer().modifyGold(unitPrice);
-                        AIUnit aiUnit = trainAIUnitInEurope(unitToTrain);
-                        if (aiUnit != null) {
-                            Unit unit = aiUnit.getUnit();
-                            if (unit != null && unit.isColonist()) {
-                                // no need to equip artillery units with muskets or horses
-                                // TODO: cleanup magic numbers 50 and 1
-                                GoodsType muskets = spec.getGoodsType("model.goods.muskets");
-                                GoodsType horses = spec.getGoodsType("model.goods.horses");
-                                getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
-                                getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
-                                
-                                EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
-                                EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
-                                AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
-                                AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
-                            }
+                    for (WorkerWish ww : aic.getWorkerWishes()) {
+                        if (ww.getValue() > bestValue) {
+                            bestValue = ww.getValue();
+                            bestWish = ww;
                         }
+                    }
+                }
+                UnitType unitType;
+                int unitPrice;
+                if (bestWish != null
+                    && (unitType = bestWish.getUnitType()) != null
+                    && (unitPrice = europe.getUnitPrice(unitType)) >= 0) {
+                    // cheat add the necessary amount of money
+                    getPlayer().modifyGold(unitPrice);
+                    AIUnit aiUnit = trainAIUnitInEurope(unitType);
+                    if (aiUnit != null) {
+                        Unit unit = aiUnit.getUnit();
+                        if (unit != null && unit.isColonist()) {
+                            // no need to equip artillery units with muskets or horses
+                            // TODO: cleanup magic numbers 50 and 1
+                            GoodsType muskets = spec.getGoodsType("model.goods.muskets");
+                            GoodsType horses = spec.getGoodsType("model.goods.horses");
+                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
+                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
+                            
+                            EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
+                            EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
+                            AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
+                            AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
+                        }
+                        aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+System.err.println("CHEAT UNIT: " + aiUnit + " has mission " + aiUnit.getMission());
                     }
                 }
             }
@@ -1598,9 +1605,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (TransportMission tm : availableMissions) {
                 int transportSpace = tm.getAvailableSpace(t);
                 if (transportSpace <= 0) continue;
-                if (t instanceof AIUnit && !tm.getUnit().canCarryUnits()) {
-                    continue;
-                }
+                if (t instanceof AIUnit) {
+                    if (!tm.getUnit().canCarryUnits()) continue;
+                } else if (t instanceof AIGoods) {
+                    if (!tm.getUnit().canCarryGoods()) continue;
+                }                    
                 if (t.getTransportSource() != null
                     && (t.getTransportSource().getTile()
                         == tm.getUnit().getTile())) {
