@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -36,11 +38,12 @@ import org.w3c.dom.Element;
 /**
  * Mission for working inside a <code>Colony</code>.
  */
-public class WorkInsideColonyMission extends Mission{
+public class WorkInsideColonyMission extends Mission {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
+    // The AI colony to work inside.
     private AIColony aiColony;
 
 
@@ -53,12 +56,10 @@ public class WorkInsideColonyMission extends Mission{
      * @param aiColony The <code>AIColony</code> the unit should be
      *        working in.
      */
-    public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit, AIColony aiColony) {
+    public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
+                                   AIColony aiColony) {
         super(aiMain, aiUnit);
         this.aiColony = aiColony;
-        if (aiColony == null) {
-            throw new NullPointerException("aiColony == null");
-        }
     }
 
     /**
@@ -74,7 +75,8 @@ public class WorkInsideColonyMission extends Mission{
     }
 
     /**
-     * Creates a new <code>WorkInsideColonyMission</code> and reads the given element.
+     * Creates a new <code>WorkInsideColonyMission</code> and reads
+     * the given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -82,27 +84,20 @@ public class WorkInsideColonyMission extends Mission{
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public WorkInsideColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public WorkInsideColonyMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
 
 
     /**
-    * Disposes this <code>Mission</code>.
-    */
+     * Disposes of this <code>Mission</code>.
+     */
     public void dispose() {
         super.dispose();
     }
 
-
-    /**
-    * Performs this mission.
-    * @param connection The <code>Connection</code> to the server.
-    */
-    public void doMission(Connection connection) {
-        // Nothing to do yet.
-    }
 
     /**
      * Checks if this mission is still valid to perform.
@@ -113,7 +108,68 @@ public class WorkInsideColonyMission extends Mission{
         return super.isValid()
             && aiColony != null
             && aiColony.getColony() != null
-            && !aiColony.getColony().isDisposed();
+            && !aiColony.getColony().isDisposed()
+            && getUnit().getOwner() == aiColony.getColony().getOwner();
+    }
+
+    /**
+     * Should the unit use transport to get to a specified tile?
+     *
+     * True if the unit is not there already and:
+     * - the unit is already has transport, this will always be faster
+     *   (TODO: mounted units on good roads might be faster, check for this)
+     * - if not on the map
+     * - if on the map can not find a path to the tile
+     *
+     * @param tile The <code>Tile</code> to go to.
+     * @return True if the unit should use transport.
+     */
+    private boolean shouldTakeTransportToTile(Tile tile) {
+        final Unit unit = getUnit();
+        return (unit.getTile() != tile)
+            && (unit.isOnCarrier()
+                || unit.getTile() == null
+                || unit.findPath(tile) == null);
+    }
+
+    /**
+     * Gets the destination for units with this mission.
+     *
+     * @return Usually the colony tile unless the unit is there
+     *         already or can get there itself.
+     */
+    public Tile getTransportDestination() {
+        final Tile colonyTile = aiColony.getColony().getTile();
+        return (shouldTakeTransportToTile(colonyTile))
+            ? colonyTile
+            : null;
+    }
+
+    /**
+     * Gets the priority of getting the unit to the colony.
+     *
+     * @return The transport priority.
+     */
+    public int getTransportPriority() {
+        return (shouldTakeTransportToTile(aiColony.getColony().getTile()))
+            ? NORMAL_TRANSPORT_PRIORITY
+            : 0;
+    }
+
+    /**
+     * Performs this mission.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    public void doMission(Connection connection) {
+        if (!isValid()) return;
+
+        final Tile colonyTile = aiColony.getColony().getTile();
+        final Unit unit = getUnit();
+        if (!unit.isOnCarrier() && unit.getTile() != null
+            && unit.getTile() != colonyTile) {
+            moveTowards(colonyTile);
+        }
     }
 
 
@@ -129,11 +185,18 @@ public class WorkInsideColonyMission extends Mission{
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("colony", aiColony.getId());
     }
 
+    /**
+     * {@inherit-doc}
+     */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -146,9 +209,9 @@ public class WorkInsideColonyMission extends Mission{
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "workInsideColonyMission".
+     * @return "workInsideColonyMission".
      */
     public static String getXMLElementTagName() {
         return "workInsideColonyMission";
