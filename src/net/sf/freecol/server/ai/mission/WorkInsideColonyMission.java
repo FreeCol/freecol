@@ -113,26 +113,6 @@ public class WorkInsideColonyMission extends Mission {
     }
 
     /**
-     * Should the unit use transport to get to a specified tile?
-     *
-     * True if the unit is not there already and:
-     * - the unit is already has transport, this will always be faster
-     *   (TODO: mounted units on good roads might be faster, check for this)
-     * - if not on the map
-     * - if on the map can not find a path to the tile
-     *
-     * @param tile The <code>Tile</code> to go to.
-     * @return True if the unit should use transport.
-     */
-    private boolean shouldTakeTransportToTile(Tile tile) {
-        final Unit unit = getUnit();
-        return (unit.getTile() != tile)
-            && (unit.isOnCarrier()
-                || unit.getTile() == null
-                || unit.findPath(tile) == null);
-    }
-
-    /**
      * Gets the destination for units with this mission.
      *
      * @return Usually the colony tile unless the unit is there
@@ -143,17 +123,6 @@ public class WorkInsideColonyMission extends Mission {
         return (shouldTakeTransportToTile(colonyTile))
             ? colonyTile
             : null;
-    }
-
-    /**
-     * Gets the priority of getting the unit to the colony.
-     *
-     * @return The transport priority.
-     */
-    public int getTransportPriority() {
-        return (shouldTakeTransportToTile(aiColony.getColony().getTile()))
-            ? NORMAL_TRANSPORT_PRIORITY
-            : 0;
     }
 
     /**

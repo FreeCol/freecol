@@ -88,6 +88,13 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Disposes this mission by removing any references to it.
+     */
+    public void dispose() {
+        // Nothing to do yet.
+    }
+
+    /**
      * Moves the unit owning this mission towards the given
      * <code>Tile</code>.  This is done in a loop until the tile is
      * reached, there are no moves left, the path to the target cannot
@@ -359,10 +366,23 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Disposes this mission by removing any references to it.
+     * Should the unit use transport to get to a specified tile?
+     *
+     * True if the unit is not there already and:
+     * - the unit is already has transport, this will always be faster
+     *   (TODO: mounted units on good roads might be faster, check for this)
+     * - if not on the map
+     * - if on the map can not find a path to the tile
+     *
+     * @param tile The <code>Tile</code> to go to.
+     * @return True if the unit should use transport.
      */
-    public void dispose() {
-        // Nothing to do yet.
+    protected boolean shouldTakeTransportToTile(Tile tile) {
+        final Unit unit = getUnit();
+        return (unit.getTile() != tile)
+            && (unit.isOnCarrier()
+                || unit.getTile() == null
+                || unit.findPath(tile) == null);
     }
 
 
