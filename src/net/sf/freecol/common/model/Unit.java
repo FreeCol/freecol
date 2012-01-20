@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -99,6 +100,56 @@ public class Unit extends FreeColGameObject
      */
     public static enum Role {
         DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
+
+        // Equipment types needed for certain roles.
+        private static final HashMap<Role, List<EquipmentType>> roleEquipment
+            = new HashMap<Role, List<EquipmentType>>();
+
+        /**
+         * Initializes roleEquipment.  How about that.
+         */
+        private void initializeRoleEquipment(Specification spec) {
+            if (!roleEquipment.isEmpty()) return;
+            UnitType defaultUnit = spec.getDefaultUnitType();
+            for (EquipmentType e : spec.getEquipmentTypeList()) {
+                Boolean b = e.getUnitAbilitiesRequired()
+                    .get("model.ability.bornInIndianSettlement");
+                if (b != null && b.booleanValue()) continue;
+                Role r = e.getRole();
+                if (r != null) {
+                    List<EquipmentType> eq = roleEquipment.get(r);
+                    if (eq == null) eq = new ArrayList<EquipmentType>();
+                    eq.add(e);
+                    roleEquipment.put(r, eq);
+                }
+            }
+            // TODO: Not quite completely generic yet.  There are more
+            // equipment types that are compatible with the soldier role.
+            // The spec expresses this with <compatible-equipment> but
+            // it does not express that while muskets and horses are compatible
+            // for a soldier, they are not for a scout.
+            for (EquipmentType e : spec.getEquipmentTypeList()) {
+                if (!e.isMilitaryEquipment()) continue;
+                Boolean b = e.getUnitAbilitiesRequired()
+                    .get("model.ability.bornInIndianSettlement");
+                if (b != null && b.booleanValue()) continue;
+                List<EquipmentType> eq = roleEquipment.get(Role.SOLDIER);
+                if (!eq.contains(e)) eq.add(e);
+            }
+        }
+
+        /**
+         * Gets the equipment required for this role.
+         * TODO: passing the spec in is a wart.
+         *
+         * @param spec The <code>Specification</code> to extract requirements
+         *     from.
+         * @return A list of required <code>EquipmentType</code>s.
+         */
+        public List<EquipmentType> getRoleEquipment(Specification spec) {
+            initializeRoleEquipment(spec);
+            return roleEquipment.get(this);
+        }
 
         public boolean isCompatibleWith(Role oldRole) {
             return (this == oldRole) ||

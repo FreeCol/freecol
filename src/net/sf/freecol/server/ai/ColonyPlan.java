@@ -184,10 +184,6 @@ public class ColonyPlan {
     private final List<GoodsType> otherRawGoodsTypes
         = new ArrayList<GoodsType>();
 
-    // Equipment types needed for certain roles.
-    private static final Map<Role, List<EquipmentType>> roleEquipment
-        = new HashMap<Role, List<EquipmentType>>();
-
 
     /**
      * Creates a new <code>ColonyPlan</code>.
@@ -203,7 +199,6 @@ public class ColonyPlan {
         this.colony = colony;
         this.profileType = ProfileType
             .getProfileTypeFromSize(colony.getUnitCount());
-        initializeRoleEquipment();
     }
 
     /**
@@ -216,40 +211,6 @@ public class ColonyPlan {
     public ColonyPlan(AIMain aiMain, Element element) {
         this.aiMain = aiMain;
         readFromXMLElement(element);
-        initializeRoleEquipment();
-    }
-
-    /**
-     * Initializes roleEquipment.  How about that.
-     */
-    private void initializeRoleEquipment() {
-        if (!roleEquipment.isEmpty()) return;
-        UnitType defaultUnit = spec().getDefaultUnitType();
-        for (EquipmentType e : spec().getEquipmentTypeList()) {
-            Boolean b = e.getUnitAbilitiesRequired()
-                .get("model.ability.bornInIndianSettlement");
-            if (b != null && b.booleanValue()) continue;
-            Role r = e.getRole();
-            if (r != null) {
-                List<EquipmentType> eq = roleEquipment.get(r);
-                if (eq == null) eq = new ArrayList<EquipmentType>();
-                eq.add(e);
-                roleEquipment.put(r, eq);
-            }
-        }
-        // TODO: Not quite completely generic yet.  There are more
-        // equipment types that are compatible with the soldier role.
-        // The spec expresses this with <compatible-equipment> but
-        // it does not express that while muskets and horses are compatible
-        // for a soldier, they are not for a scout.
-        for (EquipmentType e : spec().getEquipmentTypeList()) {
-            if (!e.isMilitaryEquipment()) continue;
-            Boolean b = e.getUnitAbilitiesRequired()
-                .get("model.ability.bornInIndianSettlement");
-            if (b != null && b.booleanValue()) continue;
-            List<EquipmentType> eq = roleEquipment.get(Role.SOLDIER);
-            if (!eq.contains(e)) eq.add(e);
-        }
     }
 
     /**
@@ -1113,7 +1074,7 @@ public class ColonyPlan {
      * @return True if the unit was equipped.
      */
     private boolean equipUnit(Unit unit, Role role, Colony colony) {
-        List<EquipmentType> equipment = roleEquipment.get(role);
+        List<EquipmentType> equipment = role.getRoleEquipment(spec());
         if (equipment == null || equipment.isEmpty()) return false;
         EquipmentType type = equipment.get(0);
         if (!unit.isPerson()
