@@ -536,6 +536,29 @@ abstract public class Settlement extends GoodsLocation
         return true;
     }
 
+    /**
+     * Determines if this settlement can build the given type of equipment.
+     * Unlike canBuildEquipment, this takes goods "reserved"
+     * for other purposes into account (e.g. breeding).
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return True if the settlement can provide the equipment.
+     * @see Settlement#canBuildEquipment(EquipmentType equipmentType)
+     */
+    public boolean canProvideEquipment(EquipmentType equipmentType) {
+        for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+            int available = getGoodsCount(goods.getType());
+
+            int breedingNumber = goods.getType().getBreedingNumber();
+            if (breedingNumber != GoodsType.INFINITY) {
+                available -= breedingNumber;
+            }
+
+            if (available < goods.getAmount()) return false;
+        }
+        return true;
+    }
+
 
     /**
      * Write the attributes of this object to a stream.

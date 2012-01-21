@@ -381,16 +381,19 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Determines if this colony build the given type of equipment?
+     * Determines if this colony can build the given type of equipment.
      * Unlike canBuildEquipment, this takes goods "reserved"
-     * for building or breeding purposes into account.
+     * for other purposes into account.
+     * This colony-specific version also checks for requirements of the
+     * current buildable.
      *
      * @param equipmentType an <code>EquipmentType</code> value
      * @return True if the colony can provide the equipment.
-     * @see Colony#canBuildEquipment(EquipmentType equipmentType)
+     * @see Settlement#canProvideEquipment(EquipmentType equipmentType)
      */
+    @Override
     public boolean canProvideEquipment(EquipmentType equipmentType) {
-        if (!canBuildEquipment(equipmentType)) return false;
+        BuildableType buildable = getCurrentlyBuilding();
         for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
             int available = getGoodsCount(goods.getType());
 
@@ -399,7 +402,6 @@ public class Colony extends Settlement implements Nameable {
                 available -= breedingNumber;
             }
 
-            BuildableType buildable = getCurrentlyBuilding();
             if (buildable != null) {
                 for (AbstractGoods ag : buildable.getGoodsRequired()) {
                     if (ag.getType() == goods.getType()) {

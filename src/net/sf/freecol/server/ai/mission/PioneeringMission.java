@@ -239,32 +239,18 @@ public class PioneeringMission extends Mission {
 
     /**
      * Performs this mission.
+     *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        logger.finest("Entering PioneeringMission.doMission()");
+        final Unit unit = getUnit();
 
-        Unit unit = getUnit();
-
-        boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
-        if(unit.getState() == UnitState.IMPROVING || hasTools){
-            state = PioneeringMissionState.IMPROVING;
-        }
-        else{
-            state = PioneeringMissionState.GET_TOOLS;
-        }
-
-        while(isValid() && unit.getMovesLeft() > 0){
-            switch(state){
-            case GET_TOOLS:
-                getTools(connection);
-                break;
-            case IMPROVING:
+        while (isValid() && unit.getMovesLeft() > 0) {
+            boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
+            if (hasTools) {
                 processImprovementPlan(connection);
-                break;
-            default:
-                logger.warning("Unknown state");
-                invalidateMission = true;
+            } else {
+                if (!getTools()) break;
             }
         }
     }
@@ -361,11 +347,9 @@ public class PioneeringMission extends Mission {
         }
     }
 
-    private void getTools(Connection connection) {
+    private boolean getTools() {
         validateColonyWithTools();
-        if(invalidateMission){
-            return;
-        }
+        if (invalidateMission) return false;
 
         Unit unit = getUnit();
 
@@ -376,40 +360,20 @@ public class PioneeringMission extends Mission {
             if(path == null){
                 invalidateMission = true;
                 colonyWithTools = null;
-                return;
+                return false;
             }
 
             Direction direction = moveTowards(path);
-            if (direction == null || !moveButDontAttack(direction)) return;
+            if (direction == null || !moveButDontAttack(direction)) return true;
 
             // not there yet, remove any moves left
             if(unit.getTile() != colonyWithTools.getTile()){
                 unit.setMovesLeft(0);
-                return;
+                return true;
             }
         }
         // reached colony with tools, equip unit
-        equipUnitWithTools(connection);
-    }
-
-
-    public void equipUnitWithTools(Connection connection) {
-        final EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
-        Unit unit = getUnit();
-        if (!colonyWithTools.canProvideEquipment(toolsType)) {
-            invalidateMission = true;
-            return;
-        }
-
-        if (AIMessage.askEquipUnit(getAIUnit(), toolsType, 1)
-            && unit.getEquipmentCount(toolsType) > 0) {
-            state = PioneeringMissionState.IMPROVING;
-            logger.finest("Equipped " + unit
-                + " at " + colonyWithTools.getName() + " with tools");
-        } else {
-            logger.warning("Equip with tools failed for " + unit
-                + " at " + colonyWithTools.getName());
-        }
+        return getAIUnit().equipForRole(Unit.Role.PIONEER, false);
     }
 
 

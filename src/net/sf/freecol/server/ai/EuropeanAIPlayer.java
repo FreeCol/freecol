@@ -637,20 +637,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     if (aiUnit != null) {
                         Unit unit = aiUnit.getUnit();
                         if (unit != null && unit.isColonist()) {
-                            // no need to equip artillery units with muskets or horses
-                            // TODO: cleanup magic numbers 50 and 1
-                            GoodsType muskets = spec.getGoodsType("model.goods.muskets");
-                            GoodsType horses = spec.getGoodsType("model.goods.horses");
-                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
-                            getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
-                            
-                            EquipmentType horsesEq = spec.getEquipmentType("model.equipment.horses");
-                            EquipmentType musketsEq = spec.getEquipmentType("model.equipment.muskets");
-                            AIMessage.askEquipUnit(getAIUnit(unit), horsesEq, 1);
-                            AIMessage.askEquipUnit(getAIUnit(unit), musketsEq, 1);
+                            aiUnit.equipForRole(Unit.Role.DRAGOON, true);
                         }
                         aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
-System.err.println("CHEAT UNIT: " + aiUnit + " has mission " + aiUnit.getMission());
                     }
                 }
             }

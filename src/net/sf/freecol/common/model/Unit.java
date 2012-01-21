@@ -112,29 +112,37 @@ public class Unit extends FreeColGameObject
             if (!roleEquipment.isEmpty()) return;
             UnitType defaultUnit = spec.getDefaultUnitType();
             for (EquipmentType e : spec.getEquipmentTypeList()) {
-                Boolean b = e.getUnitAbilitiesRequired()
-                    .get("model.ability.bornInIndianSettlement");
-                if (b != null && b.booleanValue()) continue;
                 Role r = e.getRole();
                 if (r != null) {
                     List<EquipmentType> eq = roleEquipment.get(r);
-                    if (eq == null) eq = new ArrayList<EquipmentType>();
+                    if (eq == null) {
+                        eq = new ArrayList<EquipmentType>();
+                        roleEquipment.put(r, eq);
+                    }
                     eq.add(e);
-                    roleEquipment.put(r, eq);
                 }
             }
             // TODO: Not quite completely generic yet.  There are more
-            // equipment types that are compatible with the soldier role.
+            // equipment types that are compatible with the dragoon role.
             // The spec expresses this with <compatible-equipment> but
             // it does not express that while muskets and horses are compatible
             // for a soldier, they are not for a scout.
             for (EquipmentType e : spec.getEquipmentTypeList()) {
                 if (!e.isMilitaryEquipment()) continue;
-                Boolean b = e.getUnitAbilitiesRequired()
-                    .get("model.ability.bornInIndianSettlement");
-                if (b != null && b.booleanValue()) continue;
-                List<EquipmentType> eq = roleEquipment.get(Role.SOLDIER);
+                List<EquipmentType> eq = roleEquipment.get(Role.DRAGOON);
+                if (eq == null) {
+                    eq = new ArrayList<EquipmentType>();
+                    roleEquipment.put(Role.DRAGOON, eq);
+                }
                 if (!eq.contains(e)) eq.add(e);
+            }
+            // Make sure there is an empty list at least for each role.
+            for (Role r : Role.values()) {
+                List<EquipmentType> e = roleEquipment.get(r);
+                if (e == null) {
+                    e = new ArrayList<EquipmentType>();
+                    roleEquipment.put(r, e);
+                }
             }
         }
 
@@ -148,7 +156,7 @@ public class Unit extends FreeColGameObject
          */
         public List<EquipmentType> getRoleEquipment(Specification spec) {
             initializeRoleEquipment(spec);
-            return roleEquipment.get(this);
+            return new ArrayList<EquipmentType>(roleEquipment.get(this));
         }
 
         public boolean isCompatibleWith(Role oldRole) {

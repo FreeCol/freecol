@@ -27,9 +27,16 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -383,6 +390,61 @@ public class AIUnit extends AIObject implements Transportable {
         return getAIOwner().getConnection();
     }
 
+    /**
+     * Equips this AI unit for a particular role.
+     *
+     * The unit must be at a location where the required goods are available
+     * (possibly requiring a purchase, which may fail due to lack of gold
+     * or boycotts in effect).
+     *
+     * When multiple equipment types are needed, try them all --- so for
+     * example, if a request is made to equip a unit in Europe as a dragoon
+     * but muskets are boycotted, it may still acquire the horses and end
+     * up as a scout.
+     *
+     * TODO: remove cheat.
+     *
+     * @param r The <code>Role</code> to adopt.
+     * @param cheat Cheat goods purchase in Europe (but *not* boycotts).
+     * @return True if the role change was successful.
+     */
+    public boolean equipForRole(Role r, boolean cheat) {
+        final Specification spec = unit.getGame().getSpecification();
+        final Player player = unit.getOwner();
+        Location loc = unit.getLocation();
+        Europe europe = (loc instanceof Europe) ? (Europe)loc : null;
+        Settlement settlement = loc.getSettlement();
+        if (settlement == null && europe == null) return false;
+
+        eq: for (EquipmentType e : r.getRoleEquipment(spec)) {
+            if (!unit.canBeEquippedWith(e)) {
+                // Weed out native/colonial-specific equipment types.
+                continue;
+            }
+            // Check that this should succeed before querying server.
+            if (europe != null) {
+                for (AbstractGoods ag : e.getGoodsRequired()) {
+                    if (player.getMarket().getArrears(ag.getType()) > 0) {
+                        continue eq; // Boycott prevents purchase.
+                    }
+                    int cost = player.getMarket().getBidPrice(ag.getType(),
+                                                              ag.getAmount());
+                    if (!player.checkGold(cost)) {
+                        if (cheat) {
+                            player.modifyGold(cost);
+                        } else {
+                            continue eq;
+                        }
+                    }
+                }
+            } else {
+                if (!settlement.canBuildEquipment(e)) continue eq;
+            }
+            // Should now only fail due to comms lossage.
+            AIMessage.askEquipUnit(this, e, 1);
+        }
+        return unit.getRole() == r;
+    }
 
     /**
      * Writes this object to an XML stream.

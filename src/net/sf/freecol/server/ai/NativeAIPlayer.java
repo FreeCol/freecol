@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
@@ -463,51 +464,29 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
-     * Equips braves with horses and muskets.
-     * Keeps some for the settlement defence.
+     * Greedily equips braves with horses and muskets.
      *
      * @param is The <code>IndianSettlement</code> where the equipping occurs.
      */
     public void equipBraves(IndianSettlement is) {
-        Specification spec = getGame().getSpecification();
-        GoodsType armsType = spec.getGoodsType("model.goods.muskets");
-        GoodsType horsesType = spec.getGoodsType("model.goods.horses");
-        EquipmentType armsEqType = spec.getEquipmentType("model.equipment.indian.muskets");
-        EquipmentType horsesEqType = spec.getEquipmentType("model.equipment.indian.horses");
-
-        int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
-        int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
-        int armsAvail = is.getGoodsCount(armsType);
-        int horsesAvail = is.getGoodsCount(horsesType);
-
-        for (Unit brave : is.getUnitList()) {
-            if (armsAvail < musketsToArmIndian) {
-                break;
+        final Specification spec = is.getGame().getSpecification();
+        List<Unit> units = is.getUnitList();
+        roles: for (Role r : new Role[] { Role.DRAGOON, Role.SOLDIER,
+                                          Role.SCOUT }) {
+            List<EquipmentType> e = r.getRoleEquipment(spec);
+            while (!units.isEmpty()) {
+                Unit u = units.get(0);
+                for (EquipmentType et : e) {
+                    if (u.canBeEquippedWith(et)
+                        && !is.canProvideEquipment(et)) {
+                        continue roles;
+                    }
+                }
+                if (u.getRole() != Role.DRAGOON && u.getRole() != r) {
+                    getAIUnit(u).equipForRole(r, false);
+                }
+                units.remove(0);
             }
-            if (brave.isArmed()) {
-                continue;
-            }
-            logger.info("Equipping brave with muskets");
-            AIMessage.askEquipUnit(getAIUnit(brave), armsEqType, 1);
-            if (!brave.isArmed()) {
-                logger.warning("Brave has not been armed");
-            }
-            armsAvail = is.getGoodsCount(armsType);
-        }
-
-        for (Unit brave : is.getUnitList()) {
-            if (horsesAvail < horsesToMountIndian) {
-                break;
-            }
-            if (brave.isMounted()) {
-                continue;
-            }
-            logger.info("Equipping brave with horses");
-            AIMessage.askEquipUnit(getAIUnit(brave), horsesEqType, 1);
-            if (!brave.isMounted()) {
-                logger.warning("Brave has not mounted");
-            }
-            horsesAvail = is.getGoodsCount(horsesType);
         }
     }
 
