@@ -149,6 +149,10 @@ public class UnitSeekAndDestroyMission extends Mission {
                 Unit defender = newTile.getDefendingUnit(unit);
                 if (defender == null) {
                     logger.warning("MoveType is ATTACK, but no defender is present!");
+                } else if (unit.getTile().getSettlement() != null
+                    && unit.getTile().getSettlement().getUnitCount() < 2) {
+                    // Do not risk attacking out of a settlement that
+                    // might collapse.
                 } else {
                     Player enemy = defender.getOwner();
                     if (unit.getOwner().atWarWith(enemy)

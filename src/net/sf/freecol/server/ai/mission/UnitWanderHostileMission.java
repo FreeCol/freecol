@@ -107,7 +107,13 @@ public class UnitWanderHostileMission extends Mission {
         if (pathToTarget != null) {
             Direction direction = moveTowards(pathToTarget);
             if (direction != null && unit.getMoveType(direction).isAttack()) {
-                AIMessage.askAttack(getAIUnit(), direction);
+                if (unit.getTile().getSettlement() != null
+                    && unit.getTile().getSettlement().getUnitCount() < 2) {
+                    // Do not risk attacking out of a settlement that
+                    // might collapse.
+                } else {
+                    AIMessage.askAttack(getAIUnit(), direction);
+                }
             }
         } else {
             // Just make a random move if no target can be found.
