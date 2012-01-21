@@ -344,8 +344,24 @@ public class Messages {
                     otherKey = getChoice(messageBundle.get(otherKey), selector);
                     result.append(otherKey);
                 } else {
-                    logger.warning("Unknown key or untagged choice: " + otherKey);
-                    continue;
+                    logger.warning("Unknown key or untagged choice: '" + otherKey
+                                   + "', selector was '" + selector
+                                   + "', trying 'default' instead");
+                    int defaultStart = otherKey.indexOf("default=");
+                    if (defaultStart >= 0) {
+                        defaultStart += 8;
+                        int defaultEnd = otherKey.indexOf('|', defaultStart);
+                        String defaultChoice;
+                        if (defaultEnd < 0) {
+                            defaultChoice = otherKey.substring(defaultStart);
+                        } else {
+                            defaultChoice = otherKey.substring(defaultStart, defaultEnd);
+                        }
+                        result.append(defaultChoice);
+                    } else {
+                        logger.warning("No default choice found.");
+                        continue;
+                    }
                 }
             } else {
                 int start = keyIndex + selector.length() + 1;

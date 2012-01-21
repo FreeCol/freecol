@@ -175,6 +175,31 @@ public class MessagesTest extends FreeColTestCase {
 
     }
 
+    public void testReplaceArbitraryTag() {
+        StringTemplate template = StringTemplate.template("tutorial.startGame")
+            .add("%direction%", "east");
+        String expected = "After months at sea, you have finally arrived off the "
+            + "coast of an unknown continent. Sail eastward in order to discover "
+            + "the New World and to claim it for the Crown.";
+        assertEquals(expected, Messages.message(template));
+
+        template = StringTemplate.template("tutorial.startGame")
+            .add("%direction%", "west");
+        expected = "After months at sea, you have finally arrived off the "
+            + "coast of an unknown continent. Sail westward in order to discover "
+            + "the New World and to claim it for the Crown.";
+        assertEquals(expected, Messages.message(template));
+
+        template = StringTemplate.template("tutorial.startGame")
+            .add("%direction%", "whatever");
+        expected = "After months at sea, you have finally arrived off the "
+            + "coast of an unknown continent. Sail into the wind in order to discover "
+            + "the New World and to claim it for the Crown.";
+        assertEquals(expected, Messages.message(template));
+
+    }
+
+
     public void testReplaceChoicesPlural() {
 
         String mapping = "some.key=This is {{plural:%number%|one=a test|other=one of several tests"

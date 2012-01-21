@@ -236,7 +236,7 @@ public final class PreGameController {
                 new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                  "tutorial.startGame", myPlayer);
             String direction = myPlayer.getNation().startsOnEastCoast()
-                ? "direction.W" : "direction.E";
+                ? "west" : "east";
             message.add("%direction%", direction);
             myPlayer.addModelMessage(message);
             // force view of tutorial message
