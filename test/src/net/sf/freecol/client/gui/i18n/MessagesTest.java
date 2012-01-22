@@ -349,6 +349,28 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeEquipment(bible, -1);
         assertEquals("Jesuit Missionary (not commissioned)", Messages.message(Messages.getLabel(unit)));
 
+        // REF addition message
+        StringTemplate template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 1)
+            .add("%unit%", spec().getUnitType("model.unit.kingsRegular").getNameKey());
+        String expected = "The Crown has added 1 King's Regular to the Royal Expeditionary Force."
+            + " Colonial leaders express concern.";
+        assertEquals(expected, Messages.message(template));
+
+        template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 2)
+            .add("%unit%", spec().getUnitType("model.unit.artillery").getNameKey());
+        expected = "The Crown has added 2 Pieces of Artillery to the Royal Expeditionary Force."
+            + " Colonial leaders express concern.";
+        assertEquals(expected, Messages.message(template));
+
+        template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 3)
+            .add("%unit%", spec().getUnitType("model.unit.manOWar").getNameKey());
+        expected = "The Crown has added 3 Men of War to the Royal Expeditionary Force."
+            + " Colonial leaders express concern.";
+        assertEquals(expected, Messages.message(template));
+
     }
 
 

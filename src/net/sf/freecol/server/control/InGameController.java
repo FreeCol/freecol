@@ -1037,15 +1037,16 @@ public final class InGameController extends Controller {
                     StringTemplate.template(messageId)));
             break;
         case ADD_TO_REF:
-            List<AbstractUnit> refAdditions = monarch.chooseForREF(random);
-            if (refAdditions.isEmpty()) break;
+            AbstractUnit refAdditions = monarch.chooseForREF(random);
+            if (refAdditions == null) break;
             monarch.addToREF(refAdditions);
+            template = StringTemplate.template(messageId)
+                .addAmount("%number%", refAdditions.getNumber())
+                .add("%unit%", refAdditions.getUnitType(getGame().getSpecification())
+                     .getNameKey());
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)
-                        .addStringTemplate("%addition%",
-                            abstractUnitTemplate(", ", refAdditions))));
+                   new MonarchActionMessage(action, template));
             break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();

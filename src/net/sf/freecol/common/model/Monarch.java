@@ -403,8 +403,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @param random The <code>Random</code> number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
-    public List<AbstractUnit> chooseForREF(Random random) {
-        ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
+    public AbstractUnit chooseForREF(Random random) {
+        AbstractUnit result = null;
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
         logger.info("Add to REF: capacity=" + capacity
@@ -413,14 +413,13 @@ public final class Monarch extends FreeColGameObject implements Named {
                     + " unit");
         // TODO: magic number 2.5 * Manowar-capacity = 15
         if (capacity < spaceRequired + 15) {
-            AbstractUnit unit = Utils.getRandomMember(logger, "Choose naval",
-                navalUnits, random);
-            result.add(new AbstractUnit(unit.getId(), unit.getRole(), 1));
+            result = Utils.getRandomMember(logger, "Choose naval",
+                                           navalUnits, random);
+            result.setNumber(1);
         } else {
-            AbstractUnit unit = Utils.getRandomMember(logger, "Choose land",
-                    landUnits, random);
-            result.add(new AbstractUnit(unit.getId(), unit.getRole(),
-                    Utils.randomInt(logger, "Choose land#", random, 3) + 1));
+            result = Utils.getRandomMember(logger, "Choose land",
+                                           landUnits, random);
+            result.setNumber(Utils.randomInt(logger, "Choose land#", random, 3) + 1);
         }
         return result;
     }
@@ -430,29 +429,27 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * @param units The addition to the Royal Expeditionary Force.
      */
-    public void addToREF(List<AbstractUnit> units) {
+    public void addToREF(AbstractUnit units) {
         Specification spec = getSpecification();
-        for (AbstractUnit unitToAdd : units) {
-            UnitType unitType = spec.getUnitType(unitToAdd.getId());
-            int n = unitToAdd.getNumber();
-            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                for (AbstractUnit refUnit : navalUnits) {
-                    if (refUnit.getId().equals(unitToAdd.getId())) {
-                        refUnit.setNumber(refUnit.getNumber() + n);
-                        if (unitType.canCarryUnits()) {
-                            capacity += unitType.getSpace() * n;
-                        }
-                        break;
+        UnitType unitType = spec.getUnitType(units.getId());
+        int n = units.getNumber();
+        if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
+            for (AbstractUnit refUnit : navalUnits) {
+                if (refUnit.getId().equals(units.getId())) {
+                    refUnit.setNumber(refUnit.getNumber() + n);
+                    if (unitType.canCarryUnits()) {
+                        capacity += unitType.getSpace() * n;
                     }
+                    break;
                 }
-            } else {
-                for (AbstractUnit refUnit : landUnits) {
-                    if (refUnit.getId().equals(unitToAdd.getId())
-                        && refUnit.getRole().equals(unitToAdd.getRole())) {
-                        refUnit.setNumber(refUnit.getNumber() + n);
-                        spaceRequired += unitType.getSpaceTaken() * n;
-                        break;
-                    }
+            }
+        } else {
+            for (AbstractUnit refUnit : landUnits) {
+                if (refUnit.getId().equals(units.getId())
+                    && refUnit.getRole().equals(units.getRole())) {
+                    refUnit.setNumber(refUnit.getNumber() + n);
+                    spaceRequired += unitType.getSpaceTaken() * n;
+                    break;
                 }
             }
         }
