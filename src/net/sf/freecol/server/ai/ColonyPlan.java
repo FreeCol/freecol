@@ -1074,24 +1074,22 @@ public class ColonyPlan {
      * @return True if the unit was equipped.
      */
     private boolean equipUnit(Unit unit, Role role, Colony colony) {
+        if (role == Unit.Role.SOLDIER) role = Unit.Role.DRAGOON; // Special case
+
         List<EquipmentType> equipment = role.getRoleEquipment(spec());
-        if (equipment == null || equipment.isEmpty()) return false;
-        EquipmentType type = equipment.get(0);
-        if (!unit.isPerson()
-            || !colony.canProvideEquipment(type)
-            || !unit.canBeEquippedWith(type)) return false;
-        unit.setLocation(colony.getTile());
-        unit.changeEquipment(type, 1);
-        colony.addEquipmentGoods(type, -1);
-        for (int i = 1; i < equipment.size(); i++) {
-            type = equipment.get(i);
-            if (colony.canProvideEquipment(type)
-                && unit.canBeEquippedWith(type)) {
-                unit.changeEquipment(type, 1);
-                colony.addEquipmentGoods(type, -1);
+        if (equipment.isEmpty() || !unit.isPerson()) return false;
+
+        boolean result = false;
+        for (EquipmentType et : equipment) {
+            if (colony.canProvideEquipment(et)
+                && unit.canBeEquippedWith(et)) {
+                unit.setLocation(colony.getTile());
+                unit.changeEquipment(et, 1);
+                colony.addEquipmentGoods(et, -1);
+                result = true;
             }
         }
-        return true;
+        return result;
     }
 
     /**
