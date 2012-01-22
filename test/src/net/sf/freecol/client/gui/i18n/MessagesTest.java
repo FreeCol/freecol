@@ -322,6 +322,17 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeEquipment(muskets, 1);
         assertEquals("Veteran Dragoon", Messages.message(Messages.getLabel(unit)));
 
+        // Indian Braves
+        unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.brave"));
+        assertEquals(0, unit.getEquipment().getCount(muskets));
+        assertEquals("Brave", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(muskets, 1);
+        assertEquals("Armed Brave", Messages.message(Messages.getLabel(unit)));
+
+        unit.changeEquipment(horses, 1);
+        assertEquals("Indian Dragoon", Messages.message(Messages.getLabel(unit)));
+
         // Hardy Pioneers
         unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.hardyPioneer"));
         assertEquals(5, unit.getEquipment().getCount(tools));
@@ -330,6 +341,7 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeEquipment(tools, -5);
         assertEquals("Hardy Pioneer (no tools)", Messages.message(Messages.getLabel(unit)));
 
+        // Jesuit Missionaries
         unit = new ServerUnit(game, null, dutch, spec().getUnitType("model.unit.jesuitMissionary"));
         assertEquals(1, unit.getEquipment().getCount(bible));
         assertEquals("Jesuit Missionary", Messages.message(Messages.getLabel(unit)));
