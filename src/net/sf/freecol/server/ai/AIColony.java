@@ -110,6 +110,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private static final Set<GoodsType> fullExport = new HashSet<GoodsType>();
     private static final Set<GoodsType> partExport = new HashSet<GoodsType>();
 
+    // Comparator to favour expert scouts, then units with the SCOUT role,
+    // then least skillful.
+    private static final Comparator<Unit> scoutComparator
+        = new Comparator<Unit>() {
+            public int compare(Unit u1, Unit u2) {
+                boolean a1 = u1.hasAbility("model.ability.expertScout");
+                boolean a2 = u2.hasAbility("model.ability.expertScout");
+                if (a1 != a2) return (a1) ? -1 : 1;
+                a1 = u1.getRole() == Unit.Role.SCOUT;
+                a2 = u2.getRole() == Unit.Role.SCOUT;
+                if (a1 != a2) return (a1) ? -1 : 1;
+                return u1.getType().getSkill() - u2.getType().getSkill();
+            }
+        };
 
     /**
      * Creates a new <code>AIColony</code>.
@@ -488,6 +502,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 explorers.add(u);
             }
         }
+        Collections.sort(explorers, scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
