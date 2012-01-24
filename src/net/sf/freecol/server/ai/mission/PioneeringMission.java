@@ -244,65 +244,57 @@ public class PioneeringMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-
         while (isValid() && unit.getMovesLeft() > 0) {
-            boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
+            boolean hasTools = unit.hasAbility("model.ability.improveTerrain");
             if (hasTools) {
-                processImprovementPlan(connection);
+                if (!processImprovementPlan()) break;
             } else {
                 if (!getTools()) break;
             }
         }
     }
 
-    private void processImprovementPlan(Connection connection) {
+    private boolean processImprovementPlan() {
         if (tileImprovementPlan == null) {
             updateTileImprovementPlan();
             if (tileImprovementPlan == null) {
                 invalidateMission = true;
-                return;
+                return false;
             }
         }
 
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
         // Sanitation
         if (unit.getTile() == null) {
             logger.warning("Unit is in unknown location, cannot proceed with mission");
             invalidateMission = true;
-            return;
+            return false;
         }
 
         // move toward the target tile
-        if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
-            PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
+        final Tile target = tileImprovementPlan.getTarget();
+        if (unit.getTile() != target) {
+            PathNode pathToTarget = unit.findPath(target);
             if (pathToTarget == null) {
                 invalidateMission = true;
-                return;
+                return false;
             }
 
             Direction direction = moveTowards(pathToTarget);
-            if (direction != null) {
-                if (!moveButDontAttack(direction)) return;
-            }
-
-            if(unit.getTile() != tileImprovementPlan.getTarget()){
-                unit.setMovesLeft(0);
-            }
-            if(unit.getMovesLeft() == 0){
-                return;
-            }
+            if (direction != null && !moveButDontAttack(direction)) return true;
+            if (unit.getTile() != target) unit.setMovesLeft(0);
         }
+        if (unit.getMovesLeft() == 0) return true;
 
         // Sanitation
-        if (unit.getTile() != tileImprovementPlan.getTarget()){
+        if (unit.getTile() != target) {
             String errMsg = "Something is wrong, pioneer should be on the tile to improve, but isnt";
             logger.warning(errMsg);
             invalidateMission = true;
-            return;
+            return false;
         }
 
-        Tile target = tileImprovementPlan.getTarget();
-        Player player = getUnit().getOwner();
+        final Player player = getUnit().getOwner();
         if (!player.owns(target)) {
             // Take control of land before proceeding with mission.
             // Decide whether to pay or steal.
@@ -314,37 +306,28 @@ public class PioneeringMission extends Mission {
                 if (price > 0 && !player.checkGold(price)) {
                     price = NetworkConstants.STEAL_LAND;
                 }
-                AIMessage.askClaimLand(connection, target, null, price);
+                AIPlayer aiOwner = getAIMain().getAIPlayer(player);
+                AIMessage.askClaimLand(aiOwner.getConnection(), target, null,
+                                       price);
             }
         }
         if (!player.owns(target)) {
             // Failed to take ownership
             invalidateMission = true;
-            return;
+            return false;
         }
 
-        makeImprovement(connection);
-    }
-
-    private void makeImprovement(Connection connection) {
-        Unit unit = getUnit();
-
-        if (unit.getState() == UnitState.IMPROVING){
+        if (unit.getState() == UnitState.IMPROVING) {
             unit.setMovesLeft(0);
-            return;
+            return true;
         }
 
         if (unit.checkSetState(UnitState.IMPROVING)) {
-            // start improving now
-            int price = unit.getOwner().getLandPrice(unit.getTile());
-            // Buy the land from the Indians first?
-            if (price > 0) {
-                // TODO: the AI should buy the land, to avoid indian wars
-            }
-            // ask to create the TileImprovement
+            // Ask to create the TileImprovement
             AIMessage.askChangeWorkImprovementType(getAIUnit(),
                 tileImprovementPlan.getType());
         }
+        return true;
     }
 
     private boolean getTools() {
