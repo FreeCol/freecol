@@ -64,6 +64,8 @@ import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -412,10 +414,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
         }
         for (Unit u : tile.getUnitList()) {
-            if (u.isArmed()) {
-                AIUnit aiU = getAIUnit(u);
+            AIUnit aiU = getAIUnit(u);
+            switch (u.getRole()) {
+            case SOLDIER: case DRAGOON:
                 aiU.setMission(new DefendSettlementMission(aiMain, aiU,
-                        colony));
+                                                           colony));
+                break;
+            case SCOUT:
+                if (ScoutingMission.isValid(aiU)) {
+                    aiU.setMission(new ScoutingMission(aiMain, aiU));
+                }
+                break;
+            case PIONEER:
+                if (PioneeringMission.isValid(aiU)) {
+                    aiU.setMission(new PioneeringMission(aiMain, aiU));
+                }
+                break;
+            // TODO: case MISSIONARY:
+            default:
+                break;
             }
         }
 
