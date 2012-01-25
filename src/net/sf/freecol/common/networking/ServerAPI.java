@@ -894,12 +894,12 @@ public class ServerAPI {
      * Server query-response for naming a new region.
      *
      * @param region The <code>Region</code> that is being discovered.
-     * @param unit The <code>Unit</code> that discovered the region.
+     * @param tile The <code>Tile</code> where the region is discovered.
      * @param name The new region name.
      * @return True if the server interaction succeeded.
      */
-    public boolean newRegionName(Region region, Unit unit, String name) {
-        return askHandling(new NewRegionNameMessage(region, unit, name),
+    public boolean newRegionName(Region region, Tile tile, String name) {
+        return askHandling(new NewRegionNameMessage(region, tile, name),
             null, null);
     }
 

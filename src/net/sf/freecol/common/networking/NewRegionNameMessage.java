@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -41,9 +40,9 @@ public class NewRegionNameMessage extends DOMMessage {
     private String regionId;
 
     /**
-     * The ID of the unit that discovered the region.
+     * The tile where the region is discovered.
      */
-    private String unitId;
+    private String tileId;
 
     /**
      * The new name.
@@ -55,13 +54,13 @@ public class NewRegionNameMessage extends DOMMessage {
      * supplied name.
      *
      * @param region The <code>Region</code> being discovered.
-     * @param unit The <code>Unit</code> that is discovering.
+     * @param tile The <code>Tile</code> where the region is discovered.
      * @param newRegionName The default new region name.
      */
-    public NewRegionNameMessage(Region region, Unit unit,
+    public NewRegionNameMessage(Region region, Tile tile,
                                 String newRegionName) {
         this.regionId = region.getId();
-        this.unitId = unit.getId();
+        this.tileId = tile.getId();
         this.newRegionName = newRegionName;
     }
 
@@ -74,7 +73,7 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public NewRegionNameMessage(Game game, Element element) {
         this.regionId = element.getAttribute("region");
-        this.unitId = element.getAttribute("unit");
+        this.tileId = element.getAttribute("tile");
         this.newRegionName = element.getAttribute("newRegionName");
     }
 
@@ -90,14 +89,14 @@ public class NewRegionNameMessage extends DOMMessage {
     }
 
     /**
-     * Public accessor for the unit.
+     * Public accessor for the tile.
      *
-     * @param game The <code>Game</code> to look for a unit in.
-     * @return The unit of this message.
+     * @param game The <code>Game</code> to look for a tile in.
+     * @return The tile of this message.
      */
-    public Unit getUnit(Game game) {
-        Object o = game.getFreeColGameObjectSafely(unitId);
-        return (o instanceof Unit) ? (Unit) o : null;
+    public Tile getTile(Game game) {
+        Object o = game.getFreeColGameObjectSafely(tileId);
+        return (o instanceof Tile) ? (Tile)o : null;
     }
 
     /**
@@ -120,21 +119,18 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
+        Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit;
-        try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+
+        Tile tile = getTile(game);
+        if (!tile.isExploredBy(player)) {
+            return DOMMessage.clientError("Can not claim discovery in unexplored tile: " + tileId);
         }
-        Tile tile = unit.getTile();
-        if (tile == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        }
+
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
-            return DOMMessage.clientError("No discoverable region for: "
-                + unitId);
+            return DOMMessage.clientError("No discoverable region in: "
+                + tileId);
         }
         if (region.isPacific()) {
             return DOMMessage.clientError("Can not rename the Pacific!");
@@ -146,7 +142,7 @@ public class NewRegionNameMessage extends DOMMessage {
 
         // Do the discovery
         return server.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, newRegionName);
+            .setNewRegionName(serverPlayer, region, newRegionName);
     }
 
     /**
@@ -157,7 +153,7 @@ public class NewRegionNameMessage extends DOMMessage {
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("region", regionId);
-        result.setAttribute("unit", unitId);
+        result.setAttribute("tile", tileId);
         result.setAttribute("newRegionName", newRegionName);
         return result;
     }

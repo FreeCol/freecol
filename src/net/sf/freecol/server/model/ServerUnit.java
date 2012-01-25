@@ -935,7 +935,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 String defaultName = Messages.getDefaultRegionName(serverPlayer,
                     region.getType());
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                    new NewRegionNameMessage(region, this, defaultName));
+                    new NewRegionNameMessage(region, newTile, defaultName));
                 // Set the default name to prevent multiple attempts.
                 region.setName(defaultName);
             }

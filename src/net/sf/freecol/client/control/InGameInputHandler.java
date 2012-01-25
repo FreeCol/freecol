@@ -1046,11 +1046,11 @@ public final class InGameInputHandler extends InputHandler {
         NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         String name = message.getNewRegionName();
         Region region = message.getRegion(game);
-        Unit unit = message.getUnit(game);
+        Tile tile = message.getTile(game);
         if (name == null || region == null) return null;
 
         // Offer to name the region.
-        new NewRegionNameSwingTask(unit, region, message.getNewRegionName())
+        new NewRegionNameSwingTask(tile, region, message.getNewRegionName())
             .invokeLater();
         return null;
     }
@@ -1436,7 +1436,7 @@ public final class InGameInputHandler extends InputHandler {
 
     class NewRegionNameSwingTask extends NoResultCanvasSwingTask {
 
-        private Unit unit;
+        private Tile tile;
         private Region region;
         private String defaultName;
 
@@ -1444,25 +1444,24 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor.
          *
-         * @param unit The <code>Unit</code> that discovers the region.
+         * @param tile The <code>Tile</code> where the region is discovered.
          * @param region The <code>Region</code> that is discovered.
          * @param defaultName The default name of the new region.
          */
-        public NewRegionNameSwingTask(Unit unit, Region region,
+        public NewRegionNameSwingTask(Tile tile, Region region,
                                       String defaultName) {
-            this.unit = unit;
+            this.tile = tile;
             this.region = region;
             this.defaultName = defaultName;
         }
 
         protected void doNoResultWork() {
-            String name = gui.showInputDialog((unit == null) ? null
-                : unit.getTile(),
+            String name = gui.showInputDialog(tile,
                 StringTemplate.template("nameRegion.text")
                     .addName("%type%", Messages.message(region.getLabel())),
                 defaultName, "ok", null, false);
             if (name == null || "".equals(name)) name = defaultName;
-            getFreeColClient().askServer().newRegionName(region, unit, name);
+            getFreeColClient().askServer().newRegionName(region, tile, name);
         }
     }
 
