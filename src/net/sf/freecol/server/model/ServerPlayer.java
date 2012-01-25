@@ -2983,7 +2983,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                     "model.unit.goodsStolen", colony, goods)
                 .addAmount("%amount%", goods.getAmount())
-                .add("%goods%", goods.getNameKey())
+                .add("%goods%", goods.getType().getNameKey())
                 .addName("%colony%", colony.getName())
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
