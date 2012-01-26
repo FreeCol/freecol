@@ -40,7 +40,6 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 
@@ -919,10 +918,9 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the statistics of this game.
      *
-     * @param aiMain The (optional) AI.
      * @return A <code>Map</code> of the statistics.
      */
-    public java.util.Map<String, String> getStatistics(AIMain aiMain) {
+    public java.util.Map<String, String> getStatistics() {
         java.util.Map<String, String> stats = new HashMap<String, String>();
 
         // Memory
@@ -954,11 +952,6 @@ public class Game extends FreeColGameObject {
         stats.put("disposed", Long.toString(disposed));
         for (String k : objStats.keySet()) {
             stats.put(k, Long.toString(objStats.get(k)));
-        }
-
-        // Add AI if supplied.
-        if (aiMain != null) {
-            stats.putAll(aiMain.getAIStatistics());
         }
 
         return stats;

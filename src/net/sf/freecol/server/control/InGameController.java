@@ -3801,7 +3801,12 @@ public final class InGameController extends Controller {
     public Element getStatistics(ServerPlayer serverPlayer) {
         // Convert statistics map to a list.
         java.util.Map<String, String> stats = getGame()
-            .getStatistics(getFreeColServer().getAIMain());
+            .getStatistics();
+        
+
+        stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
+
+        
         List<String> all = new ArrayList<String>();
         List<String> keys = new ArrayList<String>(stats.keySet());
         Collections.sort(keys);

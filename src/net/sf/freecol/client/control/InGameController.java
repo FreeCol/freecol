@@ -2003,7 +2003,7 @@ public final class InGameController implements NetworkConstants {
      * @return A <code>Map</code> containing the client statistics.
      */
     public java.util.Map<String, String> getClientStatistics() {
-        return freeColClient.getGame().getStatistics(null);
+        return freeColClient.getGame().getStatistics();
     }
 
     /**
