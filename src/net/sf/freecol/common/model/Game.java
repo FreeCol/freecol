@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -41,9 +42,6 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
-import net.sf.freecol.server.model.ServerModelObject;
-
-import net.sf.freecol.common.model.NationOptions.Advantages;
 
 
 /**
@@ -615,21 +613,6 @@ public class Game extends FreeColGameObject {
         } else {
             return players.get(0);
         }
-    }
-
-    /**
-     * Collects a list of all the ServerModelObjects in this game.
-     *
-     * @return A list of all the ServerModelObjects in this game.
-     */
-    public List<ServerModelObject> getServerModelObjects() {
-        List<ServerModelObject> objs = new ArrayList<ServerModelObject>();
-        for (WeakReference<FreeColGameObject> wr :freeColGameObjects.values()) {
-            if (wr.get() instanceof ServerModelObject) {
-                objs.add((ServerModelObject) wr.get());
-            }
-        }
-        return objs;
     }
 
     /**

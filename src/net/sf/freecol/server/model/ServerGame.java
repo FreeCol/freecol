@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -325,5 +327,21 @@ public class ServerGame extends Game implements ServerModelObject {
      */
     public String getServerXMLElementTagName() {
         return "serverGame";
+    }
+    
+
+    /**
+     * Collects a list of all the ServerModelObjects in this game.
+     *
+     * @return A list of all the ServerModelObjects in this game.
+     */
+    public List<ServerModelObject> getServerModelObjects() {
+        List<ServerModelObject> objs = new ArrayList<ServerModelObject>();
+        for (WeakReference<FreeColGameObject> wr :freeColGameObjects.values()) {
+            if (wr.get() instanceof ServerModelObject) {
+                objs.add((ServerModelObject) wr.get());
+            }
+        }
+        return objs;
     }
 }

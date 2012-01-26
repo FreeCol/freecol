@@ -796,7 +796,7 @@ public final class FreeColServer {
      */
     public void saveGame(File file, String username, OptionGroup options, BufferedImage image)
         throws IOException {
-        final Game game = getGame();
+        final ServerGame game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         JarOutputStream fos = null;
         try {
@@ -1510,6 +1510,8 @@ public final class FreeColServer {
         return getAIMain().getAIPlayer(player);
     }
 
+    
+    
     /**
      * Get the <code>HighScores</code> value.
      *
