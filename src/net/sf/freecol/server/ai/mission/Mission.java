@@ -31,9 +31,11 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -95,6 +97,39 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Gets the unit this mission has been created for.
+     * @return The <code>Unit</code>.
+     */
+    public Unit getUnit() {
+        return aiUnit.getUnit();
+    }
+
+    /**
+     * Gets the AI-unit this mission has been created for.
+     * @return The <code>AIUnit</code>.
+     */
+    public AIUnit getAIUnit() {
+        return aiUnit;
+    }
+
+    /**
+     * Sets the AI-unit this mission has been created for.
+     * @param aiUnit The <code>AIUnit</code>.
+     */
+    protected void setAIUnit(AIUnit aiUnit) {
+        this.aiUnit = aiUnit;
+    }
+
+    /**
+     * Convenience accessor for the unit/player PRNG.
+     *
+     * @return A <code>Random</code> to use.
+     */
+    public Random getAIRandom() {
+        return aiUnit.getAIRandom();
+    }
+
+    /**
      * Moves the unit owning this mission towards the given
      * <code>Tile</code>.  This is done in a loop until the tile is
      * reached, there are no moves left, the path to the target cannot
@@ -119,14 +154,10 @@ public abstract class Mission extends AIObject {
      *     move can not be made.
      */
     protected Direction moveTowards(PathNode pathNode) {
-        if (getUnit().getMovesLeft() <= 0) {
-            return null;
-        }
+        if (getUnit().getMovesLeft() <= 0) return null;
 
         while (pathNode.next != null && pathNode.getTurns() == 0) {
-            if (!isValid()) {
-                return null;
-            }
+            if (!isValid()) return null;
             if (!getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
                 break;
             }
@@ -144,11 +175,8 @@ public abstract class Mission extends AIObject {
 
     /**
      * Move a unit randomly.
-     *
-     * @param connection The <code>Connection</code> to use
-     *         when communicating with the server.
      */
-    protected void moveRandomly(Connection connection) {
+    protected void moveRandomly() {
         Unit unit = getUnit();
         Direction[] randomDirections
             = Direction.getRandomDirectionArray(getAIRandom());
@@ -169,13 +197,11 @@ public abstract class Mission extends AIObject {
 
 
     protected void moveUnitToAmerica() {
-        AIMessage.askMoveTo(aiUnit,
-            aiUnit.getUnit().getOwner().getGame().getMap());
+        AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getGame().getMap());
     }
 
     protected void moveUnitToEurope() {
-        AIMessage.askMoveTo(aiUnit,
-            aiUnit.getUnit().getOwner().getEurope());
+        AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getEurope());
     }
 
 
@@ -189,9 +215,10 @@ public abstract class Mission extends AIObject {
      * @return True if the unit doing this mission is still valid/alive.
      */
     protected boolean moveButDontAttack(Direction direction) {
+        final Unit unit = getUnit();
         if (direction != null
-            && getUnit() != null
-            && getUnit().getMoveType(direction).isProgress()) {
+            && unit != null
+            && unit.getMoveType(direction).isProgress()) {
             AIMessage.askMove(aiUnit, direction);
         }
         return getUnit() != null && !getUnit().isDisposed();
@@ -284,67 +311,54 @@ public abstract class Mission extends AIObject {
                                 CostDeciders.avoidIllegal(), maxTurns, null);
     }
 
-
     /**
-    * Returns the destination of a required transport.
-    * @return The destination of a required transport or
-    *         <code>null</code> if no transport is needed.
-    */
-    public Tile getTransportDestination() {
-        if (getUnit().getTile() == null) {
-            return ((getUnit().isOnCarrier()) ? ((Unit) getUnit().getLocation()) : getUnit()).getFullEntryLocation();
-        } else if (!getUnit().isOnCarrier()) {
-            return null;
-        }
-
-        Unit carrier = (Unit) getUnit().getLocation();
-
-        if (carrier.getSettlement() != null) {
-            return carrier.getTile();
-        }
-        // Find the closest friendly Settlement:
-        GoalDecider gd = new GoalDecider() {
-            private PathNode bestTarget = null;
-
-            public PathNode getGoal() {
-                return bestTarget;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit unit, PathNode pathNode) {
-                Tile newTile = pathNode.getTile();
-                boolean hasOurSettlement = (newTile.getSettlement() != null)
-                        && newTile.getSettlement().getOwner() == unit.getOwner();
-                if (hasOurSettlement) {
-                    bestTarget = pathNode;
+     * Find the nearest reachable settlement to a unit (owned by the
+     * same player) excepting the any on the current tile.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return The nearest settlement if any, otherwise null.
+     */
+    protected PathNode findNearestOtherSettlement(Unit unit) {
+        Player player = unit.getOwner();
+        PathNode nearest = null;
+        int dist = Integer.MAX_VALUE;
+        for (Settlement settlement : player.getSettlements()) {
+            if (settlement.getTile() == unit.getTile()) return null;
+            PathNode path = unit.findPath(settlement.getTile());
+            if (path != null) {
+                int d = path.getTotalTurns();
+                if (d < dist) {
+                    nearest = path;
+                    dist = d;
                 }
-                return hasOurSettlement;
             }
-        };
-        PathNode path = carrier.search(carrier.getTile(), gd,
-            CostDeciders.avoidSettlementsAndBlockingUnits(),
-            Integer.MAX_VALUE, null);
-        return (path != null) ? path.getLastNode().getTile() : null;
+        }
+        return nearest;
     }
-
 
     /**
-    * Returns the priority of getting the unit to the
-    * transport destination.
-    *
-    * @return The priority.
-    */
-    public int getTransportPriority() {
-        if (getTransportDestination() != null) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else {
-            return 0;
+     * Unload a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to unload.
+     * @return True if the unit is unloaded.
+     */
+    protected boolean unitLeavesShip(AIUnit aiUnit) {
+        Colony colony = aiUnit.getUnit().getColony();
+        if (colony != null) {
+            AIColony ac = getAIMain().getAIColony(colony);
+            if (ac != null) ac.completeWish(aiUnit.getUnit());
+
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
+        return AIMessage.askDisembark(aiUnit);
     }
 
+    /**
+     * Unload some goods in a colony.
+     *
+     * @param goods The <code>Goods</code> to unload.
+     * @return True if the goods are unloaded.
+     */
     protected boolean unloadCargoInColony(Goods goods) {
         Colony colony = aiUnit.getUnit().getColony();
         AIColony ac;
@@ -355,6 +369,12 @@ public abstract class Mission extends AIObject {
         return AIMessage.askUnloadCargo(aiUnit, goods);
     }
 
+    /**
+     * Sell some goods in Europe.
+     *
+     * @param goods The <code>Goods</code> to sell.
+     * @return True if the goods are sold.
+     */
     protected boolean sellCargoInEurope(Goods goods) {
         // CHEAT: Remove when the AI is good enough
         Player p = getUnit().getOwner();
@@ -372,7 +392,7 @@ public abstract class Mission extends AIObject {
      * - the unit is already has transport, this will always be faster
      *   (TODO: mounted units on good roads might be faster, check for this)
      * - if not on the map
-     * - if on the map can not find a path to the tile
+     * - if on the map but can not find a path to the tile
      *
      * @param tile The <code>Tile</code> to go to.
      * @return True if the unit should use transport.
@@ -386,20 +406,74 @@ public abstract class Mission extends AIObject {
     }
 
 
-    /**
-    * Performs the mission. This method should be implemented by a subclass.
-    * @param connection The <code>Connection</code> to the server.
-    */
-    public abstract void doMission(Connection connection);
-
+    // Fake implementation of Transportable interface.
+    // Missions are not actually Transportables but the units that are
+    // performing a mission delegate to these routines.
 
     /**
-     * Checks if this mission is still valid to perform.
-     * At this level, if the unit was killed then the mission becomes invalid.
+     * Gets the destination of a required transport.
      *
-     * A mission can be invalidated for a number of reasons. For example:
-     * a seek-and-destroy mission can be invalidated in case the
-     * relationship towards the targeted player improves.
+     * @return The destination of a required transport or
+     *         <code>null</code> if no transport is needed.
+     */
+    public Location getTransportDestination() {
+        final Unit unit = getUnit();
+        if (unit.getTile() == null) {
+            return ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : unit)
+                .getFullEntryLocation();
+        }
+        if (!unit.isOnCarrier()) return null;
+        final Unit carrier = (Unit)unit.getLocation();
+        if (carrier.getSettlement() != null) return carrier.getTile();
+
+        // Find the closest friendly Settlement:
+        GoalDecider gd = new GoalDecider() {
+            private PathNode bestTarget = null;
+
+            public PathNode getGoal() {
+                return bestTarget;
+            }
+
+            public boolean hasSubGoals() {
+                return false;
+            }
+
+            public boolean check(Unit unit, PathNode pathNode) {
+                Tile newTile = pathNode.getTile();
+                boolean hasOurSettlement = (newTile.getSettlement() != null)
+                    && newTile.getSettlement().getOwner() == unit.getOwner();
+                if (hasOurSettlement) bestTarget = pathNode;
+                return hasOurSettlement;
+            }
+        };
+        PathNode path = carrier.search(carrier.getTile(), gd,
+            CostDeciders.avoidSettlementsAndBlockingUnits(),
+            Integer.MAX_VALUE, null);
+        return (path == null) ? null : path.getLastNode().getTile();
+    }
+
+    /**
+     * Returns the priority of getting the unit to the
+     * transport destination.
+     *
+     * @return The priority.
+     */
+    public int getTransportPriority() {
+        return (getTransportDestination() != null)
+            ? NORMAL_TRANSPORT_PRIORITY
+            : 0;
+    }
+
+
+    // Mission interface to be implemented/overridden by descendants.
+
+    /**
+     * Checks if this mission is still valid to perform.  At this
+     * level, if the unit was killed then the mission becomes invalid.
+     *
+     * A mission can be invalidated for a number of reasons. For
+     * example: a seek-and-destroy mission can be invalidated in case
+     * the relationship towards the targeted player improves.
      *
      * @return True if the unit is still intact.
      */
@@ -417,53 +491,27 @@ public abstract class Mission extends AIObject {
     public static boolean isValid(AIUnit aiUnit) {
         return aiUnit.getMission() == null
             && aiUnit.getUnit() != null
+            && !aiUnit.getUnit().isDisposed()
             && !aiUnit.getUnit().isUnderRepair();
     }
 
     /**
      * Returns true if this Mission should only be carried out once.
+     * Missions are not one-time by default, true one-time missions must
+     * override this routine.
      *
-     * @return false
+     * @return False.
      */
     public boolean isOneTime() {
         return false;
     }
 
-
     /**
-    * Gets the unit this mission has been created for.
-    * @return The <code>Unit</code>.
-    */
-    public Unit getUnit() {
-        return aiUnit.getUnit();
-    }
-
-
-    /**
-    * Gets the AI-unit this mission has been created for.
-    * @return The <code>AIUnit</code>.
-    */
-    public AIUnit getAIUnit() {
-        return aiUnit;
-    }
-
-
-    /**
-     * Sets the AI-unit this mission has been created for.
-     * @param aiUnit The <code>AIUnit</code>.
-     */
-    protected void setAIUnit(AIUnit aiUnit) {
-        this.aiUnit = aiUnit;
-    }
-
-    /**
-     * Convenience accessor for the unit/player PRNG.
+     * Performs the mission. Must be implemented by the subclasses.
      *
-     * @return A <code>Random</code> to use.
+     * @param connection The <code>Connection</code> to the server.
      */
-    public Random getAIRandom() {
-        return aiUnit.getAIRandom();
-    }
+    public abstract void doMission(Connection connection);
 
     /**
      * Gets debugging information about this mission.
@@ -477,58 +525,22 @@ public abstract class Mission extends AIObject {
         return "";
     }
 
+    // Serialization
 
-    protected boolean unitLeavesShip(AIUnit aiUnit) {
-        Colony colony = aiUnit.getUnit().getColony();
-        if (colony != null) {
-            AIColony ac = getAIMain().getAIColony(colony);
-            if (ac != null) ac.completeWish(aiUnit.getUnit());
-
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-        }
-        return AIMessage.askDisembark(aiUnit);
-    }
-
-    public boolean buyGoods(Connection connection, Unit carrier,
-                            GoodsType goodsType, int amount) {
-        return AIMessage.askBuyGoods(aiUnit, goodsType, amount);
-    }
-
-    public PathNode findNearestColony(Unit unit){
-        Player player = unit.getOwner();
-        PathNode nearestColony = null;
-        int distToColony = Integer.MAX_VALUE;
-
-        // First try colonies
-        for(Colony colony : player.getColonies()){
-            PathNode path = unit.findPath(colony.getTile());
-            if(path == null){
-                continue;
-            }
-            int dist = path.getTotalTurns();
-
-            if(dist <= 1){
-                nearestColony = path;
-                break;
-            }
-
-            if(dist < distToColony){
-                nearestColony = path;
-                distToColony = dist;
-            }
-        }
-
-        return nearestColony;
-    }
-
+    /**
+     * {@inherit-doc}
+     */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         out.writeAttribute("unit", getUnit().getId());
     }
 
+    /**
+     * {@inherit-doc}
+     */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+        String unit = in.getAttributeValue(null, "unit");
+        setAIUnit((AIUnit)getAIMain().getAIObject(unit));
     }
-
 }

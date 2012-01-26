@@ -174,7 +174,7 @@ public class PrivateerMission extends Mission {
             target = null;
             logger.finest("Privateer at " + unit.getTile()
                           + " without target, wandering");
-        	moveRandomly(connection);
+        	moveRandomly();
         }
         // some movement points may still remain
     	//due to some block or just not enough points for next node
@@ -274,7 +274,7 @@ public class PrivateerMission extends Mission {
         nearestPort = null;
         Unit unit = getUnit();
 
-        PathNode path = findNearestColony(unit);
+        PathNode path = findNearestOtherSettlement(unit);
         if(path != null){
             nearestPort = path.getLastNode().getTile().getColony();
         }

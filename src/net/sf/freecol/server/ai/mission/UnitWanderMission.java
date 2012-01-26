@@ -91,7 +91,7 @@ public class UnitWanderMission extends Mission {
         Unit unit = getUnit();
 
         while(unit.getMovesLeft() > 0) {
-            moveRandomly(connection);
+            moveRandomly();
         }
     }
 

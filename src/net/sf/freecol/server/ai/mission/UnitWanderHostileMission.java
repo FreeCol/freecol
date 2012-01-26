@@ -117,7 +117,7 @@ public class UnitWanderHostileMission extends Mission {
             }
         } else {
             // Just make a random move if no target can be found.
-            moveRandomly(connection);
+            moveRandomly();
         }
     }
 

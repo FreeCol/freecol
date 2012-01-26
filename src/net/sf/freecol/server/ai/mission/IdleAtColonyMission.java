@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -38,6 +39,7 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for idling in colony.
+ * TODO: this has now been generalized to settlements, rename one day.
  */
 public class IdleAtColonyMission extends Mission {
 
@@ -69,7 +71,8 @@ public class IdleAtColonyMission extends Mission {
     }
 
     /**
-     * Creates a new <code>IdleAtColonyMission</code> and reads the given element.
+     * Creates a new <code>IdleAtColonyMission</code> and reads the
+     * given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -77,51 +80,67 @@ public class IdleAtColonyMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public IdleAtColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public IdleAtColonyMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
 
+
     /**
-    * Performs the mission. This is done by moving in a random direction
-    * until the move points are zero or the unit gets stuck.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
-    public void doMission(Connection connection) {
-        Tile thisTile = getUnit().getTile();
-        Unit unit = getUnit();
-
-        //Only deal with units on the map
-        if (thisTile != null) {
-
-            //if our tile contains a settlement, idle
-            if (thisTile.getSettlement()!=null) {
-                logger.info("Unit "+unit.getId()+" idle at settlement: "+thisTile.getSettlement().getId());
-                return;
-            }
-
-            //still here, so we're somewhere on the map; find some colony
-            PathNode pathToTarget = findNearestColony(unit);
-
-            if (pathToTarget != null) {
-                Direction r = moveTowards(pathToTarget);
-                if (r == null || !moveButDontAttack(r)) return;
-            } else {
-                // Just make a random move if no target can be found.
-                moveRandomly(connection);
-            }
-        }
+     * Gets the transport destination for units with this mission.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    public Location getTransportDestination() {
+        final Unit unit = getUnit();
+        if (unit.getTile() == null
+            || unit.getTile().getSettlement() != null) return null;
+        PathNode path = findNearestOtherSettlement(unit);
+        Tile target = (path == null) ? null : path.getLastNode().getTile();
+        return (target != null && shouldTakeTransportToTile(target))
+            ? target
+            : null;
     }
 
     /**
-     * Returns true if this Mission should only be carried out once.
+     * Should this Mission only be carried out once?
      *
-     * @return true
+     * @return True.
      */
     public boolean isOneTime() {
         return true;
     }
+
+    /**
+     * Performs the mission. This is done by moving in a random direction
+     * until the move points are zero or the unit gets stuck.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    public void doMission(Connection connection) {
+        final Unit unit = getUnit();
+        final Tile tile = unit.getTile();
+        if (tile == null) return;
+
+        // If our tile contains a settlement, idle
+        if (tile.getSettlement() != null) {
+            logger.finest("Unit " + unit.getId()
+                + " idle at settlement: " + tile.getSettlement().getId());
+            return;
+        }
+
+        PathNode path = findNearestOtherSettlement(unit);
+        if (path != null) {
+            Direction r = moveTowards(path);
+            if (r == null || !moveButDontAttack(r)) return;
+        } else {
+            // Just make a random move if no target can be found.
+            moveRandomly();
+        }
+    }
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related

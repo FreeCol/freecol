@@ -174,7 +174,7 @@ public class IndianBringGiftMission extends Mission {
         }
 
         // Walk in a random direction if we have any moves left:
-        moveRandomly(connection);
+        moveRandomly();
     }
 
     /**

@@ -746,7 +746,7 @@ public class TransportMission extends Mission {
         }
 
         // Try nearest colony
-        if ((path = findNearestColony(unit)) != null) {
+        if ((path = findNearestOtherSettlement(unit)) != null) {
             return new Destination(false, path);
         }
 
