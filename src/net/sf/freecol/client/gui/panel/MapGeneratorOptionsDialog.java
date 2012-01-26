@@ -41,8 +41,8 @@ import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 
 /**

@@ -17,7 +17,9 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server.generator;
+package net.sf.freecol.common.option;
+
+import net.sf.freecol.server.generator.MapGenerator;
 
 /**
  * Keeps track of the available map generator options.

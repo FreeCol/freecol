@@ -39,8 +39,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

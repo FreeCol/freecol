@@ -42,8 +42,8 @@ import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
  * The panel where you choose your nation and color and connected players are

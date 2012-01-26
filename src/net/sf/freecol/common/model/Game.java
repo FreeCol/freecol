@@ -38,9 +38,9 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 
 /**
