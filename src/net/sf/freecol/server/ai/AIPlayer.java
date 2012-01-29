@@ -382,9 +382,10 @@ public abstract class AIPlayer extends AIObject {
      * a neighbouring carrier.
      *
      * @param aiU The <code>AIUnit</code> whose mission is ended.
+     * @param why A reason for aborting the mission.
      */
-    private void abortUnitMission(AIUnit aiU) {
-        aiU.setMission(null);
+    private void abortUnitMission(AIUnit aiU, String why) {
+        aiU.abortMission(why);
         // There is a common stuffup where the AIs converge on the
         // same location on a small island.  First mover gets the
         // colony, the rest get stuck there when their mission is aborted.
@@ -416,11 +417,8 @@ public abstract class AIPlayer extends AIObject {
     protected void abortInvalidMissions() {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
-            if (mission == null) continue;
-            if (!mission.isValid()) {
-                logger.finest("Abort invalid mission: " + mission
-                    + " for: " + au.getUnit());
-                abortUnitMission(au);
+            if (mission != null && !mission.isValid()) {
+                abortUnitMission(au, "invalid");
             }
         }
     }
@@ -433,13 +431,9 @@ public abstract class AIPlayer extends AIObject {
             Mission mission = au.getMission();
             if (mission == null) continue;
             if (!mission.isValid()) {
-                logger.finest("Abort invalid mission: " + mission
-                              + " for: " + au.getUnit());
-                abortUnitMission(au);
+                abortUnitMission(au, "invalid");
             } else if (mission.isOneTime()) {
-                logger.finest("Abort one-time mission: " + mission
-                              + " for: " + au.getUnit());
-                abortUnitMission(au);
+                abortUnitMission(au, "one-time");
             }
         }
     }
@@ -451,7 +445,7 @@ public abstract class AIPlayer extends AIObject {
         logger.finest("Entering method doMissions");
         for (AIUnit au : getAIUnits()) {
             if (au.hasMission() && au.getMission().isValid()
-                && !(au.getUnit().isOnCarrier())) {
+                && !au.getUnit().isOnCarrier()) {
                 try {
                     au.doMission(getConnection());
                 } catch (Exception e) {

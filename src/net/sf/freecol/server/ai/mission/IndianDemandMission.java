@@ -161,7 +161,7 @@ public class IndianDemandMission extends Mission {
                 Mission mission = au.getMission();
                 if (mission instanceof IndianDemandMission
                     && !((IndianDemandMission)mission).hasTribute()) {
-                    au.setMission(null);
+                    au.abortMission("completed demand");
                 }
                 if (accepted) {
                     logger.info("Indian demand by " + unit

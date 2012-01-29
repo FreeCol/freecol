@@ -316,17 +316,39 @@ public class AIUnit extends AIObject implements Transportable {
      * @return <code>true</code> if this unit has a mission.
      */
     public boolean hasMission() {
-        return (mission != null);
+        return mission != null;
     }
 
     /**
-     * Assignes a mission to unit. The dynamic priority is reset.
+     * Aborts a mission.  Always use this instead of setMission(null),
+     * and provide a useful reason so that AI mission thrashing can be
+     * tracked down.
+     *
+     * @param why A string describing why the mission is to be aborted
+     *     (e.g. "invalid").
+     */
+    public void abortMission(String why) {
+        if (mission != null) {
+            logger.finest("Aborting old " + why
+                + " " + mission.getClass().getName()
+                + " for unit " + getUnit());
+            mission.dispose();
+            this.mission = null;
+        }
+    }
+
+    /**
+     * Assigns a mission to unit. The dynamic priority is reset.
+     * Do not call setMission(null), use abortMission above.
      *
      * @param mission The new <code>Mission</code>.
      */
     public void setMission(Mission mission) {
         final Mission oldMission = this.mission;
         if (oldMission != null) {
+            logger.finest("Replacing old " + oldMission.getClass().getName()
+                + " with " + mission.getClass().getName()
+                + " for unit " + getUnit());
             oldMission.dispose();
         }
         this.mission = mission;
@@ -340,16 +362,14 @@ public class AIUnit extends AIObject implements Transportable {
      *            with the server.
      */
     public void doMission(Connection connection) {
-        if (getMission() != null && getMission().isValid()) {
-            getMission().doMission(connection);
-        }
+        if (mission != null && mission.isValid()) mission.doMission(connection);
     }
 
     /**
      * Disposes this object and any attached mission.
      */
     public void dispose() {
-        setMission(null);
+        abortMission("disposed");
         setTransport(null);
         super.dispose();
     }

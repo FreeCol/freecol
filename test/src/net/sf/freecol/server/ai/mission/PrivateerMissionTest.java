@@ -106,7 +106,7 @@ public class PrivateerMissionTest extends FreeColTestCase {
         AIUnit privateerAI = aiMain.getAIUnit(privateer);
         assertNotNull("Setup error, could not get privateerAI", privateerAI);
 
-        privateerAI.setMission(null);
+        privateerAI.abortMission("test");
         assertNull(privateerAI.getMission());
         assertNotNull(privateerAI.getUnit());
         assertTrue(Mission.isValid(privateerAI));
