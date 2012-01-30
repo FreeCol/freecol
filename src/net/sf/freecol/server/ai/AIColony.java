@@ -415,6 +415,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
+            if (aiU.getMission() != null) continue;
             switch (u.getRole()) {
             case SOLDIER: case DRAGOON:
                 aiU.setMission(new DefendSettlementMission(aiMain, aiU,
