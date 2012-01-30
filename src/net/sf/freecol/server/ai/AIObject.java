@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -67,11 +68,30 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
-     * Returns the main AI-object.
+     * Convenience accessor for the main AI-object.
+     *
      * @return The <code>AIMain</code>.
      */
     public AIMain getAIMain() {
         return aiMain;
+    }
+
+    /**
+     * Convenience accessor for the game.
+     *
+     * @return The <code>Game</code>.
+     */
+    public Game getGame() {
+        return aiMain.getGame();
+    }
+
+    /**
+     * Convenience accessor for the specification.
+     *
+     * @return The <code>Specification</code>.
+     */
+    public Specification getSpecification() {
+        return getGame().getSpecification();
     }
 
     /**
@@ -92,15 +112,6 @@ public abstract class AIObject extends FreeColObject {
      */
     public void dispose() {
         getAIMain().removeAIObject(getId());
-    }
-
-
-    /**
-    * Returns the game.
-    * @return The <code>Game</code>.
-    */
-    public Game getGame() {
-        return aiMain.getGame();
     }
 
 

@@ -261,7 +261,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        type = getAIMain().getGame().getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
+        type = getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
         
         final String pioneerStr = in.getAttributeValue(null, "pioneer");

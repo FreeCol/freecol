@@ -429,7 +429,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @return True if the role change was successful.
      */
     public boolean equipForRole(Role r, boolean cheat) {
-        final Specification spec = unit.getGame().getSpecification();
+        final Specification spec = getSpecification();
         final Player player = unit.getOwner();
         Location loc = unit.getLocation();
         Europe europe = (loc instanceof Europe) ? (Europe)loc : null;

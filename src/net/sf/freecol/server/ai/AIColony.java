@@ -261,7 +261,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final AIMain aiMain = getAIMain();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
-        final Specification spec = colony.getSpecification();
+        final Specification spec = getSpecification();
 
         // For now, cap the rearrangement horizon, because confidence
         // that we are triggering on all relevant changes is low.
@@ -454,7 +454,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * TODO: consider market prices?
      */
     private void resetExports() {
-        final Specification spec = colony.getSpecification();
+        final Specification spec = getSpecification();
         final List<GoodsType> produce = colonyPlan.getPreferredProduction();
         if (fullExport.isEmpty()) {
             // Initialize the exportable sets.
@@ -544,7 +544,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * raw building materials, with a lesser interest in food.
      */
     private void stealTiles() {
-        final Specification spec = colony.getSpecification();
+        final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
         boolean hasDefender = false;
@@ -618,7 +618,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * the colony and stuffing it into the town hall.
      */
     private void avertAutoDestruction() {
-        List<GoodsType> libertyGoods = colony.getSpecification()
+        List<GoodsType> libertyGoods = getSpecification()
             .getLibertyGoodsTypeList();
         for (Unit u : colony.getTile().getUnitList()) {
             if (!u.isPerson()) continue;
@@ -698,7 +698,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final int capacity = colony.getWarehouseCapacity();
         List<AIGoods> newAIGoods = new ArrayList<AIGoods>();
         List<AIGoods> oldAIGoods = new ArrayList<AIGoods>();
-        for (GoodsType g : colony.getSpecification().getGoodsTypeList()) {
+        for (GoodsType g : getSpecification().getGoodsTypeList()) {
             if (colony.getAdjustedNetProductionOf(g) < 0) continue;
             int count = colony.getGoodsCount(g);
             int exportAmount = (fullExport.contains(g))
@@ -912,7 +912,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Creates the worker wishes.
      */
     private void createWorkerWishes() {
-        final Specification spec = colony.getSpecification();
+        final Specification spec = getSpecification();
         final int baseValue = 25;
         final int priorityMax = 50;
         final int priorityDecay = 5;
@@ -1009,7 +1009,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Creates the goods wishes.
      */
     private void createGoodsWishes() {
-        final Specification spec = colony.getSpecification();
+        final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
         // request goods

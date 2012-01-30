@@ -186,7 +186,7 @@ public class GoodsWish extends Wish {
         }
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
 
-        goodsType = getAIMain().getGame().getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
+        goodsType = getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
         amountRequested = getAttribute(in, "amountRequested",
                                        GoodsContainer.CARGO_SIZE);
         in.nextTag();

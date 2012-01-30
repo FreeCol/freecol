@@ -285,7 +285,7 @@ public class NativeAIPlayer extends AIPlayer {
      * @return The ship trade penalties.
      */
     private Set<Modifier> getShipTradePenalties(boolean sense) {
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         List<Modifier> shipPenalties = spec.getModifiers(SHIP_TRADE_PENALTY);
         Set<Modifier> result = new HashSet<Modifier>();
         int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
@@ -310,7 +310,7 @@ public class NativeAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         IndianSettlement is = (IndianSettlement) settlement;
         Player buyer = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -378,7 +378,7 @@ public class NativeAIPlayer extends AIPlayer {
      */
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
-        Specification spec = getGame().getSpecification();
+        Specification spec = getSpecification();
         IndianSettlement is = (IndianSettlement) settlement;
         Player seller = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -469,7 +469,7 @@ public class NativeAIPlayer extends AIPlayer {
      * @param is The <code>IndianSettlement</code> where the equipping occurs.
      */
     public void equipBraves(IndianSettlement is) {
-        final Specification spec = is.getGame().getSpecification();
+        final Specification spec = getSpecification();
         List<Unit> units = is.getUnitList();
         roles: for (Role r : new Role[] { Role.DRAGOON, Role.SOLDIER,
                                           Role.SCOUT }) {
@@ -582,7 +582,7 @@ public class NativeAIPlayer extends AIPlayer {
         // Create a datastructure for the worker wishes:
         java.util.Map<UnitType, ArrayList<Wish>> workerWishes =
             new HashMap<UnitType, ArrayList<Wish>>();
-        for (UnitType unitType : getAIMain().getGame().getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
 

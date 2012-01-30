@@ -197,9 +197,9 @@ public class IndianDemandMission extends Mission {
      */
     public Goods selectGoods(Colony target) {
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
-        int dx = getAIMain().getGame().getSpecification().getIntegerOption("model.option.nativeDemands")
+        int dx = getSpecification().getIntegerOption("model.option.nativeDemands")
             .getValue() + 1;
-        GoodsType food = getAIMain().getGame().getSpecification().getPrimaryFoodType();
+        GoodsType food = getSpecification().getPrimaryFoodType();
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
@@ -228,7 +228,7 @@ public class IndianDemandMission extends Mission {
             }
         } else {
             // military goods
-            for (GoodsType preferred : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
+            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isMilitaryGoods()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
@@ -237,7 +237,7 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // storable building materials (what do the natives need tools for?)
-            for (GoodsType preferred : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
+            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isBuildingMaterial() && preferred.isStorable()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
@@ -246,7 +246,7 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // trade goods
-            for (GoodsType preferred : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
+            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isTradeGoods()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
@@ -255,7 +255,7 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // refined goods
-            for (GoodsType preferred : getAIMain().getGame().getSpecification().getGoodsTypeList()) {
+            for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isRefined() && preferred.isStorable()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {

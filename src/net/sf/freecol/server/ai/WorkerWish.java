@@ -186,7 +186,7 @@ public class WorkerWish extends Wish {
         }
         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
 
-        unitType = getAIMain().getGame().getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
         in.nextTag();
 

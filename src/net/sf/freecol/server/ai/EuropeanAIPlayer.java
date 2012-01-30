@@ -356,7 +356,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             // TODO: consider the amount of goods produced. If we
             // depend on shipping huge amounts of cheap goods, we
             // don't want these goods to be boycotted.
-            List<GoodsType> goodsTypes = getAIMain().getGame().getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
                     averageIncome += getPlayer().getIncomeAfterTaxes(type);
@@ -583,7 +583,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void cheat() {
         logger.finest("Entering method cheat");
-        Specification spec = getAIMain().getGame().getSpecification();
+        Specification spec = getSpecification();
         Market market = getPlayer().getMarket();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
@@ -710,10 +710,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     /*
     private void secureColony(Colony colony) {
-        GoodsType musketType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = getAIMain().getGame().getSpecification().getGoodsType("model.goods.horses");
-        final EquipmentType muskets = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horses = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.horses");
+        GoodsType musketType = getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
+        final EquipmentType muskets = getSpecification().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horses = getSpecification().getEquipmentType("model.equipment.horses");
 
         Map map = getPlayer().getGame().getMap();
         int olddefenders = 0;
@@ -939,7 +939,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Create a datastructure for the worker wishes:
         java.util.Map<UnitType, ArrayList<Wish>> workerWishes =
             new HashMap<UnitType, ArrayList<Wish>>();
-        for (UnitType unitType : getAIMain().getGame().getSpecification().getUnitTypeList()) {
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
         for (Wish w : getWishes()) {

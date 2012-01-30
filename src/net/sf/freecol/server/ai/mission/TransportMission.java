@@ -1023,7 +1023,7 @@ public class TransportMission extends Mission {
 
         int priceTrained = 0;
         UnitType cheapestTrained = null;
-        List<UnitType> unitTypes = getAIMain().getGame().getSpecification().getUnitTypesTrainedInEurope();
+        List<UnitType> unitTypes = getSpecification().getUnitTypesTrainedInEurope();
         for (UnitType unitType : unitTypes) {
             int price = europe.getUnitPrice(unitType);
             if (cheapestTrained == null || price < priceTrained) {

@@ -136,7 +136,7 @@ public class IndianBringGiftMission extends Mission {
                 // Load the goods:
                 List<Goods> goodsList = new ArrayList<Goods>();
                 GoodsContainer gc = is.getGoodsContainer();
-                for (GoodsType goodsType : getAIMain().getGame().getSpecification().getNewWorldGoodsTypeList()) {
+                for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
                         Goods goods = new Goods(getGame(), is, goodsType,
                             Utils.randomInt(logger, "Gift amount",
