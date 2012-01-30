@@ -870,8 +870,7 @@ public class ServerAPI {
             GetNationSummaryMessage.getXMLElementTagName(), null);
         if (reply == null) return null;
 
-        Game game = freeColClient.getGame();
-        return new GetNationSummaryMessage(game, reply).getNationSummary();
+        return new GetNationSummaryMessage(reply).getNationSummary();
     }
 
     /**

@@ -65,7 +65,7 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public GetNationSummaryMessage(Game game, Element element) {
+    public GetNationSummaryMessage(Element element) {
         playerId = element.getAttribute("player");
         NodeList nodes = element.getChildNodes();
         summary = (nodes == null || nodes.getLength() != 1) ? null

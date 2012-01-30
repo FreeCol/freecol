@@ -600,7 +600,7 @@ public final class InGameInputHandler extends InputHandler
                  new NetworkRequestHandler() {
             @Override
             public Element handle(Connection connection, Element element) {
-                return new GetNationSummaryMessage(getGame(), element)
+                return new GetNationSummaryMessage(element)
                     .handle(freeColServer, connection);
             }});
         register("getNewTradeRoute",
