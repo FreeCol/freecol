@@ -403,6 +403,16 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Is this unit able to carry a specified one?
+     *
+     * @param The potential cargo <code>Unit</code>.
+     * @return True if this unit can carry the cargo unit.
+     */
+    public boolean canCarryUnit(Unit u) {
+        return canCarryUnits() && getType().getSpace() >= u.getSpaceTaken();
+    }
+
+    /**
      * Returns <code>true</code> if the Unit can carry Goods.
      *
      * @return a <code>boolean</code> value
@@ -1175,10 +1185,28 @@ public class Unit extends FreeColGameObject
      * @return A <code>PathNode</code> for the first tile in the path.
      */
     public PathNode findPath(Tile start, Tile end, Unit carrier) {
+        return this.findPath(start, end, carrier, null);
+    }
+
+    /**
+     * Finds a shortest path from the current <code>Tile</code> to the one
+     * specified. Only paths on water are allowed if <code>isNaval()</code>
+     * and only paths on land if not.
+     *
+     * @param start The <code>Tile</code> in which the path starts from.
+     * @param end The <code>Tile</code> at the end of the path.
+     * @param carrier An optional <code>Unit</code> to carry the unit.
+     * @param costDecider An optional <code>CostDecider</code> for
+     *        determining the movement costs (uses default cost deciders
+     *        for the unit/s if not provided).
+     * @return A <code>PathNode</code> for the first tile in the path.
+     */
+    public PathNode findPath(Tile start, Tile end, Unit carrier,
+                             CostDecider costDecider) {
         Location dest = getDestination();
         setDestination(end);
         PathNode path = getGame().getMap().findPath(this, start, end,
-                                                    carrier, null);
+                                                    carrier, costDecider);
         setDestination(dest);
         return path;
     }
@@ -1221,7 +1249,7 @@ public class Unit extends FreeColGameObject
             Location dest = getDestination();
             setDestination(end);
             final Unit carrier = (Unit) getLocation();
-            p = getGame().getMap().findPath(this, start, end, carrier, null);
+            p = this.findPath(start, end, carrier);
             setDestination(dest);
         } else {
             p = this.findPath(start, end);
