@@ -586,7 +586,6 @@ public class NativeAIPlayer extends AIPlayer {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
 
-        boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -629,9 +628,8 @@ public class NativeAIPlayer extends AIPlayer {
             boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
                                 || unit.hasAbility(Ability.EXPERT_PIONEER);
             boolean isExpert = unit.getSkillLevel() > 0;
-            if ((isPioneer || (isPioneerReq && !isExpert)) && PioneeringMission.isValid(aiUnit)) {
+            if (isPioneer && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
-                isPioneerReq = false;
                 continue;
             }
 

@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -55,25 +56,24 @@ import org.w3c.dom.Element;
  * @see net.sf.freecol.common.model.Unit.Role#PIONEER
  */
 public class PioneeringMission extends Mission {
-    /*
-     * TODO-LATER: "updateTileImprovementPlan" should be called
-     *             only once (in the beginning of the turn).
-     */
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
-    private static enum PioneeringMissionState {GET_TOOLS,IMPROVING};
+    /** Maximum number of turns to travel to make progress on pioneering. */
+    private static final int MAX_TURNS = 10;
 
-    private PioneeringMissionState state = PioneeringMissionState.GET_TOOLS;
-
+    /** The improvement this pioneer is to work on. */
     private TileImprovementPlan tileImprovementPlan = null;
 
+    /** A colony to go to to equip if required. */
     private Colony colonyWithTools = null;
 
-    private boolean invalidateMission = false;
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a pioneering mission for the given <code>AIUnit</code>.
+     * Note that PioneeringMission.isValid(aiUnit) should be called
+     * before this, to guarantee that
+     * findTileImprovementPlan/findColonyWithTools succeed.
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission
@@ -82,15 +82,13 @@ public class PioneeringMission extends Mission {
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
-        if(hasTools){
-            state = PioneeringMissionState.IMPROVING;
-        }
-        else{
-            state = PioneeringMissionState.GET_TOOLS;
-        }
+        if (!hasTools()) colonyWithTools = findColonyWithTools(aiUnit);
+        tileImprovementPlan = findTileImprovementPlan(aiUnit);
+        tileImprovementPlan.setPioneer(aiUnit);
+        logger.finest("AI pioneer starts with plan "
+            + tileImprovementPlan + "/" + tileImprovementPlan.getTarget()
+            + ": " + aiUnit.getUnit());
     }
-
 
     /**
      * Loads a mission from the given element.
@@ -105,7 +103,8 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Creates a new <code>PioneeringMission</code> and reads the given element.
+     * Creates a new <code>PioneeringMission</code> and reads the
+     * given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -113,433 +112,231 @@ public class PioneeringMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public PioneeringMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public PioneeringMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
 
-
     /**
-     * Disposes this <code>Mission</code>.
+     * Gets the <code>TileImprovementPlan</code> for this mission.
+     *
+     * @return The <code>TileImprovementPlan</code>.
      */
-    public void dispose() {
-        if (tileImprovementPlan != null) {
-            tileImprovementPlan.setPioneer(null);
-            tileImprovementPlan = null;
-        }
-        super.dispose();
+    public TileImprovementPlan getTileImprovementPlan() {
+        return tileImprovementPlan;
     }
 
     /**
      * Sets the <code>TileImprovementPlan</code> which should
      * be the next target.
      *
-     * @param tileImprovementPlan The <code>TileImprovementPlan</code>.
+     * @param tip The <code>TileImprovementPlan</code>.
      */
-    public void setTileImprovementPlan(TileImprovementPlan tileImprovementPlan) {
-        this.tileImprovementPlan = tileImprovementPlan;
+    public void setTileImprovementPlan(TileImprovementPlan tip) {
+        this.tileImprovementPlan = tip;
     }
 
-    private void updateTileImprovementPlan() {
-        final EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-        final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
-
-        Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
-        // invalid tileImprovementPlan, remove and get a new valid one
-        if (tileImprovementPlan != null && improvementTarget == null) {
-            logger.finest("Found invalid TileImprovementPlan, removing it and assigning a new one");
-            aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
-            tileImprovementPlan.dispose();
-            tileImprovementPlan = null;
-        }
-
-        // Verify if the improvement has been applied already
-        // If it has, remove this improvement
-        if (tileImprovementPlan != null &&
-            improvementTarget != null &&
-            improvementTarget.hasImprovement(tileImprovementPlan.getType())){
-            aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
-            tileImprovementPlan.dispose();
-            tileImprovementPlan = null;
-        }
-
-        // mission still valid, no update needed
-        if (tileImprovementPlan != null && improvementTarget != null) {
-            return;
-        }
-
-        final Tile startTile;
-        if (getUnit().getTile() == null) {
-            startTile = ((getUnit().isOnCarrier())
-                         ? ((Unit) getUnit().getLocation())
-                         : getUnit()).getFullEntryLocation();
-            if (startTile == null) {
-                logger.warning("Unable to determine entry location for: "
-                               + getUnit().toString());
-                return;
-            }
-        } else {
-            startTile = getUnit().getTile();
-        }
-
-        TileImprovementPlan bestChoice = null;
-        int bestValue = 0;
-        for (TileImprovementPlan ti : aiPlayer.getTileImprovementPlans()) {
-            if (ti.getPioneer() == null) {
-                // invalid tileImprovementPlan, remove and get a new valid one
-                if (ti.getTarget() == null) {
-                    logger.finest("Found invalid TileImprovementPlan, removing it and finding a new one");
-                    aiPlayer.removeTileImprovementPlan(ti);
-                    ti.dispose();
-                    continue;
-                }
-
-                PathNode path = null;
-                int value;
-                if (startTile != ti.getTarget()) {
-                    path = getUnit().findPath(startTile, ti.getTarget(), carrier);
-                    if (path != null) {
-                        value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
-
-                        /*
-                         * Avoid picking a TileImprovementPlan with a path being blocked
-                         * by an enemy unit (apply a penalty to the value):
-                         */
-                        PathNode pn = path;
-                        while (pn != null) {
-                            if (pn.getTile().getFirstUnit() != null
-                                && pn.getTile().getFirstUnit().getOwner() != getUnit().getOwner()) {
-                                value -= 1000;
-                            }
-                            pn = pn.next;
-                        }
-                    } else {
-                        value = ti.getValue();
-                    }
-                } else {
-                    value = ti.getValue() + 10000;
-                }
-                if (value > bestValue) {
-                    bestChoice = ti;
-                    bestValue = value;
-                }
-            }
-        }
-
-        if (bestChoice != null) {
-            tileImprovementPlan = bestChoice;
-            bestChoice.setPioneer(getAIUnit());
-        }
-
-        if(tileImprovementPlan == null){
-            invalidateMission = true;
-        }
+    /**
+     * Disposes of this pioneering mission.
+     */
+    public void dispose() {
+        abandonTileImprovementPlan();
+        super.dispose();
     }
 
 
     /**
-     * Performs this mission.
+     * Does a supplied unit have tools?
      *
-     * @param connection The <code>Connection</code> to the server.
+     * @param unit The pioneer <code>Unit</code> to check.
+     * @return True if the pioneer has tools.
      */
-    public void doMission(Connection connection) {
-        final Unit unit = getUnit();
-        while (isValid() && unit.getMovesLeft() > 0) {
-            boolean hasTools = unit.hasAbility("model.ability.improveTerrain");
-            if (hasTools) {
-                if (!processImprovementPlan()) break;
-            } else {
-                if (!getTools()) break;
-            }
-        }
-    }
-
-    private boolean processImprovementPlan() {
-        if (tileImprovementPlan == null) {
-            updateTileImprovementPlan();
-            if (tileImprovementPlan == null) {
-                invalidateMission = true;
-                return false;
-            }
-        }
-
-        final Unit unit = getUnit();
-        // Sanitation
-        if (unit.getTile() == null) {
-            logger.warning("Unit is in unknown location, cannot proceed with mission");
-            invalidateMission = true;
-            return false;
-        }
-
-        // move toward the target tile
-        final Tile target = tileImprovementPlan.getTarget();
-        if (unit.getTile() != target) {
-            PathNode pathToTarget = unit.findPath(target);
-            if (pathToTarget == null) {
-                invalidateMission = true;
-                return false;
-            }
-
-            Direction direction = moveTowards(pathToTarget);
-            if (direction != null && !moveButDontAttack(direction)) return true;
-            if (unit.getTile() != target) unit.setMovesLeft(0);
-        }
-        if (unit.getMovesLeft() == 0) return true;
-
-        // Sanitation
-        if (unit.getTile() != target) {
-            String errMsg = "Something is wrong, pioneer should be on the tile to improve, but isnt";
-            logger.warning(errMsg);
-            invalidateMission = true;
-            return false;
-        }
-
-        final Player player = getUnit().getOwner();
-        if (!player.owns(target)) {
-            // Take control of land before proceeding with mission.
-            // Decide whether to pay or steal.
-            // Currently always pay if we can, steal if we can not.
-            int price = player.getLandPrice(target);
-            if (price < 0) {
-                ; // fail
-            } else {
-                if (price > 0 && !player.checkGold(price)) {
-                    price = NetworkConstants.STEAL_LAND;
-                }
-                AIPlayer aiOwner = getAIMain().getAIPlayer(player);
-                AIMessage.askClaimLand(aiOwner.getConnection(), target, null,
-                                       price);
-            }
-        }
-        if (!player.owns(target)) {
-            // Failed to take ownership
-            invalidateMission = true;
-            return false;
-        }
-
-        if (unit.getState() == UnitState.IMPROVING) {
-            unit.setMovesLeft(0);
-            return true;
-        }
-
-        if (unit.checkSetState(UnitState.IMPROVING)) {
-            // Ask to create the TileImprovement
-            AIMessage.askChangeWorkImprovementType(getAIUnit(),
-                tileImprovementPlan.getType());
-        }
-        return true;
-    }
-
-    private boolean getTools() {
-        validateColonyWithTools();
-        if (invalidateMission) return false;
-
-        Unit unit = getUnit();
-
-        // Not there yet
-        if(unit.getTile() != colonyWithTools.getTile()){
-            PathNode path = unit.findPath(colonyWithTools.getTile());
-
-            if(path == null){
-                invalidateMission = true;
-                colonyWithTools = null;
-                return false;
-            }
-
-            Direction direction = moveTowards(path);
-            if (direction == null || !moveButDontAttack(direction)) return true;
-
-            // not there yet, remove any moves left
-            if(unit.getTile() != colonyWithTools.getTile()){
-                unit.setMovesLeft(0);
-                return true;
-            }
-        }
-        // reached colony with tools, equip unit
-        return getAIUnit().equipForRole(Unit.Role.PIONEER, false);
-    }
-
-
-    private boolean validateColonyWithTools() {
-        EquipmentType toolsType = getAIMain().getGame().getSpecification().getEquipmentType("model.equipment.tools");
-        if(colonyWithTools != null){
-            if(colonyWithTools.isDisposed()
-               || colonyWithTools.getOwner() != getUnit().getOwner()
-               || !colonyWithTools.canBuildEquipment(toolsType)){
-                colonyWithTools = null;
-            }
-        }
-        if(colonyWithTools == null){
-            // find a new colony with tools
-            colonyWithTools = findColonyWithTools(getAIUnit());
-            if(colonyWithTools == null){
-                logger.finest("No tools found");
-                invalidateMission = true;
-                return false;
-            }
-            logger.finest("Colony found=" + colonyWithTools.getName());
-        }
-        return true;
-    }
-
-
-    /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link Tile} of the transport
-     * or the target for the entire <code>Transportable</code>'s
-     * mission. The target for the tansport is determined by
-     * {@link TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
-     */
-    public Tile getTransportDestination() {
-        updateTileImprovementPlan();
-        if (tileImprovementPlan == null) {
-            return null;
-        }
-        if (getUnit().isOnCarrier()) {
-            return tileImprovementPlan.getTarget();
-        } else if (getUnit().getTile() == tileImprovementPlan.getTarget()) {
-            return null;
-        } else if (getUnit().getTile() == null || getUnit().findPath(tileImprovementPlan.getTarget()) == null) {
-            return tileImprovementPlan.getTarget();
-        } else {
-            return null;
-        }
+    private static boolean hasTools(AIUnit aiUnit) {
+        return aiUnit.getUnit().hasAbility("model.ability.improveTerrain");
     }
 
     /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
+     * Does this pioneer have tools?
      *
-     * @return The priority.
+     * @return True if the pioneer has tools.
      */
-    public int getTransportPriority() {
-        if (getTransportDestination() != null) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else {
-            return 0;
-        }
+    private boolean hasTools() {
+        return hasTools(getAIUnit());
     }
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Checks if a colony can provide the tools required for a pioneer.
      *
-     * @param aiUnit The unit.
-     * @return <code>true</code> if this mission is still valid to perform
-     *         and <code>false</code> otherwise.
+     * @param colony The <code>Colony</code> to check.
+     * @return True if the colony can provide tools.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        if(!aiUnit.getUnit().isColonist()){
-            return false;
-        }
-
-        if(aiUnit.getUnit().getTile() == null){
-            return false;
-        }
-
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiUnit.getAIMain()
-            .getAIPlayer(aiUnit.getUnit().getOwner());
-        boolean foundImprovementPlan = false;
-        for (TileImprovementPlan ti : aiPlayer.getTileImprovementPlans()) {
-            if (ti.getPioneer() == null) {
-                foundImprovementPlan = true;
-                break;
-            }
-        }
-        if (!foundImprovementPlan) {
-            logger.finest("No plan found, PioneeringMission not valid");
-            return false;
-        }
-
-        EquipmentType toolsType = aiUnit.getAIMain().getGame().getSpecification()
-            .getEquipmentType("model.equipment.tools");
-        boolean unitHasToolsAvail = aiUnit.getUnit().getEquipmentCount(toolsType) > 0;
-        if(unitHasToolsAvail){
-            logger.finest("Tools equipped, PioneeringMission valid");
-            return true;
-        }
-
-        // Search colony with tools to equip the unit with
-        Colony colonyWithTools = findColonyWithTools(aiUnit);
-        if(colonyWithTools != null){
-            logger.finest("Tools found, PioneeringMission valid");
-            return true;
-        }
-
-        logger.finest("Tools not found, PioneeringMission not valid");
-        return false;
+    private boolean checkColonyForTools(Colony colony) {
+        final List<EquipmentType> pioneerEquipment
+            = Unit.Role.PIONEER.getRoleEquipment(getSpecification());
+        return colony != null
+            && !colony.isDisposed()
+            && colony.getOwner() == getUnit().getOwner()
+            && colony.canProvideEquipment(pioneerEquipment);
     }
 
+    /**
+     * Finds the closest colony within MAX_TURNS that can equip the unit.
+     * Public for the test suite.
+     *
+     * @param aiu The <code>AIUnit</code> to equip.
+     * @return The closest colony that can equip the unit.
+     */
     public static Colony findColonyWithTools(AIUnit aiu) {
-        final int MAX_TURN_DISTANCE = 10;
+        final Unit unit = aiu.getUnit();
+        if (unit == null || unit.isDisposed()) return null;
+        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
+            : null;
+        final Tile startTile = getPathStartTile(unit);
+        final List<EquipmentType> pioneerEquipment
+            = Unit.Role.PIONEER.getRoleEquipment(aiu.getSpecification());
+
         Colony best = null;
         int bestValue = Integer.MIN_VALUE;
-
-        Unit unit = aiu.getUnit();
-        // Sanitation
-        if(unit == null){
-            return null;
-        }
-
-        EquipmentType toolsType = aiu.getAIMain().getGame().getSpecification()
-            .getEquipmentType("model.equipment.tools");
-        for(Colony colony : unit.getOwner().getColonies()){
-            if(!colony.canBuildEquipment(toolsType)) {
-                continue;
-            }
+        for (Colony colony : unit.getOwner().getColonies()) {
+            if (!colony.canProvideEquipment(pioneerEquipment)) continue;
 
             AIColony ac = aiu.getAIMain().getAIColony(colony);
-            // Sanitation
-            if(ac == null){
-                continue;
-            }
+            if (ac == null) continue;
 
-            // check if it possible for the unit to reach the colony
-            PathNode pathNode = null;
-            if(unit.getTile() != colony.getTile()){
-                pathNode = unit.findPath(colony.getTile());
-                // no path found
-                if(pathNode == null){
-                    continue;
-                }
-                // colony too far
-                if(pathNode.getTotalTurns() > MAX_TURN_DISTANCE){
-                    continue;
-                }
-            }
+            if (startTile == colony.getTile()) return colony;
 
-            int value = 100;
-            // Prefer units with plenty of tools
-            for(AbstractGoods goods : toolsType.getGoodsRequired()){
-                value += colony.getGoodsCount(goods.getType());
-            }
-
-            if(pathNode != null){
-                value -= pathNode.getTotalTurns() * 10;
-            }
-
-            if(best == null || value > bestValue){
-                best = colony;
+            PathNode path = (startTile == null) 
+                ? unit.getGame().getMap().findPathToEurope(colony.getTile())
+                : unit.findPath(startTile, colony.getTile(), carrier);
+            int turns = (path != null) ? path.getTotalTurns()
+                : (colony.getTile().isAdjacent(startTile)) ? 1
+                : -1;
+            if (turns < 0 || turns > MAX_TURNS) continue;
+            int value = MAX_TURNS - turns;
+            if (value > bestValue) {
                 bestValue = value;
+                best = colony;
             }
         }
         return best;
     }
 
-    public static List<AIUnit>getPlayerPioneers(AIPlayer aiPlayer){
-        List<AIUnit> list = new ArrayList<AIUnit>();
+    /**
+     * Weeds out a broken or obsolete tile improvement plan.
+     *
+     * @param tip The <code>TileImprovementPlan</code> to test.
+     * @param aiPlayer The <code>AIPlayer</code> that owns the plan.
+     * @return True if the plan survives this check.
+     */
+    private static boolean validateTileImprovementPlan(TileImprovementPlan tip,
+        EuropeanAIPlayer aiPlayer) {
+        if (tip == null) return false;
+        Tile target = tip.getTarget();
+        if (target == null) {
+            logger.warning("Removing targetless TileImprovementPlan");
+            aiPlayer.removeTileImprovementPlan(tip);
+            tip.dispose();
+            return false;
+        }
+        if (target.hasImprovement(tip.getType())) {
+            logger.finest("Removing obsolete TileImprovementPlan");
+            aiPlayer.removeTileImprovementPlan(tip);
+            tip.dispose();
+            return false;
+        }
+        if (tip.getPioneer() != null
+            && (tip.getPioneer().getUnit() == null
+                || tip.getPioneer().getUnit().isDisposed())) {
+            logger.warning("Clearing broken pioneer for TileImprovementPlan");
+            tip.setPioneer(null);
+        }
+        return true;
+    }
 
-        AIMain aiMain = aiPlayer.getAIMain();
-        for (Unit u : aiPlayer.getPlayer().getUnits()) {
-            AIUnit aiu = aiMain.getAIUnit(u);
-            if (aiu == null) continue;
-            if(aiu.getMission() instanceof PioneeringMission){
-                list.add(aiu);
+    /**
+     * Checks that a tile improvement plan is valid.
+     *
+     * @param tip The <code>TileImprovementPlan</code> to check.
+     * @return True if the plan is valid.
+     */
+    private boolean checkTileImprovementPlan(TileImprovementPlan tip) {
+        return validateTileImprovementPlan(tip,
+            (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner()));
+    }
+
+    /**
+     * Finds the best tile improvement plan for a supplied AI unit.
+     * Public for the test suite.
+     *
+     * @param aiu The <code>AIUnit</code> to find a plan for.
+     * @return The best available tile improvement plan, or null if none found.
+     */
+    public static TileImprovementPlan findTileImprovementPlan(AIUnit aiu) {
+        final Unit unit = aiu.getUnit();
+        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
+            : null;
+        final Player player = unit.getOwner();
+        final EuropeanAIPlayer aiPlayer
+            = (EuropeanAIPlayer)aiu.getAIMain().getAIPlayer(player);
+        final Tile startTile = getPathStartTile(unit);
+
+        // Choose the best plan.
+        TileImprovementPlan best = null;
+        int bestValue = Integer.MIN_VALUE;
+        for (TileImprovementPlan tip : aiPlayer.getTileImprovementPlans()) {
+            if (!validateTileImprovementPlan(tip, aiPlayer)) continue;
+            if (tip.getPioneer() == aiu) return tip;
+            if (tip.getPioneer() != null) continue;
+            
+            if (startTile == tip.getTarget()) return tip;
+
+            PathNode path = (startTile == null)
+                ? unit.getGame().getMap().findPathToEurope(tip.getTarget())
+                : unit.findPath(startTile, tip.getTarget(), carrier);
+            int turns = (path != null) ? path.getTotalTurns()
+                : (tip.getTarget().isAdjacent(startTile)) ? 1
+                : -1;
+            if (turns < 0 || turns > MAX_TURNS) continue;
+            int value = tip.getValue() - 5 * turns;
+            if (value > bestValue) {
+                bestValue = value;
+                best = tip;
             }
         }
-        return list;
+        return best;
     }
+
+    /**
+     * Abandons the current plan if any.
+     */
+    private void abandonTileImprovementPlan() {
+        if (tileImprovementPlan != null) {
+            if (tileImprovementPlan.getPioneer() == getAIUnit()) {
+                tileImprovementPlan.setPioneer(null);
+            }
+            tileImprovementPlan = null;
+        }
+    }
+
+    // Fake Transportable interface.
+
+    /**
+     * Gets the transport destination for units with this mission.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    public Location getTransportDestination() {
+        Tile target = (hasTools())
+            ? ((!checkTileImprovementPlan(tileImprovementPlan)) ? null
+                : tileImprovementPlan.getTarget())
+            : ((!checkColonyForTools(colonyWithTools)) ? null
+                : colonyWithTools.getTile());
+        return (target != null && shouldTakeTransportToTile(target)) ? target
+            : null;
+    }
+
+    // Mission interface
 
     /**
      * Checks if this mission is still valid to perform.
@@ -547,32 +344,208 @@ public class PioneeringMission extends Mission {
      * @return True if this mission is still valid to perform.
      */
     public boolean isValid() {
-        if (!super.isValid()
-            || getUnit().getTile() == null
-            || invalidateMission) return false;
+        return super.isValid()
+            && getUnit().isPerson()
+            && checkTileImprovementPlan(tileImprovementPlan)
+            && (hasTools() || checkColonyForTools(colonyWithTools));
+    }
 
-        switch (state) {
-        case GET_TOOLS:
-            EquipmentType toolsType = getAIMain().getGame()
-                .getSpecification().getEquipmentType("model.equipment.tools");
-            if (colonyWithTools == null
-                || colonyWithTools.isDisposed()
-                || colonyWithTools.getOwner() != getUnit().getOwner()
-                || !colonyWithTools.canBuildEquipment(toolsType)) {
-                return findColonyWithTools(getAIUnit()) != null;
-            }
-            break;
-        case IMPROVING:
-            Tile target = (tileImprovementPlan == null) ? null
-                : tileImprovementPlan.getTarget();
-            if (tileImprovementPlan == null
-                || target == null
-                || target.hasImprovement(tileImprovementPlan.getType())) {
-                return false;
-            }
-            break;
+    /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The unit.
+     * @return True if the AI unit can be assigned a PioneeringMission.
+     */
+    public static boolean isValid(AIUnit aiUnit) {
+        return Mission.isValid(aiUnit)
+            && aiUnit.getUnit().isPerson()
+            && findTileImprovementPlan(aiUnit) != null
+            && (hasTools(aiUnit) || findColonyWithTools(aiUnit) != null);
+    }
+
+    /**
+     * Performs this mission.
+     *
+     * - Gets tools if needed.
+     * - Makes sure we have a valid plan.
+     * - Get to the target.
+     * - Claim it if necessary.
+     * - Make the improvement.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    public void doMission(Connection connection) {
+        final Unit unit = getUnit();
+        if (unit.getTile() == null) {
+            logger.finest("AI pioneer waiting to go to"
+                + getTransportDestination() + ": " + unit);
+            return;
         }
-        return true;
+
+        if (!hasTools()) { // Try to equip.
+            if (colonyWithTools != null
+                && !checkColonyForTools(colonyWithTools)) {
+                colonyWithTools = null;
+            }
+            if (colonyWithTools == null) { // Find a new colony.
+                colonyWithTools = findColonyWithTools(getAIUnit());
+            }
+            if (colonyWithTools == null) {
+                abandonTileImprovementPlan();
+                logger.finest("AI pioneer can not find equipment: " + unit);
+                return;
+            }
+
+            // Not there yet
+            if (unit.getTile() != colonyWithTools.getTile()) {
+                PathNode path = unit.findPath(colonyWithTools.getTile());
+                if (path == null) {
+                    if (unit.isOnCarrier()) {
+                        logger.finest("AI pioneer in transit to "
+                            + colonyWithTools.getName() + ": " + unit);
+                        return;
+                    }
+                    abandonTileImprovementPlan();
+                    logger.finest("AI pioneer can not find path to "
+                        + colonyWithTools.getName() + ": " + unit);
+                    colonyWithTools = null;
+                    return;
+                }
+
+                Direction direction = moveTowards(path);
+                if (direction != null && !moveButDontAttack(direction)) {
+                    abandonTileImprovementPlan();
+                    logger.finest("AI pioneer died en route to "
+                        + colonyWithTools.getName() + ": " + unit);
+                    return;
+                }
+
+                if (unit.getTile() != colonyWithTools.getTile()) {
+                    unit.setMovesLeft(0);
+                    logger.finest("AI pioneer at " + unit.getTile()
+                        + " en route to " + colonyWithTools.getName()
+                        + ": " + unit);
+                    return;
+                }
+            }
+
+            // Reached colony with tools, equip unit.
+            getAIUnit().equipForRole(Unit.Role.PIONEER, false);
+            if (!hasTools()) {
+                abandonTileImprovementPlan();
+                logger.finest("AI pioneer reached " + colonyWithTools.getName()
+                    + " but could not equip: " + unit);
+                return;
+            }
+            logger.finest("AI pioneer reached " + colonyWithTools.getName()
+                + " and equips: " + unit);
+            colonyWithTools = null;
+        }
+
+        // Check the plan still makes sense.
+        final Player player = unit.getOwner();
+        final EuropeanAIPlayer aiPlayer
+            = (EuropeanAIPlayer) getAIMain().getAIPlayer(player);
+        if (tileImprovementPlan != null
+            && !validateTileImprovementPlan(tileImprovementPlan, aiPlayer)) {
+            tileImprovementPlan = null;
+        }
+        if (tileImprovementPlan == null) { // Find a new plan.
+            AIUnit aiu = getAIUnit();
+            tileImprovementPlan = findTileImprovementPlan(aiu);
+            if (tileImprovementPlan == null) {
+                logger.finest("AI pioneer could not find an improvement: "
+                    + unit);
+                return;
+            }
+            tileImprovementPlan.setPioneer(aiu);
+        }
+    
+        // Move toward the target tile.
+        Tile target = tileImprovementPlan.getTarget();
+        if (unit.getTile() != target) {
+            PathNode path = unit.findPath(target);
+            if (path == null) {
+                if (unit.isOnCarrier()) {
+                    logger.finest("AI pioneer in transit to " + target
+                        + ": " + unit);
+                } else {
+                    logger.finest("AI pioneer can not get"
+                        + " from " + unit.getTile()
+                        + " to " + target
+                        + ": " + unit);
+                }
+                return;
+            }
+
+            Direction direction = moveTowards(path);
+            if (direction != null && !moveButDontAttack(direction)) {
+                abandonTileImprovementPlan();
+                logger.finest("AI pioneer died en route to " + target
+                    + ": " + unit);
+                return;
+            }
+
+            if (unit.getTile() != target) {
+                logger.finest("AI pioneer at " + unit.getTile()
+                    + " en route to " + target
+                    + ": " + unit);
+                unit.setMovesLeft(0);
+                return;
+            }
+        }
+
+        if (!player.owns(target)) {
+            // Take control of land before proceeding with mission.
+            // TODO: Decide whether to pay or steal.
+            // Currently always pay if we can, steal if we can not.
+            boolean fail = false;
+            int price = player.getLandPrice(target);
+            if (price < 0) {
+                fail = true;
+            } else {
+                if (price > 0 && !player.checkGold(price)) {
+                    price = NetworkConstants.STEAL_LAND;
+                }
+                if (!AIMessage.askClaimLand(aiPlayer.getConnection(), target,
+                                            null, price)
+                    || !player.owns(target)) { // Failed to take ownership
+                    fail = true;
+                }
+            }
+            if (fail) {
+                aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+                tileImprovementPlan.dispose();
+                tileImprovementPlan = null;
+                logger.finest("AI pioneer can not claim land at " + target
+                    + ": " + unit);
+                return;
+            }
+        }
+
+        if (unit.getState() == UnitState.IMPROVING) {
+            unit.setMovesLeft(0);
+            logger.finest("AI pioneer improving "
+                + tileImprovementPlan.getType() + ": " + unit);
+        } else if (unit.checkSetState(UnitState.IMPROVING)) {
+            // Ask to create the TileImprovement
+            if (AIMessage.askChangeWorkImprovementType(getAIUnit(),
+                    tileImprovementPlan.getType())) {
+                logger.finest("AI pioneer began improvement "
+                    + tileImprovementPlan.getType()
+                    + " at target " + target
+                    + ": " + unit);
+            } else {
+                aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+                tileImprovementPlan.dispose();
+                tileImprovementPlan = null;
+                logger.finest("AI pioneer failed to improve " + target
+                    + ": " + unit);
+            }
+        } else { // Probably just out of moves.
+            logger.finest("AI pioneer waiting to improve at " + target.getId()
+                + ": " + unit);
+        }
     }
 
     /**
@@ -588,24 +561,19 @@ public class PioneeringMission extends Mission {
      *      </ul>
      */
     public String getDebuggingInfo() {
-        switch(state){
-        case IMPROVING:
-            if(tileImprovementPlan == null){
-                return "No target";
-            }
+        if (hasTools()) {
+            if (tileImprovementPlan == null) return "No target";
             final String action = tileImprovementPlan.getType().getNameKey();
-            return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
-        case GET_TOOLS:
-            if (colonyWithTools == null) {
-                return "No target";
-            }
+            return tileImprovementPlan.getTarget().getPosition().toString()
+                + " " + action;
+        } else {
+            if (colonyWithTools == null) return "No target";
             return "Getting tools from " + colonyWithTools.getName();
-        default:
-            logger.warning("Unknown state");
-            return "";
         }
     }
 
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -619,33 +587,42 @@ public class PioneeringMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
         writeAttribute(out, "tileImprovementPlan", tileImprovementPlan);
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
 
         final String tileImprovementPlanStr
             = in.getAttributeValue(null, "tileImprovementPlan");
         if (tileImprovementPlanStr != null) {
-            tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementPlanStr);
+            tileImprovementPlan = (TileImprovementPlan)
+                getAIMain().getAIObject(tileImprovementPlanStr);
             if (tileImprovementPlan == null) {
-                tileImprovementPlan = new TileImprovementPlan(getAIMain(), tileImprovementPlanStr);
+                tileImprovementPlan = new TileImprovementPlan(getAIMain(),
+                    tileImprovementPlanStr);
             }
         } else {
             tileImprovementPlan = null;
         }
-
     }
 
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return "wishRealizationMission".
+     * @return "pioneeringMission".
      */
     public static String getXMLElementTagName() {
-        return "tileImprovementPlanMission";
+        return "pioneeringMission";
     }
 }

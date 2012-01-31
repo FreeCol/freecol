@@ -930,6 +930,19 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
     */
 
+    private List<AIUnit>getPlayerPioneers() {
+        List<AIUnit> pioneers = new ArrayList<AIUnit>();
+        AIMain aiMain = getAIMain();
+        for (Unit u : getPlayer().getUnits()) {
+            AIUnit aiu = aiMain.getAIUnit(u);
+            if (aiu == null) continue;
+            if (aiu.getMission() instanceof PioneeringMission) {
+                pioneers.add(aiu);
+            }
+        }
+        return pioneers;
+    }
+
     /**
      * Gives a mission to non-naval units.
      */
@@ -949,7 +962,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         final boolean fewColonies = hasFewColonies();
-        boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
+        boolean isPioneerReq = getPlayerPioneers().size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -1001,17 +1014,19 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
 
-            // Setup as a pioneer if unit is:
-            //      - already with tools, or
-            //      - an expert pioneer, or
-            //      - a non-expert unit and there are no other units assigned as pioneers
+            // Setup as a pioneer if unit:
+            // - already has tools
+            // - an expert pioneer
+            // - a non-expert unit and there are no other units assigned as pioneers
             boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
                                 || unit.hasAbility(Ability.EXPERT_PIONEER);
             boolean isExpert = unit.getSkillLevel() > 0;
-            if ((isPioneer || (isPioneerReq && !isExpert)) && PioneeringMission.isValid(aiUnit)) {
-                aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
-                isPioneerReq = false;
-                continue;
+            if (isPioneer || (isPioneerReq && !isExpert)) {
+                if (PioneeringMission.isValid(aiUnit)) {
+                    aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
+                    isPioneerReq = false;
+                    continue;
+                }
             }
 
             if (unit.isColonist()) {
@@ -1113,12 +1128,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         // Choose to build a new colony:
         if (colonyTile != null) {
-            Mission mission = new BuildColonyMission(getAIMain(),
-                                                     aiUnit,
-                                                     colonyTile,
-                                                     getPlayer().getColonyValue(colonyTile));
-            aiUnit.setMission(mission);
-
+            aiUnit.setMission(new BuildColonyMission(getAIMain(),
+                    aiUnit, colonyTile,
+                    getPlayer().getColonyValue(colonyTile)));
             boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
             if (isUnitOnCarrier) {
                 // Verify carrier mission

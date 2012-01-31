@@ -524,8 +524,8 @@ abstract public class Settlement extends GoodsLocation
      * Return true if this Colony could build at least one item of the
      * given EquipmentType.
      *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return a <code>boolean</code> value
+     * @param equipmentType The <code>EquipmentType</code> to build.
+     * @return True if the equipment can be built.
      */
     public boolean canBuildEquipment(EquipmentType equipmentType) {
         for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
@@ -559,6 +559,20 @@ abstract public class Settlement extends GoodsLocation
         return true;
     }
 
+    /**
+     * Return true if this Settlement could provide at least one item of
+     * all the given EquipmentTypes.  This is designed specifically to
+     * mesh with getRoleEquipment().
+     *
+     * @param equipment A list of <code>EquipmentType</code>s to build.
+     * @return True if the settlement can provide all the equipment.
+     */
+    public boolean canProvideEquipment(List<EquipmentType> equipment) {
+        for (EquipmentType e : equipment) {
+            if (!canProvideEquipment(e)) return false;
+        }
+        return true;
+    }
 
     /**
      * Write the attributes of this object to a stream.

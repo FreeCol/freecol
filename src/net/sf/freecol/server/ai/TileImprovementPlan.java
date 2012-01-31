@@ -125,7 +125,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * no longer wanted.
      */
     public void dispose() {
-        if (pioneer != null && pioneer.getMission() != null) {
+        if (pioneer != null
+            && pioneer.getMission() instanceof PioneeringMission) {
             ((PioneeringMission) pioneer.getMission()).setTileImprovementPlan(null);
         }
         super.dispose();

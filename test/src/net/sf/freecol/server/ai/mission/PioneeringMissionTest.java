@@ -19,8 +19,12 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.List;
+
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -29,8 +33,11 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TileImprovementPlan;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -39,11 +46,15 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PioneeringMissionTest extends FreeColTestCase {
 
+    private static final GoodsType toolsGoodsType
+        = spec().getGoodsType("model.goods.tools");
+
     private static final EquipmentType toolsEqType
         = spec().getEquipmentType("model.equipment.tools");
 
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
+
 
 
     @Override
@@ -54,42 +65,70 @@ public class PioneeringMissionTest extends FreeColTestCase {
 
 
     public void testImprovementNoLongerValid() {
+        final List<EquipmentType> pioneerEquipment
+            = Unit.Role.PIONEER.getRoleEquipment(spec());
+
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-
-        // Create player and unit
+        
+        // Get player, colony and unit
         ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        Tile unitTile = map.getTile(2, 2);
-        Unit colonist = new ServerUnit(game, unitTile, player, colonistType, toolsEqType);
-
-        // Setup mission
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) aiMain.getAIPlayer(player);
+        Colony colony = getStandardColony();
+        AIColony aiColony = aiMain.getAIColony(colony);
+        Unit colonist = new ServerUnit(game, colony.getTile(), player,
+            colonistType);
         AIUnit aiUnit = aiMain.getAIUnit(colonist);
         assertNotNull(aiUnit);
-        Tile improvementTarget = map.getTile(10, 10);
-        TileImprovementType roadImprovement = spec().getTileImprovementType("model.improvement.road");
-        TileImprovementPlan improvement =  new TileImprovementPlan(aiMain, improvementTarget, roadImprovement, 100);
-        improvement.setPioneer(aiUnit);
-        PioneeringMission mission = new PioneeringMission(aiMain,aiUnit);
-        mission.setTileImprovementPlan(improvement);
+        aiUnit.abortMission("Test");
+
+        // Check there are improvements to be made.
+        aiColony.createTileImprovementPlans();
+        List<TileImprovementPlan> improvements
+            = aiPlayer.getTileImprovementPlans();
+        assertTrue("There should be valid improvements",
+            !improvements.isEmpty());
+
+        // Setup mission
+        assertFalse("Pioneering should be invalid (no tools)",
+            PioneeringMission.isValid(aiUnit));
+
+        // Add some tools to the colony, mission should become viable.
+        colony.addGoods(toolsGoodsType, 100);
+        assertTrue("Colony can provide tools",
+            colony.canProvideEquipment(pioneerEquipment));
+        assertEquals("Colony found", colony,
+            PioneeringMission.findColonyWithTools(aiUnit));
+        assertNull(aiUnit.getMission());
+        assertTrue(Mission.isValid(aiUnit));
+        assertTrue(colonist.isPerson());
+        assertTrue("Pioneering should be valid (tools present in colony)",
+            PioneeringMission.isValid(aiUnit));
+
+        // Move tools to the unit and try again.
+        colony.addGoods(toolsGoodsType, -100);
+        colonist.changeEquipment(toolsEqType, 1);
+        assertNotNull("TileImprovementPlan found",
+            PioneeringMission.findTileImprovementPlan(aiUnit));
+        assertTrue("Pioneering should be valid (unit has tools)",
+            PioneeringMission.isValid(aiUnit));
+
+        PioneeringMission mission = new PioneeringMission(aiMain, aiUnit);
+        assertTrue("Mission should be valid", mission.isValid());
+        TileImprovementPlan tip = mission.getTileImprovementPlan();
+        assertNotNull("Mission should have a plan", tip);
+        Tile target = tip.getTarget();
+        assertNotNull("Plan should have a target", target);
         aiUnit.setMission(mission);
 
-        //Verify assigned mission
-        Mission unitMission = aiUnit.getMission();
-        assertNotNull("Colonist should have been assigned a mission", unitMission);
-        boolean hasPioneeringMission = unitMission instanceof PioneeringMission;
-        assertTrue("Colonist should have been assigned a Pioneering mission",hasPioneeringMission);
-        assertTrue("Pioneering mission should be valid", aiUnit.getMission().isValid());
-
         // Simulate improvement tile getting road other than by unit
-        TileImprovement tileRoad = new TileImprovement(game, improvementTarget, roadImprovement);
-        tileRoad.setTurnsToComplete(0);
-        improvementTarget.setTileItemContainer(new TileItemContainer(game, improvementTarget));
-        improvementTarget.getTileItemContainer().addTileItem(tileRoad);
-        assertTrue("Tile should have road", improvementTarget.hasRoad());
-
+        target.setTileItemContainer(new TileItemContainer(game, target));
+        TileImprovement imp = new TileImprovement(game, target, tip.getType());
+        imp.setTurnsToComplete(0);
+        target.getTileItemContainer().addTileItem(imp);
         // Verify that mission no longer valid
-        assertFalse("Pioneering mission should not be valid anymore", aiUnit.getMission().isValid());
+        assertFalse("Pioneering mission should not be valid anymore",
+            mission.isValid());
     }
 }

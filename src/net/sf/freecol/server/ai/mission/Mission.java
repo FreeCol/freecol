@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -388,11 +389,16 @@ public abstract class Mission extends AIObject {
     /**
      * Should the unit use transport to get to a specified tile?
      *
-     * True if the unit is not there already and:
+     * True if:
+     * - The unit is not there already
+     * AND
      * - the unit is already has transport, this will always be faster
-     *   (TODO: mounted units on good roads might be faster, check for this)
+     *   (TODO: actually, mounted units on good roads might be faster,
+     *   check for this)
      * - if not on the map
-     * - if on the map but can not find a path to the tile
+     * - if on the map but can not find a path to the tile, unless
+     *   adjacent to the destination which usually means the path
+     *   finding failed due to a temporary blockage such as an enemty unit
      *
      * @param tile The <code>Tile</code> to go to.
      * @return True if the unit should use transport.
@@ -402,16 +408,48 @@ public abstract class Mission extends AIObject {
         return (unit.getTile() != tile)
             && (unit.isOnCarrier()
                 || unit.getTile() == null
-                || unit.findPath(tile) == null);
+                || (unit.findPath(tile) == null
+                    && !unit.getTile().isAdjacent(tile)));
     }
 
+    /**
+     * Gets a suitable tile to start path searches from for a unit.
+     *
+     * Must handle all the cases where the unit is off the map, and
+     * take account of the use of a carrier.
+     *
+     * If the unit is in or heading to Europe, return null because there
+     * is no good way to tell where the unit will reappear on the map,
+     * which is in question anyway if not on a carrier.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return A suitable starting tile, or null if none found.
+     */
+    protected static Tile getPathStartTile(Unit unit) {
+        Location loc;
+        if (unit.isOnCarrier()) {
+            final Unit carrier = (Unit)unit.getLocation();
+            if (carrier.getTile() != null) {
+                return carrier.getTile();
+            } else if (carrier.getDestination() instanceof Map) {
+                return carrier.getFullEntryLocation();
+            } else if (carrier.getDestination() instanceof Colony) {
+                return ((Colony)carrier.getDestination()).getTile();
+            }
+        } else if (unit.getTile() != null) {
+            return unit.getTile();
+        }
+        // Must be heading to or in Europe.
+        return null;
+    }
 
     // Fake implementation of Transportable interface.
     // Missions are not actually Transportables but the units that are
     // performing a mission delegate to these routines.
 
     /**
-     * Gets the destination of a required transport.
+     * Gets the transport destination of the unit associated with this
+     * mission.
      *
      * @return The destination of a required transport or
      *         <code>null</code> if no transport is needed.
@@ -453,8 +491,8 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
+     * Gets the priority of getting the unit to the transport
+     * destination.
      *
      * @return The priority.
      */
@@ -471,11 +509,12 @@ public abstract class Mission extends AIObject {
      * Checks if this mission is still valid to perform.  At this
      * level, if the unit was killed then the mission becomes invalid.
      *
-     * A mission can be invalidated for a number of reasons. For
-     * example: a seek-and-destroy mission can be invalidated in case
-     * the relationship towards the targeted player improves.
+     * A mission can be invalidated for a number of subclass-specific
+     * reasons.  For example: a seek-and-destroy mission could be
+     * invalidated when the relationship towards the targeted player
+     * improves.
      *
-     * @return True if the unit is still intact.
+     * @return True if the unit is still intact to perform its mission.
      */
     public boolean isValid() {
         return getUnit() != null && !getUnit().isDisposed();
@@ -484,21 +523,22 @@ public abstract class Mission extends AIObject {
     /**
      * Checks if this mission is valid for the given unit.
      *
-     * @param aiUnit The unit.
-     * @return <code>true</code> if this mission is valid to perform
-     *         and <code>false</code> otherwise.
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return True if the unit can be usefully assigned this mission.
      */
     public static boolean isValid(AIUnit aiUnit) {
-        return aiUnit.getMission() == null
+        return aiUnit != null
+            && aiUnit.getMission() == null
             && aiUnit.getUnit() != null
             && !aiUnit.getUnit().isDisposed()
             && !aiUnit.getUnit().isUnderRepair();
     }
 
     /**
-     * Returns true if this Mission should only be carried out once.
-     * Missions are not one-time by default, true one-time missions must
-     * override this routine.
+     * Checks if this Mission should only be carried out once.
+     *
+     * Missions are not one-time by default, true one-time missions
+     * must override this routine.
      *
      * @return False.
      */
@@ -514,16 +554,15 @@ public abstract class Mission extends AIObject {
     public abstract void doMission(Connection connection);
 
     /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
+     * Gets debugging information about this mission.  This string is
+     * a short representation of this object's state.
      *
-     * @return An empty <code>String</code>. Should be
-     *      replaced by subclasses.
+     * @return "".
      */
     public String getDebuggingInfo() {
         return "";
     }
+
 
     // Serialization
 
