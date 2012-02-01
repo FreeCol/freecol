@@ -271,7 +271,7 @@ public final class FreeColClient {
      * @return A ServerAPI.
      */
     public ServerAPI askServer() {
-        if (serverAPI == null) serverAPI = new ServerAPI(this, gui);
+        if (serverAPI == null) serverAPI = new ServerAPI(this);
         return serverAPI;
     }
 
