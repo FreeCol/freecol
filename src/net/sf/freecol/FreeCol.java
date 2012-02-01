@@ -177,9 +177,6 @@ public final class FreeCol {
         createAndSetDirectories();
         initLogging();
 
-        if (freeColSeed == 0L) freeColSeed = new SecureRandom().nextLong();
-        logger.info("Using seed: " + freeColSeed);
-
         Locale locale = getLocale();
         Locale.setDefault(locale);
         Messages.setMessageBundle(locale);
@@ -921,6 +918,10 @@ public final class FreeCol {
      * @return The seed.
      */
     public static long getFreeColSeed() {
+        if (freeColSeed == 0L) {
+            freeColSeed = new SecureRandom().nextLong();
+            logger.info("Using seed: " + freeColSeed);
+        }
         return freeColSeed;
     }
 
@@ -928,7 +929,8 @@ public final class FreeCol {
      * Increments the seed for the PRNG.
      */
     public static void incrementFreeColSeed() {
-        freeColSeed++;
+        freeColSeed = getFreeColSeed() + 1;
+        logger.info("Reseeded with: " + freeColSeed);
     }
 
     /**
