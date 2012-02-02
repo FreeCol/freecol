@@ -307,8 +307,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 // at the destination, and perhaps the bugs are now sorted.
                 PathNode path = map.findPathToEurope(this,
                     settlement.getTile(), CostDeciders.serverAvoidIllegal());
-                Tile entry = (path == null) ? getFullEntryLocation()
-                    : path.getLastNode().getTile();
+                Tile entry;
+                if (path == null) {
+                    entry = getFullEntryLocation();
+                } else {
+                    entry = path.getLastNode().getTile();
+                    setEntryLocation(entry);
+                }
                 csMove(entry, random, cs);
                 logger.info(toString() + " arrives in America"
                     + ", sailing for" + settlement.getName()
