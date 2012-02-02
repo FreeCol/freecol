@@ -456,7 +456,6 @@ public class GUI {
     }
 
     public void refresh() {
-        frame.paintAll(canvas.getGraphics());
         mapViewer.forceReposition();
         canvas.refresh();
     }
