@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.video;
+package net.sf.freecol.common.resources;
 
 import java.net.URL;
 
@@ -37,7 +37,7 @@ public class Video {
         this.url = url;
     }
     
-    URL getURL() {
+    public URL getURL() {
         return url;
     }
 }

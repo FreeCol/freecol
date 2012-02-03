@@ -33,8 +33,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.FAFile;
-import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 

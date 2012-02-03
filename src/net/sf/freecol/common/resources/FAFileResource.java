@@ -22,7 +22,6 @@ package net.sf.freecol.common.resources;
 import java.net.URI;
 import java.net.URL;
 
-import net.sf.freecol.client.gui.FAFile;
 
 
 /**

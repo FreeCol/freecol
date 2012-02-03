@@ -37,8 +37,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 

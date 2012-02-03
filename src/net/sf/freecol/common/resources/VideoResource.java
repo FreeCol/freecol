@@ -22,7 +22,6 @@ package net.sf.freecol.common.resources;
 import java.net.URI;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.video.Video;
 
 /**
  * A <code>Resource</code> wrapping a <code>Video</code>.

@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.common.resources.Video;
 
 import com.fluendo.player.Cortado;
 

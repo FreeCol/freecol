@@ -121,7 +121,6 @@ import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
-import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
@@ -150,6 +149,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.Video;
 
 /**
  * The main container for the other GUI components in FreeCol. This container is
