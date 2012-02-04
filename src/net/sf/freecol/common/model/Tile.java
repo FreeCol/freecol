@@ -654,6 +654,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Is this tile in the polar regions?
+     *
+     * @return True if the tile is polar.
+     */
+    public boolean isPolar() {
+        return getMap().isPolar(this);
+    }
+
+    /**
      * Returns <code>true</code> if this Tile is a land Tile, 'false' otherwise.
      *
      * @return <code>true</code> if this Tile is a land Tile, 'false' otherwise.

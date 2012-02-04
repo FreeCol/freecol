@@ -240,7 +240,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 for (int tries=0; tries<100; tries++) {
                     Position p = map.getRandomLandPosition(random);
                     Tile t = map.getTile(p);
-                    if (map.isPolar(t)) continue; // No polar lost cities
+                    if (t.isPolar()) continue; // No polar lost cities
                     if (t.isLand() && !t.hasLostCityRumour()
                         && t.getSettlement() == null && t.getUnitCount() == 0) {
                         LostCityRumour r = new LostCityRumour(t.getGame(), t);
@@ -353,7 +353,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = spec.getRangeOption("model.option.settlementNumber").getValue();
         List<Tile> settlementTiles = new ArrayList<Tile>();
         tiles: for (Tile tile : map.getAllTiles()) {
-            if (!map.isPolar(tile) && suitableForNativeSettlement(tile)) {
+            if (!tile.isPolar() && suitableForNativeSettlement(tile)) {
                 for (Tile t : settlementTiles) {
                     if (tile.getDistanceTo(t) < minSettlementDistance) {
                         continue tiles;
@@ -867,7 +867,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = map.getFloodFillIterator(startTile.getPosition());
         while (cti.hasNext()) {
             Tile tempTile = map.getTile(cti.next());
-            if (map.isPolar(tempTile)) {
+            if (tempTile.isPolar()) {
                 // do not place the initial colony at the pole
                 continue;
             }
