@@ -1032,7 +1032,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 try {
                     giveColonistMission(aiUnit, fewColonies, workerWishes);
                 } catch (Exception e) {
-                    throw new IllegalStateException("GCM: " + unit);
+                    throw new IllegalStateException("GCM " + unit
+                                                    + ": " + e.getMessage());
                 }
             }
 

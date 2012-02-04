@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Location;
@@ -35,11 +38,14 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TileImprovementPlan;
@@ -56,7 +62,14 @@ public class PioneeringMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
-    /** Maximum number of turns to travel to make progress on pioneering. */
+    /**
+     * Maximum number of turns to travel to make progress on
+     * pioneering.  This is low-ish because it is usually more
+     * efficient to ship the tools where they are needed and either
+     * create a new pioneer on site or send a hardy pioneer on
+     * horseback.  The AI is probably smart enough to do the former
+     * already, and one day the latter.
+     */
     private static final int MAX_TURNS = 10;
 
     /** The improvement this pioneer is to work on. */
@@ -135,6 +148,18 @@ public class PioneeringMission extends Mission {
     }
 
     /**
+     * Abandons the current plan if any.
+     */
+    private void abandonTileImprovementPlan() {
+        if (tileImprovementPlan != null) {
+            if (tileImprovementPlan.getPioneer() == getAIUnit()) {
+                tileImprovementPlan.setPioneer(null);
+            }
+            tileImprovementPlan = null;
+        }
+    }
+
+    /**
      * Disposes of this pioneering mission.
      */
     public void dispose() {
@@ -142,6 +167,15 @@ public class PioneeringMission extends Mission {
         super.dispose();
     }
 
+
+    /**
+     * Convenience accessor for the owning European AI player.
+     *
+     * @return The <code>EuropeanAIPlayer</code>.
+     */
+    private EuropeanAIPlayer getEuropeanAIPlayer() {
+        return (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
+    }
 
     /**
      * Does a supplied unit have tools?
@@ -165,58 +199,54 @@ public class PioneeringMission extends Mission {
     /**
      * Checks if a colony can provide the tools required for a pioneer.
      *
+     * @param aiUnit The <code>AIUnit</code> that needs tools.
      * @param colony The <code>Colony</code> to check.
      * @return True if the colony can provide tools.
      */
-    private boolean checkColonyForTools(Colony colony) {
-        final List<EquipmentType> pioneerEquipment
-            = Unit.Role.PIONEER.getRoleEquipment(getSpecification());
+    private static boolean checkColonyForTools(AIUnit aiUnit, Colony colony) {
         return colony != null
             && !colony.isDisposed()
-            && colony.getOwner() == getUnit().getOwner()
-            && colony.canProvideEquipment(pioneerEquipment);
+            && colony.getOwner() == aiUnit.getUnit().getOwner()
+            && colony.canProvideEquipment(Unit.Role.PIONEER
+                .getRoleEquipment(colony.getSpecification()));
     }
+
 
     /**
      * Finds the closest colony within MAX_TURNS that can equip the unit.
      * Public for the test suite.
      *
-     * @param aiu The <code>AIUnit</code> to equip.
+     * @param aiUnit The <code>AIUnit</code> to equip.
      * @return The closest colony that can equip the unit.
      */
-    public static Colony findColonyWithTools(AIUnit aiu) {
-        final Unit unit = aiu.getUnit();
+    public static Colony findColonyWithTools(final AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
         if (unit == null || unit.isDisposed()) return null;
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
+
         final Tile startTile = getPathStartTile(unit);
-        final List<EquipmentType> pioneerEquipment
-            = Unit.Role.PIONEER.getRoleEquipment(aiu.getSpecification());
-
-        Colony best = null;
-        int bestValue = Integer.MIN_VALUE;
-        for (Colony colony : unit.getOwner().getColonies()) {
-            if (!colony.canProvideEquipment(pioneerEquipment)) continue;
-
-            AIColony ac = aiu.getAIMain().getAIColony(colony);
-            if (ac == null) continue;
-
-            if (startTile == colony.getTile()) return colony;
-
-            PathNode path = (startTile == null) 
-                ? unit.getGame().getMap().findPathToEurope(colony.getTile())
-                : unit.findPath(startTile, colony.getTile(), carrier);
-            int turns = (path != null) ? path.getTotalTurns()
-                : (colony.getTile().isAdjacent(startTile)) ? 1
-                : -1;
-            if (turns < 0 || turns > MAX_TURNS) continue;
-            int value = MAX_TURNS - turns;
-            if (value > bestValue) {
-                bestValue = value;
-                best = colony;
-            }
+        if (startTile == null) return null;
+        if (checkColonyForTools(aiUnit, startTile.getColony())) {
+            return startTile.getColony();
         }
-        return best;
+
+        final GoalDecider equipDecider = new GoalDecider() {
+                private PathNode best = null;
+
+                public PathNode getGoal() { return best; }
+                public boolean hasSubGoals() { return false; }
+                public boolean check(Unit u, PathNode path) {
+                    Colony colony = path.getTile().getColony();
+                    if (checkColonyForTools(aiUnit, colony)) {
+                        best = path;
+                        return true;
+                    }
+                    return false;
+                }
+            };
+        PathNode path = unit.search(startTile, equipDecider,
+            CostDeciders.avoidIllegal(), MAX_TURNS, 
+            (unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null);
+        return (path == null) ? null : path.getLastNode().getTile().getColony();
     }
 
     /**
@@ -258,62 +288,65 @@ public class PioneeringMission extends Mission {
      * @return True if the plan is valid.
      */
     private boolean checkTileImprovementPlan(TileImprovementPlan tip) {
-        return validateTileImprovementPlan(tip,
-            (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner()));
+        return validateTileImprovementPlan(tip, getEuropeanAIPlayer());
     }
 
     /**
      * Finds the best tile improvement plan for a supplied AI unit.
      * Public for the test suite.
      *
-     * @param aiu The <code>AIUnit</code> to find a plan for.
+     * @param aiUnit The <code>AIUnit</code> to find a plan for.
      * @return The best available tile improvement plan, or null if none found.
      */
-    public static TileImprovementPlan findTileImprovementPlan(AIUnit aiu) {
-        final Unit unit = aiu.getUnit();
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
-        final Player player = unit.getOwner();
-        final EuropeanAIPlayer aiPlayer
-            = (EuropeanAIPlayer)aiu.getAIMain().getAIPlayer(player);
-        final Tile startTile = getPathStartTile(unit);
+    public static TileImprovementPlan findTileImprovementPlan(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        if (unit == null || unit.isDisposed()) return null;
 
-        // Choose the best plan.
-        TileImprovementPlan best = null;
-        int bestValue = Integer.MIN_VALUE;
+        final Tile startTile = getPathStartTile(unit);
+        if (startTile == null) return null;
+
+        // Build the TileImprovementPlan map.
+        final HashMap<Tile, TileImprovementPlan> tipMap
+            = new HashMap<Tile, TileImprovementPlan>();
+        final EuropeanAIPlayer aiPlayer
+            = (EuropeanAIPlayer)aiUnit.getAIMain().getAIPlayer(unit.getOwner());
         for (TileImprovementPlan tip : aiPlayer.getTileImprovementPlans()) {
             if (!validateTileImprovementPlan(tip, aiPlayer)) continue;
-            if (tip.getPioneer() == aiu) return tip;
+            if (tip.getPioneer() == aiUnit) return tip;
             if (tip.getPioneer() != null) continue;
-            
             if (startTile == tip.getTarget()) return tip;
-
-            PathNode path = (startTile == null)
-                ? unit.getGame().getMap().findPathToEurope(tip.getTarget())
-                : unit.findPath(startTile, tip.getTarget(), carrier);
-            int turns = (path != null) ? path.getTotalTurns()
-                : (tip.getTarget().isAdjacent(startTile)) ? 1
-                : -1;
-            if (turns < 0 || turns > MAX_TURNS) continue;
-            int value = tip.getValue() - 5 * turns;
-            if (value > bestValue) {
-                bestValue = value;
-                best = tip;
+            TileImprovementPlan other = tipMap.get(tip.getTarget());
+            if (other == null || other.getValue() < tip.getValue()) {
+                tipMap.put(tip.getTarget(), tip);
             }
         }
-        return best;
-    }
 
-    /**
-     * Abandons the current plan if any.
-     */
-    private void abandonTileImprovementPlan() {
-        if (tileImprovementPlan != null) {
-            if (tileImprovementPlan.getPioneer() == getAIUnit()) {
-                tileImprovementPlan.setPioneer(null);
-            }
-            tileImprovementPlan = null;
-        }
+        // Find the best TileImprovementPlan.
+        final GoalDecider tipDecider = new GoalDecider() {
+                private PathNode best = null;
+                private int bestValue = Integer.MIN_VALUE;
+
+                public PathNode getGoal() { return best; }
+                public boolean hasSubGoals() { return false; }
+                public boolean check(Unit u, PathNode path) {
+                    TileImprovementPlan tip = tipMap.get(path.getTile());
+                    if (tip != null) {
+                        int value = tip.getValue() - 5 * path.getTotalTurns();
+                        if (value > bestValue) {
+                            bestValue = value;
+                            best = path;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+        if (tipMap.get(startTile) != null) return tipMap.get(startTile);
+        PathNode path = (tipMap.isEmpty()) ? null
+            : unit.search(startTile, tipDecider,
+                CostDeciders.avoidIllegal(), MAX_TURNS,
+                (unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null);
+        return (path == null) ? null : tipMap.get(path.getLastNode().getTile());
     }
 
     // Fake Transportable interface.
@@ -327,10 +360,9 @@ public class PioneeringMission extends Mission {
         Tile target = (hasTools())
             ? ((!checkTileImprovementPlan(tileImprovementPlan)) ? null
                 : tileImprovementPlan.getTarget())
-            : ((!checkColonyForTools(colonyWithTools)) ? null
+            : ((!checkColonyForTools(getAIUnit(), colonyWithTools)) ? null
                 : colonyWithTools.getTile());
-        return (target != null && shouldTakeTransportToTile(target)) ? target
-            : null;
+        return (shouldTakeTransportToTile(target)) ? target : null;
     }
 
     // Mission interface
@@ -344,13 +376,13 @@ public class PioneeringMission extends Mission {
         return super.isValid()
             && getUnit().isPerson()
             && checkTileImprovementPlan(tileImprovementPlan)
-            && (hasTools() || checkColonyForTools(colonyWithTools));
+            && (hasTools() || checkColonyForTools(getAIUnit(), colonyWithTools));
     }
 
     /**
      * Checks if this mission is valid for the given unit.
      *
-     * @param aiUnit The unit.
+     * @param aiUnit The <code>AIUnit</code> to check.
      * @return True if the AI unit can be assigned a PioneeringMission.
      */
     public static boolean isValid(AIUnit aiUnit) {
@@ -381,7 +413,7 @@ public class PioneeringMission extends Mission {
 
         if (!hasTools()) { // Try to equip.
             if (colonyWithTools != null
-                && !checkColonyForTools(colonyWithTools)) {
+                && !checkColonyForTools(getAIUnit(), colonyWithTools)) {
                 colonyWithTools = null;
             }
             if (colonyWithTools == null) { // Find a new colony.
@@ -441,8 +473,7 @@ public class PioneeringMission extends Mission {
 
         // Check the plan still makes sense.
         final Player player = unit.getOwner();
-        final EuropeanAIPlayer aiPlayer
-            = (EuropeanAIPlayer) getAIMain().getAIPlayer(player);
+        final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
         if (tileImprovementPlan != null
             && !validateTileImprovementPlan(tileImprovementPlan, aiPlayer)) {
             tileImprovementPlan = null;

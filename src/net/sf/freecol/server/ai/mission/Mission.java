@@ -404,7 +404,8 @@ public abstract class Mission extends AIObject {
      */
     protected boolean shouldTakeTransportToTile(Tile tile) {
         final Unit unit = getUnit();
-        return (unit.getTile() != tile)
+        return tile != null
+            && unit.getTile() != tile
             && (unit.isOnCarrier()
                 || unit.getTile() == null
                 || (unit.findPath(tile) == null
