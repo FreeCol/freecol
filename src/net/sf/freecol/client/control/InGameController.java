@@ -1400,7 +1400,7 @@ public final class InGameController implements NetworkConstants {
         NoClaimReason reason = player.canClaimToFoundSettlementReason(tile);
         if (reason != NoClaimReason.NONE
             && reason != NoClaimReason.NATIVES) {
-            gui.showInformationMessage("badTileUse."
+            gui.showInformationMessage("noClaimReason."
                 + reason.toString().toLowerCase(Locale.US));
             return;
         }
