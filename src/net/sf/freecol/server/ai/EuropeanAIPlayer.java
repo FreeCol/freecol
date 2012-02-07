@@ -1061,7 +1061,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (Wish w : al) {
                 if (w.getDestination() != null
                     && !distances.containsKey(w.getDestination())) {
-                    distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
+                    distances.put(w.getDestination(), 
+                        ((w.getDestination() == unit.getLocation()) ? 0
+                            : unit.getTurnsToReach(w.getDestination())));
                 }
             }
         }
