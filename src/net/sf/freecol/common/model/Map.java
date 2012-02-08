@@ -1167,33 +1167,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Select a random land position on the map.
-     *
-     * <b>Warning:</b> This method should not be used by any model
-     * object unless we have completed restructuring the model
-     * (making all model changes at the server). The reason is
-     * the use of random numbers in this method.
-     *
-     * @param random A <code>Random</code> number source.
-     * @return Position selected
-     */
-    public Position getRandomLandPosition(Random random) {
-        int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5
-            : random.nextInt(getWidth());
-        int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5
-            : random.nextInt(getHeight());
-        Position centerPosition = new Position(x, y);
-        Iterator<Position> it = getFloodFillIterator(centerPosition);
-        while (it.hasNext()) {
-            Position p = it.next();
-            if (getTile(p).isLand()) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Represents a position on the Map.
      */
     public static final class Position {

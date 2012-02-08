@@ -95,6 +95,32 @@ public class TerrainGenerator {
     }
 
     /**
+     * Select a random land position on the map.
+     *
+     * <b>Warning:</b> This method should not be used by any model
+     * object unless we have completed restructuring the model
+     * (making all model changes at the server). The reason is
+     * the use of random numbers in this method.
+     *
+     * @param map The <code>Map</code> to search in.
+     * @param random A <code>Random</code> number source.
+     * @return Position selected
+     */
+    public Position getRandomLandPosition(Map map, Random random) {
+        int x = (map.getWidth() < 10) ? random.nextInt(map.getWidth())
+            : random.nextInt(map.getWidth() - 10) + 5;
+        int y = (map.getHeight() < 10) ? random.nextInt(map.getHeight())
+            : random.nextInt(map.getHeight() - 10) + 5;
+        Position centerPosition = new Position(x, y);
+        Iterator<Position> it = map.getFloodFillIterator(centerPosition);
+        while (it.hasNext()) {
+            Position p = it.next();
+            if (map.getTile(p).isLand()) return p;
+        }
+        return null;
+    }
+
+    /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
      *
      * The <code>Map</code> is added to the <code>Game</code> after
@@ -1041,7 +1067,7 @@ public class TerrainGenerator {
         int counter = 0;
         nextTry: for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
-                Position p = map.getRandomLandPosition(random);
+                Position p = getRandomLandPosition(map, random);
                 if (p == null) {
                     // this can only happen if the map contains no land
                     return;
@@ -1115,7 +1141,7 @@ public class TerrainGenerator {
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
-                Position p = map.getRandomLandPosition(random);
+                Position p = getRandomLandPosition(map, random);
                 Tile t = map.getTile(p);
                 if (t.getType() == hills || t.getType() == mountains) {
                     // already a high ground
@@ -1166,7 +1192,7 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Position position = map.getRandomLandPosition(random);
+                Position position = getRandomLandPosition(map, random);
                 if (!map.getTile(position).getType().canHaveImprovement(riverType)) {
                     continue;
                 }

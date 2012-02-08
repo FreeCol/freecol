@@ -238,7 +238,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 .getInteger("model.option.rumourDifficulty");
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
-                    Position p = map.getRandomLandPosition(random);
+                    Position p = terrainGenerator.getRandomLandPosition(map, random);
                     Tile t = map.getTile(p);
                     if (t.isPolar()) continue; // No polar lost cities
                     if (t.isLand() && !t.hasLostCityRumour()
@@ -298,14 +298,14 @@ public class SimpleMapGenerator implements MapGenerator {
                 = ((IndianNationType) player.getNationType()).getRegionNames();
             Territory territory = null;
             if (regionNames == null || regionNames.isEmpty()) {
-                territory = new Territory(player, map.getRandomLandPosition(random));
+                territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
                 territoryMap.put(player.getId(), territory);
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
                         ServerRegion region = (ServerRegion) map.getRegion(name);
                         if (region == null) {
-                            territory = new Territory(player, map.getRandomLandPosition(random));
+                            territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
                         } else {
                             territory = new Territory(player, region);
                         }
@@ -337,7 +337,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (territory == null) {
                         logger.warning("Unable to find free region for "
                                        + player.getName());
-                        territory = new Territory(player, map.getRandomLandPosition(random));
+                        territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
                         territoryMap.put(player.getId(), territory);
                     }
                 }
