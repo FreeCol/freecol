@@ -942,6 +942,20 @@ public final class InGameController extends Controller {
         return template;
     }
 
+    private String getNonPlayerNation() {
+        int nations = Nation.EUROPEAN_NATIONS.length;
+        int start = Utils.randomInt(logger, "Random nation", random, nations);
+        for (int index = 0; index < nations; index++) {
+            String nationId = "model.nation."
+                + Nation.EUROPEAN_NATIONS[(start + index) % nations];
+            if (getGame().getPlayer(nationId) == null) {
+                return nationId + ".name";
+            }
+        }
+        // this should never happen
+        return "";
+    }
+
     /**
      * Resolves a tax raise.
      *
@@ -994,7 +1008,8 @@ public final class InGameController extends Controller {
             if (action == MonarchAction.RAISE_TAX_WAR) {
                 template = template.add("%nation%", getNonPlayerNation());
             } else if (action == MonarchAction.RAISE_TAX_ACT) {
-                template = template.addAmount("%number%", random.nextInt(6))
+                template = template.addAmount("%number%",
+                    Utils.randomInt(logger, "Tax act goods", random, 6))
                     .addName("%newWorld%", serverPlayer.getNewLandName());
             }
             message = new MonarchActionMessage(action, template);
@@ -1026,7 +1041,8 @@ public final class InGameController extends Controller {
             if (action == MonarchAction.LOWER_TAX_WAR) {
                 template = template.add("%nation%", getNonPlayerNation());
             } else {
-                template = template.addAmount("%number%", random.nextInt(5));
+                template = template.addAmount("%number%",
+                    Utils.randomInt(logger, "Lower tax reason", random, 5));
             }
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action, template));
@@ -3879,18 +3895,4 @@ public final class InGameController extends Controller {
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
-
-    private String getNonPlayerNation() {
-        int nations = Nation.EUROPEAN_NATIONS.length;
-        int start = random.nextInt(nations);
-        for (int index = 0; index < nations; index++) {
-            String nationId = "model.nation." + Nation.EUROPEAN_NATIONS[(start+index)%nations];
-            if (getGame().getPlayer(nationId) == null) {
-                return nationId + ".name";
-            }
-        }
-        // this should never happen
-        return "";
-    }
-
 }
