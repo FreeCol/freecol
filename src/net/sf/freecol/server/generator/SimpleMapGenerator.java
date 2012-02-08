@@ -591,7 +591,7 @@ public class SimpleMapGenerator implements MapGenerator {
     private Tile findFreeNeighbouringTile(IndianSettlement is,
                                           List<Tile> tiles, Random random) {
         for (Tile tile : tiles) {
-            for (Direction d : Direction.getRandomDirectionArray(random)) {
+            for (Direction d : Direction.getRandomDirections("freeTile", random)) {
                 Tile t = tile.getNeighbourOrNull(d);
                 if ((t != null)
                     && (t.getOwningSettlement() == null)

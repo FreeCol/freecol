@@ -1074,7 +1074,7 @@ public class TerrainGenerator {
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
                 map.setRegion(mountainRegion);
-                Direction direction = Direction.getRandomDirection(random);
+                Direction direction = Direction.getRandomDirection("getLand", random);
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 for (int index = 0; index < length; index++) {
                     p = p.getAdjacent(direction);

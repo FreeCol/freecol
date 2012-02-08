@@ -147,7 +147,7 @@ public class DefendSettlementMission extends Mission {
         Unit bestTarget = null;
         float bestDifference = Float.MIN_VALUE;
         Direction bestDirection = null;
-        for (Direction direction : Direction.getRandomDirectionArray(getAIRandom())) {
+        for (Direction direction : Direction.getRandomDirections("defendSettlements", getAIRandom())) {
             Tile t = unit.getTile().getNeighbourOrNull(direction);
             if (t == null) continue;
             Unit defender = t.getFirstUnit();

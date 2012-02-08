@@ -179,7 +179,7 @@ public abstract class Mission extends AIObject {
     protected void moveRandomly() {
         Unit unit = getUnit();
         Direction[] randomDirections
-            = Direction.getRandomDirectionArray(getAIRandom());
+            = Direction.getRandomDirections("moveRandomly", getAIRandom());
 
         while (isValid() && unit.getMovesLeft() > 0) {
             Tile thisTile = getUnit().getTile();

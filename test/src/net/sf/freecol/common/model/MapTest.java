@@ -286,7 +286,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
         builder.setDimensions(10, 15).build();
-        Direction[] dirs = Direction.getRandomDirectionArray(new Random(1));
+        Direction[] dirs = Direction.getRandomDirections("testRandomDirection", new Random(1));
         assertNotNull(dirs);
     }
 

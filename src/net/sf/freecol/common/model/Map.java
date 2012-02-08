@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -81,6 +82,8 @@ public class Map extends FreeColGameObject implements Location {
         W  (-1,  0, -1,  0),
         NW ( 0, -1, -1, -1);
 
+        public final static int NUMBER_OF_DIRECTIONS = values().length;
+
         public final static Direction[] longSides = new Direction[] {
             Direction.NE, Direction.SE, Direction.SW, Direction.NW
         };
@@ -90,6 +93,7 @@ public class Map extends FreeColGameObject implements Location {
         };
 
         private int oddDX, oddDY, evenDX, evenDY;
+
 
         Direction(int oddDX, int oddDY, int evenDX, int evenDY) {
             this.oddDX = oddDX;
@@ -114,21 +118,42 @@ public class Map extends FreeColGameObject implements Location {
             return evenDY;
         }
 
-        public Direction getNextDirection() {
-            return values()[(ordinal() + 1) % 8];
+        /**
+         * Gets this direction rotated by n places.
+         *
+         * @param n The number of places to rotate.
+         * @return The rotated direction.
+         */
+        private Direction rotate(int n) {
+            return values()[(ordinal() + n + NUMBER_OF_DIRECTIONS)
+                            % NUMBER_OF_DIRECTIONS];
         }
 
+        /**
+         * Get the next direction after this one (clockwise).
+         *
+         * @return The next <code>Direction</code>.
+         */
+        public Direction getNextDirection() {
+            return rotate(1);
+        }
+
+        /**
+         * Get the previous direction after this one (anticlockwise).
+         *
+         * @return The previous <code>Direction</code>.
+         */
         public Direction getPreviousDirection() {
-            return values()[(ordinal() + 7) % 8];
+            return rotate(-1);
         }
 
         /**
          * Returns the reverse direction of the given direction.
          *
-         * @return The reverse direction of the given direction.
+         * @return The reverse <code>Direction</code>.
          */
         public Direction getReverseDirection() {
-            return values()[(ordinal() + 4) % 8];
+            return rotate(NUMBER_OF_DIRECTIONS/2);
         }
 
         public String getNameKey() {
@@ -136,25 +161,31 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns a random Direction.
+         * Gets a random Direction.
          *
+         * @param logMe A string to log with the random results.
          * @param random A <code>Random</code> number source.
-         * @return a <code>Direction</code> value
+         * @return A random <code>Direction</code> value.
          */
-        public static Direction getRandomDirection(Random random) {
-            return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
+        public static Direction getRandomDirection(String logMe,
+                                                   Random random) {
+            return values()[Utils.randomInt(logger, logMe, random,
+                                            NUMBER_OF_DIRECTIONS)];
         }
 
         /**
          * Creates an array of the eight directions in a random order.
          *
+         * @param logMe A string to log with the random results.
          * @param random A <code>Random</code> number source.
-         * @return The array.
+         * @return An array of the <code>Direction</code>s in a random order.
          */
-        public static Direction[] getRandomDirectionArray(Random random) {
+        public static Direction[] getRandomDirections(String logMe,
+                                                      Random random) {
             Direction[] directions = Direction.values();
             for (int i = 0; i < directions.length; i++) {
-                int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
+                int i2 = Utils.randomInt(logger, logMe, random,
+                                         NUMBER_OF_DIRECTIONS);
                 if (i2 != i) {
                     Direction temp = directions[i2];
                     directions[i2] = directions[i];
@@ -163,9 +194,45 @@ public class Map extends FreeColGameObject implements Location {
             }
             return directions;
         }
-    }
 
-    public static final int NUMBER_OF_DIRECTIONS = Direction.values().length;
+        /**
+         * Creates an array of the directions in an order that favours
+         * a supplied one.  Entry 0 will be the supplied direction,
+         * entry 1+2 will be those immediately to the left and right
+         * of it (chosen randomly), and so on until the last entry
+         * will be the complete reverse of the supplied direction.
+         * 
+         * Useful if we to step in a particular direction, but if this
+         * fails to be able to try the closest other directions to the
+         * original one in order.
+         *
+         * @param logMe A string to log with the random results.
+         * @param random A <code>Random</code> number source.
+         * @return An array of the <code>Direction</code>s favouring this one.
+         */
+        public Direction[] getClosestDirections(String logMe, Random random) {
+            // Will need 3 bits of randomness --- 2 directions are known,
+            // need one bit to randomize each remaining pair.
+            final int nbits = (NUMBER_OF_DIRECTIONS - 2) / 2;
+            final int r = Utils.randomInt(logger, logMe, random, 1 << nbits);
+
+            Direction[] ret = new Direction[NUMBER_OF_DIRECTIONS];
+            ret[0] = this;
+
+            int step = 1, mask = 1, ord = this.ordinal();
+            for (int i = 1; i < NUMBER_OF_DIRECTIONS; i += 2) {
+                Direction dr = this.rotate(step);
+                Direction dl = this.rotate(NUMBER_OF_DIRECTIONS - step);
+                ret[i] = ((r & mask) == 0) ? dr : dl;
+                ret[i+1] = ((r & mask) == 0) ? dl : dr;
+                step += 1;
+                mask *= 2;
+            }
+
+            ret[NUMBER_OF_DIRECTIONS-1] = this.getReverseDirection();
+            return ret;
+        }
+    }
 
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MIN_VALUE;
