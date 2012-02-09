@@ -3575,7 +3575,7 @@ public final class InGameController implements NetworkConstants {
            player.invalidateCanSeeTiles();
 
            // Check for emigration.
-           if (player.checkEmigrate()) {
+           while (player.checkEmigrate()) {
                 if (player.hasAbility("model.ability.selectRecruit")
                     && player.getEurope().recruitablesDiffer()) {
                     int index = gui.showEmigrationPanel(false);
