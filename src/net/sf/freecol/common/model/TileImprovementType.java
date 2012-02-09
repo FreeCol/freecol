@@ -53,12 +53,15 @@ public final class TileImprovementType extends FreeColGameObjectType {
     /**
      * The layer a TileItem belongs to. Items with higher zIndex
      * will be displayed above items with a lower zIndex. E.g. the
-     * LostCityRumour will be displayed above the Plow improvement.
+     * LostCityRumour would be displayed above the Plow improvement.
      */
     private int zIndex;
 
-    // Does this improvement expose a resource when completed
-    // (should only apply to clearing forests).
+    /**
+     * Can this improvement expose a resource when completed? This
+     * should only apply to improvement types that change the
+     * underlying tile type (e.g. clearing forests).
+     */
     private int exposeResourcePercent;
 
     /**
@@ -218,10 +221,33 @@ public final class TileImprovementType extends FreeColGameObjectType {
         }
     }
 
+    /**
+     * Returns true if this TileImprovementType changes the underlying
+     * tile type.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isChangeType() {
+        return !tileTypeChange.isEmpty();
+    }
+
+    /**
+     * Returns the destination type of a tile type change (or null).
+     *
+     * @param tileType a <code>TileType</code> value
+     * @return a <code>TileType</code> value
+     */
     public TileType getChange(TileType tileType) {
         return tileTypeChange.get(tileType);
     }
 
+    /**
+     * Returns true if this TileImprovementType can change a tile type
+     * to the given tile type.
+     *
+     * @param tileType a <code>TileType</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean changeContainsTarget(TileType tileType) {
         return tileTypeChange.containsValue(tileType);
     }
@@ -252,8 +278,9 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the percent chance that this tile improvement can expose
-     * a resource on the tile.
+     * Gets the percent chance that this tile improvement can expose a
+     * resource on the tile. This only applies to TileImprovementTypes
+     * that change the underlying tile type (e.g. clearing forests).
      *
      * @return The exposure chance.
      */
