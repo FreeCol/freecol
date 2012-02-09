@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -123,6 +123,18 @@ public class TileTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.freeColonist");
 
 
+    private class Work {
+        public TileType type;
+        public int plow;
+        public int road;
+
+        public Work(TileType type, int plow, int road) {
+            this.type = type;
+            this.plow = plow;
+            this.road = road;
+        }
+    }
+
     public void testGetWorkAmount() {
 
         Game game = getStandardGame();
@@ -156,47 +168,49 @@ public class TileTest extends FreeColTestCase {
         assertNotNull(road);
         assertNotNull(clearForest);
 
-        java.util.Map<TileType, int[]> cost = new HashMap<TileType, int[]>();
-        cost.put(plains, new int[] { 5, 3 });
-        cost.put(desert, new int[] { 5, 3 });
-        cost.put(grassland, new int[] { 5, 3 });
-        cost.put(prairie, new int[] { 5, 3 });
-        cost.put(tundra, new int[] { 6, 4 });
-        cost.put(savannah, new int[] { 5, 3 });
-        cost.put(marsh, new int[] { 7, 5 });
-        cost.put(swamp, new int[] { 9, 7 });
-        // TODO: fix test
-        //cost.put(arctic, new int[] { 6, 4 });
+        Work[] cost = new Work[] {
+            new Work(plains, 5, 3),
+            new Work(desert, 5, 3),
+            new Work(grassland, 5, 3),
+            new Work(prairie, 5, 3),
+            new Work(tundra, 6, 4),
+            new Work(savannah, 5, 3),
+            new Work(marsh, 7, 5),
+            new Work(swamp, 9, 7),
+            // TODO: fix test
+            //new Work(arctic, 6, 4)
+        };
 
-        for (java.util.Map.Entry<TileType, int[]> entry : cost.entrySet()){
-            Tile tile = new Tile(game, entry.getKey(), 0, 0);
+        for (Work entry : cost) {
+            Tile tile = new Tile(game, entry.type, 0, 0);
             assertTrue(tile.getType().toString(), plow.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), road.isTileAllowed(tile));
             assertFalse(tile.getType().toString(), clearForest.isTileAllowed(tile));
 
-            assertEquals(tile.getType().toString(), entry.getValue()[0], tile.getWorkAmount(plow));
-            assertEquals(tile.getType().toString(), entry.getValue()[1], tile.getWorkAmount(road));
+            assertEquals(tile.getType().toString(), entry.plow, tile.getWorkAmount(plow));
+            assertEquals(tile.getType().toString(), entry.road, tile.getWorkAmount(road));
         }
 
         // Now check the forests
-        cost.clear();
-        cost.put(tundraForest, new int[] { 6, 4 });
-        cost.put(grasslandForest, new int[] { 6, 4 });
-        cost.put(desertForest, new int[] { 6, 4});
-        cost.put(prairieForest, new int[] { 6, 4 });
-        cost.put(savannahForest, new int[] { 8, 6 });
-        cost.put(marshForest, new int[] { 8, 6 });
-        cost.put(swampForest, new int[] { 9, 7});
-        cost.put(plainsForest, new int[] { 6, 4});
+        cost = new Work[] {
+            new Work(tundraForest, 6, 4),
+            new Work(grasslandForest, 6, 4),
+            new Work(desertForest, 6, 4),
+            new Work(prairieForest, 6, 4),
+            new Work(savannahForest, 8, 6),
+            new Work(marshForest, 8, 6),
+            new Work(swampForest, 9, 7),
+            new Work(plainsForest, 6, 4)
+        };
 
-        for (java.util.Map.Entry<TileType, int[]> entry : cost.entrySet()){
-            Tile tile = new Tile(game, entry.getKey(), 0, 0);
+        for (Work entry : cost) {
+            Tile tile = new Tile(game, entry.type, 0, 0);
             assertFalse(tile.getType().toString(), plow.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), road.isTileAllowed(tile));
             assertTrue(tile.getType().toString(), clearForest.isTileAllowed(tile));
 
-            assertEquals(tile.getType().toString(), entry.getValue()[0], tile.getWorkAmount(clearForest));
-            assertEquals(tile.getType().toString(), entry.getValue()[1], tile.getWorkAmount(road));
+            assertEquals(tile.getType().toString(), entry.plow, tile.getWorkAmount(clearForest));
+            assertEquals(tile.getType().toString(), entry.road, tile.getWorkAmount(road));
         }
 
     }
