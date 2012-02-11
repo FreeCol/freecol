@@ -163,15 +163,6 @@ public class PioneeringMission extends Mission {
 
 
     /**
-     * Convenience accessor for the owning European AI player.
-     *
-     * @return The <code>EuropeanAIPlayer</code>.
-     */
-    private EuropeanAIPlayer getEuropeanAIPlayer() {
-        return (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
-    }
-
-    /**
      * Does a supplied unit have tools?
      *
      * @param unit The pioneer <code>Unit</code> to check.
@@ -419,40 +410,9 @@ public class PioneeringMission extends Mission {
                 return;
             }
 
-            // Not there yet
-            if (unit.getTile() != colonyWithTools.getTile()) {
-                PathNode path = unit.findPath(colonyWithTools.getTile());
-                if (path == null) {
-                    if (unit.isOnCarrier()) {
-                        logger.finest("AI pioneer in transit to "
-                            + colonyWithTools.getName() + ": " + unit);
-                        return;
-                    }
-                    abandonTileImprovementPlan();
-                    logger.finest("AI pioneer can not find path to "
-                        + colonyWithTools.getName() + ": " + unit);
-                    colonyWithTools = null;
-                    return;
-                }
-
-                Direction direction = moveTowards(path);
-                if (direction != null && !moveButDontAttack(direction)) {
-                    abandonTileImprovementPlan();
-                    logger.finest("AI pioneer died en route to "
-                        + colonyWithTools.getName() + ": " + unit);
-                    return;
-                }
-
-                if (unit.getTile() != colonyWithTools.getTile()) {
-                    unit.setMovesLeft(0);
-                    logger.finest("AI pioneer at " + unit.getTile()
-                        + " en route to " + colonyWithTools.getName()
-                        + ": " + unit);
-                    return;
-                }
-            }
-
-            // Reached colony with tools, equip unit.
+            // Go there, equip unit.
+            if (travelToTarget("AI pioneer", colonyWithTools.getTile())
+                != Unit.MoveType.MOVE) return;
             getAIUnit().equipForRole(Unit.Role.PIONEER, false);
             if (!hasTools()) {
                 abandonTileImprovementPlan();
@@ -483,43 +443,12 @@ public class PioneeringMission extends Mission {
             tileImprovementPlan.setPioneer(aiu);
         }
     
-        // Move toward the target tile.
+        // Go to target and take control of the land before proceeding
+        // to build.
         Tile target = tileImprovementPlan.getTarget();
-        if (unit.getTile() != target) {
-            PathNode path = unit.findPath(target);
-            if (path == null) {
-                if (unit.isOnCarrier()) {
-                    logger.finest("AI pioneer in transit to " + target
-                        + ": " + unit);
-                } else {
-                    logger.finest("AI pioneer can not get"
-                        + " from " + unit.getTile()
-                        + " to " + target
-                        + ": " + unit);
-                }
-                return;
-            }
-
-            Direction direction = moveTowards(path);
-            if (direction != null && !moveButDontAttack(direction)) {
-                abandonTileImprovementPlan();
-                logger.finest("AI pioneer died en route to " + target
-                    + ": " + unit);
-                return;
-            }
-
-            if (unit.getTile() != target) {
-                logger.finest("AI pioneer at " + unit.getTile()
-                    + " en route to " + target
-                    + ": " + unit);
-                unit.setMovesLeft(0);
-                return;
-            }
-        }
-
+        if (travelToTarget("AI pioneer", target) != Unit.MoveType.MOVE) return;
         if (!player.owns(target)) {
-            // Take control of land before proceeding with mission.
-            // TODO: Decide whether to pay or steal.
+            // TODO: Better choice whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
             boolean fail = false;
             int price = player.getLandPrice(target);

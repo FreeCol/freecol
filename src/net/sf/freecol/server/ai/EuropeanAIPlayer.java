@@ -1029,12 +1029,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (unit.isColonist()) {
-                try {
-                    giveColonistMission(aiUnit, fewColonies, workerWishes);
-                } catch (Exception e) {
-                    throw new IllegalStateException("GCM " + unit
-                                                    + ": " + e.getMessage());
-                }
+                giveColonistMission(aiUnit, fewColonies, workerWishes);
             }
 
             if (!aiUnit.hasMission()) {
@@ -1051,7 +1046,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private void giveColonistMission(AIUnit aiUnit, boolean fewColonies,
                                      java.util.Map<UnitType, ArrayList<Wish>> workerWishes) {
-        Unit unit = aiUnit.getUnit();
+        final Unit unit = aiUnit.getUnit();
         /*
          * Motivated by (speed) performance: This map stores the
          * distance between the unit and the destination of a Wish:
@@ -1095,8 +1090,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         // Find a site for a new colony:
         Tile colonyTile = null;
-        if (getPlayer().canBuildColonies() && unit.canBuildColony()) {
-            colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
+        if (getPlayer().canBuildColonies()
+            && BuildColonyMission.isValid(aiUnit)) {
+            colonyTile = BuildColonyMission.findTargetTile(aiUnit, false);
             if (colonyTile != null) {
                 bestTurns = unit.getTurnsToReach(colonyTile);
             }
@@ -1130,9 +1126,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         // Choose to build a new colony:
         if (colonyTile != null) {
-            aiUnit.setMission(new BuildColonyMission(getAIMain(),
-                    aiUnit, colonyTile,
-                    getPlayer().getColonyValue(colonyTile)));
+            aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit,
+                                                     colonyTile));
             boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
             if (isUnitOnCarrier) {
                 // Verify carrier mission

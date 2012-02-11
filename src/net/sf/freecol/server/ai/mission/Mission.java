@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -48,6 +49,7 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 
 /**
@@ -98,6 +100,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Gets the unit this mission has been created for.
+     *
      * @return The <code>Unit</code>.
      */
     public Unit getUnit() {
@@ -106,6 +109,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Gets the AI-unit this mission has been created for.
+     *
      * @return The <code>AIUnit</code>.
      */
     public AIUnit getAIUnit() {
@@ -114,6 +118,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Sets the AI-unit this mission has been created for.
+     *
      * @param aiUnit The <code>AIUnit</code>.
      */
     protected void setAIUnit(AIUnit aiUnit) {
@@ -125,8 +130,17 @@ public abstract class Mission extends AIObject {
      *
      * @return A <code>Random</code> to use.
      */
-    public Random getAIRandom() {
+    protected Random getAIRandom() {
         return aiUnit.getAIRandom();
+    }
+
+    /**
+     * Convenience accessor for the owning European AI player.
+     *
+     * @return The <code>EuropeanAIPlayer</code>.
+     */
+    protected EuropeanAIPlayer getEuropeanAIPlayer() {
+        return (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
     }
 
     /**
@@ -391,25 +405,30 @@ public abstract class Mission extends AIObject {
      * True if:
      * - The unit is not there already
      * AND
-     * - the unit is already has transport, this will always be faster
-     *   (TODO: actually, mounted units on good roads might be faster,
-     *   check for this)
-     * - if not on the map
-     * - if on the map but can not find a path to the tile, unless
-     *   adjacent to the destination which usually means the path
-     *   finding failed due to a temporary blockage such as an enemty unit
+     *   - the unit already has transport, this will always be faster
+     *     (TODO: actually, mounted units on good roads might be faster,
+     *     check for this)
+     *   - if not on the map
+     *   - if on the map but can not find a path to the tile, unless
+     *     adjacent to the destination which usually means the path
+     *     finding failed due to a temporary blockage such as an enemy unit
+     *   - if the path to the tile will take more than MAX_TURNS
      *
      * @param tile The <code>Tile</code> to go to.
      * @return True if the unit should use transport.
      */
     protected boolean shouldTakeTransportToTile(Tile tile) {
+        final int MAX_TURNS = 5;
         final Unit unit = getUnit();
+        PathNode path;
         return tile != null
+            && unit != null
             && unit.getTile() != tile
             && (unit.isOnCarrier()
                 || unit.getTile() == null
-                || (unit.findPath(tile) == null
-                    && !unit.getTile().isAdjacent(tile)));
+                || ((path = unit.findPath(tile)) == null
+                    && !unit.getTile().isAdjacent(tile))
+                || (path != null && path.getTotalTurns() >= MAX_TURNS));
     }
 
     /**
@@ -441,6 +460,118 @@ public abstract class Mission extends AIObject {
         }
         // Must be heading to or in Europe.
         return null;
+    }
+
+    /**
+     * Tries to move this mission's unit to a target location.
+     *
+     * First check for units in transit: that is units on a carrier that
+     * are going to but not yet in Europe, or going to but not yet at
+     * a Tile and whose path still requires the carrier.
+     *
+     * Similarly check for units not in transit but should be: that
+     * is units not on a carrier but can not get to their target
+     * without one.
+     *
+     * If there is no impediment to the unit moving towards the target,
+     * do so.  Return an indicative MoveType for the result of the travel.
+     * - MOVE if the unit has arrived at the target.  The unit may not
+     *   have moved, or have exhausted its moves.
+     * - MOVE_NO_MOVES if out of moves short of the target
+     * - MOVE_ILLEGAL if the unit is unable to proceed for now
+     * - MOVE_NO_REPAIR if the unit died for whatever reason
+     * - other results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
+     *   occur if the unit proceeded--- such moves require special handling
+     *   and are not performed here, the calling mission code must
+     *   handle them.
+     *
+     * @param logMe A prefix string for the log messages.
+     * @param target The destination <code>Location</code>.
+     * @return The type of move the unit stopped at.
+     */
+    protected MoveType travelToTarget(String logMe, Location target) {
+        final Tile targetTile = target.getTile();
+        if (!(target instanceof Europe) && targetTile == null) {
+            throw new IllegalStateException("Target neither Europe nor Tile");
+        }
+
+        final Unit unit = getUnit();
+        final Unit carrier = (unit.isOnCarrier()) ? (Unit)unit.getLocation()
+            : null;
+        PathNode path = null;
+        boolean inTransit = false;
+        boolean needTransport = false;
+        if (target instanceof Europe) {
+            if (unit.isInEurope()) return MoveType.MOVE;
+
+            if (unit.isOnCarrier()) {
+                inTransit = true;
+            } else {
+                needTransport = true;
+            }
+        } else {
+            if (unit.getTile() == targetTile) return MoveType.MOVE;
+
+            if (unit.isOnCarrier()) {
+                if (carrier.getTile() == null) {
+                    inTransit = true;
+                } else {
+                    path = unit.findPath(unit.getTile(), targetTile, carrier);
+                    if (path == null) {
+                        logger.finest(logMe + " can not get from "
+                            + unit.getTile() + " to " + targetTile
+                            + ": " + unit);
+                        return MoveType.MOVE_ILLEGAL;
+                    } else {
+                        inTransit = path.isOnCarrier();
+                    }
+                }
+            } else {
+                if (unit.isInEurope()) {
+                    needTransport = true;
+                } else if (unit.getTile() == null) { // Can not happen
+                    throw new IllegalStateException("No tile or carrier: "
+                        + unit);
+                } else {
+                    path = unit.findPath(targetTile);
+                    if (path == null) needTransport = true;
+                }
+            }
+        }
+        if (inTransit) {
+            logger.finest(logMe + " in transit to " + target + ": " + unit);
+            return MoveType.MOVE_ILLEGAL;
+        } else if (needTransport) {
+            logger.finest(logMe + " needs transport to " + target
+                + ": " + unit);
+            return MoveType.MOVE_ILLEGAL;
+        }
+
+        // This can not happen.
+        if (path == null) throw new IllegalStateException("Path == null");
+
+        // Follow the path towards the target.
+        for (; path != null; path = path.next) {
+            if (unit.getMovesLeft() <= 0) {
+                logger.finest(logMe + " en route to " + targetTile
+                    + ": " + unit);
+                return MoveType.MOVE_NO_MOVES;
+            }
+
+            MoveType mt = unit.getMoveType(path.getDirection());
+            if (!mt.isProgress()) return mt; // Special handling required
+
+            if (!AIMessage.askMove(aiUnit, path.getDirection())) {
+                logger.finest(logMe + " move failed at " + unit.getTile()
+                    + ": " + unit);
+                return MoveType.MOVE_ILLEGAL;
+            } else if (unit.isDisposed()) {
+                logger.finest(logMe + " died en route to " + targetTile
+                    + ": " + unit);
+                return MoveType.MOVE_NO_REPAIR;
+            }
+        }
+        return MoveType.MOVE; // Must have completed path
     }
 
     // Fake implementation of Transportable interface.
@@ -506,6 +637,20 @@ public abstract class Mission extends AIObject {
     // Mission interface to be implemented/overridden by descendants.
 
     /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return True if the unit can be usefully assigned this mission.
+     */
+    public static boolean isValid(AIUnit aiUnit) {
+        return aiUnit != null
+            && aiUnit.getMission() == null
+            && aiUnit.getUnit() != null
+            && !aiUnit.getUnit().isDisposed()
+            && !aiUnit.getUnit().isUnderRepair();
+    }
+
+    /**
      * Checks if this mission is still valid to perform.  At this
      * level, if the unit was killed then the mission becomes invalid.
      *
@@ -518,20 +663,6 @@ public abstract class Mission extends AIObject {
      */
     public boolean isValid() {
         return getUnit() != null && !getUnit().isDisposed();
-    }
-
-    /**
-     * Checks if this mission is valid for the given unit.
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @return True if the unit can be usefully assigned this mission.
-     */
-    public static boolean isValid(AIUnit aiUnit) {
-        return aiUnit != null
-            && aiUnit.getMission() == null
-            && aiUnit.getUnit() != null
-            && !aiUnit.getUnit().isDisposed()
-            && !aiUnit.getUnit().isUnderRepair();
     }
 
     /**

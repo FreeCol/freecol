@@ -640,7 +640,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // No good, no choice but to fail.
         if (colony.getUnitCount() <= 0) {
             throw new IllegalStateException("Colony " + colony.getName()
-                + " rearrangement leaves no units!");
+                + " rearrangement leaves no units, "
+                + colony.getTile().getUnitList().size() + " available.");
         }
     }
 

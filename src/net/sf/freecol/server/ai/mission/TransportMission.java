@@ -791,7 +791,7 @@ public class TransportMission extends Mission {
             // since we are in Europe, use the carrier entry point to
             // search for a good settlement spot.
             Unit carrier = getUnit();
-            Tile colonyTile = BuildColonyMission.findColonyLocation(carrier);
+            Tile colonyTile = BuildColonyMission.findTargetTile(getAIUnit(), false);
             int space = getAvailableSpace();
             while (colonyTile != null && space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
@@ -802,8 +802,7 @@ public class TransportMission extends Mission {
                     && newUnit.getUnit().getRole() != Role.PIONEER) {
                     // send the colonist to build the new colony
                     newUnit.setMission(new BuildColonyMission(getAIMain(),
-                            newUnit, colonyTile,
-                            aiPlayer.getPlayer().getColonyValue(colonyTile)));
+                            newUnit, colonyTile));
                 }
                 addToTransportList(newUnit);
                 space--;

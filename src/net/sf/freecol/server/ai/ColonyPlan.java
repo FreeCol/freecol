@@ -1271,8 +1271,9 @@ public class ColonyPlan {
         // Make a scratch colony to work on.
         Colony scratch = colony.getScratchColony();
         Tile tile = scratch.getTile();
-        String report = "Worker assignment for " + colony.getName()
-            + " at " + aiMain.getGame().getTurn().getNumber() + "\n";
+        String report = "Worker assignment at " + colony.getName()
+            + " of " + workers.size() + " workers "
+            + " in " + turn + "/" + turn.getNumber() + "\n";
 
         // Move all workers to the tile, removing storable equipment.
         for (Unit u : workers) {
