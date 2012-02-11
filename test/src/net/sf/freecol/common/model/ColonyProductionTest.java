@@ -58,26 +58,14 @@ public class ColonyProductionTest extends FreeColTestCase {
     public void testProductionSoldier() {
 
         Game game = getStandardGame();
-
+        Map map = getTestMap();
+        game.setMap(map);
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        Tile[][] tiles = new Tile[10][15];
+        Tile tile = map.getTile(5, 8);
+        Resource grain = new Resource(game, tile, spec().getResourceType("model.resource.grain"));
+        tile.addResource(grain);
 
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, plainsType, x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
-
-        Resource grain = new Resource(game, map.getTile(5, 8),
-                                      spec().getResourceType("model.resource.grain"));
-        map.getTile(5, 8).addResource(grain);
-        map.getTile(5, 8).setExploredBy(dutch, true);
-        map.getTile(6, 8).setExploredBy(dutch, true);
-
-        game.setMap(map);
         UnitType veteran = spec().getUnitType("model.unit.veteranSoldier");
         Unit soldier = new ServerUnit(game, map.getTile(6, 8), dutch, veteran);
 
@@ -114,7 +102,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals(foodType, soldier.getWorkType());
 
-        assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
+        assertEquals(colony.getColonyTile(tile).getTile(), soldier.getLocation().getTile());
 
         assertEquals(0, soldier.getMovesLeft());
 
@@ -124,26 +112,14 @@ public class ColonyProductionTest extends FreeColTestCase {
     public void testProductionPioneer() {
 
         Game game = getStandardGame();
-
+        Map map = getTestMap();
+        game.setMap(map);
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        Tile[][] tiles = new Tile[10][15];
+        Tile tile = map.getTile(5, 8);
+        Resource grain = new Resource(game, tile, spec().getResourceType("model.resource.grain"));
+        tile.addResource(grain);
 
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, plainsType, x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
-
-        Resource grain = new Resource(game, map.getTile(5, 8),
-                                      spec().getResourceType("model.resource.grain"));
-        map.getTile(5, 8).addResource(grain);
-        map.getTile(5, 8).setExploredBy(dutch, true);
-        map.getTile(6, 8).setExploredBy(dutch, true);
-
-        game.setMap(map);
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         GoodsType foodType = grainType;
         Unit pioneer = new ServerUnit(game, map.getTile(6, 8), dutch, pioneerType);
@@ -179,7 +155,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Pioneer should be working on the field with the bonus
         assertEquals(foodType, pioneer.getWorkType());
 
-        assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), pioneer.getLocation().getTile());
+        assertEquals(colony.getColonyTile(tile).getTile(), pioneer.getLocation().getTile());
 
         assertEquals(0, pioneer.getMovesLeft());
 
