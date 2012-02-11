@@ -353,8 +353,10 @@ public final class Specification {
 
         public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if ("delete".equals(xsr.getLocalName())) {
-                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                if (id == null) {
+                    logger.warning("ID is 'null', element name is " + xsr.getLocalName());
+                } else if ("delete".equals(xsr.getLocalName())) {
                     FreeColGameObjectType object = allTypes.remove(id);
                     if (object != null) {
                         result.remove(object);

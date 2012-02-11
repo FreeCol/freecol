@@ -42,10 +42,14 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private Set<String> allowedWorkers = new HashSet<String>();
     private EquipmentType expendedEquipmentType;
     private int expendedAmount;
+
+    // @compat 0.10.4
     private GoodsType deliverGoodsType;
     private int deliverAmount;
+    // end @compat
 
-    private Map<TileType, TileType> tileTypeChange = new HashMap<TileType, TileType>();
+    private Map<TileType, TileTypeChange> tileTypeChanges
+        = new HashMap<TileType, TileTypeChange>();
 
     private int movementCost;
     private float movementCostFactor;
@@ -121,13 +125,18 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return expendedAmount;
     }
 
-    public GoodsType getDeliverGoodsType() {
-        return deliverGoodsType;
+    /**
+     * Returns the goods produced by applying this TileImprovementType
+     * to a Tile with the given TileType.
+     *
+     * @param from a <code>TileType</code> value
+     * @return an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods getProduction(TileType from) {
+        TileTypeChange change = tileTypeChanges.get(from);
+        return change == null ? null : change.getProduction();
     }
 
-    public int getDeliverAmount() {
-        return deliverAmount;
-    }
 
     /**
      * Get the <code>Scopes</code> value.
@@ -228,7 +237,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isChangeType() {
-        return !tileTypeChange.isEmpty();
+        return !tileTypeChanges.isEmpty();
     }
 
     /**
@@ -238,7 +247,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return a <code>TileType</code> value
      */
     public TileType getChange(TileType tileType) {
-        return tileTypeChange.get(tileType);
+        TileTypeChange change = tileTypeChanges.get(tileType);
+        return change == null ? null : change.getTo();
     }
 
     /**
@@ -249,7 +259,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean changeContainsTarget(TileType tileType) {
-        return tileTypeChange.containsValue(tileType);
+        for (TileTypeChange change : tileTypeChanges.values()) {
+            if (change.getTo() == tileType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -356,12 +371,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
             out.writeAttribute("expended-amount",
                 Integer.toString(expendedAmount));
         }
-        if (deliverGoodsType != null) {
-            out.writeAttribute("deliver-goods-type",
-                deliverGoodsType.getId());
-            out.writeAttribute("deliver-amount",
-                Integer.toString(deliverAmount));
-        }
     }
 
     /**
@@ -388,13 +397,9 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 out.writeEndElement();
             }
         }
-        if (tileTypeChange != null) {
-            for (Map.Entry<TileType, TileType> entry
-                     : tileTypeChange.entrySet()) {
-                out.writeStartElement("change");
-                out.writeAttribute("from", entry.getKey().getId());
-                out.writeAttribute("to", entry.getValue().getId());
-                out.writeEndElement();
+        if (tileTypeChanges != null) {
+            for (TileTypeChange change : tileTypeChanges.values()) {
+                change.toXML(out);
             }
         }
     }
@@ -426,9 +431,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
         expendedEquipmentType = getSpecification().getType(in,
             "expended-equipment-type", EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);
+
+        // @compat 0.10.4
         deliverGoodsType = getSpecification().getType(in,
             "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
+        // end @compat
     }
 
     /**
@@ -446,9 +454,18 @@ public final class TileImprovementType extends FreeColGameObjectType {
             allowedWorkers.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
             in.nextTag(); // close this element
         } else if ("change".equals(childName)) {
-            tileTypeChange.put(getSpecification().getTileType(in.getAttributeValue(null, "from")),
-                               getSpecification().getTileType(in.getAttributeValue(null, "to")));
-            in.nextTag(); // close this element
+            TileTypeChange change = new TileTypeChange();
+            if (deliverGoodsType == null) {
+                change.readFromXML(in, getSpecification());
+            } else {
+                // @compat 0.10.4
+                change.setFrom(getSpecification().getTileType(in.getAttributeValue(null, "from")));
+                change.setTo(getSpecification().getTileType(in.getAttributeValue(null, "to")));
+                change.setProduction(new AbstractGoods(deliverGoodsType, deliverAmount));
+                // end @compat
+                in.nextTag(); // close this element
+            }
+            tileTypeChanges.put(change.getFrom(), change);
         } else {
             super.readChild(in);
         }

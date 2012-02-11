@@ -249,6 +249,9 @@
 
   <xs:element name="change">
     <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="production" />
+      </xs:sequence>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
       <xs:attribute name="to" use="required" type="TileTypeId"/>
     </xs:complexType>

@@ -213,14 +213,6 @@ public class TileImprovement extends TileItem implements Named {
         return type.getExpendedAmount();
     }
 
-    public GoodsType getDeliverGoodsType() {
-        return type.getDeliverGoodsType();
-    }
-
-    public int getDeliverAmount() {
-        return type.getDeliverAmount();
-    }
-
     /**
      * Returns the bonus (if any).
      * @param goodsType a <code>GoodsType</code> value

@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -347,34 +348,41 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
-        GoodsType deliver = getWorkImprovement().getDeliverGoodsType();
+        AbstractGoods deliver = getWorkImprovement().getType().getProduction(tile.getType());
         if (deliver != null) { // Deliver goods if any
-            int amount = tile.potential(deliver, getType())
-                * getWorkImprovement().getDeliverAmount();
+            int amount = deliver.getAmount();
             if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
                 amount *= 2;
             }
             Settlement settlement = tile.getSettlement();
             if (settlement != null
                 && (ServerPlayer) settlement.getOwner() == owner) {
-                settlement.addGoods(deliver, amount);
+                amount = (int) settlement.getFeatureContainer()
+                    .applyModifier(amount, Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+                settlement.addGoods(deliver.getType(), amount);
             } else {
                 List<Settlement> adjacent = new ArrayList<Settlement>();
+                int newAmount = amount;
                 for (Tile t : tile.getSurroundingTiles(1)) {
                     if (t.getSettlement() != null
                         && (ServerPlayer) t.getSettlement().getOwner()
                         == owner) {
                         adjacent.add(t.getSettlement());
+                        int modAmount = (int) settlement.getFeatureContainer()
+                            .applyModifier(amount, Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+                        if (modAmount > newAmount) {
+                            newAmount = modAmount;
+                        }
                     }
                 }
                 if (adjacent.size() > 0) {
-                    int deliverPerCity = amount / adjacent.size();
+                    int deliverPerCity = newAmount / adjacent.size();
                     for (Settlement s : adjacent) {
-                        s.addGoods(deliver, deliverPerCity);
+                        s.addGoods(deliver.getType(), deliverPerCity);
                     }
                     // Add residue to first adjacent settlement.
-                    adjacent.get(0).addGoods(deliver,
-                                             amount % adjacent.size());
+                    adjacent.get(0).addGoods(deliver.getType(),
+                                             newAmount % adjacent.size());
                 }
             }
         }

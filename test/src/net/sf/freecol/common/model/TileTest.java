@@ -215,6 +215,17 @@ public class TileTest extends FreeColTestCase {
 
     }
 
+    public void testTileTypeChangeProduction() {
+        for (TileType tileType : spec().getTileTypeList()) {
+            if (tileType.isForested()) {
+                AbstractGoods production = clearForest.getProduction(tileType);
+                assertNotNull(tileType.getId(), production);
+                int amount = (desertForest == tileType) ? 10 : 20;
+                assertEquals(tileType.getId(), amount, production.getAmount());
+            }
+        }
+    }
+
     public void testPrimarySecondaryGoods() {
 
         Game game = getStandardGame();

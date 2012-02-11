@@ -525,9 +525,8 @@
       expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
       - natural="true" means that this improvement cannot be built, but may be present on its own
       - expended goods/amount are the 'cost' of building this improvement
-      - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
-      - deliver-amount is a factor to multiply the base production of that tile to give.
       Children: worker, type, tiles, tile, effect, change
+      - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
       worker child options: id
       type child options: id, magnitude
       - id is a string identifier, there must be a "river" and a "road" id among the tileimprovement-types
@@ -583,16 +582,32 @@
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.clearForest" add-work-turns="2"
                           expended-equipment-type="model.equipment.tools" expended-amount="1"
-                          deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1" exposeResourcePercent="5">
+                          magnitude="1" exposeResourcePercent="5">
       <scope method-name="isForested" method-value="true" />
-      <change from="model.tile.mixedForest"     to="model.tile.plains"/>
-      <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
-      <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
-      <change from="model.tile.tropicalForest"  to="model.tile.savannah"/>
-      <change from="model.tile.wetlandForest"   to="model.tile.marsh"/>
-      <change from="model.tile.rainForest"      to="model.tile.swamp"/>
-      <change from="model.tile.scrubForest"     to="model.tile.desert"/>
-      <change from="model.tile.borealForest"    to="model.tile.tundra"/>
+      <change from="model.tile.mixedForest"     to="model.tile.plains">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.coniferForest"   to="model.tile.grassland">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.broadleafForest" to="model.tile.prairie">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.tropicalForest"  to="model.tile.savannah">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.wetlandForest"   to="model.tile.marsh">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.rainForest"      to="model.tile.swamp">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
+      <change from="model.tile.scrubForest"     to="model.tile.desert">
+        <production goods-type="model.goods.lumber" value="10" />
+      </change>
+      <change from="model.tile.borealForest"    to="model.tile.tundra">
+        <production goods-type="model.goods.lumber" value="20" />
+      </change>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.fishBonusLand" natural="true" zIndex="250">
       <scope method-name="isWater" method-value="true" />
@@ -991,6 +1006,9 @@
                    basicProduction="6" upgradesFrom="model.building.carpenterHouse"
                    required-population="3" upkeep="10">
       <required-goods id="model.goods.hammers" value="52"/>
+      <modifier id="model.modifier.tileTypeChangeProduction" value="3" type="multiplicative">
+        <scope type="model.goods.lumber" />
+      </modifier>
     </building-type>
     <building-type id="model.building.blacksmithHouse" basicProduction="3"
                    consumes="model.goods.ore" produces="model.goods.tools">
