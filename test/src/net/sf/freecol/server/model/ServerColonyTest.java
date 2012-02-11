@@ -96,24 +96,13 @@ public class ServerColonyTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap());
 
         Player dutch = game.getPlayer("model.nation.dutch");
-        Tile[][] tiles = new Tile[10][15];
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.desert"), x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
+        Map map = getTestMap(spec().getTileType("model.tile.desert"));
         game.setMap(map);
 
         //////////////////////
         // Setting test colony
 
         Tile colonyTile = map.getTile(5, 8);
-
-        colonyTile.setExploredBy(dutch, true);
-
-        game.setMap(map);
 
         Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(colonyTile).build();
 
@@ -151,19 +140,10 @@ public class ServerColonyTest extends FreeColTestCase {
 
     public void testDeathByStarvation() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-
-        Tile[][] tiles = new Tile[10][15];
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.marsh"), x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
+        Map map = getTestMap(spec().getTileType("model.tile.marsh"));
+        game.setMap(map);
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        map.getTile(5, 8).setExploredBy(dutch, true);
-        game.setMap(map);
 
         ServerColony colony = new ServerColony(game, dutch, "New Amsterdam", map.getTile(5, 8));
         dutch.addSettlement(colony);
