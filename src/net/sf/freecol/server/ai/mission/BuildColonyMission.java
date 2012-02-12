@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -27,10 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -40,11 +36,9 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 import org.w3c.dom.Element;
 
