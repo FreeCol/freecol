@@ -364,11 +364,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 List<Settlement> adjacent = new ArrayList<Settlement>();
                 int newAmount = amount;
                 for (Tile t : tile.getSurroundingTiles(1)) {
-                    if (t.getSettlement() != null
-                        && (ServerPlayer) t.getSettlement().getOwner()
-                        == owner) {
-                        adjacent.add(t.getSettlement());
-                        int modAmount = (int) settlement.getFeatureContainer()
+                    Settlement ts = t.getSettlement();
+                    if (ts != null && (ServerPlayer)ts.getOwner() == owner) {
+                        adjacent.add(ts);
+                        int modAmount = (int) ts.getFeatureContainer()
                             .applyModifier(amount, Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                         if (modAmount > newAmount) {
                             newAmount = modAmount;
