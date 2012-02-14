@@ -539,7 +539,10 @@ public class AIUnit extends AIObject implements Transportable {
                 mission = new WishRealizationMission(getAIMain(), in);
             } else if (in.getLocalName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
                 mission = new UnitSeekAndDestroyMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(PioneeringMission.getXMLElementTagName())) {
+            } else if (in.getLocalName().equals(PioneeringMission.getXMLElementTagName())
+                // @compat 0.10.3
+                || in.getLocalName().equals("tileImprovementPlanMission")) {
+                // @end compatibility code                
                 mission = new PioneeringMission(getAIMain(), in);
             } else if (in.getLocalName().equals(DefendSettlementMission.getXMLElementTagName())) {
                 mission = new DefendSettlementMission(getAIMain(), in);
