@@ -61,6 +61,18 @@ public class ColorResource extends Resource {
      */
     public void preload() {}
 
+    private static boolean isHexString(String str) {
+        if (str == null
+            || !(str.startsWith("0x") || str.startsWith("0X"))
+            || str.length() <= 2) return false;
+        for (int i = 2; i < str.length(); i++) {
+            if ("0123456789ABCDEFabcdef".indexOf(str.substring(i, i+1)) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns the <code>Color</code> identified by the given
      * string. This is either a hexadecimal integer prefixed with
@@ -70,22 +82,25 @@ public class ColorResource extends Resource {
      * @return a <code>Color</code> value
      */
     public static Color getColor(String colorName) {
-        if (colorName.startsWith("0x") || colorName.startsWith("0X")) {
-            boolean hasAlpha = false;
-            if (colorName.length()>8) {
-               hasAlpha = true;
+        if (isHexString(colorName)) {
+            try {
+                int col = Integer.decode(colorName);
+                return new Color(col, colorName.length() > 8);
+            } catch (NumberFormatException e) {
+                logger.warning("Failed to decode colour string: " + colorName);
             }
-            return new Color(Integer.decode(colorName),hasAlpha);
         } else {
             try {
                 Field field = Color.class.getField(colorName);
                 return (Color) field.get(null);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 // probably a non-standard color name
                 logger.warning(e.toString());
             }
-            return null;
         }
+        // Fall back to black.  There are places where a null colour
+        // can cause crashes.
+        return Color.BLACK;
     }
     
     /**

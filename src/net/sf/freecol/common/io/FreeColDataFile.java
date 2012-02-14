@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -180,7 +181,13 @@ public class FreeColDataFile {
     protected URI getURI(String filename) {
         try {
             if (filename.startsWith("urn:")) {
-                return new URI(filename);
+                try {
+                    return new URI(filename);
+                } catch (URISyntaxException e) {
+                    logger.log(Level.WARNING, "Resource creation failure with |"
+                        + filename + "|", e);
+                    return null;
+                }
             } else if (file.isDirectory()) {
                 return new File(file, filename).toURI();
             } else {
@@ -233,7 +240,10 @@ public class FreeColDataFile {
             if (value.startsWith(resourceScheme)) {
                 todo.add(key);
             } else {
-                rc.add(key, ResourceFactory.createResource(getURI(value)));
+                URI uri = getURI(value);
+                if (uri != null) {
+                    rc.add(key, ResourceFactory.createResource(uri));
+                }
             }
         }
         boolean progress = true;
