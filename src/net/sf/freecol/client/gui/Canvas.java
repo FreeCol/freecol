@@ -1791,14 +1791,18 @@ public final class Canvas extends JDesktopPane {
             text.append(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
-        StringTemplate template = StringTemplate.template("scoutSettlement.trade");
-        for (int i = 0; i < wantedGoods.length; i++) {
-            if (wantedGoods[i] != null) {
-                template.add("%goods" + Integer.toString(i+1) + "%",
-                    wantedGoods[i].getNameKey());
+        if (wantedGoods.length > 0) {
+            StringTemplate template
+                = StringTemplate.template("scoutSettlement.trade."
+                    + Integer.toString(wantedGoods.length));
+            for (int i = 0; i < wantedGoods.length; i++) {
+                if (wantedGoods[i] != null) {
+                    template.add("%goods" + Integer.toString(i+1) + "%",
+                        wantedGoods[i].getNameKey());
+                }
             }
+            text.append(Messages.message(template) + "\n\n");
         }
-        text.append(Messages.message(template) + "\n\n");
 
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
