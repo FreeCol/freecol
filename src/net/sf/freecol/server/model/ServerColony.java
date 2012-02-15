@@ -130,6 +130,28 @@ public class ServerColony extends Colony implements ServerModelObject {
 
 
     /**
+     * Is a goods type needed for a buildable that this colony could
+     * be building.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if the goods could be used to build something.
+     */
+    private boolean neededForBuildableType(GoodsType goodsType) {
+        final Specification spec = getSpecification();
+        List<BuildableType> buildables = new ArrayList<BuildableType>();
+        buildables.addAll(spec.getBuildingTypeList());
+        buildables.addAll(spec.getUnitTypesWithoutAbility("model.ability.person"));
+        for (BuildableType bt : buildables) {
+            if (canBuild(bt)) {
+                for (AbstractGoods ag : bt.getGoodsRequired()) {
+                    if (ag.getType() == goodsType) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * New turn for this colony.
      * Try to find out if the colony is going to survive (last colonist does
      * not starve) before generating lots of production-related messages.
@@ -421,23 +443,28 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // If the build queue is empty, check that we are not
-        // producing any building goods types, except if that type is
-        // the input to some other form of production.  Such
-        // production probably means we forgot to reset the build
+        // producing any goods types useful for BuildableTypes, except
+        // if that type is the input to some other form of production.
+        // (Note: isBuildingMaterial is also true for goods used to
+        // produce EquipmentTypes, hence neededForBuildableType).
+        // Such production probably means we forgot to reset the build
         // queue.  Thus, if hammers are being produced it is worth
         // warning about, but not if producing tools.
-        if (buildQueue.size() == 0) {
+        if (buildQueue.isEmpty()) {
             for (GoodsType g : spec.getGoodsTypeList()) {
-                if (g.isBuildingMaterial() && !g.isRawMaterial()
-                    && getAdjustedNetProductionOf(g) > 0) {
+                if (g.isBuildingMaterial()
+                    && !g.isRawMaterial()
+                    && getAdjustedNetProductionOf(g) > 0
+                    && neededForBuildableType(g)) {
                     cs.addMessage(See.only((ServerPlayer) owner),
                         new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                            "model.colony.notBuildingAnything",
-                            this)
+                                         "model.colony.notBuildingAnything",
+                                         this)
                             .addName("%colony%", getName()));
                     break;
                 }
             }
+        } else {
         }
 
         // Update SoL.
