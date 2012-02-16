@@ -226,7 +226,9 @@ public class TransportMission extends Mission {
      */
     private boolean isCarrying(Transportable t) {
         // TODO: Proper code for checking if the goods is onboard the carrier.
-        return t.getTransportLocatable().getLocation() == getUnit();
+        return t != null
+            && t.getTransportLocatable() != null
+            && t.getTransportLocatable().getLocation() == getUnit();
     }
 
     /**

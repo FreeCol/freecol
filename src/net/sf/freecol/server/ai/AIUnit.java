@@ -474,6 +474,11 @@ public class AIUnit extends AIObject implements Transportable {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        if (unit == null || unit.isDisposed()) {
+            logger.warning("Dead AIUnit: " + unit);
+            return;
+        }
+
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
@@ -490,6 +495,9 @@ public class AIUnit extends AIObject implements Transportable {
             }
         }
         if (mission != null) {
+            if (!mission.isValid()) {
+                logger.warning("Writing invalid mission: " + mission);
+            }
             mission.toXML(out);
         }
 

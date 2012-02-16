@@ -151,7 +151,9 @@ public class WorkInsideColonyMission extends Mission {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
+        }
     }
 
     /**
@@ -171,10 +173,6 @@ public class WorkInsideColonyMission extends Mission {
         super.readAttributes(in);
         aiColony = (AIColony) getAIMain()
             .getAIObject(in.getAttributeValue(null, "colony"));
-        if (aiColony == null) {
-            aiColony = new AIColony(getAIMain(),
-                in.getAttributeValue(null, "colony"));
-        }
     }
 
     /**

@@ -1328,7 +1328,6 @@ public class Unit extends FreeColGameObject
         // Not in Europe, at sea, or going to Europe, so there must be
         // a well defined start and end tile.
         Tile start = (carrier == null) ? getTile() : carrier.getTile();
-        if (start == null) throw new IllegalStateException("STARTNULL: " + this + " / " + getLocation() + " / " + isDisposed());
         return getTurnsToReach(start, destination.getTile());
     }
 

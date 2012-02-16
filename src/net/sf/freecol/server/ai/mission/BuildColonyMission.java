@@ -437,7 +437,9 @@ public class BuildColonyMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
+        }
     }
 
     /**

@@ -969,9 +969,11 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             Unit unit = aiUnit.getUnit();
             if (unit.isUninitialized()) {
-                logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
+                logger.warning("Unit is uninitialized: " + unit.getId());
                 continue;
             }
+
+            if (unit.isDisposed()) continue;
 
             if (unit.getState() == UnitState.IN_COLONY
                 && unit.getSettlement().getUnitCount() <= 1) {

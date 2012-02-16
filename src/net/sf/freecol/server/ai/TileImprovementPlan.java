@@ -244,7 +244,9 @@ public class TileImprovementPlan extends ValuedAIObject {
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("type", type.getId());
         out.writeAttribute("value", Integer.toString(getValue()));
-        if (pioneer != null) {
+        if (pioneer != null
+            && pioneer.getUnit() != null
+            && !pioneer.getUnit().isDisposed()) {
             out.writeAttribute("pioneer", pioneer.getId());
         }
         out.writeAttribute("target", target.getId());

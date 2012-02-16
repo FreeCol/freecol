@@ -1249,6 +1249,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        if (colony == null || colony.isDisposed()) {
+            logger.warning("Dead AIColony: " + colony.getName());
+            return;
+        }
+
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE, getId());
 

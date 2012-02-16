@@ -149,24 +149,18 @@ public class WishRealizationMission extends Mission {
 
 
     /**
-    * Returns the destination for this <code>Transportable</code>.
-    * This can either be the target {@link Tile} of the transport
-    * or the target for the entire <code>Transportable</code>'s
-    * mission. The target for the tansport is determined by
-    * {@link TransportMission} in the latter case.
-    *
-    * @return The destination for this <code>Transportable</code>.
-    */
-    public Tile getTransportDestination() {
-        if (getUnit().isOnCarrier()) {
-            return wish.getDestination().getTile();
-        } else if (getUnit().getTile() == wish.getDestination().getTile()) {
-            return null;
-        } else if (getUnit().getTile() == null || getUnit().findPath(wish.getDestination().getTile()) == null) {
-            return wish.getDestination().getTile();
-        } else {
-            return null;
-        }
+     * Gets the transport destination for units with this mission.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    public Location getTransportDestination() {
+        return (wish == null || wish.getDestination() == null)
+            ? null
+            : (wish.getDestination() instanceof Tile)
+            ? ((shouldTakeTransportToTile((Tile)wish.getDestination()))
+                ? (Tile)wish.getDestination()
+                : null)
+            : wish.getDestination();
     }
 
 
