@@ -1266,15 +1266,17 @@ public final class ColonyPanel extends FreeColPanel
                 : getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
             GoodsContainer container = getColony().getGoodsContainer();
-            for (Goods goods : container.getCompactGoods()) {
-                if (goods.getType().isStorable()
-                    && goods.getAmount() >= threshold) {
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
-                    if (colonyPanel.isEditable()) {
-                        goodsLabel.setTransferHandler(defaultTransferHandler);
-                        goodsLabel.addMouseListener(pressListener);
+            for (GoodsType goodsType : getColony().getSpecification().getGoodsTypeList()) {
+                if (goodsType.isStorable()) {
+                    Goods goods = container.getGoods(goodsType);
+                    if (goods.getAmount() >= threshold) {
+                        GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
+                        if (colonyPanel.isEditable()) {
+                            goodsLabel.setTransferHandler(defaultTransferHandler);
+                            goodsLabel.addMouseListener(pressListener);
+                        }
+                        add(goodsLabel, false);
                     }
-                    add(goodsLabel, false);
                 }
             }
             revalidate();
