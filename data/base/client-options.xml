@@ -28,7 +28,7 @@
       <!-- Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping. -->
       <integerOption id="model.option.guiMaxNumberOfGoodsImages" defaultValue="7" minimumValue="1" maximumValue="10"/>
       <!-- Used by GUI, the good will be displayed in the warehouse panel when its quantity is at least this number. -->
-      <integerOption id="model.option.guiMinNumberToDisplayGoods" defaultValue="0" minimumValue="0" maximumValue="15"/>
+      <integerOption id="model.option.guiMinNumberToDisplayGoods" defaultValue="0" minimumValue="0" maximumValue="100"/>
       <!-- Selected tiles always gets centered if this option is enabled -->
       <booleanOption id="model.option.alwaysCenter" defaultValue="false"/>
       <!-- If this option is enabled, the display will recenter in order to display the active unit -->
