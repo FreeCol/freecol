@@ -363,7 +363,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             } else {
                 List<Settlement> adjacent = new ArrayList<Settlement>();
                 int newAmount = amount;
-                for (Tile t : tile.getSurroundingTiles(1)) {
+                for (Tile t : tile.getSurroundingTiles(2)) {
                     Settlement ts = t.getSettlement();
                     if (ts != null && (ServerPlayer)ts.getOwner() == owner) {
                         adjacent.add(ts);
