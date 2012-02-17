@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
@@ -1240,6 +1241,7 @@ public class TransportMission extends Mission {
                 // If unload or doMission succeeded, update the transportables
                 if (u.getLocation() != carrier) {
                     removeFromTransportList(au);
+                    while (transportList.remove(au)); // Make sure its gone!
                     transportListChanged = true;
                 }
                 if (reason != null) {
@@ -1325,7 +1327,13 @@ public class TransportMission extends Mission {
                         // give up on it and do something else with
                         // the carrier.  Similarly also for the goods
                         // loads below.
-                        AIMessage.askEmbark(getAIUnit(), u, null);
+                        if (u.getLocation() instanceof WorkLocation
+                            && ((WorkLocation)u.getLocation()).getColony().getUnitCount() <= 1) {
+                            ; // Do not load sole units in colonies.
+                            // TODO: do this better.
+                        } else {
+                            AIMessage.askEmbark(getAIUnit(), u, null);
+                        }
                         tli.remove();
                         transportListChanged = true;
                     } else {

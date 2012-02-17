@@ -249,6 +249,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return True if the workers were rearranged.
      */
     public boolean rearrangeWorkers() {
+        if (colony.getUnitCount() <= 0) {
+            throw new IllegalStateException("Empty colony found: "
+                + colony.getName());
+        }
+
         int turn = getGame().getTurn().getNumber();
         if (colony.getCurrentlyBuilding() == null
             && colonyPlan.getBestBuildableType() != null
@@ -354,8 +359,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
             String destruct = "Autodestruct at " + colony.getName()
-                + " in " + turn + "\n";
-            for (UnitWas uw : was) destruct += uw.toString() + "\n";
+                + " in " + turn + ":";
+            for (UnitWas uw : was) destruct += " " + uw.toString();
             logger.warning(destruct);
             avertAutoDestruction();
         }
@@ -404,8 +409,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             + " (" + colony.getUnitCount() + ")"
             + " build=" + buildStr
             + " " + getGame().getTurn()
-            + " + " + nextRearrange + "\n";
-        for (UnitWas uw : was) report += uw.toString() + "\n";
+            + " + " + nextRearrange;
+        for (UnitWas uw : was) report += "\n" + uw.toString();
         logger.finest(report);
 
         // Give suitable missions to all units.
@@ -619,6 +624,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * the colony and stuffing it into the town hall.
      */
     private void avertAutoDestruction() {
+        String msg = "Colony " + colony.getName()
+            + " rearrangement leaves no units, "
+            + colony.getTile().getUnitList().size() + " available";
+        for (Unit u : colony.getTile().getUnitList()) {
+            msg += ", " + u.toString();
+        }
+        logger.warning(msg);
+
         List<GoodsType> libertyGoods = getSpecification()
             .getLibertyGoodsTypeList();
         for (Unit u : colony.getTile().getUnitList()) {
@@ -639,9 +652,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         // No good, no choice but to fail.
         if (colony.getUnitCount() <= 0) {
-            throw new IllegalStateException("Colony " + colony.getName()
-                + " rearrangement leaves no units, "
-                + colony.getTile().getUnitList().size() + " available.");
+            throw new IllegalStateException(msg);
         }
     }
 
