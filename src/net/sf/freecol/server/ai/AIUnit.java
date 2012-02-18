@@ -209,7 +209,8 @@ public class AIUnit extends AIObject implements Transportable {
      * @return The source for this <code>Transportable</code>.
      */
     public Location getTransportSource() {
-        return getUnit().getLocation();
+        return (getUnit() == null || getUnit().isDisposed()) ? null
+            : getUnit().getLocation();
     }
 
     /**
@@ -223,11 +224,9 @@ public class AIUnit extends AIObject implements Transportable {
      * @return The destination for this <code>Transportable</code>.
      */
     public Location getTransportDestination() {
-        if (hasMission()) {
-            return mission.getTransportDestination();
-        } else {
-            return null;
-        }
+        return (getUnit() == null || getUnit().isDisposed() || !hasMission())
+            ? null
+            : mission.getTransportDestination();
     }
 
     /**
