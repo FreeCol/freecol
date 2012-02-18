@@ -2746,6 +2746,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             centerTile.changeOwnership(centerClaimant.getOwner(),
                                        centerClaimant);
         }
+        owner.removeSettlement(settlement);
     }
 
     /**
