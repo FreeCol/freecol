@@ -891,9 +891,10 @@ public class InGameControllerTest extends FreeColTestCase {
 
         // Attacker wins and destroys the colony
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);
-        assertTrue("Brave v Colony (8) failed", crs.size() == 2
+        assertTrue("Brave v Colony (8) failed", crs.size() == 3
                    && crs.get(0) == CombatResult.WIN
-                   && crs.get(1) == CombatResult.DESTROY_COLONY);
+                   && crs.get(1) == CombatResult.SLAUGHTER_UNIT
+                   && crs.get(2) == CombatResult.DESTROY_COLONY);
         igc.combat((ServerPlayer) inca, attacker, defender, crs);
 
         assertTrue("Attacker should be mounted",

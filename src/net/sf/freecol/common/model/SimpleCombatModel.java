@@ -577,6 +577,9 @@ public class SimpleCombatModel extends CombatModel {
                         || loser.getLocation() == tile)
                     ? CombatResult.SLAUGHTER_UNIT
                     : CombatResult.DESTROY_COLONY;
+                if (colonyResult == CombatResult.DESTROY_COLONY) {
+                    crs.add(CombatResult.SLAUGHTER_UNIT);
+                }
                 if (colonyResult == CombatResult.CAPTURE_COLONY
                     || colonyResult == CombatResult.DESTROY_COLONY) {
                     CombatResult shipResult = null;
