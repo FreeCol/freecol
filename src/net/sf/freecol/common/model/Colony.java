@@ -2405,7 +2405,7 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
+        for (WorkLocation workLocation : getAllWorkLocations()) {
             objects.addAll(((FreeColGameObject) workLocation).disposeList());
         }
         TileImprovement road = getTile().getRoad();
