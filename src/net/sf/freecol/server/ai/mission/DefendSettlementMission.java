@@ -28,49 +28,49 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Element;
 
 
 /**
  * Mission for defending a <code>Settlement</code>.
- * @see net.sf.freecol.common.model.Settlement Settlement
+ *
+ * TODO: This Mission should later use sub-missions for
+ *       eliminating threats etc.
  */
 public class DefendSettlementMission extends Mission {
-    /*
-     * TODO: This Mission should later use sub-missions for
-     *       eliminating threats etc.
-     */
-    private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
+    private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
     /** The <code>Settlement</code> to be protected. */
     private Settlement settlement;
 
-    //private Mission subMission;
-
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
+     *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
      * @param settlement The <code>Settlement</code> to defend.
-     * @exception NullPointerException if <code>aiUnit == null</code> or
-     *        <code>settlement == null</code>.
      */
-    public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit, Settlement settlement) {
+    public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
+                                   Settlement settlement) {
         super(aiMain, aiUnit);
-
         this.settlement = settlement;
     }
 
@@ -96,10 +96,75 @@ public class DefendSettlementMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-     public DefendSettlementMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-         super(aiMain);
-         readFromXML(in);
-     }
+    public DefendSettlementMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
+    }
+    
+
+    /**
+     * Gets the target settlement.
+     *
+     * @return The <code>Settlement</code> to be defended by
+     *         this <code>Mission</code>.
+     */
+    public Settlement getSettlement() {
+        return settlement;
+    }
+
+
+    // Fake Transportable interface
+
+    /**
+     * Gets the transport destination for units with this mission.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    public Location getTransportDestination() {
+        return (settlement != null
+            && shouldTakeTransportToTile(settlement.getTile()))
+            ? settlement.getTile()
+            : null;
+    }
+
+    /**
+     * Returns the priority of getting the unit to the
+     * transport destination.
+     *
+     * @return The priority.
+     */
+    public int getTransportPriority() {
+        return (getTransportDestination() == null) ? 0
+            : NORMAL_TRANSPORT_PRIORITY + 5;
+    }
+
+    // Mission interface
+
+    /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @return True if this mission is still valid to perform.
+     */
+    public static boolean isValid(AIUnit aiUnit) {
+        return Mission.isValid(aiUnit)
+            && aiUnit.getUnit().isDefensiveUnit()
+            && aiUnit.getUnit().getOwner().getNumberOfSettlements() > 0;
+    }
+
+    /**
+     * Checks if this mission is still valid to perform.
+     *
+     * @return True if this mission is still valid to perform.
+     */
+    public boolean isValid() {
+        return super.isValid()
+            && getUnit().isDefensiveUnit()
+            && settlement != null
+            && !settlement.isDisposed()
+            && settlement.getOwner() == getUnit().getOwner();
+    }
 
     /**
      * Performs this mission.
@@ -108,40 +173,78 @@ public class DefendSettlementMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-        if (!isValid() || unit.getTile() == null) return;
-        final Tile settlementTile = settlement.getTile();
+        if (unit == null || unit.isDisposed()) return;
 
-        if (unit.getTile() != settlementTile) { // Go home!
-            Direction r = moveTowards(settlementTile);
-            if (r == null || !moveButDontAttack(r)) return;
-        }
-
-        int defenderCount = 0, fortifiedCount = 0;
-        List<Unit> units = settlement.getUnitList();
-        units.addAll(settlementTile.getUnitList());
-        for (Unit u : units) {
-            if (unit.isOffensiveUnit()) {
-                defenderCount++;
-                if (unit.getState() == UnitState.FORTIFIED) {
-                    fortifiedCount++;
-                }
-            }
-        }
-        if (defenderCount <= 2 || fortifiedCount <= 1) {
-            // The settlement is badly defended, go straight home if not
-            // there, otherwise fortify if not already.
-            if (unit.getTile() == settlementTile
-                && unit.getState() != UnitState.FORTIFIED
-                && unit.getState() != UnitState.FORTIFYING
-                && unit.checkSetState(UnitState.FORTIFYING)) {
-                AIMessage.askChangeState(getAIUnit(), UnitState.FORTIFYING);
-            }
+        // Check target still makes sense.
+        if (!isValid()) {
+            logger.finest("AI defender has invalid settlement " + settlement
+                + ": " + unit);
             return;
         }
 
-        // The settlement is well enough defended.  (must prevent a
-        // sole unit losing an offensive combat because the combat
-        // model does not understand that).
+        // Go home!
+        if (travelToTarget("AI defender", settlement.getTile())
+            != Unit.MoveType.MOVE) return;
+
+        // Check if the mission should change?
+        // Change to supporting the settlement if the size is marginal.
+        final AIMain aiMain = getAIMain();
+        final AIUnit aiUnit = getAIUnit();
+        Mission m = null;
+        if (settlement instanceof Colony) {
+            Colony colony = (Colony)settlement;
+            if (unit.getLocation() instanceof WorkLocation
+                || (unit.isPerson() && settlement.getUnitCount() <= 1)) {
+                m = new WorkInsideColonyMission(aiMain, aiUnit,
+                    aiMain.getAIColony(colony));
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            if (unit.isPerson() && settlement.getUnitCount() <= 1) {
+                m = new IdleAtColonyMission(aiMain, aiUnit);
+            }
+        }                
+        if (m != null) {
+            aiUnit.setMission(m);
+            m.doMission(aiUnit.getConnection());
+            return;
+        }
+
+        // Anything more to do?
+        if (unit.getState() == UnitState.FORTIFIED
+            || unit.getState() == UnitState.FORTIFYING) {
+            return; // No log, these happen indefinitely.
+        }
+
+        // Check if the settlement is badly defended.  If so, try to fortify.
+        int defenderCount = 0, fortifiedCount = 0;
+        List<Unit> units = settlement.getUnitList();
+        units.addAll(settlement.getTile().getUnitList());
+        for (Unit u : units) {
+            if (unit.isDefensiveUnit()) {
+                defenderCount++;
+                if (unit.getState() == UnitState.FORTIFIED) fortifiedCount++;
+            }
+        }
+        if (defenderCount <= 2 || fortifiedCount <= 1) {
+            String logMe;
+            if (!unit.checkSetState(UnitState.FORTIFYING)) {
+                logMe = "waiting to fortify at ";
+            } else if (AIMessage.askChangeState(getAIUnit(),
+                                                UnitState.FORTIFYING)
+                && unit.getState() == UnitState.FORTIFYING) {
+                logMe = "fortifying at ";
+            } else {
+                logMe = "fortify failed at ";
+            }
+            logger.finest("AI defender " + logMe + settlement.getName()
+                + ": " + unit);
+            return;
+        }
+
+        // The settlement is well enough defended.  See if the unit
+        // should attack a nearby hostile unit.  Remember to prevent a
+        // sole unit attacking because if it loses, the settlement
+        // will collapse (and the combat model does not understand that).
         if (!unit.isOffensiveUnit()) return;
         CombatModel combatModel = unit.getGame().getCombatModel();
         Unit bestTarget = null;
@@ -160,7 +263,8 @@ public class DefendSettlementMission extends Mission {
                 float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);
                 float weDefend = combatModel.getDefencePower(enemyUnit, unit);
                 
-                float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);
+                float difference = weAttack / (weAttack + enemyDefend)
+                    - enemyAttack / (enemyAttack + weDefend);
                 if (difference > bestDifference) {
                     if (difference > 0 || weAttack > enemyDefend) {
                         bestDifference = difference;
@@ -171,74 +275,17 @@ public class DefendSettlementMission extends Mission {
             }
         }
 
+        // Attack if a target is available.  Do not log if nothing happening.
         if (bestTarget != null) {
+            logger.finest("AI defender attacking " + bestTarget
+                + " from " + settlement.getName() + ": " + unit);
             AIMessage.askAttack(getAIUnit(), bestDirection);
         }
     }
-
+    
     /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link Tile} of the transport
-     * or the target for the entire <code>Transportable</code>'s
-     * mission. The target for the transport is determined by
-     * {@link TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
-     */
-     public Tile getTransportDestination() {
-         if (settlement == null) {
-             return null;
-         } else if (getUnit().isOnCarrier()) {
-             return settlement.getTile();
-         } else if (getUnit().getLocation().getTile() == settlement.getTile()) {
-             return null;
-         } else if (getUnit().getTile() == null || getUnit().findPath(settlement.getTile()) == null) {
-             return settlement.getTile();
-         } else {
-             return null;
-         }
-     }
-
-
-     /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
-     *
-     * @return The priority.
-     */
-     public int getTransportPriority() {
-        if (getTransportDestination() != null) {
-            return NORMAL_TRANSPORT_PRIORITY + 5;
-        } else {
-            return 0;
-        }
-     }
-
-     /**
-      * Gets the settlement.
-      * @return The <code>Settlement</code> to be defended by
-      *         this <code>Mission</code>.
-      */
-     public Settlement getSettlement() {
-         return settlement;
-     }
-
-    /**
-     * Checks if this mission is still valid to perform.
-     *
-     * @return True if this mission is still valid to perform.
-     */
-    public boolean isValid() {
-        return super.isValid()
-            && settlement != null && !settlement.isDisposed()
-            && settlement.getOwner() == getUnit().getOwner()
-            && getUnit().isDefensiveUnit();
-    }
-
-    /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
+     * Gets debugging information about this mission.  This string is
+     * a short representation of this object's state.
      *
      * @return The <code>String</code>:
      *      "(x, y) ColonyName"
@@ -248,10 +295,12 @@ public class DefendSettlementMission extends Mission {
      *      (if available).
      */
     public String getDebuggingInfo() {
-        String name = (settlement instanceof Colony) ? ((Colony) settlement).getName() : "";
-        return settlement.getTile().getPosition().toString() + " " + name;
+        return settlement.getTile().getPosition().toString()
+            + " " + settlement.getName();
     }
 
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -262,23 +311,25 @@ public class DefendSettlementMission extends Mission {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
-    }
-
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        if (settlement != null) {
-            out.writeAttribute("settlement", settlement.getId());
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
         }
     }
 
     /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
+     * {@inherit-doc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("settlement", settlement.getId());
+    }
+
+    /**
+     * {@inherit-doc}
+     */
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
         settlement = (Settlement) getGame()
             .getFreeColGameObject(in.getAttributeValue(null, "settlement"));

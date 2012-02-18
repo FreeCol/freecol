@@ -406,6 +406,11 @@ public class AIUnit extends AIObject implements Transportable {
         return getAIMain().getAIPlayer(unit.getOwner());
     }
 
+    /**
+     * Convenience accessor for the owning player connection.
+     *
+     * @return The connection.
+     */
     public Connection getConnection() {
         return getAIOwner().getConnection();
     }
