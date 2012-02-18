@@ -1395,8 +1395,9 @@ public class TransportMission extends Mission {
      * @return <code>true</code>
      */
     public boolean isValid() {
+        if (!super.isValid()) return false;
         updateTransportList();
-        return !transportList.isEmpty() && super.isValid();
+        return !transportList.isEmpty();
     }
 
     /**
