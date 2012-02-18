@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -2958,7 +2959,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
             if (building.getType().getUpgradesFrom() == null) {
+                // Eject units to any available work location.
+                unit: for (Unit u : building.getUnitList()) {
+                    for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+                        if (wl == building || !wl.canAdd(u)) continue;
+                        u.setLocation(wl);
+                        continue unit;
+                    }
+                    u.setLocation(colony.getTile());
+                }
                 colony.removeBuilding(building);
+                cs.addDispose(See.only(colonyPlayer), colony, building);
             } else if (building.canBeDamaged()) {
                 building.damage();
             }
