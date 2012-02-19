@@ -3460,37 +3460,36 @@ public class Player extends FreeColGameObject implements Nameable {
                                  boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
 
-        for (Entry<Player, Tension> entry : tension.entrySet()) {
-            out.writeStartElement(TENSION_TAG);
-            out.writeAttribute("player", entry.getKey().getId());
-            out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
-            out.writeEndElement();
-        }
-
-        for (Entry<String, Stance> entry : stance.entrySet()) {
-            out.writeStartElement(STANCE_TAG);
-            out.writeAttribute("player", entry.getKey());
-            out.writeAttribute(VALUE_TAG, entry.getValue().toString());
-            out.writeEndElement();
-        }
-
-        for (HistoryEvent event : history) {
-            event.toXML(out);
-        }
-
-        for (TradeRoute route : tradeRoutes) {
-            route.toXML(out, this, false, false);
-        }
-
         if (market != null) {
             market.toXML(out, player, showAll, toSavedGame);
         }
-
-        if (highSeas != null) {
-            highSeas.toXMLImpl(out, player, showAll, toSavedGame);
-        }
-
         if (showAll || toSavedGame || equals(player)) {
+            for (Entry<Player, Tension> entry : tension.entrySet()) {
+                out.writeStartElement(TENSION_TAG);
+                out.writeAttribute("player", entry.getKey().getId());
+                out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
+                out.writeEndElement();
+            }
+            
+            for (Entry<String, Stance> entry : stance.entrySet()) {
+                out.writeStartElement(STANCE_TAG);
+                out.writeAttribute("player", entry.getKey());
+                out.writeAttribute(VALUE_TAG, entry.getValue().toString());
+                out.writeEndElement();
+            }
+            
+            for (HistoryEvent event : history) {
+                event.toXML(out);
+            }
+            
+            for (TradeRoute route : tradeRoutes) {
+                route.toXML(out, this, false, false);
+            }
+            
+            if (highSeas != null) {
+                highSeas.toXMLImpl(out, player, showAll, toSavedGame);
+            }
+
             out.writeStartElement(FOUNDING_FATHER_TAG);
             out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
             int index = 0;
@@ -3525,11 +3524,22 @@ public class Player extends FreeColGameObject implements Nameable {
                     sale.toXMLImpl(out);
                 }
             }
-            if (market != null) {
-                market.toXML(out, player, showAll, toSavedGame);
+        } else {
+            Tension t = getTension(player);
+            if (t != null) {
+                out.writeStartElement(TENSION_TAG);
+                out.writeAttribute("player", player.getId());
+                out.writeAttribute(VALUE_TAG, String.valueOf(t.getValue()));
+                out.writeEndElement();
+            }
+            Stance s = getStance(player);
+            for (Entry<String, Stance> entry : stance.entrySet()) {
+                out.writeStartElement(STANCE_TAG);
+                out.writeAttribute("player", player.getId());
+                out.writeAttribute(VALUE_TAG, s.toString());
+                out.writeEndElement();
             }
         }
-
     }
 
     /**
