@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -151,8 +152,6 @@ public final class FreeColClient {
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
-
-
         gui = new GUI(this);
 
         // Look for base data directory.  Failure is fatal.
@@ -181,6 +180,10 @@ public final class FreeColClient {
 
         // Determine the window size.
         gui.setWindowed(size != null);
+        final Dimension windowSize = (size == null) ? null
+            : (size.width <= 0 || size.height <= 0) ? gui.determineWindowSize()
+            : size;
+        logger.info("Window size is " + windowSize);
 
         // Control
         connectController = new ConnectController(this, gui);
@@ -205,8 +208,9 @@ public final class FreeColClient {
         try {
             FreeColTcFile tcData = new FreeColTcFile("classic");
             ResourceManager.setTcMapping(tcData.getResourceMapping());
-        } catch(IOException e) {
-            System.out.println("Failed to load resource mapping from rule set 'classic'.");
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load resource mapping from rule set 'classic'.", e);
+            System.err.println("Failed to load resource mapping from rule set 'classic'.");
             System.exit(1);
         }
         actionManager.initializeActions();
@@ -216,7 +220,7 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         // Once resources are in place, get preloading started.
-        ResourceManager.preload(gui.determineWindowSize());
+        ResourceManager.preload(windowSize);
 
         // Work out the main font now that resources are loaded.
         Font font = null;
@@ -231,11 +235,12 @@ public final class FreeColClient {
         // Swing system and look-and-feel initialization.
         try {
             FreeColLookAndFeel fclaf
-                = new FreeColLookAndFeel(FreeCol.getDataDirectory(), size);
+                = new FreeColLookAndFeel(FreeCol.getDataDirectory());
             FreeColLookAndFeel.install(fclaf, font);
         } catch (FreeColException e) {
+            logger.log(Level.SEVERE, "Unable to install FreeCol look-and-feel.",
+                       e);
             System.err.println("Unable to install FreeCol look-and-feel.");
-            e.printStackTrace();
             System.exit(1);
         }
 
@@ -243,7 +248,7 @@ public final class FreeColClient {
         gui.hideSplashScreen();
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    gui.startGUI(size, sound, showOpeningVideo,
+                    gui.startGUI(windowSize, sound, showOpeningVideo,
                                  savedGame != null);
                 }
             });

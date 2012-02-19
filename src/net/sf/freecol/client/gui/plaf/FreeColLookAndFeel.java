@@ -53,11 +53,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      * Initiates a new FreeCol look and feel.
      *
      * @param dataDirectory The home of the FreeCol data files.
-     * @param windowSize The size of the application window.
      * @exception FreeColException If the ui directory could not be found.
      */
-    public FreeColLookAndFeel(File dataDirectory, Dimension windowSize)
-        throws FreeColException {
+    public FreeColLookAndFeel(File dataDirectory) throws FreeColException {
         super();
 
         setCurrentTheme(new DefaultMetalTheme() {

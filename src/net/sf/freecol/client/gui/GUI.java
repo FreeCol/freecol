@@ -114,7 +114,7 @@ public class GUI {
     /**
      * The space not being used in windowed mode.
      */
-    private static final int DEFAULT_WINDOW_SPACE = 100;
+    private static final int DEFAULT_WINDOW_SPACE = 50;
 
 
     private FreeColClient freeColClient;
@@ -247,13 +247,10 @@ public class GUI {
     }
 
     public Dimension determineWindowSize() {
-
-        Rectangle bounds = GraphicsEnvironment
-            .getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
+            .getMaximumWindowBounds();
         Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
-                             bounds.height - DEFAULT_WINDOW_SPACE);
-        logger.info("Window size is " + size.getWidth()
-            + " x " + size.getHeight());
+                                       bounds.height - DEFAULT_WINDOW_SPACE);
         return size;
     }
 
