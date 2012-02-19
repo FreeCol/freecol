@@ -34,6 +34,8 @@ import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
+import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
@@ -53,11 +55,19 @@ import net.sf.freecol.common.model.TileImprovementType;
  */
 public abstract class MapControls {
 
+    public static final int MAP_WIDTH = 220;
+    public static final int MAP_HEIGHT = 128;
+    public static final int GAP = 4;
+
     private final FreeColClient freeColClient;
 
     private final InfoPanel infoPanel;
     private final MiniMap miniMap;
+    private final UnitButton miniMapZoomOutButton;
+    private final UnitButton miniMapZoomInButton;
     private final List<UnitButton> unitButtons;
+
+    private boolean useSkin = true;
 
     private GUI gui;
 
@@ -73,7 +83,7 @@ public abstract class MapControls {
         this.gui = gui;
 
         infoPanel = new InfoPanel(freeColClient, gui, useSkin);
-        miniMap = new MiniMap(freeColClient, gui, useSkin);
+        miniMap = new MiniMap(freeColClient, gui);
         final ActionManager am = freeColClient.getActionManager();
 
         unitButtons = new ArrayList<UnitButton>();
@@ -93,16 +103,39 @@ public abstract class MapControls {
         unitButtons.add(new UnitButton(am, BuildColonyAction.id));
         unitButtons.add(new UnitButton(am, DisbandUnitAction.id));
 
+        miniMapZoomOutButton = new UnitButton(am, MiniMapZoomOutAction.id);
+        miniMapZoomInButton = new UnitButton(am, MiniMapZoomInAction.id);
+
+        miniMapZoomOutButton.setFocusable(false);
+        miniMapZoomInButton.setFocusable(false);
+
         //
         // Don't allow them to gain focus
         //
         infoPanel.setFocusable(false);
-        miniMap.setFocusable(false);
 
         for (UnitButton button : unitButtons) {
             button.setFocusable(false);
         }
 
+    }
+
+    /**
+     * Returns the <code>miniMapZoomOutButton</code>.
+     *
+     * @return an <code>UnitButton</code> value
+     */
+    public UnitButton getMiniMapZoomOutButton() {
+        return miniMapZoomOutButton;
+    }
+
+    /**
+     * Returns the <code>miniMapZoomInButton</code>.
+     *
+     * @return an <code>UnitButton</code> value
+     */
+    public UnitButton getMiniMapZoomInButton() {
+        return miniMapZoomInButton;
     }
 
     /**
@@ -186,4 +219,7 @@ public abstract class MapControls {
             break;
         }
     }
+
+    public abstract void repaint();
+
 }

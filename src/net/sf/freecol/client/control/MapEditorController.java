@@ -214,7 +214,7 @@ public final class MapEditorController {
                     BufferedImage image = new BufferedImage(width, height,
                                                             BufferedImage.TYPE_INT_ARGB);
                     Graphics2D g2d = image.createGraphics();
-                    miniMap.paintMap(g2d, width, height);
+                    miniMap.paintMap(g2d);
 
                     // TODO: this can probably done more efficiently
                     // by applying a suitable AffineTransform to the

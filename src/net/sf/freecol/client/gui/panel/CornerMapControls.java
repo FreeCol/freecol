@@ -22,9 +22,13 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.util.List;
 
+import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -46,6 +50,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class CornerMapControls extends MapControls {
 
     private final JLabel compassRose;
+    private final MiniMapPanel miniMapPanel;
+    private Image miniMapSkin;
 
     /**
      * The basic constructor.
@@ -71,6 +77,49 @@ public final class CornerMapControls extends MapControls {
                 }
             });
 
+        miniMapSkin = ResourceManager.getImage("MiniMap.skin");
+
+        miniMapPanel = new MiniMapPanel();
+        miniMapPanel.setFocusable(false);
+        MiniMap miniMap = getMiniMap();
+        UnitButton miniMapZoomInButton = getMiniMapZoomInButton();
+        UnitButton miniMapZoomOutButton = getMiniMapZoomOutButton();
+
+        // Add buttons:
+        miniMapPanel.setLayout(null);
+        miniMap.setSize(MAP_WIDTH, MAP_HEIGHT);
+        miniMapPanel.add(miniMapZoomInButton);
+        miniMapPanel.add(miniMapZoomOutButton);
+        miniMapPanel.add(miniMap);
+
+        if (miniMapSkin != null) {
+            miniMapPanel.setBorder(null);
+            miniMapPanel.setSize(miniMapSkin.getWidth(null), miniMapSkin.getHeight(null));
+            miniMapPanel.setOpaque(false);
+            // TODO-LATER: The values below should be specified by a skin-configuration-file:
+            miniMap.setLocation(38, 75);
+            miniMapZoomInButton.setLocation(4, 174);
+            miniMapZoomOutButton.setLocation(264, 174);
+        } else {
+            int width = miniMapZoomOutButton.getWidth()
+                + miniMapZoomInButton.getWidth() + 4 * GAP;
+            miniMapPanel.setOpaque(true);
+            miniMap.setBorder(new BevelBorder(BevelBorder.RAISED));
+            miniMap.setLocation(width/2, GAP);
+            miniMapZoomInButton.setLocation(GAP, MAP_HEIGHT + GAP - miniMapZoomInButton.getHeight());
+            miniMapZoomOutButton.setLocation(miniMapZoomInButton.getWidth() + MAP_WIDTH + 3 * GAP,
+                                             MAP_HEIGHT + GAP - miniMapZoomOutButton.getHeight());
+        }
+
+    }
+
+    /**
+     * Returns the mini map panel.
+     *
+     * @return a <code>MiniMapPanel</code> value
+     */
+    public MiniMapPanel getMiniMapPanel() {
+        return miniMapPanel;
     }
 
     public boolean isShowing() {
@@ -91,11 +140,11 @@ public final class CornerMapControls extends MapControls {
         // Relocate GUI Objects
         //
 
-        MiniMap miniMap = getMiniMap();
+        MiniMapPanel miniMapPanel = getMiniMapPanel();
         InfoPanel infoPanel = getInfoPanel();
 
         infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
-        miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
+        miniMapPanel.setLocation(0, component.getHeight() - miniMapPanel.getHeight());
         compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20, 20);
 
         List<UnitButton> unitButtons = getUnitButtons();
@@ -103,8 +152,8 @@ public final class CornerMapControls extends MapControls {
             final int WIDTH = unitButtons.get(0).getWidth();
             final int SPACE = 5;
             int length = unitButtons.size();
-            int x = miniMap.getWidth() + 1 +
-                ((infoPanel.getX() - miniMap.getWidth() -
+            int x = miniMapPanel.getWidth() + 1 +
+                ((infoPanel.getX() - miniMapPanel.getWidth() -
                   length * WIDTH - (length - 1) * SPACE - WIDTH) / 2);
             int y = component.getHeight() - 40;
             int step = WIDTH + SPACE;
@@ -119,7 +168,7 @@ public final class CornerMapControls extends MapControls {
         // Add the GUI Objects to the container
         //
         component.add(infoPanel, CONTROLS_LAYER, false);
-        component.add(miniMap, CONTROLS_LAYER, false);
+        component.add(miniMapPanel, CONTROLS_LAYER, false);
         if (getFreeColClient().getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
             component.add(compassRose, CONTROLS_LAYER, false);
@@ -140,12 +189,28 @@ public final class CornerMapControls extends MapControls {
      */
     public void removeFromComponent(Canvas canvas) {
         canvas.remove(getInfoPanel(), false);
-        canvas.remove(getMiniMap(), false);
+        canvas.remove(getMiniMapPanel(), false);
         canvas.remove(compassRose, false);
 
         for (UnitButton button : getUnitButtons()) {
             canvas.remove(button, false);
         }
+    }
+
+    public void repaint() {
+        miniMapPanel.repaint();
+    }
+
+    public class MiniMapPanel extends JPanel {
+
+        @Override
+        public void paintComponent(Graphics graphics) {
+            if (miniMapSkin != null) {
+                graphics.drawImage(miniMapSkin, 0, 0, null);
+            }
+            super.paintComponent(graphics);
+        }
+
     }
 
 }

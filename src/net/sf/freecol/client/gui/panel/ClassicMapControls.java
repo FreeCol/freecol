@@ -61,8 +61,11 @@ public final class ClassicMapControls extends MapControls {
         panel = new JPanel(new MigLayout("wrap 3"));
 
         MiniMap miniMap = getMiniMap();
-        panel.add(miniMap, "span, width " + miniMap.getWidth()
-                  + ", height " + miniMap.getHeight());
+        panel.add(miniMap, "span, width " + MAP_WIDTH
+                  + ", height " + MAP_HEIGHT);
+
+        panel.add(getMiniMapZoomInButton(), "newline 10");
+        panel.add(getMiniMapZoomOutButton(), "skip");
 
         panel.add(makeButton("NW", "\u2196"), "newline 20");
         panel.add(makeButton("N",  "\u2191"));
@@ -115,6 +118,10 @@ public final class ClassicMapControls extends MapControls {
      */
     public void removeFromComponent(Canvas canvas) {
         canvas.remove(panel, false);
+    }
+
+    public void repaint() {
+        panel.repaint();
     }
 
 }

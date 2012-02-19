@@ -79,6 +79,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
         MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
             .getFreeColAction(MapControlsAction.id);
         mca.getMapControls().getMiniMap().zoomOut();
+        mca.getMapControls().repaint();
         update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id).update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id + ".secondary").update();
