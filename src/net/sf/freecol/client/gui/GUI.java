@@ -945,9 +945,9 @@ public class GUI {
      * Starts the GUI by creating and displaying the GUI-objects.
      */
     public void startGUI(Dimension innerWindowSize,
-                          final boolean sound,
-                          final boolean showOpeningVideo,
-                          final boolean loadGame) {
+                         final boolean sound,
+                         final boolean showOpeningVideo,
+                         final boolean loadGame) {
         final ClientOptions opts = freeColClient.getClientOptions();
         // Prepare the sound system.
         if (sound) {

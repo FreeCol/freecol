@@ -146,7 +146,8 @@ public final class FreeColClient {
      * @param showOpeningVideo Display the opening video.
      * @param fontName An optional override of the main font.
      */
-    public FreeColClient(final File savedGame, Dimension size,
+    public FreeColClient(final File savedGame,
+                         final Dimension size,
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo, String fontName) {
@@ -179,10 +180,7 @@ public final class FreeColClient {
         gui.displaySpashScreen(splashFilename);
 
         // Determine the window size.
-        gui.setWindowed((size != null));
-        if (size != null && size.width < 0) {
-            size = gui.determineWindowSize();
-        }
+        gui.setWindowed(size != null);
 
         // Control
         connectController = new ConnectController(this, gui);
@@ -218,7 +216,7 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         // Once resources are in place, get preloading started.
-        ResourceManager.preload(size);
+        ResourceManager.preload(gui.determineWindowSize());
 
         // Work out the main font now that resources are loaded.
         Font font = null;
@@ -242,14 +240,11 @@ public final class FreeColClient {
         }
 
         // Start the GUI.
-
         gui.hideSplashScreen();
-
-        final Dimension windowSize = size;
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    gui.startGUI(windowSize, sound, showOpeningVideo,
-                        savedGame != null);
+                    gui.startGUI(size, sound, showOpeningVideo,
+                                 savedGame != null);
                 }
             });
 
