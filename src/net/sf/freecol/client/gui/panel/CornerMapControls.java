@@ -85,9 +85,14 @@ public final class CornerMapControls extends MapControls {
         UnitButton miniMapZoomInButton = getMiniMapZoomInButton();
         UnitButton miniMapZoomOutButton = getMiniMapZoomOutButton();
 
-        // Add buttons:
+        /**
+         * In order to make the setLocation setup work, we need to set
+         * the layout to null first, then set the size of the minimap,
+         * and then its location.
+         */
         miniMapPanel.setLayout(null);
         miniMap.setSize(MAP_WIDTH, MAP_HEIGHT);
+        // Add buttons:
         miniMapPanel.add(miniMapZoomInButton);
         miniMapPanel.add(miniMapZoomOutButton);
         miniMapPanel.add(miniMap);
