@@ -266,6 +266,12 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected int liberty;
 
+    /**
+     * The number of liberty bells produced towards the intervention
+     * force.
+     */
+    protected int interventionBells;
+
     /** The market for Europe. */
     protected Market market;
 
@@ -2851,6 +2857,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void incrementLiberty(int amount) {
         setLiberty(Math.max(0, getLiberty() + amount));
+        if (playerType == PlayerType.REBEL) {
+            interventionBells += amount;
+        }
     }
 
     /**
@@ -3427,6 +3436,7 @@ public class Player extends FreeColGameObject implements Nameable {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("liberty", Integer.toString(liberty));
+            out.writeAttribute("interventionBells", Integer.toString(interventionBells));
             if (currentFather != null) {
                 out.writeAttribute("currentFather", currentFather.getId());
             }
@@ -3559,6 +3569,7 @@ public class Player extends FreeColGameObject implements Nameable {
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         immigration = getAttribute(in, "immigration", 0);
         liberty = getAttribute(in, "liberty", 0);
+        interventionBells = getAttribute(in, "interventionBells", 0);
         oldSoL = getAttribute(in, "oldSoL", 0);
         score = getAttribute(in, "score", 0);
         ready = getAttribute(in, "ready", false);

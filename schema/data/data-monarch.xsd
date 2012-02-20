@@ -3,7 +3,7 @@
 	   elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-      
+
       Copyright (C) 2002-2011  The FreeCol Team
 
       This file is part of FreeCol.
@@ -29,6 +29,7 @@
   <xs:element name="monarch">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <!-- @compat 0.10.5 -->
         <xs:element name="navalUnits">
           <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -43,6 +44,9 @@
             </xs:choice>
           </xs:complexType>
         </xs:element>
+        <!-- end @compat -->
+        <xs:element name="expeditionaryForce" type="ForceType" />
+        <xs:element name="interventionForce" type="ForceType" />
       </xs:choice>
 
       <xs:attribute name="ID" type="MonarchId" use="required"/>
@@ -55,8 +59,8 @@
 
     </xs:complexType>
   </xs:element>
-  
-  
+
+
   <xs:element name="abstractUnit">
     <xs:complexType>
       <xs:attribute name="id" type="UnitTypeId" use="required"/>
@@ -65,5 +69,25 @@
                     default="1"/>
     </xs:complexType>
   </xs:element>
-  
+
+
+  <xs:complexType name="ForceType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="navalUnits">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="abstractUnit" />
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="landUnits">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="abstractUnit" />
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
 </xs:schema>

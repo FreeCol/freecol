@@ -61,25 +61,11 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** The player of this monarch. */
     private Player player;
 
-    /** The number of land units in the REF. */
-    private final List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
-
-    /** The number of naval units in the REF. */
-    private final List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
-
     /** Whether a frigate has been provided. */
     private boolean supportSea = false;
 
     /** Whether displeasure has been incurred. */
     private boolean displeasure = false;
-
-    // Internal variables that do not need serialization.
-    /** The space required to transport all land units. */
-    private int spaceRequired;
-
-    /** The current naval transport capacity. */
-    private int capacity;
-
 
     /** Constants describing monarch actions. */
     public static enum MonarchAction {
@@ -96,6 +82,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         SUPPORT_SEA,
         OFFER_MERCENARIES, DISPLEASURE,
     }
+
+    private Force expeditionaryForce = new Force();
+    private Force interventionForce = new Force();
 
 
     /**
@@ -118,22 +107,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.name = name;
 
         Specification spec = getSpecification();
-        List<AbstractUnit> ref =
-            ((UnitListOption) spec.getOption("model.option.refSize")).getOptionValues();
-        for (AbstractUnit unit : ref) {
-            UnitType unitType = unit.getUnitType(spec);
-            if (unitType.hasAbility("model.ability.refUnit")) {
-                if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                    navalUnits.add(unit);
-                } else {
-                    landUnits.add(unit);
-                }
-            } else {
-                logger.warning("Found REF unit lacking ability \"model.ability.refUnit\": "
-                               + unit.toString());
-            }
-        }
-        //updateSpaceAndCapacity();
+        expeditionaryForce = new Force((UnitListOption) spec.getOption("model.option.refSize"), "model.ability.refUnit");
+        interventionForce = new Force((UnitListOption) spec.getOption("model.option.interventionForce"), null);
     }
 
     /**
@@ -164,20 +139,21 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Update the space and capacity variables.
+     * Describe <code>getExpeditionaryForce</code> method here.
+     *
+     * @return a <code>Force</code> value
      */
-    private void updateSpaceAndCapacity() {
-        Specification spec = getSpecification();
-        capacity = 0;
-        for (AbstractUnit nu : navalUnits) {
-            if (nu.getUnitType(spec).canCarryUnits()) {
-                capacity += nu.getUnitType(spec).getSpace() * nu.getNumber();
-            }
-        }
-        spaceRequired = 0;
-        for (AbstractUnit lu : landUnits) {
-            spaceRequired += lu.getUnitType(spec).getSpaceTaken() * lu.getNumber();
-        }
+    public Force getExpeditionaryForce() {
+        return expeditionaryForce;
+    }
+
+    /**
+     * Describe <code>getInterventionForce</code> method here.
+     *
+     * @return a <code>Force</code> value
+     */
+    public Force getInterventionForce() {
+        return interventionForce;
     }
 
     /**
@@ -224,35 +200,6 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public String getNameKey() {
         return name;
-    }
-
-    /**
-     * Gets the REF units.
-     *
-     * @return A list of all REF units.
-     */
-    public List<AbstractUnit> getREF() {
-        List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
-        result.addAll(navalUnits);
-        return result;
-    }
-
-    /**
-     * Gets the REF naval units.
-     *
-     * @return A list of the REF naval units.
-     */
-    public List<AbstractUnit> getREFNavalUnits() {
-        return navalUnits;
-    }
-
-    /**
-     * Gets the REF land units.
-     *
-     * @return A list of the REF land units.
-     */
-    public List<AbstractUnit> getREFLandUnits() {
-        return landUnits;
     }
 
     /**
@@ -407,53 +354,23 @@ public final class Monarch extends FreeColGameObject implements Named {
         AbstractUnit result = null;
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
-        logger.info("Add to REF: capacity=" + capacity
-                    + " spaceRequired=" + spaceRequired + " => "
-                    + ((capacity < spaceRequired + 15) ? "naval" : "land")
-                    + " unit");
         // TODO: magic number 2.5 * Manowar-capacity = 15
-        if (capacity < spaceRequired + 15) {
+        boolean needNaval = (expeditionaryForce.getCapacity()
+                             < expeditionaryForce.getSpaceRequired() + 15);
+        logger.info("Add to REF: capacity=" + expeditionaryForce.getCapacity()
+                    + " spaceRequired=" + expeditionaryForce.getSpaceRequired() + " => "
+                    + (needNaval ? "naval" : "land")
+                    + " unit");
+        if (needNaval) {
             result = Utils.getRandomMember(logger, "Choose naval",
-                                           navalUnits, random);
+                                           expeditionaryForce.getNavalUnits(), random);
             result.setNumber(1);
         } else {
             result = Utils.getRandomMember(logger, "Choose land",
-                                           landUnits, random);
+                                           expeditionaryForce.getLandUnits(), random);
             result.setNumber(Utils.randomInt(logger, "Choose land#", random, 3) + 1);
         }
         return result;
-    }
-
-    /**
-     * Adds units to the Royal Expeditionary Force.
-     *
-     * @param units The addition to the Royal Expeditionary Force.
-     */
-    public void addToREF(AbstractUnit units) {
-        Specification spec = getSpecification();
-        UnitType unitType = spec.getUnitType(units.getId());
-        int n = units.getNumber();
-        if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-            for (AbstractUnit refUnit : navalUnits) {
-                if (refUnit.getId().equals(units.getId())) {
-                    refUnit.setNumber(refUnit.getNumber() + n);
-                    if (unitType.canCarryUnits()) {
-                        capacity += unitType.getSpace() * n;
-                    }
-                    break;
-                }
-            }
-        } else {
-            for (AbstractUnit refUnit : landUnits) {
-                if (refUnit.getId().equals(units.getId())
-                    && refUnit.getRole().equals(units.getRole())) {
-                    refUnit.setNumber(refUnit.getNumber() + n);
-                    spaceRequired += unitType.getSpaceTaken() * n;
-                    break;
-                }
-            }
-        }
-        updateSpaceAndCapacity();
     }
 
     /**
@@ -639,17 +556,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         out.writeAttribute("supportSea", String.valueOf(supportSea));
         out.writeAttribute("displeasure", String.valueOf(displeasure));
 
-        out.writeStartElement("navalUnits");
-        for (AbstractUnit unit : navalUnits) {
-            unit.toXMLImpl(out);
-        }
-        out.writeEndElement();
-
-        out.writeStartElement("landUnits");
-        for (AbstractUnit unit : landUnits) {
-            unit.toXMLImpl(out);
-        }
-        out.writeEndElement();
+        expeditionaryForce.toXML(out, "expeditionaryForce");
+        interventionForce.toXML(out, "interventionForce");
 
         out.writeEndElement();
     }
@@ -670,23 +578,30 @@ public final class Monarch extends FreeColGameObject implements Named {
         supportSea = getAttribute(in, "supportSea", false);
         displeasure = getAttribute(in, "displeasure", false);
 
-        navalUnits.clear();
-        landUnits.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("navalUnits".equals(childName)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    AbstractUnit newUnit = new AbstractUnit(in);
-                    navalUnits.add(newUnit);
+            if ("expeditionaryForce".equals(childName)) {
+                expeditionaryForce.readFromXML(in);
+            } else if ("interventionForce".equals(childName)) {
+                interventionForce.readFromXML(in);
+            } else {
+                // @compat 0.10.4
+                if ("navalUnits".equals(childName)) {
+                    expeditionaryForce.getNavalUnits().clear();
+                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(in);
+                        expeditionaryForce.getNavalUnits().add(newUnit);
+                    }
+                } else if ("landUnits".equals(childName)) {
+                    expeditionaryForce.getLandUnits().clear();
+                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(in);
+                        expeditionaryForce.getLandUnits().add(newUnit);
+                    }
                 }
-            } else if ("landUnits".equals(childName)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    AbstractUnit newUnit = new AbstractUnit(in);
-                    landUnits.add(newUnit);
-                }
+                // end @compat
             }
         }
-        updateSpaceAndCapacity();
 
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Monarch.getXMLElementTagName())) {
@@ -729,4 +644,181 @@ public final class Monarch extends FreeColGameObject implements Named {
     public static String getXMLElementTagName() {
         return "monarch";
     }
+
+
+    public class Force {
+
+        /** The number of land units in the REF. */
+        private final List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
+
+        /** The number of naval units in the REF. */
+        private final List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
+
+        // Internal variables that do not need serialization.
+        /** The space required to transport all land units. */
+        private int spaceRequired;
+
+        /** The current naval transport capacity. */
+        private int capacity;
+
+        public Force() {
+            // empty constructor
+        }
+
+        public Force(UnitListOption option, String ability) {
+            List<AbstractUnit> units = option.getOptionValues();
+            for (AbstractUnit unit : units) {
+                UnitType unitType = unit.getUnitType(getSpecification());
+                if (ability == null || unitType.hasAbility(ability)) {
+                    if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
+                        navalUnits.add(unit);
+                    } else {
+                        landUnits.add(unit);
+                    }
+                } else {
+                    logger.warning("Found unit lacking required ability \"" + ability + "\": "
+                                   + unit.toString());
+                }
+            }
+            updateSpaceAndCapacity();
+        }
+
+        public int getSpaceRequired() {
+            return spaceRequired;
+        }
+
+        public int getCapacity() {
+            return capacity;
+        }
+
+        /**
+         * Update the space and capacity variables.
+         */
+        private void updateSpaceAndCapacity() {
+            Specification spec = getSpecification();
+            capacity = 0;
+            for (AbstractUnit nu : navalUnits) {
+                if (nu.getUnitType(spec).canCarryUnits()) {
+                    capacity += nu.getUnitType(spec).getSpace() * nu.getNumber();
+                }
+            }
+            spaceRequired = 0;
+            for (AbstractUnit lu : landUnits) {
+                spaceRequired += lu.getUnitType(spec).getSpaceTaken() * lu.getNumber();
+            }
+        }
+
+        /**
+         * Gets all units.
+         *
+         * @return A list of all units.
+         */
+        public List<AbstractUnit> getUnits() {
+            List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
+            result.addAll(navalUnits);
+            return result;
+        }
+
+        /**
+         * Gets the naval units.
+         *
+         * @return A list of the naval units.
+         */
+        public List<AbstractUnit> getNavalUnits() {
+            return navalUnits;
+        }
+
+        /**
+         * Gets the land units.
+         *
+         * @return A list of the  land units.
+         */
+        public List<AbstractUnit> getLandUnits() {
+            return landUnits;
+        }
+
+        /**
+         * Returns true if this Force does not contain any units.
+         *
+         * @compat 0.10.4
+         *
+         * @return a <code>boolean</code> value
+         */
+        public boolean isEmpty() {
+            return landUnits.isEmpty() && navalUnits.isEmpty();
+        }
+
+        /**
+         * Adds units to this Force.
+         *
+         * @param units The addition to this Force.
+         */
+        public void add(AbstractUnit units) {
+            Specification spec = getSpecification();
+            UnitType unitType = spec.getUnitType(units.getId());
+            int n = units.getNumber();
+            if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
+                for (AbstractUnit refUnit : navalUnits) {
+                    if (refUnit.getId().equals(units.getId())) {
+                        refUnit.setNumber(refUnit.getNumber() + n);
+                        if (unitType.canCarryUnits()) {
+                            capacity += unitType.getSpace() * n;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                for (AbstractUnit refUnit : landUnits) {
+                    if (refUnit.getId().equals(units.getId())
+                        && refUnit.getRole().equals(units.getRole())) {
+                        refUnit.setNumber(refUnit.getNumber() + n);
+                        spaceRequired += unitType.getSpaceTaken() * n;
+                        break;
+                    }
+                }
+            }
+            updateSpaceAndCapacity();
+        }
+
+        public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
+            out.writeStartElement(tag);
+
+            out.writeStartElement("navalUnits");
+            for (AbstractUnit unit : navalUnits) {
+                unit.toXMLImpl(out);
+            }
+            out.writeEndElement();
+
+            out.writeStartElement("landUnits");
+            for (AbstractUnit unit : landUnits) {
+                unit.toXMLImpl(out);
+            }
+            out.writeEndElement();
+
+            out.writeEndElement();
+        }
+
+        public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+
+            navalUnits.clear();
+            landUnits.clear();
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                String childName = in.getLocalName();
+                if ("navalUnits".equals(childName)) {
+                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(in);
+                        navalUnits.add(newUnit);
+                    }
+                } else if ("landUnits".equals(childName)) {
+                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(in);
+                        landUnits.add(newUnit);
+                    }
+                }
+            }
+        }
+
+    }
+
+
 }

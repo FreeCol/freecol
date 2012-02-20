@@ -47,7 +47,7 @@ public class REFTest extends FreeColTestCase {
         super.tearDown();
     }
 
-	
+
     public void testCreateREFPlayer() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
@@ -55,11 +55,12 @@ public class REFTest extends FreeColTestCase {
 
         // Create player
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        List <AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch().getREF();
+        List <AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
+            .getExpeditionaryForce().getUnits();
         int soldiersBeforeIndependence = 0;
         int dragoonsBeforeIndependence = 0;
         int artilleryBeforeIndependence = 0;
-        int shipsBeforeIndependence = 0; 
+        int shipsBeforeIndependence = 0;
         for(AbstractUnit unit : refUnitsBeforeIndependence){
             UnitType unitType = unit.getUnitType(spec());
             if(unitType.hasAbility(Ability.NAVAL_UNIT)){
@@ -101,7 +102,7 @@ public class REFTest extends FreeColTestCase {
         int soldiersAfterIndependence = 0;
         int dragoonsAfterIndependence = 0;
         int artilleryAfterIndependence = 0;
-        int shipsAfterIndependence = 0; 
+        int shipsAfterIndependence = 0;
         for(Unit unit : refUnitsAfterIndependence){
             UnitType unitType = unit.getType();
             if(unitType.hasAbility(Ability.NAVAL_UNIT)){
@@ -129,7 +130,7 @@ public class REFTest extends FreeColTestCase {
             fail("Unkown REF unit: " +  unit.toString());
         }
 
-        // Verify results 
+        // Verify results
         assertEquals("Wrong number of ships",shipsBeforeIndependence,shipsAfterIndependence);
         assertEquals("Wrong number of artillery",artilleryBeforeIndependence,artilleryAfterIndependence);
         assertEquals("Wrong number of soldiers",soldiersBeforeIndependence,soldiersAfterIndependence);

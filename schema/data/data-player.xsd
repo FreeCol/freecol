@@ -100,6 +100,7 @@
       <xs:attribute name="gold" type="xs:int" use="required"/>
       <xs:attribute name="immigration" type="xs:int" use="required"/>
       <xs:attribute name="liberty" type="xs:int" use="required"/>
+      <xs:attribute name="interventionBells" type="xs:int" use="optional"/>
       <xs:attribute name="oldSoL" type="xs:int" use="optional"
 		    default="0"/>
       <xs:attribute name="score" type="xs:int" use="optional"

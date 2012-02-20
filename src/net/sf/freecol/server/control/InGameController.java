@@ -335,9 +335,9 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         List<Unit> landUnits
-            = refPlayer.createUnits(monarch.getREFLandUnits());
+            = refPlayer.createUnits(monarch.getExpeditionaryForce().getLandUnits());
         List<Unit> navalUnits
-            = refPlayer.createUnits(monarch.getREFNavalUnits());
+            = refPlayer.createUnits(monarch.getExpeditionaryForce().getNavalUnits());
         List<Unit> unitsList = new ArrayList<Unit>();
         unitsList.addAll(navalUnits);
         unitsList.addAll(landUnits);
@@ -1055,7 +1055,7 @@ public final class InGameController extends Controller {
         case ADD_TO_REF:
             AbstractUnit refAdditions = monarch.chooseForREF(random);
             if (refAdditions == null) break;
-            monarch.addToREF(refAdditions);
+            monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
                 .add("%unit%", refAdditions.getUnitType(getGame().getSpecification())
@@ -3758,7 +3758,7 @@ public final class InGameController extends Controller {
                 }
             }
         } else {
-            units = serverPlayer.getMonarch().getREF();
+            units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
         }
 
         ChangeSet cs = new ChangeSet();
