@@ -94,14 +94,13 @@ public class TensionTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, stance);
 
         // create 2 unarmed european units next to the indianSettlement
+        Tile tile2 = map.getTile(6,8);
         UnitType unitType = spec().getUnitType("model.unit.hardyPioneer");
-        @SuppressWarnings("unused") Unit unit1
-            = new ServerUnit(game, map.getTile(7, 9), european, unitType);
+        Unit unit1 = new ServerUnit(game, tile2, european, unitType);
         @SuppressWarnings("unused") Unit unit2
             = new ServerUnit(game, map.getTile(5, 9), european, unitType);
 
         // the european player steals 1 tile from the indians
-        Tile tile2 = map.getTile(6,8);
         assertEquals(indian, tile2.getOwner());
         igc.claimLand(european, tile2, null, NetworkConstants.STEAL_LAND);
         assertEquals(european, tile2.getOwner());

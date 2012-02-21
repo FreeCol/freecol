@@ -395,13 +395,14 @@ public class PioneeringMission extends Mission {
             return;
         }
 
+        final AIUnit aiUnit = getAIUnit();
         if (!hasTools()) { // Try to equip.
             if (colonyWithTools != null
-                && !checkColonyForTools(getAIUnit(), colonyWithTools)) {
+                && !checkColonyForTools(aiUnit, colonyWithTools)) {
                 colonyWithTools = null;
             }
             if (colonyWithTools == null) { // Find a new colony.
-                colonyWithTools = findColonyWithTools(getAIUnit());
+                colonyWithTools = findColonyWithTools(aiUnit);
             }
             if (colonyWithTools == null) {
                 abandonTileImprovementPlan();
@@ -412,7 +413,7 @@ public class PioneeringMission extends Mission {
             // Go there, equip unit.
             if (travelToTarget("AI pioneer", colonyWithTools.getTile())
                 != Unit.MoveType.MOVE) return;
-            getAIUnit().equipForRole(Unit.Role.PIONEER, false);
+            aiUnit.equipForRole(Unit.Role.PIONEER, false);
             if (!hasTools()) {
                 abandonTileImprovementPlan();
                 logger.finest("AI pioneer reached " + colonyWithTools.getName()
@@ -432,14 +433,13 @@ public class PioneeringMission extends Mission {
             tileImprovementPlan = null;
         }
         if (tileImprovementPlan == null) { // Find a new plan.
-            AIUnit aiu = getAIUnit();
-            tileImprovementPlan = findTileImprovementPlan(aiu);
+            tileImprovementPlan = findTileImprovementPlan(aiUnit);
             if (tileImprovementPlan == null) {
                 logger.finest("AI pioneer could not find an improvement: "
                     + unit);
                 return;
             }
-            tileImprovementPlan.setPioneer(aiu);
+            tileImprovementPlan.setPioneer(aiUnit);
         }
     
         // Go to target and take control of the land before proceeding
@@ -457,8 +457,7 @@ public class PioneeringMission extends Mission {
                 if (price > 0 && !player.checkGold(price)) {
                     price = NetworkConstants.STEAL_LAND;
                 }
-                if (!AIMessage.askClaimLand(aiPlayer.getConnection(), target,
-                                            null, price)
+                if (!AIMessage.askClaimLand(target, aiUnit, price)
                     || !player.owns(target)) { // Failed to take ownership
                     fail = true;
                 }
@@ -479,7 +478,7 @@ public class PioneeringMission extends Mission {
                 + tileImprovementPlan.getType() + ": " + unit);
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
             // Ask to create the TileImprovement
-            if (AIMessage.askChangeWorkImprovementType(getAIUnit(),
+            if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
                 logger.finest("AI pioneer began improvement "
                     + tileImprovementPlan.getType()

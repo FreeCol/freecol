@@ -753,12 +753,13 @@ public final class InGameController implements NetworkConstants {
      *
      * @param player The <code>Player</code> that is claiming.
      * @param tile The <code>Tile</code> to claim.
-     * @param colony An optional <code>Colony</code> to own the tile.
+     * @param claimant The <code>Unit</code> or <code>Colony</code> claiming.
      * @param price The price required.
      * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
-    private boolean claimTile(Player player, Tile tile, Colony colony,
+    private boolean claimTile(Player player, Tile tile,
+                              FreeColGameObject claimant,
                               int price, int offer) {
         Player owner = tile.getOwner();
         if (price < 0) return false; // not for sale
@@ -785,7 +786,7 @@ public final class InGameController implements NetworkConstants {
         } // else price == 0 and we can just proceed
 
         // Ask the server
-        if (askServer().claimLand(tile, colony, price)
+        if (askServer().claimLand(tile, claimant, price)
             && player.owns(tile)) {
             gui.updateGoldLabel();
             return true;
@@ -1692,7 +1693,7 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         Tile tile = unit.getTile();
         if (!player.owns(tile)) {
-            if (!claimTile(player, tile, null, player.getLandPrice(tile), 0)
+            if (!claimTile(player, tile, unit, player.getLandPrice(tile), 0)
                 || !player.owns(tile)) return;
         }
 
@@ -1768,18 +1769,19 @@ public final class InGameController implements NetworkConstants {
      * Claim a tile.
      *
      * @param tile The <code>Tile</code> to claim.
-     * @param colony An optional <code>Colony</code> to own the tile.
+     * @param claimant The <code>Unit</code> or <code>Colony</code> claiming.
      * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
-    public boolean claimLand(Tile tile, Colony colony, int offer) {
+    public boolean claimLand(Tile tile, FreeColGameObject claimant, int offer) {
         if (!requireOurTurn()) return false;
 
         Player player = freeColClient.getMyPlayer();
-        int price = ((colony != null) ? player.canClaimForSettlement(tile)
+        int price = ((claimant instanceof Settlement)
+            ? player.canClaimForSettlement(tile)
             : player.canClaimForImprovement(tile)) ? 0
             : player.getLandPrice(tile);
-        return claimTile(player, tile, colony, price, offer);
+        return claimTile(player, tile, claimant, price, offer);
     }
 
     /**
@@ -3779,7 +3781,8 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
             if (tile.getOwner() != unit.getOwner()) {
-                if (!claimLand(tile, colony, 0)) return;
+                if (!claimLand(tile, ((colony != null) ? colony : unit),
+                               0)) return;
             }
         }
 

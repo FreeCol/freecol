@@ -27,10 +27,12 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -271,16 +273,28 @@ public class AIMessage {
     /**
      * Claims a tile for a colony.
      *
-     * @param conn The <code>Connection</code> to send on.
      * @param tile The <code>Tile</code> to claim.
-     * @param colony The <code>Colony</code> claiming the tile.
+     * @param claimant The <code>AIUnit</code> or <code>AIColony</code>
+     *     that is claiming.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askClaimLand(Connection conn, Tile tile,
-                                       Colony colony, int price) {
-        return sendMessage(conn,
-                           new ClaimLandMessage(tile, colony, price));
+    public static boolean askClaimLand(Tile tile, AIObject claimant,
+                                       int price) {
+        FreeColGameObject fcgo;
+        Player owner;
+        if (claimant instanceof AIUnit) {
+            fcgo = ((AIUnit)claimant).getUnit();
+            owner = ((Unit)fcgo).getOwner();
+        } else if (claimant instanceof AIColony) {
+            fcgo = ((AIColony)claimant).getColony();
+            owner = ((Colony)fcgo).getOwner();
+        } else {
+            throw new IllegalArgumentException("Claimant must be an AIUnit"
+                + " or AIColony: " + claimant.getId());
+        }
+        return sendMessage(claimant.getAIMain().getAIPlayer(owner)
+            .getConnection(), new ClaimLandMessage(tile, fcgo, price));
     }
 
 

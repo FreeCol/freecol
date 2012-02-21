@@ -373,7 +373,7 @@ public class BuildColonyMission extends Mission {
                 }
             }
             if (price >= 0) {
-                fail = !AIMessage.askClaimLand(connection, target, null,
+                fail = !AIMessage.askClaimLand(target, aiUnit,
                     ((price == 0) ? 0 : (player.checkGold(price)) ? price
                         : NetworkConstants.STEAL_LAND))
                     || !player.owns(target);

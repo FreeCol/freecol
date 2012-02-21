@@ -19,10 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -34,19 +36,13 @@ import org.w3c.dom.Element;
  */
 public class ClaimLandMessage extends DOMMessage {
 
-    /**
-     * The ID of the tile to claim.
-     */
+    /** The tile to claim. */
     private String tileId;
 
-    /**
-     * The ID of the Settlement to own the tile, if any.
-     */
-    private String settlementId;
+    /** The unit or settlement claiming the land. */
+    private String claimantId;
 
-    /**
-     * The price to pay for the tile.
-     */
+    /** The price to pay for the tile. */
     private String priceString;
 
 
@@ -54,12 +50,13 @@ public class ClaimLandMessage extends DOMMessage {
      * Create a new <code>ClaimLandMessage</code>.
      *
      * @param tile The <code>Tile</code> to claim.
-     * @param settlement The <code>Settlement</code> to own the tile, if any.
+     * @param claimaint The <code>Unit</code> or <code>Settlement</code>
+     *     claiming the tile.
      * @param price The price to pay for the tile, negative if stealing.
      */
-    public ClaimLandMessage(Tile tile, Settlement settlement, int price) {
+    public ClaimLandMessage(Tile tile, FreeColGameObject claimant, int price) {
         this.tileId = tile.getId();
-        this.settlementId = (settlement == null) ? null : settlement.getId();
+        this.claimantId = claimant.getId();
         this.priceString = Integer.toString(price);
     }
 
@@ -71,9 +68,7 @@ public class ClaimLandMessage extends DOMMessage {
      */
     public ClaimLandMessage(Game game, Element element) {
         this.tileId = element.getAttribute("tile");
-        this.settlementId = (element.hasAttribute("settlement"))
-            ? element.getAttribute("settlement")
-            : null;
+        this.claimantId = element.getAttribute("claimant");
         this.priceString = element.getAttribute("price");
     }
 
@@ -96,20 +91,41 @@ public class ClaimLandMessage extends DOMMessage {
         } else {
             return DOMMessage.clientError("Invalid tileId");
         }
-        Settlement settlement;
-        if (settlementId == null) {
-            settlement = null;
-        } else if (game.getFreeColGameObjectSafely(settlementId) instanceof Settlement) {
-            settlement = (Settlement) game.getFreeColGameObjectSafely(settlementId);
+
+        Unit unit = null;
+        Settlement settlement = null;
+        FreeColGameObject fcgo = game.getFreeColGameObjectSafely(claimantId);
+        if (fcgo instanceof Unit) {
+            unit = (Unit)fcgo;
+            if (unit.getOwner() != player) {
+                return DOMMessage.clientError("Not your unit");
+            }
+            if (unit.getTile() != tile) {
+                return DOMMessage.clientError("Unit can not claim tile: "
+                    + tileId);
+            }
+        } else if (fcgo instanceof Settlement) {
+            settlement = (Settlement)fcgo;
+            if (settlement.getOwner() != player) {
+                return DOMMessage.clientError("Not your settlement");
+            }
+            if (settlement.getOwner().isEuropean()
+                && !settlement.getTile().isAdjacent(tile)) {
+                return DOMMessage.clientError("Settlement can not claim tile: "
+                    + tileId);
+            }
         } else {
-            return DOMMessage.clientError("Invalid settlementId");
+            return DOMMessage.clientError("Claimant is neither unit"
+                + " nor settlement: " + claimantId);
         }
+
         int price;
         try {
             price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
             return DOMMessage.clientError("Bad price: " + priceString);
         }
+
         // Request is well formed, but there are more possibilities...
         int value = player.getLandPrice(tile);
         Player owner = tile.getOwner();
@@ -137,7 +153,9 @@ public class ClaimLandMessage extends DOMMessage {
             }
         }
 
-        // Proceed to claim.
+        // Proceed to claim.  Note, does not require unit, it is only
+        // required for permission checking above.  Settlement is required
+        // to set owning settlement.
         return server.getInGameController()
             .claimLand(serverPlayer, tile, settlement, price);
     }
@@ -150,9 +168,7 @@ public class ClaimLandMessage extends DOMMessage {
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("tile", tileId);
-        if (settlementId != null) {
-            result.setAttribute("settlement", settlementId);
-        }
+        result.setAttribute("claimant", claimantId);
         result.setAttribute("price", priceString);
         return result;
     }
