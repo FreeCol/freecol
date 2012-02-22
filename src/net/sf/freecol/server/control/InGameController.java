@@ -793,8 +793,8 @@ public final class InGameController extends Controller {
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,
                           "player", player.getId());
-            Monarch monarch = player.getMonarch();
-            if (monarch != null) {
+            if (player.getPlayerType() == PlayerType.COLONIAL) {
+                Monarch monarch = player.getMonarch();
                 MonarchAction action = null;
                 if (debugMonarchAction != null
                     && player == debugMonarchPlayer) {
@@ -3729,7 +3729,9 @@ public final class InGameController extends Controller {
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
         final UnitType defaultType = spec.getDefaultUnitType();
 
-        if (serverPlayer.getMonarch() == null) {
+        if (serverPlayer.getPlayerType() == PlayerType.COLONIAL) {
+            units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
+        } else {
             ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
             java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash
                 = new HashMap<UnitType, EnumMap<Role, Integer>>();
@@ -3759,8 +3761,6 @@ public final class InGameController extends Controller {
                     units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
                 }
             }
-        } else {
-            units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
         }
 
         ChangeSet cs = new ChangeSet();
