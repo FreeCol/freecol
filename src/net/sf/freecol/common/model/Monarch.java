@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -374,6 +375,35 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
+     * Update the intervention force, adding land units depending on
+     * turns passed, and naval units sufficient to transport all land
+     * units.
+     */
+    public void updateInterventionForce() {
+        IntegerOption interventionTurns = getSpecification()
+            .getIntegerOption("model.option.interventionTurns");
+        // @compat 0.10.5: option might not exist
+        if (interventionTurns != null && interventionTurns.getValue() > 0) {
+            int updates = getGame().getTurn().getNumber() / interventionTurns.getValue();
+            for (AbstractUnit unit : interventionForce.getLandUnits()) {
+                // add units depending on current turn
+                int value = unit.getNumber() + updates;
+                unit.setNumber(value);
+            }
+            interventionForce.updateSpaceAndCapacity();
+            while (interventionForce.getCapacity() < interventionForce.getSpaceRequired()) {
+                for (AbstractUnit ship : interventionForce.getNavalUnits()) {
+                    // add ships until all units can be transported at once
+                    int value = ship.getNumber() + 1;
+                    ship.setNumber(value);
+                }
+                interventionForce.updateSpaceAndCapacity();
+            }
+        }
+    }
+
+
+    /**
      * Gets a additions to the colonial forces.
      *
      * @param random The <code>Random</code> number source to use.
@@ -694,7 +724,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         /**
          * Update the space and capacity variables.
          */
-        private void updateSpaceAndCapacity() {
+        public void updateSpaceAndCapacity() {
             Specification spec = getSpecification();
             capacity = 0;
             for (AbstractUnit nu : navalUnits) {

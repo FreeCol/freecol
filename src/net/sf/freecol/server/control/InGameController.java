@@ -1334,12 +1334,14 @@ public final class InGameController extends Controller {
 
         // Create the REF.
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
+        // Update the intervention force
+        serverPlayer.getMonarch().updateInterventionForce();
 
         // Now the REF is ready, we can dispose of the European connection.
         serverPlayer.getHighSeas().removeDestination(europe);
         cs.addDispose(See.only(serverPlayer), null, europe);
         serverPlayer.setEurope(null);
-        serverPlayer.setMonarch(null);
+        //serverPlayer.setMonarch(null);
 
         // Pity to have to update such a heavy object as the player,
         // but we do this, at most, once per player.  Other players
