@@ -332,13 +332,12 @@ public class PrivateerMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public static boolean isValid(AIUnit aiUnit) {
-        Unit unit = aiUnit.getUnit();
         return Mission.isValid(aiUnit)
-            && unit.isCarrier()
-            && unit.isOffensiveUnit()
-            && unit.hasAbility(Ability.PIRACY)
-            && unit.getGoodsCount() == 0
-            && unit.getUnitCount() == 0;
+            && aiUnit.getUnit().isCarrier()
+            && aiUnit.getUnit().isOffensiveUnit()
+            && aiUnit.getUnit().hasAbility(Ability.PIRACY)
+            && aiUnit.getUnit().getGoodsCount() == 0
+            && aiUnit.getUnit().getUnitCount() == 0;
     }
 
     /**
@@ -347,7 +346,12 @@ public class PrivateerMission extends Mission {
      * @return True if the mission is still valid.
      */
     public boolean isValid() {
-        return super.isValid() && valid && isValid(getAIUnit());
+        return super.isValid() && valid
+            && getUnit().isCarrier()
+            && getUnit().isOffensiveUnit()
+            && getUnit().hasAbility(Ability.PIRACY)
+            && getUnit().getGoodsCount() == 0
+            && getUnit().getUnitCount() == 0;
     }
 
     /**

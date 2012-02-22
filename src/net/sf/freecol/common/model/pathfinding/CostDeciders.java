@@ -31,8 +31,24 @@ import net.sf.freecol.common.model.Unit;
 public final class CostDeciders {
 
     /**
-     * A <code>CostDecider</code> only considering the number of tiles
-     * visited when determining the cost.
+     * A trivial <code>CostDecider</code> that only considers the
+     * number of tiles visited when determining cost.  Totally ignores
+     * the legality of the move.
+     */
+    private static final CostDecider trivialCostDecider = new CostDecider() {
+            public int getCost(Unit unit, Tile oldTile, Tile newTile,
+                               int movesLeft) {
+                return (newTile == null) ? CostDecider.ILLEGAL_MOVE : 1;
+            }
+            public int getMovesLeft() { return 0; }
+            public boolean isNewTurn() { return false; }
+        };
+
+
+    /**
+     * A <code>CostDecider</code> that only considers the number of
+     * tiles visited when determining the cost, but differs from the
+     * trivialCostDecider in checking the legality of the move.
      */
     private static final CostDecider tileCostDecider
         = new CostDecider() {
@@ -61,8 +77,8 @@ public final class CostDeciders {
     /**
      * A <code>CostDecider</code> that costs unit moves normally.
      */
-    private static final CostDecider
-        avoidIllegalCostDecider = new BaseCostDecider();
+    private static final CostDecider avoidIllegalCostDecider
+        = new BaseCostDecider();
 
 
     /**
@@ -172,12 +188,21 @@ public final class CostDeciders {
     }
 
     /**
+     * The trivial <code>CostDecider</code>.
+     * 
+     * @return The <code>CostDecider</code>.
+     */
+    public static CostDecider numberOfTiles() {
+        return trivialCostDecider;
+    }
+
+    /**
      * A <code>CostDecider</code> only considering the number of tiles
      * visited when determining the cost.
      * 
      * @return The <code>CostDecider</code>.
      */
-    public static CostDecider numberOfTiles() {
+    public static CostDecider numberOfLegalTiles() {
         return tileCostDecider;
     }
 

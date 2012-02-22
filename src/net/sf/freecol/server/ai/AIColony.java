@@ -416,7 +416,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Give suitable missions to all units.
         for (Unit u : colony.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
-            aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
+            if (aiU.getMission() instanceof WorkInsideColonyMission
+                && ((WorkInsideColonyMission)aiU.getMission()).getAIColony()
+                == this) {
+                ;// Do nothing
+            } else {                
+                aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
+            }
         }
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);

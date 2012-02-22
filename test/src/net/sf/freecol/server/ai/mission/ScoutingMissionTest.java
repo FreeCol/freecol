@@ -19,9 +19,13 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -55,33 +59,58 @@ public class ScoutingMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create players, settlement and unit
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
-        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+
         Tile settlementTile = map.getTile(2, 1);
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        builder.player(player1).settlementTile(settlementTile).build();
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        builder.player(inca).settlementTile(settlementTile).build();
+        IndianSettlement is = settlementTile.getIndianSettlement();
+        Player.makeContact(inca, dutch);
 
         Tile unitTile = map.getTile(2, 2);
-        Unit scout = new ServerUnit(game, unitTile, player2, scoutType, horsesEqType);
-
-        // Setup mission
-        // this will call AIPlayer.giveNormalMissions() and set the scout mission
+        Unit scout = new ServerUnit(game, unitTile, dutch, scoutType,
+                                    horsesEqType);
 
         AIUnit aiUnit = aiMain.getAIUnit(scout);
-        assertNotNull(aiUnit);
-        assertTrue("Scouting mission should be assignable to scout",ScoutingMission.isValid(aiUnit));
-        aiUnit.setMission(new ScoutingMission(aiMain,aiUnit));
-        Mission unitMission = aiUnit.getMission();
-        assertNotNull("Scout should have been assigned a mission", unitMission);
-        boolean hasScoutingMission = unitMission instanceof ScoutingMission;
-        assertTrue("Scout should have been assigned a Scouting mission",hasScoutingMission);
+        aiUnit.abortMission("test");
+        assertNotNull("The scout should be an AI unit", aiUnit);
+        assertEquals("Scout should have the scout role", scout.getRole(),
+            Unit.Role.SCOUT);
+        assertEquals("The Inca settlement should be a scouting target",
+            settlementTile, ScoutingMission.findTarget(aiUnit));
+        assertTrue("Scouting mission should be assignable to scout",
+            ScoutingMission.isValid(aiUnit));
+        aiUnit.setMission(new ScoutingMission(aiMain, aiUnit));
+        assertTrue("Scout should have been assigned a Scouting mission",
+            aiUnit.getMission() instanceof ScoutingMission);
+        assertTrue("Scouting mission should be valid",
+            aiUnit.getMission().isValid());
 
-        assertTrue("Scouting mission should be valid",unitMission.isValid());
-
-        // Simulate unit losing horses
+        // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
+        assertFalse("Scout should not have the scout role",
+            scout.getRole() == Unit.Role.SCOUT);
+        assertFalse("Scouting mission should be invalid",
+            aiUnit.getMission().isValid());
+        assertFalse("Scouting mission should be impossible for this unit",
+            ScoutingMission.isValid(aiUnit));
+        
+        // Restore the horses.
+        scout.changeEquipment(horsesEqType, 1);
+        assertTrue("Scouting mission should be valid again",
+            aiUnit.getMission().isValid());
 
-        // Verify that mission no longer valid
-        assertFalse("Scouting mission should no longer be valid",unitMission.isValid());
+        // Complete the mission, should be invalid.
+        is.setSpokenToChief(dutch);
+        assertFalse("Scouting mission should be invalid lacking target",
+            aiUnit.getMission().isValid());
+
+        // Add an LCR.  Mission could become valid again.
+        Tile lcrTile = map.getTile(2, 3);
+        lcrTile.addLostCityRumour(new LostCityRumour(game, lcrTile));
+        assertTrue("Scouting mission should be possible for this unit",
+            ScoutingMission.isValid(aiUnit));
     }
 }

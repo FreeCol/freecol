@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -205,32 +206,51 @@ public class PioneeringMission extends Mission {
      */
     public static Colony findColonyWithTools(final AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) return null;
+        if (unit == null || unit.isDisposed()) {
+            logger.warning("AI pioneer broken: " + unit);
+            return null;
+        }
 
         final Tile startTile = getPathStartTile(unit);
-        if (startTile == null) return null;
+        if (startTile == null) {
+            Settlement settlement = Mission.getBestSettlement(unit.getOwner());
+            if (settlement != null) return (Colony)settlement;
+            logger.finest("AI pioneer settlement fallback failed: " + unit);
+            return null;
+        }
         if (checkColonyForTools(aiUnit, startTile.getColony())) {
             return startTile.getColony();
         }
 
+        PathNode path;
+        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
+            : null;
         final GoalDecider equipDecider = new GoalDecider() {
                 private PathNode best = null;
+                private int bestValue = INFINITY;
 
                 public PathNode getGoal() { return best; }
-                public boolean hasSubGoals() { return false; }
+                public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
                     Colony colony = path.getTile().getColony();
-                    if (checkColonyForTools(aiUnit, colony)) {
+                    if (checkColonyForTools(aiUnit, colony)
+                        && path.getTotalTurns() < bestValue) {
+                        bestValue = path.getTotalTurns();
                         best = path;
                         return true;
                     }
                     return false;
                 }
             };
-        PathNode path = unit.search(startTile, equipDecider,
-            CostDeciders.avoidIllegal(), MAX_TURNS, 
-            (unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null);
-        return (path == null) ? null : path.getLastNode().getTile().getColony();
+
+        // Can the pioneer legally reach the target?
+        path = unit.search(startTile, equipDecider,
+                           CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        if (path != null) return path.getLastNode().getTile().getColony();
+
+        // No suitable colonies found.
+        logger.finest("AI pioneer out of colonies: " + unit);
+        return null;
     }
 
     /**
@@ -284,10 +304,20 @@ public class PioneeringMission extends Mission {
      */
     public static TileImprovementPlan findTileImprovementPlan(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) return null;
+        if (unit == null || unit.isDisposed()) {
+            logger.warning("AI pioneer broken: " + unit);
+            return null;
+        }
 
-        final Tile startTile = getPathStartTile(unit);
-        if (startTile == null) return null;
+        Tile startTile = getPathStartTile(unit);
+        if (startTile == null) {
+            Settlement settlement = Mission.getBestSettlement(unit.getOwner());
+            if (settlement == null) {
+                logger.finest("AI pioneer settlement fallback failed: " + unit);
+                return null;
+            }
+            startTile = settlement.getTile();
+        }
 
         // Build the TileImprovementPlan map.
         final HashMap<Tile, TileImprovementPlan> tipMap
@@ -305,13 +335,15 @@ public class PioneeringMission extends Mission {
             }
         }
 
-        // Find the best TileImprovementPlan.
+        PathNode path;
+        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
+            : null;
         final GoalDecider tipDecider = new GoalDecider() {
                 private PathNode best = null;
                 private int bestValue = Integer.MIN_VALUE;
 
                 public PathNode getGoal() { return best; }
-                public boolean hasSubGoals() { return false; }
+                public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
                     TileImprovementPlan tip = tipMap.get(path.getTile());
                     if (tip != null) {
@@ -325,12 +357,22 @@ public class PioneeringMission extends Mission {
                     return false;
                 }
             };
-        if (tipMap.get(startTile) != null) return tipMap.get(startTile);
-        PathNode path = (tipMap.isEmpty()) ? null
-            : unit.search(startTile, tipDecider,
-                CostDeciders.avoidIllegal(), MAX_TURNS,
-                (unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null);
-        return (path == null) ? null : tipMap.get(path.getLastNode().getTile());
+
+        // Find the best TileImprovementPlan.  Prefer any improvement
+        // attached to the start tile, otherwise search.
+        if (tipMap.get(startTile) != null) {
+            return tipMap.get(startTile);
+        } else if (tipMap.isEmpty()) {
+            logger.finest("AI pioneer finds no improvements: " + unit);
+            return null;
+        }
+        path = unit.search(startTile, tipDecider,
+                           CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        if (path != null) return tipMap.get(path.getLastNode().getTile());
+
+        // No suitable plans.
+        logger.finest("AI pioneer out of improvements: " + unit);
+        return null;
     }
 
     // Fake Transportable interface.

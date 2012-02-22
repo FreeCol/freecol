@@ -326,6 +326,33 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Finds the best existing settlement to use as a target.
+     * Useful for missions where the unit might be in Europe, but should
+     * go to a safe spot in the New World and proceed from there.
+     *
+     * @param player The <code>Player</code> that is searching.
+     * @return A good settlement to restart a Mission from.
+     */
+    protected static Settlement getBestSettlement(Player player) {
+        int bestValue = -1;
+        Settlement best = null;
+        for (Settlement settlement : player.getSettlements()) {
+            int value = settlement.getUnitCount()
+                + settlement.getTile().getUnitCount();
+            if (settlement instanceof Colony) {
+                Colony colony = (Colony)settlement;
+                value += ((colony.isConnected()) ? 10 : 0) // Favour coastal
+                    + colony.getAvailableWorkLocations().size();
+            }
+            if (value > bestValue) {
+                bestValue = value;
+                best = settlement;
+            }
+        }
+        return (best == null) ? null : best;
+    }
+
+    /**
      * Find the nearest reachable settlement to a unit (owned by the
      * same player) excepting the any on the current tile.
      *
@@ -496,7 +523,7 @@ public abstract class Mission extends AIObject {
         }
 
         final Unit unit = getUnit();
-        final Unit carrier = (unit.isOnCarrier()) ? (Unit)unit.getLocation()
+        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
             : null;
         PathNode path = null;
         boolean inTransit = false;
@@ -553,8 +580,8 @@ public abstract class Mission extends AIObject {
         // Follow the path towards the target.
         for (; path != null; path = path.next) {
             if (unit.getMovesLeft() <= 0) {
-                logger.finest(logMe + " en route to " + targetTile
-                    + ": " + unit);
+                logger.finest(logMe + " at " + unit.getTile()
+                    + " en route to " + targetTile + ": " + unit);
                 return MoveType.MOVE_NO_MOVES;
             }
 
@@ -562,8 +589,8 @@ public abstract class Mission extends AIObject {
             if (!mt.isProgress()) return mt; // Special handling required
 
             if (!AIMessage.askMove(aiUnit, path.getDirection())) {
-                logger.finest(logMe + " move failed at " + unit.getTile()
-                    + ": " + unit);
+                logger.finest(logMe + " at " + unit.getTile()
+                    + " failed to move: " + unit);
                 return MoveType.MOVE_ILLEGAL;
             } else if (unit.isDisposed()) {
                 logger.finest(logMe + " died en route to " + targetTile
@@ -644,7 +671,7 @@ public abstract class Mission extends AIObject {
      */
     public static boolean isValid(AIUnit aiUnit) {
         return aiUnit != null
-            && aiUnit.getMission() == null
+            && (aiUnit.getMission() == null || !aiUnit.getMission().isValid())
             && aiUnit.getUnit() != null
             && !aiUnit.getUnit().isDisposed()
             && !aiUnit.getUnit().isUnderRepair();

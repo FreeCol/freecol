@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -166,29 +167,6 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Finds the best existing colony to use as a target.
-     * When the unit gets there, then retarget.
-     * This encourages the colonies to clump.
-     *
-     * @param player The <code>Player</code> that is searching.
-     * @return A good colony to restart from.
-     */
-    private static Tile getBestColonyTile(Player player) {
-        int bestValue = -1;
-        Colony best = null;
-        for (Colony colony : player.getColonies()) {
-            int value = ((colony.isConnected()) ? 10 : 0) // Favour coastal
-                + colony.getUnitCount()
-                + colony.getAvailableWorkLocations().size();
-            if (value > bestValue) {
-                bestValue = value;
-                best = colony;
-            }
-        }
-        return (best == null) ? null : best.getTile();
-    }
-
-    /**
      * Makes a goal decider that checks colony sites.
      *
      * @param deferOK Keep track of the nearest of our colonies, to use
@@ -202,12 +180,8 @@ public class BuildColonyMission extends Mission {
             private PathNode backup = null;
             private int backupTurns = INFINITY;
 
-            public PathNode getGoal() {
-                return (best != null) ? best : backup;
-            }
-
+            public PathNode getGoal() { return (best != null) ? best : backup; }
             public boolean hasSubGoals() { return true; }
-
             public boolean check(Unit u, PathNode path) {
                 Colony colony = path.getTile().getColony();
                 if (colony != null) {
@@ -241,31 +215,42 @@ public class BuildColonyMission extends Mission {
      */
     public static Tile findTargetTile(AIUnit aiUnit, boolean deferOK) {
         final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) return null;
+        if (unit == null || unit.isDisposed()) {
+            logger.warning("AI colony builder broken: " + unit);
+            return null;
+        }
 
         final Tile startTile = getPathStartTile(unit);
-        final Player player = unit.getOwner();
-        if (startTile == null) return getBestColonyTile(player);
+        if (startTile == null) {
+            Settlement settlement = Mission.getBestSettlement(unit.getOwner());
+            if (settlement != null) return settlement.getTile();
+            logger.finest("AI colony builder settlement fallback failed: "
+                + unit);
+            return null;
+        }
 
         PathNode path;
         final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
             : null;
         final GoalDecider colonyDecider = getColonyDecider(deferOK);
-        if ((path = unit.search(startTile, colonyDecider,
-                    CostDeciders.avoidIllegal(), MAX_TURNS,
-                    carrier)) != null) return path.getLastNode().getTile();
+
+        // Try for something sensible nearby.
+        path = unit.search(startTile, colonyDecider,
+                           CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        if (path != null) return path.getLastNode().getTile();
 
         // Retry, but increase the range.
-        if ((path = unit.search(startTile, colonyDecider,
-                    CostDeciders.avoidIllegal(), MAX_TURNS * 3,
-                    carrier)) != null) return path.getLastNode().getTile();
+        path = unit.search(startTile, colonyDecider,
+                           CostDeciders.avoidIllegal(), MAX_TURNS*3, carrier);
+        if (path != null) return path.getLastNode().getTile();
 
         // One more try with a relaxed cost decider and no range limit.
-        if ((path = unit.search(startTile, colonyDecider,
-                    CostDeciders.numberOfTiles(), INFINITY,
-                    carrier)) != null) return path.getLastNode().getTile();
+        path = unit.search(startTile, colonyDecider,
+                           CostDeciders.numberOfTiles(), INFINITY, carrier);
+        if (path != null) return path.getLastNode().getTile();
         
         // Enough.
+        logger.finest("AI colony builder out of targets: " + unit);
         return null;
     }
 
@@ -289,8 +274,8 @@ public class BuildColonyMission extends Mission {
      * @return True if the unit can be usefully assigned this mission.
      */
     public static boolean isValid(AIUnit aiUnit) {
-        if (!Mission.isValid(aiUnit)) return false;
-        return aiUnit.getUnit().hasAbility("model.ability.foundColony");
+        return Mission.isValid(aiUnit)
+            && aiUnit.getUnit().hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -319,12 +304,7 @@ public class BuildColonyMission extends Mission {
             || (value = player.getColonyValue(target)) < colonyValue
             || (target.getColony() != null
                 && target.getColony().getOwner() != player)) {
-            target = findTargetTile(aiUnit, true);
-            if (target == null) {
-                logger.finest("AI colony builder could not find a target: "
-                    + unit);
-                return;
-            }
+            if ((target = findTargetTile(aiUnit, true)) == null) return;
             colonyValue = player.getColonyValue(target);
         }
 

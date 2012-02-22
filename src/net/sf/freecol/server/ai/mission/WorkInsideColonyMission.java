@@ -90,6 +90,14 @@ public class WorkInsideColonyMission extends Mission {
         readFromXML(in);
     }
 
+    /**
+     * Convenience accessor for the colony to work in.
+     *
+     * @return The <code>AIColony</code> to work in.
+     */
+    public AIColony getAIColony() {
+        return aiColony;
+    }
 
     /**
      * Disposes of this <code>Mission</code>.
