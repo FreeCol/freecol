@@ -699,14 +699,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes the given settlement from this player's list of settlements.
      *
      * @param settlement The <code>Settlement</code> to remove.
+     * @return True if the settlement was removed.
      */
-    public void removeSettlement(Settlement settlement) {
-        if (hasSettlement(settlement)) {
-            if (settlement.getOwner() == this) {
-                throw new IllegalStateException("Player still owns settlement.");
-            }
-            settlements.remove(settlement);
-        }
+    public boolean removeSettlement(Settlement settlement) {
+        return settlements.remove(settlement);
     }
     
     public boolean owns(Ownable ownable) {

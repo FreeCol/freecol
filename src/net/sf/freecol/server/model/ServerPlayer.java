@@ -2796,12 +2796,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Settlement goes away
+        if (!owner.removeSettlement(settlement)) {
+            throw new IllegalStateException("Failed to remove settlement: "
+                + settlement);
+        }
+        if (owner.hasSettlement(settlement)) {
+            throw new IllegalStateException("Still has settlement: "
+                + settlement);
+        }
         cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
         if (centerClaimant != null) {
             centerTile.changeOwnership(centerClaimant.getOwner(),
                                        centerClaimant);
         }
-        owner.removeSettlement(settlement);
     }
 
     /**
