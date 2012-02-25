@@ -42,12 +42,14 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
+import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.option.UnitListOption;
 
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
@@ -1253,6 +1255,38 @@ public final class Specification {
                 option.setValue(values[index]);
                 allOptions.put(id, option);
             }
+        }
+        // end compatibility code
+
+        // @compat 0.10.5
+        String id = "model.option.interventionBells";
+        if (allOptions.get(id) == null) {
+            IntegerOption interventionBells = new IntegerOption(id);
+            interventionBells.setValue(5000);
+            allOptions.put(id, interventionBells);
+        }
+        id = "model.option.interventionTurns";
+        if (allOptions.get(id) == null) {
+            IntegerOption interventionTurns = new IntegerOption(id);
+            interventionTurns.setValue(52);
+            allOptions.put(id, interventionTurns);
+        }
+        id = "model.option.interventionForce";
+        if (allOptions.get(id) == null) {
+            UnitListOption interventionForce = new UnitListOption(id);
+            AbstractUnitOption regulars = new AbstractUnitOption(id + ".regulars");
+            regulars.setValue(new AbstractUnit("model.unit.colonialRegular", Unit.Role.SOLDIER, 2));
+            interventionForce.getValue().add(regulars);
+            AbstractUnitOption dragoons = new AbstractUnitOption(id + ".dragoons");
+            dragoons.setValue(new AbstractUnit("model.unit.colonialRegular", Unit.Role.DRAGOON, 2));
+            interventionForce.getValue().add(dragoons);
+            AbstractUnitOption artillery = new AbstractUnitOption(id + ".artillery");
+            artillery.setValue(new AbstractUnit("model.unit.artillery", Unit.Role.DEFAULT, 2));
+            interventionForce.getValue().add(artillery);
+            AbstractUnitOption menOfWar = new AbstractUnitOption(id + ".menOfWar");
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar", Unit.Role.DEFAULT, 2));
+            interventionForce.getValue().add(menOfWar);
+            allOptions.put(id, interventionForce);
         }
         // end compatibility code
 

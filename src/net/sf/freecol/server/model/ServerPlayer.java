@@ -812,21 +812,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Create units from a list of abstract units.  Only used by
-     * Europeans at present, so the units are created in Europe.
+     * Europeans at present.
      *
      * @param abstractUnits The list of <code>AbstractUnit</code>s to create.
+     * @param location The location where the units will be created.
      * @return A list of units created.
      */
-    public List<Unit> createUnits(List<AbstractUnit> abstractUnits) {
+    public List<Unit> createUnits(List<AbstractUnit> abstractUnits, Location location) {
         Game game = getGame();
-        Specification spec = game.getSpecification();
         List<Unit> units = new ArrayList<Unit>();
-        Europe europe = getEurope();
-        if (europe == null) return units;
+        if (location == null) return units;
 
+        Specification spec = game.getSpecification();
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
-                units.add(new ServerUnit(game, europe, this,
+                units.add(new ServerUnit(game, location, this,
                         au.getUnitType(spec), au.getEquipment(spec)));
             }
         }
@@ -1094,6 +1094,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 cs.addPartial(See.only(this), this, "immigration");
             }
             cs.addPartial(See.only(this), this, "liberty");
+            if (getPlayerType() == PlayerType.REBEL
+                && interventionBells >= getSpecification().getInteger("model.option.interventionBells")) {
+                List<Unit> interventionForce =
+                    createUnits(getMonarch().getInterventionForce().getUnits(),
+                                getEntryLocation());
+                cs.add(See.all(), new ArrayList<FreeColGameObject>(interventionForce));
+            }
         }
 
         // Update stances
@@ -1380,7 +1387,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {
-            createUnits(father.getUnits());
+            createUnits(father.getUnits(), europe);
             europeDirty = true;
         }
 
@@ -3318,7 +3325,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,
                                  ChangeSet cs) {
         if (checkGold(price)) {
-            createUnits(mercs);
+            createUnits(mercs, getEurope());
             cs.add(See.only(this), getEurope());
             modifyGold(-price);
             cs.addPartial(See.only(this), this, "gold");

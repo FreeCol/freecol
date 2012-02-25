@@ -97,6 +97,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -153,10 +154,10 @@ public final class InGameController extends Controller {
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
 
- 
+
     /**
      * The constructor to use.
-     * 
+     *
      * @param freeColServer The main server object.
      * @param random The pseudo-random number source to use.
      */
@@ -335,9 +336,11 @@ public final class InGameController extends Controller {
 
         // Instantiate the REF in Europe
         List<Unit> landUnits
-            = refPlayer.createUnits(monarch.getExpeditionaryForce().getLandUnits());
+            = refPlayer.createUnits(monarch.getExpeditionaryForce().getLandUnits(),
+                                    serverPlayer.getEurope());
         List<Unit> navalUnits
-            = refPlayer.createUnits(monarch.getExpeditionaryForce().getNavalUnits());
+            = refPlayer.createUnits(monarch.getExpeditionaryForce().getNavalUnits(),
+                                    serverPlayer.getEurope());
         List<Unit> unitsList = new ArrayList<Unit>();
         unitsList.addAll(navalUnits);
         unitsList.addAll(landUnits);
@@ -383,7 +386,7 @@ public final class InGameController extends Controller {
         private Game game;
         private DOMMessage message;
         private DOMMessageHandler handler;
-        
+
 
         public DOMMessageCallable(Connection connection, Game game,
                                   DOMMessage message,
@@ -393,7 +396,7 @@ public final class InGameController extends Controller {
             this.message = message;
             this.handler = handler;
         }
-        
+
         public DOMMessage call() {
             Element reply;
             try {
@@ -403,7 +406,7 @@ public final class InGameController extends Controller {
             }
             if (reply == null) return null;
             String tag = reply.getTagName();
-            tag = "net.sf.freecol.common.networking." 
+            tag = "net.sf.freecol.common.networking."
                 + tag.substring(0, 1).toUpperCase() + tag.substring(1)
                 + "Message";
             Class[] types = new Class[] { Game.class, Element.class };
@@ -518,8 +521,8 @@ public final class InGameController extends Controller {
         }
         return reply;
     }
-        
-        
+
+
     /**
      * Get a list of all server players, optionally excluding supplied ones.
      *
@@ -1079,7 +1082,7 @@ public final class InGameController extends Controller {
             boolean sea = action == MonarchAction.SUPPORT_SEA;
             List<AbstractUnit> support = monarch.getSupport(random, sea);
             if (support.isEmpty()) break;
-            serverPlayer.createUnits(support);
+            serverPlayer.createUnits(support, serverPlayer.getEurope());
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
@@ -1212,7 +1215,7 @@ public final class InGameController extends Controller {
             cashInAmount = fullAmount;
             messageId = "model.unit.cashInTreasureTrain.independent";
         }
-            
+
         serverPlayer.modifyGold(cashInAmount);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
         cs.addMessage(See.only(serverPlayer),
@@ -1336,6 +1339,12 @@ public final class InGameController extends Controller {
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
         // Update the intervention force
         serverPlayer.getMonarch().updateInterventionForce();
+        cs.addMessage(See.only(serverPlayer),
+                      new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                       "declareIndependence.interventionForce",
+                                       serverPlayer)
+                      .add("%nation%", getNonPlayerNation())
+                      .addAmount("%number%", spec.getInteger("model.option.interventionBells")));
 
         // Now the REF is ready, we can dispose of the European connection.
         serverPlayer.getHighSeas().removeDestination(europe);
@@ -2735,7 +2744,7 @@ public final class InGameController extends Controller {
 
     /**
      * Disband a unit.
-     * 
+     *
      * @param serverPlayer The owner of the unit.
      * @param unit The <code>Unit</code> to disband.
      * @return An <code>Element</code> encapsulating this action.
@@ -3057,7 +3066,7 @@ public final class InGameController extends Controller {
         default:
             return DOMMessage.clientError("Bogus trade status: " + status);
         }
-            
+
         DOMMessage reply = askTimeout(otherPlayer,
             new DiplomacyMessage(unit, settlement, agreement));
         DiplomaticTrade theirAgreement = (reply instanceof DiplomacyMessage)
@@ -3144,7 +3153,7 @@ public final class InGameController extends Controller {
             ((ServerUnit)unit).csRemoveEquipment(colony,
                 new HashSet<EquipmentType>(unit.getEquipment().keySet()),
                 0, random, cs);
-          
+
         }
 
         // Check for upgrade.
@@ -3820,11 +3829,11 @@ public final class InGameController extends Controller {
         // Convert statistics map to a list.
         java.util.Map<String, String> stats = getGame()
             .getStatistics();
-        
+
 
         stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
 
-        
+
         List<String> all = new ArrayList<String>();
         List<String> keys = new ArrayList<String>(stats.keySet());
         Collections.sort(keys);

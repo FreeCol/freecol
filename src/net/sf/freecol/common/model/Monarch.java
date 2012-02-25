@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -380,11 +379,10 @@ public final class Monarch extends FreeColGameObject implements Named {
      * units.
      */
     public void updateInterventionForce() {
-        IntegerOption interventionTurns = getSpecification()
-            .getIntegerOption("model.option.interventionTurns");
-        // @compat 0.10.5: option might not exist
-        if (interventionTurns != null && interventionTurns.getValue() > 0) {
-            int updates = getGame().getTurn().getNumber() / interventionTurns.getValue();
+        Specification spec = getSpecification();
+        int interventionTurns = spec.getInteger("model.option.interventionTurns");
+        if (interventionTurns > 0) {
+            int updates = getGame().getTurn().getNumber() / interventionTurns;
             for (AbstractUnit unit : interventionForce.getLandUnits()) {
                 // add units depending on current turn
                 int value = unit.getNumber() + updates;
@@ -392,11 +390,17 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
             interventionForce.updateSpaceAndCapacity();
             while (interventionForce.getCapacity() < interventionForce.getSpaceRequired()) {
+                boolean progress = false;
                 for (AbstractUnit ship : interventionForce.getNavalUnits()) {
                     // add ships until all units can be transported at once
-                    int value = ship.getNumber() + 1;
-                    ship.setNumber(value);
+                    if (ship.getUnitType(spec).canCarryUnits()
+                        && ship.getUnitType(spec).getSpace() > 0) {
+                        int value = ship.getNumber() + 1;
+                        ship.setNumber(value);
+                        progress = true;
+                    }
                 }
+                if (!progress) break;
                 interventionForce.updateSpaceAndCapacity();
             }
         }
