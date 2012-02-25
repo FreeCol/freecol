@@ -121,30 +121,66 @@ public class ChangeSet {
         // Use these public constructor-like functions to define the
         // visibility of changes.
 
+        /**
+         * Make this change visible to all players.
+         *
+         * @return a <code>See</code> value
+         */
         public static See all() {
             return new See(ALL);
         }
 
+        /**
+         * Make this change visible to all players, provided they can
+         * see the objects that are being changed.
+         *
+         * @return a <code>See</code> value
+         */
         public static See perhaps() {
             return new See(PERHAPS);
         }
 
+        /**
+         * Make this change visible only to the given player.
+         *
+         * @param player a <code>ServerPlayer</code> value
+         * @return a <code>See</code> value
+         */
         public static See only(ServerPlayer player) {
             return new See(ONLY).always(player);
         }
 
         // Use these to modify a See visibility.
 
+        /**
+         * Make this change visible to the given player.
+         *
+         * @param player a <code>ServerPlayer</code> value
+         * @return a <code>See</code> value
+         */
         public See always(ServerPlayer player) {
             seeAlways = player;
             return this;
         }
 
+        /**
+         * Make this change visible to the given player, provided the
+         * player can see the objects being changed.
+         *
+         * @param player a <code>ServerPlayer</code> value
+         * @return a <code>See</code> value
+         */
         public See perhaps(ServerPlayer player) {
             seePerhaps = player;
             return this;
         }
 
+        /**
+         * Make this change invisible to the given player.
+         *
+         * @param player a <code>ServerPlayer</code> value
+         * @return a <code>See</code> value
+         */
         public See except(ServerPlayer player) {
             seeNever = player;
             return this;
