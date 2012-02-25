@@ -87,6 +87,8 @@ public class IdleAtColonyMission extends Mission {
     }
 
 
+    // Fake Transportable interface
+
     /**
      * Gets the transport destination for units with this mission.
      *
@@ -98,10 +100,10 @@ public class IdleAtColonyMission extends Mission {
             || unit.getTile().getSettlement() != null) return null;
         PathNode path = findNearestOtherSettlement(unit);
         Tile target = (path == null) ? null : path.getLastNode().getTile();
-        return (target != null && shouldTakeTransportToTile(target))
-            ? target
-            : null;
+        return (shouldTakeTransportToTile(target)) ? target : null;
     }
+
+    // Mission interface
 
     /**
      * Should this Mission only be carried out once?
@@ -120,23 +122,20 @@ public class IdleAtColonyMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-        final Tile tile = unit.getTile();
-        if (tile == null) return;
-
-        // If our tile contains a settlement, idle
-        if (tile.getSettlement() != null) {
-            logger.finest("Unit " + unit.getId()
-                + " idle at settlement: " + tile.getSettlement().getId());
+        if (unit == null || unit.isDisposed()) {
+            logger.warning("AI idler broken: " + unit);
             return;
         }
 
+        // If our tile contains a settlement, idle.  No log, this is normal.
+        if (unit.getTile().getSettlement() != null) return;
+
         PathNode path = findNearestOtherSettlement(unit);
         if (path != null) {
-            Direction r = moveTowards(path);
-            if (r == null || !moveButDontAttack(r)) return;
-        } else {
-            // Just make a random move if no target can be found.
+            travelToTarget("AI idler", path.getLastNode().getTile());
+        } else { // Just make a random move if no target can be found.
             moveRandomly();
+            logger.finest("AI idler wandered randomly: " + unit);
         }
     }
 

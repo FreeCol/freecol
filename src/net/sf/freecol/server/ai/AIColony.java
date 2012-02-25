@@ -1243,14 +1243,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
-     * Handle REARRANGE_WORKERS property change events, by setting
-     * the rearrangeTurn variable such that rearrangeWorkers will
-     * run fully next time it is invoked.
+     * Handle REARRANGE_WORKERS property change events.
      *
      * @param event The <code>PropertyChangeEvent</code>.
      */
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("Property change REARRANGE_WORKERS fired.");
+        requestRearrange();
+    }
+
+    /**
+     * Sets the rearrangeTurn variable such that rearrangeWorkers will
+     * run fully next time it is invoked.
+     */
+    public void requestRearrange() {
         rearrangeTurn = new Turn(0);
     }
 

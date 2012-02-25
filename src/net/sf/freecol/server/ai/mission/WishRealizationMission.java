@@ -31,8 +31,11 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -45,12 +48,12 @@ import org.w3c.dom.Element;
 
 /**
  * Mission for realizing a <code>Wish</code>.
- * @see Wish
  */
 public class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
+    /** The wish to be realized. */
     private Wish wish;
 
 
@@ -66,12 +69,10 @@ public class WishRealizationMission extends Mission {
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
         this.wish = wish;
-
-        if (wish == null) {
-            throw new NullPointerException("wish == null");
-        }
+        logger.finest("AI wish unit starting"
+            + " with destination " + wish.getDestination()
+            + ": " + aiUnit.getUnit());
     }
-
 
     /**
      * Loads a mission from the given element.
@@ -86,7 +87,8 @@ public class WishRealizationMission extends Mission {
     }
 
     /**
-     * Creates a new <code>WishRealizationMission</code> and reads the given element.
+     * Creates a new <code>WishRealizationMission</code> and reads the
+     * given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -94,14 +96,16 @@ public class WishRealizationMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public WishRealizationMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public WishRealizationMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
 
+
     /**
-    * Disposes this <code>Mission</code>.
-    */
+     * Disposes this <code>Mission</code>.
+     */
     public void dispose() {
         if (wish != null) {
             wish.setTransportable(null);
@@ -111,42 +115,7 @@ public class WishRealizationMission extends Mission {
     }
 
 
-    /**
-    * Performs this mission.
-    * @param connection The <code>Connection</code> to the server.
-    */
-    public void doMission(Connection connection) {
-        if (!isValid()) {
-            return;
-        }
-
-        // Move towards the target.
-        if (getUnit().getTile() != null) {
-            if (wish.getDestination().getTile() != getUnit().getTile()) {
-                Direction r = moveTowards(wish.getDestination().getTile());
-                if (r == null || !moveButDontAttack(r)) return;
-            }
-            if (wish.getDestination().getTile() == getUnit().getTile()) {
-                if (wish.getDestination() instanceof Colony) {
-                    Colony colony = (Colony) wish.getDestination();
-                    WorkLocation loc = colony.getVacantWorkLocationFor(getUnit());
-                    if (getUnit().getLocation() == loc) {
-                        this.wish = null; // Done
-                    } else if (AIMessage.askWork(getAIUnit(), loc)) {
-                        //getUnit().setLocation(colony);
-                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), getAIMain().getAIColony(colony)));
-                    } else {
-                        logger.warning("AIunit " + getAIUnit().getId()
-                                       + " could not work in " + colony.getId());
-                    }
-                } else {
-                    logger.warning("Unknown type of destination for: " + wish);
-                }
-            }
-        }
-    }
-
-
+    // Fake Transportable interface
 
     /**
      * Gets the transport destination for units with this mission.
@@ -154,34 +123,12 @@ public class WishRealizationMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */
     public Location getTransportDestination() {
-        return (wish == null || wish.getDestination() == null)
-            ? null
-            : (wish.getDestination() instanceof Tile)
-            ? ((shouldTakeTransportToTile((Tile)wish.getDestination()))
-                ? (Tile)wish.getDestination()
-                : null)
-            : wish.getDestination();
+        Tile tile = (wish == null || wish.getDestination() == null) ? null
+            : wish.getDestination().getTile();
+        return (shouldTakeTransportToTile(tile)) ? tile : null;
     }
 
-
-    /**
-    * Returns the priority of getting the unit to the
-    * transport destination.
-    *
-    * @return The priority.
-    */
-    public int getTransportPriority() {
-        if (getUnit().isOnCarrier()) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else if (getUnit().getLocation().getTile() == wish.getDestination().getTile()) {
-            return 0;
-        } else if (getUnit().getTile() == null || getUnit().findPath(wish.getDestination().getTile()) == null) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else {
-            return 0;
-        }
-    }
-
+    // Mission interface
 
     /**
      * Checks if this mission is still valid to perform.
@@ -195,15 +142,55 @@ public class WishRealizationMission extends Mission {
             && (loc = wish.getDestination()) != null
             && !((FreeColGameObject)loc).isDisposed()
             && !(loc instanceof Ownable
-                 && ((Ownable)loc).getOwner() != getUnit().getOwner())
-            && !(loc instanceof Colony
-                 && ((Colony) loc).getVacantWorkLocationFor(getUnit()) == null);
+                && ((Ownable)loc).getOwner() != getUnit().getOwner());
     }
 
     /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
+     * Performs this mission.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    public void doMission(Connection connection) {
+        final Unit unit = getUnit();
+        if (unit == null || unit.isDisposed() || !isValid()) {
+            logger.warning("AI wish broken: " + unit);
+            return;
+        }
+
+        // Move towards the target.
+        if (travelToTarget("AI wish unit", wish.getDestination())
+            != Unit.MoveType.MOVE) return;
+
+        if (wish.getDestination() instanceof Colony) {
+            final Colony colony = (Colony)wish.getDestination();
+            final AIUnit aiUnit = getAIUnit();
+            final AIColony aiColony = getAIMain().getAIColony(colony);
+            aiColony.removeWish(wish);
+            logger.finest("AI wish completed at " + colony
+                + ": " + unit);
+            // Replace the mission, with a defensive one if this is a
+            // military unit or a simple working one if not.  Beware
+            // that setMission() will dispose of this mission which is
+            // why this is done last.
+            if (unit.getType().getOffence() > UnitType.DEFAULT_OFFENCE) {
+                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
+                                  aiUnit, colony));
+            } else {                
+                aiColony.requestRearrange();
+                aiUnit.setMission(new WorkInsideColonyMission(getAIMain(),
+                                  aiUnit, aiColony));
+            }
+        } else {
+            logger.warning("AI wish unknown destination type " + wish
+                + ": " + unit);
+            wish.dispose();
+            wish = null;
+        }
+    }
+
+    /**
+     * Gets debugging information about this mission.  This string is
+     * a short representation of this object's state.
      *
      * @return The <code>String</code>.
      */
@@ -211,10 +198,11 @@ public class WishRealizationMission extends Mission {
         if (wish == null) {
             return "No wish";
         } else {
-            return wish.getDestination().getTile().getPosition() + " " + wish.getValue();
+            return wish.getDestination().getTile() + " " + wish.getValue();
         }
     }
 
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -230,19 +218,25 @@ public class WishRealizationMission extends Mission {
         }
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("wish", wish.getId());
     }
 
-
+    /**
+     * {@inherit-doc}
+     */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        wish = (Wish) getAIMain().getAIObject(in.getAttributeValue(null,
-                "wish"));
+        final String wid = in.getAttributeValue(null, "wish");
+        wish = (Wish)getAIMain().getAIObject(wid);
+
         if (wish == null) {
-            final String wid = in.getAttributeValue(null, "wish");
             if (wid.startsWith(GoodsWish.getXMLElementTagName())
                 // @compat 0.10.3
                 || wid.startsWith("GoodsWish")

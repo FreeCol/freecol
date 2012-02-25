@@ -206,7 +206,7 @@ public class DefendSettlementMission extends Mission {
         if (m != null) {
             aiUnit.setMission(m);
             m.doMission(aiUnit.getConnection());
-            return;
+            return; // No log, setMission() logs this mission going away.
         }
 
         // Anything more to do?

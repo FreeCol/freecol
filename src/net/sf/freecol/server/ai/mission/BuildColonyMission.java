@@ -376,15 +376,15 @@ public class BuildColonyMission extends Mission {
         // Clear to build the colony.
         if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
             && target.getColony() != null) {
+            logger.finest("AI colony builder completed "
+                + target.getColony().getName() + ": " + unit);
             aiUnit.setMission(new WorkInsideColonyMission(getAIMain(), aiUnit,
                     getAIMain().getAIColony(target.getColony())));
-            logger.finest("AI colony builder"
-                + " built " + target.getColony().getName() + ": " + unit);
         } else {
             logger.warning("AI colony builder failed to build at " + target
                 + ": " + unit);
+            target = null;
         }
-        target = null;
     }
 
     /**

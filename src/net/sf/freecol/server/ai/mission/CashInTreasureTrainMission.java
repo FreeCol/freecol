@@ -272,9 +272,10 @@ public class CashInTreasureTrainMission extends Mission {
                 || europe == null
                 || player.getCarriersForUnit(unit).isEmpty()
                 || unit.getTransportFee() == 0) {
-                logger.finest("AI treasure train cashed in at "
-                    + unit.getLocation() + ": " + unit);
-                AIMessage.askCashInTreasureTrain(aiUnit);
+                if (AIMessage.askCashInTreasureTrain(aiUnit)) {
+                    logger.finest("AI treasure train completed cash in at "
+                        + unit.getLocation() + ": " + unit);
+                }
             } else {
                 targetLoc = europe;
                 logger.finest("AI treasure train at " + unit.getLocation()

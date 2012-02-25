@@ -36,14 +36,13 @@ import org.w3c.dom.Element;
 
 
 /**
- * Mission for working inside a <code>Colony</code>.
+ * Mission for working inside an AI colony.
  */
 public class WorkInsideColonyMission extends Mission {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
-    // The AI colony to work inside.
+    /** The AI colony to work inside. */
     private AIColony aiColony;
 
 
@@ -107,18 +106,7 @@ public class WorkInsideColonyMission extends Mission {
     }
 
 
-    /**
-     * Checks if this mission is still valid to perform.
-     *
-     * @return True if this mission is still valid to perform.
-     */
-    public boolean isValid() {
-        return super.isValid()
-            && aiColony != null
-            && aiColony.getColony() != null
-            && !aiColony.getColony().isDisposed()
-            && getUnit().getOwner() == aiColony.getColony().getOwner();
-    }
+    // Fake Transportable interface
 
     /**
      * Gets the destination for units with this mission.
@@ -133,22 +121,39 @@ public class WorkInsideColonyMission extends Mission {
             : null;
     }
 
+    // Mission interface
+
+    /**
+     * Checks if this mission is still valid to perform.
+     *
+     * @return True if this mission is still valid to perform.
+     */
+    public boolean isValid() {
+        return super.isValid()
+            && getUnit().isPerson()
+            && aiColony != null
+            && aiColony.getColony() != null
+            && !aiColony.getColony().isDisposed()
+            && aiColony.getColony().getOwner() == getUnit().getOwner();
+    }
+
     /**
      * Performs this mission.
      *
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        if (!isValid()) return;
-
-        final Tile colonyTile = aiColony.getColony().getTile();
         final Unit unit = getUnit();
-        if (!unit.isOnCarrier() && unit.getTile() != null
-            && unit.getTile() != colonyTile) {
-            moveTowards(colonyTile);
+        if (unit == null || unit.isDisposed() || !isValid()) {
+            logger.finest("AI worker broken: " + unit);
+            return;
         }
+
+        travelToTarget("AI worker", aiColony.getColony().getTile());
     }
 
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
