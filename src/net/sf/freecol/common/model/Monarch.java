@@ -619,7 +619,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             } else if ("interventionForce".equals(childName)) {
                 interventionForce.readFromXML(in);
             } else {
-                // @compat 0.10.4
+                // @compat 0.10.5
                 if ("navalUnits".equals(childName)) {
                     expeditionaryForce.getNavalUnits().clear();
                     while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -636,6 +636,12 @@ public final class Monarch extends FreeColGameObject implements Named {
                 // end @compat
             }
         }
+        // @compat 0.10.5
+        if (interventionForce.getUnits().isEmpty()) {
+            interventionForce = new Force((UnitListOption) getSpecification()
+                                          .getOption("model.option.interventionForce"), null);
+        }
+        // end @compat
 
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Monarch.getXMLElementTagName())) {

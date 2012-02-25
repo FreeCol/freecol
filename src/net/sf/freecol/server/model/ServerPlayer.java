@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -834,6 +835,36 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Embark the land units.  For all land units, find a naval unit
+     * to carry it.  Fill greedily, so as if there is excess naval
+     * capacity then the naval units at the end of the list will tend
+     * to be empty or very lightly filled, allowing them to defend the
+     * whole fleet at full strength. Returns a list of units that
+     * could not be placed on ships.
+     *
+     * @param landUnits the land units to put on ships
+     * @param navalUnits the ships to put land units on
+     * @param random a PRNG
+     * @return a list of units left over
+     */
+    public List<Unit> loadShips(List<Unit> landUnits, List<Unit> navalUnits, Random random) {
+        List<Unit> leftOver = new ArrayList<Unit>();
+        Collections.shuffle(navalUnits, random);
+        Collections.shuffle(landUnits, random);
+        landUnit: for (Unit unit : landUnits) {
+            for (Unit carrier : navalUnits) {
+                if (unit.getSpaceTaken() <= carrier.getSpaceLeft()) {
+                    unit.setLocation(carrier);
+                    logger.finest("Loading " + unit + " onto carrier " + carrier);
+                    continue landUnit;
+                }
+            }
+            leftOver.add(unit);
+        }
+        return leftOver;
+    }
+
+    /**
      * Calculates the price of a group of mercenaries for this player.
      *
      * @param mercenaries A list of mercenaries to price.
@@ -1099,10 +1130,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // TODO: this assumes that the entry location will
                 // always be a tile. This seems safe enough at the moment.
                 Tile entryLocation = ((Tile) getEntryLocation()).getSafeTile(this, random);
-                List<Unit> interventionForce =
-                    createUnits(getMonarch().getInterventionForce().getUnits(),
+                List<Unit> landUnits =
+                    createUnits(getMonarch().getInterventionForce().getLandUnits(),
                                 entryLocation);
+                List<Unit> navalUnits =
+                    createUnits(getMonarch().getInterventionForce().getNavalUnits(),
+                                entryLocation);
+                List<Unit> leftOver = loadShips(landUnits, navalUnits, random);
+                for (Unit unit : leftOver) {
+                    // no use for left over units
+                    logger.warning("Disposing of left over unit " + unit);
+                    unit.setLocation(null);
+                    unit.dispose();
+                }
                 cs.add(See.perhaps(), entryLocation);
+                cs.addMessage(See.only(this),
+                              new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                               "declareIndependence.interventionForceArrives",
+                                               this));
             }
         }
 

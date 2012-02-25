@@ -97,7 +97,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -341,26 +340,8 @@ public final class InGameController extends Controller {
         List<Unit> navalUnits
             = refPlayer.createUnits(monarch.getExpeditionaryForce().getNavalUnits(),
                                     serverPlayer.getEurope());
-        List<Unit> unitsList = new ArrayList<Unit>();
-        unitsList.addAll(navalUnits);
-        unitsList.addAll(landUnits);
 
-        // Embark the land units.  For all land units, find a naval
-        // unit to carry it.  Fill greedily, so as if there is excess
-        // naval capacity then the naval units at the end of the list
-        // will tend to be empty or very lightly filled, allowing them
-        // to defend the whole fleet at full strength against the
-        // rebel navy.
-        Collections.shuffle(navalUnits, random);
-        Collections.shuffle(landUnits, random);
-        for (Unit unit : landUnits) {
-            for (Unit carrier : navalUnits) {
-                if (unit.getSpaceTaken() <= carrier.getSpaceLeft()) {
-                    unit.setLocation(carrier);
-                    continue;
-                }
-            }
-        }
+        refPlayer.loadShips(landUnits, navalUnits, random);
         // Send the navy on its way
         for (Unit u : navalUnits) {
             u.setWorkLeft(1);
