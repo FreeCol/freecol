@@ -22,25 +22,18 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
@@ -49,7 +42,7 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * This panel displays the Military Report.
  */
-public final class ReportMilitaryPanel extends ReportPanel {
+public final class ReportMilitaryPanel extends ReportUnitPanel {
 
     /*
      * In the future, we should consider all possible combinations of
@@ -76,34 +69,16 @@ public final class ReportMilitaryPanel extends ReportPanel {
      private Map<EquippedUnitType, Integer> unitMap;
     */
 
-    private List<String> colonyNames;
-    private List<String> otherNames;
-
-    /**
-     * Records the number of units of each type.
-     */
-    private TypeCountMap<UnitType> soldiers = new TypeCountMap<UnitType>();
-    private TypeCountMap<UnitType> dragoons = new TypeCountMap<UnitType>();
-    private TypeCountMap<UnitType> scouts = new TypeCountMap<UnitType>();
-    private TypeCountMap<UnitType> others = new TypeCountMap<UnitType>();
-
-    private Map<String, ArrayList<Unit>> locations;
-
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * @param freeColClient
      * @param gui The parent of this panel.
      */
     public ReportMilitaryPanel(FreeColClient freeColClient, GUI gui) {
+        super(freeColClient, gui, "reportMilitaryAction.name", true);
+    }
 
-        super(freeColClient, gui, Messages.message("reportMilitaryAction.name"));
-
-        gatherData();
-
-        Player player = getMyPlayer();
-
-        reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
-
+    protected void addREFUnits() {
         reportPanel.add(new JLabel(Messages.message(player.getNation().getRefNation().getId() + ".name")),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
@@ -116,7 +91,9 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 }
             }
         }
+    }
 
+    protected void addOwnUnits() {
         reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
                                        .addStringTemplate("%nation%", player.getNationName())),
                         "newline, span, split 2");
@@ -132,18 +109,18 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility("model.ability.canBeEquipped")) {
-                    scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, scouts.getCount(unitType)));
-                    dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, dragoons.getCount(unitType)));
-                    soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, soldiers.getCount(unitType)));
+                    scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, getCount("scouts", unitType)));
+                    dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, getCount("dragoons", unitType)));
+                    soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, getCount("soldiers", unitType)));
                 } else {
-                    units.add(new AbstractUnit(unitType, Role.DEFAULT, others.getCount(unitType)));
+                    units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount("others", unitType)));
                 }
             }
         }
         UnitType defaultType = getSpecification().getDefaultUnitType();
-        dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, dragoons.getCount(defaultType)));
-        soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, soldiers.getCount(defaultType)));
-        scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, scouts.getCount(defaultType)));
+        dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, getCount("dragoons", defaultType)));
+        soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, getCount("soldiers", defaultType)));
+        scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, getCount("scouts", defaultType)));
         units.addAll(dragoonUnits);
         units.addAll(soldierUnits);
         units.addAll(scoutUnits);
@@ -151,29 +128,6 @@ public final class ReportMilitaryPanel extends ReportPanel {
         for (AbstractUnit unit : units) {
             reportPanel.add(createUnitTypeLabel(unit), "sg");
         }
-
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx, wrap 40");
-
-        // colonies first, sorted according to user preferences
-        for (String locationName : colonyNames) {
-            handleLocation(locationName, true);
-        }
-
-        // Europe next
-        if (player.getEurope() != null) {
-            String europeName = Messages.message(player.getEurope().getNameKey());
-            handleLocation(europeName, true);
-            otherNames.remove(europeName);
-        }
-
-        // finally all other locations, sorted alphabetically
-        Collections.sort(otherNames);
-        for (String locationName : otherNames) {
-            handleLocation(locationName, false);
-        }
-
-        revalidate();
-        repaint();
     }
 
     @Override
@@ -186,19 +140,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         return getMinimumSize();
     }
 
-    private void gatherData() {
-        Player player = getMyPlayer();
-        locations = new HashMap<String, ArrayList<Unit>>();
-        List<Colony> colonies = getSortedColonies();
-        colonyNames = new ArrayList<String>();
-        for (Colony colony : colonies) {
-            colonyNames.add(colony.getName());
-        }
-        otherNames = new ArrayList<String>();
-        if (player.getEurope() != null) {
-            otherNames.add(Messages.message(player.getEurope().getNameKey()));
-        }
-
+    protected void gatherData() {
         UnitType defaultType = getSpecification().getDefaultUnitType();
         for (Unit unit : player.getUnits()) {
             if (unit.isOffensiveUnit() && !unit.isNaval()) {
@@ -207,63 +149,12 @@ public final class ReportMilitaryPanel extends ReportPanel {
                     unit.hasAbility(Ability.EXPERT_SOLDIER)) {
                     unitType = unit.getType();
                 }
-                switch(unit.getRole()) {
-                case DRAGOON:
-                    dragoons.incrementCount(unitType, 1);
-                    break;
-                case SOLDIER:
-                    soldiers.incrementCount(unitType, 1);
-                    break;
-                default:
-                    others.incrementCount(unitType, 1);
-                }
-            } else {
-                continue;
-            }
-
-
-            String locationName = getLocationNameFor(unit);
-
-            ArrayList<Unit> unitList = locations.get(locationName);
-            if (unitList == null) {
-                unitList = new ArrayList<Unit>();
-                locations.put(locationName, unitList);
-            }
-            unitList.add(unit);
-            if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
-                otherNames.add(locationName);
-            }
-        }
-    }
-
-
-    private void handleLocation(String location, boolean makeButton) {
-        List<Unit> unitList = locations.get(location);
-        JComponent component;
-        if (makeButton) {
-            JButton button = FreeColPanel.getLinkButton(location, null, location);
-            button.addActionListener(this);
-            component = button;
-        } else {
-            component = new JLabel(location);
-        }
-        reportPanel.add(component, "newline, span, split 2");
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
-
-        if (unitList == null) {
-            reportPanel.add(new JLabel(Messages.message("none")), "sg");
-        } else {
-            Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true);
-                if (unit.getDestination() != null) {
-                    String destination = Messages.message(unit.getDestination().getLocationNameFor(getMyPlayer()));
-                    unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
-                                             Messages.message(StringTemplate.template("goingTo")
-                                                              .addName("%location%", destination))
-                                             + "</html>");
-                }
-                reportPanel.add(unitLabel, "sg");
+                String key = unit.getRole() == Role.DRAGOON
+                    ? "dragoons"
+                    : unit.getRole() == Role.SOLDIER
+                    ? "soldiers"
+                    : "others";
+                addUnit(unit, key);
             }
         }
     }
