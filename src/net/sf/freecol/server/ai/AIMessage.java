@@ -372,12 +372,12 @@ public class AIMessage {
     /**
      * A unit in Europe emigrates.
      *
-     * @param connection The <code>Connection</code> to the server.
+     * @param aiPlayer The <code>AIPlayer</code> requiring emigration.
      * @param slot The slot to emigrate from.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askEmigrate(Connection connection, int slot) {
-        return sendMessage(connection,
+    public static boolean askEmigrate(AIPlayer aiPlayer, int slot) {
+        return sendMessage(aiPlayer.getConnection(),
             new EmigrateUnitMessage(slot));
     }
 
@@ -385,11 +385,11 @@ public class AIMessage {
     /**
      * Ends the player turn.
      *
-     * @param connection The <code>Connection</code> to the server.
+     * @param aiPlayer The <code>AIPlayer</code> ending the turn.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askEndTurn(Connection connection) {
-        return sendTrivial(connection, "endTurn");
+    public static boolean askEndTurn(AIPlayer aiPlayer) {
+        return sendTrivial(aiPlayer.getConnection(), "endTurn");
     }
 
 
@@ -574,13 +574,13 @@ public class AIMessage {
     /**
      * Train unit in Europe.
      *
-     * @param connection The <code>Connection</code> to the server.
+     * @param aiPlayer The <code>AIPlayer</code> requiring training.
      * @param type The <code>UnitType</code> to train.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askTrainUnitInEurope(Connection connection,
+    public static boolean askTrainUnitInEurope(AIPlayer aiPlayer,
                                                UnitType type) {
-        return sendMessage(connection,
+        return sendMessage(aiPlayer.getConnection(),
                            new TrainUnitInEuropeMessage(type));
     }
 
@@ -609,5 +609,4 @@ public class AIMessage {
         return sendMessage(aiUnit.getConnection(),
                            new WorkMessage(aiUnit.getUnit(), workLocation));
     }
-
 }

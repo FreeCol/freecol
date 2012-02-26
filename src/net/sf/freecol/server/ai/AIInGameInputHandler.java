@@ -232,7 +232,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "AI player failed while working!", e);
                     }
-                    AIMessage.askEndTurn(connection);
+                    AIMessage.askEndTurn(getAIPlayer());
                 }
             };
             t.start();
@@ -381,7 +381,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             n = -1;
         }
         for (int i = 0; i < n; i++) {
-            AIMessage.askEmigrate(connection, 0);
+            AIMessage.askEmigrate(getAIPlayer(), 0);
         }
         return null;
     }

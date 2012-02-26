@@ -217,7 +217,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         final String selectAbility = "model.ability.selectRecruit";
         int slot = (index >= 0 && index < Europe.RECRUIT_COUNT
             && getPlayer().hasAbility(selectAbility)) ? (index + 1) : 0;
-        if (AIMessage.askEmigrate(getConnection(), slot)
+        if (AIMessage.askEmigrate(this, slot)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
         }
@@ -242,7 +242,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Europe europe = getPlayer().getEurope();
         int n = europe.getUnitCount();
 
-        if (AIMessage.askTrainUnitInEurope(getConnection(), unitType)
+        if (AIMessage.askTrainUnitInEurope(this, unitType)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));
         }
