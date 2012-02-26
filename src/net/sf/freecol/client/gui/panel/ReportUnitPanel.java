@@ -220,17 +220,14 @@ public abstract class ReportUnitPanel extends ReportPanel {
         ImageIcon icon = getLibrary().getUnitImageIcon(unit.getType(), unit.getRole());
         JButton button = getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        /*
-        String toolTip = Messages.getLabel(unit);
+        String toolTip = Messages.message(Messages.getLabel(unit));
         if (unit.getDestination() != null) {
-            toolTip += " ("
+            toolTip += "\n"
                 + Messages.message(StringTemplate.template("goingTo")
                                    .addStringTemplate("%location%", unit.getDestination()
-                                                      .getLocationNameFor(getMyPlayer())))
-                + ")";
+                                                      .getLocationNameFor(getMyPlayer())));
         }
-        */
-        button.setToolTipText(Messages.message(Messages.getLabel(unit)));
+        button.setToolTipText(toolTip);
         return button;
     }
 

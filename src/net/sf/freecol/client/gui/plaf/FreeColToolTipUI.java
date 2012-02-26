@@ -28,6 +28,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JToolTip;
 import javax.swing.plaf.ComponentUI;
@@ -51,6 +52,8 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     private static int margin = 5;
     private static int maximumWidth = 300;
 
+    private static final Pattern lineBreak = Pattern.compile("\n");
+
 
     private FreeColToolTipUI() {
         super();
@@ -65,7 +68,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
      *
      * @param width an <code>int</code> value
      */
-    public static void setMaximumWidth(int width){
+    public static void setMaximumWidth(int width) {
         maximumWidth = width;
     }
 
@@ -78,26 +81,27 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         // TODO: find out why this is necessary
         g.setColor(Color.BLACK);
         Graphics2D graphics = (Graphics2D) g;
-        AttributedCharacterIterator styledText =
-            new AttributedString(((JToolTip) c).getTipText()).getIterator();
-
-        LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
         float x = margin;
         float y = margin;
-        while (measurer.getPosition() < styledText.getEndIndex()) {
+        for (String line : lineBreak.split(((JToolTip) c).getTipText())) {
+            AttributedCharacterIterator styledText =
+                new AttributedString(line).getIterator();
 
-            TextLayout layout = measurer.nextLayout(maximumWidth);
+            LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
-            y += (layout.getAscent());
-            float dx = layout.isLeftToRight() ?
-                0 : (maximumWidth - layout.getAdvance());
+            while (measurer.getPosition() < styledText.getEndIndex()) {
 
-            layout.draw(graphics, x + dx, y);
-            y += layout.getDescent() + layout.getLeading();
+                TextLayout layout = measurer.nextLayout(maximumWidth);
+
+                y += (layout.getAscent());
+                float dx = layout.isLeftToRight() ?
+                    0 : (maximumWidth - layout.getAdvance());
+
+                layout.draw(graphics, x + dx, y);
+                y += layout.getDescent() + layout.getLeading();
+            }
         }
-
-
      }
 
     public Dimension getPreferredSize(JComponent c) {
@@ -106,19 +110,21 @@ public class FreeColToolTipUI extends BasicToolTipUI {
             return new Dimension(0, 0);
         }
 
-        AttributedCharacterIterator styledText =
-            new AttributedString(((JToolTip) c).getTipText()).getIterator();
-        LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
-
         float x = 0f;
         float y = 0f;
-        while (measurer.getPosition() < styledText.getEndIndex()) {
+        for (String line : lineBreak.split(((JToolTip) c).getTipText())) {
+            AttributedCharacterIterator styledText
+                = new AttributedString(line).getIterator();
+            LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);
 
-            TextLayout layout = measurer.nextLayout(maximumWidth);
+            while (measurer.getPosition() < styledText.getEndIndex()) {
 
-            x = Math.max(x, layout.getVisibleAdvance());
-            y += layout.getAscent() + layout.getDescent() + layout.getLeading();
+                TextLayout layout = measurer.nextLayout(maximumWidth);
 
+                x = Math.max(x, layout.getVisibleAdvance());
+                y += layout.getAscent() + layout.getDescent() + layout.getLeading();
+
+            }
         }
         return new Dimension((int) (x + 2 * margin),
                              (int) (y + 2 * margin));
