@@ -222,8 +222,14 @@ public abstract class ReportUnitPanel extends ReportPanel {
         button.addActionListener(this);
         String toolTip = Messages.message(Messages.getLabel(unit));
         if (unit.getDestination() != null) {
+            String type = unit.isPerson()
+                ? "person"
+                : unit.isNaval()
+                ? "ship"
+                : "other";
             toolTip += "\n"
                 + Messages.message(StringTemplate.template("goingTo")
+                                   .addName("%type%", type)
                                    .addStringTemplate("%location%", unit.getDestination()
                                                       .getLocationNameFor(getMyPlayer())));
         }

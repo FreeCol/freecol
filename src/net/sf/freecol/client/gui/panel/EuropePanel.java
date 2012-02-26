@@ -513,7 +513,8 @@ public final class EuropePanel extends FreeColPanel {
                 }
             }
 
-            StringTemplate t = StringTemplate.template("sailingTo")
+            StringTemplate t = StringTemplate.template("goingTo")
+                .addName("%type%", "ship")
                 .addStringTemplate("%location%",
                     destination.getLocationNameFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
