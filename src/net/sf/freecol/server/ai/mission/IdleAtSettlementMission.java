@@ -38,12 +38,11 @@ import org.w3c.dom.Element;
 
 
 /**
- * Mission for idling in colony.
- * TODO: this has now been generalized to settlements, rename one day.
+ * Mission for idling in a settlement.
  */
-public class IdleAtColonyMission extends Mission {
+public class IdleAtSettlementMission extends Mission {
 
-    private static final Logger logger = Logger.getLogger(IdleAtColonyMission.class.getName());
+    private static final Logger logger = Logger.getLogger(IdleAtSettlementMission.class.getName());
 
 
     /**
@@ -53,7 +52,7 @@ public class IdleAtColonyMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission
      *        is created for.
      */
-    public IdleAtColonyMission(AIMain aiMain, AIUnit aiUnit) {
+    public IdleAtSettlementMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
     }
 
@@ -65,13 +64,13 @@ public class IdleAtColonyMission extends Mission {
      * @param element An <code>Element</code> containing an
      *      XML-representation of this object.
      */
-    public IdleAtColonyMission(AIMain aiMain, Element element) {
+    public IdleAtSettlementMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
     }
 
     /**
-     * Creates a new <code>IdleAtColonyMission</code> and reads the
+     * Creates a new <code>IdleAtSettlementMission</code> and reads the
      * given element.
      *
      * @param aiMain The main AI-object.
@@ -80,7 +79,7 @@ public class IdleAtColonyMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public IdleAtColonyMission(AIMain aiMain, XMLStreamReader in)
+    public IdleAtSettlementMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
@@ -127,6 +126,9 @@ public class IdleAtColonyMission extends Mission {
             return;
         }
 
+        // Wait if in Europe.
+        if (unit.getTile() == null) return;
+
         // If our tile contains a settlement, idle.  No log, this is normal.
         if (unit.getTile().getSettlement() != null) return;
 
@@ -156,9 +158,9 @@ public class IdleAtColonyMission extends Mission {
     /**
      * Returns the tag name of the root element representing this object.
      *
-     * @return "idleAtColonyMission".
+     * @return "idleAtSettlementMission".
      */
     public static String getXMLElementTagName() {
-        return "idleAtColonyMission";
+        return "idleAtSettlementMission";
     }
 }

@@ -62,7 +62,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
@@ -316,7 +316,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (!u.isPerson()) continue;
             Mission mission = getAIUnit(u).getMission();
             if (mission == null
-                || mission instanceof IdleAtColonyMission
+                || mission instanceof IdleAtSettlementMission
                 || mission instanceof WorkInsideColonyMission
                 || (mission instanceof BuildColonyMission
                     && ((BuildColonyMission)mission).getTarget() == tile)

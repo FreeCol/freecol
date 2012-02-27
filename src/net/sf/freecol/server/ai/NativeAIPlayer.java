@@ -60,7 +60,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -638,7 +638,7 @@ public class NativeAIPlayer extends AIPlayer {
                 } else {
                     //non-offensive units should take shelter in a nearby colony,
                     //not try to be hostile
-                    aiUnit.setMission(new IdleAtColonyMission(getAIMain(), aiUnit));
+                    aiUnit.setMission(new IdleAtSettlementMission(getAIMain(), aiUnit));
                 }
             }
         }

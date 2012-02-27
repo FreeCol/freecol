@@ -40,7 +40,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Element;
@@ -200,7 +200,7 @@ public class DefendSettlementMission extends Mission {
             }
         } else if (settlement instanceof IndianSettlement) {
             if (unit.isPerson() && settlement.getUnitCount() <= 1) {
-                m = new IdleAtColonyMission(aiMain, aiUnit);
+                m = new IdleAtSettlementMission(aiMain, aiUnit);
             }
         }                
         if (m != null) {

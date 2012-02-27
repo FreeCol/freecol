@@ -42,7 +42,7 @@ import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -564,8 +564,12 @@ public class AIUnit extends AIObject implements Transportable {
                 mission = new ScoutingMission(getAIMain(), in);
             } else if (in.getLocalName().equals(CashInTreasureTrainMission.getXMLElementTagName())) {
                 mission = new CashInTreasureTrainMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(IdleAtColonyMission.getXMLElementTagName())) {
-                mission = new IdleAtColonyMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(IdleAtSettlementMission.getXMLElementTagName())
+                // @compat 0.10.5
+                || in.getLocalName().equals("idleAtColonyMission")
+                // @end compatibility code
+                ) {
+                mission = new IdleAtSettlementMission(getAIMain(), in);
             } else if (in.getLocalName().equals(PrivateerMission.getXMLElementTagName())) {
                 mission = new PrivateerMission(getAIMain(), in);
             } else {

@@ -69,7 +69,7 @@ import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
+import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.PrivateerMission;
@@ -1040,7 +1040,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else {
                     //non-offensive units should take shelter in a nearby colony,
                     //not try to be hostile
-                    aiUnit.setMission(new IdleAtColonyMission(getAIMain(), aiUnit));
+                    aiUnit.setMission(new IdleAtSettlementMission(getAIMain(), aiUnit));
                 }
             }
         }
