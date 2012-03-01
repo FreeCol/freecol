@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
