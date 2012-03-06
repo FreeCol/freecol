@@ -1211,17 +1211,6 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, gui), PopupPosition.ORIGIN);
     }
 
-    /**
-     * Displays the given dialog.
-     *
-     * @param freeColDialog The dialog to be displayed
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *         the dialog.
-     */
-    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
-        return showFreeColDialog(freeColDialog, null);
-    }
-
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions));
     }
@@ -2353,6 +2342,17 @@ public final class Canvas extends JDesktopPane {
         return (where > 0) ? PopupPosition.CENTERED_LEFT
             : (where < 0) ? PopupPosition.CENTERED_RIGHT
             : PopupPosition.CENTERED;
+    }
+
+    /**
+     * Displays the given dialog.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
+        return showFreeColDialog(freeColDialog, null);
     }
 
     /**
