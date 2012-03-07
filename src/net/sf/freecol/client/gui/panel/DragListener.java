@@ -72,7 +72,6 @@ public final class DragListener extends MouseAdapter {
     private static final Logger logger = Logger.getLogger(DragListener.class.getName());
 
     private final FreeColPanel parentPanel;
-    private final Canvas canvas;
 
     private FreeColClient freeColClient;
 
@@ -89,7 +88,6 @@ public final class DragListener extends MouseAdapter {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.parentPanel = parentPanel;
-        this.canvas = parentPanel.getCanvas();
     }
 
     /**
@@ -132,7 +130,7 @@ public final class DragListener extends MouseAdapter {
                             // work-around: JRE on Windows is unable
                             // to display popup menus that extend
                             // beyond the canvas
-                            menu.show(canvas, 0, 0);
+                            menu.show(gui.getCanvas(), 0, 0);
                         } else {
                             menu.show(comp, e.getX(), e.getY());
                         }
