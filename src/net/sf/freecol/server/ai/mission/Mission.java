@@ -545,9 +545,9 @@ public abstract class Mission extends AIObject {
                 } else {
                     path = unit.findPath(unit.getTile(), targetTile, carrier);
                     if (path == null) {
-                        logger.finest(logMe + " can not get from "
-                            + unit.getTile() + " to " + targetTile
-                            + ": " + unit);
+                        logger.finest(logMe 
+                            + " can not get from " + unit.getTile()
+                            + " to " + targetTile + ": " + unit);
                         return MoveType.MOVE_ILLEGAL;
                     } else {
                         inTransit = path.isOnCarrier();
@@ -569,7 +569,8 @@ public abstract class Mission extends AIObject {
             logger.finest(logMe + " in transit to " + target + ": " + unit);
             return MoveType.MOVE_ILLEGAL;
         } else if (needTransport) {
-            logger.finest(logMe + " needs transport to " + target
+            logger.finest(logMe + " at " + unit.getLocation()
+                + " needs transport to " + target
                 + ": " + unit);
             return MoveType.MOVE_ILLEGAL;
         }
