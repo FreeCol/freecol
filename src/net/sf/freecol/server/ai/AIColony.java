@@ -239,7 +239,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public static boolean isBadlyDefended(Colony colony) {
         return colony.getTotalDefencePower()
-            < 1.25f * colony.getUnitCount() - 2.5f;
+            < 1.25f * colony.getWorkLocationUnitCount() - 2.5f;
     }
 
     /**
@@ -249,12 +249,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return True if the workers were rearranged.
      */
     public boolean rearrangeWorkers() {
-        if (colony.getUnitCount() <= 0) {
+        if (colony.getWorkLocationUnitCount() <= 0) {
             throw new IllegalStateException("Empty colony found: "
                 + colony.getName());
         }
 
-        int turn = getGame().getTurn().getNumber();
+        final int turn = getGame().getTurn().getNumber();
         if (colony.getCurrentlyBuilding() == null
             && colonyPlan.getBestBuildableType() != null
             && rearrangeTurn.getNumber() > turn) {
@@ -328,9 +328,19 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Assign the workers according to the colony plan.
-        // ATM we just accept this assignment.
+        // ATM we just accept this assignment unless it failed, in
+        // which case restore original state.
         Colony scratch = colonyPlan.assignWorkers(workers);
-
+        if (scratch == null) {
+            for (UnitWas w : was) {
+                Unit u = w.getUnit();
+                u.setLocation(w.getLocation());
+                u.setWorkType(w.getWorkType());
+            }
+            rearrangeTurn = new Turn(turn + 1);
+            return false;
+        }
+            
         // Apply the arrangement, and give suitable missions to all units.
         // For now, do a soft rearrange (that is, no c-s messaging).
         // Also change the goods counts as we may have changed equipment.
@@ -357,10 +367,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         scratch.disposeScratchColony();
 
         // Emergency recovery if something broke and the colony is empty.
-        if (colony.getUnitCount() <= 0) {
+        if (colony.getWorkLocationUnitCount() <= 0) {
             String destruct = "Autodestruct at " + colony.getName()
                 + " in " + turn + ":";
-            for (UnitWas uw : was) destruct += " " + uw.toString();
+            for (UnitWas uw : was) destruct += "\n" + uw.toString();
             logger.warning(destruct);
             avertAutoDestruction();
         }
@@ -406,7 +416,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             ? "unexpected-null(" + build.toString() + ")"
             : "expected-null";
         String report = "Rearrange " + colony.getName()
-            + " (" + colony.getUnitCount() + ")"
+            + " (" + colony.getWorkLocationUnitCount() + ")"
             + " build=" + buildStr
             + " " + getGame().getTurn()
             + " + " + nextRearrange;
@@ -655,7 +665,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         // No good, no choice but to fail.
-        if (colony.getUnitCount() <= 0) {
+        if (colony.getWorkLocationUnitCount() <= 0) {
             throw new IllegalStateException(msg);
         }
     }
@@ -986,7 +996,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Request population increase if no worker wishes and the bonus
         // can take it.
         if (experts.isEmpty()
-            && colony.governmentChange(colony.getUnitCount() + 1) >= 0) {
+            && colony.governmentChange(colony.getWorkLocationUnitCount() + 1) >= 0) {
             boolean needFood = colony.getFoodProduction()
                 <= colony.getFoodConsumption()
                 + colony.getOwner().getMaximumFoodConsumption();

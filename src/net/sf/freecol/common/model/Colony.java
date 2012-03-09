@@ -950,13 +950,20 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the number of units inside this colony, which is just the sum
-     * of the units at each work location.
+     * Gets the number of units inside this colony.
      *
      * @return The number of <code>Unit</code>s in this colony.
      */
     public int getUnitCount() {
-        if (unitCount >= 0) return unitCount;
+        return (unitCount >= 0) ? unitCount : getWorkLocationUnitCount();
+    }
+
+    /**
+     * Gets the total number of units in the work locations.
+     *
+     * @return The number of <code>Unit</code>s in the work locations.
+     */     
+    public int getWorkLocationUnitCount() {
         int count = 0;
         for (WorkLocation w : getCurrentWorkLocations()) {
             count += w.getUnitCount();

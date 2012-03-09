@@ -333,7 +333,7 @@ public class ColonyPlan {
 
         // Update the profile type.
         profileType = ProfileType
-            .getProfileTypeFromSize(colony.getUnitCount());
+            .getProfileTypeFromSize(colony.getWorkLocationUnitCount());
 
         // Build the total map of all possible production with standard units.
         Map<GoodsType, Map<WorkLocation, Integer>> production
@@ -1510,26 +1510,44 @@ public class ColonyPlan {
             if (u.getLocation() != tile) u.setLocation(tile);
         }
 
-        // Check for failure to assign any workers.  This happens when
-        // food is low, and perhaps partly eaten by horses, and no
-        // unit can *improve* production by being added.  Find a place
-        // to produce food that at least avoids starvation and add one
-        // worker, thereby avoiding colony collapse.
-        if (scratch.getUnitCount() == 0) {
-            plans: for (WorkLocationPlan w : getFoodPlans()) {
-                GoodsType goodsType = w.getGoodsType();
-                WorkLocation wl = w.getWorkLocation();
-                for (Unit u : new ArrayList<Unit>(workers)) {
-                    GoodsType oldWork = u.getWorkType();
-                    u.setLocation(wl);
-                    u.setWorkType(goodsType);
-                    if (scratch.getAdjustedNetProductionOf(foodType) >= 0) {
-                        report += "Subsist with " + u + "\n";
-                        workers.remove(u);
-                        break plans;
+        // Check for failure to assign any workers.  This happens when:
+        // - there are no useful food plans
+        //   - in which case look for a `harmless' place and add one worker
+        // - food is low, and perhaps partly eaten by horses, and no
+        //   unit can *improve* production by being added.
+        //   - find a place to produce food that at least avoids
+        //     starvation and add one worker.
+        if (scratch.getWorkLocationUnitCount() == 0) {
+            if (getFoodPlans().isEmpty()) {
+locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
+                    for (Unit u : new ArrayList<Unit>(workers)) {
+                        for (GoodsType type : libertyGoodsTypes) {
+                            if (wl.canAdd(u)
+                                && wl.getPotentialProduction(u.getType(),
+                                                             type) > 0) {
+                                u.setLocation(wl);
+                                u.setWorkType(type);
+                                break locations;
+                            }
+                        }
                     }
-                    u.setLocation(tile);
-                    u.setWorkType(oldWork);
+                }
+            } else {
+plans:          for (WorkLocationPlan w : getFoodPlans()) {
+                    GoodsType goodsType = w.getGoodsType();
+                    WorkLocation wl = w.getWorkLocation();
+                    for (Unit u : new ArrayList<Unit>(workers)) {
+                        GoodsType oldWork = u.getWorkType();
+                        u.setLocation(wl);
+                        u.setWorkType(goodsType);
+                        if (scratch.getAdjustedNetProductionOf(foodType) >= 0) {
+                            report += "Subsist with " + u + "\n";
+                            workers.remove(u);
+                            break plans;
+                        }
+                        u.setLocation(tile);
+                        u.setWorkType(oldWork);
+                    }
                 }
             }
         }
@@ -1593,9 +1611,15 @@ public class ColonyPlan {
             }
         }
 
-        // Log
-        logger.finest(report.substring(0, report.length()-1));
+        // Broken?  Abandon this rearrangement.
+        if (scratch.getWorkLocationUnitCount() == 0) {
+            scratch.disposeScratchColony();
+            logger.warning("assignWorkers at " + colony.getName()
+                + " failed.");
+            return null;
+        }
 
+        logger.finest(report.substring(0, report.length()-1));
         return scratch;
     }
 
