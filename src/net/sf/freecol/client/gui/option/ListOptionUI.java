@@ -41,7 +41,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
@@ -123,7 +122,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
                 try {
                     Option value = oldValue.clone();
-                    if (showEditDialog(gui, value)) {
+                    if (gui.showEditOptionDialog(value)) {
                         model.addElement(value);
                         list.setSelectedValue(value, true);
                         list.repaint();
@@ -137,7 +136,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             public void actionPerformed(ActionEvent e) {
                 Object object = list.getSelectedValue();
                 if (object != null) {
-                    if (showEditDialog(gui, (Option) object)) {
+                    if (gui.showEditOptionDialog((Option) object)) {
                         list.repaint();
                     }
                 }
@@ -181,41 +180,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         initialize();
     }
 
-    private boolean showEditDialog(GUI gui, Option option) {
-        final EditDialog editDialog = new EditDialog(freeColClient, gui, option);
-        boolean result = gui.getCanvas().showFreeColDialog(editDialog);
-        editDialog.requestFocus();
-        return result;
-    }
-
-    private class EditDialog extends FreeColDialog<Boolean> {
-
-        private OptionUI ui;
-
-        public EditDialog(FreeColClient freeColClient, GUI gui, Option option) {
-            super(freeColClient, gui);
-            setLayout(new MigLayout());
-            ui = OptionUI.getOptionUI(freeColClient, gui, option, editable);
-            if (ui.getLabel() == null) {
-                add(ui.getLabel(), "split 2");
-            }
-            add(ui.getComponent());
-
-            add(okButton, "newline, split 2, tag ok");
-            add(cancelButton, "tag cancel");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
-            if (OK.equals(command)) {
-                ui.updateOption();
-                setResponse(true);
-            } else {
-                setResponse(false);
-            }
-        }
-    }
 
     /**
      * Returns <code>null</code>, since this OptionUI does not require

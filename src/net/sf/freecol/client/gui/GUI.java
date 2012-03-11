@@ -94,6 +94,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.PercentageOption;
@@ -653,6 +654,10 @@ public class GUI {
     }
 
 
+    public boolean showEditOptionDialog(Option option) {
+        return canvas.showEditOptionDialog(option);
+    }
+
     public int showEmigrationPanel(boolean fountainOfYouth) {
         return canvas.showEmigrationPanel(fountainOfYouth);
     }
@@ -689,13 +694,13 @@ public class GUI {
         canvas.showIndianSettlementPanel(indianSettlement);
     }
 
+
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
             boolean canBuy,
             boolean canSell,
             boolean canGift) {
         return canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
     }
-
 
     public void showInformationMessage(FreeColObject displayObject, String messageId) {
         canvas.showInformationMessage(displayObject, messageId);
@@ -735,10 +740,10 @@ public class GUI {
         return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
     }
 
+
     public void showLogFilePanel() {
         canvas.showLogFilePanel();
     }
-
 
     public void showMainPanel() {
         canvas.showMainPanel();
@@ -814,10 +819,10 @@ public class GUI {
         canvas.showReportLabourPanel();
     }
 
+
     public void showReportMilitaryPanel() {
         canvas.showReportMilitaryPanel();
     }
-
 
     public void showReportNavalPanel() {
         canvas.showReportNavalPanel();
@@ -861,12 +866,12 @@ public class GUI {
         return canvas.showScoutIndianSettlementDialog(settlement, number);
     }
 
+
+
+
     public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
         return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
     }
-
-
-
 
     public Location showSelectDestinationDialog(Unit unit) {
         return canvas.showSelectDestinationDialog(unit);
@@ -896,10 +901,10 @@ public class GUI {
         canvas.showStatisticsPanel();
     }
 
+
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
     }
-
 
     public void showTilePanel(Tile tile) {
         canvas.showTilePanel(tile);
@@ -1104,14 +1109,12 @@ public class GUI {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
 
+
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
-
-
-
 
 
 }

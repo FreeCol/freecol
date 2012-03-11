@@ -68,6 +68,7 @@ import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.DifficultyDialog;
 import net.sf.freecol.client.gui.panel.DumpCargoDialog;
+import net.sf.freecol.client.gui.panel.EditOptionDialog;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.EndTurnDialog;
@@ -1113,9 +1114,17 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(dumpDialog, unit.getTile());
     }
 
+    public boolean showEditOptionDialog(Option option) {
+        final EditOptionDialog editDialog = new EditOptionDialog(freeColClient, gui, option);
+        boolean result = showFreeColDialog(editDialog, null);
+        editDialog.requestFocus();
+        return result;
+    }
+
     public void showEditSettlementDialog(IndianSettlement settlement) {
         showFreeColDialog(new EditSettlementDialog(freeColClient, gui, settlement));
     }
+
 
     /**
      * Shows the panel that allows the user to choose which unit will emigrate
@@ -1132,11 +1141,10 @@ public final class Canvas extends JDesktopPane {
     }
 
 
+
     public boolean showEndTurnDialog(List<Unit> units) {
         return showFreeColDialog(new EndTurnDialog(freeColClient, gui, units));
     }
-
-
 
     /**
      * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
@@ -1211,6 +1219,20 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, gui), PopupPosition.ORIGIN);
     }
 
+    /**
+     * Displays the given dialog.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
+        return showFreeColDialog(freeColDialog, null);
+    }
+
+
+    // A variety of special purpose panels/dialogs follow
+
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
         showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions));
     }
@@ -1223,9 +1245,6 @@ public final class Canvas extends JDesktopPane {
     public void showHighScoresPanel(String messageId) {
         showSubPanel(new ReportHighScoresPanel(freeColClient, gui, messageId), PopupPosition.ORIGIN);
     }
-
-
-    // A variety of special purpose panels/dialogs follow
 
     /**
      * Displays the panel of the given native settlement.
@@ -1335,6 +1354,7 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(null, template);
     }
 
+
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
@@ -1386,7 +1406,6 @@ public final class Canvas extends JDesktopPane {
     public File showLoadDialog(File directory) {
         return showLoadDialog(directory, new FileFilter[] { FreeColDialog.getFSGFileFilter() });
     }
-
 
     /**
      * Displays a dialog where the user may choose a file.
@@ -1520,6 +1539,7 @@ public final class Canvas extends JDesktopPane {
         return showFreeColDialog(negotiationDialog, unit.getTile());
     }
 
+
     public void showNewPanel() {
         showSubPanel(new NewPanel(freeColClient, gui));
     }
@@ -1527,7 +1547,6 @@ public final class Canvas extends JDesktopPane {
     public void showNewPanel(Specification specification) {
         showSubPanel(new NewPanel(freeColClient, gui, specification));
     }
-
 
     /**
      * Shows the <code>OpenGamePanel</code>.
@@ -1664,6 +1683,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ReportRequirementsPanel(freeColClient, gui));
     }
 
+
     public void showReportTradePanel() {
         showSubPanel(new ReportTradePanel(freeColClient, gui));
 
@@ -1678,10 +1698,10 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ReportTurnPanel(freeColClient, gui, messages));
     }
 
-
     public int showRiverStyleDialog() {
         return showFreeColDialog(new RiverStylePanel(freeColClient, gui));
     }
+
 
     /**
      * Displays a dialog where the user may choose a filename. This is the same
@@ -1719,7 +1739,6 @@ public final class Canvas extends JDesktopPane {
         FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(freeColClient, gui, directory, standardName, fileFilters, defaultName);
         return showFreeColDialog(saveDialog);
     }
-
 
     /**
      * Displays a dialog that asks the user what he wants to do with his scout
@@ -1881,6 +1900,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(serverListPanel);
     }
 
+
     public void showSettlement(Settlement s) {
         if (s instanceof Colony) {
             if (s.getOwner().equals(freeColClient.getMyPlayer())) {
@@ -1917,7 +1937,6 @@ public final class Canvas extends JDesktopPane {
                                 Messages.message(cancelText),
                                 choices);
     }
-
 
     /**
      * Displays the <code>StartGamePanel</code>.
@@ -2264,6 +2283,7 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
+
     /**
      * Filters out and displays the EventPanel messages.
      *
@@ -2310,7 +2330,6 @@ public final class Canvas extends JDesktopPane {
         return null;
     }
 
-
     /**
      * Gets the internal frame for the given component.
      *
@@ -2345,17 +2364,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the given dialog.
-     *
-     * @param freeColDialog The dialog to be displayed
-     * @return The {@link FreeColDialog#getResponse reponse} returned by
-     *         the dialog.
-     */
-    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
-        return showFreeColDialog(freeColDialog, null);
-    }
-
-    /**
      * Displays the given dialog, making sure a tile is visible.
      *
      * @param freeColDialog The dialog to be displayed
@@ -2370,6 +2378,7 @@ public final class Canvas extends JDesktopPane {
         return response;
     }
 
+
     /**
      * Displays the given panel, making sure a tile is visible.
      *
@@ -2380,7 +2389,6 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(panel, getPopupPosition(tile));
     }
 
-
     /**
      * Displays a <code>FreeColPanel</code>.
      * @param panel <code>FreeColPanel</code>, panel to show
@@ -2388,7 +2396,7 @@ public final class Canvas extends JDesktopPane {
     private void showSubPanel(FreeColPanel panel) {
         showSubPanel(panel, PopupPosition.CENTERED);
     }
-
+    
     /**
      * Displays a <code>FreeColPanel</code> at a generalized position.
      *
