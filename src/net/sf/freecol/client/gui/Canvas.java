@@ -1003,15 +1003,16 @@ public final class Canvas extends JDesktopPane {
 
 
     public void showCompactLabourReport() {
-        showSubPanel(new CompactLabourReport(freeColClient, gui));
+        CompactLabourReport details = new CompactLabourReport(freeColClient, gui);
+        details.initialize();
+        showSubPanel(details);
 
     }
 
     public void showCompactLabourReport(UnitData unitData) {
         CompactLabourReport details = new CompactLabourReport(freeColClient, gui, unitData);
         details.initialize();
-        addAsFrame(details);
-        details.requestFocus();
+        showSubPanel(details);
     }
 
     /**

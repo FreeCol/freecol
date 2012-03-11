@@ -89,9 +89,7 @@ public final class CompactLabourReport extends ReportPanel {
      */
     public CompactLabourReport(FreeColClient freeColClient, GUI gui) {
         this(freeColClient, gui, null);
-
         labourData = new LabourData(getFreeColClient());
-        initialize();
     }
 
     /**
