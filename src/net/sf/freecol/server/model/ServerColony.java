@@ -109,7 +109,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
         } else {
             buildQueue.add(spec.getBuildingType("model.building.docks"));
-            getFeatureContainer().addAbility(HAS_PORT);
+            addAbility(HAS_PORT);
         }
         for (UnitType unitType : spec.getUnitTypesWithAbility("model.ability.bornInColony")) {
             if (!unitType.getGoodsRequired().isEmpty()) {

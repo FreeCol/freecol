@@ -1240,7 +1240,7 @@ public final class InGameController extends Controller {
         serverPlayer.setIndependentNationName(nationName);
         serverPlayer.setNewLandName(countryName);
         serverPlayer.setPlayerType(PlayerType.REBEL);
-        serverPlayer.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        serverPlayer.addAbility(new Ability("model.ability.independenceDeclared"));
         serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
 
         // Do not add history event to cs as we are going to update the

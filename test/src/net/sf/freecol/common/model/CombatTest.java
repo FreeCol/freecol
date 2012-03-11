@@ -220,14 +220,12 @@ public class CombatTest extends FreeColTestCase {
          * Francis Drake
          */
         FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
-        Set<Modifier> drakeModifiers = drake.getFeatureContainer()
-            .getModifierSet("model.modifier.offence", privateerType);
+        Set<Modifier> drakeModifiers = drake.getModifierSet("model.modifier.offence", privateerType);
         assertEquals(1, drakeModifiers.size());
         Modifier drakeModifier = drakeModifiers.iterator().next();
 
         french.addFather(drake);
-        drakeModifiers = french.getFeatureContainer().getModifierSet("model.modifier.offence",
-                                                                     privateerType);
+        drakeModifiers = french.getModifierSet("model.modifier.offence", privateerType);
         assertEquals(1, drakeModifiers.size());
         assertEquals(drakeModifier, drakeModifiers.iterator().next());
 
@@ -481,7 +479,7 @@ public class CombatTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        french.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        french.addAbility(new Ability("model.ability.independenceDeclared"));
         ServerPlayer refPlayer = igc.createREFPlayer(french);
 
         SimpleCombatModel combatModel = new SimpleCombatModel();

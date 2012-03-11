@@ -230,9 +230,8 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
         }
 
-        Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
         List<JComponent> labels = new ArrayList<JComponent>();
-        for (Modifier productionBonus : bonusList) {
+        for (Modifier productionBonus : buildingType.getModifiers()) {
             JComponent component = getModifierComponent(productionBonus);
             if (component instanceof JButton) {
                 labels.add(0, component);
@@ -241,7 +240,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
         }
 
-        Set<Ability> abilities = buildingType.getFeatureContainer().getAbilities();
+        Set<Ability> abilities = buildingType.getAbilities();
         for (Ability ability : abilities) {
             JComponent component = getAbilityComponent(ability);
             if (component != null) {

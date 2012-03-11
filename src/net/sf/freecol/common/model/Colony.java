@@ -226,8 +226,7 @@ public class Colony extends Settlement implements Nameable {
         }
         scratch.setGoodsContainer(container);
         FeatureContainer fc = scratch.getFeatureContainer();
-        for (Ability a : getFeatureContainer().getAbilities()) fc.addAbility(a);
-        for (Modifier m : getFeatureContainer().getModifiers()) fc.addModifier(m);
+        FeatureContainer.addFeatures(fc, this);
         scratch.colonyTiles.clear();
         for (ColonyTile ct : colonyTiles) {
             Tile wt = ct.getWorkTile();
@@ -348,9 +347,9 @@ public class Colony extends Settlement implements Nameable {
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
-        float value = owner.getFeatureContainer()
-            .applyModifier(100f, "model.modifier.buildingPriceBonus",
-                           buildingType, getGame().getTurn());
+        float value = owner.applyModifier(100f,
+                                          "model.modifier.buildingPriceBonus",
+                                          buildingType, getGame().getTurn());
         return value == 0f && canBuild(buildingType);
     }
 
@@ -362,7 +361,7 @@ public class Colony extends Settlement implements Nameable {
     public void addBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
-        getFeatureContainer().add(building.getType().getFeatureContainer());
+        addFeatures(building.getType());
         invalidateCache();
     }
 
@@ -375,7 +374,7 @@ public class Colony extends Settlement implements Nameable {
     public boolean removeBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         boolean result = buildingMap.remove(buildingType.getId()) != null;
-        getFeatureContainer().remove(building.getType().getFeatureContainer());
+        removeFeatures(building.getType());
         invalidateCache();
         return result;
     }
@@ -928,21 +927,22 @@ public class Colony extends Settlement implements Nameable {
     }
 
     protected void modifySpecialGoods(GoodsType goodsType, int amount) {
-        FeatureContainer container = goodsType.getFeatureContainer();
-        Set<Modifier> libertyModifiers = container.getModifierSet("model.modifier.liberty");
+        Set<Modifier> libertyModifiers
+            = goodsType.getModifierSet("model.modifier.liberty");
         if (!libertyModifiers.isEmpty()) {
-            int newLiberty = (int) FeatureContainer.applyModifierSet(amount,
-                                                                     getGame().getTurn(),
-                                                                     libertyModifiers);
+            int newLiberty = (int)FeatureContainer
+                .applyModifierSet(amount, getGame().getTurn(),
+                                  libertyModifiers);
             incrementLiberty(newLiberty);
             getOwner().incrementLiberty(newLiberty);
         }
 
-        Set<Modifier> immigrationModifiers = container.getModifierSet("model.modifier.immigration");
+        Set<Modifier> immigrationModifiers
+            = goodsType.getModifierSet("model.modifier.immigration");
         if (!immigrationModifiers.isEmpty()) {
-            int newImmigration = (int) FeatureContainer.applyModifierSet(amount,
-                                                                         getGame().getTurn(),
-                                                                         immigrationModifiers);
+            int newImmigration = (int)FeatureContainer
+                .applyModifierSet(amount, getGame().getTurn(),
+                                  immigrationModifiers);
             incrementImmigration(newImmigration);
             getOwner().incrementImmigration(newImmigration);
         }
@@ -2271,14 +2271,14 @@ public class Colony extends Settlement implements Nameable {
      * above this limit, except Food, will be removed by the
      * end-of-turn processing.
      *
+     * This will return 0 unless additive modifiers are present.  This
+     * is intentional.
+     *
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getGoodsCapacity() {
-        /* This will return 0 unless additive modifiers are present.
-           This is intentional.
-        */
-        return (int) getFeatureContainer().applyModifier(0, "model.modifier.warehouseStorage",
-                                                    null, getGame().getTurn());
+        return (int) applyModifier(0f, "model.modifier.warehouseStorage",
+                                   null, getGame().getTurn());
     }
 
     public Building getWarehouse() {
@@ -2354,10 +2354,11 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>Modifier</code> value
      */
     public final Set<Modifier> getModifierSet(String id) {
+        Turn turn = getGame().getTurn();
         Set<Modifier> result = new HashSet<Modifier>();
-        result.addAll(getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
+        result.addAll(getModifierSet(id, null, turn));
         if (owner != null) { // Null owner happens during dispose.
-            result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
+            result.addAll(owner.getModifierSet(id, null, turn));
         }
         return result;
     }
@@ -2382,11 +2383,9 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id, FreeColGameObjectType type) {
-        HashSet<Ability> colonyAbilities
-            = new HashSet<Ability>(getFeatureContainer().getAbilitySet(id, type, getGame().getTurn()));
-        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, type, getGame().getTurn());
-        colonyAbilities.addAll(playerAbilities);
-        return FeatureContainer.hasAbility(colonyAbilities);
+        Turn turn = getGame().getTurn();
+        return super.hasAbility(id, type, turn)
+            || (owner != null && owner.hasAbility(id, type, turn));
     }
 
     /**
@@ -2736,10 +2735,8 @@ public class Colony extends Settlement implements Nameable {
             // which is currently only those with increments.
             // Fixed features will be added from their origins (usually
             // buildings).
-            for (Modifier modifier : getFeatureContainer().getModifiers()) {
-                if (modifier.hasIncrement()) {
-                    modifier.toXML(out);
-                }
+            for (Modifier modifier : getModifiers()) {
+                if (modifier.hasIncrement()) modifier.toXML(out);
             }
 
             for (WorkLocation workLocation : getAllWorkLocations()) {
@@ -2780,9 +2777,7 @@ public class Colony extends Settlement implements Nameable {
         immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
         landLocked = getAttribute(in, "landLocked", true);
-        if (!landLocked) {
-            getFeatureContainer().addAbility(HAS_PORT);
-        }
+        if (!landLocked) addAbility(HAS_PORT);
         unitCount = getAttribute(in, "unitCount", -1);
         stockadeKey = in.getAttributeValue(null, "stockadeKey");
 
@@ -2806,8 +2801,7 @@ public class Colony extends Settlement implements Nameable {
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
-                Modifier modifier = new Modifier(in, getSpecification());
-                getFeatureContainer().addModifier(modifier);
+                addModifier(new Modifier(in, getSpecification()));
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format, move serialization to BuildQueue
                 int size = getAttribute(in, ARRAY_SIZE, 0);

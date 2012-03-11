@@ -332,7 +332,7 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(undead.isAvailableTo(indian));
         assertFalse(undead.isAvailableTo(european));
 
-        european.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        european.addAbility(new Ability("model.ability.independenceDeclared"));
         assertTrue(colonial.isAvailableTo(european));
 
     }

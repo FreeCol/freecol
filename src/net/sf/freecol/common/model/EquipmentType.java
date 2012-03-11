@@ -317,7 +317,7 @@ public class EquipmentType extends BuildableType {
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         super.readChildren(in);
 
-        for (Modifier modifier : getFeatureContainer().getModifiers()) {
+        for (Modifier modifier : getModifiers()) {
             if (modifier.getId().equals(Modifier.OFFENCE) ||
                 modifier.getId().equals(Modifier.DEFENCE)) {
                 militaryEquipment = true;

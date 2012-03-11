@@ -49,10 +49,8 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     private boolean abstractType;
 
-    /**
-     * Describe featureContainer here.
-     */
-    private FeatureContainer featureContainer;
+    /** The features of this game object type. */
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
 
     protected FreeColGameObjectType() {
@@ -70,27 +68,18 @@ public class FreeColGameObjectType extends FreeColObject {
     public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
         setSpecification(specification);
-        featureContainer = new FeatureContainer();
     }
 
     /**
-     * Get the <code>FeatureContainer</code> value.
+     * Gets the feature container.
      *
-     * @return a <code>FeatureContainer</code> value
+     * @return The <code>FeatureContainer</code>.
      */
+    @Override
     public final FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
-
-    /**
-     * Set the <code>FeatureContainer</code> value.
-     *
-     * @param newFeatureContainer The new FeatureContainer value.
-     */
-    public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
-        this.featureContainer = newFeatureContainer;
-    }
-
+    
     /**
      * Describe <code>setIndex</code> method here.
      *
@@ -120,26 +109,6 @@ public class FreeColGameObjectType extends FreeColObject {
 
     public final String getDescriptionKey() {
         return getId() + ".description";
-    }
-
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    public boolean hasAbility(String id, FreeColGameObjectType type) {
-        return featureContainer.hasAbility(id, type);
-    }
-
-    public void addAbility(Ability ability) {
-        featureContainer.addAbility(ability);
-    }
-
-    public void addModifier(Modifier modifier) {
-        featureContainer.addModifier(modifier);
-    }
-
-    public Set<Modifier> getModifierSet(String id) {
-        return featureContainer.getModifierSet(id);
     }
 
     /**
@@ -230,13 +199,11 @@ public class FreeColGameObjectType extends FreeColObject {
         throws XMLStreamException {
         super.writeChildren(out);
 
-        if (featureContainer != null) {
-            for (Ability ability: featureContainer.getAbilities()) {
-                ability.toXMLImpl(out);
-            }
-            for (Modifier modifier: featureContainer.getModifiers()) {
-                modifier.toXMLImpl(out);
-            }
+        for (Ability ability : getAbilities()) {
+            ability.toXMLImpl(out);
+        }
+        for (Modifier modifier : getModifiers()) {
+            modifier.toXMLImpl(out);
         }
     }
 
@@ -280,7 +247,7 @@ public class FreeColGameObjectType extends FreeColObject {
         if (Ability.getXMLElementTagName().equals(childName)) {
             if (getAttribute(in, "delete", false)) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                featureContainer.removeAbilities(id);
+                removeAbilities(id);
                 in.nextTag();
             } else {
                 Ability ability = new Ability(in, getSpecification());
@@ -293,7 +260,7 @@ public class FreeColGameObjectType extends FreeColObject {
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             if (getAttribute(in, "delete", false)) {
                 String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                featureContainer.removeModifiers(id);
+                removeModifiers(id);
                 in.nextTag();
             } else {
                 Modifier modifier = new Modifier(in, getSpecification());

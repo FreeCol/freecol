@@ -141,13 +141,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.name = name;
         this.admin = admin;
-        featureContainer = new FeatureContainer();
         europe = null;
         if (nation != null && nation.getType() != null) {
             this.nationType = nation.getType();
             this.nationID = nation.getId();
             try {
-                featureContainer.add(nationType.getFeatureContainer());
+                addFeatures(nationType);
             } catch (Throwable error) {
                 error.printStackTrace();
             }
@@ -723,10 +722,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public List<RandomChoice<UnitType>> generateRecruitablesList() {
         ArrayList<RandomChoice<UnitType>> recruitables
             = new ArrayList<RandomChoice<UnitType>>();
-        FeatureContainer fc = getFeatureContainer();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
-                && fc.hasAbility("model.ability.canRecruitUnit", unitType)) {
+                && hasAbility("model.ability.canRecruitUnit", unitType)) {
                 recruitables.add(new RandomChoice<UnitType>(unitType,
                         unitType.getRecruitProbability()));
             }
@@ -967,9 +965,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         market.modifySales(type, -amount);
         market.modifyIncomeBeforeTaxes(type, -price);
         market.modifyIncomeAfterTaxes(type, -price);
-        int marketAmount = -(int) getFeatureContainer()
-            .applyModifier(amount, "model.modifier.tradeBonus",
-                           type, getGame().getTurn());
+        int marketAmount = -(int)applyModifier((float)amount,
+                                               "model.modifier.tradeBonus",
+                                               type, getGame().getTurn());
         market.addGoodsToMarket(type, marketAmount);
         propagateToEuropeanMarkets(type, marketAmount, random);
 
@@ -996,9 +994,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         market.modifySales(type, amount);
         market.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
         market.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-        int marketAmount = (int) getFeatureContainer()
-            .applyModifier(amount, "model.modifier.tradeBonus",
-                           type, getGame().getTurn());
+        int marketAmount = (int)applyModifier((float)amount,
+                                              "model.modifier.tradeBonus",
+                                              type, getGame().getTurn());
         market.addGoodsToMarket(type, marketAmount);
         propagateToEuropeanMarkets(type, marketAmount, random);
 
@@ -1275,10 +1273,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Player player = entry.getKey();
                     int change = entry.getValue().intValue();
                     if (change != 0) {
-                        change = (int) player.getFeatureContainer()
-                            .applyModifier(change,
-                                           "model.modifier.nativeAlarmModifier",
-                                           null, game.getTurn());
+                        change = (int)player.applyModifier((float)change,
+                            "model.modifier.nativeAlarmModifier",
+                            null, game.getTurn());
                         ((ServerIndianSettlement)settlement).modifyAlarm(player,
                             change);
                     }
@@ -1539,10 +1536,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                        && europe != null) {
                 List<RandomChoice<UnitType>> recruits
                     = generateRecruitablesList();
-                FeatureContainer fc = getFeatureContainer();
                 for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                    if (!fc.hasAbility("model.ability.canRecruitUnit",
-                                       europe.getRecruitable(i))) {
+                    if (!hasAbility("model.ability.canRecruitUnit",
+                                    europe.getRecruitable(i))) {
                         UnitType newType = RandomChoice
                             .getWeightedRandom(logger,
                                 "Replace recruit", random, recruits);
@@ -2274,10 +2270,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Hand over the colony.
         colony.changeOwner(attackerPlayer);
         // Remove goods party modifiers as they apply to a different monarch.
-        FeatureContainer fc = colony.getFeatureContainer();
-        for (Modifier m : fc.getModifiers()) {
+        for (Modifier m : colony.getModifiers()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
-                fc.removeModifier(m);
+                colony.removeModifier(m);
             }
         }
 
@@ -3323,9 +3318,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     50, Modifier.Type.PERCENTAGE);
                 template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
             } // end compatibility code
-            colony.getFeatureContainer()
-                .addModifier(Modifier.makeTimedModifier("model.goods.bells",
-                        template, turn));
+            colony.addModifier(Modifier.makeTimedModifier("model.goods.bells",
+                                                          template, turn));
 
             // Have to update the colony to pick up the feature container.
             // Otherwise we could get away with just sending the goods

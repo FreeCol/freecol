@@ -130,7 +130,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         DefaultListModel current = new DefaultListModel();
         for (BuildableType type : colony.getBuildQueue()) {
             current.addElement(type);
-            featureContainer.add(type.getFeatureContainer());
+            FeatureContainer.addFeatures(featureContainer, type);
         }
 
         cellRenderer = getCellRenderer();
@@ -254,9 +254,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 }
             }
 
-            if (!(colony.getFeatureContainer()
-                  .hasAbility(Ability.BUILD, unitType, getGame().getTurn())
-                  || featureContainer.hasAbility(Ability.BUILD, unitType))) {
+            if (!(colony.hasAbility(Ability.BUILD, unitType, getGame().getTurn())
+                    || FeatureContainer.hasAbility(featureContainer, Ability.BUILD, unitType, null))) {
                 boolean builderFound = false;
                 for (Ability ability : getSpecification().getAbilities(Ability.BUILD)) {
                     if (ability.appliesTo(unitType)
@@ -277,7 +276,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             Map<String, Boolean> requiredAbilities = unitType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                    && FeatureContainer.hasAbility(featureContainer, entry.getKey(), null, null) != entry.getValue()) {
                     List<FreeColGameObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
                     if (sources.isEmpty()) {
@@ -331,7 +330,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             Map<String, Boolean> requiredAbilities = buildingType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                    && FeatureContainer.hasAbility(featureContainer, entry.getKey(), null, null) != entry.getValue()) {
                     List<FreeColGameObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
                     if (sources.isEmpty()) {
@@ -376,7 +375,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         featureContainer = new FeatureContainer();
         for (Object type: current.toArray()) {
             if (getMinimumIndex((BuildableType) type) >= 0) {
-                featureContainer.add(((BuildableType) type).getFeatureContainer());
+                FeatureContainer.addFeatures(featureContainer,
+                                             (BuildableType)type);
             } else {
                 current.removeElement(type);
             }

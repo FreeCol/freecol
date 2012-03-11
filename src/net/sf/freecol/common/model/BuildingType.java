@@ -320,7 +320,7 @@ public final class BuildingType extends BuildableType
         upkeep = getAttribute(in, "upkeep", parent.upkeep);
 
         if (parent != this) {
-            getFeatureContainer().add(parent.getFeatureContainer());
+            addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);
             }
@@ -353,7 +353,7 @@ public final class BuildingType extends BuildableType
                     // old-style auto-production
                     Ability ability = new Ability(Ability.AVOID_EXCESS_PRODUCTION);
                     addAbility(ability);
-                    getFeatureContainer().removeModifiers("model.goods.horses");
+                    removeModifiers("model.goods.horses");
                     float value = ("model.building.country".equals(getId()))
                         ? 50 : 25;
                     Modifier modifier = new Modifier("model.modifier.breedingDivisor",

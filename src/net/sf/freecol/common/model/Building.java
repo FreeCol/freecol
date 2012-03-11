@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -208,13 +209,13 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
         Colony colony = getColony();
-        colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
+        colony.removeFeatures(buildingType);
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
 
             // add new features and abilities from new type
-            colony.getFeatureContainer().add(buildingType.getFeatureContainer());
+            colony.addFeatures(buildingType);
 
             // Colonists which can't work here must be put outside
             for (Unit unit : getUnitList()) {
@@ -407,10 +408,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 int available = getColony().getGoodsCount(outputType);
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
-                    int divisor = (int) getType().getFeatureContainer()
-                        .applyModifier(0, "model.modifier.breedingDivisor");
-                    int factor = (int) getType().getFeatureContainer()
-                        .applyModifier(0, "model.modifier.breedingFactor");
+                    int divisor = (int) getType().applyModifier(0, "model.modifier.breedingDivisor");
+                    int factor = (int) getType().applyModifier(0, "model.modifier.breedingFactor");
                     maximumInput = ((available - 1) / divisor + 1) * factor;
                 }
             } else {
@@ -579,7 +578,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         int productivity = buildingType.getBasicProduction();
         if (productivity > 0) {
             productivity += getColony().getProductionBonus();
-            return (int) prodUnit.getType().getFeatureContainer()
+            return (int)prodUnit.getType()
                 .applyModifier(Math.max(1, productivity),
                                getGoodsOutputType().getId());
         } else {
@@ -633,13 +632,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             if (production > 0) {
                 production += getColony().getProductionBonus();
                 if (unitType != null) {
-                    unitType.getFeatureContainer()
-                        .applyModifier(Math.max(1, production),
-                            getGoodsOutputType().getId());
+                    unitType.applyModifier(Math.max(1, production),
+                                           getGoodsOutputType().getId());
                 }
                 production = (int) FeatureContainer
                     .applyModifiers(production, getGame().getTurn(),
-                        getProductionModifiers());
+                                    getProductionModifiers());
             }
         }
         return production;
@@ -653,21 +651,22 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * individual units present in the Building, such as the colony
      * production bonus.
      *
-     * @return a List of all Modifiers that influence the total
-     * production of the Building
+     * @return A list of all Modifiers that influence the total
+     *     production of the Building
      */
     public List<Modifier> getProductionModifiers() {
         List<Modifier> modifiers = new ArrayList<Modifier>();
         GoodsType goodsOutputType = getGoodsOutputType();
+        Turn turn = getGame().getTurn();
         if (goodsOutputType != null) {
-            modifiers.addAll(getColony().getFeatureContainer().
-                             getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+            modifiers.addAll(getColony()
+                .getModifierSet(goodsOutputType.getId(), buildingType, turn));
             if (getOwner() != null) {
-                modifiers.addAll(getOwner().getFeatureContainer().
-                                 getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+                modifiers.addAll(getOwner()
+                    .getModifierSet(goodsOutputType.getId(), buildingType, turn));
             }
-            Collections.sort(modifiers);
         }
+        Collections.sort(modifiers);
         return modifiers;
     }
 

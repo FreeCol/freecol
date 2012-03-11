@@ -498,8 +498,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
 
-        dutch.getFeatureContainer()
-            .addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
         Tile tile1 = map.getTile(5, 8);
         tile1.setExploredBy(dutch, true);
         tile1.setExploredBy(french, true);
@@ -578,8 +577,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
-        dutch.getFeatureContainer()
-            .addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
         Unit colonist = colony.getUnitIterator().next();
         colonist.setType(colonialType);
         assertEquals("Colonist should be Colonial Regular",
@@ -1063,8 +1061,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, tile1, dutch, pettyCriminalType, muskets);
         Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
         // Enable automatic promotion
-        dutch.getFeatureContainer()
-            .addAbility(new Ability("model.ability.automaticPromotion"));
+        dutch.addAbility(new Ability("model.ability.automaticPromotion"));
 
         // Criminal -> Servant
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
@@ -1107,8 +1104,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Colonial Regulars should not yet be available",
                     colonialType.isAvailableTo(dutch));
         dutch.setPlayerType(PlayerType.REBEL);
-        dutch.getFeatureContainer()
-            .addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
         dutch.setIndependentNationName("Vrije Nederlands");
         assertTrue("Colonial Regulars should be available",
                    colonialType.isAvailableTo(dutch));

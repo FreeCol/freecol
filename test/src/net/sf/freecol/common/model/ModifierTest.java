@@ -114,9 +114,9 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
 
         FeatureContainer featureContainer = new FeatureContainer();
-        featureContainer.addModifier(modifier1);
-        featureContainer.addModifier(modifier2);
-        featureContainer.addModifier(modifier3);
+        FeatureContainer.addModifier(featureContainer, modifier1);
+        FeatureContainer.addModifier(featureContainer, modifier2);
+        FeatureContainer.addModifier(featureContainer, modifier3);
 
         // applies to frigate
         Scope scope1 = new Scope();
@@ -136,12 +136,12 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier1.appliesTo(frigate));
         assertFalse(modifier1.appliesTo(carpenter));
 
-        Set<Modifier> result = featureContainer.getModifierSet("test", frigate);
+        Set<Modifier> result = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, 
                 FeatureContainer.applyModifierSet(1, null, result));
 
-        result = featureContainer.getModifierSet("test", carpenter);
+        result = featureContainer.getModifierSet("test", carpenter, null);
         assertEquals(2, result.size());
         assertEquals(1.5f + (1.5f * 30) / 100, 
                 FeatureContainer.applyModifierSet(1, null, result));
@@ -153,12 +153,12 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.appliesTo(frigate));
         assertTrue(modifier2.appliesTo(carpenter));
 
-        result = featureContainer.getModifierSet("test", frigate);
+        result = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
         assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, 
                 FeatureContainer.applyModifierSet(1, null, result));
 
-        result = featureContainer.getModifierSet("test", carpenter);
+        result = featureContainer.getModifierSet("test", carpenter, null);
         assertEquals(2, result.size());
 
         assertEquals(1.5f + (1.5f * 30) / 100, 
@@ -191,8 +191,8 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
 
         FeatureContainer featureContainer = new FeatureContainer();
-        featureContainer.addModifier(modifier1);
-        featureContainer.addModifier(modifier2);
+        FeatureContainer.addModifier(featureContainer, modifier1);
+        FeatureContainer.addModifier(featureContainer, modifier2);
         Set<Modifier> modifierSet = featureContainer.getModifierSet("test", frigate, new Turn(15));
         assertEquals(1, modifierSet.size());
         assertEquals(modifier1, modifierSet.iterator().next());
@@ -215,8 +215,8 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier1.hasIncrement());
 
         FeatureContainer featureContainer = new FeatureContainer();
-        featureContainer.addModifier(modifier1);
-        featureContainer.addModifier(modifier2);
+        FeatureContainer.addModifier(featureContainer, modifier1);
+        FeatureContainer.addModifier(featureContainer, modifier2);
 
         // only modifier2
         assertEquals(3f, featureContainer.applyModifier(1, "test", frigate, new Turn(9)));

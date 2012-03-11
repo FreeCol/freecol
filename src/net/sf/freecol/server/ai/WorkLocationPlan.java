@@ -134,7 +134,7 @@ public class WorkLocationPlan extends ValuedAIObject {
                 return 0;
             }
 
-            base = (int) expertUnitType.getFeatureContainer().applyModifier(base, goodsType.getId());
+            base = (int) expertUnitType.applyModifier(base, goodsType.getId());
             return Math.max(base, 1);
 
         } else {

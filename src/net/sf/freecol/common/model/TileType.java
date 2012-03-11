@@ -175,7 +175,7 @@ public final class TileType extends FreeColGameObjectType {
      * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
-        return (int) getFeatureContainer().applyModifier(0f, goodsType.getId(), unitType);
+        return (int)applyModifier(0f, goodsType.getId(), unitType);
         /*
         Set<Modifier> result = featureContainer.getModifierSet(goodsType.getId(), unitType);
         if (unitType != null && !result.isEmpty()) {
@@ -192,7 +192,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>Modifier</code> value
      */
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
-        return getFeatureContainer().getModifierSet(goodsType.getId());
+        return getModifierSet(goodsType.getId());
     }
 
     /**
@@ -360,11 +360,12 @@ public final class TileType extends FreeColGameObjectType {
         production = getProduction(tileProduction);
         // remove old modifiers
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            getFeatureContainer().removeModifiers(goodsType.getId());
+            removeModifiers(goodsType.getId());
         }
         // add new modifiers
         for (AbstractGoods goods : production) {
-            addModifier(new Modifier(goods.getType().getId(), this, goods.getAmount(),
+            addModifier(new Modifier(goods.getType().getId(), this,
+                                     goods.getAmount(),
                                      Modifier.Type.ADDITIVE));
         }
     }

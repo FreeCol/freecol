@@ -485,9 +485,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         assertEquals("model.nationType.trade", dutch.getNationType().getId());
-        assertFalse(dutch.getNationType().getFeatureContainer()
-                    .getModifierSet("model.modifier.tradeBonus").isEmpty());
-        assertFalse(dutch.getFeatureContainer().getModifierSet("model.modifier.tradeBonus").isEmpty());
+        assertFalse(dutch.getNationType().getModifierSet("model.modifier.tradeBonus").isEmpty());
+        assertFalse(dutch.getModifierSet("model.modifier.tradeBonus").isEmpty());
 
         {// Test that the dutch can sell more goods until the price drops
             int dutchSellAmount = sellUntilPriceDrop(game, dutch, silverType);

@@ -61,10 +61,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
-        FeatureContainer featureContainer = new FeatureContainer();
         // TODO: put this in the specification
-        featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
-        setFeatureContainer(featureContainer);
+        addAbility(new Ability("model.ability.dressMissionary"));
     }
 
 

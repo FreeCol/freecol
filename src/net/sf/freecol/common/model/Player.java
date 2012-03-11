@@ -350,7 +350,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private final Object canSeeLock = new Object();
 
     // Contains the abilities and modifiers of this type.
-    protected FeatureContainer featureContainer;
+    protected final FeatureContainer featureContainer = new FeatureContainer();
 
     // Maximum food consumption of unit types available to this player.
     private int maximumFoodConsumption = -1;
@@ -459,52 +459,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>FeatureContainer</code> value.
+     * Get this settlement's feature container.
      *
-     * @return a <code>FeatureContainer</code> value
+     * @return The <code>FeatureContainer</code>.
      */
+    @Override
     public final FeatureContainer getFeatureContainer() {
         return featureContainer;
-    }
-
-    /**
-     * Set the <code>FeatureContainer</code> value.
-     *
-     * @param newFeatureContainer The new FeatureContainer value.
-     */
-    public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
-        this.featureContainer = newFeatureContainer;
-    }
-
-    /**
-     * Get the modifier set for a given id from the feature container.
-     *
-     * @param id The id to look up.
-     * @return The modifier set.
-     */
-    public Set<Modifier> getModifierSet(String id) {
-        return featureContainer.getModifierSet(id);
-    }
-
-    /**
-     * Get the modifier set for a given id and type from the feature container.
-     *
-     * @param id The id to look up.
-     * @param type The associated type.
-     * @return The modifier set.
-     */
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType type) {
-        return featureContainer.getModifierSet(id, type);
-    }
-
-    /**
-     * Does a player have a particular ability.
-     *
-     * @param ability The ability to test.
-     * @return True if the player has the ability.
-     */
-    public boolean hasAbility(String ability) {
-        return featureContainer.hasAbility(ability);
     }
 
     /**
@@ -1429,9 +1390,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         price *= getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
         price += 100;
-        return (int) featureContainer
-            .applyModifier(price, "model.modifier.landPaymentModifier",
-                           null, getGame().getTurn());
+        return (int) applyModifier(price, "model.modifier.landPaymentModifier",
+                                   null, getGame().getTurn());
     }
 
     /**
@@ -1691,7 +1651,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void addFather(FoundingFather father) {
         allFathers.add(father);
-        featureContainer.add(father.getFeatureContainer());
+        addFeatures(father);
         for (Colony colony : getColonies()) {
             colony.invalidateCache();
         }
@@ -2090,11 +2050,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType a <code>NationType</code> value
      */
     public void setNationType(NationType newNationType) {
-        if (nationType != null) {
-            featureContainer.remove(nationType.getFeatureContainer());
-        }
+        if (nationType != null) removeFeatures(nationType);
         nationType = newNationType;
-        featureContainer.add(newNationType.getFeatureContainer());
+        if (newNationType != null) addFeatures(newNationType);
     }
 
     /**
@@ -2287,8 +2245,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!canRecruitUnits()) {
             return;
         }
-        immigrationRequired += (int) featureContainer
-            .applyModifier(getSpecification()
+        immigrationRequired += (int)applyModifier(getSpecification()
                            .getIntegerOption("model.option.crossesIncrement").getValue(),
                            "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
@@ -3008,10 +2965,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if a bells bonus was set.
      */
     protected boolean recalculateBellsBonus() {
-        Set<Modifier> libertyBonus
-            = featureContainer.getModifierSet("model.goods.bells");
+        Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
         boolean ret = false;
-        for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
+        for (Ability ability : getAbilitySet("model.ability.addTaxToBells")) {
             FreeColGameObjectType source = ability.getSource();
             if (source != null) {
                 for (Modifier modifier : libertyBonus) {
@@ -3607,14 +3563,11 @@ public class Player extends FreeColGameObject implements Nameable {
             if (index > 0) setNameIndex(key, index);
         }
 
-        featureContainer = new FeatureContainer();
-        if (nationType != null) {
-            featureContainer.add(nationType.getFeatureContainer());
-        }
+        if (nationType != null) addFeatures(nationType);
         switch (playerType) {
         case REBEL:
         case INDEPENDENT:
-            featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
+            addAbility(new Ability("model.ability.independenceDeclared"));
             break;
         default:
             // no special abilities for other playertypes, but silent warning about unused enum.

@@ -422,7 +422,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                 && (workTile.getType().isPrimaryGoodsType(goodsType)
                     || workTile.getType().isSecondaryGoodsType(goodsType))) {
                 result.addAll(workTile.getProductionBonus(goodsType, null));
-                result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+                result.addAll(getColony().getModifierSet(goodsType.getId()));
             } else if (goodsType.equals(unit.getWorkType())) {
                 result.addAll(workTile.getProductionBonus(goodsType, unitType));
                 result.addAll(unit.getModifierSet(goodsType.getId()));
@@ -511,7 +511,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
-                                                                  unitType);
+                                                                   unitType);
             if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
                     modifiers) > 0) {
                 if (unitType != null) {

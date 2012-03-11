@@ -53,7 +53,7 @@ abstract public class Settlement extends GoodsLocation
     protected Tile tile;
 
     /** Contains the abilities and modifiers of this Settlement. */
-    private FeatureContainer featureContainer;
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
     /** The tiles this settlement owns. */
     private List<Tile> ownedTiles = new ArrayList<Tile>();
@@ -85,7 +85,6 @@ abstract public class Settlement extends GoodsLocation
         this.name = name;
         this.tile = tile;
 
-        featureContainer = new FeatureContainer();
         setType(owner.getNationType().getSettlementType(false));
     }
 
@@ -132,17 +131,9 @@ abstract public class Settlement extends GoodsLocation
      * @param newType The new Type value.
      */
     public final void setType(final SettlementType newType) {
-        if (type != null) {
-            featureContainer.remove(type.getFeatureContainer());
-        }
+        if (type != null) removeFeatures(type);
         this.type = newType;
-        if (newType != null) {
-            featureContainer.add(newType.getFeatureContainer());
-        }
-    }
-
-    public Set<Modifier> getModifierSet(String key) {
-        return featureContainer.getModifierSet(key);
+        if (newType != null) addFeatures(newType);
     }
 
     // TODO: remove this again
@@ -203,22 +194,15 @@ abstract public class Settlement extends GoodsLocation
 
 
     /**
-     * Describe <code>getFeatureContainer</code> method here.
+     * Get this settlement's feature container.
      *
-     * @return a <code>FeatureContainer</code> value
+     * @return The <code>FeatureContainer</code>.
      */
+    @Override
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
 
-    /**
-     * Describe <code>setFeatureContainer</code> method here.
-     *
-     * @param container a <code>FeatureContainer</code> value
-     */
-    protected void setFeatureContainer(FeatureContainer container) {
-        featureContainer = container;
-    }
 
     /**
      * Gets this colony's line of sight.
@@ -227,9 +211,8 @@ abstract public class Settlement extends GoodsLocation
      * @see Player#canSee(Tile)
      */
     public int getLineOfSight() {
-        return (int) getFeatureContainer()
-            .applyModifier(getType().getVisibleRadius(),
-                           "model.modifier.lineOfSightBonus");
+        return (int)applyModifier((float)getType().getVisibleRadius(),
+                                  "model.modifier.lineOfSightBonus");
     }
 
 
@@ -607,7 +590,6 @@ abstract public class Settlement extends GoodsLocation
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        featureContainer = new FeatureContainer();
 
         // @compat 0.9.x
         String typeStr = in.getAttributeValue(null, "settlementType");

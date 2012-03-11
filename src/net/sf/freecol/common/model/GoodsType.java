@@ -281,7 +281,7 @@ public final class GoodsType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isLibertyGoodsType() {
-        return getFeatureContainer().containsModifierKey("model.modifier.liberty");
+        return containsModifierKey("model.modifier.liberty");
     }
 
     /**
@@ -290,7 +290,7 @@ public final class GoodsType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isImmigrationGoodsType() {
-        return getFeatureContainer().containsModifierKey("model.modifier.immigration");
+        return containsModifierKey("model.modifier.immigration");
     }
 
     /**

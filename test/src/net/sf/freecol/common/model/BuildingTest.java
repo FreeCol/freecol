@@ -346,24 +346,24 @@ public class BuildingTest extends FreeColTestCase {
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.getFeatureContainer()
-                     .applyModifier(0, "model.modifier.minimumColonySize"));
+        assertEquals(0f, stockadeType.applyModifier(0,
+                "model.modifier.minimumColonySize"));
 
         modifierSet = fortType.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.getFeatureContainer()
-                     .applyModifier(0, "model.modifier.minimumColonySize"));
+        assertEquals(0f, stockadeType.applyModifier(0,
+                "model.modifier.minimumColonySize"));
 
         modifierSet = fortressType.getModifierSet("model.modifier.defence");
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-        assertEquals(0f, stockadeType.getFeatureContainer()
-                     .applyModifier(0, "model.modifier.minimumColonySize"));
+        assertEquals(0f, stockadeType.applyModifier(0,
+                "model.modifier.minimumColonySize"));
     }
 
     public void testCottonClothProduction() {
@@ -500,7 +500,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(1, modifiers.size());
         bellsModifier = modifiers.iterator().next();
         owner.addFather(jefferson);
-        assertTrue(colony.getOwner().getFeatureContainer().getModifierSet("model.goods.bells")
+        assertTrue(colony.getOwner().getModifierSet("model.goods.bells")
                    .contains(bellsModifier));
         assertTrue(colony.getModifierSet("model.goods.bells").contains(bellsModifier));
 

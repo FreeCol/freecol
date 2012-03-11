@@ -596,10 +596,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                 // do this, AI colonies accumulate heaps of party
                 // modifiers because of the cheat boycott removal.
                 findOne: for (Colony c : getPlayer().getColonies()) {
-                    FeatureContainer fc = c.getFeatureContainer();
-                    for (Modifier m : fc.getModifiers()) {
+                    for (Modifier m : c.getModifiers()) {
                         if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
-                            fc.removeModifier(m);
+                            c.removeModifier(m);
                             break findOne;
                         }
                     }

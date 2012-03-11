@@ -357,8 +357,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             Settlement settlement = tile.getSettlement();
             if (settlement != null
                 && (ServerPlayer) settlement.getOwner() == owner) {
-                amount = (int) settlement.getFeatureContainer()
-                    .applyModifier(amount, Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+                amount = (int)settlement.applyModifier(amount,
+                    Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
             } else {
                 List<Settlement> adjacent = new ArrayList<Settlement>();
@@ -367,8 +367,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     Settlement ts = t.getSettlement();
                     if (ts != null && (ServerPlayer)ts.getOwner() == owner) {
                         adjacent.add(ts);
-                        int modAmount = (int) ts.getFeatureContainer()
-                            .applyModifier(amount, Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+                        int modAmount = (int)ts.applyModifier((float)amount,
+                            Modifier.TILE_TYPE_CHANGE_PRODUCTION,
+                            deliver.getType());
                         if (modAmount > newAmount) {
                             newAmount = modAmount;
                         }

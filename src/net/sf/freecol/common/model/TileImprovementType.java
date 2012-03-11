@@ -219,12 +219,13 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = getFeatureContainer().getModifierSet(goodsType.getId());
+        Set<Modifier> modifierSet = getModifierSet(goodsType.getId());
         if (modifierSet == null || modifierSet.isEmpty()) {
             return null;
         } else {
             if (modifierSet.size() > 1) {
-                logger.warning("Only one Modifier for " + goodsType.getId() + " expected!");
+                logger.warning("Only one Modifier for " + goodsType.getId()
+                    + " expected!");
             }
             return modifierSet.iterator().next();
         }
@@ -318,14 +319,13 @@ public final class TileImprovementType extends FreeColGameObjectType {
             if (newTileType == null) { // simple bonus
                 int production = tile.potential(goodsType, null);
                 if (production > 0) {
-                    float change = getFeatureContainer()
-                        .applyModifier(production, goodsType.getId());
-                    value = (int) (change - production);
+                    float chg = applyModifier(production, goodsType.getId());
+                    value = (int)(chg - production);
                 }
             } else { // tile type change
-                int change = newTileType.getProductionOf(goodsType, null)
+                int chg = newTileType.getProductionOf(goodsType, null)
                     - tile.getType().getProductionOf(goodsType, null);
-                value = change;
+                value = chg;
             }
         }
         return value;

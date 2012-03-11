@@ -33,7 +33,9 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,6 +105,7 @@ public abstract class FreeColObject {
 
     private PropertyChangeSupport pcs = null;
 
+
     /**
      * Get the <code>Id</code> value.
      *
@@ -138,16 +141,6 @@ public abstract class FreeColObject {
      */
     protected void setSpecification(Specification specification) {
         this.specification = specification;
-    }
-
-    /**
-     * Describe <code>hasAbility</code> method here.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return false;
     }
 
     /**
@@ -952,6 +945,299 @@ public abstract class FreeColObject {
         if (pcs != null) {
             pcs.removePropertyChangeListener(propertyName, listener);
         }
+    }
+
+    /**
+     * Gets the feature container for this object, if any.
+     * None is provided here, but select subclasses will override.
+     *
+     * @return Null here, but subclasses will yield a feature container.
+     */
+    public FeatureContainer getFeatureContainer() {
+        return null;
+    }
+
+    /**
+     * Is an ability present in this object?
+     *
+     * @param id The id of the ability to test.
+     * @return True if the ability is present.
+     */
+    public boolean hasAbility(String id) {
+        return FeatureContainer.hasAbility(getFeatureContainer(),
+                                           id, null, null);
+    }
+
+    /**
+     * Is an ability present in this object?
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @return True if the ability is present.
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot) {
+        return FeatureContainer.hasAbility(getFeatureContainer(),
+                                           id, fcgot, null);
+    }
+
+    /**
+     * Is an ability present in this object?
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                              Turn turn) {
+        return FeatureContainer.hasAbility(getFeatureContainer(),
+                                           id, fcgot, turn);
+    }
+
+    /**
+     * Checks if this object contains a given ability key.
+     *
+     * @param key The key to check.
+     * @return True if the key is present.
+     */
+    public boolean containsAbilityKey(String key) {
+        return FeatureContainer.containsAbilityKey(getFeatureContainer(),
+                                                   key);
+    }
+
+    /**
+     * Gets a copy of the abilities of this object.
+     *
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilities() {
+        return FeatureContainer.getAbilities(getFeatureContainer());
+    }
+
+    /**
+     * Gets the set of abilities with the given Id from this object.
+     *
+     * @param id The id of the ability to test.
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilitySet(String id) {
+        return FeatureContainer.getAbilitySet(getFeatureContainer(),
+                                              id, null, null);
+    }
+
+    /**
+     * Gets the set of abilities with the given Id from this object.
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilitySet(String id,
+                                      FreeColGameObjectType fcgot) {
+        return FeatureContainer.getAbilitySet(getFeatureContainer(),
+                                              id, fcgot, null);
+    }
+
+    /**
+     * Gets the set of abilities with the given Id from this object.
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilitySet(String id,
+                                      FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        return FeatureContainer.getAbilitySet(getFeatureContainer(),
+                                              id, fcgot, turn);
+    }
+
+    /**
+     * Add the given ability to this object.
+     *
+     * @param ability An <code>Ability</code> to add.
+     * @return True if the ability was added.
+     */
+    public boolean addAbility(Ability ability) {
+        return FeatureContainer.addAbility(getFeatureContainer(), ability);
+    }
+
+    /**
+     * Remove the given ability from this object.
+     *
+     * @param ability An <code>Ability</code> to remove.
+     * @return The ability removed.
+     */
+    public Ability removeAbility(Ability ability) {
+        return FeatureContainer.removeAbility(getFeatureContainer(), ability);
+    }
+
+    /**
+     * Remove all abilities with a given Id.
+     *
+     * @param id The id of the abilities to remove.
+     */
+    public void removeAbilities(String id) {
+        FeatureContainer.removeAbilities(getFeatureContainer(), id);
+    }
+
+
+    /**
+     * Checks if this object contains a given modifier key.
+     *
+     * @param key The key to check.
+     * @return True if the key is present.
+     */
+    public boolean containsModifierKey(String key) {
+        return FeatureContainer.containsModifierKey(getFeatureContainer(),
+                                                    key);
+    }
+
+    /**
+     * Gets a copy of the modifiers of this object.
+     *
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifiers() {
+        return FeatureContainer.getModifiers(getFeatureContainer());
+    }
+
+    /**
+     * Gets the set of modifiers with the given Id from this object.
+     *
+     * @param id The id of the modifier to test.
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifierSet(String id) {
+        return FeatureContainer.getModifierSet(getFeatureContainer(), 
+                                               id, null, null);
+    }
+
+    /**
+     * Gets the set of modifiers with the given Id from this object.
+     *
+     * @param id The id of the modifier to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifierSet(String id,
+                                        FreeColGameObjectType fcgot) {
+        return FeatureContainer.getModifierSet(getFeatureContainer(), 
+                                               id, fcgot, null);
+    }
+
+    /**
+     * Gets the set of modifiers with the given Id from this object.
+     *
+     * @param id The id of the modifier to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifierSet(String id,
+                                        FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        return FeatureContainer.getModifierSet(getFeatureContainer(), 
+                                               id, fcgot, turn);
+    }
+
+    /**
+     * Applies this objects modifiers with the given Id to the given number.
+     *
+     * @param number The number to modify.
+     * @param id The id of the modifiers to apply.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return The modified number.
+     */
+    public float applyModifier(float number, String id) {
+        return FeatureContainer.applyModifier(getFeatureContainer(),
+                                              number, id, null, null);
+    }
+
+    /**
+     * Applies this objects modifiers with the given Id to the given number.
+     *
+     * @param number The number to modify.
+     * @param id The id of the modifiers to apply.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return The modified number.
+     */
+    public float applyModifier(float number, String id,
+                               FreeColGameObjectType fcgot) {
+        return FeatureContainer.applyModifier(getFeatureContainer(),
+                                              number, id, fcgot, null);
+    }
+
+    /**
+     * Applies this objects modifiers with the given Id to the given number.
+     *
+     * @param number The number to modify.
+     * @param id The id of the modifiers to apply.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return The modified number.
+     */
+    public float applyModifier(float number, String id,
+                               FreeColGameObjectType fcgot, Turn turn) {
+        return FeatureContainer.applyModifier(getFeatureContainer(),
+                                              number, id, fcgot, turn);
+    }
+
+    /**
+     * Add the given modifier to this object.
+     *
+     * @param modifier An <code>Modifier</code> to add.
+     * @return True if the modifier was added.
+     */
+    public boolean addModifier(Modifier modifier) {
+        return FeatureContainer.addModifier(getFeatureContainer(), modifier);
+    }
+
+    /**
+     * Remove the given modifier from this object.
+     *
+     * @param modifier An <code>Modifier</code> to remove.
+     * @return The modifier removed.
+     */
+    public Modifier removeModifier(Modifier modifier) {
+        return FeatureContainer.removeModifier(getFeatureContainer(), modifier);
+    }
+
+    /**
+     * Remove all abilities with a given Id.
+     *
+     * @param id The id of the abilities to remove.
+     */
+    public void removeModifiers(String id) {
+        FeatureContainer.removeModifiers(getFeatureContainer(), id);
+    }
+
+
+    /**
+     * Adds all the features in an object to this object.
+     *
+     * @param fco The <code>FreeColObject</code> to add features from.
+     */
+    public void addFeatures(FreeColObject fco) {
+        FeatureContainer.addFeatures(getFeatureContainer(), fco);
+    }
+
+    /**
+     * Removes all the features in an object from this object.
+     *
+     * @param fco The <code>FreeColObject</code> to find features to remove in.
+     */
+    public void removeFeatures(FreeColObject fco) {
+        FeatureContainer.removeFeatures(getFeatureContainer(), fco);
     }
 
 

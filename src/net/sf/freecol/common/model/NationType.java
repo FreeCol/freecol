@@ -199,7 +199,7 @@ public abstract class NationType extends FreeColGameObjectType {
 
         if (parent != this) {
             getSettlementTypes().addAll(parent.getSettlementTypes());
-            getFeatureContainer().add(parent.getFeatureContainer());
+            addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);
             }

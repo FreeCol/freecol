@@ -295,7 +295,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                             outside.add(data, true);
                         } else {
                             String message = "";
-                            Set<Modifier> modifierSet = outside.getColony().getFeatureContainer()
+                            Set<Modifier> modifierSet = outside.getColony()
                                 .getModifierSet("model.modifier.minimumColonySize");
                             for (Modifier modifier : modifierSet) {
                                 message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")

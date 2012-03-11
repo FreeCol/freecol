@@ -1093,8 +1093,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        colony.getOwner().getFeatureContainer()
-            .addAbility(new Ability("model.ability.independenceDeclared"));
+        colony.getOwner().addAbility(new Ability("model.ability.independenceDeclared"));
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit regular = units.next();

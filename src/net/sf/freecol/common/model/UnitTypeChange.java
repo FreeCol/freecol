@@ -190,7 +190,6 @@ public class UnitTypeChange extends FreeColObject {
         this.newUnitType = newNewUnitType;
     }
 
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

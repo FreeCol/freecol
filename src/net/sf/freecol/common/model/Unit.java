@@ -620,10 +620,9 @@ public class Unit extends FreeColGameObject
         if (!isInEurope() && getOwner().getEurope() != null) {
             float fee = (getSpecification().getInteger("model.option.treasureTransportFee")
                          * getTreasureAmount()) / 100;
-            return (int) getOwner().getFeatureContainer()
-                .applyModifier(fee,
-                               "model.modifier.treasureTransportFee",
-                               unitType, getGame().getTurn());
+            return (int) getOwner().applyModifier(fee,
+                "model.modifier.treasureTransportFee",
+                unitType, getGame().getTurn());
         }
         return 0;
     }
@@ -835,42 +834,34 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns true if the Unit, or its owner has the ability
-     * identified by <code>id</code>.
+     * Does this unit or its owner satisfy the ability set identified
+     * by <code>id</code>.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @param id The ability id to satisfy.
+     * @return True if the ability is satisfied.
      */
     public boolean hasAbility(String id) {
         Set<Ability> result = new HashSet<Ability>();
+        Turn turn = getGame().getTurn();
         // UnitType abilities always apply
-        result.addAll(unitType.getFeatureContainer().getAbilitySet(id));
-        // the player's abilities may not apply
-        result.addAll(getOwner().getFeatureContainer()
-                      .getAbilitySet(id, unitType, getGame().getTurn()));
-        // EquipmentType abilities always apply
+        result.addAll(unitType.getAbilitySet(id));
+        // The player's abilities require more qualification.
+        result.addAll(getOwner().getAbilitySet(id, unitType, turn));
+        // EquipmentType abilities always apply.
         for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getFeatureContainer().getAbilitySet(id));
-            // player abilities may also apply to equipment (missionary)
-            result.addAll(getOwner().getFeatureContainer()
-                          .getAbilitySet(id, equipmentType, getGame().getTurn()));
+            result.addAll(equipmentType.getAbilitySet(id));
+            // Player abilities may also apply to equipment (e.g. missionary).
+            result.addAll(getOwner().getAbilitySet(id, equipmentType, turn));
         }
-        // Location abilities may apply. TODO: extend this to all
-        // locations? May simplify code. Units are also Locations,
-        // however, which complicates the issue. We do not want Units
-        // aboard other Units to share the abilities of the carriers.
+        // Location abilities may apply.
+        // TODO: extend this to all locations? May simplify
+        // code. Units are also Locations, however, which complicates
+        // the issue. We do not want Units aboard other Units to share
+        // the abilities of the carriers.
         if (getColony() != null) {
-            result.addAll(getColony().getFeatureContainer()
-                          .getAbilitySet(id, unitType, getGame().getTurn()));
+            result.addAll(getColony().getAbilitySet(id, unitType, turn));
         } else if (isInEurope()) {
-            // TODO: the following check should not be necessary
-            // Presumably, it will become redundant as soon as
-            // Europe abilities are in the spec
-            if (getOwner().getEurope() != null
-                && getOwner().getEurope().getFeatureContainer() != null) {
-                result.addAll(getOwner().getEurope().getFeatureContainer()
-                              .getAbilitySet(id, unitType, getGame().getTurn()));
-            }
+            result.addAll(getOwner().getEurope().getAbilitySet(id, unitType, turn));
         }
         return FeatureContainer.hasAbility(result);
     }
@@ -884,17 +875,16 @@ public class Unit extends FreeColGameObject
      */
     public Set<Modifier> getModifierSet(String id) {
         Set<Modifier> result = new HashSet<Modifier>();
+        Turn turn = getGame().getTurn();
         // UnitType modifiers always apply
         result.addAll(unitType.getModifierSet(id));
         // the player's modifiers may not apply
-        result.addAll(getOwner().getFeatureContainer()
-                      .getModifierSet(id, unitType, getGame().getTurn()));
+        result.addAll(getOwner().getModifierSet(id, unitType, turn));
         // EquipmentType modifiers always apply
         for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getFeatureContainer().getModifierSet(id));
+            result.addAll(equipmentType.getModifierSet(id));
             // player modifiers may also apply to equipment (unused)
-            result.addAll(getOwner().getFeatureContainer()
-                          .getModifierSet(id, equipmentType, getGame().getTurn()));
+            result.addAll(getOwner().getModifierSet(id, equipmentType, turn));
         }
         return result;
     }
@@ -909,12 +899,12 @@ public class Unit extends FreeColGameObject
      */
     public Set<Modifier> getModifierSet(String id, Ownable ownable) {
         Set<Modifier> result = new HashSet<Modifier>();
-        NationType nationType = ownable.getOwner().getNationType();
         Turn turn = getGame().getTurn();
-        result.addAll(unitType.getFeatureContainer().getModifierSet(id, nationType, turn));
-        result.addAll(getOwner().getFeatureContainer().getModifierSet(id, nationType, turn));
+        NationType nationType = ownable.getOwner().getNationType();
+        result.addAll(unitType.getModifierSet(id, nationType, turn));
+        result.addAll(getOwner().getModifierSet(id, nationType, turn));
         for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getFeatureContainer().getModifierSet(id, nationType, turn));
+            result.addAll(equipmentType.getModifierSet(id, nationType, turn));
         }
         return result;
     }
@@ -1791,14 +1781,17 @@ public class Unit extends FreeColGameObject
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        float line = unitType.getLineOfSight();
-        Set<Modifier> modifierSet = getModifierSet("model.modifier.lineOfSightBonus");
+        Turn turn = getGame().getTurn();
+        Set<Modifier> modifierSet = new HashSet<Modifier>();
+        modifierSet.addAll(getModifierSet("model.modifier.lineOfSightBonus"));
         if (getTile() != null && getTile().getType() != null) {
-            modifierSet.addAll(getTile().getType().getFeatureContainer()
-                               .getModifierSet("model.modifier.lineOfSightBonus",
-                                               unitType, getGame().getTurn()));
+            modifierSet.addAll(getTile().getType()
+                .getModifierSet("model.modifier.lineOfSightBonus",
+                                unitType, turn));
         }
-        return (int) FeatureContainer.applyModifierSet(line, getGame().getTurn(), modifierSet);
+        return (int)FeatureContainer
+            .applyModifierSet((float)unitType.getLineOfSight(),
+                              turn, modifierSet);
     }
 
     /**
@@ -2773,12 +2766,11 @@ public class Unit extends FreeColGameObject
      * @return The number of turns to sail to/from Europe.
      */
     public int getSailTurns() {
-        return (int) getOwner().getFeatureContainer()
-            .applyModifier(getSpecification()
-                           .getIntegerOption("model.option.turnsToSail")
-                           .getValue(),
-                           "model.modifier.sailHighSeas",
-                           unitType, getGame().getTurn());
+        float base = getSpecification()
+            .getIntegerOption("model.option.turnsToSail").getValue();
+        return (int) getOwner().applyModifier(base,
+                                              "model.modifier.sailHighSeas",
+                                              unitType, getGame().getTurn());
     }
 
 
@@ -3264,7 +3256,8 @@ public class Unit extends FreeColGameObject
         TypeCountMap<EquipmentType> equipmentList = null;
 
         // Check for necessary equipment in the settlement
-        Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
+        Set<Ability> autoDefence = new HashSet<Ability>();
+        autoDefence.addAll(getOwner().getAbilitySet("model.ability.automaticEquipment"));
 
         for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
             for (Ability ability : autoDefence) {

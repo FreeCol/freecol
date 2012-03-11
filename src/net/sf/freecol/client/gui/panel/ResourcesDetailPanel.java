@@ -88,12 +88,10 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         name.setFont(smallHeaderFont);
         panel.add(name, "span, align center, wrap 40");
 
-        Set<Modifier> modifiers = type.getFeatureContainer().getModifiers();
-
         panel.add(localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (Modifier modifier : modifiers) {
+        for (Modifier modifier : type.getModifiers()) {
             String text = getModifierAsString(modifier);
             if (modifier.hasScope()) {
                 List<String> scopeStrings = new ArrayList<String>();

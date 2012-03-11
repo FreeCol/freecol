@@ -74,7 +74,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
     private Player owner;
 
-    private FeatureContainer featureContainer;
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
 
     /**
@@ -126,32 +126,13 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Describe <code>hasAbility</code> method here.
+     * Gets the feature container for this Europe object.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @return The <code>FeatureContainer</code>.
      */
     @Override
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the FeatureContainer.
-     *
-     * @return a <code>FeatureContainer</code> value
-     */
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
-    }
-
-    /**
-     * Sets the FeatureContainer.
-     *
-     * @param container a <code>FeatureContainer</code> value
-     */
-    protected void setFeatureContainer(FeatureContainer container) {
-        featureContainer = container;
     }
 
     /**
@@ -406,9 +387,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
         Specification spec = getSpecification();
 
         // @compat 0.10.0
-        if (featureContainer == null) {
-            featureContainer = new FeatureContainer();
-            featureContainer.addAbility(new Ability("model.ability.dressMissionary"));
+        if (!hasAbility("model.ability.dressMissionary")) {
+            addAbility(new Ability("model.ability.dressMissionary"));
         }
         // end compatibility code
 

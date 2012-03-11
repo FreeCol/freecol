@@ -291,8 +291,7 @@ public final class InfoPanel extends FreeColPanel {
                         add(ownerLabel, "span 4");
                     }
 
-                    int defenceBonus = (int) tile.getType().getFeatureContainer()
-                        .applyModifier(100, Modifier.DEFENCE) - 100;
+                    int defenceBonus = (int)tile.getType().applyModifier(100, Modifier.DEFENCE) - 100;
                     JLabel defenceLabel = new JLabel(Messages.message("colopedia.terrain.defenseBonus") +
                                                      " " + defenceBonus + "%");
                     defenceLabel.setFont(font);

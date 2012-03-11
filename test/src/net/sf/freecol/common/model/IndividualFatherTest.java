@@ -173,7 +173,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         assertTrue(player.hasAbility("model.ability.addTaxToBells"));
         Set<Modifier> modifierSet
-            = player.getFeatureContainer().getModifierSet("model.goods.bells");
+            = player.getModifierSet("model.goods.bells");
         assertEquals(1, modifierSet.size());
 
         Modifier paineModifier = modifierSet.iterator().next();
@@ -280,7 +280,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         for (UnitType unitType : spec().getUnitTypeList()) {
             if (unitType.isRecruitable()) {
                 assertTrue("Unable to recruit " + unitType.toString(),
-                    dutch.getFeatureContainer().hasAbility(ability, unitType));
+                    dutch.hasAbility(ability, unitType));
             }
         }
 
@@ -292,12 +292,10 @@ public class IndividualFatherTest extends FreeColTestCase {
             if (unitType.isRecruitable()) {
                 if (unitType.getSkill() < 0) {
                     assertFalse("Able to recruit " + unitType.toString(),
-                        dutch.getFeatureContainer().hasAbility(ability,
-                            unitType));
+                        dutch.hasAbility(ability, unitType));
                 } else {
                     assertTrue("Unable to recruit " + unitType.toString(),
-                        dutch.getFeatureContainer().hasAbility(ability,
-                            unitType));
+                        dutch.hasAbility(ability, unitType));
                 }
             }
         }

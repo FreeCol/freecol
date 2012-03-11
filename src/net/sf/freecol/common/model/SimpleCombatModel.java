@@ -168,8 +168,7 @@ public class SimpleCombatModel extends CombatModel {
                                     Specification.BASE_OFFENCE_SOURCE,
                                     type.getOffence(),
                                     Modifier.Type.ADDITIVE));
-            result.addAll(attackerUnit
-                          .getModifierSet(Modifier.OFFENCE));
+            result.addAll(attackerUnit.getModifierSet(Modifier.OFFENCE));
             if (defender instanceof Ownable) {
                 result.addAll(attackerUnit
                               .getModifierSet(Modifier.OFFENCE_AGAINST,

@@ -842,7 +842,7 @@ public final class UnitType extends BuildableType
             typeChanges.addAll(parent.typeChanges);
             defaultEquipment = parent.defaultEquipment;
             consumption.putAll(parent.consumption);
-            getFeatureContainer().add(parent.getFeatureContainer());
+            addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);
             }

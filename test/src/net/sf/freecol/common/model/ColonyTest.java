@@ -185,12 +185,12 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
 
-        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
-        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
-        colony.getFeatureContainer().addModifier(createTeaPartyModifier(game.getTurn()));
+        colony.addModifier(createTeaPartyModifier(game.getTurn()));
+        colony.addModifier(createTeaPartyModifier(game.getTurn()));
+        colony.addModifier(createTeaPartyModifier(game.getTurn()));
 
         int modifierCount = 0;
-        for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
+        for (Modifier existingModifier : colony.getModifierSet("model.goods.bells")) {
             if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
                 modifierCount++;
             }
@@ -198,10 +198,10 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(1, modifierCount);
 
         Turn newTurn = new Turn(game.getTurn().getNumber() + 1);
-        colony.getFeatureContainer().addModifier(createTeaPartyModifier(newTurn));
+        colony.addModifier(createTeaPartyModifier(newTurn));
 
         modifierCount = 0;
-        for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
+        for (Modifier existingModifier : colony.getModifierSet("model.goods.bells")) {
             if (Specification.COLONY_GOODS_PARTY_SOURCE.equals(existingModifier.getSource())) {
                 modifierCount++;
             }
