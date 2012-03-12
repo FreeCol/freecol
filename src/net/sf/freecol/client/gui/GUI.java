@@ -1073,10 +1073,8 @@ public class GUI {
         scaleMap(2f);
 
         setupMapEditorMenuBar();
-        JInternalFrame f = canvas.addAsToolBox(new MapEditorTransformPanel(freeColClient, this));
-        f.setLocation(f.getX(), 50);
+        canvas.showMapEditorTransformPanel();
 
-        canvas.repaint();
         setupMouseListenerForMapEditor();
     }
 
