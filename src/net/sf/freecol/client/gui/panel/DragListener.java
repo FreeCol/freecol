@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -37,7 +38,6 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -79,7 +79,7 @@ public final class DragListener extends MouseAdapter {
 
     /**
      * The constructor to use.
-     * @param freeColClient 
+     * @param freeColClient
      *
      * @param parentPanel The layered pane that contains the components to which
      *            a DragListener might be attached.
@@ -130,7 +130,18 @@ public final class DragListener extends MouseAdapter {
                             // work-around: JRE on Windows is unable
                             // to display popup menus that extend
                             // beyond the canvas
-                            menu.show(gui.getCanvas(), 0, 0);
+                            menu.show(gui.getCanvas(), menu.getLocation().x, 0);
+                        } else if(!gui.isWindowed()
+                                  && Toolkit.getDefaultToolkit()
+                                  .getScreenSize().getHeight() < 768) {
+                            /*
+                             * Move popup up when in full screen mode
+                             * and when the screen size is too small
+                             * to fit. Similar to above workaround,
+                             * but targeted for users with smaller
+                             * screens such as netbooks
+                             */
+                            menu.show(gui.getCanvas(), menu.getLocation().x, 0);
                         } else {
                             menu.show(comp, e.getX(), e.getY());
                         }
@@ -562,7 +573,7 @@ public final class DragListener extends MouseAdapter {
                 }
             }
         }
-        
+
         // convenience menu for equipping dragoons
         if (horses != null && muskets != null && horses.isCompatibleWith(muskets)) {
             final EquipmentType horseType = horses;
