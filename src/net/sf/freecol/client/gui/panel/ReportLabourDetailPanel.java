@@ -20,12 +20,24 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.TypeCountMap;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Unit.Role;
 
 
 /**
@@ -33,19 +45,73 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public final class ReportLabourDetailPanel extends ReportPanel implements ActionListener {
     
+    private Map<UnitType, Map<Location, Integer>> data;
+    private TypeCountMap<UnitType> unitCount;
+    private List<Colony> colonies;
+    private UnitType unitType;
+    
     /**
      * The constructor that will add the items to this panel.
      * @param freeColClient 
      * @param parent The parent of this panel.
      */
-    public ReportLabourDetailPanel(FreeColClient freeColClient, GUI gui) {
+    public ReportLabourDetailPanel(FreeColClient freeColClient, GUI gui, UnitType unitType, Map<UnitType, Map<Location, Integer>> data,  
+            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         super(freeColClient, gui, Messages.message("report.labour.details"));
+        this.unitType = unitType;
+        this.data = data;
+        this.unitCount = unitCount;
+        this.colonies = colonies;
     }
 
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void setDetailPanel(JPanel detailPanel) {
+    public void initialize() {
+
+        JPanel detailPanel = new JPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
+        detailPanel.setOpaque(false);
+
+        Role role = Role.DEFAULT;
+        if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
+            role = Role.PIONEER;
+        } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
+            role = Role.MISSIONARY;
+        }
+
+        // summary
+        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
+        detailPanel.add(localizedLabel(unitType.getNameKey()));
+        detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
+        boolean canTrain = false;
+        Map<Location, Integer> unitLocations = data.get(unitType);
+        for (Colony colony : colonies) {
+            if (unitLocations.get(colony) != null) {
+                String colonyName = colony.getName();
+                if (colony.canTrain(unitType)) {
+                    canTrain = true;
+                    colonyName += "*";
+                }
+                JButton colonyButton = getLinkButton(colonyName, null, colony.getId());
+                colonyButton.addActionListener(this);
+                detailPanel.add(colonyButton);
+                JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
+                countLabel.setForeground(LINK_COLOR);
+                detailPanel.add(countLabel);
+            }
+        }
+        for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
+            if (!(entry.getKey() instanceof Colony)) {
+                String locationName = Messages.message(entry.getKey().getLocationName());
+                JButton linkButton = getLinkButton(locationName, null, entry.getKey().getId());
+                linkButton.addActionListener(this);
+                detailPanel.add(linkButton);
+                JLabel countLabel = new JLabel(entry.getValue().toString());
+                countLabel.setForeground(LINK_COLOR);
+                detailPanel.add(countLabel);
+            }
+        }
+        if (canTrain) {
+            detailPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
+                            "newline 20, span");
+        }
         reportPanel.add(detailPanel);
     }
 

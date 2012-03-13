@@ -34,6 +34,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -101,6 +102,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
+import net.sf.freecol.client.gui.panel.ReportLabourDetailPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 import net.sf.freecol.client.gui.panel.ReportNavalPanel;
@@ -146,7 +148,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -457,17 +461,6 @@ public final class Canvas extends JDesktopPane {
             gui.updateMenuBar();
             freeColClient.getActionManager().update();
         }
-    }
-
-    /**
-     * Adds a component centered on this Canvas inside a frame. Removes the
-     * statuspanel if visible (and <code>comp != statusPanel</code>).
-     *
-     * @param comp The component to add to this JInternalFrame.
-     * @return The <code>JInternalFrame</code> that was created and added.
-     */
-    public JInternalFrame addAsFrame(JComponent comp) {
-        return addAsFrame(comp, false, PopupPosition.CENTERED);
     }
 
     /**
@@ -1648,6 +1641,14 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ReportIndianPanel(freeColClient, gui));
     }
 
+    public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
+            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+        
+        ReportLabourDetailPanel details = new ReportLabourDetailPanel(freeColClient, gui, unitType, data, unitCount, colonies);
+        details.initialize();
+        showSubPanel(details);
+    }
+
     public void showReportLabourPanel() {
         showSubPanel(new ReportLabourPanel(freeColClient, gui));
 
@@ -1667,11 +1668,11 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+
     public void showReportReligiousPanel() {
         showSubPanel(new ReportReligiousPanel(freeColClient, gui));
 
     }
-
 
     public void showReportRequirementsPanel() {
         showSubPanel(new ReportRequirementsPanel(freeColClient, gui));
@@ -1682,6 +1683,7 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+
     /**
      * Show the new turn report.
      *
@@ -1690,7 +1692,6 @@ public final class Canvas extends JDesktopPane {
     public void showReportTurnPanel(ModelMessage... messages) {
         showSubPanel(new ReportTurnPanel(freeColClient, gui, messages));
     }
-
 
     public int showRiverStyleDialog() {
         return showFreeColDialog(new RiverStylePanel(freeColClient, gui));
@@ -1839,6 +1840,7 @@ public final class Canvas extends JDesktopPane {
                                  unit.getTile());
     }
 
+
     /**
      * Displays the panel for negotiating a sale to a settlement.
      *
@@ -1876,7 +1878,6 @@ public final class Canvas extends JDesktopPane {
                 choices);
         return (result == null) ? SellAction.CANCEL : result;
     }
-
 
     /**
      * Displays the <code>ServerListPanel</code>.
@@ -2251,6 +2252,7 @@ public final class Canvas extends JDesktopPane {
         return f;
     }
 
+
     /**
      * Adds a component centered on this Canvas. Removes the statuspanel if
      * visible (and <code>comp != statusPanel</code>).
@@ -2264,7 +2266,6 @@ public final class Canvas extends JDesktopPane {
 
         add(comp, i);
     }
-
 
     /**
      * Create key bindings for all actions.
@@ -2340,6 +2341,7 @@ public final class Canvas extends JDesktopPane {
         return (JInternalFrame) temp;
     }
 
+
     /**
      * Given a tile to be made visible, determine a position to popup
      * a panel.
@@ -2356,7 +2358,6 @@ public final class Canvas extends JDesktopPane {
             : PopupPosition.CENTERED;
     }
 
-
     /**
      * Displays the given dialog, making sure a tile is visible.
      *
@@ -2371,7 +2372,7 @@ public final class Canvas extends JDesktopPane {
         remove(freeColDialog);
         return response;
     }
-
+    
     /**
      * Displays the given panel, making sure a tile is visible.
      *
@@ -2381,7 +2382,7 @@ public final class Canvas extends JDesktopPane {
     private void showFreeColPanel(FreeColPanel panel, Tile tile) {
         showSubPanel(panel, getPopupPosition(tile));
     }
-    
+
     /**
      * Displays a <code>FreeColPanel</code>.
      * @param panel <code>FreeColPanel</code>, panel to show

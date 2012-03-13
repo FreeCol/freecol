@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,7 +91,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -815,10 +818,16 @@ public class GUI {
         canvas.showReportIndianPanel();
     }
 
+    public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
+            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+        canvas.showReportLabourDetailPanel(unitType, data, unitCount, colonies);
+        
+    }
+
+
     public void showReportLabourPanel() {
         canvas.showReportLabourPanel();
     }
-
 
     public void showReportMilitaryPanel() {
         canvas.showReportMilitaryPanel();
@@ -862,12 +871,12 @@ public class GUI {
         return canvas.showScoutForeignColonyDialog(colony, unit, canNegotiate);
     }
 
+
+
+
     public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement, String number) {
         return canvas.showScoutIndianSettlementDialog(settlement, number);
     }
-
-
-
 
     public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
         return canvas.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
@@ -897,10 +906,10 @@ public class GUI {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
 
+
     public void showStatisticsPanel() {
         canvas.showStatisticsPanel();
     }
-
 
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
@@ -1103,10 +1112,10 @@ public class GUI {
         }
     }
 
+
     private void setupMapEditorMenuBar() {
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
     }
-
 
     private void setupMouseListenerForMapEditor() {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);

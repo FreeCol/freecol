@@ -25,11 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -143,57 +141,6 @@ public final class ReportLabourPanel extends ReportPanel {
         }
     }
 
-    private JPanel createUnitDetails(UnitType unitType, ReportLabourDetailPanel report) {
-
-        JPanel detailPanel = new JPanel(new MigLayout("wrap 7", "[]30[][]30[][]30[][]", ""));
-        detailPanel.setOpaque(false);
-
-        Role role = Role.DEFAULT;
-        if (unitType.hasAbility(Ability.EXPERT_PIONEER)) {
-            role = Role.PIONEER;
-        } else if (unitType.hasAbility(Ability.EXPERT_MISSIONARY)) {
-            role = Role.MISSIONARY;
-        }
-
-        // summary
-        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
-        detailPanel.add(localizedLabel(unitType.getNameKey()));
-        detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
-        boolean canTrain = false;
-        Map<Location, Integer> unitLocations = data.get(unitType);
-        for (Colony colony : colonies) {
-            if (unitLocations.get(colony) != null) {
-                String colonyName = colony.getName();
-                if (colony.canTrain(unitType)) {
-                    canTrain = true;
-                    colonyName += "*";
-                }
-                JButton colonyButton = getLinkButton(colonyName, null, colony.getId());
-                colonyButton.addActionListener(report);
-                detailPanel.add(colonyButton);
-                JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
-                countLabel.setForeground(LINK_COLOR);
-                detailPanel.add(countLabel);
-            }
-        }
-        for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
-            if (!(entry.getKey() instanceof Colony)) {
-                String locationName = Messages.message(entry.getKey().getLocationName());
-                JButton linkButton = getLinkButton(locationName, null, entry.getKey().getId());
-                linkButton.addActionListener(report);
-                detailPanel.add(linkButton);
-                JLabel countLabel = new JLabel(entry.getValue().toString());
-                countLabel.setForeground(LINK_COLOR);
-                detailPanel.add(countLabel);
-            }
-        }
-        if (canTrain) {
-            detailPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
-                            "newline 20, span");
-        }
-        return detailPanel;
-    }
-
     /**
      * This function analyzes an event and calls the right methods to take care
      * of the user's requests.
@@ -207,10 +154,8 @@ public final class ReportLabourPanel extends ReportPanel {
             super.actionPerformed(event);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
-            ReportLabourDetailPanel details = new ReportLabourDetailPanel(getFreeColClient(), getGUI());
-            details.setDetailPanel(createUnitDetails(unitType, details));
-            getGUI().getCanvas().addAsFrame(details);
-            details.requestFocus();
+            getGUI().showReportLabourDetailPanel(unitType, data, unitCount, colonies);
+
         }
     }
 }
