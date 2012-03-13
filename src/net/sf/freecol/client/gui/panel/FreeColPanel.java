@@ -68,7 +68,6 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -309,7 +308,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Constructor.
      *
-     * @param parent <code>Canvas</code>
+     * @param gui <code>GUI</code>
      */
     public FreeColPanel(FreeColClient freeColClient, GUI gui) {
         this(freeColClient, gui, new FlowLayout());
@@ -319,7 +318,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Default constructor.
      *
-     * @param parent The <code>Canvas</code> all panels belong to.
+     * @param gui The <code>GUI</code>.
      * @param layout The <code>LayoutManager</code> to be used.
      */
     public FreeColPanel(FreeColClient freeColClient, GUI gui, LayoutManager layout) {
@@ -436,17 +435,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         JButton button = getLinkButton(colony.getName(), null, colony.getId());
         button.addActionListener(this);
         return button;
-    }
-
-
-
-    /**
-     * Get the <code>Canvas</code> value.
-     *
-     * @return a <code>Canvas</code> value
-     */
-    protected final Canvas getCanvas() {
-        return gui.getCanvas();
     }
 
     /**
