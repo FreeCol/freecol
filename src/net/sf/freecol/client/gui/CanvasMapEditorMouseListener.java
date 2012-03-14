@@ -440,73 +440,13 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 try {
                     sleep(100);
                 } catch (InterruptedException e) {
+                    
                 }
 
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
                             public void run() {
-                                try {
-                                    int x, y;
-                                    Tile t = mapViewer.getFocus();
-                                    if (t == null) {
-                                        return;
-                                    }
-
-                                    t = t.getNeighbourOrNull(direction);
-                                    if (t == null) {
-                                        return;
-                                    }
-
-                                    if (mapViewer.isMapNearTop(t.getY()) && mapViewer.isMapNearTop(mapViewer.getFocus().getY())) {
-                                        if (t.getY() > mapViewer.getFocus().getY()) {
-                                            y = t.getY();
-                                            do {
-                                                y += 2;
-                                            } while (mapViewer.isMapNearTop(y));
-                                        } else {
-                                            y = mapViewer.getFocus().getY();
-                                        }
-                                    } else if (mapViewer.isMapNearBottom(t.getY()) && mapViewer.isMapNearBottom(mapViewer.getFocus().getY())) {
-                                        if (t.getY() < mapViewer.getFocus().getY()) {
-                                            y = t.getY();
-                                            do {
-                                                y -= 2;
-                                            } while (mapViewer.isMapNearBottom(y));
-                                        } else {
-                                            y = mapViewer.getFocus().getY();
-                                        }
-                                    } else {
-                                        y = t.getY();
-                                    }
-
-                                    if (mapViewer.isMapNearLeft(t.getX(), t.getY())
-                                        && mapViewer.isMapNearLeft(mapViewer.getFocus().getX(), mapViewer.getFocus().getY())) {
-                                        if (t.getX() > mapViewer.getFocus().getX()) {
-                                            x = t.getX();
-                                            do {
-                                                x++;
-                                            } while (mapViewer.isMapNearLeft(x, y));
-                                        } else {
-                                            x = mapViewer.getFocus().getX();
-                                        }
-                                    } else if (mapViewer.isMapNearRight(t.getX(), t.getY())
-                                               && mapViewer.isMapNearRight(mapViewer.getFocus().getX(), mapViewer.getFocus().getY())) {
-                                        if (t.getX() < mapViewer.getFocus().getX()) {
-                                            x = t.getX();
-                                            do {
-                                                x--;
-                                            } while (mapViewer.isMapNearRight(x, y));
-                                        } else {
-                                            x = mapViewer.getFocus().getX();
-                                        }
-                                    } else {
-                                        x = t.getX();
-                                    }
-
-                                    mapViewer.setFocus(getMap().getTile(x,y));
-                                } catch (Exception e) {
-                                    logger.log(Level.WARNING, "Exception while scrolling!", e);
-                                }
+                                mapViewer.scrollMap(direction);
                             }
                         });
                 } catch (InvocationTargetException e) {

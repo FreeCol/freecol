@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -3429,6 +3430,72 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
+    public void scrollMap(Direction direction) {
+
+        try {
+            int x, y;
+            Tile t = getFocus();
+            if (t == null) {
+                return;
+            }
+
+            t = t.getNeighbourOrNull(direction);
+            if (t == null) {
+                return;
+            }
+
+            if (isMapNearTop(t.getY()) && isMapNearTop(getFocus().getY())) {
+                if (t.getY() > getFocus().getY()) {
+                    y = t.getY();
+                    do {
+                        y += 2;
+                    } while (isMapNearTop(y));
+                } else {
+                    y = getFocus().getY();
+                }
+            } else if (isMapNearBottom(t.getY()) && isMapNearBottom(getFocus().getY())) {
+                if (t.getY() < getFocus().getY()) {
+                    y = t.getY();
+                    do {
+                        y -= 2;
+                    } while (isMapNearBottom(y));
+                } else {
+                    y = getFocus().getY();
+                }
+            } else {
+                y = t.getY();
+            }
+
+            if (isMapNearLeft(t.getX(), t.getY())
+                && isMapNearLeft(getFocus().getX(), getFocus().getY())) {
+                if (t.getX() > getFocus().getX()) {
+                    x = t.getX();
+                    do {
+                        x++;
+                    } while (isMapNearLeft(x, y));
+                } else {
+                    x = getFocus().getX();
+                }
+            } else if (isMapNearRight(t.getX(), t.getY())
+                       && isMapNearRight(getFocus().getX(), getFocus().getY())) {
+                if (t.getX() < getFocus().getX()) {
+                    x = t.getX();
+                    do {
+                        x--;
+                    } while (isMapNearRight(x, y));
+                } else {
+                    x = getFocus().getX();
+                }
+            } else {
+                x = t.getX();
+            }
+
+            setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while scrolling!", e);
+        }
+            
+    }
 
 
 }
