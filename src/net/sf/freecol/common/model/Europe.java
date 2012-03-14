@@ -412,18 +412,15 @@ public class Europe extends UnitLocation implements Ownable, Named {
         if (in.getLocalName().equals(UNITS_TAG_NAME)) {
             Unit unit;
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                    unit = updateFreeColGameObject(in, Unit.class);
-                    // @compat 0.10.1
-                    if (unit.getLocation() == null) {
-                        // sometimes units in a Europe element have a missing
-                        //  location. it should always be this Europe instance.
-                        unit.setLocationNoUpdate(this);
-                    }
-                    // end compatibility code
-                    add(unit);
-                }
+                super.readChild(in);
             }
+            // @compat 0.10.1
+            // Sometimes units in a Europe element have a missing
+            // location.  It should always be this Europe instance.
+            for (Unit u : getUnitList()) {
+                if (u.getLocation() == null) u.setLocationNoUpdate(this);
+            }
+            // end compatibility code
         } else if (in.getLocalName().equals("unitPrice")) {
             String unitTypeId = in.getAttributeValue(null, "unitType");
             Integer price = new Integer(in.getAttributeValue(null, "price"));
