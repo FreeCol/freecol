@@ -27,7 +27,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -255,54 +254,7 @@ public final class Canvas extends JDesktopPane {
         GIFT
     }
 
-    /**
-     * Handles the moving of internal frames.
-     */
-    class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
-
-        private JInternalFrame f;
-
-        private Point loc = null;
-
-
-        FrameMotionListener(JInternalFrame f) {
-            this.f = f;
-        }
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
-                return;
-            }
-
-            Point p = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
-            int moveX = loc.x - p.x;
-            int moveY = loc.y - p.y;
-            f.getDesktopPane().getDesktopManager().dragFrame(f, f.getX() - moveX, f.getY() - moveY);
-            loc = p;
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent arg0) {
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if (f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
-                return;
-            }
-            loc = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
-            f.getDesktopPane().getDesktopManager().beginDraggingFrame(f);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
-                return;
-            }
-            f.getDesktopPane().getDesktopManager().endDraggingFrame(f);
-        }
-    }
+  
 
     /**
      * A class for frames being used as tool boxes.
