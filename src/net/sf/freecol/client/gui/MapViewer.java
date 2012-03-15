@@ -1317,47 +1317,6 @@ public final class MapViewer {
     }
 
     /**
-     * Returns 'true' if the Tile is near the bottom.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the bottom.
-     */
-    public boolean isMapNearBottom(int y) {
-        return (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows));
-    }
-
-    /**
-     * Returns 'true' if the Tile is near the left.
-     * @param x The x-coordinate of a Tile.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the left.
-     */
-    public boolean isMapNearLeft(int x, int y) {
-        return (x < getLeftColumns(y));
-    }
-
-
-    /**
-     * Returns 'true' if the Tile is near the right.
-     * @param x The x-coordinate of a Tile.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the right.
-     */
-    public boolean isMapNearRight(int x, int y) {
-        return (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y)));
-    }
-
-
-    /**
-     * Returns 'true' if the Tile is near the top.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the top.
-     */
-    public boolean isMapNearTop(int y) {
-        return (y < topRows);
-    }
-
-
-    /**
      * Describe <code>moveTileCursor</code> method here.
      *
      * @param direction a <code>Direction</code> value
@@ -1370,7 +1329,6 @@ public final class MapViewer {
             logger.warning("selectedTile is null");
         }
     }
-
 
     /**
      * Checks if the Tile/Units at the given coordinates are displayed
@@ -1390,12 +1348,81 @@ public final class MapViewer {
             && tileToCheck.getX() + 2 < rightColumn;
     }
 
+
     /**
      * Describe <code>restartBlinking</code> method here.
      *
      */
     public void restartBlinking() {
         blinkingMarqueeEnabled = true;
+    }
+
+
+    public void scrollMap(Direction direction) {
+
+        try {
+            int x, y;
+            Tile t = getFocus();
+            if (t == null) {
+                return;
+            }
+
+            t = t.getNeighbourOrNull(direction);
+            if (t == null) {
+                return;
+            }
+
+            if (isMapNearTop(t.getY()) && isMapNearTop(getFocus().getY())) {
+                if (t.getY() > getFocus().getY()) {
+                    y = t.getY();
+                    do {
+                        y += 2;
+                    } while (isMapNearTop(y));
+                } else {
+                    y = getFocus().getY();
+                }
+            } else if (isMapNearBottom(t.getY()) && isMapNearBottom(getFocus().getY())) {
+                if (t.getY() < getFocus().getY()) {
+                    y = t.getY();
+                    do {
+                        y -= 2;
+                    } while (isMapNearBottom(y));
+                } else {
+                    y = getFocus().getY();
+                }
+            } else {
+                y = t.getY();
+            }
+
+            if (isMapNearLeft(t.getX(), t.getY())
+                && isMapNearLeft(getFocus().getX(), getFocus().getY())) {
+                if (t.getX() > getFocus().getX()) {
+                    x = t.getX();
+                    do {
+                        x++;
+                    } while (isMapNearLeft(x, y));
+                } else {
+                    x = getFocus().getX();
+                }
+            } else if (isMapNearRight(t.getX(), t.getY())
+                       && isMapNearRight(getFocus().getX(), getFocus().getY())) {
+                if (t.getX() < getFocus().getX()) {
+                    x = t.getX();
+                    do {
+                        x--;
+                    } while (isMapNearRight(x, y));
+                } else {
+                    x = getFocus().getX();
+                }
+            } else {
+                x = t.getX();
+            }
+
+            setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while scrolling!", e);
+        }
+            
     }
 
 
@@ -1470,7 +1497,6 @@ public final class MapViewer {
 
         gui.refresh();
     }
-
 
     /**
     * Sets the focus of the map and repaints the screen immediately.
@@ -1609,6 +1635,7 @@ public final class MapViewer {
         return ret;
     }
 
+
     /**
      * Describe <code>setSize</code> method here.
      *
@@ -1644,7 +1671,6 @@ public final class MapViewer {
     }
 
 
-
     /**
     * Starts a goto operation on the mapboard.
     */
@@ -1674,6 +1700,7 @@ public final class MapViewer {
     }
 
 
+
     /**
     * Sets the path of the active unit to display it.
     */
@@ -1687,7 +1714,6 @@ public final class MapViewer {
             ? null // Do nothing, unit has arrived
             : activeUnit.findPath(activeUnit.getDestination().getTile());
     }
-
 
     /**
      * Change the scale of the map by delta.
@@ -1779,6 +1805,7 @@ public final class MapViewer {
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
+
     /**
      * Creates an Image that shows the given text centred on a
      * translucent rounded rectangle with the given color.
@@ -1794,7 +1821,6 @@ public final class MapViewer {
         specs[0] = new TextSpecification(text, font);
         return createLabel(g, specs, backgroundColor);
     }
-
 
 
     /**
@@ -1847,6 +1873,7 @@ public final class MapViewer {
         }
         return bi;
     }
+
 
     /**
      * Draws a cross indicating a religious mission is present in the native village.
@@ -1903,7 +1930,6 @@ public final class MapViewer {
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
     }
-
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -1978,6 +2004,8 @@ public final class MapViewer {
             }
         }
     }
+
+
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -2055,6 +2083,7 @@ public final class MapViewer {
             }
         }
     }
+
 
     /**
      * Displays the Map onto the given Graphics2D object. The Tile at
@@ -2603,7 +2632,6 @@ public final class MapViewer {
         }
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
@@ -2632,7 +2660,6 @@ public final class MapViewer {
             displayOptionalValues(g, tile);
         }
     }
-
 
     /**
      * Displays the given Unit onto the given Graphics2D object at the
@@ -2712,7 +2739,6 @@ public final class MapViewer {
         }
     }
 
-
     /**
      * Describe <code>drawCursor</code> method here.
      *
@@ -2721,6 +2747,7 @@ public final class MapViewer {
     private void drawCursor(Graphics2D g) {
         g.drawImage(cursorImage, 0, 0, null);
     }
+
 
     /**
      * Draws the given TileItem on the given Tile.
@@ -2825,6 +2852,7 @@ public final class MapViewer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
+
     /**
      * Describe <code>enterUnitOutForAnimation</code> method here.
      *
@@ -2871,6 +2899,7 @@ public final class MapViewer {
         }
     }
 
+
     /**
      * Returns the amount of columns that are to the left of the Tile
      * that is displayed in the center of the Map.
@@ -2880,8 +2909,6 @@ public final class MapViewer {
     private int getLeftColumns() {
         return getLeftColumns(focus.getY());
     }
-
-
 
     /**
      * Returns the amount of columns that are to the left of the Tile
@@ -2925,6 +2952,8 @@ public final class MapViewer {
     private int getMessageCount() {
         return messages.size();
     }
+
+
 
     /**
      * Returns the amount of columns that are to the right of the Tile
@@ -2993,7 +3022,6 @@ public final class MapViewer {
         return new Point(unitX, unitY);
     }
 
-
     /**
     * Gets the unit that should be displayed on the given tile.
     *
@@ -3038,7 +3066,6 @@ public final class MapViewer {
         }
     }
 
-
     /**
      * Draw the unit's image and occupation indicator in one JLabel object.
      * @param unit The unit to be drawn
@@ -3059,6 +3086,47 @@ public final class MapViewer {
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
         return label;
+    }
+
+    /**
+     * Returns 'true' if the Tile is near the bottom.
+     * @param y The y-coordinate of a Tile.
+     * @return 'true' if the Tile is near the bottom.
+     */
+    private boolean isMapNearBottom(int y) {
+        return (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows));
+    }
+
+
+    /**
+     * Returns 'true' if the Tile is near the left.
+     * @param x The x-coordinate of a Tile.
+     * @param y The y-coordinate of a Tile.
+     * @return 'true' if the Tile is near the left.
+     */
+    private boolean isMapNearLeft(int x, int y) {
+        return (x < getLeftColumns(y));
+    }
+
+
+    /**
+     * Returns 'true' if the Tile is near the right.
+     * @param x The x-coordinate of a Tile.
+     * @param y The y-coordinate of a Tile.
+     * @return 'true' if the Tile is near the right.
+     */
+    private boolean isMapNearRight(int x, int y) {
+        return (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y)));
+    }
+
+
+    /**
+     * Returns 'true' if the Tile is near the top.
+     * @param y The y-coordinate of a Tile.
+     * @return 'true' if the Tile is near the top.
+     */
+    private boolean isMapNearTop(int y) {
+        return (y < topRows);
     }
 
 
@@ -3183,7 +3251,6 @@ public final class MapViewer {
         }
     }
 
-
     /**
      * Position the map so that the supplied location is
      * displayed at the center.
@@ -3278,14 +3345,14 @@ public final class MapViewer {
         }
     }
 
+
+
     private void redrawMapControls() {
         MapControls mapControls = gui.getCanvas().getMapControls();
         if (mapControls != null) {
             mapControls.update();
         }
     }
-
-
 
     /**
      * Describe <code>releaseUnitOutForAnimation</code> method here.
@@ -3328,6 +3395,7 @@ public final class MapViewer {
 
         return result;
     }
+
 
     private void repositionMapIfNeeded() {
         if (bottomRow < 0 && focus != null)
@@ -3412,7 +3480,6 @@ public final class MapViewer {
         updateMapDisplayVariables();
     }
 
-
     /**
      * Describe <code>updateMapDisplayVariables</code> method here.
      *
@@ -3428,73 +3495,6 @@ public final class MapViewer {
         bottomRows = topRows;
         leftSpace = (size.width - tileWidth) / 2;
         rightSpace = leftSpace;
-    }
-
-    public void scrollMap(Direction direction) {
-
-        try {
-            int x, y;
-            Tile t = getFocus();
-            if (t == null) {
-                return;
-            }
-
-            t = t.getNeighbourOrNull(direction);
-            if (t == null) {
-                return;
-            }
-
-            if (isMapNearTop(t.getY()) && isMapNearTop(getFocus().getY())) {
-                if (t.getY() > getFocus().getY()) {
-                    y = t.getY();
-                    do {
-                        y += 2;
-                    } while (isMapNearTop(y));
-                } else {
-                    y = getFocus().getY();
-                }
-            } else if (isMapNearBottom(t.getY()) && isMapNearBottom(getFocus().getY())) {
-                if (t.getY() < getFocus().getY()) {
-                    y = t.getY();
-                    do {
-                        y -= 2;
-                    } while (isMapNearBottom(y));
-                } else {
-                    y = getFocus().getY();
-                }
-            } else {
-                y = t.getY();
-            }
-
-            if (isMapNearLeft(t.getX(), t.getY())
-                && isMapNearLeft(getFocus().getX(), getFocus().getY())) {
-                if (t.getX() > getFocus().getX()) {
-                    x = t.getX();
-                    do {
-                        x++;
-                    } while (isMapNearLeft(x, y));
-                } else {
-                    x = getFocus().getX();
-                }
-            } else if (isMapNearRight(t.getX(), t.getY())
-                       && isMapNearRight(getFocus().getX(), getFocus().getY())) {
-                if (t.getX() < getFocus().getX()) {
-                    x = t.getX();
-                    do {
-                        x--;
-                    } while (isMapNearRight(x, y));
-                } else {
-                    x = getFocus().getX();
-                }
-            } else {
-                x = t.getX();
-            }
-
-            setFocus(freeColClient.getGame().getMap().getTile(x,y));
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while scrolling!", e);
-        }
-            
     }
 
 
