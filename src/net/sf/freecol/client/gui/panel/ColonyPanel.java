@@ -52,7 +52,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
 import javax.swing.JViewport;
@@ -67,6 +69,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -90,7 +93,6 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
-
 
 /**
  * This is a panel for the Colony display. It shows the units that are working
@@ -120,7 +122,8 @@ public final class ColonyPanel extends FreeColPanel
         UNLOAD = 2,
         WAREHOUSE = 4,
         FILL = 5,
-        SETGOODS = 6;
+        COLONY_UNITS = 6,
+        SETGOODS = 7;
 
     private final JPanel netProductionPanel = new JPanel();
     private final PopulationPanel populationPanel = new PopulationPanel();
@@ -159,14 +162,14 @@ public final class ColonyPanel extends FreeColPanel
 
     private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
 
+    private JButton colonyUnitsButton = new JButton(Messages.message("Colony Units"));
+
     private JButton setGoodsButton = (FreeCol.isInDebugMode())
         ? new JButton("Set Goods") : null;
 
-
-
     /**
      * The constructor for the panel.
-     * @param freeColClient 
+     * @param freeColClient
      *
      * @param parent The parent of this panel
      */
@@ -190,6 +193,21 @@ public final class ColonyPanel extends FreeColPanel
         fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false), "pressed");
         fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true), "released");
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
+
+        InputMap warehouseInputMap = new ComponentInputMap(warehouseButton);
+        warehouseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "pressed");
+        warehouseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(warehouseButton, JComponent.WHEN_IN_FOCUSED_WINDOW, warehouseInputMap);
+
+        InputMap buildQueueInputMap = new ComponentInputMap(buildQueueButton);
+        buildQueueInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0, false), "pressed");
+        buildQueueInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(buildQueueButton, JComponent.WHEN_IN_FOCUSED_WINDOW, buildQueueInputMap);
+
+        InputMap colonyUnitsInputMap = new ComponentInputMap(colonyUnitsButton);
+        colonyUnitsInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false), "pressed");
+        colonyUnitsInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(colonyUnitsButton, JComponent.WHEN_IN_FOCUSED_WINDOW, colonyUnitsInputMap);
 
         netProductionPanel.setOpaque(false);
 
@@ -284,6 +302,10 @@ public final class ColonyPanel extends FreeColPanel
         enterPressesWhenFocused(buildQueueButton);
         buildQueueButton.addActionListener(this);
 
+        colonyUnitsButton.setActionCommand(String.valueOf(COLONY_UNITS));
+        enterPressesWhenFocused(colonyUnitsButton);
+        colonyUnitsButton.addActionListener(this);
+
         if (setGoodsButton != null) {
             setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
             enterPressesWhenFocused(setGoodsButton);
@@ -310,11 +332,12 @@ public final class ColonyPanel extends FreeColPanel
         add(outsideColonyScroll, "grow, sg, height 60:121:");
         add(warehouseScroll, "span, height 40:60:, growx");
         add(unloadButton, "span, split "
-            + Integer.toString((setGoodsButton == null) ? 5 : 6)
+            + Integer.toString((setGoodsButton == null) ? 6 : 7)
             + ", align center");
         add(fillButton);
         add(warehouseButton);
         add(buildQueueButton);
+        add(colonyUnitsButton);
         if (setGoodsButton != null) add(setGoodsButton);
         add(okButton, "tag ok");
 
@@ -438,6 +461,9 @@ public final class ColonyPanel extends FreeColPanel
                 case FILL:
                     fill();
                     break;
+                case COLONY_UNITS:
+                	generateColonyUnitsMenu();
+                	break;
                 case SETGOODS:
                     debugSetGoods(colony);
                     break;
@@ -654,6 +680,7 @@ public final class ColonyPanel extends FreeColPanel
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
         warehouseButton.setEnabled(isEditable());
+        colonyUnitsButton.setEnabled(isEditable());
         nameBox.setEnabled(isEditable());
 
         // update all the subpanels
@@ -720,6 +747,113 @@ public final class ColonyPanel extends FreeColPanel
         }
     }
 
+    /**
+     * Generates a menu containing the units currently accessible
+     * from the Colony Panel allowing keyboard access to said units.
+     */
+    private void generateColonyUnitsMenu()
+    {
+        JPopupMenu colonyUnitsMenu = new JPopupMenu("Colony Units");
+        ImageLibrary imageLibrary = super.getLibrary();
+        ImageIcon unitIcon = null;
+        final QuickActionMenu unitMenu = new QuickActionMenu(getFreeColClient(), getGUI(), this);
+        Tile colonyTile = colony.getTile();
+        int unitNumber = 0;
+        JMenuItem subMenu = null;
+
+        for(final Unit unit : colony.getUnitList())
+        {
+            ColonyTile workingOnLand = unit.getWorkTile();
+            if(workingOnLand != null){
+                GoodsType goodsType = unit.getWorkType();
+                int producing = workingOnLand.getProductionOf(unit, goodsType);
+                unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
+                String menuTitle = new String(Messages.message(unit.getLabel()) + " Producing: " + producing + " " +
+                                              Messages.message(goodsType.getId() + ".name"));
+                subMenu = new JMenuItem(menuTitle, unitIcon);
+  	            subMenu.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                    }
+                });
+                unitNumber++;
+                colonyUnitsMenu.add(subMenu);
+            }else{
+                Building workingInBuilding = unit.getWorkLocation();
+                if(workingInBuilding != null){
+                    GoodsType goodsType = unit.getWorkType();
+                    int producing = workingInBuilding.getProductionOf(unit, workingInBuilding.getGoodsOutputType());
+                    unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
+                    String menuTitle = new String(Messages.message(unit.getLabel()) + " Producing: " + producing + " " +
+                                                  Messages.message(goodsType.getId() + ".name"));
+                    subMenu = new JMenuItem(menuTitle, unitIcon);
+                    subMenu.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                            unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        }
+                    });
+                    unitNumber++;
+                    colonyUnitsMenu.add(subMenu);
+                }
+            }
+        }
+        colonyUnitsMenu.addSeparator();
+        for (final Unit unit : colonyTile.getUnitList()) {
+            if(unit.isCarrier()){
+                unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
+                String menuTitle = new String(Messages.message(unit.getLabel()) + " In Port");
+                subMenu = new JMenuItem(menuTitle, unitIcon);
+                subMenu.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                    }
+                });
+                unitNumber++;
+                colonyUnitsMenu.add(subMenu);
+                if(unit.getUnitList() != null){
+                    for(final Unit innerUnit : unit.getUnitList()){
+                        unitIcon = imageLibrary.getUnitImageIcon(innerUnit, 0.5);
+                        menuTitle = new String(Messages.message(innerUnit.getLabel()) + " Cargo On " + Messages.message(unit.getLabel()));
+                        subMenu = new JMenuItem(menuTitle, unitIcon);
+                        subMenu.addActionListener(new ActionListener() {
+    	                   public void actionPerformed(ActionEvent e) {
+                                unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), innerUnit, getGUI()));
+                                unitMenu.show(getGUI().getCanvas(), 0, 0);
+                            }
+                        });
+                        unitNumber++;
+                        colonyUnitsMenu.add(subMenu);
+                    }
+                }
+            }else if(!unit.isOnCarrier()){
+                unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
+                String menuTitle = new String(Messages.message(unit.getLabel()) + " Outside of Colony");
+                subMenu = new JMenuItem(menuTitle, unitIcon);
+                subMenu.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        }
+                });
+                unitNumber++;
+                colonyUnitsMenu.add(subMenu);
+            }
+        }
+        colonyUnitsMenu.addSeparator();
+        if (colonyUnitsMenu != null) {
+            int elements = colonyUnitsMenu.getSubElements().length;
+            if (elements > 0) {
+                int lastIndex = colonyUnitsMenu.getComponentCount() - 1;
+                if (colonyUnitsMenu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
+                    colonyUnitsMenu.remove(lastIndex);
+                }
+            }
+        }
+        colonyUnitsMenu.show(getGUI().getCanvas(), 0, 0);
+    }
     /**
      * Add property change listeners needed by this ColonyPanel.
      */
@@ -1350,7 +1484,7 @@ public final class ColonyPanel extends FreeColPanel
 
         /**
          * Creates this TilePanel.
-         * @param freeColClient 
+         * @param freeColClient
          *
          * @param colonyPanel The panel that holds this TilePanel.
          */
