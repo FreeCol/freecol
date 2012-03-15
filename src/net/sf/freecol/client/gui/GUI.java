@@ -66,6 +66,8 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.MapSize;
+import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.FreeColObject;
@@ -1118,6 +1120,14 @@ public class GUI {
         CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
+    }
+
+    public Parameters showParametersDialog() {
+        return canvas.showParametersDialog(); 
+    }
+
+    public MapSize showScaleMapSizeDialog() {
+        return canvas.showScaleMapSizeDialog();
     }
 
 
