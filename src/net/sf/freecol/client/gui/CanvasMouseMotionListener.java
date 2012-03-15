@@ -23,16 +23,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
-public final class CanvasMouseMotionListener implements MouseMotionListener {
+public final class CanvasMouseMotionListener extends AbstractCanvasListener implements MouseMotionListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
 
@@ -40,18 +38,6 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     // dragging units.
     private Tile lastTile;
     
-    private final MapViewer mapViewer;
-
-    private ScrollThread scrollThread;
-
-    private FreeColClient freeColClient;
-
-    // private static final int SCROLLSPACE = 3;
-    private static final int DRAG_SCROLLSPACE = 100;
-
-	private static final int AUTO_SCROLLSPACE = 1;
-
-
     /**
      * The constructor to use.
      *
@@ -61,9 +47,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      *            GUI).
      */
     public CanvasMouseMotionListener(FreeColClient freeColClient, MapViewer mapViewer) {
-        this.freeColClient = freeColClient;
-        this.mapViewer = mapViewer;
-        this.scrollThread = null;
+        super(freeColClient, mapViewer);
     }
 
     /**
@@ -73,14 +57,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      */
     public void mouseMoved(MouseEvent e) {
 
-    	if (e.getComponent().isEnabled()
-          && freeColClient.getClientOptions()
-          .getBoolean(ClientOptions.AUTO_SCROLL)) {
-				auto_scroll(e.getX(), e.getY());
-        } else if (scrollThread != null) {
-            scrollThread.stopScrolling();
-            scrollThread = null;
-        }
+    	performAutoScrollIfActive(e);
 
         if (mapViewer.isGotoStarted()) {
             if (mapViewer.getActiveUnit() == null) {
@@ -104,21 +81,14 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         }
     }
 
-	/**
+    /**
      * Invoked when the mouse has been dragged.
      *
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
 
-        if (e.getComponent().isEnabled()
-            && freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
-				drag_scroll(e.getX(), e.getY());
-        } else if (scrollThread != null) {
-            scrollThread.stopScrolling();
-            scrollThread = null;
-        }
+        performDragScrollIfActive(e);
 
         Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
         if (tile != null &&
@@ -143,68 +113,6 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             }
         }
     }
-
-	private void auto_scroll(int x, int y){
-		scroll(x, y, AUTO_SCROLLSPACE);
-	}
-
-	private void drag_scroll(int x, int y){
-		scroll(x, y, DRAG_SCROLLSPACE);
-	}
-
-	private void scroll(int x, int y, int scrollspace) {
-
-		/*
-         * if (y < canvas.getMenuBarHeight()) { if (scrollThread != null) {
-         * scrollThread.stopScrolling(); scrollThread = null; } return; } else
-         * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
-         * canvas.getMenuBarHeight(); }
-         */
-
-		Direction direction;
-        if ((x < scrollspace) && (y < scrollspace)) {
-            // Upper-Left
-            direction = Direction.NW;
-        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y < scrollspace)) {
-            // Upper-Right
-            direction = Direction.NE;
-        } else if ((x >= mapViewer.getWidth() - scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
-            // Bottom-Right
-            direction = Direction.SE;
-        } else if ((x < scrollspace) && (y >= mapViewer.getHeight() - scrollspace)) {
-            // Bottom-Left
-            direction = Direction.SW;
-        } else if (y < scrollspace) {
-            // Top
-            direction = Direction.N;
-        } else if (x >= mapViewer.getWidth() - scrollspace) {
-            // Right
-            direction = Direction.E;
-        } else if (y >= mapViewer.getHeight() - scrollspace) {
-            // Bottom
-            direction = Direction.S;
-        } else if (x < scrollspace) {
-            // Left
-            direction = Direction.W;
-        } else {
-            // Center
-            if (scrollThread != null) {
-                scrollThread.stopScrolling();
-                scrollThread = null;
-            }
-            return;
-        }
-
-        if (scrollThread != null) {
-            // continue scrolling in a (perhaps new) direction
-            scrollThread.setDirection(direction);
-        } else {
-            // start scrolling in a direction
-            scrollThread = new ScrollThread(mapViewer);
-            scrollThread.setDirection(direction);
-            scrollThread.start();
-        }
-	}
 
  
 }
