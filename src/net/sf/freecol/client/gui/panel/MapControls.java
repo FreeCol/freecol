@@ -59,15 +59,14 @@ public abstract class MapControls {
     public static final int MAP_HEIGHT = 128;
     public static final int GAP = 4;
 
-    private final FreeColClient freeColClient;
+    protected final FreeColClient freeColClient;
 
-    private final InfoPanel infoPanel;
-    private final MiniMap miniMap;
-    private final UnitButton miniMapZoomOutButton;
-    private final UnitButton miniMapZoomInButton;
-    private final List<UnitButton> unitButtons;
+    protected final InfoPanel infoPanel;
+    protected final MiniMap miniMap;
+    protected final UnitButton miniMapZoomOutButton;
+    protected final UnitButton miniMapZoomInButton;
+    protected final List<UnitButton> unitButtons;
 
-    private boolean useSkin = true;
 
     private GUI gui;
 
@@ -121,75 +120,20 @@ public abstract class MapControls {
     }
 
     /**
-     * Returns the <code>miniMapZoomOutButton</code>.
-     *
-     * @return an <code>UnitButton</code> value
-     */
-    public UnitButton getMiniMapZoomOutButton() {
-        return miniMapZoomOutButton;
-    }
-
-    /**
-     * Returns the <code>miniMapZoomInButton</code>.
-     *
-     * @return an <code>UnitButton</code> value
-     */
-    public UnitButton getMiniMapZoomInButton() {
-        return miniMapZoomInButton;
-    }
-
-    /**
-     * Returns the mini map.
-     *
-     * @return a <code>MiniMap</code> value
-     */
-    public MiniMap getMiniMap() {
-        return miniMap;
-    }
-
-    /**
-     * Returns the info panel.
-     *
-     * @return an <code>InfoPanel</code> value
-     */
-    public InfoPanel getInfoPanel() {
-        return infoPanel;
-    }
-
-    /**
-     * Returns a list of unit buttons.
-     *
-     * @return an <code>List</code> value
-     */
-    public List<UnitButton> getUnitButtons() {
-        return unitButtons;
-    }
-
-    /**
-     * Returns the FreeColClient.
-     *
-     * @return a <code>FreeColClient</code> value
-     */
-    public FreeColClient getFreeColClient() {
-        return freeColClient;
-    }
-
-    /**
-     * Updates this <code>InfoPanel</code>.
-     *
-     * @param mapTransform The current MapTransform.
-     */
-    public void update(MapTransform mapTransform) {
-        if (infoPanel != null) {
-            infoPanel.update(mapTransform);
-        }
-    }
-
-    /**
      * Adds the map controls to the given component.
      * @param component The component to add the map controls to.
      */
     public abstract void addToComponent(Canvas component);
+
+    public boolean canZoomInMapControls() {
+        return miniMap != null && miniMap.canZoomIn();
+    }
+
+    public boolean canZoomOutMapControls() {
+        return miniMap != null && miniMap.canZoomOut();
+    }
+
+    public abstract boolean isShowing();
 
     /**
      * Removes the map controls from the parent canvas component.
@@ -198,8 +142,8 @@ public abstract class MapControls {
      */
     public abstract void removeFromComponent(Canvas canvas);
 
-    public abstract boolean isShowing();
-
+    public abstract void repaint();
+    
     /**
      * Updates this <code>MapControls</code>.
      */
@@ -220,6 +164,25 @@ public abstract class MapControls {
         }
     }
 
-    public abstract void repaint();
+    /**
+     * Updates this <code>InfoPanel</code>.
+     *
+     * @param mapTransform The current MapTransform.
+     */
+    public void update(MapTransform mapTransform) {
+        if (infoPanel != null) {
+            infoPanel.update(mapTransform);
+        }
+    }
+    
+    public void zoomIn() {
+        miniMap.zoomIn();
+        repaint();
+    }
+
+    public void zoomOut() {
+        miniMap.zoomOut();
+        repaint();
+    }
 
 }

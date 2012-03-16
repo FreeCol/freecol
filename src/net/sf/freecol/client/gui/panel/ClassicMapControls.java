@@ -60,12 +60,11 @@ public final class ClassicMapControls extends MapControls {
 
         panel = new JPanel(new MigLayout("wrap 3"));
 
-        MiniMap miniMap = getMiniMap();
         panel.add(miniMap, "span, width " + MAP_WIDTH
                   + ", height " + MAP_HEIGHT);
 
-        panel.add(getMiniMapZoomInButton(), "newline 10");
-        panel.add(getMiniMapZoomOutButton(), "skip");
+        panel.add(miniMapZoomInButton, "newline 10");
+        panel.add(miniMapZoomOutButton, "skip");
 
         panel.add(makeButton("NW", "\u2196"), "newline 20");
         panel.add(makeButton("N",  "\u2191"));
@@ -76,24 +75,12 @@ public final class ClassicMapControls extends MapControls {
         panel.add(makeButton("S",  "\u2193"));
         panel.add(makeButton("SE", "\u2198"), "wrap 20");
 
-        for (UnitButton button : getUnitButtons()) {
+        for (UnitButton button : unitButtons) {
             panel.add(button);
         }
 
-        InfoPanel infoPanel = getInfoPanel();
         panel.add(infoPanel, "newline push, span, width " + infoPanel.getWidth()
                   + ", height " + infoPanel.getHeight());
-    }
-
-    private JButton makeButton(String direction, String arrow) {
-        JButton button = new JButton(am.getFreeColAction("moveAction." + direction));
-        button.setFont(arrowFont);
-        button.setText(arrow);
-        return button;
-    }
-
-    public boolean isShowing() {
-        return panel.getParent() != null;
     }
 
     /**
@@ -101,14 +88,18 @@ public final class ClassicMapControls extends MapControls {
      * @param component The component to add the map controls to.
      */
     public void addToComponent(Canvas component) {
-        if (getFreeColClient().getGame() == null
-            || getFreeColClient().getGame().getMap() == null) {
+        if (freeColClient.getGame() == null
+            || freeColClient.getGame().getMap() == null) {
             return;
         }
         int width = (int) panel.getPreferredSize().getWidth();
         panel.setSize(width, component.getHeight());
         panel.setLocation(component.getWidth() - width, 0);
         component.addToCanvas(panel, CONTROLS_LAYER);
+    }
+
+    public boolean isShowing() {
+        return panel.getParent() != null;
     }
 
     /**
@@ -122,6 +113,13 @@ public final class ClassicMapControls extends MapControls {
 
     public void repaint() {
         panel.repaint();
+    }
+
+    private JButton makeButton(String direction, String arrow) {
+        JButton button = new JButton(am.getFreeColAction("moveAction." + direction));
+        button.setFont(arrowFont);
+        button.setText(arrow);
+        return button;
     }
 
 }

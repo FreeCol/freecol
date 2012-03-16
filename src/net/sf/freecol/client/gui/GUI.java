@@ -1169,25 +1169,19 @@ public class GUI {
     
 
     public void zoomInMapControls() {
-        mapControls.getMiniMap().zoomIn();
-        mapControls.repaint();
+        mapControls.zoomIn();
     }
     
     public void zoomOutMapControls() {
-        mapControls.getMiniMap().zoomOut();
-        mapControls.repaint();
+        mapControls.zoomOut();
     }
     
     public boolean canZoomInMapControls() {
-        return mapControls != null
-        && mapControls.getMiniMap() != null
-        && mapControls.getMiniMap().canZoomIn();
+        return mapControls != null && mapControls.canZoomInMapControls();
     }
 
     public boolean canZoomOutMapControls() {
-        return mapControls != null
-        && mapControls.getMiniMap() != null
-        && mapControls.getMiniMap().canZoomOut();
+        return mapControls != null && mapControls.canZoomOutMapControls();
     }
     
 }
