@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -87,10 +86,7 @@ public class UnloadAction extends MapboardAction {
         Unit carrier = getUnit();
         if (carrier != null) {
             getFreeColClient().getInGameController().unload(carrier);
-            MapControls controls
-                = ((MapControlsAction) getFreeColClient().getActionManager()
-                   .getFreeColAction(MapControlsAction.id)).getMapControls();
-            if (controls != null) controls.update();
+            gui.updateMapControls();
         }
     }
 }

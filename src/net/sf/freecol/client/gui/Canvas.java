@@ -51,7 +51,6 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
@@ -305,9 +304,6 @@ public final class Canvas extends JDesktopPane {
 
 
     private boolean clientOptionsDialogShowing = false;
-
-    private MapControls mapControls;
-
     /**
      * Variable used for detecting resizing.
      */
@@ -502,14 +498,6 @@ public final class Canvas extends JDesktopPane {
         return loadingSavegameDialog;
     }
 
-    /**
-     * Returns the MapControls of this Canvas.
-     *
-     * @return a <code>MapControls</code> value
-     */
-    public MapControls getMapControls() {
-        return mapControls;
-    }
 
     @Override
     public Dimension getMinimumSize() {
@@ -1377,7 +1365,6 @@ public final class Canvas extends JDesktopPane {
         
         JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient, gui), true, PopupPosition.CENTERED);
         f.setLocation(f.getX(), 50);
-
         repaint();    
         
     }
@@ -2013,13 +2000,10 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
         if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
-            MapControlsAction mca = (MapControlsAction) freeColClient
-                .getActionManager().getFreeColAction(MapControlsAction.id);
-            MapControls mc = mca.getMapControls();
+            MapControls mc = gui.getMapControls();
             if (mc != null && mc.isShowing()) {
                 mc.removeFromComponent(this);
                 mc.addToComponent(this);
-                mapControls = mc;
             }
             mapViewer.setSize(getSize());
             mapViewer.forceReposition();

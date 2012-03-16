@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -79,11 +78,8 @@ public final class ClientOptionsDialog extends OptionsDialog  {
                 getFreeColClient().getActionManager().update();
                 getGUI().resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
-                MapControlsAction mca = (MapControlsAction) getFreeColClient()
-                    .getActionManager().getFreeColAction(MapControlsAction.id);
-                if (mca.getMapControls() != null) {
-                    mca.getMapControls().update();
-                }
+                
+                getGUI().updateMapControls();
             } catch(FileNotFoundException e) {
                 logger.warning(e.toString());
                 StringTemplate t = StringTemplate.template("failedToSave")

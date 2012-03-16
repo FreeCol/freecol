@@ -44,8 +44,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -66,7 +66,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.InfoPanel;
-import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -1479,7 +1478,7 @@ public final class MapViewer {
         } else {
             freeColClient.getActionManager().update();
             gui.updateMenuBar();
-            redrawMapControls();
+            gui.updateMapControls();
         }
         return ret;
     }
@@ -1616,7 +1615,7 @@ public final class MapViewer {
         freeColClient.getActionManager().update();
         gui.updateMenuBar();
 
-        redrawMapControls();
+        gui.updateMapControls();
 
         // Check for refocus
         if (!onScreen(selectedTile) || freeColClient.getClientOptions()
@@ -3345,14 +3344,6 @@ public final class MapViewer {
         }
     }
 
-
-
-    private void redrawMapControls() {
-        MapControls mapControls = gui.getCanvas().getMapControls();
-        if (mapControls != null) {
-            mapControls.update();
-        }
-    }
 
     /**
      * Describe <code>releaseUnitOutForAnimation</code> method here.

@@ -63,12 +63,8 @@ public class MiniMapZoomOutAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
-            .getFreeColAction(MapControlsAction.id);
         return super.shouldBeEnabled()
-            && mca.getMapControls() != null
-            && mca.getMapControls().getMiniMap() != null
-            && mca.getMapControls().getMiniMap().canZoomOut();
+            && gui.canZoomOutMapControls();
     }
 
     /**
@@ -76,10 +72,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager()
-            .getFreeColAction(MapControlsAction.id);
-        mca.getMapControls().getMiniMap().zoomOut();
-        mca.getMapControls().repaint();
+        gui.zoomOutMapControls();
         update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id).update();
         getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomInAction.id + ".secondary").update();

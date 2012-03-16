@@ -62,9 +62,11 @@ import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapSize;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
@@ -131,6 +133,8 @@ public class GUI {
     private Canvas canvas;
 
     private MapViewer mapViewer;
+    
+    private MapControls mapControls;
 
     /**
      * This is the MapViewer instance used to paint the colony tiles in the
@@ -1118,5 +1122,66 @@ public class GUI {
         return canvas.showScaleMapSizeDialog();
     }
 
+    
 
+    public void showMapControls(boolean value) {
+        if (value && freeColClient.isInGame()) {
+            if (mapControls == null) {
+                try {
+                    String className = freeColClient.getClientOptions()
+                        .getString(ClientOptions.MAP_CONTROLS);
+                    Class<?> controls = Class.forName("net.sf.freecol.client.gui.panel." + className);
+                    mapControls = (MapControls) controls.getConstructor(FreeColClient.class, GUI.class)
+                        .newInstance(freeColClient, this);
+                } catch(Exception e) {
+                    mapControls = new CornerMapControls(freeColClient, this);
+                }
+            }
+            mapControls.update();
+        }
+        if (mapControls != null) {
+            if (value) {
+                if (!mapControls.isShowing()) {
+                    mapControls.addToComponent(canvas);
+                }
+                mapControls.update();
+            } else {
+                if (mapControls.isShowing()) {
+                    mapControls.removeFromComponent(canvas);
+                }
+            }
+        }
+    }
+
+    public MapControls getMapControls() {
+        return mapControls;
+    }
+    
+    public void updateMapControls() {
+        if (mapControls != null) 
+            mapControls.update();
+    }
+
+    public void zoomInMapControls() {
+        mapControls.getMiniMap().zoomIn();
+        mapControls.repaint();
+    }
+    
+    public void zoomOutMapControls() {
+        mapControls.getMiniMap().zoomOut();
+        mapControls.repaint();
+    }
+    
+    public boolean canZoomInMapControls() {
+        return mapControls != null
+        && mapControls.getMiniMap() != null
+        && mapControls.getMiniMap().canZoomIn();
+    }
+
+    public boolean canZoomOutMapControls() {
+        return mapControls != null
+        && mapControls.getMiniMap() != null
+        && mapControls.getMiniMap().canZoomOut();
+    }
+    
 }

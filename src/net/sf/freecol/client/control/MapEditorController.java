@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.client.gui.panel.MiniMap;
@@ -123,11 +122,7 @@ public final class MapEditorController {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager()
-                                .getFreeColAction(MapControlsAction.id);
-        if (mca.getMapControls() != null) {
-            mca.getMapControls().update(mt);
-        }
+        gui.updateMapControls();
     }
 
     /**

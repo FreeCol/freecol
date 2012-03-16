@@ -26,19 +26,15 @@ import javax.swing.AbstractButton;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.CornerMapControls;
 
 /**
  * An action for displaying the map controls.
  *
- * @see MapControls
  */
 public class MapControlsAction extends SelectableAction {
 
     public static final String id = "mapControlsAction";
 
-    private MapControls mapControls;
 
 
     /**
@@ -58,16 +54,7 @@ public class MapControlsAction extends SelectableAction {
     public void update() {
         super.update();
 
-        showMapControls(enabled && isSelected());
-    }
-
-    /**
-     * Returns The MapControls object.
-     *
-     * @return The MapControls object.
-     */
-    public MapControls getMapControls() {
-        return mapControls;
+        gui.showMapControls((enabled && isSelected()));
     }
 
     /**
@@ -78,35 +65,6 @@ public class MapControlsAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
         updateOption(selected);
-        showMapControls(enabled && selected);
-    }
-
-    private void showMapControls(boolean value) {
-        if (value && getFreeColClient().isInGame()) {
-            if (mapControls == null) {
-                try {
-                    String className = freeColClient.getClientOptions()
-                        .getString(ClientOptions.MAP_CONTROLS);
-                    Class<?> controls = Class.forName("net.sf.freecol.client.gui.panel." + className);
-                    mapControls = (MapControls) controls.getConstructor(FreeColClient.class, GUI.class)
-                        .newInstance(getFreeColClient(), gui);
-                } catch(Exception e) {
-                    mapControls = new CornerMapControls(getFreeColClient(), gui);
-                }
-            }
-            mapControls.update();
-        }
-        if (mapControls != null) {
-            if (value) {
-                if (!mapControls.isShowing()) {
-                    mapControls.addToComponent(gui.getCanvas());
-                }
-                mapControls.update();
-            } else {
-                if (mapControls.isShowing()) {
-                    mapControls.removeFromComponent(gui.getCanvas());
-                }
-            }
-        }
+        gui.showMapControls((enabled && selected));
     }
 }
