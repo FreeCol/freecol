@@ -48,8 +48,10 @@ import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
+
 
 
 /**
@@ -126,12 +128,12 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Convenience accessor for the unit/player PRNG.
+     * Convenience accessor for the owning AI player.
      *
-     * @return A <code>Random</code> to use.
+     * @return The <code>AIPlayer</code>.
      */
-    protected Random getAIRandom() {
-        return aiUnit.getAIRandom();
+    protected AIPlayer getAIPlayer() {
+        return getAIMain().getAIPlayer(getUnit().getOwner());
     }
 
     /**
@@ -141,6 +143,15 @@ public abstract class Mission extends AIObject {
      */
     protected EuropeanAIPlayer getEuropeanAIPlayer() {
         return (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
+    }
+
+    /**
+     * Convenience accessor for the unit/player PRNG.
+     *
+     * @return A <code>Random</code> to use.
+     */
+    protected Random getAIRandom() {
+        return aiUnit.getAIRandom();
     }
 
     /**
@@ -354,7 +365,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Find the nearest reachable settlement to a unit (owned by the
-     * same player) excepting the any on the current tile.
+     * same player) excepting any on the current tile.
      *
      * @param unit The <code>Unit</code> to check.
      * @return The nearest settlement if any, otherwise null.
@@ -427,6 +438,63 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Gets a standard mission-specific goal decider.
+     *
+     * @param aiUnit The <code>AIUnit</code> searching.
+     * @param type The specific mission class.
+     * @return A standard goal decider for the supplied mission type.
+     */
+    public static GoalDecider getMissionGoalDecider(final AIUnit aiUnit,
+                                                    final Class type) {
+        final AIPlayer aiPlayer = aiUnit.getAIMain()
+            .getAIPlayer(aiUnit.getUnit().getOwner());
+
+        return new GoalDecider() {
+            private int bestValue = -1;
+            private PathNode best = null;
+
+            public PathNode getGoal() { return best; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value = aiPlayer.scoreMission(aiUnit, path, type);
+                if (value > bestValue) {
+                    bestValue = value;
+                    best = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Evaluates a proposed mission type for a unit.
+     *
+     * This works out the basic mission-specific score.  The final
+     * result goes through further refinement in the fooAIPlayer
+     * specialized scoreMission routines.
+     *
+     * TODO: see if we can remove the requirement this routine be
+     * static (trouble is, we are trying to work out what sort of
+     * mission to use, so there is not yet a mission object to call a
+     * method of).  We could use introspection to call a static
+     * scoreTarget routine if it exists...
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param type The mission class.
+     * @return A score representing the desirability of this mission.
+     */
+    public static int scoreTarget(AIUnit aiUnit, PathNode path,
+                                  Class type) {
+        return (type == DefendSettlementMission.class)
+            ? DefendSettlementMission.scoreTarget(aiUnit, path)
+            : (type == UnitSeekAndDestroyMission.class)
+            ? UnitSeekAndDestroyMission.scoreTarget(aiUnit, path)
+            : -1; // NYI
+    }
+
+    /**
      * Should the unit use transport to get to a specified tile?
      *
      * True if:
@@ -459,46 +527,17 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Gets a suitable tile to start path searches from for a unit.
-     *
-     * Must handle all the cases where the unit is off the map, and
-     * take account of the use of a carrier.
-     *
-     * If the unit is in or heading to Europe, return null because there
-     * is no good way to tell where the unit will reappear on the map,
-     * which is in question anyway if not on a carrier.
-     *
-     * @param unit The <code>Unit</code> to check.
-     * @return A suitable starting tile, or null if none found.
-     */
-    protected static Tile getPathStartTile(Unit unit) {
-        Location loc;
-        if (unit.isOnCarrier()) {
-            final Unit carrier = (Unit)unit.getLocation();
-            if (carrier.getTile() != null) {
-                return carrier.getTile();
-            } else if (carrier.getDestination() instanceof Map) {
-                return carrier.getFullEntryLocation();
-            } else if (carrier.getDestination() instanceof Colony) {
-                return ((Colony)carrier.getDestination()).getTile();
-            }
-        } else if (unit.getTile() != null) {
-            return unit.getTile();
-        }
-        // Must be heading to or in Europe.
-        return null;
-    }
-
-    /**
      * Tries to move this mission's unit to a target location.
      *
-     * First check for units in transit: that is units on a carrier that
+     * First check for units in transit, that is units on a carrier that
      * are going to but not yet in Europe, or going to but not yet at
-     * a Tile and whose path still requires the carrier.
+     * a Tile and whose path still requires the carrier.  These need to
+     * be handled by the carrier's TransportMission, not by the unit's
+     * Mission.
      *
-     * Similarly check for units not in transit but should be: that
+     * Similarly check for units not in transit but should be, that
      * is units not on a carrier but can not get to their target
-     * without one.
+     * without one.  These must just wait.
      *
      * If there is no impediment to the unit moving towards the target,
      * do so.  Return an indicative MoveType for the result of the travel.
@@ -508,7 +547,7 @@ public abstract class Mission extends AIObject {
      * - MOVE_ILLEGAL if the unit is unable to proceed for now
      * - MOVE_NO_REPAIR if the unit died for whatever reason
      * - other results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
-     *   occur if the unit proceeded--- such moves require special handling
+     *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
      *   handle them.
      *
@@ -570,8 +609,7 @@ public abstract class Mission extends AIObject {
             return MoveType.MOVE_ILLEGAL;
         } else if (needTransport) {
             logger.finest(logMe + " at " + unit.getLocation()
-                + " needs transport to " + target
-                + ": " + unit);
+                + " needs transport to " + target + ": " + unit);
             return MoveType.MOVE_ILLEGAL;
         }
 

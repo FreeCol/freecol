@@ -25,8 +25,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
@@ -42,6 +45,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
@@ -53,6 +57,8 @@ import org.w3c.dom.Element;
 public class UnitSeekAndDestroyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
+
+    private static final String tag = "AI seek+destroyer";
 
     /**
      * The object we are trying to destroy. This can be a
@@ -70,21 +76,19 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param target The object we are trying to destroy. This can be either a
      *        <code>Settlement</code> or a <code>Unit</code>.
      */
-    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
+    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
+                                     Location target) {
         super(aiMain, aiUnit);
-        this.target = target;
 
-        if (!(target instanceof Ownable)) {
-            logger.warning("!(target instanceof Ownable)");
-            throw new IllegalArgumentException("!(target instanceof Ownable)");
-        }
         if (!(target instanceof Unit || target instanceof Settlement)) {
-            logger.warning("!(target instanceof Unit || target instanceof Settlement)");
-            throw new IllegalArgumentException("!(target instanceof Unit || target instanceof Settlement)");
-
+            throw new IllegalArgumentException("Invalid seek+destroy target: "
+                + target);
         }
+            
+        this.target = target;
+        logger.finest(tag + " begins with target " + target
+            + ": " + aiUnit.getUnit());
     }
-
 
     /**
      * Loads a mission from the given element.
@@ -99,7 +103,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Creates a new <code>UnitSeekAndDestroyMission</code> and reads the given element.
+     * Creates a new <code>UnitSeekAndDestroyMission</code> and reads
+     * the given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -107,188 +112,16 @@ public class UnitSeekAndDestroyMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public UnitSeekAndDestroyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public UnitSeekAndDestroyMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
         readFromXML(in);
     }
 
-
     /**
-    * Performs the mission. This is done by searching for hostile units
-    * that are located within one tile and attacking them. If no such units
-    * are found, then wander in a random direction.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
-    @Override
-	public void doMission(Connection connection) {
-        Unit unit = getUnit();
-
-        if (!isValid()) {
-            return;
-        }
-
-        PathNode pathToTarget = null;
-        if (unit.isOnCarrier()) {
-            if (unit.getTile() != null) {
-                pathToTarget = getDisembarkPath(unit, unit.getTile(), target.getTile(), (Unit) unit.getLocation());
-                if (pathToTarget.getTransportDropNode() != pathToTarget) {
-                    pathToTarget = null;
-                }
-            }
-        } else {
-            if (unit.getTile() != null) {
-                pathToTarget = getUnit().findPath(target.getTile());
-            }
-        }
-
-        if (pathToTarget != null) {
-            Direction direction = moveTowards(pathToTarget);
-            if (direction != null && unit.getMoveType(direction).isAttack()) {
-                Tile newTile = unit.getTile().getNeighbourOrNull(direction);
-                Unit defender = newTile.getDefendingUnit(unit);
-                if (defender == null) {
-                    logger.warning("MoveType is ATTACK, but no defender is present!");
-                } else if (unit.getTile().getSettlement() != null
-                    && unit.getTile().getSettlement().getUnitCount() < 2) {
-                    // Do not risk attacking out of a settlement that
-                    // might collapse.
-                } else {
-                    Player enemy = defender.getOwner();
-                    if (unit.getOwner().atWarWith(enemy)
-                        || enemy.owns((Ownable) target)) {
-                        AIMessage.askAttack(getAIUnit(), direction);
-                    }
-                }
-            }
-        }
-    }
-
-
-    private PathNode getDisembarkPath(Unit unit, Tile start, final Tile end, Unit carrier) {
-        GoalDecider gd = new GoalDecider() {
-            private PathNode goal = null;
-
-            public PathNode getGoal() {
-                return goal;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit u, PathNode pathNode) {
-                goal = pathNode;
-                if (pathNode.getTile().getSettlement() == null) {
-                    for (Direction direction : Direction.values()) {
-                        Tile attackTile = pathNode.getTile().getNeighbourOrNull(direction);
-                        if (attackTile == null) continue;
-                        if (end == attackTile
-                                && attackTile.getSettlement() != null
-                                && pathNode.getTile().isLand()) {
-                            int cost = pathNode.getCost();
-                            int movesLeft = pathNode.getMovesLeft();
-                            int turns = pathNode.getTurns();
-                            goal = new PathNode(attackTile, cost, cost, direction, movesLeft, turns);
-                            goal.previous = pathNode;
-                            return true;
-                        }
-                    }
-                }
-                return pathNode.getTile() == end;
-            }
-        };
-        return unit.search(start, gd,
-                           CostDeciders.avoidSettlementsAndBlockingUnits(),
-                           Integer.MAX_VALUE, carrier);
-    }
-
-    /**
-     * Check to see if this is a valid hostility with a valid target.
-     *
-     * @return True if this mission is valid.
-    */
-    public boolean isValid() {
-        Player owner = getUnit().getOwner();
-        Player targetPlayer;
-
-        return super.isValid()
-            && target != null && !((FreeColGameObject)target).isDisposed()
-            && target.getTile() != null
-            && getUnit().isOffensiveUnit()
-            && !(target instanceof Unit
-                 && target.getTile().getSettlement() != null)
-            && (targetPlayer = ((Ownable)target).getOwner()) != null
-            && targetPlayer != owner
-            && (owner.getStance(targetPlayer) == Stance.WAR
-                || (owner.isIndian()
-                    && owner.getTension(targetPlayer).getLevel()
-                    .compareTo(Tension.Level.CONTENT) >= 0));
-    }
-
-
-    /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link Tile} of the transport
-     * or the target for the entire <code>Transportable</code>'s
-     * mission. The target for the transport is determined by
-     * {@link TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
-     */
-    @Override
-	public Tile getTransportDestination() {
-        if (target == null) {
-            return null;
-        }
-
-        Tile dropTarget = target.getTile();
-        if (getUnit().getTile() == null) {
-            return dropTarget;
-        } else if (getUnit().isOnCarrier()) {
-            PathNode p = getDisembarkPath(getUnit(),
-                    getUnit().getTile(),
-                    target.getTile(),
-                    (Unit) getUnit().getLocation());
-            if (p != null) {
-                dropTarget = p.getTransportDropNode().getTile();
-            }
-        }
-
-        if (getUnit().isOnCarrier()) {
-            return dropTarget;
-        } else if (getUnit().getLocation().getTile() == target) {
-            return null;
-        } else if (getUnit().findPath(target.getTile()) == null) {
-            return dropTarget;
-        } else {
-            return null;
-        }
-    }
-
-
-    /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
-     *
-     * @return The priority.
-     */
-    @Override
-	public int getTransportPriority() {
-        if (getTransportDestination() != null) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else {
-            return 0;
-        }
-    }
-
-
-    /**
-     * Returns the object we are trying to destroy.
+     * Gets the object we are trying to destroy.
      *
      * @return The object which should be destroyed.
-     *      This can be either a <code>Settlement</code>
-     *      or a <code>Unit</code>.
      */
     public Location getTarget() {
         return target;
@@ -296,14 +129,274 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
-     * Sets the object we are trying to destroy.
+     * Is a location a suitable seek-and-destroy target for an AI unit?
      *
-     * @param target The object which should be destroyed.
-     *      This can be either a <code>Settlement</code>
-     *      or a <code>Unit</code>.
+     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
+     * @param target The candidate <code>Settlement</code> or <code>Unit</code>.
+     * @return True if the target is suitable.
      */
-    public void setTarget(Location target) {
-        this.target = target;
+    public static boolean isTarget(AIUnit aiUnit, Location target) {
+        final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
+        Player targetPlayer;
+        return target != null
+            && !((FreeColGameObject)target).isDisposed()
+            && target.getTile() != null
+            && !(target instanceof Settlement && unit.isNaval())
+            && !(target instanceof Unit
+                && (target.getTile().getSettlement() != null
+                    || ((((Unit)target).isNaval() && !target.getTile().isLand())
+                        != unit.isNaval())))
+            && (targetPlayer = ((Ownable)target).getOwner()) != null
+            && targetPlayer != owner
+            && (owner.getStance(targetPlayer) == Stance.WAR
+                || (owner.isIndian()
+                    && owner.getTension(targetPlayer).getLevel()
+                        .compareTo(Tension.Level.CONTENT) > 0));
+    }
+
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from.
+     * @return A target for this mission, or null if none found.
+     */
+    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+        Unit unit;
+        Tile tile;
+        Location target = (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null
+            || path == null
+            || (tile = path.getLastNode().getTile()) == null) ? null
+            : (tile.getSettlement() != null) ? tile.getSettlement()
+            : tile.getDefendingUnit(unit);
+        return (isTarget(aiUnit, target)) ? target : null;
+    }
+
+    /**
+     * Scores a potential attack on a settlement.
+     *
+     * Do not cheat and look inside the settlement.
+     * Just use visible facts about it.
+     *
+     * TODO: if we are the REF and there is a significant Tory
+     * population inside, assume traitors have briefed us.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path The <code>PathNode</code> to take to the settlement.
+     * @param settlement The <code>Settlement</code> to attack.
+     * @return A score of the desirability of the mission.
+     */
+    static private int scoreSettlementTarget(AIUnit aiUnit, PathNode path,
+                                             Settlement settlement) {
+        final Unit unit = aiUnit.getUnit();
+        final CombatModel combatModel = unit.getGame().getCombatModel();
+
+        int value = 1020;
+        value -= path.getTotalTurns() * 100;
+
+        final float off = combatModel.getOffencePower(unit, settlement);
+        value += off * 50;
+
+        if (settlement instanceof Colony) {
+            // Favour high population (more loot:-).
+            Colony colony = (Colony) settlement;
+            value += 50 * colony.getUnitCount();
+            if (colony.hasStockade()) { // Avoid fortifications.
+                value -= 200 * colony.getStockade().getLevel();
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            // Favour the most hostile settlements
+            IndianSettlement is = (IndianSettlement) settlement;
+            Tension tension = is.getAlarm(unit.getOwner());
+            if (tension != null) value += tension.getValue() / 2;
+        }
+        if (unit.getOwner().isIndian()) {
+            // Natives prefer to attack when DISPLEASED.
+            IndianSettlement is = unit.getIndianSettlement();
+            if (is != null && is.getAlarm(settlement.getOwner()) != null) {
+                value += is.getAlarm(settlement.getOwner()).getValue()
+                    - Tension.Level.DISPLEASED.getLimit();
+            }
+        }
+
+        logger.finest("UnitSeekAndDestroyMission settlement score(" + unit
+            + " v " + settlement + ") = " + value);
+        return value;
+    }
+
+    /**
+     * Scores a potential attack on a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path The <code>PathNode</code> to take to the settlement.
+     * @param defender The <code>Unit</code> to attack.
+     * @return A score of the desirability of the mission.
+     */
+    static private int scoreUnitTarget(AIUnit aiUnit, PathNode path,
+                                       Unit defender) {
+        final Unit unit = aiUnit.getUnit();
+        final Tile tile = path.getLastNode().getTile();
+        final int turns = path.getTotalTurns();
+        final CombatModel combatModel = unit.getGame().getCombatModel();
+        final float off = combatModel.getOffencePower(unit, defender);
+        final float def = combatModel.getDefencePower(unit, defender);
+        if (off <= 0) return Integer.MIN_VALUE;
+
+        int value = 1020 - turns * 100;
+        value += 100 * (off - def);
+
+        // Add a big bonus for treasure trains on the tile.
+        // Do not cheat and look at the value.
+        for (Unit u : tile.getUnitList()) {
+            if (u.canCarryTreasure() && u.getTreasureAmount() > 0) {
+                value += 1000;
+                break;
+            }
+        }
+
+        if (defender.isNaval()) {
+            if (tile.isLand()) value += 500; // Easy win
+        } else {
+            if (defender.hasAbility(Ability.EXPERT_SOLDIER)
+                && !defender.isArmed()) value += 100;
+        }
+
+        logger.finest("UnitSeekAndDestroyMission score(" + unit
+            + " v " + defender + ") = " + value);
+        return value;
+    }
+
+    /**
+     * Evaluate a potential seek and destroy mission for a given unit
+     * to a given tile.
+     *
+     * TODO: revisit and rebalance the mass of magic numbers.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path A <code>PathNode</code> to take to the target.
+     * @return A score for the proposed mission.
+     */
+    public static int scoreTarget(AIUnit aiUnit, PathNode path) {
+        Location target = extractTarget(aiUnit, path);
+        return (target instanceof Settlement)
+            ? scoreSettlementTarget(aiUnit, path, (Settlement)target)
+            : (target instanceof Unit)
+            ? scoreUnitTarget(aiUnit, path, (Unit)target)
+            : Integer.MIN_VALUE;
+    }
+
+    /**
+     * Finds a suitable seek-and-destroy target for an AI unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a target for.
+     * @param range An upper bound on the number of moves.
+     * @return A path to the target, or null if none found.
+     */
+    public static PathNode findTarget(AIUnit aiUnit, int range) {
+        Unit unit;
+        Tile startTile;
+        if (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed() 
+            || (startTile = unit.getPathStartTile()) == null) return null;
+
+        return unit.search(startTile,
+            getMissionGoalDecider(aiUnit, UnitSeekAndDestroyMission.class),
+            CostDeciders.avoidIllegal(), range,
+            ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+    }
+
+    // Fake Transportable interface
+
+    /**
+     * Gets the transport destination for units with this mission.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    @Override
+    public Tile getTransportDestination() {
+        Tile tile = (target == null) ? null : target.getTile();
+        return (shouldTakeTransportToTile(tile)) ? tile : null;
+    }
+
+    // Mission interface
+
+    /**
+     * Check to see if this mission is still valid.
+     *
+     * @return True if this mission is valid.
+    */
+    public boolean isValid() {
+        return super.isValid()
+            && getUnit().isOffensiveUnit()
+            && isTarget(getAIUnit(), target);
+    }
+
+    /**
+     * Performs the mission.  Check for a target-of-opportunity within one
+     * turn and hit that if possible.  Otherwise, just continue on towards
+     * the real target.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    @Override
+    public void doMission(Connection connection) {
+        final Unit unit = getUnit();
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        } else if (!unit.isOffensiveUnit()) {
+            logger.finest(tag + " disarmed: " + unit);
+            return;
+        }
+        final Player player = unit.getOwner();
+
+        // Is there a target-of-opportunity?
+        final AIUnit aiUnit = getAIUnit();
+        PathNode path = findTarget(aiUnit, 1);
+        Location nearbyTarget = (path == null) ? null
+            : extractTarget(aiUnit, path);
+        if (nearbyTarget == target) nearbyTarget = null;
+        if (isValid()) {
+            if (nearbyTarget != null) {
+                logger.finest(tag + " found target-of-opportunity "
+                    + nearbyTarget + ": " + unit);
+            }
+        } else {
+            if (nearbyTarget == null) {
+                logger.finest(tag + " can not find a target: " + unit);
+                return;
+            }
+            logger.finest(tag + " abandoning " + target
+                + " retargeting " + nearbyTarget + ": " + unit);
+            target = nearbyTarget;
+            nearbyTarget = null;
+        }
+
+        Location currentTarget = (nearbyTarget != null) ? nearbyTarget : target;
+        Unit.MoveType mt = travelToTarget(tag, currentTarget.getTile());
+        Tile unitTile = unit.getTile();
+        Settlement settlement = unitTile.getSettlement();
+        switch (mt) {
+        case MOVE_NO_MOVES:
+            logger.finest(tag + " en route to " + currentTarget + ": " + unit);
+            break;
+        case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+            if (settlement != null && settlement.getUnitCount() < 2) {
+                // Do not risk attacking out of a settlement that
+                // might collapse.  Defend instead.
+                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
+                        aiUnit, settlement));
+                return;
+            }
+            logger.finest(tag + " attacking " + currentTarget + ": " + unit);
+            AIMessage.askAttack(aiUnit, unitTile.getDirection(target.getTile()));
+            break;
+        default:
+            logger.finest(tag + " unexpected move type: " + mt + ": " + unit);
+            break;
+        }
     }
 
     /**
@@ -330,6 +423,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
     }
 
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -343,20 +437,27 @@ public class UnitSeekAndDestroyMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
+    /**
+     * {@inherit-doc}
+     */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
         if (getTarget() != null) {
             out.writeAttribute("target", getTarget().getId());
         }
     }
 
+    /**
+     * {@inherit-doc}
+     */
     @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        setTarget((Location) getGame()
-            .getFreeColGameObject(in.getAttributeValue(null, "target")));
+        target = (Location)getGame()
+            .getFreeColGameObject(in.getAttributeValue(null, "target"));
     }
 
     /**

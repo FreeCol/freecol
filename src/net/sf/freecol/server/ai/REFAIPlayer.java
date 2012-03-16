@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
@@ -84,21 +85,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         super(aiMain, in);
     }
 
-
-    /**
-     * Tells this <code>REFAIPlayer</code> to make decisions.
-     */
-    public void startWorking() {
-        final Player player = getPlayer();
-        logger.finest("Entering method startWorking: "
-            + player + ", year " + getGame().getTurn());
-        if (!player.isWorkForREF()) {
-            logger.warning("No work for REF: " + player);
-            return;
-        }
-        super.startWorking();
-    }
-
     /**
      * Initialize the REF.
      * - Find the initial target
@@ -134,32 +120,21 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
         }
         if (aiUnit == null) {
-            logger.warning("New REF has no army?!?");
+            logger.warning("REF has no army?!?");
             return null;
         }
-        Unit unit = aiUnit.getUnit();
+        final Unit unit = aiUnit.getUnit();
 
         // Find the best coastal colony.
-        Colony target = null;
-        int bestScore = Integer.MIN_VALUE;
-        Player player = getPlayer();
-        for (Player p : player.getRebels()) {
-            for (Colony c : p.getColonies()) {
-                if (c.isConnected()) {
-                    int score = getUnitSeekAndDestroyMissionValue(unit,
-                        c.getTile(), INFINITY);
-                    if (score > bestScore) {
-                        bestScore = score;
-                        target = c;
-                    }
-                }
-            }
-        }
-        if (target == null) {
+        PathNode path = UnitSeekAndDestroyMission.findTarget(aiUnit, INFINITY);
+        Colony colony;
+        if (path == null 
+            || (colony = (Colony)UnitSeekAndDestroyMission
+                .extractTarget(aiUnit, path)) == null) {
             logger.warning("Rebels have no connected colonies?!?");
             return null;
         }
-        Tile tile = target.getTile();
+        Tile tile = colony.getTile();
 
         // Give the army seek-and-destroy missions for the target,
         // then once the army has missions it is possible to give the
@@ -168,7 +143,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         for (AIUnit aiu : getAIUnits()) {
             if (!aiu.getUnit().isNaval()) {
                 aiu.setMission(new UnitSeekAndDestroyMission(aiMain, aiu,
-                        target));
+                                                             colony));
             }
         }
         for (AIUnit aiu : getAIUnits()) {
@@ -191,17 +166,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         //
         // TODO: pick the tile with the best defence and try to avoid
         // hostile fortifications.
-        GoalDecider gd = new GoalDecider() {
+        final GoalDecider gd = new GoalDecider() {
                 private PathNode goal = null;
 
-                public PathNode getGoal() {
-                    return goal;
-                }
-
-                public boolean hasSubGoals() {
-                    return false;
-                }
-
+                public PathNode getGoal() { return goal; }
+                public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode pathNode) {
                     if (!pathNode.getTile().isEmpty()) return false;
                     for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
@@ -213,10 +182,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        PathNode path = unit.search(tile, gd, null, 10, null);
-        if (path == null) {
+        if ((path = unit.search(tile, gd, null, 10,
+                    ((unit.isOnCarrier()) ? ((Unit)unit.getLocation())
+                        : null))) == null) {
             logger.warning("Can not find suitable REF landing site for: "
-                + target);
+                + colony);
             return null;
         }
         tile = path.getTile();
@@ -244,77 +214,75 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         return null;
     }
 
-    /**
-     * Evaluate allocating a unit to the defence of a colony.
-     * Temporary helper method for giveMilitaryMission.
-     *
-     * Only public for testAssignDefendSettlementMission.
-     *
-     * @param unit The <code>Unit</code> that is to defend.
-     * @param colony The <code>Colony</code> to defend.
-     * @param turns The turns for the unit to reach the colony.
-     * @return A value for such a mission.
-     */
-    @Override
-    public int getDefendColonyMissionValue(Unit unit, Colony colony,
-                                           int turns) {
-        int value = super.getDefendColonyMissionValue(unit, colony, turns);
 
-        // The REF garrisons thinly.
-        return (getColonyDefenders(colony) > 0) ? 0 : value;
+    // AI Player interface
+
+    /**
+     * Tells this <code>REFAIPlayer</code> to make decisions.
+     */
+    public void startWorking() {
+        final Player player = getPlayer();
+        logger.finest("Entering method startWorking: "
+            + player + ", year " + getGame().getTurn());
+        if (!player.isWorkForREF()) {
+            logger.warning("No work for REF: " + player);
+            return;
+        }
+        super.startWorking();
     }
 
     /**
-     * Evaluate a potential seek and destroy mission for a given unit
-     * to a given tile.
+     * Evaluates a proposed mission type for a unit, specialized for
+     * REF players.
      *
-     * @param unit The <code>Unit</code> to do the mission.
-     * @param newTile The <code>Tile</code> to go to.
-     * @param turns How long to travel to the tile.
-     * @return A score for the proposed mission.
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param type The mission type.
+     * @return A score representing the desirability of this mission.
      */
-    @Override
-    public int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile,
-                                                 int turns) {
-        int value = super.getUnitSeekAndDestroyMissionValue(unit, newTile,
-                                                            turns);
-        if (value <= 0) return value;
-
-        Settlement settlement = newTile.getSettlement();
-        Unit defender = newTile.getDefendingUnit(unit);
-        if (settlement == null) {
-            if (unit.getOwner().getNumberOfSettlements() <= 0) {
-                // Do not chase units until at least one colony is captured.
-                return Integer.MIN_VALUE;
+    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
+        int value = super.scoreMission(aiUnit, path, type);
+        if (value > 0) {
+            if (type == DefendSettlementMission.class) {
+                // REF garrisons thinly.
+                Settlement settlement = DefendSettlementMission
+                    .extractTarget(aiUnit, path);
+                if (getSettlementDefenders(settlement) > 0) value = 0;
+            } else if (type == UnitSeekAndDestroyMission.class) {
+                Location target = UnitSeekAndDestroyMission
+                    .extractTarget(aiUnit, path);
+                if (target instanceof Settlement) {
+                    // Value connected settlements highly.
+                    // Initially, accept no others.
+                    if (((Settlement)target).isConnected()) {
+                        value += 500;
+                    } else {
+                        if (getPlayer().getNumberOfSettlements() <= 0) {
+                            return Integer.MIN_VALUE;
+                        }
+                    }
+                } else if (target instanceof Unit) {
+                    // Do not chase units until at least one colony is captured.
+                    if (getPlayer().getNumberOfSettlements() <= 0) {
+                        return Integer.MIN_VALUE;
+                    }
+                    // Do not chase the same unit!
+                    for (AIUnit au : getAIUnits()) {
+                        Mission m = au.getMission();
+                        Location loc;
+                        if (m != null
+                            && m instanceof UnitSeekAndDestroyMission
+                            && (loc = ((UnitSeekAndDestroyMission)m)
+                                .getTarget()) != null
+                            && loc instanceof Unit
+                            && loc == target) return Integer.MIN_VALUE;
+                    }
+                    // The REF is more interested in colonies.
+                    value /= 2;
+                }
             }
-            // Do not all chase the one unit!
-            if (alreadySeeking(defender)) return Integer.MIN_VALUE;
-            // The REF is more interested in colonies.
-            value /= 2;
-        } else {
-            if (settlement.isConnected()) value += 1000;
         }
         return value;
-    }
-
-    /**
-     * Checks if there is already a seek and destroy mission active on
-     * for a target unit.
-     *
-     * @param unit The <code>Unit</code> to check if there is a mission for.
-     * @return True if there is a mission for the unit.
-     */
-    private boolean alreadySeeking(Unit unit) {
-        for (AIUnit au : getAIUnits()) {
-            Mission m = au.getMission();
-            Location target;
-            if (m != null
-                && m instanceof UnitSeekAndDestroyMission
-                && (target = ((UnitSeekAndDestroyMission) m).getTarget()) != null
-                && target instanceof Unit
-                && ((Unit)target) == unit) return true;
-        }
-        return false;
     }
 
     /**

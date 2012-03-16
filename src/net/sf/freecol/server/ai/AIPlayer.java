@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -42,6 +43,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -278,9 +280,8 @@ public abstract class AIPlayer extends AIObject {
         return player.getStance(other);
     }
 
-/* INTERFACE ******************************************************************/
 
-
+    // Interface
 
     /**
      * Tells this <code>AIPlayer</code> to make decisions. The
@@ -288,6 +289,19 @@ public abstract class AIPlayer extends AIObject {
      * returns.
      */
     public abstract void startWorking();
+
+    /**
+     * Evaluates a proposed mission type for a unit.
+     * Subclasses should override and refine this.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param type The mission type.
+     * @return A score representing the desirability of this mission.
+     */
+    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
+        return Mission.scoreTarget(aiUnit, path, type);
+    }
 
     /**
      * Resolves a native demand.
@@ -456,6 +470,25 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Counts the number of defenders allocated to a settlement.
+     *
+     * @param settlement The <code>Settlement</code> to examine.
+     * @return The number of defenders.
+     */
+    public int getSettlementDefenders(Settlement settlement) {
+        int defenders = 0;
+        for (AIUnit au : getAIUnits()) {
+            Mission m = au.getMission();
+            if (m != null && m instanceof DefendSettlementMission
+                && ((DefendSettlementMission) m).getTarget() == settlement
+                && au.getUnit().getSettlement() == settlement) {
+                defenders++;
+            }
+        }
+        return defenders;
+    }
+
+    /**
      * Find out if a tile contains a suitable target for seek-and-destroy.
      * TODO: Package for access by a test only - necessary?
      *
@@ -525,6 +558,8 @@ public abstract class AIPlayer extends AIObject {
         return null;
     }
 
+
+    // Serialization
 
     /**
      * Writes this object to an XML stream.

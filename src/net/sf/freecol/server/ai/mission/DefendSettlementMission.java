@@ -31,14 +31,19 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
@@ -56,6 +61,8 @@ public class DefendSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
+    private String tag = "AI defender";
+
     /** The <code>Settlement</code> to be protected. */
     private Settlement settlement;
 
@@ -72,6 +79,8 @@ public class DefendSettlementMission extends Mission {
                                    Settlement settlement) {
         super(aiMain, aiUnit);
         this.settlement = settlement;
+        logger.finest(tag + " started with " + settlement
+            + ": " + aiUnit.getUnit());
     }
 
     /**
@@ -102,17 +111,86 @@ public class DefendSettlementMission extends Mission {
         readFromXML(in);
     }
     
-
     /**
      * Gets the target settlement.
      *
      * @return The <code>Settlement</code> to be defended by
      *         this <code>Mission</code>.
      */
-    public Settlement getSettlement() {
+    public Settlement getTarget() {
         return settlement;
     }
 
+
+    /**
+     * Is a settlement suitable for a defence mission?
+     *
+     * @param aiUnit The <code>AIUnit</code> to defend with.
+     * @param settlement The candidate <code>Settlement</code>.
+     * @return True if the settlement is suitable.
+     */
+    public static boolean isTarget(AIUnit aiUnit, Settlement settlement) {
+        return settlement != null
+            && settlement.getOwner() == aiUnit.getUnit().getOwner();
+    }
+
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from,
+     *     (uses the unit location if null).
+     * @return A target for a <code>DefendSettlementMission</code> or null
+     *     if none found.
+     */
+    public static Settlement extractTarget(AIUnit aiUnit, PathNode path) {
+        Tile tile = (path == null) ? aiUnit.getUnit().getTile()
+            : path.getLastNode().getTile();
+        Settlement settlement;
+        return (tile == null
+            || !isTarget(aiUnit, settlement = tile.getSettlement())) ? null
+            : settlement;
+    }
+
+    /**
+     * Evaluate allocating a unit to the defence of a settlement.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is to defend.
+     * @param path A <code>PathNode</code> to take to the settlement.
+     * @return A value for such a mission.
+     */
+    public static int scoreTarget(AIUnit aiUnit, PathNode path) {
+        Settlement settlement;
+        if (aiUnit == null
+            || (settlement = extractTarget(aiUnit, path)) == null) {
+            return Integer.MIN_VALUE;
+        }
+
+        final int turns = (path == null) ? 0 : path.getTotalTurns();
+        int value = 1025 - 100 * turns;
+        return value;
+    }
+
+    /**
+     * Finds a path to the best nearby settlement to defend.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param range An upper bound on the number of moves.
+     * @return A <code>PathNode</code> to take to the target,
+     *     or null if none suitable.
+     */
+    public static PathNode findTarget(AIUnit aiUnit, int range) {
+        Unit unit;
+        Tile startTile;
+        return (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
+            || (startTile = unit.getPathStartTile()) == null)
+            ? null
+            : unit.search(startTile,
+                getMissionGoalDecider(aiUnit, DefendSettlementMission.class),
+                CostDeciders.avoidIllegal(), range, 
+                ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+    }
 
     // Fake Transportable interface
 
@@ -173,17 +251,20 @@ public class DefendSettlementMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) return;
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        }
 
         // Check target still makes sense.
         if (!isValid()) {
-            logger.finest("AI defender has invalid settlement " + settlement
+            logger.finest(tag + " has invalid settlement " + settlement
                 + ": " + unit);
             return;
         }
 
         // Go home!
-        if (travelToTarget("AI defender", settlement.getTile())
+        if (travelToTarget(tag, settlement.getTile())
             != Unit.MoveType.MOVE) return;
 
         // Check if the mission should change?
@@ -228,16 +309,15 @@ public class DefendSettlementMission extends Mission {
         if (defenderCount <= 2 || fortifiedCount <= 1) {
             String logMe;
             if (!unit.checkSetState(UnitState.FORTIFYING)) {
-                logMe = "waiting to fortify at ";
+                logMe = " waiting to fortify at ";
             } else if (AIMessage.askChangeState(getAIUnit(),
                                                 UnitState.FORTIFYING)
                 && unit.getState() == UnitState.FORTIFYING) {
-                logMe = "fortifying at ";
+                logMe = " fortifying at ";
             } else {
-                logMe = "fortify failed at ";
+                logMe = " fortify failed at ";
             }
-            logger.finest("AI defender " + logMe + settlement.getName()
-                + ": " + unit);
+            logger.finest(tag + logMe + settlement.getName() + ": " + unit);
             return;
         }
 
@@ -246,7 +326,7 @@ public class DefendSettlementMission extends Mission {
         // sole unit attacking because if it loses, the settlement
         // will collapse (and the combat model does not understand that).
         if (!unit.isOffensiveUnit()) return;
-        CombatModel combatModel = unit.getGame().getCombatModel();
+        final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
         float bestDifference = Float.MIN_VALUE;
         Direction bestDirection = null;
@@ -258,10 +338,10 @@ public class DefendSettlementMission extends Mission {
                 && defender.getOwner().atWarWith(unit.getOwner())
                 && unit.getMoveType(direction).isAttack()) {
                 Unit enemyUnit = t.getDefendingUnit(unit);
-                float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
-                float weAttack = combatModel.getOffencePower(unit, enemyUnit);
-                float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);
-                float weDefend = combatModel.getDefencePower(enemyUnit, unit);
+                float enemyAttack = cm.getOffencePower(enemyUnit, unit);
+                float weAttack = cm.getOffencePower(unit, enemyUnit);
+                float enemyDefend = cm.getDefencePower(unit, enemyUnit);
+                float weDefend = cm.getDefencePower(enemyUnit, unit);
                 
                 float difference = weAttack / (weAttack + enemyDefend)
                     - enemyAttack / (enemyAttack + weDefend);
@@ -277,7 +357,7 @@ public class DefendSettlementMission extends Mission {
 
         // Attack if a target is available.  Do not log if nothing happening.
         if (bestTarget != null) {
-            logger.finest("AI defender attacking " + bestTarget
+            logger.finest(tag + " attacking " + bestTarget
                 + " from " + settlement.getName() + ": " + unit);
             AIMessage.askAttack(getAIUnit(), bestDirection);
         }

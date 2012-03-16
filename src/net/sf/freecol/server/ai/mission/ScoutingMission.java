@@ -156,7 +156,7 @@ public class ScoutingMission extends Mission {
             return null;
         }
 
-        final Tile startTile = getPathStartTile(unit);
+        final Tile startTile = unit.getPathStartTile();
         if (startTile == null) {
             Settlement settlement = Mission.getBestSettlement(unit.getOwner());
             if (settlement != null) return settlement.getTile();

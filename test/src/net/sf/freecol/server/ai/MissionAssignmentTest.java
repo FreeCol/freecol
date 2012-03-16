@@ -103,14 +103,16 @@ public class MissionAssignmentTest extends FreeColTestCase {
         //Make tests
         int turnsToReach = 1; // not important
 
-        assertTrue("Cannot attack own unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, friendlyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
-        assertTrue("Players are not at war", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
+        assertFalse("Cannot attack own unit", UnitSeekAndDestroyMission.isTarget(aiUnit, friendlyColonist));
+        assertFalse("Players are not at war", UnitSeekAndDestroyMission.isTarget(aiUnit, enemyColonist));
 
         dutch.setStance(french, Stance.WAR);
         french.setStance(dutch, Stance.WAR);
 
-        assertFalse("Unit should be able to attack land unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyColonist.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
-        assertTrue("Land unit cannot attack naval unit", aiDutch.getUnitSeekAndDestroyMissionValue(soldier, enemyGalleon.getTile(), turnsToReach) == MISSION_IMPOSSIBLE);
+        assertTrue("Unit should be able to attack land unit",
+            UnitSeekAndDestroyMission.isTarget(aiUnit, enemyColonist));
+        assertFalse("Land unit cannot attack naval unit",
+            UnitSeekAndDestroyMission.isTarget(aiUnit, enemyGalleon));
     }
 
     public void testIsTargetValidForSeekAndDestroy() {
@@ -219,25 +221,26 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue(colonyTile.getSettlement() == colony);
         assertTrue(colony.getOwner() == dutch);
         assertTrue(colony.getUnitCount() == 1);
+        aiUnit.abortMission("test");
+        assertTrue("DefendSettlementMission should be possible",
+            DefendSettlementMission.isValid(aiUnit)
+            && DefendSettlementMission.isTarget(aiUnit, colony));
 
-        int turnsToColony = 1;
         // reassign mission and check
-
         aiDutch.giveMilitaryMission(aiUnit);
-
-        boolean missionIsValid = aiDutch.getDefendColonyMissionValue(soldier, colony, turnsToColony) > 0;
         isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
         boolean isDefendSettlementMission = aiUnit.getMission() instanceof DefendSettlementMission;
 
-        assertTrue("DefendColonyMission should be possible",missionIsValid);
         assertFalse("Colony in need of defense, should no longer be UnitWanderHostileMission", isUnitWanderHostileMission);
         assertTrue("Colony in need of defense, should be DefendSettlementMission", isDefendSettlementMission);
 
-        //TODO: Increase defense to a point where the soldier does best to patrol
-
-        // Right now (08/05/2008), the algorithm that calculates the value of a colony defense mission
-        //does not take into account the various levels of fortification, and requires too many units to
-        //guard the colony
+        // TODO: Increase defense to a point where the soldier does
+        // best to patrol
+        //
+        // Right now (08/05/2008), the algorithm that calculates the
+        // value of a colony defense mission does not take into account
+        // the various levels of fortification, and requires too many
+        // units to guard the colony
     }
 
     public void testSecureIndianSettlementMission() {

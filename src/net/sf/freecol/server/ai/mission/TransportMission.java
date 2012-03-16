@@ -780,8 +780,6 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     private void buyCargo(Connection connection) {
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-
         if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
         }
@@ -790,11 +788,13 @@ public class TransportMission extends Mission {
          * Quick fix for forcing the AI to build more colonies. This fix should
          * be removed after a proper implementation has been created.
          */
+        final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
+        final AIUnit aiUnit = getAIUnit();
         if (aiPlayer.hasFewColonies()) {
             // since we are in Europe, use the carrier entry point to
             // search for a good settlement spot.
             Unit carrier = getUnit();
-            Tile colonyTile = BuildColonyMission.findTargetTile(getAIUnit(), false);
+            Tile colonyTile = BuildColonyMission.findTargetTile(aiUnit, false);
             int space = getAvailableSpace();
             while (colonyTile != null && space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);

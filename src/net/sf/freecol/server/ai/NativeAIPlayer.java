@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
@@ -169,6 +170,26 @@ public class NativeAIPlayer extends AIPlayer {
         abortInvalidMissions();
         clearAIUnits();
     }
+
+    /**
+     * Evaluates a proposed mission type for a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param type The mission type.
+     * @return A score representing the desirability of this mission.
+     */
+    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
+        int value = super.scoreMission(aiUnit, path, type);
+        if (type == DefendSettlementMission.class) {
+            // Reduce value in proportion to the number of active defenders.
+            Settlement settlement = (Settlement)DefendSettlementMission
+                .extractTarget(aiUnit, path);
+            value -= 75 * getSettlementDefenders(settlement);
+        }
+        return value;
+    }
+
 
     public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
         boolean validOffer = true;
@@ -774,70 +795,6 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
         }
-    }
-
-    /**
-     * Evaluate a potential seek and destroy mission for a given unit
-     * to a given tile.
-     * TODO: revisit and rebalance the mass of magic numbers.
-     *
-     * @param unit The <code>Unit</code> to do the mission.
-     * @param newTile The <code>Tile</code> to go to.
-     * @param turns How long to travel to the tile.
-     * @return A score for the proposed mission.
-     */
-    int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
-        if (!isTargetValidForSeekAndDestroy(unit, newTile)) {
-            return Integer.MIN_VALUE;
-        }
-        Settlement settlement = newTile.getSettlement();
-        Unit defender = newTile.getDefendingUnit(unit);
-        // Take distance to target into account
-        int value = 10020 - turns * 100;
-
-        if (settlement != null) {
-            // Do not cheat and look inside the settlement.
-            // Just use visible facts about it.
-            // TODO: if we are the REF and there is a significant Tory
-            // population inside, assume traitors have briefed us.
-            if (settlement instanceof Colony) {
-                // Favour high population and weak fortifications.
-                Colony colony = (Colony) settlement;
-                value += 50 * colony.getUnitCount();
-                if (colony.hasStockade()) {
-                    value -= 1000 * colony.getStockade().getLevel();
-                }
-            } else if (settlement instanceof IndianSettlement) {
-                // Favour the most hostile settlements
-                IndianSettlement is = (IndianSettlement) settlement;
-                Tension tension = is.getAlarm(unit.getOwner());
-                if (tension != null) value += tension.getValue();
-            }
-        } else if (defender != null) {
-            CombatModel combatModel = unit.getGame().getCombatModel();
-            float off = combatModel.getOffencePower(unit, defender);
-            float def = combatModel.getDefencePower(unit, defender);
-
-            if (defender.getType().getOffence() > 0) {
-                value += 200 - def * 2 - turns * 50;
-            }
-
-            value += combatModel.getOffencePower(defender, unit)
-                - combatModel.getDefencePower(defender, unit);
-
-            if (!defender.isNaval()
-                && defender.hasAbility(Ability.EXPERT_SOLDIER)
-                && !defender.isArmed()) {
-                value += 10 - def * 2 - turns * 25;
-            }
-            if (value < 0) value = 0;
-        }
-        logger.finest("getUnitSeekAndDestroyMissionValue " + unit.getId()
-                      + " v " + ((settlement != null) ? settlement.getId()
-                                 : (defender != null) ? defender.getId()
-                                 : "none")
-                      + " = " + value);
-        return value;
     }
 
     /**

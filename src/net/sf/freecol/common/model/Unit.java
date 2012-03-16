@@ -1132,6 +1132,34 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Gets a suitable tile to start path searches from for a unit.
+     *
+     * Must handle all the cases where the unit is off the map, and
+     * take account of the use of a carrier.
+     *
+     * If the unit is in or heading to Europe, return null because there
+     * is no good way to tell where the unit will reappear on the map,
+     * which is in question anyway if not on a carrier.
+     *
+     * @return A suitable starting tile, or null if none found.
+     */
+    public Tile getPathStartTile() {
+        if (isOnCarrier()) {
+            final Unit carrier = (Unit)getLocation();
+            return (carrier.getTile() != null)
+                ? carrier.getTile()
+                : (carrier.getDestination() instanceof Map)
+                ? carrier.getFullEntryLocation()
+                : (carrier.getDestination() instanceof Settlement)
+                ? ((Settlement)carrier.getDestination()).getTile()
+                //: (carrier.getDestination() instanceof Europe)
+                //? null
+                : null;
+        }
+        return getTile(); // Or null if heading to or in Europe.
+    }
+
+    /**
      * Finds a shortest path from the current <code>Tile</code> to the one
      * specified.  Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.

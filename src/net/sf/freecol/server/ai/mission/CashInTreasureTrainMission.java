@@ -126,7 +126,7 @@ public class CashInTreasureTrainMission extends Mission {
 
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
-        final Tile startTile = getPathStartTile(unit);
+        final Tile startTile = unit.getPathStartTile();
         // Not on the map?  Europe *must* be viable, so go there.
         // Nowhere to go to?  Go to Europe (even if it is null).
         if (startTile == null 

@@ -211,7 +211,7 @@ public class PioneeringMission extends Mission {
             return null;
         }
 
-        final Tile startTile = getPathStartTile(unit);
+        final Tile startTile = unit.getPathStartTile();
         if (startTile == null) {
             Settlement settlement = Mission.getBestSettlement(unit.getOwner());
             if (settlement != null) return (Colony)settlement;
@@ -309,7 +309,7 @@ public class PioneeringMission extends Mission {
             return null;
         }
 
-        Tile startTile = getPathStartTile(unit);
+        Tile startTile = unit.getPathStartTile();
         if (startTile == null) {
             Settlement settlement = Mission.getBestSettlement(unit.getOwner());
             if (settlement == null) {
