@@ -1123,6 +1123,7 @@ public class GUI {
     }
 
     
+    
 
     public void showMapControls(boolean value) {
         if (value && freeColClient.isInGame()) {
@@ -1152,15 +1153,20 @@ public class GUI {
             }
         }
     }
-
-    public MapControls getMapControls() {
-        return mapControls;
-    }
     
     public void updateMapControls() {
         if (mapControls != null) 
             mapControls.update();
     }
+    
+    public void updateMapControlsInCanvas() {
+        if (mapControls != null && mapControls.isShowing()) {
+            mapControls.removeFromComponent(canvas);
+            mapControls.addToComponent(canvas);
+        }
+    }
+
+    
 
     public void zoomInMapControls() {
         mapControls.getMiniMap().zoomIn();

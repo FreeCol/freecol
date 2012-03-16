@@ -83,7 +83,6 @@ import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MapSize;
@@ -2000,11 +1999,7 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
         if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
-            MapControls mc = gui.getMapControls();
-            if (mc != null && mc.isShowing()) {
-                mc.removeFromComponent(this);
-                mc.addToComponent(this);
-            }
+            gui.updateMapControlsInCanvas();
             mapViewer.setSize(getSize());
             mapViewer.forceReposition();
             oldSize = getSize();
