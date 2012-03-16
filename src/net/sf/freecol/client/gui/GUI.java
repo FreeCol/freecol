@@ -398,10 +398,7 @@ public class GUI {
         return windowed;
     }
 
-    public void moveTileCursor(Direction direction) {
-        mapViewer.moveTileCursor(direction);
-    }
-
+ 
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }

@@ -1316,20 +1316,6 @@ public final class MapViewer {
     }
 
     /**
-     * Describe <code>moveTileCursor</code> method here.
-     *
-     * @param direction a <code>Direction</code> value
-     */
-    public void moveTileCursor(Direction direction) {
-        if (selectedTile != null) {
-            Tile newTile = selectedTile.getNeighbourOrNull(direction);
-            if (newTile != null) setSelectedTile(newTile, false);
-        } else {
-            logger.warning("selectedTile is null");
-        }
-    }
-
-    /**
      * Checks if the Tile/Units at the given coordinates are displayed
      * on the screen (or, if the map is already displayed and the focus
      * has been changed, whether they will be displayed on the screen

@@ -3795,4 +3795,22 @@ public final class InGameController implements NetworkConstants {
             unitWas.fireChanges();
         }
     }
+    
+
+    /**
+     * Describe <code>moveTileCursor</code> method here.
+     *
+     * @param direction a <code>Direction</code> value 
+     */
+    public void moveTileCursor(Direction direction) {
+        if (gui.getSelectedTile() != null) {
+            Tile newTile = gui.getSelectedTile().getNeighbourOrNull(direction);
+            if (newTile != null) 
+                gui.setSelectedTile(newTile, false);
+        } else {
+            logger.warning("selectedTile is null");
+        }
+    } 
+
+    
 }

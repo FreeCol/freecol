@@ -63,13 +63,13 @@ public class MoveAction extends MapboardAction {
      *
      * @param e The <code>ActionEvent</code>.
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) { 
         switch(gui.getCurrentViewMode()) {
         case ViewMode.MOVE_UNITS_MODE:
             getFreeColClient().getInGameController().moveActiveUnit(direction);
             break;
         case ViewMode.VIEW_TERRAIN_MODE:
-            gui.moveTileCursor(direction);
+            getFreeColClient().getInGameController().moveTileCursor(direction);
             break;
         }
     }
