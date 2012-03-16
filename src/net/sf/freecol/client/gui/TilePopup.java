@@ -82,7 +82,6 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
-    private final MapViewer mapViewer;
 
     private boolean hasAnItem = false;
 
@@ -101,7 +100,6 @@ public final class TilePopup extends JPopupMenu {
 
         this.freeColClient = freeColClient;
         this.gui = gui;
-        this.mapViewer = gui.getMapViewer();
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
@@ -146,7 +144,7 @@ public final class TilePopup extends JPopupMenu {
 
                             //if unit did not move, we should show the goto path
                             if(activeUnit.getTile() == currTile){
-                            	mapViewer.updateGotoPathForActiveUnit();
+                                gui.getMapViewer().updateGotoPathForActiveUnit();
                             }
                         }
                     });
