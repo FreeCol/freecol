@@ -386,7 +386,9 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void add(Component comp, Integer i) {
-        add(comp, i, true);
+        addToCanvas(comp, i);
+        gui.updateMenuBar();
+        freeColClient.getActionManager().update();
     }
 
     /**
@@ -396,11 +398,11 @@ public final class Canvas extends JDesktopPane {
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
      */
-    public void add(Component comp, Integer i, boolean update) {
+    public void addToCanvas(Component comp, Integer i) {
 
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog<?>)
                 && statusPanel.isVisible()) {
-            remove(statusPanel, false);
+            removeFromCanvas(statusPanel);
         }
 
         try {
@@ -412,11 +414,6 @@ public final class Canvas extends JDesktopPane {
         } catch(Exception e) {
             logger.warning("add component failed with layer " + i);
             e.printStackTrace();
-        }
-
-        if (update) {
-            gui.updateMenuBar();
-            freeColClient.getActionManager().update();
         }
     }
 
@@ -603,18 +600,21 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public void remove(Component comp) {
-        remove(comp, true);
+        removeFromCanvas(comp);
+        final boolean takeFocus = (comp != statusPanel);
+        gui.updateMenuBar();
+        freeColClient.getActionManager().update();
+        if (takeFocus && !isShowingSubPanel()) {
+            requestFocus();
+        }
     }
 
     /**
      * Removes the given component from this Container.
      *
      * @param comp The component to remove from this Container.
-     * @param update The <code>Canvas</code> will be enabled, the graphics
-     *            repainted and both the menubar and the actions will be updated
-     *            if this parameter is <code>true</code>.
      */
-    public void remove(Component comp, boolean update) {
+    public void removeFromCanvas(Component comp) {
         if (comp == null) {
             return;
         } else if (comp instanceof FreeColPanel) {
@@ -624,22 +624,11 @@ public final class Canvas extends JDesktopPane {
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame frame = getInternalFrame(comp);
         if (frame != null && frame != comp) {
-            // updateBounds = frame.getBounds();
             frame.dispose();
         } else {
             super.remove(comp);
         }
-
         repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
-
-        final boolean takeFocus = (comp != statusPanel);
-        if (update) {
-            gui.updateMenuBar();
-            freeColClient.getActionManager().update();
-            if (takeFocus && !isShowingSubPanel()) {
-                requestFocus();
-            }
-        }
     }
 
     /**
@@ -667,7 +656,7 @@ public final class Canvas extends JDesktopPane {
         gui.getMapViewer().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         for (Component c : getComponents()) {
-            remove(c, false);
+            removeFromCanvas(c);
         }
 
     }

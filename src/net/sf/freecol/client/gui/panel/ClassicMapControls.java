@@ -108,7 +108,7 @@ public final class ClassicMapControls extends MapControls {
         int width = (int) panel.getPreferredSize().getWidth();
         panel.setSize(width, component.getHeight());
         panel.setLocation(component.getWidth() - width, 0);
-        component.add(panel, CONTROLS_LAYER, false);
+        component.addToCanvas(panel, CONTROLS_LAYER);
     }
 
     /**
@@ -117,7 +117,7 @@ public final class ClassicMapControls extends MapControls {
      * @param canvas <code>Canvas</code> parent
      */
     public void removeFromComponent(Canvas canvas) {
-        canvas.remove(panel, false);
+        canvas.removeFromCanvas(panel);
     }
 
     public void repaint() {

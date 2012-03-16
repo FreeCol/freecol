@@ -125,7 +125,8 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     private static void createAndShowGUI() {
         //Create and set up the window.
         //JFrame frame = new JFrame("MenuDemo");
-        FullScreenFrame frame = new FullScreenFrame(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+        FreeColClient client = new FreeColClient(null, null, true, null, true, null);
+        FullScreenFrame frame = new FullScreenFrame(client, GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         //Create and set up the content pane.

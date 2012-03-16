@@ -2385,7 +2385,7 @@ public final class MapViewer {
                 greyLayer = new GrayLayer(lib);
             }
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
-                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, false);
+                canvas.addToCanvas(greyLayer, JLayeredPane.DEFAULT_LAYER);
                 canvas.moveToFront(greyLayer);
             }
 
@@ -2395,7 +2395,7 @@ public final class MapViewer {
         }
         else {
             if (greyLayer != null && greyLayer.getParent() != null) {
-                canvas.remove(greyLayer, false);
+                canvas.removeFromCanvas(greyLayer);
             }
         }
 
@@ -2870,7 +2870,7 @@ public final class MapViewer {
             unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
                     getTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
-            gui.getCanvas().add(unitLabel, UNIT_LABEL_LAYER, false);
+            gui.getCanvas().addToCanvas(unitLabel, UNIT_LABEL_LAYER);
         } else {
             i++;
         }
@@ -3366,7 +3366,7 @@ public final class MapViewer {
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
-            gui.getCanvas().remove(unitsOutForAnimationLabels.remove(unit), false);
+            gui.getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
         } else {
             i--;
             unitsOutForAnimation.put(unit, i);

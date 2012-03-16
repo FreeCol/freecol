@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JWindow;
@@ -127,7 +126,7 @@ public class GUI {
     // GUI:
     private GraphicsDevice gd;
 
-    private JFrame frame;
+    private FreeColFrame frame;
 
     private Canvas canvas;
 
@@ -211,24 +210,13 @@ public class GUI {
             frame.dispose();
         }
         setWindowed(windowed);
-        if (windowed) {
-            this.frame = new WindowedFrame();
-        } else {
-            this.frame = new FullScreenFrame(gd);
-        }
+        
+        this.frame = FreeColFrame.createFreeColFrame(freeColClient, gd, windowed);
+        
         frame.setJMenuBar(menuBar);
-        if (frame instanceof WindowedFrame) {
-            ((WindowedFrame) frame).setCanvas(freeColClient, canvas);
-            frame.getContentPane().add(canvas);
-            if (getWindowBounds() != null) {
-                frame.setBounds(getWindowBounds());
-            } else {
-                frame.pack();
-            }
-        } else if (frame instanceof FullScreenFrame) {
-            ((FullScreenFrame) frame).setCanvas(freeColClient, canvas);
-            frame.getContentPane().add(canvas);
-        }
+        frame.setCanvas(canvas);
+        frame.updateBounds(getWindowBounds());
+
         mapViewer.forceReposition();
         canvas.updateSizes();
         frame.setVisible(true);

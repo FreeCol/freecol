@@ -20,9 +20,9 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.GraphicsDevice;
+import java.awt.Rectangle;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
@@ -32,13 +32,11 @@ import net.sf.freecol.client.FreeColClient;
  * The fullscreen frame that contains everything. If full screen mode is not
  * supported (or chosen), then the {@link WindowedFrame} will be used instead.
  */
-public final class FullScreenFrame extends JFrame {
+public final class FullScreenFrame extends FreeColFrame {
 
     private static final Logger logger = Logger.getLogger(FullScreenFrame.class
                                                           .getName());
 
-
-    private Canvas canvas;
 
     /**
      * The constructor to use.
@@ -46,8 +44,8 @@ public final class FullScreenFrame extends JFrame {
      * @param gd
      *            The context of this <code>FullScreenFrame</code>.
      */
-    public FullScreenFrame(GraphicsDevice gd) {
-        super("Freecol " + FreeCol.getVersion(), gd.getDefaultConfiguration());
+    public FullScreenFrame(FreeColClient freeColClient, GraphicsDevice gd) {
+        super(freeColClient, "Freecol " + FreeCol.getVersion(), gd);
 		
         logger.info("FullScreenFrame's JFrame created.");
 
@@ -63,19 +61,11 @@ public final class FullScreenFrame extends JFrame {
         logger.info("FullScreenFrame created.");
     }
 
-    public void setCanvas(FreeColClient freeColClient, Canvas canvas) {
-        this.canvas = canvas;
-        addWindowListener(new WindowedFrameListener(freeColClient));
+
+    @Override
+    public void updateBounds(Rectangle rectangle) {
     }
 
-    /**
-     * Adds a component to this FullScreenFrame.
-     * 
-     * @param c
-     *            The component to add to this FullScreenFrame.
-     */
-    public void addComponent(JComponent c) {
-        canvas.add(c);
-    }
+
 }
 

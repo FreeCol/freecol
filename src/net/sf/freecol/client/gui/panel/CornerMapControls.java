@@ -172,16 +172,16 @@ public final class CornerMapControls extends MapControls {
         //
         // Add the GUI Objects to the container
         //
-        component.add(infoPanel, CONTROLS_LAYER, false);
-        component.add(miniMapPanel, CONTROLS_LAYER, false);
+        component.addToCanvas(infoPanel, CONTROLS_LAYER);
+        component.addToCanvas(miniMapPanel, CONTROLS_LAYER);
         if (getFreeColClient().getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
-            component.add(compassRose, CONTROLS_LAYER, false);
+            component.addToCanvas(compassRose, CONTROLS_LAYER);
         }
 
         if (!getFreeColClient().isMapEditor()) {
             for (UnitButton button : unitButtons) {
-                component.add(button, CONTROLS_LAYER, false);
+                component.addToCanvas(button, CONTROLS_LAYER);
                 button.refreshAction();
             }
         }
@@ -193,12 +193,12 @@ public final class CornerMapControls extends MapControls {
      * @param canvas <code>Canvas</code> parent
      */
     public void removeFromComponent(Canvas canvas) {
-        canvas.remove(getInfoPanel(), false);
-        canvas.remove(getMiniMapPanel(), false);
-        canvas.remove(compassRose, false);
+        canvas.removeFromCanvas(getInfoPanel());
+        canvas.removeFromCanvas(getMiniMapPanel());
+        canvas.removeFromCanvas(compassRose);
 
         for (UnitButton button : getUnitButtons()) {
-            canvas.remove(button, false);
+            canvas.removeFromCanvas(button);
         }
     }
 

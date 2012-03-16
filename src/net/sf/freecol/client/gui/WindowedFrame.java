@@ -19,11 +19,11 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
@@ -36,7 +36,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 * supported and choosen, then the {@link FullScreenFrame} will be used
 * instead.
 */
-public final class WindowedFrame extends JFrame {
+public final class WindowedFrame extends FreeColFrame  {
 
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
 
@@ -46,8 +46,8 @@ public final class WindowedFrame extends JFrame {
     /**
     * The constructor to use.
     */
-    public WindowedFrame() {
-        super("FreeCol " + FreeCol.getVersion());
+    public WindowedFrame(FreeColClient freeColClient) {
+        super(freeColClient, "FreeCol " + FreeCol.getVersion());
         logger.info("WindowedFrame's JFrame created.");
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -63,21 +63,15 @@ public final class WindowedFrame extends JFrame {
         logger.info("WindowedFrame created.");
     }
 
-    
-    
-    
 
-    public void setCanvas(FreeColClient freeColClient, Canvas canvas) {
-        this.canvas = canvas;
-        addWindowListener(new WindowedFrameListener(freeColClient));
+    @Override
+    public void updateBounds(Rectangle rectangle) {
+        if (rectangle != null) {
+            setBounds(rectangle);
+        } else {
+            pack();
+        }   
     }
 
-
-    /**
-    * Adds a component to this WindowedFrame.
-    * @param c The component to add to this WindowedFrame.
-    */
-    public void addComponent(JComponent c) {
-        canvas.add(c);
-    }
+   
 }
