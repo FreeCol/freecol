@@ -54,7 +54,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * @param freeColClient
      *
      * @param gui The parent of this panel.
      */
@@ -151,6 +151,7 @@ public final class ReportProductionPanel extends ReportPanel {
                 // colonyButton
                 JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
                 colonyButton.setBorder(FreeColPanel.LEFTCELLBORDER);
+                colonyButton.addActionListener(this);
                 reportPanel.add(colonyButton, "newline");
 
                 // production
