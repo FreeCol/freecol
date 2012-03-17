@@ -47,11 +47,14 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 
 public class WorkProductionPanel extends FreeColPanel {
+
+    private final Turn turn = getGame().getTurn();
 
     private static final Border border = BorderFactory
         .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
@@ -106,7 +109,6 @@ public class WorkProductionPanel extends FreeColPanel {
                 unitModifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
             }
             modifiers.addAll(colony.getModifierSet(goodsType.getId()));
-
             add(localizedLabel(building.getNameKey()), "span, align center, wrap 30");
 
             add(new JLabel(ResourceManager.getImageIcon(building.getType().getId() + ".image")));
@@ -161,7 +163,11 @@ public class WorkProductionPanel extends FreeColPanel {
                 }
             }
         }
-        String bonus = getModifierFormat().format(modifier.getValue());
+        float value = modifier.getValue(turn);
+        if (value == 0) {
+            return result;
+        }
+        String bonus = getModifierFormat().format(value);
         boolean percentage = false;
         switch(modifier.getType()) {
         case ADDITIVE:

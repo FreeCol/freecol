@@ -291,33 +291,19 @@ public class FeatureContainer {
         if (modifierSet == null || modifierSet.isEmpty()) return number;
         float result = number;
         for (Modifier modifier : modifierSet) {
-            float value = modifier.getValue();
-            if (value == Modifier.UNKNOWN) return Modifier.UNKNOWN;
-            if (modifier.hasIncrement() && turn != null) {
-                int diff = turn.getNumber()
-                    - modifier.getFirstTurn().getNumber();
-                switch (modifier.getIncrementType()) {
+            float value = modifier.getValue(turn);
+            if (value != Modifier.UNKNOWN) {
+                switch (modifier.getType()) {
                 case ADDITIVE:
-                    value += modifier.getIncrement() * diff;
+                    result += value;
                     break;
                 case MULTIPLICATIVE:
-                    value *= modifier.getIncrement() * diff;
+                    result *= value;
                     break;
                 case PERCENTAGE:
-                    value += (value * modifier.getIncrement() * diff) / 100;
+                    result += (result * value) / 100;
                     break;
                 }
-            }
-            switch (modifier.getType()) {
-            case ADDITIVE:
-                result += value;
-                break;
-            case MULTIPLICATIVE:
-                result *= value;
-                break;
-            case PERCENTAGE:
-                result += (result * value) / 100;
-                break;
             }
         }
         return result;

@@ -211,6 +211,38 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
+     * Get the <code>value</code> of the Modifier during the given
+     * Turn.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return a <code>float</code> value
+     */
+    public float getValue(Turn turn) {
+        if (hasIncrement()) {
+            if (appliesTo(null, turn)) {
+                float incrementedValue = value;
+                float diff = (turn.getNumber() - getFirstTurn().getNumber()) * increment;
+                switch (incrementType) {
+                case ADDITIVE:
+                    incrementedValue += diff;
+                    break;
+                case MULTIPLICATIVE:
+                    incrementedValue *= diff;
+                    break;
+                case PERCENTAGE:
+                    incrementedValue += (incrementedValue * diff) / 100;
+                    break;
+                }
+                return incrementedValue;
+            } else {
+                return 0;
+            }
+        } else {
+            return value;
+        }
+    }
+
+    /**
      * Set the <code>Value</code> value.
      *
      * @param newValue The new Value value.
