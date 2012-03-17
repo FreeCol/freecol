@@ -1326,6 +1326,8 @@ public final class MapViewer {
      * otherwise.
      */
     public boolean onScreen(Tile tileToCheck) {
+        if (tileToCheck == null)
+            return false;
         repositionMapIfNeeded();
         return tileToCheck.getY() - 2 > topRow
             && tileToCheck.getY() + 4 < bottomRow

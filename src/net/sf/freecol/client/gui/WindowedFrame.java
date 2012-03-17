@@ -40,13 +40,10 @@ public final class WindowedFrame extends FreeColFrame  {
 
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
 
-    private Canvas canvas;
-    
-
     /**
     * The constructor to use.
     */
-    public WindowedFrame(FreeColClient freeColClient) {
+    public WindowedFrame(final FreeColClient freeColClient) {
         super(freeColClient, "FreeCol " + FreeCol.getVersion());
         logger.info("WindowedFrame's JFrame created.");
 
@@ -56,7 +53,7 @@ public final class WindowedFrame extends FreeColFrame  {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                ResourceManager.startBackgroundPreloading(canvas.getSize());
+                ResourceManager.startBackgroundPreloading(freeColClient.getGUI().getCanvas().getSize());
             }
         });
 
