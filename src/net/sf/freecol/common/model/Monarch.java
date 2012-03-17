@@ -358,17 +358,19 @@ public final class Monarch extends FreeColGameObject implements Named {
         boolean needNaval = (expeditionaryForce.getCapacity()
                              < expeditionaryForce.getSpaceRequired() + 15);
         logger.info("Add to REF: capacity=" + expeditionaryForce.getCapacity()
-                    + " spaceRequired=" + expeditionaryForce.getSpaceRequired() + " => "
-                    + (needNaval ? "naval" : "land")
-                    + " unit");
+            + " spaceRequired=" + expeditionaryForce.getSpaceRequired()
+            + " => " + ((needNaval) ? "naval" : "land") + " unit");
         if (needNaval) {
             result = Utils.getRandomMember(logger, "Choose naval",
-                                           expeditionaryForce.getNavalUnits(), random);
+                expeditionaryForce.getNavalUnits(), random);
+            result = result.clone();
             result.setNumber(1);
         } else {
             result = Utils.getRandomMember(logger, "Choose land",
-                                           expeditionaryForce.getLandUnits(), random);
-            result.setNumber(Utils.randomInt(logger, "Choose land#", random, 3) + 1);
+                expeditionaryForce.getLandUnits(), random);
+            result = result.clone();
+            result.setNumber(Utils.randomInt(logger, "Choose land#",
+                    random, 3) + 1);
         }
         return result;
     }
@@ -795,27 +797,32 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public void add(AbstractUnit units) {
             Specification spec = getSpecification();
-            UnitType unitType = spec.getUnitType(units.getId());
+            UnitType unitType = units.getUnitType(spec);
             int n = units.getNumber();
+            boolean added = false;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
-                    if (refUnit.getId().equals(units.getId())) {
+                    if (refUnit.getUnitType(spec) == unitType) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         if (unitType.canCarryUnits()) {
                             capacity += unitType.getSpace() * n;
                         }
+                        added = true;
                         break;
                     }
                 }
+                if (!added) navalUnits.add(units);
             } else {
                 for (AbstractUnit refUnit : landUnits) {
-                    if (refUnit.getId().equals(units.getId())
+                    if (refUnit.getUnitType(spec) == unitType
                         && refUnit.getRole().equals(units.getRole())) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         spaceRequired += unitType.getSpaceTaken() * n;
+                        added = true;
                         break;
                     }
                 }
+                if (!added) landUnits.add(units);
             }
             updateSpaceAndCapacity();
         }
