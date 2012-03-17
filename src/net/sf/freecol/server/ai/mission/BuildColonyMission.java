@@ -440,9 +440,8 @@ public class BuildColonyMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        final String targetStr = in.getAttributeValue(null, "target");
-        target = (targetStr == null) ? null
-            : (Tile) getGame().getFreeColGameObject(targetStr);
+        target = (Tile)getGame()
+            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
         final Unit unit = getUnit();
         colonyValue = (unit == null) ? -1
             : unit.getOwner().getColonyValue(target);

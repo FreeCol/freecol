@@ -318,7 +318,7 @@ public class CashInTreasureTrainMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
         targetLoc = (Location) getGame()
-            .getFreeColGameObject(in.getAttributeValue(null, "target"));
+            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
     }
 
     /**

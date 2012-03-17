@@ -331,7 +331,7 @@ public class ScoutingMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
         target = (Tile) getGame()
-            .getFreeColGameObject(in.getAttributeValue(null, "target"));
+            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
     }
 
     /**

@@ -457,7 +457,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
         target = (Location)getGame()
-            .getFreeColGameObject(in.getAttributeValue(null, "target"));
+            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
     }
 
     /**
