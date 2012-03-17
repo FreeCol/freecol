@@ -245,6 +245,7 @@
             <fileset dir="${freecol.packaging.dir}/common" includes="COPYING"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="README"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol"/>
+            <fileset dir="${freecol.packaging.dir}/common" includes="freecol.cmd"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol.xpm"/>
             <fileset dir="${basedir}" includes="data/**" excludes="**/.svn/**"/>
             <fileset dir="${basedir}" includes="jars/**" excludes="**/.svn/**"/>

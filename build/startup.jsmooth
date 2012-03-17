@@ -16,8 +16,12 @@
     <executableName>freecol.exe</executableName>
     <iconLocation>../packaging/icons/freecol2.ico</iconLocation>
     <initialMemoryHeap>134217728</initialMemoryHeap>
+    <javaProperties>
+        <name>sun.java2d.d3d</name>
+        <value>false</value>
+    </javaProperties>
     <mainClassName>net.sf.freecol.FreeCol</mainClassName>
-    <maximumMemoryHeap>268435456</maximumMemoryHeap>
+    <maximumMemoryHeap>536870912</maximumMemoryHeap>
     <maximumVersion></maximumVersion>
     <minimumVersion>1.4</minimumVersion>
     <skeletonName>Windowed Wrapper</skeletonName>
