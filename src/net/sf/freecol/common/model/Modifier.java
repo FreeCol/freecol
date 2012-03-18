@@ -220,20 +220,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public float getValue(Turn turn) {
         if (hasIncrement()) {
             if (appliesTo(null, turn)) {
-                float incrementedValue = value;
-                float diff = (turn.getNumber() - getFirstTurn().getNumber()) * increment;
-                switch (incrementType) {
-                case ADDITIVE:
-                    incrementedValue += diff;
-                    break;
-                case MULTIPLICATIVE:
-                    incrementedValue *= diff;
-                    break;
-                case PERCENTAGE:
-                    incrementedValue += (incrementedValue * diff) / 100;
-                    break;
-                }
-                return incrementedValue;
+                return apply(value, (turn.getNumber() - getFirstTurn().getNumber()) * increment);
             } else {
                 return 0;
             }
@@ -304,6 +291,41 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
+     * Applies the given value to the given base value, depending on
+     * the type of this Modifier.
+     *
+     * @param base a <code>float</code> value
+     * @param value a <code>float</code> value
+     * @return a <code>float</code> value
+     */
+    public float apply(float base, float value) {
+        return apply(base, value, type);
+    }
+
+    /**
+     * Applies the given value to the given base value, depending on
+     * the give modifier Type.
+     *
+     * @param base a <code>float</code> value
+     * @param value a <code>float</code> value
+     * @param value a <code>Type</code> value
+     * @return a <code>float</code> value
+     */
+    private float apply(float base, float value, Type type) {
+        switch (type) {
+        case ADDITIVE:
+            return base + value;
+        case MULTIPLICATIVE:
+            return base * value;
+        case PERCENTAGE:
+            return base + (base * value) / 100;
+        default:
+            return base;
+        }
+    }
+
+
+    /**
      * Applies this Modifier to a number. This method does not take
      * scopes, increments or time limits into account.
      *
@@ -311,16 +333,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @return a <code>float</code> value
      */
     public float applyTo(float number) {
-        switch (type) {
-        case ADDITIVE:
-            return number + value;
-        case MULTIPLICATIVE:
-            return number * value;
-        case PERCENTAGE:
-            return number + (number * value) / 100;
-        default:
-            return number;
-        }
+        return apply(number, value);
     }
 
     /**
@@ -332,16 +345,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @return The modified number.
      */
     public float applyTo(float number, Turn turn) {
-        switch (type) {
-        case ADDITIVE:
-            return number + getValue(turn);
-        case MULTIPLICATIVE:
-            return number * getValue(turn);
-        case PERCENTAGE:
-            return number + (number * getValue(turn)) / 100;
-        default:
-            return number;
-        }
+        return apply(number, getValue(turn), incrementType);
     }
 
     public int hashCode() {
