@@ -74,7 +74,7 @@ public class WorkProductionPanel extends FreeColPanel {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
             Set<Modifier> tileModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
-            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), tileModifiers) > 0) {
+            if (FeatureContainer.applyModifierSet(0f, turn, tileModifiers) > 0) {
                 tileModifiers.addAll(unit.getModifierSet(goodsType.getId()));
                 unitModifiers.addAll(tileModifiers);
                 if (colony.getProductionBonus() != 0) {
@@ -171,12 +171,12 @@ public class WorkProductionPanel extends FreeColPanel {
         boolean percentage = false;
         switch(modifier.getType()) {
         case ADDITIVE:
-            if (modifier.getValue() > 0) {
+            if (value > 0) {
                 bonus = "+" + bonus;
             }
             break;
         case PERCENTAGE:
-            if (modifier.getValue() > 0) {
+            if (value > 0) {
                 bonus = "+" + bonus;
             }
             percentage = true;
@@ -191,7 +191,7 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new JLabel(bonus));
         add(new JLabel(percentage ? "%" : ""));
 
-        return modifier.applyTo(result);
+        return modifier.applyTo(result, turn);
     }
 
 

@@ -311,13 +311,34 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @return a <code>float</code> value
      */
     public float applyTo(float number) {
-        switch(type) {
+        switch (type) {
         case ADDITIVE:
             return number + value;
         case MULTIPLICATIVE:
             return number * value;
         case PERCENTAGE:
             return number + (number * value) / 100;
+        default:
+            return number;
+        }
+    }
+
+    /**
+     * Applies this Modifier to a number. This method does take increments
+     * into account.
+     *
+     * @param number The number to modify.
+     * @param turn The <code>Turn</code> to evaluate increments in.
+     * @return The modified number.
+     */
+    public float applyTo(float number, Turn turn) {
+        switch (type) {
+        case ADDITIVE:
+            return number + getValue(turn);
+        case MULTIPLICATIVE:
+            return number * getValue(turn);
+        case PERCENTAGE:
+            return number + (number * getValue(turn)) / 100;
         default:
             return number;
         }
