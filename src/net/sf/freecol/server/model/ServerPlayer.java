@@ -2662,6 +2662,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Tile tile = settlement.getTile();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
+        StringTemplate attackerNation = attackerPlayer.getNationName();
         StringTemplate nativeNation = nativePlayer.getNationName();
         String settlementName = settlement.getName();
         boolean capital = settlement.isCapital();
@@ -2709,7 +2710,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addGlobalHistory(game,
                 new HistoryEvent(game.getTurn(),
                     HistoryEvent.EventType.DESTROY_NATION)
-                .addStringTemplate("%nation%", nativeNation));
+                .addStringTemplate("%nation%", attackerNation)
+                .addStringTemplate("%nativeNation%", nativeNation));
         }
         cs.addAttribute(See.only(attackerPlayer), "sound",
             "sound.event.destroySettlement");
@@ -3237,7 +3239,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.EventType.DESTROY_NATION)
-                .addStringTemplate("%nation%", nativeNation));
+                .addStringTemplate("%nation%", winnerNation)
+                .addStringTemplate("%nativeNation%", nativeNation));
         }
 
         // Transfer equipment, do not generate messages for the loser.
