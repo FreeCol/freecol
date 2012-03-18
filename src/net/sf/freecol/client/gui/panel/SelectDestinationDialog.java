@@ -210,7 +210,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             for (Settlement s : p.getSettlements()) {
                 if (!s.isConnected()) continue;
                 PathNode path = unit.findPathToEurope(s.getTile());
-                if (path != null) {
+                if (path != null
+                    && unit.getMoveType(path.getTile(), s.getTile(),
+                                        unit.getInitialMovesLeft()).isLegal()) {
                     String extras = (s.getOwner() != unit.getOwner())
                         ? getExtras(unit, s, goodsTypes) : "";
                     destinations.add(new Destination(s,
