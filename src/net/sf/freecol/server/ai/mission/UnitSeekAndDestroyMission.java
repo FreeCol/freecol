@@ -391,7 +391,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 return;
             }
             logger.finest(tag + " attacking " + currentTarget + ": " + unit);
-            AIMessage.askAttack(aiUnit, unitTile.getDirection(target.getTile()));
+            AIMessage.askAttack(aiUnit, unitTile.getDirection(currentTarget.getTile()));
             break;
         default:
             logger.finest(tag + " unexpected move type: " + mt + ": " + unit);
