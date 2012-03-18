@@ -218,14 +218,14 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @return a <code>float</code> value
      */
     public float getValue(Turn turn) {
-        if (hasIncrement()) {
-            if (appliesTo(null, turn)) {
+        if (appliesTo(turn)) {
+            if (hasIncrement()) {
                 return apply(value, (turn.getNumber() - getFirstTurn().getNumber()) * increment, incrementType);
             } else {
-                return 0;
+                return value;
             }
         } else {
-            return value;
+            return 0;
         }
     }
 

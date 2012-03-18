@@ -175,21 +175,28 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
-     * Returns true if the <code>appliesTo</code> method of at least
-     * one <code>Scope</code> object returns true.
+     * Returns whether this Feature applies to the given Turn.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return a <code>boolean</code> value
+     */
+    protected boolean appliesTo(Turn turn) {
+        return !(turn != null &&
+                 (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
+                  lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
+    }
+
+
+    /**
+     * Returns true if this Feature applies to both the given
+     * FreeColGameObjectType and the given Turn.
      *
      * @param objectType a <code>FreeColGameObjectType</code> value
      * @param turn a <code>Turn</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(final FreeColGameObjectType objectType, Turn turn) {
-        if (turn != null &&
-            (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
-             lastTurn != null && turn.getNumber() > lastTurn.getNumber())) {
-            return false;
-        } else {
-            return appliesTo(objectType);
-        }
+    protected boolean appliesTo(final FreeColGameObjectType objectType, Turn turn) {
+        return appliesTo(turn) && appliesTo(objectType);
     }
 
     /**
