@@ -220,7 +220,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     public float getValue(Turn turn) {
         if (hasIncrement()) {
             if (appliesTo(null, turn)) {
-                return apply(value, (turn.getNumber() - getFirstTurn().getNumber()) * increment);
+                return apply(value, (turn.getNumber() - getFirstTurn().getNumber()) * increment, incrementType);
             } else {
                 return 0;
             }
@@ -345,7 +345,11 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * @return The modified number.
      */
     public float applyTo(float number, Turn turn) {
-        return apply(number, getValue(turn), incrementType);
+        if (incrementType == null) {
+            return apply(number, value);
+        } else {
+            return apply(number, getValue(turn), type);
+        }
     }
 
     public int hashCode() {
