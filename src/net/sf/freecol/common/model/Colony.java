@@ -2735,8 +2735,12 @@ public class Colony extends Settlement implements Nameable {
             // which is currently only those with increments.
             // Fixed features will be added from their origins (usually
             // buildings).
+            int turnNumber = getGame().getTurn().getNumber();
             for (Modifier modifier : getModifiers()) {
-                if (modifier.hasIncrement()) modifier.toXML(out);
+                if (modifier.hasIncrement()
+                    && turnNumber <= modifier.getLastTurn().getNumber()) {
+                    modifier.toXML(out);
+                }
             }
 
             for (WorkLocation workLocation : getAllWorkLocations()) {
