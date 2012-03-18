@@ -122,8 +122,8 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     // The color to use for links
     protected static final Color LINK_COLOR
         = ResourceManager.getColor("lookAndFeel.link.color");
-    
-    
+
+
     // The color to use for borders
     protected static final Color BORDER_COLOR
         = ResourceManager.getColor("lookAndFeel.border.color");
@@ -228,6 +228,23 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      */
     public static final DecimalFormat getModifierFormat() {
         return modifierFormat;
+    }
+
+    public static final String[] getModifierStrings(float value, Modifier.Type type) {
+        String[] result;
+        String bonus = modifierFormat.format(value);
+        if (value > 0) {
+            result = new String[] { "+", bonus, null };
+        } else {
+            result = new String[] { "-", bonus.substring(1), null };
+        }
+        if (type == Modifier.Type.PERCENTAGE) {
+            result[2] = "%";
+        } else if (type == Modifier.Type.MULTIPLICATIVE) {
+            // this assumes that no multiplicative modifier will ever be negative
+            result[0] = "\u00D7";
+        }
+        return result;
     }
 
     /**

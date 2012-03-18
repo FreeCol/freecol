@@ -129,10 +129,9 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         JLabel finalDefenceLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
         add(finalDefenceLabel, "skip");
-        JLabel finalDefenceResult = new JLabel(getModifierFormat().format(defenceResult));
-        if (defenceResult == Modifier.UNKNOWN) {
-            finalDefenceResult.setText("???");
-        }
+        JLabel finalDefenceResult = (defenceResult == Modifier.UNKNOWN)
+            ? new JLabel("???")
+            : new JLabel(getModifierFormat().format(defenceResult));
         finalDefenceResult.setFont(bigFont);
         add(finalDefenceResult);
 
@@ -160,30 +159,14 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             sourceName = Messages.message(source.getNameKey());
         }
         add(new JLabel(sourceName), constraint);
-        String bonus = getModifierFormat().format(modifier.getValue());
-        boolean percent = false;
-        switch(modifier.getType()) {
-        case ADDITIVE:
-            if (modifier.getValue() > 0) {
-                bonus = "+" + bonus;
-            }
-            break;
-        case PERCENTAGE:
-            if (modifier.getValue() > 0) {
-                bonus = "+" + bonus;
-            }
-            percent = true;
-            break;
-        case MULTIPLICATIVE:
-            bonus = "\u00D7" + bonus;
-            break;
-        default:
+        String[] bonus = getModifierStrings(modifier.getValue(), modifier.getType());
+        add(new JLabel(bonus[0] + bonus[1]));
+        if (bonus[2] == null) {
+            return false;
+        } else {
+            add(new JLabel(bonus[2]));
+            return true;
         }
-        add(new JLabel(bonus));
-        if (percent) {
-            add(new JLabel("%"));
-        }
-        return percent;
     }
 
     public void actionPerformed(ActionEvent event) {

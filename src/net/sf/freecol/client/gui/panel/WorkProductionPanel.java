@@ -123,7 +123,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
 
         if (!modifiers.isEmpty()) {
-            add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
+            add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
 
             for (Modifier modifier : modifiers) {
                 result = addModifier(modifier, unitType, result);
@@ -167,30 +167,12 @@ public class WorkProductionPanel extends FreeColPanel {
         if (value == 0) {
             return result;
         }
-        String bonus = getModifierFormat().format(value);
-        boolean percentage = false;
-        switch(modifier.getType()) {
-        case ADDITIVE:
-            if (value > 0) {
-                bonus = "+" + bonus;
-            }
-            break;
-        case PERCENTAGE:
-            if (value > 0) {
-                bonus = "+" + bonus;
-            }
-            percentage = true;
-            break;
-        case MULTIPLICATIVE:
-            bonus = "\u00D7" + bonus;
-            break;
-        default:
-        }
-
+        String[] bonus = getModifierStrings(value, modifier.getType());
         add(new JLabel(sourceName), "newline");
-        add(new JLabel(bonus));
-        add(new JLabel(percentage ? "%" : ""));
-
+        add(new JLabel(bonus[0] + bonus[1]));
+        if (bonus[2] != null) {
+            add(new JLabel(bonus[2]));
+        }
         return modifier.applyTo(result, turn);
     }
 
