@@ -292,7 +292,9 @@ public class FeatureContainer {
         float result = number;
         for (Modifier modifier : modifierSet) {
             float value = modifier.getValue(turn);
-            if (value != Modifier.UNKNOWN) {
+            if (value == Modifier.UNKNOWN) {
+                return value;
+            } else {
                 switch (modifier.getType()) {
                 case ADDITIVE:
                     result += value;

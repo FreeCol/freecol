@@ -87,7 +87,7 @@ public class ModifierTest extends FreeColTestCase {
     }
 
     public void testCombinedModifier() {
-        
+
         Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
         Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
@@ -138,12 +138,12 @@ public class ModifierTest extends FreeColTestCase {
 
         Set<Modifier> result = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
-        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, 
+        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
                 FeatureContainer.applyModifierSet(1, null, result));
 
         result = featureContainer.getModifierSet("test", carpenter, null);
         assertEquals(2, result.size());
-        assertEquals(1.5f + (1.5f * 30) / 100, 
+        assertEquals(1.5f + (1.5f * 30) / 100,
                 FeatureContainer.applyModifierSet(1, null, result));
 
         List<Scope> scopes2 = new ArrayList<Scope>();
@@ -155,13 +155,13 @@ public class ModifierTest extends FreeColTestCase {
 
         result = featureContainer.getModifierSet("test", frigate, null);
         assertEquals(3, result.size());
-        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, 
+        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100,
                 FeatureContainer.applyModifierSet(1, null, result));
 
         result = featureContainer.getModifierSet("test", carpenter, null);
         assertEquals(2, result.size());
 
-        assertEquals(1.5f + (1.5f * 30) / 100, 
+        assertEquals(1.5f + (1.5f * 30) / 100,
                 FeatureContainer.applyModifierSet(1, null, result));
     }
 
@@ -299,6 +299,25 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.hashCode() == modifier2.hashCode());
         assertFalse(modifier2.equals(modifier3));
         assertFalse(modifier2.hashCode() == modifier3.hashCode());
+
+    }
+
+    /**
+     * The presence of a single Modifier with an unknown value
+     * produces an unknown result.
+     */
+    public void testModifierUnknown() {
+
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", Modifier.UNKNOWN, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
+
+        FeatureContainer featureContainer = new FeatureContainer();
+        FeatureContainer.addModifier(featureContainer, modifier1);
+        FeatureContainer.addModifier(featureContainer, modifier2);
+        FeatureContainer.addModifier(featureContainer, modifier3);
+
+        assertEquals(Modifier.UNKNOWN, featureContainer.applyModifier(1, "test", null, new Turn(15)));
 
     }
 
