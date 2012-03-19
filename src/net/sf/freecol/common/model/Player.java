@@ -2968,7 +2968,7 @@ public class Player extends FreeColGameObject implements Nameable {
         Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
         boolean ret = false;
         for (Ability ability : getAbilitySet("model.ability.addTaxToBells")) {
-            FreeColGameObjectType source = ability.getSource();
+            FreeColObject source = ability.getSource();
             if (source != null) {
                 for (Modifier modifier : libertyBonus) {
                     if (source.equals(modifier.getSource())) {

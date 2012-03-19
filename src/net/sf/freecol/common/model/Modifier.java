@@ -105,11 +105,11 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param source a <code>FreeColGameObjectType</code> value
+     * @param source a <code>FreeColObject</code> value
      * @param value an <code>float</code> value
      * @param type the Type of the modifier
      */
-    public Modifier(String id, FreeColGameObjectType source, float value, Type type) {
+    public Modifier(String id, FreeColObject source, float value, Type type) {
         setId(id);
         setSource(source);
         setType(type);

@@ -38,7 +38,7 @@ public abstract class Feature extends FreeColObject {
     /**
      * The source of this Feature, e.g. a UnitType.
      */
-    private FreeColGameObjectType source;
+    private FreeColObject source;
 
     /**
      * The first Turn in which this Feature applies.
@@ -141,7 +141,7 @@ public abstract class Feature extends FreeColObject {
      *
      * @return a <code>String</code> value
      */
-    public final FreeColGameObjectType getSource() {
+    public final FreeColObject getSource() {
         return source;
     }
 
@@ -150,7 +150,7 @@ public abstract class Feature extends FreeColObject {
      *
      * @param newSource The new Source value.
      */
-    public final void setSource(final FreeColGameObjectType newSource) {
+    public final void setSource(final FreeColObject newSource) {
         this.source = newSource;
     }
 

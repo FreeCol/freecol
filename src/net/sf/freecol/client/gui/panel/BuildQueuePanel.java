@@ -263,7 +263,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                         && ability.getSource() != null
                         && !unbuildableTypes.contains(ability.getSource())) {
                         builderFound = true;
-                        lockReason.add(Messages.message(ability.getSource().getNameKey()));
+                        lockReason.add(Messages.getName(ability.getSource()));
                         break;
                     }
                 }

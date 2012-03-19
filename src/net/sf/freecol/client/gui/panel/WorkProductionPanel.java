@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FeatureContainer;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Scope;
@@ -149,12 +149,12 @@ public class WorkProductionPanel extends FreeColPanel {
 
 
     private float addModifier(Modifier modifier, UnitType unitType, float result) {
-        FreeColGameObjectType source = modifier.getSource();
+        FreeColObject source = modifier.getSource();
         String sourceName;
         if (source == null) {
             sourceName = "???";
         } else {
-            sourceName = Messages.message(source.getNameKey());
+            sourceName = Messages.getName(source);
             if (unitType != null && modifier.hasScope()) {
                 for (Scope scope : modifier.getScopes()) {
                     if (scope.appliesTo(unitType)) {

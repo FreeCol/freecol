@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
@@ -153,10 +153,10 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
                 constraint += ", skip " + skip;
             }
         }
-        FreeColGameObjectType source = modifier.getSource();
+        FreeColObject source = modifier.getSource();
         String sourceName = "???";
         if (source != null) {
-            sourceName = Messages.message(source.getNameKey());
+            sourceName = Messages.getName(source);
         }
         add(new JLabel(sourceName), constraint);
         String[] bonus = getModifierStrings(modifier.getValue(), modifier.getType());

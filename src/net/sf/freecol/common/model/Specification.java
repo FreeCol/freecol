@@ -455,8 +455,9 @@ public final class Specification {
     public List<FreeColGameObjectType> getTypesProviding(String id, boolean value) {
         List<FreeColGameObjectType> result = new ArrayList<FreeColGameObjectType>();
         for (Ability ability : getAbilities(id)) {
-            if (ability.getValue() == value && ability.getSource() != null) {
-                result.add(ability.getSource());
+            if (ability.getValue() == value
+                && ability.getSource() instanceof FreeColGameObjectType) {
+                result.add((FreeColGameObjectType) ability.getSource());
             }
         }
         return result;
