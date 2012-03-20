@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -27,16 +28,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -79,7 +78,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     private ColonyTradeItemPanel colonyOffer, colonyDemand;
     private GoodsTradeItemPanel goodsOffer, goodsDemand;
     //private UnitTradeItemPanel unitOffer, unitDemand;
-    private JTextPane summary;
+    private JPanel summary;
 
     private final Unit unit;
     private final Settlement settlement;
@@ -88,6 +87,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     private Player sender;
     private Player recipient;
     private boolean canAccept;
+
+    private String demandMessage;
+    private String offerMessage;
+    private String exchangeMessage;
+
+
 
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
@@ -101,7 +106,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
-     * @param freeColClient 
+     * @param freeColClient
      *
      * @param unit an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
@@ -128,6 +133,16 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             this.otherPlayer = sender;
         }
 
+        demandMessage =
+            Messages.message(StringTemplate.template("negotiationDialog.demand")
+                             .addStringTemplate("%nation%", sender.getNationName()));
+        offerMessage =
+            Messages.message(StringTemplate.template("negotiationDialog.offer")
+                             .addStringTemplate("%nation%", sender.getNationName()));
+        exchangeMessage =
+            Messages.message(StringTemplate.template("negotiationDialog.exchange")
+                             .addStringTemplate("%nation%", sender.getNationName()));
+
         if (player.atWarWith(otherPlayer)) {
             if (!hasPeaceOffer()) {
                 Stance stance = Stance.PEACE;
@@ -135,9 +150,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             }
         }
 
-        summary = getDefaultTextPane();
+        summary = new JPanel(new MigLayout("wrap 2", "[20px][]"));
         summary.setOpaque(false);
-        summary.setEditable(false);
     }
 
     /**
@@ -178,12 +192,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
         setLayout(new MigLayout("wrap 3", "[200, fill][300, fill][200, fill]", ""));
 
-        add(new JLabel(Messages.message("negotiationDialog.demand")), "center");
-        add(new JLabel(Messages.message("negotiationDialog.offer")), "skip, center");
+        add(new JLabel(demandMessage), "center");
+        add(new JLabel(offerMessage), "skip, center");
 
-        add(stance, "skip 2");
         add(goldDemand);
-        add(summary, "spany");
+        add(summary, "spany, top");
         add(goldOffer);
         if (unit.isCarrier()) {
             goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, null);
@@ -194,6 +207,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             add(colonyDemand);
             add(colonyOffer);
         }
+        add(stance, "skip");
         /** TODO: UnitTrade
             add(unitDemand, higConst.rc(row, demandColumn));
             add(unitOffer, higConst.rc(row, offerColumn));
@@ -206,54 +220,31 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     }
 
     private void updateSummary() {
-        try {
-            StyledDocument document = summary.getStyledDocument();
-            document.remove(0, document.getLength());
+        summary.removeAll();
 
-            String input = Messages.message("negotiationDialog.summary");
-            int start = input.indexOf('%');
-            if (start == -1) {
-                // no variables present
-                insertText(input.substring(0));
-                return;
-            } else if (start > 0) {
-                // output any string before the first occurence of '%'
-                insertText(input.substring(0, start));
-            }
-            int end;
+        List<TradeItem> offers = getItemsFor(sender);
+        List<TradeItem> demands = getItemsFor(recipient);
 
-            loop: while ((end = input.indexOf('%', start + 1)) >= 0) {
-                String var = input.substring(start, end + 1);
-                if (var.equals("%nation%")) {
-                    insertText(Messages.message(sender.getNationName()));
-                    start = end + 1;
-                    continue loop;
-                } else if (var.equals("%offers%")) {
-                    insertOffers();
-                    start = end + 1;
-                    continue loop;
-                } else if (var.equals("%demands%")) {
-                    insertDemands();
-                    start = end + 1;
-                    continue loop;
-                } else {
-                    // found no variable to replace: either a single '%', or
-                    // some unnecessary variable
-                    insertText(input.substring(start, end));
-                    start = end;
-                }
+        if (!offers.isEmpty()) {
+            summary.add(new JLabel(offerMessage), "span");
+            for (TradeItem item : offers) {
+                summary.add(getTradeItemButton(item), "skip");
             }
-
-            // output any string after the last occurence of '%'
-            if (start < input.length()) {
-                insertText(input.substring(start));
-            }
-        } catch(Exception e) {
-            logger.warning("Failed to update summary: " + e.toString());
         }
+        if (!demands.isEmpty()) {
+            if (offers.isEmpty()) {
+                summary.add(new JLabel(demandMessage), "span");
+            } else {
+                summary.add(new JLabel(exchangeMessage), "newline 20, span");
+            }
+            for (TradeItem item : demands) {
+                summary.add(getTradeItemButton(item), "skip");
+            }
+        }
+
     }
 
-    private void updateOfferItems(){
+    private void updateOfferItems() {
         // Update stance options
         stance.updateStanceBox();
 
@@ -314,8 +305,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
             // Update the list of goods available to add to agreement
             goodsDemand.updateGoodsBox(goodsAvail);
-        }
-        else{
+        } else {
             // Update the list of colonies available to add to agreement
             colonyDemand.updateColonyBox();
         }
@@ -327,72 +317,43 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         updateSummary();
     }
 
-    private void insertText(String text) throws Exception {
-        StyledDocument document = summary.getStyledDocument();
-        document.insertString(document.getLength(), text,
-                              document.getStyle("regular"));
-    }
-
-    private void insertOffers() {
-        insertTradeItemDescriptions(sender);
-    }
-
-    private void insertDemands() {
-        insertTradeItemDescriptions(recipient);
-    }
-
-    private void insertTradeItemDescriptions(Player itemSource) {
-        StyledDocument document = summary.getStyledDocument();
-        List<TradeItem> items = agreement.getTradeItems();
-        boolean foundItem = false;
-        for (int index = 0; index < items.size(); index++) {
-            TradeItem item = items.get(index);
-            if (item.getSource() == itemSource) {
-                foundItem = true;
-                String description = "";
-                if (item instanceof StanceTradeItem) {
-                    description = Messages.getStanceAsString(((StanceTradeItem) item).getStance());
-                } else if (item instanceof GoldTradeItem) {
-                    int gold = ((GoldTradeItem) item).getGold();
-                    description = Messages.message(StringTemplate.template("tradeItem.gold.long")
-                                                   .addAmount("%amount%", gold));
-                } else if (item instanceof ColonyTradeItem) {
-                    description = Messages.message(StringTemplate.template("tradeItem.colony.long")
-                                                   .addName("%colony%", ((ColonyTradeItem) item).getColonyName()));
-                } else if (item instanceof GoodsTradeItem) {
-                    description = Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                                   .addAmount("%amount%", ((GoodsTradeItem) item).getGoods().getAmount())
-                                                   .add("%goods%", ((GoodsTradeItem) item).getGoods().getNameKey()));
-                } else if (item instanceof UnitTradeItem) {
-                    description = Messages.message(((UnitTradeItem) item).getUnit().getLabel());
-                }
-                try {
-                    JButton button = getLinkButton(description, null, String.valueOf(index));
-                    button.addActionListener(this);
-                    StyleConstants.setComponent(document.getStyle("button"), button);
-                    document.insertString(document.getLength(), " ", document.getStyle("button"));
-                    if (index < items.size() - 1) {
-                        document.insertString(document.getLength(), ", ", document.getStyle("regular"));
-                    } else {
-                        return;
-                    }
-                } catch(Exception e) {
-                    logger.warning(e.toString());
-                }
+    private List<TradeItem> getItemsFor(Player source) {
+        List<TradeItem> result = new ArrayList<TradeItem>();
+        for (TradeItem item : agreement.getTradeItems()) {
+            if (item.getSource() == source) {
+                result.add(item);
             }
         }
-
-        if (!foundItem) {
-            try {
-                document.insertString(document.getLength(), Messages.message("negotiationDialog.nothing"),
-                                      document.getStyle("regular"));
-            } catch(Exception e) {
-                logger.warning(e.toString());
-            }
-        }
+        return result;
     }
 
-
+    private JButton getTradeItemButton(TradeItem item) {
+        String description = null;
+        if (item instanceof StanceTradeItem) {
+            description = Messages.getStanceAsString(((StanceTradeItem) item).getStance());
+        } else if (item instanceof GoldTradeItem) {
+            int gold = ((GoldTradeItem) item).getGold();
+            description = Messages.message(StringTemplate.template("tradeItem.gold.long")
+                                           .addAmount("%amount%", gold));
+        } else if (item instanceof ColonyTradeItem) {
+            description = Messages.message(StringTemplate.template("tradeItem.colony.long")
+                                           .addName("%colony%", ((ColonyTradeItem) item).getColonyName()));
+        } else if (item instanceof GoodsTradeItem) {
+            description = Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                           .addAmount("%amount%", ((GoodsTradeItem) item).getGoods().getAmount())
+                                           .add("%goods%", ((GoodsTradeItem) item).getGoods().getNameKey()));
+        } else if (item instanceof UnitTradeItem) {
+            description = Messages.message(((UnitTradeItem) item).getUnit().getLabel());
+        }
+        JButton button = new JButton(new RemoveAction(item));
+        button.setText(description);
+        button.setMargin(emptyMargin);
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
 
     private boolean hasPeaceOffer() {
         return (getStance() != null);
@@ -468,6 +429,19 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         return agreement.getStance();
     }
 
+    private class RemoveAction extends AbstractAction {
+        private TradeItem item;
+
+        public RemoveAction(TradeItem item) {
+            this.item = item;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            agreement.remove(item);
+            updateDialog();
+        }
+    }
+
 
     /**
      * Analyzes an event and calls the right external methods to take care of
@@ -487,10 +461,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         } else if (command.equals(SEND)) {
             agreement.setStatus(TradeStatus.PROPOSE_TRADE);
             setResponse(agreement);
-        } else {
-            int index = Integer.parseInt(command);
-            agreement.remove(index);
-            updateDialog();
         }
     }
 
