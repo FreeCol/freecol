@@ -184,10 +184,10 @@ public class WorkerWish extends Wish {
         } else {
             transportable = null;
         }
-        setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
+        setValue(getAttribute(in, "value", -1));
 
         unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
-        expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
+        expertNeeded = getAttribute(in, "expertNeeded", false);
         in.nextTag();
 
         attachToDestination();

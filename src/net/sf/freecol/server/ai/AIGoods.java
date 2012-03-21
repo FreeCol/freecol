@@ -375,7 +375,7 @@ public class AIGoods extends AIObject implements Transportable {
         } else {
             destination = null;
         }
-        transportPriority = Integer.parseInt(in.getAttributeValue(null, "transportPriority"));
+        transportPriority = getAttribute(in, "transportPriority", -1);
 
         final String transportStr = in.getAttributeValue(null, "transport");
         if (transportStr != null) {
