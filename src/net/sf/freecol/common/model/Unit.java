@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -1347,6 +1348,66 @@ public class Unit extends FreeColGameObject
         // a well defined start and end tile.
         Tile start = (carrier == null) ? getTile() : carrier.getTile();
         return getTurnsToReach(start, destination.getTile());
+    }
+
+    /**
+     * Find a path for this unit to the nearest settlement with the
+     * same owner that is reachable without a carrier.
+     *
+     * @param excludeStart If true, ignore any settlement the unit is
+     *     currently in.
+     * @return The nearest matching settlement if any, otherwise null.
+     */
+    private PathNode findOurNearestSettlement(final boolean excludeStart) {
+        final Player player = getOwner();
+        if (player.getNumberOfSettlements() <= 0
+            || getTile() == null) return null;
+
+        final Tile startTile = getTile();
+        final GoalDecider gd = new GoalDecider() {
+                private int bestValue = Integer.MAX_VALUE;
+                private PathNode best = null;
+
+                public PathNode getGoal() { return best; }
+                public boolean hasSubGoals() { return true; }
+                public boolean check(Unit u, PathNode path) {
+                    Tile t = path.getTile();
+                    if (t == startTile && excludeStart) return false;
+                    Settlement settlement = t.getSettlement();
+                    int value;
+                    if (settlement != null
+                        && settlement.getOwner() == player
+                        && (value = path.getTotalTurns()) < bestValue) {
+                        bestValue = value;
+                        best = path;
+                        return true;
+                    }
+                    return false;
+                }
+            };
+        return search(startTile, gd, CostDeciders.avoidIllegal(),
+                      Integer.MAX_VALUE, null);
+    }
+
+    /**
+     * Find a path for this unit to the nearest settlement with the
+     * same owner that is reachable without a carrier.
+     *
+     * @return The nearest settlement if any, otherwise null.
+     */
+    public PathNode findOurNearestSettlement() {
+        return findOurNearestSettlement(false);
+    }
+
+    /**
+     * Find a path for this unit to the nearest settlement with the
+     * same owner that is reachable without a carrier, excepting any
+     * on the current tile.
+     *
+     * @return The nearest settlement if any, otherwise null.
+     */
+    public PathNode findOurNearestOtherSettlement() {
+        return findOurNearestSettlement(true);
     }
 
     /**

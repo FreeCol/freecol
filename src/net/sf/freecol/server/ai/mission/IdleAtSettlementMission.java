@@ -96,7 +96,7 @@ public class IdleAtSettlementMission extends Mission {
         final Unit unit = getUnit();
         if (unit.getTile() == null
             || unit.getTile().getSettlement() != null) return null;
-        PathNode path = findNearestOtherSettlement(unit);
+        PathNode path = unit.findOurNearestOtherSettlement();
         Tile target = (path == null) ? null : path.getLastNode().getTile();
         return (shouldTakeTransportToTile(target)) ? target : null;
     }
@@ -131,7 +131,7 @@ public class IdleAtSettlementMission extends Mission {
         // If our tile contains a settlement, idle.  No log, this is normal.
         if (unit.getTile().getSettlement() != null) return;
 
-        PathNode path = findNearestOtherSettlement(unit);
+        PathNode path = unit.findOurNearestOtherSettlement();
         if (path != null) {
             travelToTarget("AI idler", path.getLastNode().getTile());
         } else { // Just make a random move if no target can be found.

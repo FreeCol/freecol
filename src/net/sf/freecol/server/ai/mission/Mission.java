@@ -142,7 +142,12 @@ public abstract class Mission extends AIObject {
      * @return The <code>EuropeanAIPlayer</code>.
      */
     protected EuropeanAIPlayer getEuropeanAIPlayer() {
-        return (EuropeanAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
+        Player player = getUnit().getOwner();
+        if (!player.isEuropean()) {
+            throw new IllegalArgumentException("Not a European player: "
+                + player);
+        }
+        return (EuropeanAIPlayer)getAIMain().getAIPlayer(player);
     }
 
     /**
@@ -220,13 +225,23 @@ public abstract class Mission extends AIObject {
         }
     }
 
-
-    protected void moveUnitToAmerica() {
-        AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getGame().getMap());
+    /**
+     * Moves a unit to the new world.
+     *
+     * @return True if there was no c-s problem.
+     */
+    protected boolean moveUnitToAmerica() {
+        return AIMessage.askMoveTo(aiUnit,
+            getUnit().getOwner().getGame().getMap());
     }
 
-    protected void moveUnitToEurope() {
-        AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getEurope());
+    /**
+     * Moves a unit to Europe.
+     *
+     * @return True if there was no c-s problem.
+     */
+    protected boolean moveUnitToEurope() {
+        return AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getEurope());
     }
 
 
@@ -284,13 +299,8 @@ public abstract class Mission extends AIObject {
                     return false;
                 }
 
-                if( defender.getOwner() == unit.getOwner()){
-                    return false;
-                }
-
-                if (newTile.isLand() && unit.isNaval() || !newTile.isLand() && !unit.isNaval()) {
-                    return false;
-                }
+                if (defender.getOwner() == unit.getOwner()
+                    || newTile.isLand() == unit.isNaval()) return false;
 
                 int tension = unit.getOwner().getTension(defender.getOwner()).getValue();
                 if (unit.getIndianSettlement() != null &&
@@ -364,61 +374,40 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Find the nearest reachable settlement to a unit (owned by the
-     * same player) excepting any on the current tile.
-     *
-     * @param unit The <code>Unit</code> to check.
-     * @return The nearest settlement if any, otherwise null.
-     */
-    protected PathNode findNearestOtherSettlement(Unit unit) {
-        Player player = unit.getOwner();
-        PathNode nearest = null;
-        int dist = Integer.MAX_VALUE;
-        for (Settlement settlement : player.getSettlements()) {
-            if (settlement.getTile() == unit.getTile()) return null;
-            PathNode path = unit.findPath(settlement.getTile());
-            if (path != null) {
-                int d = path.getTotalTurns();
-                if (d < dist) {
-                    nearest = path;
-                    dist = d;
-                }
-            }
-        }
-        return nearest;
-    }
-
-    /**
      * Unload a unit.
+     * Fulfills a wish if possible.
      *
      * @param aiUnit The <code>AIUnit</code> to unload.
      * @return True if the unit is unloaded.
      */
     protected boolean unitLeavesShip(AIUnit aiUnit) {
+        boolean result = AIMessage.askDisembark(aiUnit);
         Colony colony = aiUnit.getUnit().getColony();
-        if (colony != null) {
+        if (result && colony != null) {
             AIColony ac = getAIMain().getAIColony(colony);
             if (ac != null) ac.completeWish(aiUnit.getUnit());
 
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
-        return AIMessage.askDisembark(aiUnit);
+        return result;
     }
 
     /**
-     * Unload some goods in a colony.
+     * Unload some goods.
+     * Fulfills a wish if possible.
      *
      * @param goods The <code>Goods</code> to unload.
      * @return True if the goods are unloaded.
      */
     protected boolean unloadCargoInColony(Goods goods) {
+        boolean result = AIMessage.askUnloadCargo(aiUnit, goods);
         Colony colony = aiUnit.getUnit().getColony();
         AIColony ac;
-        if (colony != null
+        if (result && colony != null
             && (ac = getAIMain().getAIColony(colony)) != null) {
             ac.completeWish(goods);
         }
-        return AIMessage.askUnloadCargo(aiUnit, goods);
+        return result;
     }
 
     /**
@@ -450,7 +439,7 @@ public abstract class Mission extends AIObject {
             .getAIPlayer(aiUnit.getUnit().getOwner());
 
         return new GoalDecider() {
-            private int bestValue = -1;
+            private int bestValue = Integer.MIN_VALUE;
             private PathNode best = null;
 
             public PathNode getGoal() { return best; }
@@ -647,6 +636,7 @@ public abstract class Mission extends AIObject {
     /**
      * Gets the transport destination of the unit associated with this
      * mission.
+     * TODO: is this still needed?
      *
      * @return The destination of a required transport or
      *         <code>null</code> if no transport is needed.
@@ -658,32 +648,10 @@ public abstract class Mission extends AIObject {
                 .getFullEntryLocation();
         }
         if (!unit.isOnCarrier()) return null;
+
         final Unit carrier = (Unit)unit.getLocation();
         if (carrier.getSettlement() != null) return carrier.getTile();
-
-        // Find the closest friendly Settlement:
-        GoalDecider gd = new GoalDecider() {
-            private PathNode bestTarget = null;
-
-            public PathNode getGoal() {
-                return bestTarget;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit unit, PathNode pathNode) {
-                Tile newTile = pathNode.getTile();
-                boolean hasOurSettlement = (newTile.getSettlement() != null)
-                    && newTile.getSettlement().getOwner() == unit.getOwner();
-                if (hasOurSettlement) bestTarget = pathNode;
-                return hasOurSettlement;
-            }
-        };
-        PathNode path = carrier.search(carrier.getTile(), gd,
-            CostDeciders.avoidSettlementsAndBlockingUnits(),
-            Integer.MAX_VALUE, null);
+        PathNode path = unit.findOurNearestSettlement();
         return (path == null) ? null : path.getLastNode().getTile();
     }
 

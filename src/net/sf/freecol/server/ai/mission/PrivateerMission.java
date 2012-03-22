@@ -274,7 +274,7 @@ public class PrivateerMission extends Mission {
         nearestPort = null;
         Unit unit = getUnit();
 
-        PathNode path = findNearestOtherSettlement(unit);
+        PathNode path = unit.findOurNearestOtherSettlement();
         if(path != null){
             nearestPort = path.getLastNode().getTile().getColony();
         }
