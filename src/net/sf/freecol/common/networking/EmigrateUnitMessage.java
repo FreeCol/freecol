@@ -100,8 +100,9 @@ public class EmigrateUnitMessage extends DOMMessage {
             }
             type = MigrationType.NORMAL;
         } else if (player.checkGold(europe.getRecruitPrice())) {
-            if (!selected) {
-                return DOMMessage.clientError("Invalid slot for recruitment.");
+            if (!selected && slot != 0) {
+                return DOMMessage.clientError("Invalid slot for recruitment: "
+                    + slot);
             }
             type = MigrationType.RECRUIT;
         } else {
