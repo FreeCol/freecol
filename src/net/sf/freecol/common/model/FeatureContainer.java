@@ -18,6 +18,7 @@
  */
 package net.sf.freecol.common.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -287,10 +288,11 @@ public class FeatureContainer {
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
-                                       List<Modifier> modifierSet) {
-        if (modifierSet == null || modifierSet.isEmpty()) return number;
+                                       List<Modifier> modifiers) {
+        if (modifiers == null || modifiers.isEmpty()) return number;
+        Collections.sort(modifiers);
         float result = number;
-        for (Modifier modifier : modifierSet) {
+        for (Modifier modifier : modifiers) {
             float value = modifier.getValue(turn);
             if (value == Modifier.UNKNOWN) {
                 return value;

@@ -464,28 +464,31 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * Returns the production of the given type of goods which would
      * be produced by the given unit
      *
-     * @param unit an <code>Unit</code> value
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param unit The <code>Unit</code> that is to produce.
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return The consequent production.
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
-        } else if (workTile.isLand() || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
-            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType, unit.getType());
-            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), modifiers) > 0) {
+        }
+
+        int result = 0;
+        if (workTile.isLand()
+            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
+            Turn turn = getGame().getTurn();
+            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
+                unit.getType());
+            if (FeatureContainer.applyModifierSet(0f, turn, modifiers) > 0) {
                 modifiers.addAll(unit.getModifierSet(goodsType.getId()));
                 modifiers.add(getColony().getProductionModifier(goodsType));
                 modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
-                List<Modifier> modifierList = new ArrayList<Modifier>(modifiers);
-                Collections.sort(modifierList);
-                return Math.max(1, (int) FeatureContainer.applyModifiers(0, getGame().getTurn(), modifierList));
-            } else {
-                return 0;
+                result = Math.max(1,
+                    (int)FeatureContainer.applyModifiers(0f, turn,
+                        new ArrayList<Modifier>(modifiers)));
             }
-        } else {
-            return 0;
         }
+        return result;
     }
 
     /**
@@ -510,19 +513,18 @@ public class ColonyTile extends WorkLocation implements Ownable {
         }
         if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
+            Turn turn = getGame().getTurn();
             Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
                                                                    unitType);
-            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
-                    modifiers) > 0) {
+            if (FeatureContainer.applyModifierSet(0f, turn, modifiers) > 0) {
                 if (unitType != null) {
                     modifiers.addAll(unitType.getModifierSet(goodsType.getId()));
                 }
                 modifiers.add(getColony().getProductionModifier(goodsType));
                 modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
-                List<Modifier> modifierList = new ArrayList<Modifier>(modifiers);
-                Collections.sort(modifierList);
-                production = Math.max((int) FeatureContainer.applyModifiers(0,
-                        getGame().getTurn(), modifierList), 1);
+                production = Math.max(1,
+                    (int)FeatureContainer.applyModifiers(0f, turn,
+                        new ArrayList<Modifier>(modifiers)));
             }
         }
         return production;

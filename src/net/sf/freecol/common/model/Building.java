@@ -414,10 +414,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             } else {
                 maximumInput = getProductivity();
             }
+            Turn turn = getGame().getTurn();
             List<Modifier> productionModifiers = getProductionModifiers();
-            int maximumProduction = (int) FeatureContainer
-                .applyModifiers(maximumInput, getGame().getTurn(),
-                                productionModifiers);
+            int maxProd = (int)FeatureContainer.applyModifiers(maximumInput,
+                turn, productionModifiers);
             int actualInput = (inputType == null)
                 ? maximumInput
                 : Math.min(maximumInput, availableInput);
@@ -438,12 +438,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 }
             }
             // output is the same as input, plus production bonuses
-            int production = (int) FeatureContainer
-                .applyModifiers(actualInput, getGame().getTurn(),
-                                productionModifiers);
-            if (production > 0) {
+            int prod = (int)FeatureContainer.applyModifiers(actualInput, turn,
+                                                            productionModifiers);
+            if (prod > 0) {
                 if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-                    int total = output.getAmount() + production;
+                    int total = output.getAmount() + prod;
                     while (total > capacity) {
                         if (actualInput <= 0) {
                             // produce nothing
@@ -451,19 +450,18 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                         } else {
                             actualInput--;
                         }
-                        production = (int) FeatureContainer
-                            .applyModifiers(actualInput, getGame().getTurn(),
-                                            productionModifiers);
-                        total = output.getAmount() + production;
+                        prod = (int)FeatureContainer.applyModifiers(actualInput,
+                            turn, productionModifiers);
+                        total = output.getAmount() + prod;
                         // in this case, maximum production does not
                         // exceed actual production
                         maximumInput = actualInput;
-                        maximumProduction = production;
+                        maxProd = prod;
                     }
                 }
-                result.addProduction(new AbstractGoods(outputType, production));
-                if (maximumProduction > production) {
-                    result.addMaximumProduction(new AbstractGoods(outputType, maximumProduction));
+                result.addProduction(new AbstractGoods(outputType, prod));
+                if (maxProd > prod) {
+                    result.addMaximumProduction(new AbstractGoods(outputType, maxProd));
                 }
                 if (inputType != null) {
                     result.addConsumption(new AbstractGoods(inputType, actualInput));
@@ -634,9 +632,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                     unitType.applyModifier(Math.max(1, production),
                                            getGoodsOutputType().getId());
                 }
-                production = (int) FeatureContainer
-                    .applyModifiers(production, getGame().getTurn(),
-                                    getProductionModifiers());
+                production = (int)FeatureContainer.applyModifiers(production,
+                    getGame().getTurn(), getProductionModifiers());
             }
         }
         return production;
