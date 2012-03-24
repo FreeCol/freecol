@@ -300,7 +300,7 @@ public abstract class AIPlayer extends AIObject {
      * @return A score representing the desirability of this mission.
      */
     public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        return Mission.scoreTarget(aiUnit, path, type);
+        return Mission.scorePath(aiUnit, path, type);
     }
 
     /**

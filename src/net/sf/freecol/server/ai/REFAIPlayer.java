@@ -126,14 +126,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Unit unit = aiUnit.getUnit();
 
         // Find the best coastal colony.
-        PathNode path = UnitSeekAndDestroyMission.findTarget(aiUnit, INFINITY);
-        Colony colony;
-        if (path == null 
-            || (colony = (Colony)UnitSeekAndDestroyMission
-                .extractTarget(aiUnit, path)) == null) {
+        Location target = UnitSeekAndDestroyMission.findTarget(aiUnit,INFINITY);
+        if (!(target instanceof Colony)) {
             logger.warning("Rebels have no connected colonies?!?");
             return null;
         }
+        Colony colony = (Colony)target;
         Tile tile = colony.getTile();
 
         // Give the army seek-and-destroy missions for the target,
@@ -182,9 +180,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        if ((path = unit.search(tile, gd, null, 10,
-                    ((unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-                        : null))) == null) {
+        PathNode path = unit.search(tile, gd, null, 10,
+            ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+        if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + colony);
             return null;

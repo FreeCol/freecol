@@ -159,7 +159,7 @@ public class DefendSettlementMission extends Mission {
      * @param path A <code>PathNode</code> to take to the settlement.
      * @return A value for such a mission.
      */
-    public static int scoreTarget(AIUnit aiUnit, PathNode path) {
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
         Settlement settlement;
         if (aiUnit == null
             || (settlement = extractTarget(aiUnit, path)) == null) {
@@ -179,18 +179,23 @@ public class DefendSettlementMission extends Mission {
      * @return A <code>PathNode</code> to take to the target,
      *     or null if none suitable.
      */
-    public static PathNode findTarget(AIUnit aiUnit, int range) {
-        Unit unit;
-        Tile startTile;
-        return (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
-            || (startTile = unit.getPathStartTile()) == null)
-            ? null
-            : unit.search(startTile,
-                getMissionGoalDecider(aiUnit, DefendSettlementMission.class),
-                CostDeciders.avoidIllegal(), range, 
-                ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+    public static PathNode findTargetPath(AIUnit aiUnit, int range) {
+        return Mission.findTargetPath(aiUnit, range,
+                                      DefendSettlementMission.class);
     }
+
+    /**
+     * Finds a path to the best nearby settlement to defend.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param range An upper bound on the number of moves.
+     * @return A suitable target, or null if none found.
+     */
+    public static Location findTarget(AIUnit aiUnit, int range) {
+        PathNode path = findTargetPath(aiUnit, range);
+        return (path == null) ? null : extractTarget(aiUnit, path);
+    }
+
 
     // Fake Transportable interface
 
@@ -199,6 +204,7 @@ public class DefendSettlementMission extends Mission {
      *
      * @return The destination for this <code>Transportable</code>.
      */
+    @Override
     public Location getTransportDestination() {
         return (settlement != null
             && shouldTakeTransportToTile(settlement.getTile()))
@@ -223,7 +229,7 @@ public class DefendSettlementMission extends Mission {
      * Checks if this mission is valid for the given unit.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @return True if this mission is still valid to perform.
+     * @return True if this mission is valid.
      */
     public static boolean isValid(AIUnit aiUnit) {
         return Mission.isValid(aiUnit)
@@ -232,9 +238,9 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Checks if this mission is still valid.
      *
-     * @return True if this mission is still valid to perform.
+     * @return True if this mission is valid.
      */
     public boolean isValid() {
         return super.isValid()
@@ -254,18 +260,20 @@ public class DefendSettlementMission extends Mission {
         if (unit == null || unit.isDisposed()) {
             logger.warning(tag + " broken: " + unit);
             return;
+        } else if (!unit.isDefensiveUnit()) {
+            logger.finest(tag + " disarmed: " + unit);
+            return;
         }
 
-        // Check target still makes sense.
+        // Check target.
         if (!isValid()) {
             logger.finest(tag + " has invalid settlement " + settlement
                 + ": " + unit);
             return;
         }
 
-        // Go home!
-        if (travelToTarget(tag, settlement.getTile())
-            != Unit.MoveType.MOVE) return;
+        // Go to the target!
+        if (travelToTarget(tag, settlement) != Unit.MoveType.MOVE) return;
 
         // Check if the mission should change?
         // Change to supporting the settlement if the size is marginal.
@@ -310,10 +318,9 @@ public class DefendSettlementMission extends Mission {
             String logMe;
             if (!unit.checkSetState(UnitState.FORTIFYING)) {
                 logMe = " waiting to fortify at ";
-            } else if (AIMessage.askChangeState(getAIUnit(),
-                                                UnitState.FORTIFYING)
+            } else if (AIMessage.askChangeState(aiUnit, UnitState.FORTIFYING)
                 && unit.getState() == UnitState.FORTIFYING) {
-                logMe = " fortifying at ";
+                logMe = " completed (fortifying) at ";
             } else {
                 logMe = " fortify failed at ";
             }

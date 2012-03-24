@@ -188,8 +188,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param settlement The <code>Settlement</code> to attack.
      * @return A score of the desirability of the mission.
      */
-    static private int scoreSettlementTarget(AIUnit aiUnit, PathNode path,
-                                             Settlement settlement) {
+    private static int scoreSettlementPath(AIUnit aiUnit, PathNode path,
+                                           Settlement settlement) {
         final Unit unit = aiUnit.getUnit();
         final CombatModel combatModel = unit.getGame().getCombatModel();
 
@@ -234,8 +234,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param defender The <code>Unit</code> to attack.
      * @return A score of the desirability of the mission.
      */
-    static private int scoreUnitTarget(AIUnit aiUnit, PathNode path,
-                                       Unit defender) {
+    private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
+                                     Unit defender) {
         final Unit unit = aiUnit.getUnit();
         final Tile tile = path.getLastNode().getTile();
         final int turns = path.getTotalTurns();
@@ -278,13 +278,25 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param path A <code>PathNode</code> to take to the target.
      * @return A score for the proposed mission.
      */
-    public static int scoreTarget(AIUnit aiUnit, PathNode path) {
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
         Location target = extractTarget(aiUnit, path);
         return (target instanceof Settlement)
-            ? scoreSettlementTarget(aiUnit, path, (Settlement)target)
+            ? scoreSettlementPath(aiUnit, path, (Settlement)target)
             : (target instanceof Unit)
-            ? scoreUnitTarget(aiUnit, path, (Unit)target)
+            ? scoreUnitPath(aiUnit, path, (Unit)target)
             : Integer.MIN_VALUE;
+    }
+
+    /**
+     * Finds a suitable seek-and-destroy target path for an AI unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a target for.
+     * @param range An upper bound on the number of moves.
+     * @return A path to the target, or null if none found.
+     */
+    public static PathNode findTargetPath(AIUnit aiUnit, int range) {
+        return Mission.findTargetPath(aiUnit, range,
+                                      UnitSeekAndDestroyMission.class);
     }
 
     /**
@@ -292,20 +304,13 @@ public class UnitSeekAndDestroyMission extends Mission {
      *
      * @param aiUnit The <code>AIUnit</code> to find a target for.
      * @param range An upper bound on the number of moves.
-     * @return A path to the target, or null if none found.
+     * @return A suitable target, or null if none found.
      */
-    public static PathNode findTarget(AIUnit aiUnit, int range) {
-        Unit unit;
-        Tile startTile;
-        if (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed() 
-            || (startTile = unit.getPathStartTile()) == null) return null;
-
-        return unit.search(startTile,
-            getMissionGoalDecider(aiUnit, UnitSeekAndDestroyMission.class),
-            CostDeciders.avoidIllegal(), range,
-            ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+    public static Location findTarget(AIUnit aiUnit, int range) {
+        PathNode path = findTargetPath(aiUnit, range);
+        return (path == null) ? null : extractTarget(aiUnit, path);
     }
+
 
     // Fake Transportable interface
 
@@ -315,13 +320,25 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */
     @Override
-    public Tile getTransportDestination() {
-        Tile tile = (target == null) ? null : target.getTile();
-        return (shouldTakeTransportToTile(tile)) ? tile : null;
+    public Location getTransportDestination() {
+        return (shouldTakeTransportToTile(target.getTile()))
+            ? target.getTile()
+            : null;
     }
 
     // Mission interface
 
+    /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @return True if this mission is valid.
+     */
+    public static boolean isValid(AIUnit aiUnit) {
+        return Mission.isValid(aiUnit)
+            && aiUnit.getUnit().isOffensiveUnit();
+    }
+        
     /**
      * Check to see if this mission is still valid.
      *
@@ -334,9 +351,11 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Performs the mission.  Check for a target-of-opportunity within one
-     * turn and hit that if possible.  Otherwise, just continue on towards
-     * the real target.
+     * Performs the mission.
+     *
+     * Check for a target-of-opportunity within one turn and hit that
+     * if possible.  Otherwise, just continue on towards the real
+     * target.
      *
      * @param connection The <code>Connection</code> to the server.
      */
@@ -352,11 +371,9 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
         final Player player = unit.getOwner();
 
-        // Is there a target-of-opportunity?
+        // Check target, and if there is a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
-        PathNode path = findTarget(aiUnit, 1);
-        Location nearbyTarget = (path == null) ? null
-            : extractTarget(aiUnit, path);
+        Location nearbyTarget = findTarget(aiUnit, 1);
         if (nearbyTarget == target) nearbyTarget = null;
         if (isValid()) {
             if (nearbyTarget != null) {
@@ -374,15 +391,16 @@ public class UnitSeekAndDestroyMission extends Mission {
             nearbyTarget = null;
         }
 
+        // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget : target;
-        Unit.MoveType mt = travelToTarget(tag, currentTarget.getTile());
-        Tile unitTile = unit.getTile();
-        Settlement settlement = unitTile.getSettlement();
+        Unit.MoveType mt = travelToTarget(tag, currentTarget);
         switch (mt) {
         case MOVE_NO_MOVES:
             logger.finest(tag + " en route to " + currentTarget + ": " + unit);
             break;
         case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+            Tile unitTile = unit.getTile();
+            Settlement settlement = unitTile.getSettlement();
             if (settlement != null && settlement.getUnitCount() < 2) {
                 // Do not risk attacking out of a settlement that
                 // might collapse.  Defend instead.
@@ -390,8 +408,10 @@ public class UnitSeekAndDestroyMission extends Mission {
                         aiUnit, settlement));
                 return;
             }
+            Direction dirn = unitTile.getDirection(currentTarget.getTile());
+            if (dirn == null) throw new IllegalStateException("No direction");
             logger.finest(tag + " attacking " + currentTarget + ": " + unit);
-            AIMessage.askAttack(aiUnit, unitTile.getDirection(currentTarget.getTile()));
+            AIMessage.askAttack(aiUnit, dirn);
             break;
         default:
             logger.finest(tag + " unexpected move type: " + mt + ": " + unit);

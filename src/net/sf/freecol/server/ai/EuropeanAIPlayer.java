@@ -1237,19 +1237,19 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Check for settlements needing defence, including trivial path
         // (current tile).
         final int TURNS_TO_SETTLEMENT = 10;
-        if (((target = DefendSettlementMission.extractTarget(aiUnit, null))
-                != null)
-            && ((value = DefendSettlementMission.scoreTarget(aiUnit, null))
-                > bestValue)) {
+        if (((target = DefendSettlementMission.extractTarget(aiUnit,
+                        null)) != null)
+            && ((value = DefendSettlementMission.scorePath(aiUnit,
+                        null)) > bestValue)) {
             bestValue = value;
             bestTarget = target;
         }
         if ((path = DefendSettlementMission
-                .findTarget(aiUnit, TURNS_TO_SETTLEMENT)) != null
-            && ((target = DefendSettlementMission.extractTarget(aiUnit, path))
-                != null)
-            && ((value = DefendSettlementMission.scoreTarget(aiUnit, path))
-                > bestValue)) {
+                .findTargetPath(aiUnit, TURNS_TO_SETTLEMENT)) != null
+            && ((target = DefendSettlementMission.extractTarget(aiUnit,
+                        path)) != null)
+            && ((value = DefendSettlementMission.scorePath(aiUnit,
+                        path)) > bestValue)) {
             bestValue = value;
             bestTarget = target;
         }
@@ -1274,8 +1274,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (targetLoc != null
             && ((path = unit.findPath(startTile, targetLoc.getTile(),
                                       carrier)) != null)
-            && (value = UnitSeekAndDestroyMission
-                .scoreTarget(aiUnit, path)) > bestValue) {
+            && (value = UnitSeekAndDestroyMission.scorePath(aiUnit,
+                    path)) > bestValue) {
             bestValue = value;
             bestTarget = (Ownable)targetLoc;
         }
@@ -1283,11 +1283,11 @@ public class EuropeanAIPlayer extends AIPlayer {
         // General check for seek-and-destroy.
         final int TURNS_TO_SEEK = 16;
         if ((path = UnitSeekAndDestroyMission
-                .findTarget(aiUnit, TURNS_TO_SEEK)) != null
-            && (targetLoc = UnitSeekAndDestroyMission
-                .extractTarget(aiUnit, path)) != null
-            && (value = UnitSeekAndDestroyMission
-                .scoreTarget(aiUnit, path)) > bestValue) {
+                .findTargetPath(aiUnit, TURNS_TO_SEEK)) != null
+            && (targetLoc = UnitSeekAndDestroyMission.extractTarget(aiUnit,
+                    path)) != null
+            && (value = UnitSeekAndDestroyMission.scorePath(aiUnit, 
+                    path)) > bestValue) {
             bestValue = value;
             bestTarget = (Ownable)targetLoc;
         }

@@ -474,13 +474,32 @@ public abstract class Mission extends AIObject {
      * @param type The mission class.
      * @return A score representing the desirability of this mission.
      */
-    public static int scoreTarget(AIUnit aiUnit, PathNode path,
-                                  Class type) {
+    public static int scorePath(AIUnit aiUnit, PathNode path, Class type) {
         return (type == DefendSettlementMission.class)
-            ? DefendSettlementMission.scoreTarget(aiUnit, path)
+            ? DefendSettlementMission.scorePath(aiUnit, path)
             : (type == UnitSeekAndDestroyMission.class)
-            ? UnitSeekAndDestroyMission.scoreTarget(aiUnit, path)
+            ? UnitSeekAndDestroyMission.scorePath(aiUnit, path)
             : -1; // NYI
+    }
+
+    /**
+     * Finds a suitable seek-and-destroy target path for an AI unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a target for.
+     * @param range An upper bound on the number of moves.
+     * @param type The mission class.
+     * @return A path to the target, or null if none found.
+     */
+    public static PathNode findTargetPath(AIUnit aiUnit, int range, Class type) {
+        Unit unit;
+        Tile startTile;
+        return (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed() 
+            || (startTile = unit.getPathStartTile()) == null)
+            ? null
+            : unit.search(startTile, getMissionGoalDecider(aiUnit, type),
+                CostDeciders.avoidIllegal(), range,
+                ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
     }
 
     /**
