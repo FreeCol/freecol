@@ -334,8 +334,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (scratch == null) {
             for (UnitWas w : was) {
                 Unit u = w.getUnit();
-                u.setLocation(w.getLocation());
-                u.setWorkType(w.getWorkType());
+                if (u.getLocation() != w.getLocation()) {
+                    u.setLocation(w.getLocation());
+                }
+                if (u.getWorkType() != w.getWorkType()) {
+                    u.setWorkType(w.getWorkType());
+                }
             }
             rearrangeTurn = new Turn(turn + 1);
             return false;

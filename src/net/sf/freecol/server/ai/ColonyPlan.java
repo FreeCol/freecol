@@ -1611,16 +1611,15 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             }
         }
 
-        // Broken?  Abandon this rearrangement.
-        if (scratch.getWorkLocationUnitCount() == 0) {
-            scratch.disposeScratchColony();
-            logger.warning("assignWorkers at " + colony.getName()
-                + " failed.");
-            return null;
-        }
-
+        // Log and return the scratch colony on success.
+        // Otherwise abandon this rearrangement, disposing of the
+        // scratch colony and returning null.
         logger.finest(report.substring(0, report.length()-1));
-        return scratch;
+        if (scratch.getWorkLocationUnitCount() > 0) return scratch;
+
+        scratch.disposeScratchColony();
+        logger.warning("assignWorkers at " + colony.getName() + " failed.");
+        return null;
     }
 
 
