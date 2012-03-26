@@ -94,6 +94,16 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Gets the target of this mission, if any.
+     * Subclasses should override this.
+     *
+     * @return The target of this mission or null if none.
+     */
+    public Location getTarget() {
+        return null;
+    }
+
+    /**
      * Disposes this mission by removing any references to it.
      */
     public void dispose() {
@@ -477,6 +487,8 @@ public abstract class Mission extends AIObject {
     public static int scorePath(AIUnit aiUnit, PathNode path, Class type) {
         return (type == DefendSettlementMission.class)
             ? DefendSettlementMission.scorePath(aiUnit, path)
+            : (type == ScoutingMission.class)
+            ? ScoutingMission.scorePath(aiUnit, path)
             : (type == UnitSeekAndDestroyMission.class)
             ? UnitSeekAndDestroyMission.scorePath(aiUnit, path)
             : -1; // NYI

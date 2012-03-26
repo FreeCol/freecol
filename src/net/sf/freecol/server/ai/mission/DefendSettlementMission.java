@@ -126,12 +126,13 @@ public class DefendSettlementMission extends Mission {
      * Is a settlement suitable for a defence mission?
      *
      * @param aiUnit The <code>AIUnit</code> to defend with.
-     * @param settlement The candidate <code>Settlement</code>.
-     * @return True if the settlement is suitable.
+     * @param target The target to test.
+     * @return True if the target is a suitable settlement.
      */
-    public static boolean isTarget(AIUnit aiUnit, Settlement settlement) {
-        return settlement != null
-            && settlement.getOwner() == aiUnit.getUnit().getOwner();
+    public static boolean isTarget(AIUnit aiUnit, Location target) {
+        return target != null
+            && (target instanceof Settlement
+                && aiUnit.getUnit().getOwner().owns((Settlement)target));
     }
 
     /**
@@ -144,12 +145,11 @@ public class DefendSettlementMission extends Mission {
      *     if none found.
      */
     public static Settlement extractTarget(AIUnit aiUnit, PathNode path) {
-        Tile tile = (path == null) ? aiUnit.getUnit().getTile()
+        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
             : path.getLastNode().getTile();
-        Settlement settlement;
-        return (tile == null
-            || !isTarget(aiUnit, settlement = tile.getSettlement())) ? null
-            : settlement;
+        return (tile == null) ? null
+            : (isTarget(aiUnit, tile.getSettlement())) ? tile.getSettlement()
+            : null;
     }
 
     /**
@@ -206,10 +206,9 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (settlement != null
-            && shouldTakeTransportToTile(settlement.getTile()))
-            ? settlement.getTile()
-            : null;
+        return (settlement == null
+            || !shouldTakeTransportToTile(settlement.getTile())) ? null
+            : settlement;
     }
 
     /**
@@ -409,7 +408,7 @@ public class DefendSettlementMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("settlement", settlement.getId());
+        writeAttribute(out, "settlement", settlement);
     }
 
     /**

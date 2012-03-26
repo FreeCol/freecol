@@ -129,30 +129,56 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
+     * Is a location a suitable settlement seek-and-destroy target for
+     * an AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
+     * @param target The target to test.
+     * @return True if the target is suitable.
+     */
+    private static boolean isSettlementTarget(AIUnit aiUnit, Location target) {
+        if (!(target instanceof Settlement)) return false;
+        return !aiUnit.getUnit().isNaval();
+    }
+
+    /**
+     * Is a location a suitable unit seek-and-destroy target for an AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
+     * @param target The target to test.
+     * @return True if the target is suitable.
+     */
+    private static boolean isUnitTarget(AIUnit aiUnit, Location target) {
+        if (!(target instanceof Unit)) return false;
+        Unit unit = (Unit)target;
+        Tile tile = unit.getTile();
+        return tile != null
+            && tile.getSettlement() == null
+            && aiUnit.getUnit().isNaval() == (unit.isNaval() && !tile.isLand());
+    }
+
+    /**
      * Is a location a suitable seek-and-destroy target for an AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param target The candidate <code>Settlement</code> or <code>Unit</code>.
+     * @param target The target to test.
      * @return True if the target is suitable.
      */
     public static boolean isTarget(AIUnit aiUnit, Location target) {
         final Unit unit = aiUnit.getUnit();
         final Player owner = unit.getOwner();
         Player targetPlayer;
-        return target != null
-            && !((FreeColGameObject)target).isDisposed()
+        return target != null && !((FreeColGameObject)target).isDisposed()
             && target.getTile() != null
-            && !(target instanceof Settlement && unit.isNaval())
-            && !(target instanceof Unit
-                && (target.getTile().getSettlement() != null
-                    || ((((Unit)target).isNaval() && !target.getTile().isLand())
-                        != unit.isNaval())))
+            && (target instanceof Ownable)
             && (targetPlayer = ((Ownable)target).getOwner()) != null
             && targetPlayer != owner
             && (owner.getStance(targetPlayer) == Stance.WAR
                 || (owner.isIndian()
                     && owner.getTension(targetPlayer).getLevel()
-                        .compareTo(Tension.Level.CONTENT) > 0));
+                    .compareTo(Tension.Level.CONTENT) > 0))
+            && (isSettlementTarget(aiUnit, target)
+                || isUnitTarget(aiUnit, target));
     }
 
     /**
@@ -163,15 +189,13 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        Unit unit;
-        Tile tile;
-        Location target = (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null
-            || path == null
-            || (tile = path.getLastNode().getTile()) == null) ? null
-            : (tile.getSettlement() != null) ? tile.getSettlement()
-            : tile.getDefendingUnit(unit);
-        return (isTarget(aiUnit, target)) ? target : null;
+        final Tile tile = (path == null) ? null : path.getLastNode().getTile();
+        Unit unit, def;
+        return (tile == null || aiUnit == null
+            || (unit = aiUnit.getUnit()) == null) ? null
+            : (isTarget(aiUnit, tile.getSettlement())) ? tile.getSettlement()
+            : (isTarget(aiUnit, def = tile.getDefendingUnit(unit))) ? def
+            : null;
     }
 
     /**
@@ -212,17 +236,9 @@ public class UnitSeekAndDestroyMission extends Mission {
             Tension tension = is.getAlarm(unit.getOwner());
             if (tension != null) value += tension.getValue() / 2;
         }
-        if (unit.getOwner().isIndian()) {
-            // Natives prefer to attack when DISPLEASED.
-            IndianSettlement is = unit.getIndianSettlement();
-            if (is != null && is.getAlarm(settlement.getOwner()) != null) {
-                value += is.getAlarm(settlement.getOwner()).getValue()
-                    - Tension.Level.DISPLEASED.getLimit();
-            }
-        }
 
-        logger.finest("UnitSeekAndDestroyMission settlement score(" + unit
-            + " v " + settlement + ") = " + value);
+        //logger.finest("UnitSeekAndDestroyMission settlement score(" + unit
+        //    + " v " + settlement + ") = " + value);
         return value;
     }
 
@@ -263,8 +279,8 @@ public class UnitSeekAndDestroyMission extends Mission {
                 && !defender.isArmed()) value += 100;
         }
 
-        logger.finest("UnitSeekAndDestroyMission score(" + unit
-            + " v " + defender + ") = " + value);
+        //logger.finest("UnitSeekAndDestroyMission score(" + unit
+        //    + " v " + defender + ") = " + value);
         return value;
     }
 
@@ -321,9 +337,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (shouldTakeTransportToTile(target.getTile()))
-            ? target.getTile()
-            : null;
+        return (target == null
+            || !shouldTakeTransportToTile(target.getTile())) ? null
+            : target;
     }
 
     // Mission interface
@@ -464,8 +480,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        if (getTarget() != null) {
-            out.writeAttribute("target", getTarget().getId());
+        if (target != null) {
+            writeAttribute(out, "target", (FreeColGameObject)target);
         }
     }
 

@@ -203,7 +203,23 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         return value;
     }
-            
+
+    /**
+     * Should this AI prefer to make scouts rather than soldiers ATM?
+     *
+     * Current scheme for European AIs is to use up to three scouts in
+     * the early part of the game.
+     *
+     * @return True if scouts should be preferred.
+     */
+    public boolean preferScoutsToSoldiers() {
+        int nScouts = 0;
+        for (Unit u : getPlayer().getUnits()) {
+            if (u.getRole() == Unit.Role.SCOUT) nScouts++;
+        }
+        return nScouts < ((getGame().getTurn().getAge() <= 1) ? 3 : 1);
+    }
+
     /**
      * Gets a list of all the player's tile improvement plans required by
      * the colonies.
@@ -642,6 +658,18 @@ public class EuropeanAIPlayer extends AIPlayer {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = spec.getUnitTypeList();
 
+            if (!europe.isEmpty()
+                && preferScoutsToSoldiers()
+                && Utils.randomInt(logger, "Cheat equip scout", 
+                                   getAIRandom(), 4) == 1) {
+                for (Unit u : europe.getUnitList()) {
+                    if (u.getRole() == Unit.Role.DEFAULT
+                        && getAIUnit(u).equipForRole(Unit.Role.SCOUT, true)) {
+                        break;
+                    }
+                }
+            }
+
             if (Utils.randomInt(logger, "Cheat buy unit",
                     getAIRandom(), 10) == 1) {
                 WorkerWish bestWish = null;
@@ -1028,7 +1056,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (ScoutingMission.isValid(aiUnit)) {
+            if (ScoutingMission.isValid(aiUnit) && preferScoutsToSoldiers()) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
                 continue;
             }

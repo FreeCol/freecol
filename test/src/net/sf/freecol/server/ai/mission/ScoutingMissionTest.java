@@ -77,8 +77,10 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertEquals("Scout should have the scout role", scout.getRole(),
             Unit.Role.SCOUT);
-        assertEquals("The Inca settlement should be a scouting target",
-            settlementTile, ScoutingMission.findTarget(aiUnit));
+        assertTrue("The Inca settlement should be a scouting target",
+            ScoutingMission.isTarget(aiUnit, is));
+        assertEquals("The Inca settlement should be found as scouting target",
+            is, ScoutingMission.findTarget(aiUnit));
         assertTrue("Scouting mission should be assignable to scout",
             ScoutingMission.isValid(aiUnit));
         aiUnit.setMission(new ScoutingMission(aiMain, aiUnit));
@@ -86,6 +88,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
             aiUnit.getMission() instanceof ScoutingMission);
         assertTrue("Scouting mission should be valid",
             aiUnit.getMission().isValid());
+        assertEquals("Scouting mission target should be the Inca settlement",
+            is, aiUnit.getMission().getTarget());
 
         // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
@@ -111,5 +115,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         lcrTile.addLostCityRumour(new LostCityRumour(game, lcrTile));
         assertTrue("Scouting mission should be possible for this unit",
             ScoutingMission.isValid(aiUnit));
+        assertEquals("The LCR tile should be a scouting target",
+            lcrTile, ScoutingMission.findTarget(aiUnit));
     }
 }

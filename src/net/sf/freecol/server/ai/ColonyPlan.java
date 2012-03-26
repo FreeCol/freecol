@@ -1255,9 +1255,10 @@ public class ColonyPlan {
      *
      * @param colonyPlan The <code>ColonyPlan</code> to apply.
      * @param workers A list of <code>Unit</code>s to assign.
+     * @param preferScout Prefer to make scouts rather than soldiers.
      * @return A scratch colony with the workers in place.
      */
-    public Colony assignWorkers(List<Unit> workers) {
+    public Colony assignWorkers(List<Unit> workers, boolean preferScout) {
         final GoodsType foodType = spec().getPrimaryFoodType();
         final int maxUnitFood = colony.getOwner().getMaximumFoodConsumption();
         final Turn turn = aiMain.getGame().getTurn();
@@ -1292,15 +1293,9 @@ public class ColonyPlan {
         final Role outdoorRoles[] = new Role[] { Role.PIONEER,
                                                  Role.SOLDIER,
                                                  Role.SCOUT };
-        if (turn.getAge() <= 1) {
-            int nScouts = 0;
-            for (Unit u : colony.getOwner().getUnits()) {
-                if (u.getRole() == Role.SCOUT) nScouts++;
-            }
-            if (nScouts < 3) {
-                outdoorRoles[1] = Role.SCOUT;
-                outdoorRoles[2] = Role.SOLDIER;
-            }
+        if (preferScout) {
+            outdoorRoles[1] = Role.SCOUT;
+            outdoorRoles[2] = Role.SOLDIER;
         }
         for (int j = 0; j < outdoorRoles.length; j++) {
             String ability = "model.ability.expert"

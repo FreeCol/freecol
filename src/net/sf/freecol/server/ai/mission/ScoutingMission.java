@@ -19,12 +19,17 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
@@ -53,11 +58,19 @@ public class ScoutingMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
+    private static final String tag = "AI scout";
+
     /**
-     * The tile this scout is travelling to, either to investigate a LCR,
-     * or talk to a chief.
+     * Maximum number of turns to travel to a scouting target.
      */
-    private Tile target = null;
+    private static final int MAX_TURNS = 20;
+
+    /**
+     * The target for this mission.  Either a tile with an LCR, a
+     * native settlement to talk to the chief of, or a player colony
+     * to retarget from.
+     */
+    private Location target = null;
 
 
     /**
@@ -69,7 +82,7 @@ public class ScoutingMission extends Mission {
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
         target = findTarget(aiUnit);
-        logger.finest("AI scout starting at " + aiUnit.getUnit().getLocation()
+        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + aiUnit.getUnit());
     }
 
@@ -100,15 +113,28 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Is a tile a valid scouting target because of its native settlement.
+     * Gets the object we are trying to destroy.
      *
-     * @param tile The <code>Tile</code> to test.
-     * @param unit The <code>Unit</code> to test.
-     * @return True if the tile is a valid scouting target.
+     * @return The object which should be destroyed.
      */
-    private static boolean checkIndianSettlement(Tile tile, AIUnit aiUnit) {
-        IndianSettlement settlement = tile.getIndianSettlement();
-        if (settlement == null) return false;
+    @Override
+    public Location getTarget() {
+        return target;
+    }
+
+
+    /**
+     * Is this a valid scouting target because it is a suitable native
+     * settlement.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param target The target to test.
+     * @return True if the target is a valid scouting target.
+     */
+    private static boolean isIndianSettlementTarget(AIUnit aiUnit,
+                                                    Location target) {
+        if (!(target instanceof IndianSettlement)) return false;
+        IndianSettlement settlement = (IndianSettlement)target;
         final Player owner = aiUnit.getUnit().getOwner();
         Tension tension = settlement.getAlarm(owner);
         return !settlement.hasSpokenToChief(owner)
@@ -117,98 +143,120 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Is a tile a valid scouting target for a unit?
+     * Is this a valid scouting target because it is one of our
+     * connected colonies.
      *
-     * @param tile The <code>Tile</code> to test.
-     * @param unit The <code>Unit</code> to test.
-     * @return True if the tile is a valid scouting target.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param target The target to test.
+     * @return True if the target is a valid scouting target.
      */
-    private static boolean checkTarget(Tile tile, AIUnit aiUnit) {
-        return tile != null && tile.isLand()
-            && (tile.hasLostCityRumour()
-                || checkIndianSettlement(tile, aiUnit));
+    private static boolean isOurColonyTarget(AIUnit aiUnit, Location target) {
+        if (!(target instanceof Colony)) return false;
+        Colony colony = (Colony)target;
+        return colony.isConnected() && aiUnit.getUnit().getOwner().owns(colony);
     }
 
     /**
-     * Checks that a target tile is valid, including allowing for a
-     * fallback colony target.
+     * Is a tile a valid scouting target for a unit?
      *
-     * @param tile The <code>Tile</code> to test.
-     * @param unit The <code>Unit</code> to test.
-     * @return True if the tile is a valid scouting target.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param target The target to test.
+     * @return True if the target is a valid scouting target.
      */
-    private boolean checkTargetAllowColony(Tile tile, AIUnit aiUnit) {
-        return checkTarget(tile, aiUnit)
-            || (tile != null && tile.getColony() != null
-                && tile.getColony().getOwner() == aiUnit.getUnit().getOwner());
+    public static boolean isTarget(AIUnit aiUnit, Location target) {
+        return target != null
+            && ((target instanceof Tile
+                    && ((Tile)target).hasLostCityRumour())
+                || isIndianSettlementTarget(aiUnit, target)
+                || isOurColonyTarget(aiUnit, target));
+    }
+
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit A <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from,
+     *     (uses the unit location if null).
+     * @return A target for this mission, or null if none found.
+     */
+    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
+            : path.getLastNode().getTile();
+        return (tile == null) ? null
+            : (isTarget(aiUnit, tile)) ? tile
+            : (isTarget(aiUnit, tile.getSettlement())) ? tile.getSettlement()
+            : null;
+    }
+
+    /**
+     * Evaluate a potential scouting mission for a given unit and
+     * path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path A <code>PathNode</code> to take to the target.
+     * @return A score for the proposed mission.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        Location target;
+        return (path == null
+            || (target = extractTarget(aiUnit, path)) == null
+            || target instanceof Colony) ? Integer.MIN_VALUE
+            : 1000 / (path.getTotalTurns() + 1);
     }
 
     /**
      * Finds a suitable scouting target for the supplied unit.
      *
-     * @param unit The <code>Unit</code> to test.
-     * @return A <code>Tile</code> that is worth scouting.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A <code>PathNode</code> to the target, or null if none found.
      */
-    public static Tile findTarget(final AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning("AI scout broken: " + unit);
-            return null;
-        }
+    public static PathNode findTargetPath(final AIUnit aiUnit) {
+        Unit unit;
+        Tile startTile;
+        if (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
+            || (startTile = unit.getPathStartTile()) == null) return null;
 
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) {
-            Settlement settlement = Mission.getBestSettlement(unit.getOwner());
-            if (settlement != null) return settlement.getTile();
-            logger.finest("AI scout settlement fallback failed: " + unit);
-            return null;            
-        }
-
-        PathNode path;
         final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
             : null;
-        final GoalDecider scoutingDecider = new GoalDecider() {
-                private PathNode best = null;
-                private int bestValue = INFINITY;
-                
-                public PathNode getGoal() { return best; }
-                public boolean hasSubGoals() { return true; }
-                public boolean check(Unit u, PathNode path) {
-                    if (checkTarget(path.getTile(), aiUnit)
-                        && path.getTotalTurns() < bestValue) {
-                        bestValue = path.getTotalTurns();
-                        best = path;
-                        return true;
-                    }
-                    return false;
-                }
-            };
+        final GoalDecider scoutingDecider
+            = getMissionGoalDecider(aiUnit, ScoutingMission.class);
+        PathNode path;
 
         // Can the scout legally reach a valid target from where it
         // currently is?
         path = unit.search(startTile, scoutingDecider,
-                           CostDeciders.avoidIllegal(), INFINITY, carrier);
-        if (path != null) return path.getLastNode().getTile();
+                           CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        if (path != null) return path;
 
         // If no target was found but there is a carrier, then give up
         // as we should have been able to get everywhere except
         // islands in lakes.
         if (carrier != null) {
-            logger.finest("AI scout (with carrier) out of targets: " + unit);
+            logger.finest(tag + " (with carrier) out of targets: " + unit);
             return null;
         }
 
         // Search again, purely on distance in tiles, which allows
         // water tiles and thus potentially finds targets that require
         // a carrier to reach.
-        path = unit.search(startTile, scoutingDecider,
-                           CostDeciders.numberOfTiles(), INFINITY, carrier);
-        if (path != null) return path.getLastNode().getTile();
-
-        // Completely out of targets.
-        logger.finest("AI scout out of targets: " + unit);
-        return null;
+        return unit.search(startTile, scoutingDecider,
+                           CostDeciders.numberOfTiles(), MAX_TURNS, carrier);
     }
+
+    /**
+     * Finds a suitable scouting target for the supplied unit.
+     * Falls back to the best settlement if the unit is not on the map.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A <code>PathNode</code> to the target, or null if none found.
+     */
+    public static Location findTarget(AIUnit aiUnit) {
+        PathNode path = findTargetPath(aiUnit);
+        return (path == null) ? getBestSettlement(aiUnit.getUnit().getOwner())
+            : extractTarget(aiUnit, path);
+    }        
+
 
     // Fake Transportable interface
 
@@ -217,9 +265,13 @@ public class ScoutingMission extends Mission {
      *
      * @return The destination for this <code>Transportable</code>.
      */
+    @Override
     public Location getTransportDestination() {
-        return (shouldTakeTransportToTile(target)) ? target : null;
+        return (target == null
+            || !shouldTakeTransportToTile(target.getTile())) ? null
+            : target;
     }
+
 
     // Mission interface
 
@@ -238,13 +290,14 @@ public class ScoutingMission extends Mission {
 
     /**
      * Checks if this mission is still valid.
+     * Allows for a backup colony target.
      *
      * @return True if this mission is still valid.
      */
     public boolean isValid() {
         return super.isValid()
             && getUnit().getRole() == Unit.Role.SCOUT
-            && checkTargetAllowColony(target, getAIUnit());
+            && isTarget(getAIUnit(), target);
     }
 
     /**
@@ -254,19 +307,25 @@ public class ScoutingMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) return;
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        } else if (unit.getRole() != Unit.Role.SCOUT) {
+            logger.warning(tag + " dismounted: " + unit);
+            return;
+        }
 
         // Check the target.
         final AIUnit aiUnit = getAIUnit();
-        if (!checkTargetAllowColony(target, aiUnit)) {
-            target = findTarget(aiUnit);
-            if (target == null) {
-                logger.finest("AI scout could not find a target: " + unit);
+        if (!isTarget(aiUnit, target)) {
+            if ((target = findTarget(aiUnit)) == null) {
+                logger.finest(tag + " could not find a target: " + unit);
                 return;
             }
         }
 
-        Unit.MoveType mt = travelToTarget("AI scout", target);
+        // Go there.
+        Unit.MoveType mt = travelToTarget(tag, target);
         switch (mt) {
         case ATTACK_UNIT: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
         case MOVE_ILLEGAL:
@@ -274,30 +333,42 @@ public class ScoutingMission extends Mission {
         case MOVE:
             break;
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            Direction d = unit.getTile().getDirection(target);
+            Direction d = unit.getTile().getDirection(target.getTile());
             if (d == null) {
                 throw new IllegalStateException("Unit not next to target "
                     + target + ": " + unit + "/" + unit.getLocation());
             }
             AIMessage.askScoutIndianSettlement(aiUnit, d);
             if (unit.isDisposed()) {
-                logger.finest("AI scout died at target " + target
+                logger.finest(tag + " died at target " + target
                     + ": " + unit);
                 return;
             }
             break;
         default:
-            logger.warning("AI scout unexpected move type " + mt
-                + ": " + unit);
+            logger.warning(tag + " unexpected move type " + mt + ": " + unit);
             return;
         }
 
-        // Retarget when complete.
-        Tile completed = target;
+        // Retarget when complete, but do not retarget from one colony
+        // to another (just drop equipment and invalidate the mission).
+        Location completed = target;
         target = findTarget(aiUnit);
-        logger.finest("AI scout completed target " + completed
+        if (isOurColonyTarget(aiUnit, completed)
+            && isOurColonyTarget(aiUnit, target)) {
+            Colony colony = (Colony)completed;
+            for (EquipmentType e : new ArrayList<EquipmentType>(unit
+                    .getEquipment().keySet())) {
+                int n = unit.getEquipmentCount(e);
+                unit.changeEquipment(e, -n);
+                colony.addEquipmentGoods(e, n); // TODO: check for overflow
+            }
+            target = null;
+        }
+        logger.finest(tag + " completed target " + completed
             + ", retargeting " + target + ": " + unit);
     }
+
 
     // Serialization
 
@@ -320,7 +391,7 @@ public class ScoutingMission extends Mission {
         throws XMLStreamException {
         super.writeAttributes(out);
         if (target != null) {
-            out.writeAttribute("target", target.getId());
+            writeAttribute(out, "target", (FreeColGameObject)target);
         }
     }
 
@@ -330,7 +401,7 @@ public class ScoutingMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        target = (Tile) getGame()
+        target = (Tile)getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
     }
 

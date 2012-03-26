@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -186,7 +187,22 @@ public class NativeAIPlayer extends AIPlayer {
             Settlement settlement = (Settlement)DefendSettlementMission
                 .extractTarget(aiUnit, path);
             value -= 75 * getSettlementDefenders(settlement);
+
+        } else if (type == UnitSeekAndDestroyMission.class) {
+            // Natives prefer to attack when DISPLEASED.
+            Location target = UnitSeekAndDestroyMission
+                .extractTarget(aiUnit, path);
+            Player targetPlayer = (target instanceof Ownable)
+                ? ((Ownable)target).getOwner()
+                : null;
+            IndianSettlement is = aiUnit.getUnit().getIndianSettlement();
+            if (targetPlayer != null
+                && is != null && is.getAlarm(targetPlayer) != null) {
+                value += is.getAlarm(targetPlayer).getValue()
+                    - Tension.Level.DISPLEASED.getLimit();
+            }
         }
+
         return value;
     }
 

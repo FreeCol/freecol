@@ -303,6 +303,17 @@ public abstract class AIPlayer extends AIObject {
         return Mission.scorePath(aiUnit, path, type);
     }
 
+
+    /**
+     * Should this AI prefer to make scouts rather than soldiers ATM?
+     * Subclasses should override this.
+     *
+     * @return True if scouts should be preferred.
+     */
+    public boolean preferScoutsToSoldiers() {
+        return false;
+    }
+
     /**
      * Resolves a native demand.
      * One of goods/gold is significant.
