@@ -485,7 +485,9 @@ public abstract class Mission extends AIObject {
      * @return A score representing the desirability of this mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path, Class type) {
-        return (type == DefendSettlementMission.class)
+        return (type == BuildColonyMission.class)
+            ? BuildColonyMission.scorePath(aiUnit, path)
+            : (type == DefendSettlementMission.class)
             ? DefendSettlementMission.scorePath(aiUnit, path)
             : (type == ScoutingMission.class)
             ? ScoutingMission.scorePath(aiUnit, path)

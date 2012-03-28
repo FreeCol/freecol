@@ -1126,7 +1126,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // "WorkerWish"):
         ArrayList<Wish> wishList = workerWishes.get(unit.getType());
         WorkerWish bestWish = null;
-        int bestTurns = Integer.MAX_VALUE;
+        int bestTurns = 100000;
         for (int i = 0; i < wishList.size(); i++) {
             // TODO: is this necessary? If so, use Iterator?
             WorkerWish ww = (WorkerWish) wishList.get(i);
@@ -1148,16 +1148,17 @@ public class EuropeanAIPlayer extends AIPlayer {
             return;
         }
         // Find a site for a new colony:
-        Tile colonyTile = null;
-        PathNode path;
+        Location buildTarget = null;
         if (getPlayer().canBuildColonies()
             && BuildColonyMission.isValid(aiUnit)
-            && (colonyTile = BuildColonyMission.findTargetTile(aiUnit, false)) != null) {
-            bestTurns = unit.getTurnsToReach(colonyTile);
+            && (buildTarget = BuildColonyMission.findTarget(aiUnit, false))
+            != null) {
+            bestTurns = unit.getTurnsToReach(buildTarget);
         }
 
         // Check if we can find a better site to work than a new colony:
-        if (!fewColonies || colonyTile == null || bestTurns > 10) {
+        PathNode path;
+        if (!fewColonies || buildTarget == null || bestTurns > 10) {
             for (List<Wish> wishes : workerWishes.values()) {
                 for (int j = 0; j < wishes.size(); j++) {
                     WorkerWish ww = (WorkerWish) wishes.get(j);
@@ -1183,9 +1184,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             return;
         }
         // Choose to build a new colony:
-        if (colonyTile != null) {
+        if (buildTarget != null) {
             aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit,
-                                                     colonyTile));
+                                                     buildTarget));
             boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
             if (isUnitOnCarrier) {
                 // Verify carrier mission

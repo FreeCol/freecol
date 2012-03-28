@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -64,20 +65,19 @@ public class BuildColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(BuildColonyMission.class.getName());
 
+    private static final String tag = "AI colony builder";
+
     /** The maximum number of turns to travel to a building site. */
     private static final int MAX_TURNS = 5;
 
     /**
-     * The <code>Tile</code> where the <code>Colony</code> should be built.
-     * Alternately, this can be the site of an existing colony--- the unit
-     * is to go there and then retarget a new site.
-     *
-     * This target must be non-null for this mission to remain valid.
-     * doMission() maintains this as much as possible.
+     * The target of this mission.  It can either be a Tile where a
+     * Colony should be built or an existing connected Colony owned
+     * by this player to go to before retargeting.
      */
-    private Tile target = null;
+    private Location target = null;
 
-    /** The value of the target <code>Tile</code>. */
+    /** The value of a target <code>Tile</code>. */
     private int colonyValue = -1;
 
 
@@ -86,16 +86,13 @@ public class BuildColonyMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Tile</code> to build a colony at.
+     * @param target The target for this mission.
      */
-    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Tile target) {
+    public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
-        this.target = target;
-        colonyValue = (target == null || target.getColony() != null) ? -1
-            : aiUnit.getUnit().getOwner().getColonyValue(target);
-        logger.finest("AI colony builder starts with target " + target
-            + " and value " + colonyValue
-            + ": " + aiUnit.getUnit());
+        setTarget(target);
+        logger.finest(tag + " starts with target " + target
+            + " and value " + colonyValue + ": " + aiUnit.getUnit());
     }
 
     /**
@@ -126,75 +123,129 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
+     * Sets the target of this mission.
+     *
+     * @param target The new target.
+     */
+    private void setTarget(Location target) {
+        this.target = target;
+        this.colonyValue = (target instanceof Tile)
+            ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
+            : -1;
+    }
+
+    /**
      * Gets the target of this mission.
      *
      * @return The tile where a colony is to be built.
      */
-    public Tile getTarget() {
+    public Location getTarget() {
         return target;
     }
 
 
     /**
-     * Gets the value of a path to a colony building site.  The value is
-     * proportional to the general desirability of the site, and inversely
-     * proportional to the number of turns to get there.
+     * Is a tile a suitable colony build target for an AI unit?
      *
-     * @param path The <code>PathNode</code> to check.
-     * @param player The <code>Player</code> that will found the colony,
-     *     needed to check that the site can be acquired.
-     * @return A score for the building site.
+     * @param aiUnit The <code>AIUnit</code> that is building.
+     * @param target The candidate <code>Tile</code>.
+     * @return True if the target is suitable.
      */
-    private static float getSiteValue(PathNode path, Player player) {
-        final Tile tile = path.getTile();
-        if (tile == null || !tile.isLand()) return -1.0f;
-        float turns = path.getTotalTurns() + 1.0f;
+    public static boolean isTarget(AIUnit aiUnit, Location target) {
+        return (target instanceof Colony)
+            ? (((Colony)target).isConnected()
+                && aiUnit.getUnit().getOwner().owns((Colony)target))
+            : (target instanceof Tile)
+            ? (((Tile)target).isLand()
+                && ((Tile)target).getColony() == null)
+            : false;
+    }
 
-        // Can the player acquire the tile?
-        switch (player.canClaimToFoundSettlementReason(tile)) {
-        case NONE:
-            break;
-        case NATIVES:
-            // Penalize value when the tile will need to be stolen
-            int price = player.getLandPrice(tile);
-            if (price > 0 && !player.checkGold(price)) turns *= 2.0f;
-            break;
-        default:
-            return -1.0f;
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit A <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from,
+     *     (uses the unit location if null).
+     * @return A target for this mission, or null if none found.
+     */
+    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
+            : path.getLastNode().getTile();
+        Colony colony = tile.getColony();
+        return (isTarget(aiUnit, colony)) ? colony
+            : (isTarget(aiUnit, tile)) ? tile
+            : null;
+    }
+
+    /**
+     * Gets the value of a path to a colony building site.
+     *
+     * The value is proportional to the general desirability of the
+     * site, and inversely proportional to the number of turns to get
+     * there.
+     *
+     * @param aiUnit The <code>AIUnit</code> to build the colony.
+     * @param path The <code>PathNode</code> to check.
+     * @return A score for the target.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        final Location loc = extractTarget(aiUnit, path);
+        if (!isTarget(aiUnit, loc)) return Integer.MIN_VALUE;
+        int turns = (path == null) ? 1 : (path.getTotalTurns() + 1);
+
+        if (loc instanceof Colony) {
+            return 1000 / turns;
+
+        } else if (loc instanceof Tile) {
+            final Tile tile = (Tile)loc;
+            final Player player = aiUnit.getUnit().getOwner();
+            switch (player.canClaimToFoundSettlementReason(tile)) {
+            case NONE:
+                break;
+            case NATIVES:
+                // Penalize value when the tile will need to be stolen
+                int price = player.getLandPrice(tile);
+                if (price > 0 && !player.checkGold(price)) turns *= 2;
+                break;
+            default:
+                return Integer.MIN_VALUE;
+            }
+            return (int)(player.getColonyValue(tile) / turns);
         }
 
-        return player.getColonyValue(tile) / turns;
+        return Integer.MIN_VALUE;
     }
 
     /**
      * Makes a goal decider that checks colony sites.
      *
+     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
      * @param deferOK Keep track of the nearest of our colonies, to use
      *     as a fallback destination.
      * @return A suitable <code>GoalDecider</code>.
      */
-    private static GoalDecider getColonyDecider(final boolean deferOK) {
+    private static GoalDecider getColonyDecider(final AIUnit aiUnit,
+                                                final boolean deferOK) {
         return new GoalDecider() {
             private PathNode best = null;
-            private float bestValue = 0.0f;
+            private int bestValue = 0;
             private PathNode backup = null;
-            private int backupTurns = INFINITY;
+            private int backupValue = 0;
 
             public PathNode getGoal() { return (best != null) ? best : backup; }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
+                int value = scorePath(aiUnit, path);
                 Colony colony = path.getTile().getColony();
-                if (colony != null) {
-                    if (deferOK
-                        && colony.getOwner() == u.getOwner()
-                        && colony.isConnected()
-                        && path.getTotalTurns() < backupTurns) {
-                        backupTurns = path.getTotalTurns();
+                if (colony != null && isTarget(aiUnit, colony)) {
+                    if (deferOK && value > backupValue) {
+                        backupValue = value;
                         backup = path;
+                        return true;
                     }
                     return false;
                 }
-                float value = getSiteValue(path, u.getOwner());
                 if (value > bestValue) {
                     bestValue = value;
                     best = path;
@@ -208,51 +259,52 @@ public class BuildColonyMission extends Mission {
     /**
      * Finds a site for a new colony.  Favour closer sites.
      *
-     * @param unit The <code>Unit</code> to find a colony site with.
+     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
      * @param deferOK If true, allow the search to return a nearby existing
      *     colony as a temporary target.     
-     * @return A suitable tile for a new colony, or backup target.
+     * @return A path to the new colony or backup.
      */
-    public static Tile findTargetTile(AIUnit aiUnit, boolean deferOK) {
-        final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning("AI colony builder broken: " + unit);
-            return null;
-        }
-
-        final Tile startTile = unit.getPathStartTile();
-        if (startTile == null) {
-            Settlement settlement = Mission.getBestSettlement(unit.getOwner());
-            if (settlement != null) return settlement.getTile();
-            logger.finest("AI colony builder settlement fallback failed: "
-                + unit);
-            return null;
-        }
+    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+        Unit unit;
+        Tile startTile;
+        if (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
+            || (startTile = unit.getPathStartTile()) == null) return null;
 
         PathNode path;
         final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
             : null;
-        final GoalDecider colonyDecider = getColonyDecider(deferOK);
+        final GoalDecider colonyDecider = getColonyDecider(aiUnit, deferOK);
 
         // Try for something sensible nearby.
         path = unit.search(startTile, colonyDecider,
                            CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
-        if (path != null) return path.getLastNode().getTile();
+        if (path != null) return path;
 
         // Retry, but increase the range.
         path = unit.search(startTile, colonyDecider,
                            CostDeciders.avoidIllegal(), MAX_TURNS*3, carrier);
-        if (path != null) return path.getLastNode().getTile();
+        if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        path = unit.search(startTile, colonyDecider,
+        return unit.search(startTile, colonyDecider,
                            CostDeciders.numberOfTiles(), INFINITY, carrier);
-        if (path != null) return path.getLastNode().getTile();
-        
-        // Enough.
-        logger.finest("AI colony builder out of targets: " + unit);
-        return null;
     }
+
+    /**
+     * Finds a site for a new colony or a backup colony to go to.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
+     * @param deferOK If true, allow the search to return a nearby existing
+     *     colony as a temporary target.     
+     * @return A new target for this mission.
+     */
+    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, deferOK);
+        return (path == null) ? getBestSettlement(aiUnit.getUnit().getOwner())
+            : extractTarget(aiUnit, path);
+    }
+
 
     // Fake Transportable interface
 
@@ -261,9 +313,13 @@ public class BuildColonyMission extends Mission {
      *
      * @return The destination for this <code>Transportable</code>.
      */
+    @Override
     public Location getTransportDestination() {
-        return (shouldTakeTransportToTile(target)) ? target : null;
+        return (target == null
+            || !shouldTakeTransportToTile(target.getTile())) ? null
+            : target;
     }
+
 
     // Mission interface
 
@@ -295,95 +351,108 @@ public class BuildColonyMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        // Check the target
         final Unit unit = getUnit();
-        final Player player = unit.getOwner();
-        final AIUnit aiUnit = getAIUnit();
-        int value;
-        if (target == null
-            || (value = player.getColonyValue(target)) < colonyValue
-            || (target.getColony() != null
-                && target.getColony().getOwner() != player)) {
-            if ((target = findTargetTile(aiUnit, true)) == null) return;
-            colonyValue = player.getColonyValue(target);
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        } else if (!unit.hasAbility("model.ability.foundColony")) {
+            logger.finest(tag + " can not found colony: " + unit);
+            return;
         }
 
-        if (travelToTarget("AI colony builder", target)
-            != Unit.MoveType.MOVE) return;
+        // Check the target
+        final Player player = unit.getOwner();
+        final AIUnit aiUnit = getAIUnit();
+        Location newTarget;
+        int value;
+        if (!isTarget(aiUnit, target)
+            || (target instanceof Tile
+                && (value = player.getColonyValue((Tile)target)) < colonyValue)) {
+            if ((newTarget = findTarget(aiUnit, true)) == null) {
+                setTarget(null);
+                logger.finest(tag + " found no targets: " + unit);
+                return;
+            }
+            setTarget(newTarget);
+        }
 
-        // If arrived at one of our colonies it is time to either
-        // retarget or just join the current colony.  Only continue
-        // looking for a building site if `few colonies', but insist on
-        // finding a building site this time.
-        if (target.getColony() != null) {
-            String name = unit.getTile().getColony().getName();
-            if (getEuropeanAIPlayer().hasFewColonies()) {
-                target = findTargetTile(aiUnit, false);
-                logger.finest("AI colony builder arrived at " + name
-                    + ", retargeting " + target
-                    + ": " + unit);
+        // Go there.
+        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+
+        // If arrived at the target colony it is time to either
+        // retarget and insist on finding a building site.  On failure,
+        // just nullify the target which will invalidate this mission
+        // and free this unit for other tasks.
+        if (target instanceof Colony) {
+            String name = ((Colony)target).getName();
+            if ((newTarget = findTarget(aiUnit, false)) != null) {
+                setTarget(newTarget);
+                logger.finest(tag + " arrived at " + name
+                    + ", retargeting " + target + ": " + unit);
             } else {
-                logger.finest("AI colony builder gives up and joins " + name
-                    + ": " + unit);
-                target = null;
+                setTarget(null);
+                logger.finest(tag + " gives up at " + name + ": " + unit);
             }
             return;
         }
 
         // Arrived at the target (non-colony) tile.
-        if (target.getOwner() == null) {
+        if (!(target instanceof Tile)) {
+            throw new IllegalStateException("Not a building-site tile: "
+                + target);
+        }
+        Tile tile = (Tile)target;
+        if (tile.getOwner() == null) {
             ; // All is well
-        } else if (player.owns(target)) { // Already ours, clear users
-            Colony colony = (Colony) target.getOwningSettlement();
+        } else if (player.owns(tile)) { // Already ours, clear users
+            Colony colony = (Colony)tile.getOwningSettlement();
             if (colony != null
-                && colony.getColonyTile(target) != null) {
-                colony.getColonyTile(target).relocateWorkers();
+                && colony.getColonyTile(tile) != null) {
+                colony.getColonyTile(tile).relocateWorkers();
             }
         } else {
             // Not our tile, so claim it first.  Fail if someone has
             // claimed the tile and will not sell.  Otherwise try to
-            // buy it (TODO: remove cheat) or steal it.
-            int price = player.getLandPrice(target);
+            // buy it or steal it.
+            int price = player.getLandPrice(tile);
             boolean fail = price < 0;
             if (price > 0 && !player.checkGold(price)) {
                 if (Utils.randomInt(logger, "Cheat gold",
                                     getAIRandom(), 4) == 0) {
-                    // CHEAT: provide the gold needed 
+                    // CHEAT: provide the gold needed
                     player.modifyGold(price);
                 }
             }
             if (price >= 0) {
-                fail = !AIMessage.askClaimLand(target, aiUnit,
+                fail = !AIMessage.askClaimLand(tile, aiUnit,
                     ((price == 0) ? 0 : (player.checkGold(price)) ? price
                         : NetworkConstants.STEAL_LAND))
-                    || !player.owns(target);
+                    || !player.owns(tile);
             }
             if (fail) {
-                logger.finest("AI colony builder failed to claim land at "
-                    + unit.getTile() + ": " + unit);
-                target = null;
+                logger.finest(tag + " failed to claim land at " + tile
+                    + ": " + unit);
+                setTarget(null);
                 return;
             }
         }
 
         // Check that the unit has moves left, which are required for building.
         if (unit.getMovesLeft() <= 0) {
-            logger.finest("AI colony builder waiting to build at " + target
-                + ": " + unit);
+            logger.finest(tag + " waiting to build at " + tile + ": " + unit);
             return;
         }
             
         // Clear to build the colony.
         if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
-            && target.getColony() != null) {
-            logger.finest("AI colony builder completed "
-                + target.getColony().getName() + ": " + unit);
+            && tile.getColony() != null) {
+            Colony colony = tile.getColony();
+            logger.finest(tag + " completed " + colony.getName() + ": " + unit);
             aiUnit.setMission(new WorkInsideColonyMission(getAIMain(), aiUnit,
-                    getAIMain().getAIColony(target.getColony())));
+                    getAIMain().getAIColony(colony)));
         } else {
-            logger.warning("AI colony builder failed to build at " + target
-                + ": " + unit);
-            target = null;
+            setTarget(null);
+            logger.warning(tag + " failed to build at " + tile + ": " + unit);
         }
     }
 
@@ -428,7 +497,9 @@ public class BuildColonyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        writeAttribute(out, "target", target);
+        if (target != null) {
+            writeAttribute(out, "target", (FreeColGameObject)target);
+        }
     }
 
     /**
@@ -440,11 +511,9 @@ public class BuildColonyMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        target = (Tile)getGame()
+        FreeColGameObject fcgo = getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
-        final Unit unit = getUnit();
-        colonyValue = (unit == null) ? -1
-            : unit.getOwner().getColonyValue(target);
+        if (fcgo instanceof Location) setTarget((Location)fcgo);
     }
 
     /**
