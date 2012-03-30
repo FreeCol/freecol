@@ -401,8 +401,11 @@ public class ScoutingMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        target = (Tile)getGame()
+        FreeColGameObject fcgo = getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
+        target = (fcgo instanceof Settlement || fcgo instanceof Tile)
+            ? (Location)fcgo
+            : null;
     }
 
     /**
