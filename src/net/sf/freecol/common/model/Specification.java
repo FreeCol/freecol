@@ -132,6 +132,7 @@ public final class Specification {
     private final List<IndianNationType> indianNationTypes = new ArrayList<IndianNationType>();
 
     private final List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
+    private final List<Role> roles = new ArrayList<Role>();
 
     private final List<Event> events = new ArrayList<Event>();
     private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
@@ -185,6 +186,8 @@ public final class Specification {
                       new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
         readerMap.put("european-nation-types",
                       new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
+        readerMap.put("roles",
+                      new TypeReader<Role>(Role.class, roles));
         readerMap.put("equipment-types",
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
         readerMap.put("events", new TypeReader<Event>(Event.class, events));
@@ -1006,6 +1009,15 @@ public final class Specification {
         return REFNations;
     }
 
+    // -- Roles --
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public Role getRole(String id) {
+        return getType(id, Role.class);
+    }
+
     // -- EquipmentTypes --
     public List<EquipmentType> getEquipmentTypeList() {
         return equipmentTypes;
@@ -1154,6 +1166,7 @@ public final class Specification {
         writeSection(out, "goods-types", goodsTypeList);
         writeSection(out, "resource-types", resourceTypeList);
         writeSection(out, "tile-types", tileTypeList);
+        writeSection(out, "roles", roles);
         writeSection(out, "equipment-types", equipmentTypes);
         writeSection(out, "tileimprovement-types", tileImprovementTypeList);
         writeSection(out, "unit-types", unitTypeList);

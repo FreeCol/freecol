@@ -7,6 +7,7 @@
         <xs:element ref="goods-types"/>
         <xs:element ref="resource-types"/>
         <xs:element ref="tile-types"/>
+        <xs:element ref="roles"/>
         <xs:element ref="equipment-types"/>
         <xs:element ref="tileimprovement-types"/>
         <xs:element ref="unit-types"/>
@@ -157,6 +158,30 @@
       <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
       <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="tile-production" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="roles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="role"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="RoleId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="role">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+        <xs:element ref="ability"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-goods"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="downgrade" type="RoleId"/>
+      <xs:attribute name="expertUnit" type="UnitTypeId"/>
     </xs:complexType>
   </xs:element>
 
@@ -671,7 +696,31 @@
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="unitType"/>
-        <xs:element ref="role"/>
+        <xs:element name="role">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="value">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:token">
+                        <xs:enumeration value="DEFAULT"/>
+                        <xs:enumeration value="PIONEER"/>
+                        <xs:enumeration value="MISSIONARY"/>
+                        <xs:enumeration value="SOLDIER"/>
+                        <xs:enumeration value="SCOUT"/>
+                        <xs:enumeration value="DRAGOON"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="defaultValue" type="xs:string"/>
+            <xs:attribute name="value" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="number">
           <xs:complexType>
             <xs:attribute name="id" type="xs:string"/>
@@ -710,32 +759,6 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="role">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
-          <xs:complexType>
-            <xs:attribute name="value">
-              <xs:simpleType>
-                <xs:restriction base="xs:token">
-                  <xs:enumeration value="DEFAULT"/>
-                  <xs:enumeration value="PIONEER"/>
-                  <xs:enumeration value="MISSIONARY"/>
-                  <xs:enumeration value="SOLDIER"/>
-                  <xs:enumeration value="SCOUT"/>
-                  <xs:enumeration value="DRAGOON"/>
-                </xs:restriction>
-              </xs:simpleType>
-            </xs:attribute>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:string"/>
-      <xs:attribute name="defaultValue" type="xs:string"/>
-      <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -939,6 +962,12 @@
   <xs:simpleType name="AbilityId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.ability\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RoleId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.role\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
 
