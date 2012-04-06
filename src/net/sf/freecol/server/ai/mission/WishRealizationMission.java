@@ -162,7 +162,7 @@ public class WishRealizationMission extends Mission {
             final Colony colony = (Colony)wish.getDestination();
             final AIUnit aiUnit = getAIUnit();
             final AIColony aiColony = getAIMain().getAIColony(colony);
-            aiColony.removeWish(wish);
+            aiColony.completeWish(wish, "mission(" + unit + ")");
             logger.finest("AI wish completed at " + colony
                 + ": " + unit);
             // Replace the mission, with a defensive one if this is a

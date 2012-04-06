@@ -1081,9 +1081,13 @@ public final class FreeColServer {
 
         // AI initialization.
         AIMain aiMain = getAIMain();
-        if (!aiMain.checkIntegrity()) {
+        if (aiMain.checkIntegrity()) {
+            logger.info("AI integrity test succeeded.");
+        } else if (aiMain.fixIntegrity()) {
+            logger.info("AI integrity test failed, but fixed.");
+        } else {
             aiMain = new AIMain(this);
-            logger.info("Replacing AIMain.");
+            logger.warning("AI integrity test failed, replaced AIMain.");
         }
         game.setFreeColGameObjectListener(aiMain);
 

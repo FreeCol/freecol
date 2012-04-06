@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -322,6 +323,21 @@ public class AIGoods extends AIObject implements Transportable {
         this.goods = goods;
     }
 
+    /**
+     * Checks the integrity of a this AIGoods.
+     *
+     * @return True if the goods are valid.
+     */
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && (goods != null && goods.getLocation() != null
+                && !((FreeColGameObject)goods.getLocation()).isDisposed())
+            && (destination != null
+                && !((FreeColGameObject)destination).isDisposed());
+    }
+
+
+    // Serialization
 
     /**
      * Writes this object to an XML stream.

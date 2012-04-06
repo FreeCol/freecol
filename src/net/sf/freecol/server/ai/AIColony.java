@@ -467,7 +467,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         resetExports();
 
         createTileImprovementPlans();
-        createWishes();
+        updateWishes();
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
@@ -853,60 +853,65 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Removes a wish from the wishes list.
+     * Tries to complete a supplied wish.
      *
-     * @param wish The <code>Wish</code> to remove.
+     * @param wish The <code>Wish</code> to complete.
+     * @return True if this wish was successfully completed.
      */
-    public void removeWish(Wish wish) {
-        wishes.remove(wish);
+    public boolean completeWish(Wish wish, String reason) {
+        if (!wishes.remove(wish)) return false;
+        logger.finest(colony.getName() + " completes " + reason
+            + " wish: " + wish);
+        wish.dispose();
+        return true;
     }
 
     /**
      * Tries to complete any wishes for some goods that have just arrived.
      *
      * @param goods Some <code>Goods</code> that are arriving in this colony.
+     * @return True if a wish was successfully completed.
      */
-    public void completeWish(Goods goods) {
+    public boolean completeWish(Goods goods) {
+        boolean ret = false;
         int i = 0;
         while (i < wishes.size()) {
             if (wishes.get(i) instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish)wishes.get(i);
-                if (gw.getGoodsType() == goods.getType()
-                    && gw.getGoodsAmount() <= goods.getAmount()) {
-                    logger.finest(colony.getName()
-                        + " completes goods wish: " + gw);
-                    wishes.remove(gw);
-                    gw.dispose();
+                if (gw.satisfiedBy(goods)
+                    && completeWish(gw, "satisfied(" + goods + ")")) {
+                    ret = true;
                     continue;
                 }
             }
             i++;
         }
+        return ret;
     }
 
     /**
      * Tries to complete any wishes for a unit that has just arrived.
      *
      * @param unit A <code>Unit</code> that is arriving in this colony.
+     * @return True if a wish was successfully completed.
      */
-    public void completeWish(Unit unit) {
+    public boolean completeWish(Unit unit) {
+        boolean ret = false;
         int i = 0;
         while (i < wishes.size()) {
             if (wishes.get(i) instanceof WorkerWish) {
                 WorkerWish ww = (WorkerWish)wishes.get(i);
-                if (ww.getUnitType() == unit.getType()) {
-                    logger.finest(colony.getName()
-                        + " completes worker wish: " + ww);
-                    wishes.remove(ww);
-                    ww.dispose();
+                if (ww.satisfiedBy(unit)
+                    && completeWish(ww, "satisfied (" + unit.getId() + ")")) {
+                    ret = true;
                     continue;
                 }
             }
             i++;
         }
+        return ret;
     }
 
- 
     /**
      * Gets the wishes this colony has.
      *
@@ -914,6 +919,21 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public List<Wish> getWishes() {
         return new ArrayList<Wish>(wishes);
+    }
+
+    /**
+     * Gets the goods wishes this colony has.
+     *
+     * @return A copy of the wishes list with non-goods wishes removed.
+     */
+    public List<GoodsWish> getGoodsWishes() {
+        List<GoodsWish> result = new ArrayList<GoodsWish>();
+        for (Wish wish : wishes) {
+            if (wish instanceof GoodsWish) {
+                result.add((GoodsWish) wish);
+            }
+        }
+        return result;
     }
 
     /**
@@ -932,12 +952,55 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Creates the wishes for the <code>Colony</code>.
+     * Requires a goods wish for a specified goods type be present at this
+     * AI colony.  If one is already present, the amount specified here
+     * takes precedence as it is more likely to be up to date.  The value
+     * is treated as a minimum requirement.
+     *
+     * @param type The <code>GoodsType</code> to wish for.
+     * @param amount The amount of goods wished for.
+     * @param value The urgency of the wish.
      */
-    private void createWishes() {
-        wishes.clear();
+    public void requireGoodsWish(GoodsType type, int amount, int value) {
+        GoodsWish gw = null;
+        for (Wish w : wishes) {
+            if (w instanceof GoodsWish
+                && ((GoodsWish)w).getGoodsType() == type) {
+                gw = (GoodsWish)w;
+                break;
+            }
+        }
+        if (gw != null) {
+            gw.setGoodsAmount(amount);
+            gw.setValue(value);
+        } else {
+            gw = new GoodsWish(getAIMain(), colony, value, amount, type);
+            wishes.add(gw);
+            logger.finest(colony.getName() + " makes new goods wish: " + gw);
+        }
+    }
+
+    /**
+     * Updates the wishes for the <code>Colony</code>.
+     *
+     * Remove the WorkerWishes as we do not yet reliably track unit arrivals
+     * and departures, or other events like learning from experience.
+     * Update the goods wishes as we do check if unloading goods satisfies
+     * a goods wish.
+     */
+    private void updateWishes() {
+        int i = 0;
+        while (i < wishes.size()) {
+            if (wishes.get(i) instanceof WorkerWish) {
+                Wish w = wishes.remove(i);
+                w.dispose();
+            } else {
+                i++;
+            }
+        }
         createWorkerWishes();
-        createGoodsWishes();
+        updateGoodsWishes();
+        Collections.sort(wishes);
     }
 
     /**
@@ -994,8 +1057,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             WorkerWish ww = new WorkerWish(getAIMain(), colony, value, expert,
                 true);
             wishes.add(ww);
-            logger.finest("New WorkerWish at " + colony.getName()
-                + ": " + ww.getId() + " " + ww);
+            logger.finest(colony.getName() + " makes new worker wish: " + ww);
         }
 
         // Request population increase if no worker wishes and the bonus
@@ -1017,8 +1079,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             WorkerWish ww = new WorkerWish(getAIMain(), colony, 50, expert,
                 false);
             wishes.add(ww);
-            logger.finest("New WorkerWish at " + colony.getName()
-                + ": " + ww.getId() + " " + ww);
+            logger.finest(colony.getName() + " makes new worker wish: " + ww);
         }
 
         // TODO: check for students
@@ -1031,16 +1092,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 WorkerWish ww = new WorkerWish(getAIMain(), colony, 100,
                                                bestDefender, true);
                 wishes.add(ww);
-                logger.finest("New WorkerWish at " + colony.getName()
-                    + ": " + ww.getId() + " " + ww);
+                logger.finest(colony.getName() + " makes new worker wish: "
+                    + ww);
             }
         }
     }
 
     /**
-     * Creates the goods wishes.
+     * Updates the goods wishes.
      */
-    private void createGoodsWishes() {
+    private void updateGoodsWishes() {
         final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
@@ -1104,28 +1165,38 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
+        // Drop wishes that are no longer needed.
+        int i = 0;
+        while (i < wishes.size()) {
+            if (wishes.get(i) instanceof GoodsWish) {
+                GoodsWish g = (GoodsWish)wishes.get(i);
+                GoodsType t = g.getGoodsType();
+                if (required.getCount(t) < colony.getGoodsCount(t)) {
+                    completeWish(g, "redundant");
+                    continue;
+                }
+            }
+            i++;
+        }
+
+        // Require wishes for what is missing.
         for (GoodsType type : required.keySet()) {
             GoodsType requiredType = type;
             while (requiredType != null) {
                 if (requiredType.isStorable()) break;
                 requiredType = requiredType.getRawMaterial();
             }
-            if (requiredType != null) {
-                int amount = Math.min(colony.getWarehouseCapacity(),
-                    (required.getCount(requiredType)
-                        - colony.getGoodsCount(requiredType)));
-                if (amount > 0) {
-                    int value = goodsWishValue;
-                    if (colonyCouldProduce(requiredType)) value /= 10;
-                    GoodsWish gw = new GoodsWish(getAIMain(), colony, value,
-                        amount, requiredType);
-                    wishes.add(gw);
-                    logger.finest("New GoodsWish at " + colony.getName()
-                        + ": " + gw.getId() + " " + gw);
-                }
+            if (requiredType == null) continue;
+            int amount = Math.min(colony.getWarehouseCapacity(),
+                (required.getCount(type)
+                    - colony.getGoodsCount(requiredType)));
+            if (amount > 0) {
+                int value = goodsWishValue;
+                if (colonyCouldProduce(requiredType)) value /= 10;
+                requireGoodsWish(requiredType, amount, value);
             }
         }
-        Collections.sort(wishes);
+
     }
 
     /**
@@ -1275,6 +1346,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         rearrangeTurn = new Turn(0);
     }
 
+    /**
+     * Checks the integrity of a this AIColony
+     *
+     * @return True if the colony is intact.
+     */
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && colony != null
+            && !colony.isDisposed();
+    }
+
+
     // Serialization
 
     /**
@@ -1285,11 +1368,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (colony == null || colony.isDisposed()) {
-            logger.warning("Dead AIColony: " + colony.getName());
-            return;
-        }
-
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
@@ -1304,7 +1382,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         for (Wish w : wishes) {
-            if (!w.shouldBeStored()) continue;
+            if (!w.checkIntegrity() || !w.shouldBeStored()) continue;
             String tag = (w instanceof GoodsWish) ? GoodsWish.getXMLElementTagName()
                 : (w instanceof WorkerWish) ? WorkerWish.getXMLElementTagName()
                 : null;

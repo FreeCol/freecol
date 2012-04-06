@@ -569,6 +569,17 @@ public abstract class AIPlayer extends AIObject {
         return null;
     }
 
+    /**
+     * Checks the integrity of this AIPlayer.
+     *
+     * @return True if the player is intact.
+     */
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && player != null
+            && !player.isDisposed();
+    }
+
 
     // Serialization
 

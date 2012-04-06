@@ -471,6 +471,19 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Checks the integrity of this AIUnit.
+     *
+     * @return True if the unit is intact.
+     */
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && unit != null && !unit.isDisposed();
+    }
+
+    
+    // Serialization
+
+    /**
      * Writes this object to an XML stream.
      *
      * @param out The target stream.
@@ -478,11 +491,6 @@ public class AIUnit extends AIObject implements Transportable {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (unit == null || unit.isDisposed()) {
-            logger.warning("Dead AIUnit: " + unit);
-            return;
-        }
-
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
@@ -499,10 +507,12 @@ public class AIUnit extends AIObject implements Transportable {
             }
         }
         if (mission != null) {
-            if (!mission.isValid()) {
-                logger.warning("Writing invalid mission: " + mission);
+            if (mission.isValid()) {
+                mission.toXML(out);
+            } else {
+                logger.warning("AI unit with invalid mission " + mission
+                               + ": " + this);
             }
-            mission.toXML(out);
         }
 
         out.writeEndElement();

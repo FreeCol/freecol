@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -40,8 +41,12 @@ public class GoodsWish extends Wish {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
 
+    /** The type of goods required. */
     private GoodsType goodsType;
+
+    /** The amount of goods required. */
     private int amountRequested;
+
 
     /**
      * Creates a new <code>GoodsWish</code>.
@@ -56,7 +61,8 @@ public class GoodsWish extends Wish {
      * @param goodsType The type of goods needed for releasing this wish
      *       completly.
      */
-    public GoodsWish(AIMain aiMain, Location destination, int value, int amountRequested, GoodsType goodsType) {
+    public GoodsWish(AIMain aiMain, Location destination, int value,
+                     int amountRequested, GoodsType goodsType) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
@@ -70,27 +76,11 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Creates a new <code>GoodsWish</code>, using a standard request amount of 100.
-     * Possible TODO: Deprecate this in favor of the constructor without std amount?
-     *
-     * @param aiMain The main AI-object.
-     * @param destination The <code>Location</code> in which the
-     *       {@link Wish#getTransportable transportable} assigned to
-     *       this <code>GoodsWish</code> will have to reach.
-     * @param value The value identifying the importance of
-     *       this <code>Wish</code>.
-     * @param goodsType The type of goods needed for releasing this wish
-     *       completly.
-     */
-    public GoodsWish(AIMain aiMain, Location destination, int value, GoodsType goodsType) {
-        this(aiMain,destination,value, GoodsContainer.CARGO_SIZE, goodsType);
-    }
-
-    /**
      * Creates a new <code>GoodsWish</code> from the given XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation of a <code>GoodsWish</code>.
+     * @param element The root element for the XML-representation of a
+     *     <code>GoodsWish</code>.
      */
     public GoodsWish(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute(ID_ATTRIBUTE));
@@ -115,30 +105,65 @@ public class GoodsWish extends Wish {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public GoodsWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public GoodsWish(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
+    /**
+     * Checks if this <code>Wish</code> needs to be stored in a savegame.
+     *
+     * @return True.  We always store goods wishes.
+     */
+    @Override
+    public boolean shouldBeStored() {
+        return true;
+    }
 
     /**
-     * Describe <code>getGoodsType</code> method here.
+     * Gets the type of goods wished for.
      *
-     * @return a <code>GoodsType</code> value
+     * @return The type of goods wished for.
      */
     public GoodsType getGoodsType() {
         return goodsType;
     }
 
     /**
-     * Describe <code>getGoodsAmount</code> method here.
+     * Does some specified goods satisfy this wish?
      *
-     * @return an <code>int</code> value
+     * @param goods The <code>Goods</code> to test.
+     * @return True if the goods type matches and amount is not less than
+     *     that requested.
+     */
+    public boolean satisfiedBy(Goods goods) {
+        return goods.getType() == goodsType
+            && goods.getAmount() >= amountRequested;
+    }
+
+    /**
+     * Gets the amount of goods wished for.
+     *
+     * @return The amount of goods wished for.
      */
     public int getGoodsAmount() {
         return amountRequested;
     }
 
+    /**
+     * Sets the amount of goods wished for.
+     * Called in AIColony when the colony needs to change the required goods
+     * amount.
+     *
+     * @param amount The new amount of goods wished for.
+     */
+    public void setGoodsAmount(int amount) {
+        amountRequested = amount;
+    }
+
+
+    // Serialization
 
     /**
      * Writes this object to an XML stream.
@@ -173,31 +198,33 @@ public class GoodsWish extends Wish {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
 
-        final String transportableStr = in.getAttributeValue(null, "transportable");
-        if (transportableStr != null) {
-            transportable = (Transportable) getAIMain().getAIObject(transportableStr);
+        String str = in.getAttributeValue(null, "destination");
+        destination = (Location) getAIMain().getFreeColGameObject(str);
+        if ((str = in.getAttributeValue(null, "transportable")) != null) {
+            transportable = (Transportable) getAIMain().getAIObject(str);
             if (transportable == null) {
-                transportable = new AIGoods(getAIMain(), transportableStr);
+                transportable = new AIGoods(getAIMain(), str);
             }
         } else {
             transportable = null;
         }
-        setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
-
-        goodsType = getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
+        setValue(getAttribute(in, "value", -1));
+        str = in.getAttributeValue(null, "goodsType");
+        goodsType = getSpecification().getGoodsType(str);
         amountRequested = getAttribute(in, "amountRequested",
                                        GoodsContainer.CARGO_SIZE);
-        in.nextTag();
 
-        attachToDestination();
+        in.nextTag();
     }
 
+    /**
+     * {@inherit-doc}
+     */
     @Override
     public String toString() {
-        return "goodsWish: " + getId() + " " + amountRequested
-            + " " + goodsType + " (" + getValue() + ")";
+        return "[" + getId() + " " + amountRequested
+            + " " + goodsType + " (" + getValue() + ")]";
     }
 
     /**

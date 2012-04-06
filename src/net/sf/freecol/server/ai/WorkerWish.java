@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;
@@ -39,25 +40,29 @@ public class WorkerWish extends Wish {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());
 
+    /** The type of unit required. */
     private UnitType unitType;
+
+    /** Whether the exact type is needed. */
     private boolean expertNeeded;
 
 
     /**
-    * Creates a new <code>WorkerWish</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param destination The <code>Location</code> in which the
-    *       {@link Wish#getTransportable transportable} assigned to
-    *       this <code>WorkerWish</code> will have to reach.
-    * @param value The value identifying the importance of
-    *       this <code>Wish</code>.
-    * @param unitType The type of unit needed for releasing this wish
-    *       completly.
-    * @param expertNeeded Determines wether the <code>unitType</code> is
-    *       required or not.
-    */
-    public WorkerWish(AIMain aiMain, Location destination, int value, UnitType unitType, boolean expertNeeded) {
+     * Creates a new <code>WorkerWish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param destination The <code>Location</code> in which the
+     *       {@link Wish#getTransportable transportable} assigned to
+     *       this <code>WorkerWish</code> will have to reach.
+     * @param value The value identifying the importance of
+     *       this <code>Wish</code>.
+     * @param unitType The type of unit needed for releasing this wish
+     *       completely.
+     * @param expertNeeded Determines wether the <code>unitType</code> is
+     *       required or not.
+     */
+    public WorkerWish(AIMain aiMain, Location destination, int value,
+                      UnitType unitType, boolean expertNeeded) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
@@ -70,15 +75,14 @@ public class WorkerWish extends Wish {
         this.expertNeeded = expertNeeded;
     }
 
-
     /**
-    * Creates a new <code>WorkerWish</code> from the given
-    * XML-representation.
-    *
-    * @param aiMain The main AI-object.
-    * @param element The root element for the XML-representation
-    *       of a <code>WorkerWish</code>.
-    */
+     * Creates a new <code>WorkerWish</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param element The root element for the XML-representation
+     *       of a <code>WorkerWish</code>.
+     */
     public WorkerWish(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
@@ -104,7 +108,8 @@ public class WorkerWish extends Wish {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public WorkerWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public WorkerWish(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
@@ -127,13 +132,28 @@ public class WorkerWish extends Wish {
     }
 
     /**
-    * Returns the type of unit needed for releasing this wish.
-    * @return The type of unit.
-    */
+     * Gets the type of unit needed for releasing this wish.
+     *
+     * @return The type of unit.
+     */
     public UnitType getUnitType() {
         return unitType;
     }
 
+    /**
+     * Does a specified unit satisfy this wish?
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @return True if the unit either matches exactly if expertRequired,
+     *     or at least matches in a land/naval sense if not.
+     */
+    public boolean satisfiedBy(Unit unit) {
+        return (expertNeeded) 
+            ? unit.getType() == unitType
+            : unit.getType().isNaval() == unitType.isNaval();
+    }
+
+    // Serialization
 
     /**
      * Writes this object to an XML stream.
@@ -173,30 +193,33 @@ public class WorkerWish extends Wish {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
 
-        final String transportableStr = in.getAttributeValue(null, "transportable");
-        if (transportableStr != null) {
-            transportable = (Transportable) getAIMain().getAIObject(transportableStr);
+        String str = in.getAttributeValue(null, "destination");
+        destination = (Location) getAIMain().getFreeColGameObject(str);
+
+        if ((str = in.getAttributeValue(null, "transportable")) != null) {
+            transportable = (Transportable) getAIMain().getAIObject(str);
             if (transportable == null) {
-                transportable = new AIUnit(getAIMain(), transportableStr);
+                transportable = new AIUnit(getAIMain(), str);
             }
         } else {
             transportable = null;
         }
         setValue(getAttribute(in, "value", -1));
-
-        unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        str = in.getAttributeValue(null, "unitType");
+        unitType = getSpecification().getUnitType(str);
         expertNeeded = getAttribute(in, "expertNeeded", false);
-        in.nextTag();
 
-        attachToDestination();
+        in.nextTag();
     }
 
+    /**
+     * {@inherit-doc}
+     */
     @Override
     public String toString() {
-        return "workerWish: " + unitType.getNameKey()
-            + " (" + getValue() + (expertNeeded ? ", expert)" : ")");
+        return "[" + getId() + " " + unitType.getNameKey()
+            + " (" + getValue() + (expertNeeded ? ", expert" : "") + "]";
     }
 
     /**

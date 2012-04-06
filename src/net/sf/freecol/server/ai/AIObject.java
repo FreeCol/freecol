@@ -113,6 +113,18 @@ public abstract class AIObject extends FreeColObject {
         getAIMain().removeAIObject(getId());
     }
 
+    /**
+     * Checks the integrity of this AI object.
+     * Subclasses should override.
+     *
+     * @return True if the object is valid.
+     */
+    public boolean checkIntegrity() {
+        return !isUninitialized();
+    }
+
+
+    // Serialization
 
     /**
      * Initialize this object from an XML-representation of this object.

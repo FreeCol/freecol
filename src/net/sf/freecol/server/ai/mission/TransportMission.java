@@ -1268,7 +1268,7 @@ public class TransportMission extends Mission {
                         }
                     } else {
                         boolean success = unloadCargoInColony(ag.getGoods());
-                        if(success){
+                        if (success) {
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;

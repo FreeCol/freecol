@@ -26,46 +26,47 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 
 import org.w3c.dom.Element;
 
 
 /**
-* Represents a need for something at a given <code>Location</code>.
-*/
+ * Represents a need for something at a given <code>Location</code>.
+ */
 public abstract class Wish extends ValuedAIObject {
 
     private static final Logger logger = Logger.getLogger(Wish.class.getName());
 
+    /** The requesting location of this wish. */
     protected Location destination = null;
 
     /**
-    * The <code>Transportable</code> which will realize the wish,
-    * or <code>null</code> if no <code>Transportable</code> has
-    * been chosen.
-    */
+     * The <code>Transportable</code> which will realize the wish,
+     * or <code>null</code> if no <code>Transportable</code> has
+     * been chosen.
+     */
     protected Transportable transportable = null;
 
 
-
     /**
-    * Creates a new <code>Wish</code>.
-    * @param aiMain The main AI-object.
-    * @param id The unique ID of this object.
-    */
+     * Creates a new <code>Wish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
     public Wish(AIMain aiMain, String id) {
         super(aiMain, id);
     }
 
-
     /**
-    * Creates a new <code>Wish</code> from the given XML-representation.
-    *
-    * @param aiMain The main AI-object.
-    * @param element The root element for the XML-representation
-    *       of a <code>Wish</code>.
-    */
+     * Creates a new <code>Wish</code> from the given XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param element The root element for the XML-representation
+     *       of a <code>Wish</code>.
+     */
     public Wish(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute(ID_ATTRIBUTE));
         readFromXMLElement(element);
@@ -84,28 +85,18 @@ public abstract class Wish extends ValuedAIObject {
         readFromXML(in);
     }
 
-
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.
-     * @return The result.
+     *
+     * @return True if it has been allocated a transportable.
      */
     public boolean shouldBeStored() {
-        return (transportable != null);
-    }
-
-    /**
-     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
-     * @param transportable The <code>Transportable</code> which should
-     *        realize this wish.
-     * @see #getTransportable
-     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
-     */
-    public void setTransportable(Transportable transportable) {
-        this.transportable = transportable;
+        return transportable != null;
     }
 
     /**
      * Gets the <code>Transportable</code> assigned to this <code>Wish</code>.
+     *
      * @return The <code>Transportable</code> which will realize this wish,
      *         or <code>null</code> if none has been assigned.
      * @see #setTransportable
@@ -116,26 +107,30 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Disposes this <code>AIObject</code> by removing
-     * any referances to this object.
+     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
+     *
+     * @param transportable The <code>Transportable</code> which should
+     *        realize this wish.
+     * @see #getTransportable
+     * @see net.sf.freecol.server.ai.mission.WishRealizationMission
+     */
+    public void setTransportable(Transportable transportable) {
+        this.transportable = transportable;
+    }
+
+    /**
+     * Disposes of this <code>AIObject</code> by removing any references
+     * to this object.
      */
     public void dispose() {
-        AIColony ac = getDestinationAIColony();
-        if (ac != null) {
-            ac.removeWish(this);
-        } else {
-            logger.warning("Unknown destination: " + destination);
-        }
-        if (transportable != null) {
-            Transportable temp = transportable;
-            transportable = null;
-            temp.abortWish(this);
-        }
+        destination = null;
+        transportable = null;
         super.dispose();
     }
 
     /**
      * Gets the destination of this <code>Wish</code>.
+     *
      * @return The <code>Location</code> in which the
      *       {@link #getTransportable transportable} assigned to
      *       this <code>Wish</code> will have to reach.
@@ -156,10 +151,17 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Attaches this wish to its destination AI colony, if any.
+     * Checks the integrity of a <code>Wish</code>.
+     * The destination must be neither null nor disposed, the transportable
+     * may be null but must otherwise be intact.
+     *
+     * @return True if the wish is valid.
      */
-    public void attachToDestination() {
-        AIColony ac = getDestinationAIColony();
-        if (ac != null) ac.addWish(this);
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && (destination != null
+                && !((FreeColGameObject)destination).isDisposed())
+            && (transportable == null
+                || ((AIObject)transportable).checkIntegrity());
     }
 }

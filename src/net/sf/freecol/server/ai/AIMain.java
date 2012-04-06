@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -135,41 +136,24 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Checks the integrity of this <code>AIMain</code>
-     * by checking if there are any
-     * {@link AIObject#isUninitialized() uninitialized objects}.
+     * Checks the integrity of this <code>AIMain</code> by checking if
+     * there are any invalid objects.
      *
-     * Detected problems gets written to the log.
+     * Detected problems are logged.
      *
      * @return <code>true</code> if the <code>Game</code> has
      *      been loaded properly.
      */
     public boolean checkIntegrity() {
-        // Workaround for BR#3456180.
-        // Remove when GoodsWishes are working properly again.
-        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
-            if (ao instanceof GoodsWish) {
-                GoodsWish gw = (GoodsWish)ao;
-                Transportable tr = gw.getTransportable();
-                if (tr != null
-                    && tr instanceof AIGoods
-                    && ((AIGoods)tr).isUninitialized()) {
-                    gw.setTransportable(null);
-                    ((AIGoods)tr).dispose();
-                    logger.warning("Dropping bad GoodsWish: " + gw);
-                    gw.dispose();                    
-                }
-            }
-        }
-
         boolean ok = true;
         for (AIObject ao : aiObjects.values()) {
-            if (ao.isUninitialized()) {
-                logger.warning("Uninitialized object: " + ao.getId()
+            if (!ao.checkIntegrity()) {
+                logger.warning("Integrity failure: " + ao.getId()
                     + " (" + ao.getClass() + ")");
                 ok = false;
             }
         }
+
         Iterator<FreeColGameObject> fit = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
@@ -181,18 +165,33 @@ public class AIMain extends FreeColObject
                 ok = false;
             }
         }
-        if (ok) {
-            logger.info("AIMain integrity ok.");
-        } else {
-            logger.warning("AIMain integrity test failed.");
-        }
         return ok;
     }
 
     /**
-    * Returns the game.
-    * @return The <code>Game</code>.
-    */
+     * Fixes some integrity problems of this <code>AIMain</code>.
+     *
+     * - Workaround for BR#3456180 (remove when GoodsWishes are
+     *   working properly again)
+     *
+     * @return True if the integrity problems are fixed.
+     */
+    public boolean fixIntegrity() {
+        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
+            if (!ao.checkIntegrity()) {
+                logger.warning("Dropping invalid AIObject: " + ao.getId()
+                    + " (" + ao.getClass() + ")");
+                ao.dispose();
+            }
+        }
+        return checkIntegrity();
+    }
+
+    /**
+     * Convenience accessor for the game.
+     *
+     * @return The <code>Game</code>.
+     */
     public Game getGame() {
         return freeColServer.getGame();
     }
@@ -451,21 +450,25 @@ public class AIMain extends FreeColObject
         super.writeChildren(out);
 
         for (AIObject aio : new ArrayList<AIObject>(aiObjects.values())) {
-            if ((aio instanceof Wish) && !((Wish) aio).shouldBeStored()) {
+            if (!aio.checkIntegrity()) {
+                logger.log(Level.WARNING, "Integrity failure: " + aio);
                 continue;
+            }
+            if (aio instanceof Wish) {
+                Wish wish = (Wish)aio;
+                if (!wish.shouldBeStored()) continue;
             }
 
             try {
-                if (aio.getId() != null) {
-                    aio.toXML(out);
-                } else {
-                    logger.warning("aio.getId() == null, for: "
+                if (aio.getId() == null) {
+                    logger.warning("Null AI ID for: "
                         + aio.getClass().getName());
+                } else {
+                    aio.toXML(out);
                 }
             } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
+                logger.log(Level.WARNING, "Failed to write AI object: " + aio,
+                    e);
             }
         }
     }
@@ -490,9 +493,11 @@ public class AIMain extends FreeColObject
         }
 
         String lastTag = "";
+        Wish wish;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
+            wish = null;
             try {
                 if (oid != null && aiObjects.containsKey(oid)) {
                     getAIObject(oid).readFromXML(in);
@@ -521,13 +526,13 @@ public class AIMain extends FreeColObject
                 } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
                     new AIGoods(this, in);
                 } else if (tagName.equals(WorkerWish.getXMLElementTagName())) {
-                    new WorkerWish(this, in);
+                    wish = new WorkerWish(this, in);
                 } else if (tagName.equals(GoodsWish.getXMLElementTagName())
                     // @compat 0.10.3
                     || tagName.equals("GoodsWish")
                     // end compatibility code
                            ) {
-                    new GoodsWish(this, in);
+                    wish = new GoodsWish(this, in);
                 } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())
                     // @compat 0.10.3
                     || tagName.equals("tileimprovementplan")
@@ -535,15 +540,20 @@ public class AIMain extends FreeColObject
                            ) {
                     new TileImprovementPlan(this, in);
                 } else {
-                    logger.warning("Unknown AI-object read: " + tagName + "(" + lastTag + ")");
+                    logger.warning("Unknown AI-object read: " + tagName
+                        + "(" + lastTag + ")");
                 }
+                if (wish != null) {
+                    AIColony ac = wish.getDestinationAIColony();
+                    if (ac != null) ac.addWish(wish);
+                }
+
                 lastTag = in.getLocalName();
             } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning("Exception while reading an AIObject(" + tagName
-                    + ", " + oid + "): " + sw.toString());
-                while (!in.getLocalName().equals(tagName) && !in.getLocalName().equals(getXMLElementTagName())) {
+                logger.log(Level.WARNING, "Exception reading AIObject("
+                    + tagName + ", " + oid + ")", e);
+                while (!in.getLocalName().equals(tagName)
+                    && !in.getLocalName().equals(getXMLElementTagName())) {
                     in.nextTag();
                 }
                 if (!in.getLocalName().equals(getXMLElementTagName())) {

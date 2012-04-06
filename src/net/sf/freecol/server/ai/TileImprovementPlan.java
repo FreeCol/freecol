@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * Represents a <code>Tile</code> which should be improved in some way.
+ * Represents a plan to improve a <code>Tile</code> in some way.
  * For instance by plowing or by building a road.
  *
  * @see Tile
@@ -50,8 +50,8 @@ public class TileImprovementPlan extends ValuedAIObject {
     private TileImprovementType type;
     
     /**
-     * The pioneer which should make the improvement (if a <code>Unit</code> has
-     * been assigned).
+     * The pioneer which should make the improvement (if a
+     * <code>Unit</code> has been assigned).
      */
     private AIUnit pioneer = null;
     
@@ -63,6 +63,7 @@ public class TileImprovementPlan extends ValuedAIObject {
 
     /**
      * Creates a new <code>TileImprovementPlan</code>.
+     *
      * @param aiMain The main AI-object.
      * @param target The target <code>Tile</code> for the improvement.
      * @param type The type of improvement.
@@ -70,7 +71,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      *        this <code>TileImprovementPlan</code> - a higher value 
      *        signals a higher importance.
      */
-    public TileImprovementPlan(AIMain aiMain, Tile target, TileImprovementType type, int value) {
+    public TileImprovementPlan(AIMain aiMain, Tile target,
+                               TileImprovementType type, int value) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
         
         this.target = target;
@@ -100,35 +102,38 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public TileImprovementPlan(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
     
     /**
-     * Creates a new <code>TileImprovementPlan</code> from the given XML-representation.
+     * Creates a new <code>TileImprovementPlan</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param id The ID.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, String id) throws XMLStreamException {
+    public TileImprovementPlan(AIMain aiMain, String id)
+        throws XMLStreamException {
         super(aiMain, id);
     }
-
     
     /**
      * Disposes this <code>TileImprovementPlan</code>.
-     * If a pioneer has been assigned to making this improvement,
-     * then this pioneer gets informed that the improvement is
-     * no longer wanted.
+     *
+     * If a pioneer has been assigned to making this improvement, then
+     * abort its mission.
      */
     public void dispose() {
         if (pioneer != null
             && pioneer.getMission() instanceof PioneeringMission) {
-            ((PioneeringMission) pioneer.getMission()).setTileImprovementPlan(null);
+            pioneer.abortMission("disposing plan");
         }
+        pioneer = null;
         super.dispose();
     }    
 
@@ -159,7 +164,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
     
     /**
-     * Returns the <code>TileImprovementType</code> of this plan.
+     * Gets the <code>TileImprovementType</code> of this plan.
      * 
      * @return The type of the improvement.
      */
@@ -169,6 +174,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     
     /**
      * Sets the type of this <code>TileImprovementPlan</code>.
+     *
      * @param type The <code>TileImprovementType</code>.
      * @see #getType
      */
@@ -177,11 +183,12 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
     
     /**
-    * Gets the target of this <code>TileImprovementPlan</code>.
-    * @return The <code>Tile</code> where
-    *       {@link #getPioneer pioneer} should make the
-    *       given {@link #getType improvement}.
-    */
+     * Gets the target of this <code>TileImprovementPlan</code>.
+     *
+     * @return The <code>Tile</code> where
+     *       {@link #getPioneer pioneer} should make the
+     *       given {@link #getType improvement}.
+     */
     public Tile getTarget() {
         return target;
     }
@@ -189,7 +196,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     /**
      * Gets the 'most effective' TileImprovementType allowed for a
      * given tile and goods type.  Useful for AI in deciding the
-     * Improvements to prioritize.
+     * improvements to prioritize.
      *
      * @param tile The <code>Tile</code> that will be improved.
      * @param goodsType The <code>GoodsType</code> to be prioritized.
@@ -222,14 +229,26 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the plan is still viable.
      */
     public boolean update(GoodsType goodsType) {
-        TileImprovementType type = getBestTileImprovementType(target,
-                                                              goodsType);
+        TileImprovementType type
+            = getBestTileImprovementType(target, goodsType);
         if (type == null) return false;
         setType(type);
         setValue(type.getImprovementValue(target, goodsType));
         return true;
     }
 
+    /**
+     * Checks the integrity of a this TileImprovementPlan.
+     *
+     * @return True if the plan is valid.
+     */
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && (pioneer == null || pioneer.checkIntegrity());
+    }
+
+
+    // Serialization
 
     /**
      * Writes this object to an XML stream.
@@ -244,9 +263,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("type", type.getId());
         out.writeAttribute("value", Integer.toString(getValue()));
-        if (pioneer != null
-            && pioneer.getUnit() != null
-            && !pioneer.getUnit().isDisposed()) {
+        if (pioneer != null && pioneer.checkIntegrity()) {
             out.writeAttribute("pioneer", pioneer.getId());
         }
         out.writeAttribute("target", target.getId());
@@ -280,6 +297,9 @@ public class TileImprovementPlan extends ValuedAIObject {
         in.nextTag();
     }
 
+    /**
+     * {@inherit-doc}
+     */
     @Override
     public String toString() {
         return type.getNameKey() + " on " + target + " (" + getValue() + ")";
