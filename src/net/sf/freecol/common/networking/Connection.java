@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,11 +57,44 @@ import org.w3c.dom.Element;
  */
 public class Connection {
 
+    private class MultipleOutputStream extends OutputStream {
+       
+        private final List<OutputStream> streams
+            = new ArrayList<OutputStream>();
+
+        public MultipleOutputStream() {}
+
+        public void close() throws IOException {
+            for (OutputStream o : streams) o.close();
+        }
+
+        public void flush() throws IOException {
+            for (OutputStream o : streams) o.flush();
+        }
+            
+        public void write(byte[] b) throws IOException {
+            for (OutputStream o : streams) o.write(b);
+        }
+
+        public void write(byte[] b, int off, int len) throws IOException {
+            for (OutputStream o : streams) o.write(b, off, len);
+        }
+
+        public void write(int b) throws IOException {
+            for (OutputStream o : streams) o.write(b);
+        }
+
+        public MultipleOutputStream add(OutputStream o) {
+            streams.add(o);
+            return this;
+        }
+    }
+
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     private static final int TIMEOUT = 5000;
 
-    private final OutputStream out;
+    private final MultipleOutputStream out = new MultipleOutputStream();
 
     private final InputStream in;
 
@@ -84,7 +119,9 @@ public class Connection {
      * Trivial constructor for DummyConnection to use.
      */
     protected Connection(String name) {
-        out = null;
+        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+            out.add(System.err);
+        }
         in = null;
         socket = null;
         thread = null;
@@ -122,7 +159,10 @@ public class Connection {
         this.socket = socket;
         this.name = name;
 
-        out = socket.getOutputStream();
+        out.add(socket.getOutputStream());
+        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
+            out.add((OutputStream)System.err);
+        }
         in = socket.getInputStream();
 
         Transformer myTransformer;
@@ -425,22 +465,30 @@ public class Connection {
     public void endTransmission(XMLStreamReader in) throws IOException {
         try {
             if (in != null) {
-                while (in.hasNext()) {
-                    in.next();
+                try {
+                    while (in.hasNext()) in.next();
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "error draining input stream", e);
+                } finally {
+                    thread.unlock();
+                    in.close();
                 }
-                thread.unlock();
-                in.close();
             } else {
-                xmlOut.writeCharacters("\n");
-                xmlOut.flush();
-                xmlOut.close();
-                xmlOut = null;
+                try {
+                    xmlOut.writeCharacters("\n");
+                    xmlOut.flush();
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "error closing output stream", e);
+                } finally {
+                    xmlOut.close();
+                    xmlOut = null;
+                }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, toString() + " failed to end transmission", e);
+            logger.log(Level.WARNING, "unexpected exception in endTransmission",
+                e);
             throw new IOException(e.toString());
-        } finally {
-            // Unless the question id is released, can we ever recover?
+        } finally { // Unless the question id is released, can we ever recover?
             releaseQuestionId();
         }
     }
