@@ -68,7 +68,6 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerColonyTile.csNewTurn, for " + toString());
         Colony colony = getColony();
         ServerPlayer owner = (ServerPlayer) colony.getOwner();
 

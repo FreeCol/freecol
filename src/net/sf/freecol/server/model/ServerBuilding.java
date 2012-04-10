@@ -68,7 +68,6 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
-        logger.finest("ServerBuilding.csNewTurn, for " + toString());
         BuildingType type = getType();
         ServerPlayer owner = (ServerPlayer) getColony().getOwner();
 

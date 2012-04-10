@@ -230,7 +230,7 @@ public class ServerGame extends Game implements ServerModelObject {
         logger.info("ServerGame.csNewTurn, turn is " + getTurn().toString());
 
         for (Player player : getPlayers()) {
-            if (!player.isUnknownEnemy()) {
+            if (!player.isUnknownEnemy() && !player.isDead()) {
                 ((ServerPlayer) player).csNewTurn(random, cs);
             }
         }
@@ -276,6 +276,11 @@ public class ServerGame extends Game implements ServerModelObject {
                 || weakestPlayerLimit.evaluate(weakestAIPlayer))
             && ((strongestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer")) == null
                 || strongestPlayerLimit.evaluate(strongestAIPlayer))) {
+            String logMe = "Spanish succession"
+                + " in " + getGame().getTurn().toString()
+                + " " + weakestAIPlayer.getName()
+                + " cedes to " + strongestAIPlayer.getName()
+                + ":";
             for (Player player : getPlayers()) {
                 for (IndianSettlement settlement
                          : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
@@ -288,12 +293,14 @@ public class ServerGame extends Game implements ServerModelObject {
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {
                 colony.changeOwner(strongestAIPlayer);
+                logMe += " " + colony.getName();
                 for (Tile tile : colony.getOwnedTiles()) {
                     cs.add(See.perhaps(), tile);
                 }
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
                 unit.setOwner(strongestAIPlayer);
+                logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());
                 }
@@ -317,6 +324,7 @@ public class ServerGame extends Game implements ServerModelObject {
             cs.addPartial(See.all(), this, "spanishSuccession");
 
             ((ServerPlayer) weakestAIPlayer).csKill(cs);
+            logger.info(logMe);
         }
     }
 
