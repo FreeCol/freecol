@@ -538,24 +538,7 @@ public abstract class AIPlayer extends AIObject {
                 return false;
             }
         }
-
-        // A naval unit can never attack a land unit or settlement,
-        // but a land unit *can* attack a naval unit if it is on land.
-        // Otherwise naval units can only fight at sea, land units
-        // only on land.
-        if (attacker.isNaval()) {
-            if (settlement != null
-                || !defender.isNaval() || defender.getTile().isLand()) {
-                return false;
-            }
-        } else {
-            if (defender != null && !defender.getTile().isLand()) {
-                return false;
-            }
-        }
-
-        // Otherwise, attack.
-        return true;
+        return attacker.canAttack(defender);
     }
 
     /**

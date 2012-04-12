@@ -147,6 +147,9 @@ public final class Specification {
 
     private String difficultyLevel;
 
+    private UnitType cachedFastestLandUnitType = null;
+    private UnitType cachedFastestNavalUnitType = null;
+
 
     /**
      * Creates a new Specification object by loading it from the
@@ -945,6 +948,42 @@ public final class Specification {
      */
     public List<UnitType> getUnitTypesPurchasedInEurope() {
         return unitTypesPurchasedInEurope;
+    }
+
+    /**
+     * Gets the fastest land unit type in this specification.
+     *
+     * @return The fastest land unit type.
+     */
+    public UnitType getFastestLandUnitType() {
+        if (cachedFastestLandUnitType == null) {
+            int bestValue = -1;
+            for (UnitType t : unitTypeList) {
+                if (!t.isNaval() && t.getMovement() > bestValue) {
+                    bestValue = t.getMovement();
+                    cachedFastestLandUnitType = t;
+                }
+            }
+        }
+        return cachedFastestLandUnitType;
+    }
+
+    /**
+     * Gets the fastest naval unit type in this specification.
+     *
+     * @return The fastest naval unit type.
+     */
+    public UnitType getFastestNavalUnitType() {
+        if (cachedFastestNavalUnitType == null) {
+            int bestValue = -1;
+            for (UnitType t : unitTypeList) {
+                if (t.isNaval() && t.getMovement() > bestValue) {
+                    bestValue = t.getMovement();
+                    cachedFastestNavalUnitType = t;
+                }
+            }
+        }
+        return cachedFastestNavalUnitType;
     }
 
     // -- Founding Fathers --

@@ -438,7 +438,7 @@ public class SimpleCombatModel extends CombatModel {
             //     = 0.1 * odds.win + 0.9 => loss
             //   else => great loss
             // ...and beached ships always lose.
-            if (r < odds.win || isBeached(defenderUnit)) {
+            if (r < odds.win || defenderUnit.isBeached()) {
                 great = r < 0.1f * odds.win; // Great Win
                 crs.add(CombatResult.WIN);
                 resolveAttack(attackerUnit, defenderUnit, great,
@@ -537,7 +537,7 @@ public class SimpleCombatModel extends CombatModel {
             }
             if (great
                 || loser.getRepairLocation() == null
-                || isBeached(loser)) {
+                || loser.isBeached()) {
                 crs.add(CombatResult.SINK_SHIP_ATTACK);
             } else {
                 crs.add(CombatResult.DAMAGE_SHIP_ATTACK);
@@ -687,16 +687,4 @@ public class SimpleCombatModel extends CombatModel {
         return attacker.hasAbility("model.ability.ambushBonus")
             || defender.hasAbility("model.ability.ambushPenalty");
     }
-
-    /**
-     * Is a unit a beached ship?
-     *
-     * @param unit The <code>Unit</code> to test.
-     * @return True if the unit is a beached ship.
-     */
-    private boolean isBeached(Unit unit) {
-        return unit.isNaval() && unit.getTile().isLand()
-            && unit.getSettlement() == null;
-    }
-
 }

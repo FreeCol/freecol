@@ -1356,9 +1356,11 @@ public class Unit extends FreeColGameObject
      *
      * @param excludeStart If true, ignore any settlement the unit is
      *     currently in.
+     * @param range An upper bound on the number of moves.
      * @return The nearest matching settlement if any, otherwise null.
      */
-    private PathNode findOurNearestSettlement(final boolean excludeStart) {
+    private PathNode findOurNearestSettlement(final boolean excludeStart,
+                                              int range) {
         final Player player = getOwner();
         if (player.getNumberOfSettlements() <= 0
             || getTile() == null) return null;
@@ -1385,8 +1387,7 @@ public class Unit extends FreeColGameObject
                     return false;
                 }
             };
-        return search(startTile, gd, CostDeciders.avoidIllegal(),
-                      Integer.MAX_VALUE, null);
+        return search(startTile, gd, CostDeciders.avoidIllegal(), range, null);
     }
 
     /**
@@ -1396,7 +1397,7 @@ public class Unit extends FreeColGameObject
      * @return The nearest settlement if any, otherwise null.
      */
     public PathNode findOurNearestSettlement() {
-        return findOurNearestSettlement(false);
+        return findOurNearestSettlement(false, Integer.MAX_VALUE);
     }
 
     /**
@@ -1407,7 +1408,7 @@ public class Unit extends FreeColGameObject
      * @return The nearest settlement if any, otherwise null.
      */
     public PathNode findOurNearestOtherSettlement() {
-        return findOurNearestSettlement(true);
+        return findOurNearestSettlement(true, Integer.MAX_VALUE);
     }
 
     /**
@@ -1430,7 +1431,99 @@ public class Unit extends FreeColGameObject
      */
     public PathNode search(Tile start, GoalDecider gd, CostDecider cd,
                            int maxTurns, Unit carrier) {
-        return getGame().getMap().search(this, start, gd, cd, maxTurns, carrier);
+        return getGame().getMap().search(this, start, gd, cd, maxTurns,
+                                         carrier);
+    }
+
+    /**
+     * Can this unit attack a specified defender?
+     *
+     * A naval unit can never attack a land unit or settlement,
+     * but a land unit *can* attack a naval unit if it is beached.
+     * Otherwise naval units can only fight at sea, land units
+     * only on land.
+     *
+     * @param defender The defending <code>Unit</code>.
+     * @return True if this unit can attack.
+     */
+    public boolean canAttack(Unit defender) {
+        if (!isOffensiveUnit()
+            || defender == null
+            || defender.getTile() == null) return false;
+        Tile tile = defender.getTile();
+
+        return (isNaval())
+            ? (tile.getSettlement() == null && defender.isNaval())
+            : (!defender.isNaval() || defender.isBeached());
+    }
+
+    /**
+     * Searches for a unit that is a credible threatening unit to this
+     * unit within a range.
+     *
+     * @param range The number of turns to search for a threat in.
+     * @param threat The maximum tolerable probability of a potentially
+     *            threatening unit defeating this unit in combat.
+     * @return A path to the threat, or null if not found.
+     */
+    public PathNode searchForDanger(final int range, final float threat) {
+        final CombatModel cm = getGame().getCombatModel();
+        final Tile start = getTile();
+        final GoalDecider threatDecider = new GoalDecider() {
+                private PathNode found = null;
+
+                public PathNode getGoal() { return found; }
+                public boolean hasSubGoals() { return false; }
+                public boolean check(Unit unit, PathNode path) {
+                    Tile tile = path.getTile();
+                    Unit first = tile.getFirstUnit();
+                    if (first == null
+                        || !getOwner().atWarWith(first.getOwner())) {
+                        return false;
+                    }
+                    for (Unit u : tile.getUnitList()) {
+                        PathNode reverse;
+                        if (u.canAttack(unit)
+                            && cm.calculateCombatOdds(u, unit).win >= threat
+                            && (reverse = u.findPath(start)) != null
+                            && reverse.getTotalTurns() < range) {
+                            found = path;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+        // The range to search will depend on the speed of the other
+        // unit.  We can not know what it will be in advance, and it
+        // might be significantly faster than this unit.  We do not
+        // want to just use an unbounded search range because this
+        // routine must be quick (especially when the supplied range
+        // is low).  So use the heuristic of increasing the range by
+        // the ratio of the fastest appropriate (land/naval) unit type
+        // speed over the unit speed.
+        int reverseRange = range * (((isNaval())
+                ? getSpecification().getFastestNavalUnitType()
+                : getSpecification().getFastestLandUnitType())
+            .getMovement()) / this.getInitialMovesLeft();
+
+        return (start == null) ? null
+            : search(start, threatDecider, CostDeciders.avoidIllegal(),
+                     reverseRange,
+                     ((isOnCarrier()) ? (Unit)getLocation() : null));
+    }
+    
+    /**
+     * Checks if there is a credible threatening unit to this unit
+     * within a range of moves.
+     *
+     * @param range The number of turns to search for a threat within.
+     * @param threat The maximum tolerable probability of a potentially
+     *            threatening unit defeating this unit in combat.
+     * @return True if a threat was found.
+     */
+    public boolean isInDanger(int range, float threat) {
+        return searchForDanger(range, threat) != null;
     }
 
     /**
@@ -3114,6 +3207,17 @@ public class Unit extends FreeColGameObject
         return (entryLocation != null) ? (Tile) entryLocation
             : (owner.getEntryLocation() == null) ? null
             : owner.getEntryLocation().getTile();
+    }
+
+    /**
+     * Is the unit a beached ship?
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @return True if the unit is a beached ship.
+     */
+    public boolean isBeached() {
+        return isNaval() && getTile() != null && getTile().isLand()
+            && getSettlement() == null;
     }
 
     /**
