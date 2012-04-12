@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.Comparator;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -47,47 +46,16 @@ public class AIGoods extends AIObject implements Transportable {
 
     private static final Logger logger = Logger.getLogger(AIGoods.class.getName());
 
-    private static final Comparator<AIGoods> aiGoodsPriorityComparator
-        = new Comparator<AIGoods>() {
-            public int compare(AIGoods g1, AIGoods g2) {
-                return g2.getTransportPriority() - g1.getTransportPriority();
-            }
-        };
-
-    public static final int IMPORTANT_DELIVERY = 110;
-    public static final int FULL_DELIVERY = 100;
-
-    /**
-     * The priority of tools intended for a Colony with none stored
-     * at the present (and with no special needs).
-     */
-    public static final int TOOLS_FOR_COLONY_PRIORITY = 10;
-
-    /**
-     * The extra priority value added to the base value of
-     * {@link #TOOLS_FOR_COLONY_PRIORITY}
-     * for each ColonyTile needing a terrain improvement.
-     */
-    public static final int TOOLS_FOR_IMPROVEMENT = 10;
-
-    /**
-     * The extra priority value added to the base value of
-     * {@link #TOOLS_FOR_COLONY_PRIORITY}
-     * if a Pioneer is lacking tools
-     */
-    public static final int TOOLS_FOR_PIONEER = 90;
-
-    /**
-     * The extra priority value added to the base value of
-     * {@link #TOOLS_FOR_COLONY_PRIORITY}
-     * if a building is lacking tools. The number of tools
-     * is also added to the total amount.
-     */
-    public static final int TOOLS_FOR_BUILDING = 100;
-
+    /** The underlying goods. */
     private Goods goods;
+
+    /** The destination location for the goods. */
     private Location destination;
+
+    /** The transport priority. */
     private int transportPriority;
+
+    /** The AI unit assigned to provide the transport. */
     private AIUnit transport = null;
 
 
@@ -101,13 +69,13 @@ public class AIGoods extends AIObject implements Transportable {
      * @param destination The destination of the goods. This is the
      *      <code>Location</code> to which the goods should be transported.
      */
-    public AIGoods(AIMain aiMain, Location location, GoodsType type, int amount, Location destination) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
+    public AIGoods(AIMain aiMain, Location location, GoodsType type, int amount,
+                   Location destination) {
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
     }
-
 
     /**
      * Creates a new <code>AIGoods</code>.
@@ -129,7 +97,8 @@ public class AIGoods extends AIObject implements Transportable {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public AIGoods(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
@@ -145,28 +114,73 @@ public class AIGoods extends AIObject implements Transportable {
         uninitialized = true;
     }
 
+
     /**
-     * Gets a comparator that sorts by priority.
+     * Gets the goods this <code>AIGoods</code> is controlling.
      *
-     * @return A priority comparator.
+     * @return The <code>Goods</code>.
      */
-    public static Comparator<AIGoods> getAIGoodsPriorityComparator() {
-        return aiGoodsPriorityComparator;
+    public Goods getGoods() {
+        return goods;
     }
 
     /**
-     * Aborts the given <code>Wish</code>.
+     * Sets the goods this <code>AIGoods</code> is controlling.
      *
-     * @param w The <code>Wish</code> to be aborted.
+     * @param goods The <code>Goods</code>.
      */
-    public void abortWish(Wish w) {
-        if (destination == w.getDestination()) {
+    public void setGoods(Goods goods) {
+        if (goods == null) throw new IllegalArgumentException("null goods");
+        this.goods = goods;
+    }
+
+    /**
+     * Disposes this object.
+     */
+    public void dispose() {
+        setTransport(null);
+        if (destination != null) {
+            if (destination instanceof Colony) {
+                (getAIMain().getAIColony((Colony) destination)).removeAIGoods(this);
+            } else if (destination instanceof Europe) {
+                // Nothing to remove.
+            } else {
+                logger.warning("Unknown type of destination: " + destination);
+            }
             destination = null;
         }
-        if (w.getTransportable() == this) {
-            w.dispose();
-        }
+        goods = null;
+        super.dispose();
     }
+
+    /**
+     * Checks the integrity of a this AIGoods.
+     *
+     * @return True if the goods are valid.
+     */
+    public boolean checkIntegrity() {
+        String why = (!super.checkIntegrity()) ? "super"
+            : (goods == null) ? "null-goods"
+            : (goods.getType() == null) ? "null-goods-type"
+            : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
+            : (goods.getLocation() == null) ? "null-location"
+            : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
+            : (destination == null) ? "null-destination"
+            : (((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
+            : "ok";
+        if (!"ok".equals(why)) logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
+
+        return super.checkIntegrity()
+            && (goods != null 
+                && goods.getType() != null
+                && goods.getAmount() > 0
+                && goods.getLocation() != null
+                && !((FreeColGameObject)goods.getLocation()).isDisposed())
+            && (destination != null
+                && !((FreeColGameObject)destination).isDisposed());
+    }
+
+    // Transportable interface
 
     /**
      * Returns the source for this <code>Transportable</code>.
@@ -176,9 +190,8 @@ public class AIGoods extends AIObject implements Transportable {
      * @return The source for this <code>Transportable</code>.
      */
     public Location getTransportSource() {
-        return goods.getLocation();
+        return (goods == null) ? null : goods.getLocation();
     }
-
 
     /**
      * Returns the destination for this <code>Transportable</code>.
@@ -194,25 +207,25 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-     * Gets the <code>Locatable</code> which should be transported.
-     * @return The <code>Locatable</code>.
-     */
-    public Locatable getTransportLocatable() {
-        return getGoods();
-    }
-
-    /**
      * Gets the priority of transporting this <code>Transportable</code>
      * to it's destination.
      *
      * @return The priority of the transport.
      */
     public int getTransportPriority() {
-        if (goods.getAmount() <= GoodsContainer.CARGO_SIZE) {
-            return goods.getAmount();
-        } else {
-            return transportPriority;
-        }
+        return (goods.getAmount() <= GoodsContainer.CARGO_SIZE)
+            ? goods.getAmount()
+            : transportPriority;
+    }
+
+    /**
+     * Sets the priority of getting the goods to the {@link
+     * #getTransportDestination}.
+     *
+     * @param transportPriority The priority.
+     */
+    public void setTransportPriority(int transportPriority) {
+        this.transportPriority = transportPriority;
     }
 
     /**
@@ -222,6 +235,14 @@ public class AIGoods extends AIObject implements Transportable {
      */
     public void increaseTransportPriority() {
         transportPriority++;
+    }
+
+    /**
+     * Gets the <code>Locatable</code> which should be transported.
+     * @return The <code>Locatable</code>.
+     */
+    public Locatable getTransportLocatable() {
+        return getGoods();
     }
 
     /**
@@ -239,31 +260,13 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-     * Disposes this object.
-     */
-    public void dispose() {
-        setTransport(null);
-        if (destination != null) {
-            if (destination instanceof Colony) {
-                (getAIMain().getAIColony((Colony) destination)).removeAIGoods(this);
-            } else if (destination instanceof Europe) {
-                // Nothing to remove.
-            } else {
-                logger.warning("Unknown type of destination: " + destination);
-            }
-        }
-        super.dispose();
-    }
-
-    /**
      * Sets the carrier responsible for transporting this
      * <code>Transportable</code>.
      *
      * @param transport The <code>AIUnit</code> which has this
-     *         <code>Transportable</code> in it's transport list. This
-     *         <code>Transportable</code> has not been scheduled for
-     *         transport if this value is <code>null</code>.
-     *
+     *            <code>Transportable</code> in it's transport list. This
+     *            <code>Transportable</code> has not been scheduled for
+     *            transport if this value is <code>null</code>.
      */
     public void setTransport(AIUnit transport) {
         if (this.transport == transport) return;
@@ -289,51 +292,14 @@ public class AIGoods extends AIObject implements Transportable {
         }
     }
 
-
     /**
-     * Sets the priority of getting the goods to the {@link
-     * #getTransportDestination}.
+     * Aborts the given <code>Wish</code>.
      *
-     * @param transportPriority The priority.
+     * @param w The <code>Wish</code> to be aborted.
      */
-    public void setTransportPriority(int transportPriority) {
-        this.transportPriority = transportPriority;
-    }
-
-
-    /**
-     * Gets the goods this <code>AIGoods</code> is controlling.
-     *
-     * @return The <code>Goods</code>.
-     */
-    public Goods getGoods() {
-        return goods;
-    }
-
-
-    /**
-     * Sets the goods this <code>AIGoods</code> is controlling.
-     *
-     * @param goods The <code>Goods</code>.
-     */
-    public void setGoods(Goods goods) {
-        if (goods == null) {
-            throw new NullPointerException();
-        }
-        this.goods = goods;
-    }
-
-    /**
-     * Checks the integrity of a this AIGoods.
-     *
-     * @return True if the goods are valid.
-     */
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && (goods != null && goods.getLocation() != null
-                && !((FreeColGameObject)goods.getLocation()).isDisposed())
-            && (destination != null
-                && !((FreeColGameObject)destination).isDisposed());
+    public void abortWish(Wish w) {
+        if (destination == w.getDestination()) destination = null;
+        if (w.getTransportable() == this) w.dispose();
     }
 
 
@@ -421,7 +387,11 @@ public class AIGoods extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return "AIGoods@" + hashCode() + "[ " + goods
+        return "[" + getId()
+            + " " + goods
+            + ((goods == null) ? "" : " at " + goods.getLocation())
+            + " -> " + destination
+            + ((transport == null) ? "" : " using " + transport)
             + " /" + transportPriority + "]";
     }
 

@@ -780,28 +780,29 @@ public class ColonyPlan {
             if (type.getLevel() > maxLevel) continue;
 
             // Scale docks by the improvement available to the food supply.
-            if (type.hasAbility(Ability.PRODUCE_IN_WATER)
-                && !colony.hasAbility(Ability.PRODUCE_IN_WATER)
-                && colony.getTile().isCoast()) {
-                int landFood = 0, seaFood = 0;
-                for (Tile t : colony.getTile().getSurroundingTiles(1)) {
-                    if (t.getOwningSettlement() == colony
-                        || player.canClaimForSettlement(t)) {
-                        for (AbstractGoods ag : t.getSortedPotential()) {
-                            if (ag.getType().isFoodType()) {
-                                if (t.isLand()) {
-                                    landFood += ag.getAmount();
-                                } else {
-                                    seaFood += ag.getAmount();
+            if (type.hasAbility(Ability.PRODUCE_IN_WATER)) {
+                double factor = 0.0;
+                if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)
+                    && colony.getTile().isCoast()) {
+                    int landFood = 0, seaFood = 0;
+                    for (Tile t : colony.getTile().getSurroundingTiles(1)) {
+                        if (t.getOwningSettlement() == colony
+                            || player.canClaimForSettlement(t)) {
+                            for (AbstractGoods ag : t.getSortedPotential()) {
+                                if (ag.getType().isFoodType()) {
+                                    if (t.isLand()) {
+                                        landFood += ag.getAmount();
+                                    } else {
+                                        seaFood += ag.getAmount();
+                                    }
                                 }
                             }
                         }
                     }
+                    factor = (seaFood + landFood == 0) ? 0.0
+                        : seaFood / (double)(seaFood + landFood);
                 }
-                if (seaFood > 0) {
-                    prioritize(type, FISH_WEIGHT,
-                        seaFood / (double)(seaFood + landFood));
-                }
+                prioritize(type, FISH_WEIGHT, factor);
             }
 
             if (type.hasAbility(Ability.BUILD)) {
@@ -1390,7 +1391,7 @@ public class ColonyPlan {
                     ((wl instanceof Building)
                         ? ((Building)wl).getType().toString().substring(15)
                         : (wl instanceof ColonyTile)
-                        ? (((ColonyTile)wl).toString().substring(11,20)
+                        ? (((ColonyTile)wl).getWorkTile().getPosition().toString()
                             + ((ColonyTile)wl).getWorkTile().getType().toString().substring(11))
                         : wl.toString()));
 

@@ -83,18 +83,25 @@ public abstract class AIPlayer extends AIObject {
     private Connection debuggingConnection;
 
     /**
-     * Temporary variable, used to hold all AIUnit objects belonging to this AI.
-     * Any implementation of AIPlayer needs to make sure this list is invalidated
-     * as necessary, using clearAIUnits(), so that getAIUnitIterator() will
-     * create a new list.
+     * Temporary variable, used to hold all AIUnit objects belonging
+     * to this AI.  Any implementation of AIPlayer needs to make sure
+     * this list is invalidated as necessary, using clearAIUnits(), so
+     * that getAIUnitIterator() will create a new list.
      */
     private List<AIUnit> aiUnits = new ArrayList<AIUnit>();
 
 
+    /**
+     * Creates a new AI player.
+     *
+     * @param aiMain The <code>AIMain</code> the player exists within.
+     * @param id The identifier for the player.
+     */
     public AIPlayer(AIMain aiMain, String id) {
         super(aiMain, id);
         aiRandom = new Random(aiMain.getRandomSeed("Seed for " + id));
     }
+
 
     /**
      * Returns the <code>Player</code> this <code>AIPlayer</code> is

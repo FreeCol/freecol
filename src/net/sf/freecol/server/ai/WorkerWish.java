@@ -63,7 +63,7 @@ public class WorkerWish extends Wish {
      */
     public WorkerWish(AIMain aiMain, Location destination, int value,
                       UnitType unitType, boolean expertNeeded) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -93,17 +93,6 @@ public class WorkerWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public WorkerWish(AIMain aiMain, String id) {
-        super(aiMain, id);
-    }
-
-    /**
-     * Creates a new <code>WorkerWish</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -113,6 +102,18 @@ public class WorkerWish extends Wish {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
+
+    /**
+     * Creates a new <code>WorkerWish</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public WorkerWish(AIMain aiMain, String id) {
+        super(aiMain, id);
+    }
+
 
     /**
      * Updates this <code>WorkerWish</code> with the

@@ -88,14 +88,37 @@ public class Utils {
      * @param logger The <code>Logger</code> to log to.
      * @param logMe A string to log with the result.
      * @param random A pseudo-<code>Random</code> number source.
-     * @param n The exclusive maximum integer to return.
-     * @return A pseudo-random integer r, 0 <= r < n.
+     * @param range The exclusive maximum integer to return.
+     * @return A pseudo-random integer r, 0 <= r < range.
      */
     public static int randomInt(Logger logger, String logMe, Random random,
-                                int n) {
-        int ret = random.nextInt(n);
+                                int range) {
+        int ret = random.nextInt(range);
         if (logger != null) {
-            logger.finest(logMe + " random(" + n + ") = " + ret);
+            logger.finest(logMe + " random(" + range + ") = " + ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Convenience to aid logging uses of Randoms.
+     *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param random A pseudo-<code>Random</code> number source.
+     * @param range The exclusive maximum integer to return.
+     * @param n The number of randoms.
+     * @return A vector of pseudo-random integers r, 0 <= r < range.
+     */
+    public static int[] randomInts(Logger logger, String logMe, Random random,
+                                   int range, int n) {
+        int[] ret = new int[n];
+        for (int i = 0; i < n; i++) ret[i] = random.nextInt(range);
+        if (logger != null) {
+            String msg = logMe + " random(" + range + ") = [";
+            for (int i = 0; i < n; i++) msg += " " + Integer.toString(ret[i]);
+            msg += " ]";
+            logger.finest(msg);
         }
         return ret;
     }

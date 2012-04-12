@@ -741,12 +741,12 @@ public class IndianSettlement extends Settlement {
 
         // Only pay for the portion that is valued.
         int price = (unitPrice < 0) ? 0 : valued * unitPrice;
-        logger.finest("Normal price(" + amount + " " + type + ")"
-                      + " valued=" + valued
-                      + " current=" + getGoodsCount(type)
-                      + " + " + (current - getGoodsCount(type))
-                      + " unitPrice=" + unitPrice
-                      + " -> " + price);
+        //logger.finest("Normal price(" + amount + " " + type + ")"
+        //              + " valued=" + valued
+        //              + " current=" + getGoodsCount(type)
+        //              + " + " + (current - getGoodsCount(type))
+        //              + " unitPrice=" + unitPrice
+        //              + " -> " + price);
         return price;
     }
 

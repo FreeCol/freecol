@@ -39,16 +39,21 @@ public abstract class AIObject extends FreeColObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
+    /** The AI this object exists within. */
     private final AIMain aiMain;
+
+    /** Whether the object is uninitialized. */
     protected boolean uninitialized = false;
 
 
     /**
      * Creates a new <code>AIObject</code>.
+     *
      * @param aiMain The main AI-object.
      */
     public AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
+        uninitialized = true;
     }
 
     /**
@@ -63,6 +68,7 @@ public abstract class AIObject extends FreeColObject {
         this.aiMain = aiMain;
         setId(id);
         aiMain.addAIObject(id, this);
+        uninitialized = false;
     }
 
 

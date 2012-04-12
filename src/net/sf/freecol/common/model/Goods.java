@@ -39,7 +39,15 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
     private static Logger logger = Logger.getLogger(Goods.class.getName());
 
+    /** The game containing these goods. */
     private Game game;
+
+    /**
+     * Where the goods are.  This should always be non-null except for the
+     * really special case of goods that are in the process of being looted
+     * from a ship --- we can not use the ship as it is removed/disposed
+     * at once while the looting is still being resolved.
+     */
     private Location location;
 
     // ------------------------------------------------------------ constructor
@@ -268,12 +276,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("type", getType().getId());
+
         out.writeAttribute("amount", Integer.toString(getAmount()));
 
         if (location != null) {
             out.writeAttribute("location", location.getId());
-        } else {
-            logger.warning("Creating an XML-element for a 'Goods' without a 'Location'.");
         }
 
         out.writeEndElement();
@@ -288,12 +295,15 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        setType(game.getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
-        setAmount(Integer.parseInt(in.getAttributeValue(null, "amount")));
 
-        final String locationStr = in.getAttributeValue(null, "location");
-        if (locationStr != null) {
-            location = (Location) getGame().getFreeColGameObject(locationStr);
+        String str = in.getAttributeValue(null, "type");
+        setType(game.getSpecification().getGoodsType(str));
+
+        setAmount(getAttribute(in, "amount", 1));
+
+        str = in.getAttributeValue(null, "location");
+        if (str != null) {
+            location = (Location)getGame().getFreeColGameObject(str);
         }
 
         in.nextTag();

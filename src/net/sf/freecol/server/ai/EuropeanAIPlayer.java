@@ -241,9 +241,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public void removeTileImprovementPlan(TileImprovementPlan plan) {
         for (AIColony aic : getAIColonies()) {
-            if (aic.removeTileImprovementPlan(plan)) return;
+            if (aic.removeTileImprovementPlan(plan)) break;
         }
-        logger.warning("Not found given TileImprovementPlan to remove");
     }
 
     /**
@@ -1242,7 +1241,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void createAIGoodsInColonies() {
         logger.finest("Entering method createAIGoodsInColonies");
-        for (AIColony aic : getAIColonies()) aic.createAIGoods();
+        for (AIColony aic : getAIColonies()) aic.updateAIGoods();
     }
 
     /**

@@ -20,12 +20,14 @@
 package net.sf.freecol.server.ai;
 
 
-public abstract class ValuedAIObject extends AIObject implements Comparable<ValuedAIObject> {
+public abstract class ValuedAIObject extends AIObject
+    implements Comparable<ValuedAIObject> {
 
     /**
      * The value of this AIObject.
      */
     private int value;
+
 
     /**
      * Creates a new <code>ValuedAIObject</code> instance.
@@ -46,6 +48,7 @@ public abstract class ValuedAIObject extends AIObject implements Comparable<Valu
         super(aiMain, id);
     }
 
+
     /**
      * Get the <code>Value</code> value.
      *
@@ -64,10 +67,13 @@ public abstract class ValuedAIObject extends AIObject implements Comparable<Valu
         this.value = newValue;
     }
 
-
+    /**
+     * Compare valued AI objects by value.
+     *
+     * @param other The other <code>ValuedAIObject</code>.
+     * @return A comparison value.
+     */
     public final int compareTo(ValuedAIObject other) {
         return other.value - this.value;
     }
-
-
 }

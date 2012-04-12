@@ -51,16 +51,6 @@ public abstract class Wish extends ValuedAIObject {
 
 
     /**
-     * Creates a new <code>Wish</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public Wish(AIMain aiMain, String id) {
-        super(aiMain, id);
-    }
-
-    /**
      * Creates a new <code>Wish</code> from the given XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -84,6 +74,17 @@ public abstract class Wish extends ValuedAIObject {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
+
+    /**
+     * Creates a new <code>Wish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public Wish(AIMain aiMain, String id) {
+        super(aiMain, id);
+    }
+
 
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.

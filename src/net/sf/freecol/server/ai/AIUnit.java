@@ -115,7 +115,6 @@ public class AIUnit extends AIObject implements Transportable {
         super(aiMain, unit.getId());
 
         this.unit = unit;
-
         mission = new UnitWanderHostileMission(aiMain, this);
     }
 
@@ -158,6 +157,7 @@ public class AIUnit extends AIObject implements Transportable {
         }
         uninitialized = true;
     }
+
 
     /**
      * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
@@ -240,6 +240,18 @@ public class AIUnit extends AIObject implements Transportable {
             return mission.getTransportPriority() + dynamicPriority;
         } else {
             return 0;
+        }
+    }
+
+    /**
+     * Sets the priority of getting the goods to the {@link
+     * #getTransportDestination}.
+     *
+     * @param transportPriority The priority.
+     */
+    public void setTransportPriority(int transportPriority) {
+        if (hasMission()) {
+            dynamicPriority = transportPriority;
         }
     }
 

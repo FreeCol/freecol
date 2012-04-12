@@ -63,7 +63,7 @@ public class GoodsWish extends Wish {
      */
     public GoodsWish(AIMain aiMain, Location destination, int value,
                      int amountRequested, GoodsType goodsType) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -91,16 +91,6 @@ public class GoodsWish extends Wish {
      * Creates a new <code>GoodsWish</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public GoodsWish(AIMain aiMain, String id) {
-        super(aiMain, id);
-    }
-
-    /**
-     * Creates a new <code>GoodsWish</code>.
-     *
-     * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -110,6 +100,17 @@ public class GoodsWish extends Wish {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
+
+    /**
+     * Creates a new <code>GoodsWish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public GoodsWish(AIMain aiMain, String id) {
+        super(aiMain, id);
+    }
+
 
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.

@@ -182,13 +182,13 @@ public class Map extends FreeColGameObject implements Location {
          */
         public static Direction[] getRandomDirections(String logMe,
                                                       Random random) {
+            int[] randoms = Utils.randomInts(logger, logMe, random,
+                NUMBER_OF_DIRECTIONS, NUMBER_OF_DIRECTIONS);
             Direction[] directions = Direction.values();
             for (int i = 0; i < directions.length; i++) {
-                int i2 = Utils.randomInt(logger, logMe, random,
-                                         NUMBER_OF_DIRECTIONS);
-                if (i2 != i) {
-                    Direction temp = directions[i2];
-                    directions[i2] = directions[i];
+                if (randoms[i] != i) {
+                    Direction temp = directions[randoms[i]];
+                    directions[randoms[i]] = directions[i];
                     directions[i] = temp;
                 }
             }

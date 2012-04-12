@@ -69,11 +69,13 @@ public abstract class Mission extends AIObject {
     protected static final int NO_PATH_TO_TARGET = -2,
                                NO_MORE_MOVES_LEFT = -1;
 
+    /** The unit to undertake the mission. */
     private AIUnit aiUnit;
 
 
     /**
      * Creates a mission.
+     *
      * @param aiMain The main AI-object.
      */
     public Mission(AIMain aiMain) {

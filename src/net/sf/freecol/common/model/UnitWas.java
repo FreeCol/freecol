@@ -211,6 +211,6 @@ public class UnitWas {
                 + work.toString().substring(12) + ")"),
             newLocStr + ((newWork == null || newWorkAmount <= 0) ? "" : "("
                 + Integer.toString(newWorkAmount) + " "
-                + newWork.toString().substring(12) + ")"));
+                + newWork.toString().substring(12) + ")")).trim();
     }
 }

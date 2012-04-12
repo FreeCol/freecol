@@ -43,11 +43,13 @@ public class WorkLocationPlan extends ValuedAIObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
 
-    /**
-    * The FreeColGameObject this AIObject contains AI-information for.
-    */
+    /** The work location the plan is for. */
     private WorkLocation workLocation;
+
+    /** The plan priority. */
     private int priority;
+
+    /** The goods to produce. */
     private GoodsType goodsType;
 
 
@@ -60,13 +62,13 @@ public class WorkLocationPlan extends ValuedAIObject {
      * @param goodsType The goodsType to be produced on the
      *      <code>workLocation</code> using this plan.
      */
-    public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, GoodsType goodsType) {
+    public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation,
+                            GoodsType goodsType) {
         super(aiMain);
         this.workLocation = workLocation;
         this.goodsType = goodsType;
         setValue(getProductionOf(goodsType));
     }
-
 
     /**
      * Creates a new <code>WorkLocationPlan</code>.
@@ -80,6 +82,7 @@ public class WorkLocationPlan extends ValuedAIObject {
         readFromXMLElement(element);
         setValue(getProductionOf(goodsType));
     }
+
 
     /**
      * Gets the <code>WorkLocation</code> this

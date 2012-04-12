@@ -72,8 +72,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      *        signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
-                               TileImprovementType type, int value) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
+        TileImprovementType type, int value) {
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
         
         this.target = target;
         this.type = type;
@@ -121,7 +121,8 @@ public class TileImprovementPlan extends ValuedAIObject {
         throws XMLStreamException {
         super(aiMain, id);
     }
-    
+
+
     /**
      * Disposes this <code>TileImprovementPlan</code>.
      *
@@ -259,13 +260,16 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-
         out.writeAttribute(ID_ATTRIBUTE, getId());
+
         out.writeAttribute("type", type.getId());
+
         out.writeAttribute("value", Integer.toString(getValue()));
+
         if (pioneer != null && pioneer.checkIntegrity()) {
             out.writeAttribute("pioneer", pioneer.getId());
         }
+
         out.writeAttribute("target", target.getId());
 
         out.writeEndElement();
@@ -280,20 +284,25 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        type = getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
-        setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
+        super.readAttributes(in);
+
+        String str = in.getAttributeValue(null, "type");
+        type = getSpecification().getTileImprovementType(str);
+
+        setValue(getAttribute(in, "value", -1));
         
-        final String pioneerStr = in.getAttributeValue(null, "pioneer");
-        if (pioneerStr != null) {
-            pioneer = (AIUnit) getAIMain().getAIObject(pioneerStr);
-            if (pioneer == null) {
-                pioneer = new AIUnit(getAIMain(), pioneerStr);
+        str = in.getAttributeValue(null, "pioneer");
+        if (str != null) {
+            if ((pioneer = (AIUnit) getAIMain().getAIObject(str)) == null) {
+                pioneer = new AIUnit(getAIMain(), str);
             }
         } else {
             pioneer = null;
         }
-        target = (Tile) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "target"));
+
+        str = in.getAttributeValue(null, "target");
+        target = (Tile) getAIMain().getFreeColGameObject(str);
+
         in.nextTag();
     }
 
@@ -302,7 +311,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public String toString() {
-        return type.getNameKey() + " on " + target + " (" + getValue() + ")";
+        return "[" + getId() + " " + type.getNameKey()
+            + " at " + target + " /" + getValue() + "]";
     }
 
     /**

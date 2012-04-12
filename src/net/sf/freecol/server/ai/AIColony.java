@@ -127,6 +127,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         };
 
+
     /**
      * Creates a new <code>AIColony</code>.
      *
@@ -170,11 +171,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Creates a new <code>AIColony</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id
+     * @param id The identifier of this colony.
      */
     public AIColony(AIMain aiMain, String id) {
         this(aiMain, (Colony) aiMain.getGame().getFreeColGameObject(id));
     }
+
 
     /**
      * Gets the <code>Colony</code> this <code>AIColony</code> controls.
@@ -214,19 +216,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void dispose() {
         List<AIObject> disposeList = new ArrayList<AIObject>();
         for (AIGoods ag : aiGoods) {
-            if (ag.getGoods().getLocation() == colony) {
-                disposeList.add(ag);
-            }
+            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
         }
-        for (Wish w : wishes) {
-            disposeList.add(w);
-        }
-        for (TileImprovementPlan ti : tileImprovementPlans) {
-            disposeList.add(ti);
-        }
-        for (AIObject o : disposeList) {
-            o.dispose();
-        }
+        for (Wish w : wishes) disposeList.add(w);
+        for (TileImprovementPlan ti : tileImprovementPlans) disposeList.add(ti);
+        for (AIObject o : disposeList) o.dispose();
         super.dispose();
     }
 
@@ -313,7 +307,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<UnitWas> was = new ArrayList<UnitWas>();
         for (Unit u : workers) was.add(new UnitWas(u));
         for (Unit u : tile.getUnitList()) {
-            if (!u.isPerson()) continue;
+            if (!u.isPerson() || getAIUnit(u) == null) continue;
             Mission mission = getAIUnit(u).getMission();
             if (mission == null
                 || mission instanceof IdleAtSettlementMission
@@ -441,7 +435,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
-            if (aiU.getMission() != null) continue;
+            if (aiU == null || aiU.getMission() != null) continue;
             switch (u.getRole()) {
             case SOLDIER: case DRAGOON:
                 aiU.setMission(new DefendSettlementMission(aiMain, aiU,
@@ -477,7 +471,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Reset the export settings.
      * This is always needed even when there is no customs house, because
-     * createAIGoods needs to know what to export by transport.
+     * updateAIGoods needs to know what to export by transport.
      * TODO: consider market prices?
      */
     private void resetExports() {
@@ -505,8 +499,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
             for (EquipmentType e : spec.getEquipmentTypeList()) {
                 for (AbstractGoods ag : e.getGoodsRequired()) {
-                    fullExport.remove(ag.getType());
-                    partExport.add(ag.getType());
+                    if (fullExport.contains(ag.getType())) {
+                        fullExport.remove(ag.getType());
+                        partExport.add(ag.getType());
+                    }
                 }
             }
         }
@@ -695,8 +691,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @see AIGoods#dispose()
      */
     public void removeAIGoods(AIGoods ag) {
-        while (aiGoods.remove(ag)) { /* Do nothing here */
-        }
+        while (aiGoods.remove(ag)) {} /* Do nothing here */
     }
 
     /**
@@ -710,26 +705,63 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             ((TransportMission)ag.getTransport().getMission())
                 .removeFromTransportList(ag);
         }
-        aiGoods.remove(ag);
+        removeAIGoods(ag);
         ag.dispose();
+    }
+
+    /**
+     * Emits a standard message regarding the state of AIGoods.
+     *
+     * @param ag The <code>AIGoods</code> to log.
+     * @param action The state of the goods.
+     */
+    private void goodsLog(AIGoods ag, String action) {
+        int amount = ag.getGoods().getAmount();
+        logger.finest(String.format("%-20s %-10s %s %s %s",
+                colony.getName(), action, ag.getId(),
+                ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
+                    : Integer.toString(amount)),
+                ag.getGoods().getType().toString().substring(12)));
     }
 
     /**
      * Creates a list of the goods which should be shipped out of this colony.
      */
-    public void createAIGoods() {
+    public void updateAIGoods() {
         if (colony.hasAbility(Ability.EXPORT)) {
             while (!aiGoods.isEmpty()) {
                 AIGoods ag = aiGoods.remove(0);
+                goodsLog(ag, "customizes");
                 dropGoods(ag);
             }
             return;
         }
 
+        int i = 0;
+        while (i < aiGoods.size()) {
+            AIGoods ag = aiGoods.get(i);
+            if (ag == null) {
+                aiGoods.remove(i);
+            } else if (!ag.checkIntegrity()) {
+                goodsLog(ag, "reaps");
+                dropGoods(ag);
+            } else if (ag.getGoods().getLocation() != colony) {
+                // On its way, no longer of interest here, but do not dispose
+                // as that will happen when delivered.
+                goodsLog(ag, "sends");
+                aiGoods.remove(i); 
+            } else if (colony.getAdjustedNetProductionOf(ag.getGoods()
+                    .getType()) < 0) {
+                goodsLog(ag, "needs");
+                dropGoods(ag);
+            } else {
+                i++;
+            }
+        }
+
         final Europe europe = colony.getOwner().getEurope();
         final int capacity = colony.getWarehouseCapacity();
         List<AIGoods> newAIGoods = new ArrayList<AIGoods>();
-        List<AIGoods> oldAIGoods = new ArrayList<AIGoods>();
         for (GoodsType g : getSpecification().getGoodsTypeList()) {
             if (colony.getAdjustedNetProductionOf(g) < 0) continue;
             int count = colony.getGoodsCount(g);
@@ -739,107 +771,61 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 ? count - colony.getExportData(g).getExportLevel()
                 : -1;
             int priority = (exportAmount >= capacity)
-                ? AIGoods.IMPORTANT_DELIVERY
-                : (exportAmount > GoodsContainer.CARGO_SIZE)
-                ? AIGoods.FULL_DELIVERY
+                ? Transportable.IMPORTANT_DELIVERY
+                : (exportAmount >= GoodsContainer.CARGO_SIZE)
+                ? Transportable.FULL_DELIVERY
                 : 0;
-            //if (exportAmount > 0) {
-            //    logger.finest(String.format("%-20s %-8s AIGoods: %d %s\n",
-            //            colony.getName(), "finds", 
-            //            exportAmount, g.toString().substring(12)));
-            //}
 
-            int i = 0;
+            // Find all existing AI goods of type g
+            //   update amount of goods to export
+            //   reduce exportAmount at each step, dropping excess exports
+            i = 0;
             while (i < aiGoods.size()) {
                 AIGoods ag = aiGoods.get(i);
-                if (ag == null) {
-                    aiGoods.remove(i);
-                    continue;
-                }
-                if (ag.getGoods() == null
-                    || ag.getGoods().getType() == null
-                    || ag.getGoods().getAmount() <= 0) {
-                    dropGoods(ag);
-                    continue;
-                }
-                Goods oldGoods = ag.getGoods();
-                if (oldGoods.getLocation() != colony) {
-                    // Its on its way.  No longer of interest to the colony.
-                    aiGoods.remove(ag);
-                    continue;
-                }
-                if (oldGoods.getType() != g) {
+                Goods goods = ag.getGoods();
+                if (goods.getType() != g) {
                     i++;
                     continue;
                 }
-                
-                int oldAmount = oldGoods.getAmount();
-                String msg = null;
-                if (oldAmount < exportAmount) {
-                    int goodsAmount = oldAmount;
-                    if (oldAmount < GoodsContainer.CARGO_SIZE) {
-                        goodsAmount = Math.min(exportAmount,
+                int amount = goods.getAmount();
+                if (amount <= exportAmount) {
+                    if (amount < GoodsContainer.CARGO_SIZE) {
+                        amount = Math.min(exportAmount,
                             GoodsContainer.CARGO_SIZE);
-                        oldGoods.setAmount(goodsAmount);
-                        //msg = String.format("%-20s %-8s AIGoods: %s %d %s\n",
-                        //    colony.getName(), "grows", ag.getId(),
-                        //    oldGoods.getAmount(), g.toString().substring(12));
+                        goods.setAmount(amount);
                         ag.setTransportPriority(priority);
-                    } else {
-                        //msg = String.format("%-20s %-8s AIGoods: %s full %s\n",
-                        //    colony.getName(), "keeps", ag.getId(),
-                        //    g.toString().substring(12));
                     }
-                    exportAmount -= goodsAmount;
-                    oldAIGoods.add(ag);
-                } else if (oldAmount == exportAmount) {
-                    //msg = String.format("%-20s %-8s AIGoods: %s %d %s\n",
-                    //    colony.getName(), "keeps", ag.getId(),
-                    //    oldGoods.getAmount(), g.toString().substring(12));
-                    oldAIGoods.add(ag);
-                    exportAmount = 0;
-                } else { // oldAmount > exportAmount
-                    if (exportAmount <= 0) {
-                        msg = String.format("%-20s %-8s AIGoods: %s %d %s\n",
-                            colony.getName(), "drops", ag.getId(),
-                            oldGoods.getAmount(), g.toString().substring(12));
-                        dropGoods(ag);
-                        continue;
-                    }
-                    oldGoods.setAmount(exportAmount);
-                    //msg = String.format("%-20s %-8s AIGoods: %s %d %s\n",
-                    //    colony.getName(), "shrinks", ag.getId(),
-                    //    oldGoods.getAmount(), g.toString().substring(12));
-                    oldAIGoods.add(ag);
-                    exportAmount = 0;
+                    goodsLog(ag, "exports");
+                } else if (exportAmount >= EXPORT_MINIMUM) {
+                    goods.setAmount(exportAmount);
+                    goodsLog(ag, "clamps");
+                } else {
+                    goodsLog(ag, "unexports");
+                    dropGoods(ag);
+                    continue;
                 }
-                if (msg != null) logger.finest(msg);
+                exportAmount -= amount;
                 i++;
             }
 
+            // Export new goods
             while (exportAmount >= GoodsContainer.CARGO_SIZE) {
                 AIGoods newGoods = new AIGoods(getAIMain(), colony, g,
                     GoodsContainer.CARGO_SIZE, europe);
-                logger.finest(String.format("%-20s %-8s AIGoods: %s full %s\n",
-                        colony.getName(), "makes", newGoods.getId(),
-                        g.toString().substring(12)));
                 newGoods.setTransportPriority(priority);
                 newAIGoods.add(newGoods);
+                goodsLog(newGoods, "makes");
                 exportAmount -= GoodsContainer.CARGO_SIZE;
             }
             if (exportAmount >= EXPORT_MINIMUM) {
                 AIGoods newGoods = new AIGoods(getAIMain(), colony, g,
                     exportAmount, europe);
-                logger.finest(String.format("%-20s %-8s AIGoods: %s %d %s\n",
-                        colony.getName(), "makes", newGoods.getId(),
-                        exportAmount, g.toString().substring(12)));
+                goodsLog(newGoods, "makes");
                 newAIGoods.add(newGoods);
             }
         }
-        aiGoods.clear();
-        aiGoods.addAll(oldAIGoods);
         aiGoods.addAll(newAIGoods);
-        Collections.sort(aiGoods, AIGoods.getAIGoodsPriorityComparator());
+        Collections.sort(aiGoods, Transportable.transportableComparator);
     }
 
 
@@ -1372,27 +1358,27 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
         for (AIGoods ag : aiGoods) {
-            if (ag.getId() == null) {
-                logger.warning("ag.getId() == null");
-                continue;
-            }
+            if (!ag.checkIntegrity()) continue;
             out.writeStartElement(ag.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, ag.getId());
             out.writeEndElement();
         }
 
         for (Wish w : wishes) {
-            if (!w.checkIntegrity() || !w.shouldBeStored()) continue;
-            String tag = (w instanceof GoodsWish) ? GoodsWish.getXMLElementTagName()
-                : (w instanceof WorkerWish) ? WorkerWish.getXMLElementTagName()
+            String tag = (w instanceof GoodsWish)
+                ? GoodsWish.getXMLElementTagName()
+                : (w instanceof WorkerWish)
+                ? WorkerWish.getXMLElementTagName()
                 : null;
-            if (tag == null) continue;
+            if (!w.checkIntegrity() || !w.shouldBeStored()
+                || tag == null) continue;
             out.writeStartElement(tag + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, w.getId());
             out.writeEndElement();
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
+            if (!tip.checkIntegrity()) continue;
             out.writeStartElement(tip.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, tip.getId());
             out.writeEndElement();
@@ -1410,56 +1396,61 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        colony = (Colony) getAIMain().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-        if (colony == null) {
-            throw new NullPointerException("Could not find Colony with ID: "
-                + in.getAttributeValue(null, ID_ATTRIBUTE));
+
+        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if ((colony = (Colony)getAIMain().getFreeColGameObject(str)) == null) {
+            throw new NullPointerException("Could not find Colony: " + str);
         }
 
         aiGoods.clear();
+        tileImprovementPlans.clear();
         wishes.clear();
         colonyPlan = new ColonyPlan(getAIMain(), colony);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
-                AIGoods ag = (AIGoods) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (ag == null) {
-                    ag = new AIGoods(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
-                }
+            if (in.getLocalName().equals(AIGoods
+                    .getXMLElementTagName() + LIST_ELEMENT)) {
+                str = in.getAttributeValue(null, ID_ATTRIBUTE);
+                AIGoods ag = (AIGoods)getAIMain().getAIObject(str);
+                if (ag == null) ag = new AIGoods(getAIMain(), str);
                 aiGoods.add(ag);
                 in.nextTag();
-            } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + LIST_ELEMENT)
+            } else if (in.getLocalName().equals(TileImprovementPlan
+                    .getXMLElementTagName() + LIST_ELEMENT)
                 // @compat 0.10.3
-                || in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT)                       
+                || in.getLocalName().equals("tileimprovementplan"
+                    + LIST_ELEMENT)
                 // end compatibility code
-                       ) {
-                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (w == null) {
-                    w = new WorkerWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
-                }
-                wishes.add(w);
-                in.nextTag();
-            } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + LIST_ELEMENT)
-                // @compat 0.10.3
-                || in.getLocalName().equals("GoodsWishWish" + LIST_ELEMENT)                       
-                // end compatibility code
-                       ) {
-                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (w == null) {
-                    w = new GoodsWish(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
-                }
-                wishes.add(w);
-                in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT)
-                // @compat 0.10.3
-                || in.getLocalName().equals("tileimprovementplan" + LIST_ELEMENT)
-                // end compatibility code
-                       ) {
-                TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (ti == null) {
-                    ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, ID_ATTRIBUTE));
-                }
+                ) {
+                str = in.getAttributeValue(null, ID_ATTRIBUTE);
+                TileImprovementPlan ti = (TileImprovementPlan)getAIMain()
+                    .getAIObject(str);
+                if (ti == null) ti = new TileImprovementPlan(getAIMain(), str);
                 tileImprovementPlans.add(ti);
+                in.nextTag();
+            } else if (in.getLocalName().equals(GoodsWish
+                    .getXMLElementTagName() + LIST_ELEMENT)
+                // @compat 0.10.3
+                || in.getLocalName().equals(GoodsWish.getXMLElementTagName()
+                    + "Wish" + LIST_ELEMENT)
+                // end compatibility code
+                ) {
+                str = in.getAttributeValue(null, ID_ATTRIBUTE);
+                Wish w = (Wish)getAIMain().getAIObject(str);
+                if (w == null) w = new GoodsWish(getAIMain(), str);
+                wishes.add(w);
+                in.nextTag();
+            } else if (in.getLocalName().equals(WorkerWish
+                    .getXMLElementTagName() + LIST_ELEMENT)
+                // @compat 0.10.3
+                || in.getLocalName().equals(WorkerWish.getXMLElementTagName()
+                    + "Wish" + LIST_ELEMENT)
+                // end compatibility code
+                ) {
+                str = in.getAttributeValue(null, ID_ATTRIBUTE);
+                Wish w = (Wish)getAIMain().getAIObject(str);
+                if (w == null) w = new WorkerWish(getAIMain(), str);
+                wishes.add(w);
                 in.nextTag();
             } else {
                 logger.warning("Unknown tag name: " + in.getLocalName());
@@ -1467,7 +1458,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         if (!in.getLocalName().equals(getXMLElementTagName())) {
-            logger.warning("Expected end tag, received: " + in.getLocalName());
+            logger.warning("Expected end " + getXMLElementTagName()
+                + " tag, received: " + in.getLocalName());
         }
     }
 
