@@ -324,8 +324,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Assign the workers according to the colony plan.
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
-        Colony scratch = colonyPlan.assignWorkers(workers,
-            getAIOwner().preferScoutsToSoldiers());
+        AIPlayer aiPlayer = getAIOwner();
+        boolean preferScouts = aiPlayer.preferScoutsToSoldiers();
+        Colony scratch = colonyPlan.assignWorkers(workers, preferScouts);
         if (scratch == null) {
             for (UnitWas w : was) {
                 Unit u = w.getUnit();
@@ -442,12 +443,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                            colony));
                 break;
             case SCOUT:
-                if (ScoutingMission.isValid(aiU)) {
+                if (preferScouts && ScoutingMission.isValid(aiU)) {
                     aiU.setMission(new ScoutingMission(aiMain, aiU));
                 }
                 break;
             case PIONEER:
-                if (PioneeringMission.isValid(aiU)) {
+                if (aiPlayer.needsPioneers()
+                    && PioneeringMission.isValid(aiU)) {
                     aiU.setMission(new PioneeringMission(aiMain, aiU));
                 }
                 break;

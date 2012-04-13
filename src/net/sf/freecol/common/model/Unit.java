@@ -1358,7 +1358,7 @@ public class Unit extends FreeColGameObject
      * @param range An upper bound on the number of moves.
      * @return The nearest matching settlement if any, otherwise null.
      */
-    private PathNode findOurNearestSettlement(final boolean excludeStart,
+    public PathNode findOurNearestSettlement(final boolean excludeStart,
                                               int range) {
         final Player player = getOwner();
         if (player.getNumberOfSettlements() <= 0

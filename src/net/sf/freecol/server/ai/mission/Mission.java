@@ -491,6 +491,8 @@ public abstract class Mission extends AIObject {
             ? BuildColonyMission.scorePath(aiUnit, path)
             : (type == DefendSettlementMission.class)
             ? DefendSettlementMission.scorePath(aiUnit, path)
+            : (type == PioneeringMission.class)
+            ? PioneeringMission.scorePath(aiUnit, path)
             : (type == ScoutingMission.class)
             ? ScoutingMission.scorePath(aiUnit, path)
             : (type == UnitSeekAndDestroyMission.class)

@@ -87,6 +87,8 @@ public class PioneeringMissionTest extends FreeColTestCase {
             = aiPlayer.getTileImprovementPlans();
         assertTrue("There should be valid improvements",
             !improvements.isEmpty());
+        aiPlayer.buildTipMap();
+        assertTrue("The player should need pioneers", aiPlayer.needsPioneers());
 
         // Setup mission
         assertFalse("Pioneering should be invalid (no tools)",
@@ -97,7 +99,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertTrue("Colony can provide tools",
             colony.canProvideEquipment(pioneerEquipment));
         assertEquals("Colony found", colony,
-            PioneeringMission.findColonyWithTools(aiUnit));
+            PioneeringMission.findTarget(aiUnit));
         assertNull(aiUnit.getMission());
         assertTrue(Mission.isValid(aiUnit));
         assertTrue(colonist.isPerson());
@@ -108,7 +110,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         colony.addGoods(toolsGoodsType, -100);
         colonist.changeEquipment(toolsEqType, 1);
         assertNotNull("TileImprovementPlan found",
-            PioneeringMission.findTileImprovementPlan(aiUnit));
+            PioneeringMission.findTarget(aiUnit));
         assertTrue("Pioneering should be valid (unit has tools)",
             PioneeringMission.isValid(aiUnit));
 
@@ -125,8 +127,5 @@ public class PioneeringMissionTest extends FreeColTestCase {
         TileImprovement imp = new TileImprovement(game, target, tip.getType());
         imp.setTurnsToComplete(0);
         target.getTileItemContainer().addTileItem(imp);
-        // Verify that mission no longer valid
-        assertFalse("Pioneering mission should not be valid anymore",
-            mission.isValid());
     }
 }

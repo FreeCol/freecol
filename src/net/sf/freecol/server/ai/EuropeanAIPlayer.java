@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -94,6 +95,10 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
+    /** A cached map of Tile to best TileImprovementPlan.  Do not serialize. */
+    private final Map<Tile, TileImprovementPlan> tipMap
+        = new HashMap<Tile, TileImprovementPlan>();
+
     /**
      * Stores temporary information for sessions (trading with another player
      * etc).
@@ -131,11 +136,69 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public EuropeanAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public EuropeanAIPlayer(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
         readFromXML(in);
     }
 
+
+    /**
+     * Weeds out a broken or obsolete tile improvement plan.
+     *
+     * @param tip The <code>TileImprovementPlan</code> to test.
+     * @return True if the plan survives this check.
+     */
+    public boolean validateTileImprovementPlan(TileImprovementPlan tip) {
+        if (tip == null) return false;
+        Tile target = tip.getTarget();
+        if (target == null) {
+            logger.warning("Removing targetless TileImprovementPlan");
+            removeTileImprovementPlan(tip);
+            tip.dispose();
+            return false;
+        }
+        if (target.hasImprovement(tip.getType())) {
+            logger.finest("Removing obsolete TileImprovementPlan");
+            removeTileImprovementPlan(tip);
+            tip.dispose();
+            return false;
+        }
+        if (tip.getPioneer() != null
+            && (tip.getPioneer().getUnit() == null
+                || tip.getPioneer().getUnit().isDisposed())) {
+            logger.warning("Clearing broken pioneer for TileImprovementPlan");
+            tip.setPioneer(null);
+        }
+        return true;
+    }
+
+    /**
+     * Builds a map of locations to TileImprovementPlans.
+     * Called by startWorking at the start of every turn.
+     * Public for the test suite.
+     */
+    public void buildTipMap() {
+        tipMap.clear();
+        for (TileImprovementPlan tip : getTileImprovementPlans()) {
+            if (!validateTileImprovementPlan(tip)) continue;
+            if (tip.getPioneer() != null) continue;
+            TileImprovementPlan other = tipMap.get(tip.getTarget());
+            if (other == null || other.getValue() < tip.getValue()) {
+                tipMap.put(tip.getTarget(), tip);
+            }
+        }
+    }
+
+    /**
+     * Gets the best plan for a tile from the tipMap.
+     *
+     * @param tile The <code>Tile</code> to lookup.
+     * @return The best plan for a tile.
+     */
+    public TileImprovementPlan getBestPlan(Tile tile) {
+        return (tipMap == null) ? null : tipMap.get(tile);
+    }
 
 /* IMPLEMENTATION (AIPlayer interface) ****************************************/
 
@@ -149,6 +212,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         logger.finest("Entering method startWorking: "
                       + player + ", year " + getGame().getTurn());
+        buildTipMap();
         sessionRegister.clear();
         clearAIUnits();
         cheat();
@@ -218,6 +282,15 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (u.getRole() == Unit.Role.SCOUT) nScouts++;
         }
         return nScouts < ((getGame().getTurn().getAge() <= 1) ? 3 : 1);
+    }
+
+    /**
+     * Does this player need pioneers?
+     *
+     * @return True if there are outstanding tile improvement plans.
+     */
+    public boolean needsPioneers() {
+        return !tipMap.isEmpty();
     }
 
     /**
@@ -1017,7 +1090,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         final boolean fewColonies = hasFewColonies();
-        boolean isPioneerReq = getPlayerPioneers().size() == 0;
+        boolean isPioneerReq = getPlayerPioneers().size() == 0
+            && needsPioneers();
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();

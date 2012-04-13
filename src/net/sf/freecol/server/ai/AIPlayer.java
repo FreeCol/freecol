@@ -209,7 +209,7 @@ public abstract class AIPlayer extends AIObject {
      * @param colony The <code>Colony</code> to look up.
      * @return The corresponding AI colony or null if not found.
      */
-    protected AIColony getAIColony(Colony colony) {
+    public AIColony getAIColony(Colony colony) {
         return getAIMain().getAIColony(colony);
     }
 
@@ -218,7 +218,7 @@ public abstract class AIPlayer extends AIObject {
      *
      * @return A list of AI colonies.
      */
-    protected List<AIColony> getAIColonies() {
+    public List<AIColony> getAIColonies() {
         List<AIColony> ac = new ArrayList<AIColony>();
         for (Colony colony : getPlayer().getColonies()) {
             AIColony a = getAIColony(colony);
@@ -318,6 +318,16 @@ public abstract class AIPlayer extends AIObject {
      * @return True if scouts should be preferred.
      */
     public boolean preferScoutsToSoldiers() {
+        return false;
+    }
+
+    /**
+     * Does this player need pioneers?
+     * Subclasses should override this.
+     *
+     * @return True if pioneers are needed.
+     */
+    public boolean needsPioneers() {
         return false;
     }
 
