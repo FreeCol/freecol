@@ -134,8 +134,7 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Find out how quickly the unit can get to Europe.
         PathNode path;
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
+        final Unit carrier = unit.getCarrier();
         final GoalDecider cashInDecider = new GoalDecider() {
                 private PathNode best = null;
                 private int bestValue = INFINITY;

@@ -180,8 +180,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        PathNode path = unit.search(tile, gd, null, 10,
-            ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+        PathNode path = unit.search(tile, gd, null, 10, unit.getCarrier());
         if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + colony);
@@ -200,8 +199,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Unit should be aboard a man-o-war which we can use to find a
         // path to Europe.  Use the end of that path.
-        if (unit.getLocation() instanceof Unit) {
-            path = ((Unit)unit).findPathToEurope(tile);
+        if (unit.isOnCarrier()) {
+            path = unit.getCarrier().findPathToEurope(tile);
             if (path == null) {
                 logger.warning("Can not find path to Europe from: " + tile);
                 return null;

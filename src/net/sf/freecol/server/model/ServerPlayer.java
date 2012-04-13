@@ -336,13 +336,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 return false;
             }
             // onboard a carrier
-            if(unit.isOnCarrier()){
-                Unit carrier = (Unit) unitLocation;
-                // carrier in new world
-                if(carrier.getLocation() instanceof Tile){
-                    logger.info(getName() + " found colonist aboard carrier in new world");
-                    return false;
-                }
+            Unit carrier = unit.getCarrier();
+            if (carrier != null && carrier.getTile() != null) {
+                logger.info(getName() + " found colonist aboard carrier in new world");
+                return false;
             }
         }
         /*

@@ -217,8 +217,7 @@ public class ScoutingMission extends Mission {
             || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
             || (startTile = unit.getPathStartTile()) == null) return null;
 
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
+        final Unit carrier = unit.getCarrier();
         final GoalDecider scoutingDecider
             = getMissionGoalDecider(aiUnit, ScoutingMission.class);
         PathNode path;

@@ -514,8 +514,7 @@ public abstract class Mission extends AIObject {
             || (startTile = unit.getPathStartTile()) == null)
             ? null
             : unit.search(startTile, getMissionGoalDecider(aiUnit, type),
-                CostDeciders.avoidIllegal(), range,
-                ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : null));
+                CostDeciders.avoidIllegal(), range, unit.getCarrier());
     }
 
     /**
@@ -586,8 +585,7 @@ public abstract class Mission extends AIObject {
         }
 
         final Unit unit = getUnit();
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
+        final Unit carrier = unit.getCarrier();
         PathNode path = null;
         boolean inTransit = false;
         boolean needTransport = false;
@@ -678,16 +676,15 @@ public abstract class Mission extends AIObject {
      */
     public Location getTransportDestination() {
         final Unit unit = getUnit();
-        if (unit.getTile() == null) {
-            return ((unit.isOnCarrier()) ? ((Unit)unit.getLocation()) : unit)
-                .getFullEntryLocation();
-        }
-        if (!unit.isOnCarrier()) return null;
+        final Unit carrier = unit.getCarrier();
+        PathNode path;
 
-        final Unit carrier = (Unit)unit.getLocation();
-        if (carrier.getSettlement() != null) return carrier.getTile();
-        PathNode path = unit.findOurNearestSettlement();
-        return (path == null) ? null : path.getLastNode().getTile();
+        return (unit.getTile() == null)
+            ? ((unit.isOnCarrier()) ? carrier : unit).getFullEntryLocation()
+            : (!unit.isOnCarrier()) ? null
+            : (carrier.getSettlement() != null) ? carrier.getTile()
+            : ((path = unit.findOurNearestSettlement()) == null) ? null
+            : path.getLastNode().getTile();
     }
 
     /**

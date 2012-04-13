@@ -1146,7 +1146,7 @@ public class Unit extends FreeColGameObject
      */
     public Tile getPathStartTile() {
         if (isOnCarrier()) {
-            final Unit carrier = (Unit)getLocation();
+            final Unit carrier = getCarrier();
             return (carrier.getTile() != null)
                 ? carrier.getTile()
                 : (carrier.getDestination() instanceof Map)
@@ -1267,8 +1267,7 @@ public class Unit extends FreeColGameObject
         if (isOnCarrier()) {
             Location dest = getDestination();
             setDestination(end);
-            final Unit carrier = (Unit) getLocation();
-            p = this.findPath(start, end, carrier);
+            p = this.findPath(start, end, getCarrier());
             setDestination(dest);
         } else {
             p = this.findPath(start, end);
@@ -1291,7 +1290,7 @@ public class Unit extends FreeColGameObject
 
         Map map = getGame().getMap();
         boolean toEurope = destination instanceof Europe;
-        Unit carrier = (isOnCarrier()) ? (Unit) getLocation() : null;
+        Unit carrier = getCarrier();
         PathNode p;
 
         // Handle the special cases of travelling to and from Europe
@@ -1509,8 +1508,7 @@ public class Unit extends FreeColGameObject
 
         return (start == null) ? null
             : search(start, threatDecider, CostDeciders.avoidIllegal(),
-                     reverseRange,
-                     ((isOnCarrier()) ? (Unit)getLocation() : null));
+                     reverseRange, getCarrier());
     }
     
     /**
@@ -1978,9 +1976,20 @@ public class Unit extends FreeColGameObject
 
     /**
      * Verifies if the unit is aboard a carrier
+     *
+     * @return True if the unit is aboard a carrier.
      */
-    public boolean isOnCarrier(){
-        return(this.getLocation() instanceof Unit);
+    public boolean isOnCarrier() {
+        return getLocation() instanceof Unit;
+    }
+
+    /**
+     * Gets the carrier this unit is aboard if any.
+     *
+     * @return The carrier this unit is aboard, or null if none.
+     */
+    public Unit getCarrier() {
+        return (isOnCarrier()) ? ((Unit)getLocation()) : null;
     }
 
     /**
@@ -2023,7 +2032,6 @@ public class Unit extends FreeColGameObject
             // should have state IN_COLONY, but better safe than sorry
             && !(location instanceof WorkLocation);
     }
-
 
     /**
      * Finds the closest <code>Location</code> to this tile where
@@ -2235,29 +2243,16 @@ public class Unit extends FreeColGameObject
      *         given <code>Player</code>.
      */
     public boolean isVisibleTo(Player player) {
-        if(player == getOwner()){
-            return true;
-        }
+        Tile unitTile;
+        Settlement settlement;
 
-        Tile unitTile = getTile();
-        if(unitTile == null){
-            return false;
-        }
-
-        if(!player.canSee(unitTile)){
-            return false;
-        }
-
-        Settlement settlement = getSettlement();
-        if(settlement != null && !player.owns(settlement)){
-            return false;
-        }
-
-        if(isOnCarrier() && !player.owns((Unit) getLocation())){
-            return false;
-        }
-
-        return true;
+        return (player == getOwner()) ? true
+            : ((unitTile = getTile()) == null) ? false
+            :  (!player.canSee(unitTile)) ? false
+            : ((settlement = getSettlement()) != null
+                && !player.owns(settlement)) ? false
+            : (isOnCarrier() && !player.owns(getCarrier())) ? false
+            : true;
     }
 
     /**
@@ -2826,7 +2821,7 @@ public class Unit extends FreeColGameObject
     public boolean isInMission() {
         return getRole() == Role.MISSIONARY
             && getTile() == null
-            && !(getLocation() instanceof Unit);
+            && !isOnCarrier();
     }
 
     /**

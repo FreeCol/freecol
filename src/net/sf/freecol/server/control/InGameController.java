@@ -1865,14 +1865,14 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Naval unit " + unit.getId()
                 + " can not disembark.");
         }
-        if (!(unit.getLocation() instanceof Unit)) {
+        Unit carrier = unit.getCarrier();
+        if (carrier == null) {
             return DOMMessage.clientError("Unit " + unit.getId()
                 + " is not embarked.");
         }
 
         ChangeSet cs = new ChangeSet();
 
-        Unit carrier = (Unit) unit.getLocation();
         Location newLocation = carrier.getLocation();
         List<Tile> newTiles = (newLocation.getTile() == null) ? null
             : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());

@@ -2074,11 +2074,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Sanity check, and find our carrier before we get off.
-        if (!(unit.getLocation() instanceof Unit)) {
+        Unit carrier = unit.getCarrier();
+        if (carrier == null) {
             logger.warning("Unit " + unit.getId() + " is not on a carrier.");
             return false;
         }
-        Unit carrier = (Unit) unit.getLocation();
 
         // Proceed to disembark
         UnitWas unitWas = new UnitWas(unit);

@@ -272,8 +272,7 @@ public class BuildColonyMission extends Mission {
             || (startTile = unit.getPathStartTile()) == null) return null;
 
         PathNode path;
-        final Unit carrier = (unit.isOnCarrier()) ? ((Unit)unit.getLocation())
-            : null;
+        final Unit carrier = unit.getCarrier();
         final GoalDecider colonyDecider = getColonyDecider(aiUnit, deferOK);
 
         // Try for something sensible nearby.

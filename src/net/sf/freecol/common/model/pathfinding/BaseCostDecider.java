@@ -67,8 +67,7 @@ class BaseCostDecider implements CostDecider {
             // Ignore hostile units in the base case, treating attacks
             // as moves.
         case MOVE:
-            if (!(unit.getLocation() instanceof Unit)) break;
-            // Fall through if disembarking.
+            if (!unit.isOnCarrier()) break; // Fall through if disembarking.
         case ATTACK_SETTLEMENT:
         case EXPLORE_LOST_CITY_RUMOUR:
         case EMBARK:

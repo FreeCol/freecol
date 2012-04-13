@@ -1186,8 +1186,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (buildTarget != null) {
             aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit,
                                                      buildTarget));
-            boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
-            if (isUnitOnCarrier) {
+            if (aiUnit.getUnit().isOnCarrier()) {
                 // Verify carrier mission
                 AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit()
                     .getLocation());
@@ -1253,8 +1252,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     public Ownable chooseMilitaryTarget(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
         final Unit unit = aiUnit.getUnit();
-        final Unit carrier = (!unit.isOnCarrier()) ? null
-            : (Unit) unit.getLocation();
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
@@ -1301,7 +1298,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         if (targetLoc != null
             && ((path = unit.findPath(startTile, targetLoc.getTile(),
-                                      carrier)) != null)
+                                      unit.getCarrier())) != null)
             && (value = UnitSeekAndDestroyMission.scorePath(aiUnit,
                     path)) > bestValue) {
             bestValue = value;
