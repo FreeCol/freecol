@@ -36,7 +36,8 @@ public class ClientTestHelper {
         client.setFreeColServer(freeColServer);
         client.setSingleplayer(true);
         client.setHeadless(true);
-        boolean connected = connectController.login(username, "127.0.0.1", port);
+        boolean connected = connectController.login(username, "127.0.0.1",
+                                                    freeColServer.getPort());
         assertTrue(connected);
         client.getPreGameController().setReady(true);
         //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));

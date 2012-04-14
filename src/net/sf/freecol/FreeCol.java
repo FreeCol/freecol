@@ -112,7 +112,7 @@ public final class FreeCol {
 
     private static String fontName = null;
 
-    private static int serverPort = DEFAULT_PORT;
+    private static int serverPort = -1;
     private static String serverName = null;
 
     private static File mainUserDirectory = null;
@@ -774,7 +774,6 @@ public final class FreeCol {
                 setSavegame(line.getOptionValue("load-savegame"));
                 checkIntegrity = true;
                 standAloneServer = true;
-                serverPort = DEFAULT_PORT;
             }
             if (line.hasOption("load-savegame")) {
                 setSavegame(line.getOptionValue("load-savegame"));
@@ -955,25 +954,23 @@ public final class FreeCol {
             if (savegameFile != null) {
                 XMLStream xs = null;
                 try {
-                    // Get suggestions for "singleplayer" and "public game" settings from the file:
+                    // Get suggestions for "singleplayer" and "public
+                    // game" settings from the file:
                     final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
                     xs = FreeColServer.createXMLStreamReader(fis);
                     final XMLStreamReader in = xs.getXMLStreamReader();
                     in.nextTag();
                     xs.close();
 
-                    freeColServer = new FreeColServer(fis, serverPort, serverName);
+                    freeColServer = new FreeColServer(fis, serverPort,
+                                                      serverName);
                     if (checkIntegrity) {
                         String integrityCheckMsg = "";
                         boolean integrityOK = freeColServer.getIntegrity();
-                        if(integrityOK){
-                            integrityCheckMsg = Messages.message("cli.check-savegame.success");
-                        }
-                        else{
-                            integrityCheckMsg = Messages.message("cli.check-savegame.failure");
-                        }
-                        System.out.println(integrityCheckMsg);
-                        System.exit(integrityOK ? 0 : 1);
+                        System.out.println(Messages.message((integrityOK)
+                                ? "cli.check-savegame.success"
+                                : "cli.check-savegame.failure"));
+                        System.exit((integrityOK) ? 0 : 1);
                     }
                 } catch (Exception e) {
                     if (checkIntegrity) {
@@ -989,7 +986,8 @@ public final class FreeCol {
                 try {
                     FreeColTcFile tcData = new FreeColTcFile(tc);
                     Specification specification = tcData.getSpecification();
-                    freeColServer = new FreeColServer(specification, publicServer, false, serverPort, serverName);
+                    freeColServer = new FreeColServer(specification,
+                        publicServer, false, serverPort, serverName);
                 } catch (NoRouteToServerException e) {
                     System.out.println(Messages.message("server.noRouteToServer"));
                     System.exit(1);
@@ -1008,5 +1006,4 @@ public final class FreeCol {
             System.exit(1);
         }
     }
-
 }

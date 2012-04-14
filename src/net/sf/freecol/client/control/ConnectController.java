@@ -25,11 +25,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -133,6 +133,7 @@ public final class ConnectController {
 
     /**
      * Starts a new singleplayer game by connecting to the server.
+     * TODO: connect client/server directly (not using network-classes)
      *
      * @param specification a <code>Specification</code> value
      * @param username The name to use when logging in.
@@ -146,14 +147,11 @@ public final class ConnectController {
             logout(true);
         }
 
-        // TODO: connect client/server directly (not using network-classes)
         int port = FreeCol.getDefaultPort();
-
         if (freeColClient.getFreeColServer() != null
             && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (gui.showConfirmDialog("stopServer.text",
-                                                            "stopServer.yes",
-                                                            "stopServer.no")) {
+                                      "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
             } else {
                 return;
@@ -162,8 +160,9 @@ public final class ConnectController {
 
         loadModFragments(specification);
 
+        FreeColServer freeColServer = null;
         try {
-            FreeColServer freeColServer = new FreeColServer(specification, false, true, port, null, advantages);
+            freeColServer = new FreeColServer(specification, false, true, port, null, advantages);
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
                 FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
             }
@@ -177,12 +176,10 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(true);
-
-        if (login(username, "127.0.0.1", port)) {
+        if (login(username, "127.0.0.1", freeColServer.getPort())) {
             freeColClient.getPreGameController().setReady(true);
-            gui.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
-                                                         true);
-
+            gui.showStartGamePanel(freeColClient.getGame(),
+                                   freeColClient.getMyPlayer(), true);
         }
     }
 
@@ -220,37 +217,66 @@ public final class ConnectController {
         }
     }
 
+    /**
+     * Connects a client to host:port (or more).
+     *
+     * @param threadName The name for the thread.
+     * @param host The name of the machine running the
+     *            <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return The client.
+     * @throws ConnectException
+     * @throws IOException
+     */
+    private Client connectClient(String threadName, String host, int port)
+        throws ConnectException, IOException {
+        Client client = null;
+        int tries;
+        if (port < 0) {
+            port = FreeCol.getDefaultPort();
+            tries = 10;
+        } else {
+            tries = 1;
+        }
+        for (int i = tries; i > 0; i--) {
+            try {
+                client = new Client(host, port,
+                    freeColClient.getPreGameInputHandler(), threadName);
+                break;
+            } catch (ConnectException e) {
+                if (i == 1) throw e;
+            } catch (IOException e) {
+                if (i == 1) throw e;
+            }
+        }
+        return client;
+    }
 
     /**
      * Starts the client and connects to <i>host:port</i>.
      *
-     * @param username The name to use when logging in. This should be a unique identifier.
-     * @param host The name of the machine running the <code>FreeColServer</code>.
+     * @param username The name to use when logging in. This should be
+     *            a unique identifier.
+     * @param host The name of the machine running the
+     *            <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @return a <code>boolean</code> value
+     * @return True if the login succeeds.
      */
     public boolean login(String username, String host, int port) {
-        Client client = freeColClient.getClient();
         freeColClient.setMapEditor(false);
 
-        if (client != null) {
-            client.disconnect();
-        }
+        Client client = freeColClient.getClient();
+        if (client != null) client.disconnect();
 
         try {
-            client = new Client(host, port,
-                                freeColClient.getPreGameInputHandler(),
-                                FreeCol.CLIENT_THREAD + username);
-        } catch (ConnectException e) {
-            gui.errorMessage("server.couldNotConnect");
-            return false;
-        } catch (IOException e) {
-            gui.errorMessage("server.couldNotConnect");
+            client = connectClient(FreeCol.CLIENT_THREAD + username,
+                                   host, port);
+        } catch (Exception e) {
+            gui.errorMessage("server.couldNotConnect", e.getMessage());
             return false;
         }
 
         freeColClient.setClient(client);
-
         Connection c = client.getConnection();
         XMLStreamReader in = null;
         try {
@@ -261,25 +287,30 @@ public final class ConnectController {
             out.writeEndElement();
             in = c.getReply();
             if (in.getLocalName().equals("loginConfirmed")) {
-                final String startGameStr = in.getAttributeValue(null, "startGame");
-                boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
-                boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
-                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
+                String str;
+                str = in.getAttributeValue(null, "startGame");
+                boolean startGame = str != null
+                    && Boolean.valueOf(str).booleanValue();
+                str = in.getAttributeValue(null, "singleplayer");
+                boolean singleplayer = str != null
+                    && Boolean.valueOf(str).booleanValue();
+                str = in.getAttributeValue(null, "isCurrentPlayer");
+                boolean isCurrentPlayer = str != null
+                    && Boolean.valueOf(str).booleanValue();
                 String activeUnitId = in.getAttributeValue(null, "activeUnit");
 
                 in.nextTag();
                 Game game = new Game(in, username);
 
-                // this completes the client's view of the spec with options obtained from the server difficulty
-                // it should not be required in the client, to be removed later, when newTurn() only runs in the server
-
+                // This completes the client's view of the spec with
+                // options obtained from the server difficulty.  It
+                // should not be required in the client, to be removed
+                // later, when newTurn() only runs in the server
                 Player thisPlayer = game.getPlayerByName(username);
-
                 freeColClient.setGame(game);
                 freeColClient.setMyPlayer(thisPlayer);
-
-                freeColClient.getActionManager().addSpecificationActions(game.getSpecification());
-
+                freeColClient.getActionManager()
+                    .addSpecificationActions(game.getSpecification());
                 c.endTransmission(in);
 
                 // If (true) --> reconnect
@@ -292,13 +323,13 @@ public final class ConnectController {
                         freeColClient.getInGameController()
                             .setCurrentPlayer(thisPlayer);
                         if (activeUnitId != null) {
-                            Unit active = (Unit) freeColClient.getGame().getFreeColGameObject(activeUnitId);
+                            Unit active = (Unit)freeColClient.getGame()
+                                .getFreeColGameObject(activeUnitId);
                             if (active != null) {
                                 active.getOwner().resetIterators();
                                 active.getOwner().setNextActiveUnit(active);
                                 gui.setActiveUnit(active);
                             }
-                            
                         } else {
                             gui.setSelectedTile(entryTile, false);
                         }
@@ -309,8 +340,8 @@ public final class ConnectController {
                         .getEntryLocation().getTile(), false);
                 }
             } else if (in.getLocalName().equals("error")) {
-                gui.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
-
+                gui.errorMessage(in.getAttributeValue(null, "messageID"),
+                                 in.getAttributeValue(null, "message"));
                 c.endTransmission(in);
                 return false;
             } else {
@@ -319,26 +350,21 @@ public final class ConnectController {
                 return false;
             }
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            logger.log(Level.WARNING, "Login error", e);
             gui.errorMessage(null, "Could not send XML to the server.");
             try {
                 c.endTransmission(in);
             } catch (IOException ie) {
-                logger.warning("Exception while trying to end transmission: " + ie.toString());
+                logger.log(Level.WARNING, "Exception at endTransmission.", ie);
             }
         }
-
         freeColClient.setLoggedIn(true);
-
         return true;
     }
 
-
     /**
-    * Reconnects to the server.
-    */
+     * Reconnects to the server.
+     */
     public void reconnect() {
         final String username = freeColClient.getMyPlayer().getName();
         final String host = freeColClient.getClient().getHost();
@@ -426,7 +452,7 @@ public final class ConnectController {
             } else {
                 singleplayer = defaultSingleplayer;
                 name = null;
-                port = FreeCol.getDefaultPort();
+                port = -1;
             }
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
@@ -438,9 +464,7 @@ public final class ConnectController {
             SwingUtilities.invokeLater( new ErrorJob("couldNotLoadGame") );
             return;
         } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            logger.log(Level.WARNING, "Error reading game.", e);
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
         } finally {
@@ -467,12 +491,13 @@ public final class ConnectController {
                     freeColServer = new FreeColServer(savegame, port, name);
                     freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
+                    final int port = freeColServer.getPort();
                     freeColClient.setSingleplayer(singleplayer);
                     freeColClient.getInGameController().setGameConnected();
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             ResourceManager.setScenarioMapping(savegame.getResourceMapping());
-                            login(username, "127.0.0.1", FreeCol.getDefaultPort());
+                            login(username, "127.0.0.1", port);
                             gui.closeStatusPanel();
                         }
                     } );

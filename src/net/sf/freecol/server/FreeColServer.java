@@ -186,7 +186,8 @@ public final class FreeColServer {
 
     private boolean publicServer = false;
 
-    private final int port;
+    /** The port the server is available at. */
+    private int port;
 
     /** The name of this server. */
     private String name;
@@ -212,6 +213,42 @@ public final class FreeColServer {
         }
     };
 
+    /**
+     * Start a Server at port.
+     * If the port is specified, just try once.
+     * If the port is unspecified (negative), try multiple times.
+     *
+     * @param firstPort The port to start trying to connect at.
+     * @return A started <code>Server</code>.
+     * @throws IOException on failure to open the port.
+     */
+    private Server serverStart(int firstPort) throws IOException {
+        int port, tries;
+        if (firstPort < 0) {
+            port = FreeCol.getDefaultPort();
+            tries = 10;
+        } else {
+            port = firstPort;
+            tries = 1;
+        }
+        logger.finest("serverStart(" + firstPort + ") => " + port
+            + " x " + tries);
+        for (int i = tries; i > 0; i--) {
+            try {
+                server = new Server(this, port);
+                break;
+            } catch (IOException e) {
+                if (i == 1) {
+                    logger.log(Level.WARNING, "Exception starting server.", e);
+                    throw e;
+                }
+            }
+            port++;
+        }
+        this.port = port;
+        server.start();
+        return server;
+    }
 
     /**
      * Starts a new server in a specified mode and with a specified port.
@@ -264,13 +301,8 @@ public final class FreeColServer {
 
         mapGenerator = new SimpleMapGenerator(random, specification);
 
-        try {
-            server = new Server(this, port);
-            server.start();
-        } catch (IOException e) {
-            logger.warning("Exception while starting server: " + e);
-            throw e;
-        }
+        server = serverStart(port);
+
         updateMetaServer(true);
         startMetaServerUpdateThread();
     }
@@ -329,13 +361,8 @@ public final class FreeColServer {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
 
-        try {
-            server = new Server(this, port);
-            server.start();
-        } catch (IOException e) {
-            logger.warning("Exception while starting server: " + e);
-            throw e;
-        }
+        server = serverStart(port);
+
         try {
             loadGame(savegame, specification);
         } catch (FreeColException e) {
@@ -356,6 +383,15 @@ public final class FreeColServer {
         updateMetaServer(true);
         startMetaServerUpdateThread();
         TransactionSession.clearAll();
+    }
+
+    /**
+     * Gets the port this server was started on.
+     *
+     * @return The port.
+     */
+    public int getPort() {
+        return this.port;
     }
 
     /**

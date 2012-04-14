@@ -45,7 +45,7 @@ import net.sf.freecol.util.test.MockMapGenerator;
 public final class ServerTestHelper {
 
     private static final String SERVER_NAME = "MyTestServer";
-    private static final int SERVER_PORT = FreeCol.getDefaultPort();
+    private static final int SERVER_PORT = -1;
     private static final String TEST_FILE = "test/data/test.fsg";
 
     private static FreeColServer server = null;
