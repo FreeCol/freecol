@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioInputStream;
@@ -58,25 +59,19 @@ public class AudioResource extends Resource {
         BufferedInputStream bis = null;
         AudioInputStream ais = null;
         try {
-            bis = new BufferedInputStream( new FileInputStream(f) );
+            bis = new BufferedInputStream(new FileInputStream(f));
             bis.mark(1000); bis.skip(1); bis.reset();
             ais = AudioSystem.getAudioInputStream(bis);
             this.file = f;
         } catch (Exception e) {
-            logger.warning( "Not an audio file: " + f.getPath() + "\r\nProblem: " + e );
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Not an audio file: " + f.getPath(), e);
             this.file = null;
         } finally {
-            // close input stream
-            try {
-                if (ais != null) {
-                    ais.close();
-                } else if (bis != null) {
-                    bis.close();
-                }
+            try { // Close input streams
+                if (ais != null) ais.close();
+                if (bis != null) bis.close();
             } catch (IOException e) {
-                // unable to close stream => ignore
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Error closing audio stream", e);
             }
         }
     }
