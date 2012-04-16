@@ -374,8 +374,10 @@ public final class FreeCol {
         userModsDirectory = new File(mainUserDirectory, "mods");
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
-        clientOptionsFile = (tcUserDirectory == null) ? null
-            : new File(tcUserDirectory, "options.xml");
+        if (clientOptionsFile == null) {
+            clientOptionsFile = (tcUserDirectory == null) ? null
+                : new File(tcUserDirectory, "options.xml");
+        }
     }
 
     /**
@@ -633,6 +635,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.timeout"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("clientOptions")
+                          .withDescription(Messages.message("cli.clientOptions"))
+                          .withArgName(Messages.message("cli.arg.clientOptions"))
+                          .hasArg()
+                          .create());
 
         try {
             // parse the command line arguments
@@ -806,12 +813,23 @@ public final class FreeCol {
                     freeColTimeout = result;
                 }
             }
+            if (line.hasOption("clientOptions")) {
+                String fileName = line.getOptionValue("clientOptions");
+                File file = new File(fileName);
+                if (file.exists() && file.isFile() && file.canRead()) {
+                    clientOptionsFile = file;
+                } else {
+                    String err = Messages.message(StringTemplate
+                        .template("cli.error.clientOptions")
+                        .addName("%string%", fileName));
+                    System.err.println(err);
+                }
+            }                    
         } catch (ParseException e) {
             System.err.println("\n" + e.getMessage() + "\n");
             printUsage();
             System.exit(1);
         }
-
     }
 
 

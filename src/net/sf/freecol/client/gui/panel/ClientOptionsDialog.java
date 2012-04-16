@@ -72,7 +72,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            File file = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
+            File file = FreeCol.getClientOptionsFile();
             try {
                 getGroup().save(file);
                 getFreeColClient().getActionManager().update();
