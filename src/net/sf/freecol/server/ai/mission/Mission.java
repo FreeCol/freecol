@@ -489,6 +489,8 @@ public abstract class Mission extends AIObject {
     public static int scorePath(AIUnit aiUnit, PathNode path, Class type) {
         return (type == BuildColonyMission.class)
             ? BuildColonyMission.scorePath(aiUnit, path)
+            : (type == CashInTreasureTrainMission.class)
+            ? CashInTreasureTrainMission.scorePath(aiUnit, path)
             : (type == DefendSettlementMission.class)
             ? DefendSettlementMission.scorePath(aiUnit, path)
             : (type == PioneeringMission.class)

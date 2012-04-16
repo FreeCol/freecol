@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -50,11 +51,13 @@ public class CashInTreasureTrainMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
+    private static final String tag = "AI treasureTrain";
+
     /** Maximum number of turns to travel to a cash in location. */
     private static final int MAX_TURNS = 20;
 
     /** A target to aim for, used for a TransportMission. */
-    private Location targetLoc = null;
+    private Location target = null;
 
 
     /**
@@ -66,9 +69,9 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-        targetLoc = findTarget(aiUnit);
-        logger.finest("AI treasure train starts with target " + targetLoc
-            + ": " + aiUnit.getUnit());
+        target = findTarget(aiUnit);
+        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
+            + " with target " + target + ": " + aiUnit.getUnit());
     }
 
     /**
@@ -100,57 +103,85 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Is a location a valid place to cash in this treasure train?
+     * Gets the location we are aiming to cash in at.
      *
-     * @param loc The <code>Location</code> to test.
-     * @param unit The treasure train <code>Unit</code>.
-     * @return True if the location is a valid cash in target.
+     * @return The location we are aiming to cash in at.
      */
-    private static boolean checkTarget(Location loc, Unit unit) {
-        return (loc instanceof Europe && !((Europe)loc).isDisposed())
-            || (loc instanceof Tile && unit.canCashInTreasureTrain((Tile)loc));
+    @Override
+    public Location getTarget() {
+        return target;
     }
 
     /**
-     * Find a suitable destination for this unit.
+     * Is a location a valid place to cash in this treasure train?
+     *
+     * @param aiUnit The treasure train <code>AIUnit</code>.
+     * @param loc The <code>Location</code> to test.
+     * @return True if the location is a valid cash in target.
+     */
+    public static boolean isTarget(AIUnit aiUnit, Location loc) {
+        return (loc instanceof Europe
+                && !((Europe)loc).isDisposed())
+            || (loc instanceof Tile
+                && aiUnit.getUnit().canCashInTreasureTrain((Tile)loc));
+    }
+
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit A <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from,
+     *     (uses the unit location if null).
+     * @return A target for this mission, or null if none found.
+     */
+    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+        final Unit unit = aiUnit.getUnit();
+        final Tile tile = (path == null) ? unit.getTile()
+            : path.getLastNode().getTile();
+        return (isTarget(aiUnit, tile)) ? tile : null;
+    }
+
+    /**
+     * Evaluate a potential cashin mission for a given unit and
+     * path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path A <code>PathNode</code> to take to the target.
+     * @return A score for the proposed mission.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
+        Location loc = extractTarget(aiUnit, path);
+        return (isTarget(aiUnit, loc)) ? 1000 / turns
+            : Integer.MIN_VALUE;
+    }
+
+    /**
+     * Find a suitable cashin location for this unit.
      *
      * @param aiUnit The <code>AIUnit</code> to execute a cash in mission.
-     * @return A suitable target location or null if none found.
+     * @return A <code>PathNode</code> to the target, or null if not found.
      */
-    private static Location findTarget(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning("AI treasure train broken: " + unit);
+    private static PathNode findTargetPath(AIUnit aiUnit) {
+        Unit unit;
+        if (aiUnit == null
+            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()) {
             return null;
         }
-
+        // Not on the map?  Europe *must* be viable, so go there
+        // (return null for now, path still impossible).
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
-        final Tile startTile = unit.getPathStartTile();
-        // Not on the map?  Europe *must* be viable, so go there.
-        // Nowhere to go to?  Go to Europe (even if it is null).
-        if (startTile == null 
-            || player.getNumberOfSettlements() <= 0) return europe;
+        Tile startTile;
+        if ((startTile = unit.getPathStartTile()) == null
+            || player.getNumberOfSettlements() <= 0) return null;
+
+        final Unit carrier = unit.getCarrier();
+        final GoalDecider cashInDecider
+            = getMissionGoalDecider(aiUnit, CashInTreasureTrainMission.class);
+        PathNode path;
 
         // Find out how quickly the unit can get to Europe.
-        PathNode path;
-        final Unit carrier = unit.getCarrier();
-        final GoalDecider cashInDecider = new GoalDecider() {
-                private PathNode best = null;
-                private int bestValue = INFINITY;
-            
-                public PathNode getGoal() { return best; }
-                public boolean hasSubGoals() { return true; }
-                public boolean check(Unit u, PathNode path) {
-                    if (checkTarget(path.getTile(), unit)
-                        && path.getTotalTurns() < bestValue) {
-                        bestValue = path.getTotalTurns();
-                        best = path;
-                        return true;
-                    }
-                    return false;
-                }
-            };
         final int europeTurns = (europe == null || carrier == null
             || (path = carrier.findPathToEurope(startTile)) == null) ? -1
             : path.getTotalTurns();
@@ -163,22 +194,35 @@ public class CashInTreasureTrainMission extends Mission {
         // If there is a viable local target, go there first unless it is
         // quicker to just go straight to Europe.
         // Otherwise go to Europe if possible.
-        if (localTurns >= 0 && (europeTurns < 0 || localTurns < europeTurns)) {
-            return path.getLastNode().getTile();
-        }
-        if (europeTurns >= 0) return europe;
+        if (localTurns >= 0
+            && (europeTurns < 0 || localTurns < europeTurns)) return path;
+        if (europeTurns >= 0) return null;
 
         // Finally search again for the nearest colony, this time with
         // relaxed cost decider that ignores blockages and no range
         // restriction.
         path = unit.search(startTile, cashInDecider,
                            CostDeciders.numberOfTiles(), INFINITY, carrier);
-        if (path != null) return path.getLastNode().getTile();
+        if (path != null) return path;
 
         // Failed.  TODO: some sort of hack to build a colony nearby.
-        logger.finest("AI treasure train out of targets: " + unit);
+        logger.finest(tag + " out of targets: " + unit);
         return null;
     }
+
+    /**
+     * Finds a suitable cashin target for the supplied unit.
+     * Falls back to Europe if the unit is not on the map.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A <code>PathNode</code> to the target, or null if none found.
+     */
+    public static Location findTarget(AIUnit aiUnit) {
+        Location loc = extractTarget(aiUnit, findTargetPath(aiUnit));
+        if (loc == null) loc = aiUnit.getUnit().getOwner().getEurope();
+        return (isTarget(aiUnit, loc)) ? loc : null;
+    }        
+
 
     // Fake Transportable interface
 
@@ -188,12 +232,10 @@ public class CashInTreasureTrainMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */
     public Location getTransportDestination() {
-        final Unit unit = getUnit();
-        return (checkTarget(targetLoc, unit)
-            && (targetLoc instanceof Europe
-                || (targetLoc instanceof Tile
-                    && shouldTakeTransportToTile((Tile)targetLoc))))
-            ? targetLoc : null;
+        return (target instanceof Europe
+            || (target instanceof Tile
+                && shouldTakeTransportToTile((Tile)target))) ? target
+            : null;
     }
 
     /**
@@ -207,18 +249,29 @@ public class CashInTreasureTrainMission extends Mission {
             : getUnit().getTreasureAmount();
     }
 
+
     // Mission interface
 
     /**
      * Is it valid to for a unit to perform a CashInTreasureTrainMission.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the task would be valid.
+     */
+    private static boolean isValid(Unit unit) {
+        return unit.canCarryTreasure()
+            && unit.getTreasureAmount() > 0;
+    }
+
+    /**
+     * Is it valid to for an AI unit to perform a CashInTreasureTrainMission.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return True if the task would be valid.
      */
     public static boolean isValid(AIUnit aiUnit) {
         return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().canCarryTreasure()
-            && aiUnit.getUnit().getTreasureAmount() > 0
+            && isValid(aiUnit.getUnit())
             && findTarget(aiUnit) != null;
     }
 
@@ -229,9 +282,8 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public boolean isValid() {
         return super.isValid()
-            && getUnit().canCarryTreasure()
-            && getUnit().getTreasureAmount() > 0
-            && checkTarget(targetLoc, getUnit());
+            && isValid(getUnit())
+            && isTarget(getAIUnit(), target);
     }
 
     /**
@@ -241,20 +293,22 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public void doMission(Connection connection) {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning("AI treasure train broken: " + unit);
+        if (unit == null || unit.isDisposed() || !isValid(unit)) {
+            logger.warning(tag + " broken: " + unit);
             return;
         }
 
         // Validate target.
-        AIUnit aiUnit = getAIUnit();
-        if (!checkTarget(targetLoc, unit)) {
-            if ((targetLoc = findTarget(aiUnit)) == null) return;
+        final AIUnit aiUnit = getAIUnit();
+        if (!isTarget(aiUnit, target)) {
+            if ((target = findTarget(aiUnit)) == null) {
+                logger.finest(tag + " could not find a target: " + unit);
+                return;
+            }
         }
 
-        // Go to the target.
-        if (travelToTarget("AI treasure train", targetLoc)
-            != Unit.MoveType.MOVE) return;
+        // Go there.
+        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
         // - already in Europe
@@ -270,16 +324,16 @@ public class CashInTreasureTrainMission extends Mission {
                 || player.getCarriersForUnit(unit).isEmpty()
                 || unit.getTransportFee() == 0) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
-                    logger.finest("AI treasure train completed cash in at "
+                    logger.finest(tag + " completed cash in at "
                         + unit.getLocation() + ": " + unit);
                 }
             } else {
-                targetLoc = europe;
-                logger.finest("AI treasure train at " + unit.getLocation()
+                target = europe;
+                logger.finest(tag + " at " + unit.getLocation()
                     + " retargeting Europe: " + unit);
             }
         } else {
-            logger.finest("AI treasure train waiting to cash in at "
+            logger.finest(tag + " waiting to cash in at "
                 + unit.getLocation() + ": " + unit);
         }
     }
@@ -307,7 +361,10 @@ public class CashInTreasureTrainMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("target", targetLoc.getId());
+
+        if (target != null) {
+            out.writeAttribute("target", target.getId());
+        }
     }
 
     /**
@@ -316,8 +373,12 @@ public class CashInTreasureTrainMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        targetLoc = (Location) getGame()
+        
+        FreeColGameObject fcgo = getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
+        target = (fcgo instanceof Europe || fcgo instanceof Tile)
+            ? (Location)fcgo
+            : null;
     }
 
     /**
