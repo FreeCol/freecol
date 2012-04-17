@@ -3153,17 +3153,11 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         /**
-         * Returns true if the unit is active (and going nowhere).
+         * Returns true if the unit is active, going nowhere, on a tile,
+         * and thus available to be moved by the player.
          */
         public boolean obtains(Unit unit) {
-            return !unit.isDisposed()
-                && unit.getOwner() == player
-                && unit.getMovesLeft() > 0
-                && unit.getState() == Unit.UnitState.ACTIVE
-                && unit.getDestination() == null
-                && unit.getTradeRoute() == null
-                && !(unit.getLocation() instanceof WorkLocation)
-                && unit.getTile() != null;
+            return unit.couldMove();
         }
     }
 

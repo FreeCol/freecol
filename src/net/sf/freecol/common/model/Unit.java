@@ -2015,13 +2015,14 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns true if this Unit could still be moved. This is used to
-     * prevent an accidental end of turn order.
+     * Is this unit a suitable `next active unit', that is, the unit
+     * needs to be currently movable by the player.
      *
      * @return True if this unit could still be moved by the player.
      */
     public boolean couldMove() {
-        return getState() == UnitState.ACTIVE
+        return !isDisposed()
+            && getState() == UnitState.ACTIVE
             && getMovesLeft() > 0
             && destination == null // Can not reach next tile
             && tradeRoute == null
