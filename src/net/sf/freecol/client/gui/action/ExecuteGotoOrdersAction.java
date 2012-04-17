@@ -50,8 +50,6 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit active = gui.getActiveUnit();
         getFreeColClient().getInGameController().executeGotoOrders();
-        gui.setActiveUnit(active);
     }
 }

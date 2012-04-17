@@ -330,6 +330,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean doExecuteGotoOrders() {
         Player player = freeColClient.getMyPlayer();
+        Unit active = gui.getActiveUnit();
 
         // Ensure the goto mode sticks.
         if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
@@ -353,7 +354,7 @@ public final class InGameController implements NetworkConstants {
             if (moveToDestination(unit)) stillActive = unit;
             nextModelMessage();
         }
-        gui.setActiveUnit(stillActive);
+        gui.setActiveUnit((stillActive != null) ? stillActive : active);
         return stillActive == null;
     }
 
@@ -2066,6 +2067,21 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Go to a tile.
+     *
+     * Called from the CanvasMouseListener and TilePopup when the
+     * goto-path is set.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param tile The <code>Tile</code> to move to.
+     */
+    public void goToTile(Unit unit, Tile tile) {
+        if (!requireOurTurn()) return;
+        if (!setDestination(unit, tile)) return;
+        if (!moveToDestination(unit)) nextActiveUnit();
+    }
+
+    /**
      * Leave a ship.  The ship must be in harbour.
      *
      * @param unit The <code>Unit</code> which is to leave the ship.
@@ -2259,25 +2275,22 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Clear ordinary destinations if arrived.
-        Location location = unit.getDestination();
-        if (location != null) {
+        if ((destination = unit.getDestination()) != null) {
             if (unit.getTile() == null) {
-                if (unit.getLocation() == location) {
+                if (unit.getLocation() == destination) {
                     clearGotoOrders(unit);
                 }
-            } else {
-                if (unit.getTile() == location.getTile()) {
-                    clearGotoOrders(unit);
-                    // Check cash-in, and if the unit has moves left
-                    // and was not set to SKIPPED by moveDirection,
-                    // then make sure it remains selected to show that
-                    // this unit could continue.
-                    if (!checkCashInTreasureTrain(unit)
-                        && unit.getMovesLeft() > 0
-                        && unit.getState() != UnitState.SKIPPED) {
-                        gui.setActiveUnit(unit);
-                        return true;
-                    }
+            } else if (unit.getTile() == destination.getTile()) {
+                clearGotoOrders(unit);
+                // Check cash-in, and if the unit has moves left
+                // and was not set to SKIPPED by moveDirection,
+                // then make sure it remains selected to show that
+                // this unit could continue.
+                if (!checkCashInTreasureTrain(unit)
+                    && unit.getMovesLeft() > 0
+                    && unit.getState() != UnitState.SKIPPED) {
+                    gui.setActiveUnit(unit);
+                    return true;
                 }
             }
         }
@@ -3494,6 +3507,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
         }
+        nextActiveUnit(); // Unit may have become unmovable.
     }
 
     /**

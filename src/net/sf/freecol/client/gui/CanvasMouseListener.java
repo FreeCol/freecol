@@ -140,14 +140,10 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                     PathNode path = mapViewer.getGotoPath();
                     if (path != null) {
                         mapViewer.stopGoto();
-                        // Move the unit:
-                        Unit unit = mapViewer.getActiveUnit();
+                        // Move the unit
                         freeColClient.getInGameController()
-                            .setDestination(unit, path.getLastNode().getTile());
-                        if (freeColClient.currentPlayerIsMyPlayer()) {
-                            freeColClient.getInGameController()
-                                .moveToDestination(unit);
-                        }
+                            .goToTile(mapViewer.getActiveUnit(),
+                                      path.getLastNode().getTile());
                     }
                 } else if (doubleClickTimer.isRunning()) {
                     doubleClickTimer.stop();

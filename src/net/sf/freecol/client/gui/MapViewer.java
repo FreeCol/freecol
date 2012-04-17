@@ -1438,6 +1438,12 @@ public final class MapViewer {
 
         this.activeUnit = activeUnit;
 
+        /*
+          This is quite old code, but it is interfering with some
+          automated moves by clearing their destinations (BR#3518130).
+          Disabling experimentally, to see if it is still needed.
+          It would be good to lose callouts to the controller.          
+
         if (activeUnit != null) {
             if (freeColClient.currentPlayerIsMyPlayer()) {
                 if (activeUnit.getState() != Unit.UnitState.ACTIVE) {
@@ -1447,6 +1453,7 @@ public final class MapViewer {
                 freeColClient.getInGameController().clearGotoOrders(activeUnit);
             }
         }
+        */
         updateGotoPathForActiveUnit();
 
         // The user activated a unit
