@@ -2159,8 +2159,8 @@
         <integerOption id="model.option.shipTradePenalty" value="-40"/>
         <integerOption id="model.option.interventionBells" value="8000" />
         <integerOption id="model.option.interventionTurns" value="54" />
-        <booleanOption id="model.option.expertStartingUnits" value="false" />
         <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+        <booleanOption id="model.option.expertStartingUnits" value="false" />
         <stringOption  id="model.option.tileProduction" value="veryLow" />
         <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
         <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
