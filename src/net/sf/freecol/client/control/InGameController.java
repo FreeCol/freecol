@@ -199,7 +199,9 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean requireOurTurn() {
         if (!freeColClient.currentPlayerIsMyPlayer()) {
-            gui.showInformationMessage("notYourTurn");
+            if (freeColClient.isInGame()) {
+                gui.showInformationMessage("notYourTurn");
+            }
             return false;
         }
         return true;
