@@ -2258,7 +2258,7 @@
           <choice value="model.option.buildOnNativeLand.firstAndUncontacted" />
           <choice value="model.option.buildOnNativeLand.never" />
         </stringOption>
-        <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
+        <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
           <rangeValue label="verySmall" value="10"/>
           <rangeValue label="small" value="8"/>
           <rangeValue label="medium" value="7"/>
