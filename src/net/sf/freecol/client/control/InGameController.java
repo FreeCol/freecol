@@ -329,14 +329,15 @@ public final class InGameController implements NetworkConstants {
      *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
+        Player player = freeColClient.getMyPlayer();
+
         // Ensure the goto mode sticks.
         if (moveMode < MODE_EXECUTE_GOTO_ORDERS) {
             moveMode = MODE_EXECUTE_GOTO_ORDERS;
         }
 
         // Process all units.
-        boolean result = true;
-        Player player = freeColClient.getMyPlayer();
+        Unit stillActive = null;
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
@@ -349,11 +350,11 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Move the unit as much as possible
-            if (moveToDestination(unit)) result = false;
+            if (moveToDestination(unit)) stillActive = unit;
             nextModelMessage();
         }
-        gui.setActiveUnit(null);
-        return result;
+        gui.setActiveUnit(stillActive);
+        return stillActive == null;
     }
 
     /**
@@ -1996,6 +1997,8 @@ public final class InGameController implements NetworkConstants {
      * Execute goto orders command.
      */
     public void executeGotoOrders() {
+        if (!requireOurTurn()) return;
+
         doExecuteGotoOrders();
     }
 
@@ -3242,6 +3245,20 @@ public final class InGameController implements NetworkConstants {
 
     // end move-consequents
 
+    /**
+     * Describe <code>moveTileCursor</code> method here.
+     *
+     * @param direction a <code>Direction</code> value 
+     */
+    public void moveTileCursor(Direction direction) {
+        if (gui.getSelectedTile() != null) {
+            Tile newTile = gui.getSelectedTile().getNeighbourOrNull(direction);
+            if (newTile != null) 
+                gui.setSelectedTile(newTile, false);
+        } else {
+            logger.warning("selectedTile is null");
+        }
+    } 
 
     /**
      * Makes a new unit active.
@@ -3793,22 +3810,4 @@ public final class InGameController implements NetworkConstants {
             unitWas.fireChanges();
         }
     }
-    
-
-    /**
-     * Describe <code>moveTileCursor</code> method here.
-     *
-     * @param direction a <code>Direction</code> value 
-     */
-    public void moveTileCursor(Direction direction) {
-        if (gui.getSelectedTile() != null) {
-            Tile newTile = gui.getSelectedTile().getNeighbourOrNull(direction);
-            if (newTile != null) 
-                gui.setSelectedTile(newTile, false);
-        } else {
-            logger.warning("selectedTile is null");
-        }
-    } 
-
-    
 }
