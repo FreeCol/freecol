@@ -289,7 +289,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 }
             }
         }
-        if ((unit.getTurnsOfTraining() > 0) && (unit.getStudent() != null)) {
+        if (unit.getStudent() != null) {
             Unit student = unit.getStudent();
             String studentName = Messages.message(student.getType().getNameKey());
             JMenuItem menuItem = new JMenuItem(Messages.message(StringTemplate
