@@ -276,9 +276,12 @@ public final class QuickActionMenu extends JPopupMenu {
                         menuItem.addActionListener(unitLabel);
                     } else {
                         String teacherName = Messages.message(teacher.getType().getNameKey());
-                        menuItem = new JMenuItem(Messages.message(StringTemplate.template("menu.unit.apprentice")
-                                                                  .addName("%unit%", teacherName)),
-                                                 teacherIcon);
+                        menuItem = new JMenuItem(Messages.message(StringTemplate
+                                .template("menu.unit.apprentice")
+                                    .addName("%unit%", teacherName))
+                            + ": " + teacher.getTurnsOfTraining()
+                            + "/" + teacher.getNeededTurnsOfTraining(),
+                            teacherIcon);
                         menuItem.setEnabled(false);
                     }
                     this.add(menuItem);
@@ -287,9 +290,13 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
         if ((unit.getTurnsOfTraining() > 0) && (unit.getStudent() != null)) {
-            JMenuItem menuItem = new JMenuItem(Messages.message("menuBar.teacher") +
-                                               ": " + unit.getTurnsOfTraining() +
-                                               "/" + unit.getNeededTurnsOfTraining());
+            Unit student = unit.getStudent();
+            String studentName = Messages.message(student.getType().getNameKey());
+            JMenuItem menuItem = new JMenuItem(Messages.message(StringTemplate
+                    .template("menuBar.teacher")
+                        .addName("%unit%", studentName))
+                + ": " + unit.getTurnsOfTraining()
+                + "/" + unit.getNeededTurnsOfTraining());
             menuItem.setEnabled(false);
             this.add(menuItem);
             separatorNeeded = true;
