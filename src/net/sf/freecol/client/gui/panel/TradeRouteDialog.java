@@ -49,29 +49,50 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Allows the user to edit trade routes.
  */
-public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements ActionListener {
+public final class TradeRouteDialog extends FreeColDialog<Boolean>
+    implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
 
     private static enum Action { OK, CANCEL, DEASSIGN, DELETE }
 
-    private final JButton editRouteButton = new JButton(Messages.message("traderouteDialog.editRoute"));
-    private final JButton newRouteButton = new JButton(Messages.message("traderouteDialog.newRoute"));
-    private final JButton removeRouteButton = new JButton(Messages.message("traderouteDialog.removeRoute"));
-    private final JButton deassignRouteButton = new JButton(Messages.message("traderouteDialog.deassignRoute"));
+    private final JButton editRouteButton
+        = new JButton(Messages.message("traderouteDialog.editRoute"));
+    private final JButton newRouteButton
+        = new JButton(Messages.message("traderouteDialog.newRoute"));
+    private final JButton removeRouteButton
+        = new JButton(Messages.message("traderouteDialog.removeRoute"));
+    private final JButton deassignRouteButton
+        = new JButton(Messages.message("traderouteDialog.deassignRoute"));
 
     private final DefaultListModel listModel = new DefaultListModel();
     private final JList tradeRoutes = new JList(listModel);
     private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
 
+    private static final Comparator<TradeRoute> tradeRouteComparator
+        = new Comparator<TradeRoute>() {
+            public int compare(TradeRoute r1, TradeRoute r2) {
+                return r1.getName().compareTo(r2.getName());
+            }
+        };
+
+    /** The unit to assign/deassign trade routes for. */
+    private Unit unit = null;
+
+
     /**
      * The constructor that will add the items to this panel.
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> controlling the
+     *     trade routes.
+     * @param gui The <code>GUI</code> to display in.
+     * @param unit The optional <code>Unit</code> to operate on.
      */
-    public TradeRouteDialog(FreeColClient freeColClient, final GUI gui, TradeRoute selectedRoute) {
-
+    public TradeRouteDialog(FreeColClient freeColClient, final GUI gui,
+                            Unit unit) {
         super(freeColClient, gui);
+
+        this.unit = unit;
 
         deassignRouteButton.addActionListener(this);
         deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
@@ -110,7 +131,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
         Player player = getMyPlayer();
 
-        List<TradeRoute> theRoutes = new ArrayList<TradeRoute>(player.getTradeRoutes());
+        List<TradeRoute> theRoutes
+            = new ArrayList<TradeRoute>(player.getTradeRoutes());
         for (TradeRoute tradeRoute : theRoutes) tradeRoute.setCount(0);
         for (Unit u : player.getUnits()) {
             TradeRoute tradeRoute = u.getTradeRoute();
@@ -144,8 +166,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 }
             });
 
-        if (selectedRoute != null) {
-            tradeRoutes.setSelectedValue(selectedRoute, true);
+        if (unit != null && unit.getTradeRoute() != null) {
+            tradeRoutes.setSelectedValue(unit.getTradeRoute(), true);
         }
         updateButtons();
 
@@ -164,24 +186,17 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         add(cancelButton, "tag cancel");
 
         restoreSavedSize(getPreferredSize());
-
     }
 
-     private static final Comparator<TradeRoute> tradeRouteComparator = new Comparator<TradeRoute>() {
-         public int compare(TradeRoute r1, TradeRoute r2) {
-             return r1.getName().compareTo(r2.getName());
-         }
-     };
-
     public void updateButtons() {
-        if (tradeRoutes.getSelectedIndex() == -1) {
+        if (tradeRoutes.getSelectedIndex() < 0) {
             editRouteButton.setEnabled(false);
             removeRouteButton.setEnabled(false);
             deassignRouteButton.setEnabled(false);
         } else {
             editRouteButton.setEnabled(true);
             removeRouteButton.setEnabled(true);
-            deassignRouteButton.setEnabled(true);
+            deassignRouteButton.setEnabled(unit != null);
         }
     }
 
@@ -194,25 +209,26 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
-        Unit unit = getGUI().getActiveUnit();
-        TradeRoute route = (TradeRoute) tradeRoutes.getSelectedValue();
-        if (unit != null && route != null) {
+        TradeRoute route = (TradeRoute)tradeRoutes.getSelectedValue();
+        boolean ret = false;
+        if (route != null) {
             switch (action) {
             case OK:
-                getGUI().removeFromCanvas(this);
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));
                 }
                 getController().setTradeRoutes(routes);
-                unit.setTradeRoute(route);
-                setResponse(route);
-                return;
+
+                if (unit != null) unit.setTradeRoute(route);
+                ret = true;
+                break;
             case DEASSIGN:
-                getGUI().removeFromCanvas(this);
-                getController().clearOrders(unit);
-                setResponse(route);
-                return;
+                if (unit != null && route == unit.getTradeRoute()) {
+                    unit.setTradeRoute(null);
+                    ret = true;
+                }
+                break;
             case DELETE:
                 for (Unit u : route.getAssignedUnits()) {
                     getController().clearOrders(u);
@@ -221,13 +237,13 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 Player player = getMyPlayer();
                 player.getTradeRoutes().remove(route);
                 getController().setTradeRoutes(player.getTradeRoutes());
-                // Do not set response
-                return;
+                return; // Continue, do not set response
             case CANCEL: default:
+                ret = false;
                 break;
             }
         }
         getGUI().removeFromCanvas(this);
-        setResponse(null);
+        setResponse(ret);
     }
 }

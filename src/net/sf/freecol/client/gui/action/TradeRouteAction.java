@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 
+
 /**
  * An action for editing trade routes.
  */
@@ -34,6 +35,7 @@ public class TradeRouteAction extends MapboardAction {
 
     /**
      * Creates this action.
+     *
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
@@ -43,9 +45,10 @@ public class TradeRouteAction extends MapboardAction {
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showTradeRouteDialog(null, null);
+        gui.showTradeRouteDialog(null);
     }
 }

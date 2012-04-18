@@ -913,8 +913,8 @@ public class GUI {
                 mapViewer.getCursor().getCanvasY());
     }
 
-    public TradeRoute showTradeRouteDialog(TradeRoute tradeRoute, Tile tile) {
-        return canvas.showTradeRouteDialog(tradeRoute, tile);
+    public boolean showTradeRouteDialog(Unit unit) {
+        return canvas.showTradeRouteDialog(unit);
     }
 
     public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
