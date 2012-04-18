@@ -43,23 +43,27 @@ public class FeatureContainer {
 
     /**
      * Is an ability present in this container?
+     * All applicable abilities must be true, and there must be at least one.
      *
      * @param id The id of the ability to test.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is present.
+     * @return True if the ability is `satisfied'.
      */
     public static boolean hasAbility(FeatureContainer fc, String id,
                                      FreeColGameObjectType fcgot, Turn turn) {
         if (fc == null) return false;
         Set<Ability> abilitySet = fc.abilities.get(id);
         if (abilitySet == null) return false;
+        boolean ret = false;
         for (Ability ability : abilitySet) {
-            if (ability.appliesTo(fcgot, turn)
-                && !ability.getValue()) return false;
+            if (ability.appliesTo(fcgot, turn)) {
+                if (!ability.getValue()) return false;
+                ret = true;
+            }
         }
-        return true;
+        return ret;
     }
 
     /**

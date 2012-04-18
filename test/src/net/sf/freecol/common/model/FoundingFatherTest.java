@@ -81,9 +81,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertFalse(ability.hashCode() == ability2.hashCode());
         father4.addAbility(ability2);
         dutch.addFather(father4);
-
         assertFalse(dutch.hasAbility("some.new.ability"));
-
     }
 
     public void testAddAllFathers() {

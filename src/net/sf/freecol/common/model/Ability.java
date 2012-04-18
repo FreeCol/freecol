@@ -327,9 +327,9 @@ public final class Ability extends Feature {
 
     @Override
     public String toString() {
-        return getId() + (getSource() == null ? " "
-            : " (" + getSource().getId() + ") ")
-            + " " + value;
+        return "[ " + getId() + (getSource() == null ? " "
+            : " (" + getSource().getId() + ")")
+            + " = " + value + " ]";
     }
 
     /**

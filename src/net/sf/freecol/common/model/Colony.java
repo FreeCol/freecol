@@ -1920,7 +1920,7 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility(Ability.BORN_IN_COLONY)
+            if (!buildableType.hasAbility("model.ability.person")
                 && !hasAbility(Ability.BUILD, buildableType)) {
                 return NoBuildReason.MISSING_BUILD_ABILITY;
             }
