@@ -2922,11 +2922,8 @@ public class Unit extends FreeColGameObject
         case FORTIFIED:
             return getState() == UnitState.FORTIFYING;
         case IMPROVING:
-            if (location instanceof Tile
-                && getOwner().canAcquireForImprovement(location.getTile())) {
-                return getMovesLeft() > 0;
-            }
-            return false;
+            return location instanceof Tile
+                && getOwner().canAcquireForImprovement(location.getTile());
         case SKIPPED:
             if (getState() == UnitState.ACTIVE) return true;
             // Fall through
@@ -3016,7 +3013,8 @@ public class Unit extends FreeColGameObject
             if (workImprovement == null) {
                 setWorkLeft(-1);
             } else {
-                setWorkLeft(workImprovement.getTurnsToComplete());
+                setWorkLeft(workImprovement.getTurnsToComplete()
+                    + ((getMovesLeft() > 0) ? 0 : 1));
             }
             movesLeft = 0;
             break;

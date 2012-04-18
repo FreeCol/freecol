@@ -1729,9 +1729,8 @@ public final class InGameController implements NetworkConstants {
                 || !player.owns(tile)) return;
         }
 
-        if (askServer().changeWorkImprovementType(unit,
-                improvementType)) {
-            // Redisplay should work
+        if (askServer().changeWorkImprovementType(unit, improvementType)) {
+            ;// Redisplay should work
         }
         nextActiveUnit();
     }
