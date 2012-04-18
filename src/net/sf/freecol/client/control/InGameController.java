@@ -208,6 +208,34 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Confirms that a unit should move somewhere where it would have
+     * to abandon its participation in education if any.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param checkStudent Should we check for student movements.
+     * @return True if the unit should abandon education.
+     */
+    private boolean confirmAbandonEducation(Unit unit, boolean checkStudent) {
+        if (!(unit.getLocation() instanceof WorkLocation)) return true;
+        boolean teacher = unit.getStudent() != null;
+        boolean student = checkStudent && unit.getTeacher() != null;
+        if (!teacher && !student) return true;
+
+        Building school = (Building)((teacher) ? unit.getLocation()
+            : unit.getTeacher().getLocation());
+        String action = (teacher)
+            ? Messages.message("abandonEducation.action.teaching")
+            : Messages.message("abandonEducation.action.studying");
+        return gui.showConfirmDialog(unit.getTile(),
+            StringTemplate.template("abandonEducation.text")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addName("%colony%", unit.getColony().getName())
+                .add("%building%", school.getNameKey())
+                .addName("%action%", action),
+            "abandonEducation.yes", "abandonEducation.no");
+    }
+
+    /**
      * Check if an attack results in a transition from peace or cease fire to
      * war and, if so, warn the player.
      *
@@ -2592,6 +2620,7 @@ public final class InGameController implements NetworkConstants {
                 choices);
             if (carrier == null) return; // User cancelled
         }
+        if (!confirmAbandonEducation(unit, true)) return;
 
         // Proceed to embark
         if (askServer().embark(unit, carrier, direction)
@@ -3406,6 +3435,8 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Unit is not in colony.");
         } else if (!colony.canReducePopulation()) {
             return false;
+        } else if (!confirmAbandonEducation(unit, true)) {
+            return false;
         }
 
         ColonyWas colonyWas = new ColonyWas(colony);
@@ -3803,6 +3834,9 @@ public final class InGameController implements NetworkConstants {
      */
     public void work(Unit unit, WorkLocation workLocation) {
         if (!requireOurTurn()) return;
+
+        if (unit.getStudent() != null
+            && !confirmAbandonEducation(unit, false)) return;
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {
