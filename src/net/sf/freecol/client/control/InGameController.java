@@ -2292,10 +2292,14 @@ public final class InGameController implements NetworkConstants {
 
             // No path, give up.
             if (path == null) {
-                StringTemplate dest = destination.getLocationNameFor(player);
+                StringTemplate src = unit.getLocation()
+                    .getLocationNameFor(player);
+                StringTemplate dst = destination.getLocationNameFor(player);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("selectDestination.failed")
-                    .addStringTemplate("%destination%", dest));
+                        .addStringTemplate("%unit%", Messages.getLabel(unit))
+                        .addStringTemplate("%location%", src)
+                        .addStringTemplate("%destination%", dst));
                 break;
             }
 
