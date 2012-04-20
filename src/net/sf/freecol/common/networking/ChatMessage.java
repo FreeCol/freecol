@@ -31,10 +31,6 @@ import org.w3c.dom.Element;
  * The message that contains a chat string.
  */
 public class ChatMessage extends DOMMessage {
-    /**
-     * The sending player.
-     */
-    private Player player;
 
     /**
      * The ID of the sender player.
@@ -51,6 +47,7 @@ public class ChatMessage extends DOMMessage {
      */
     private boolean privateChat;
 
+
     /**
      * Create a new <code>ChatMessage</code> with the
      * supplied message.
@@ -60,7 +57,6 @@ public class ChatMessage extends DOMMessage {
      * @param privateChat Whether this message is private.
      */
     public ChatMessage(Player player, String message, boolean privateChat) {
-        this.player = player;
         this.sender = player.getId();
         this.message = message;
         this.privateChat = privateChat;
@@ -81,18 +77,19 @@ public class ChatMessage extends DOMMessage {
         } else if (!(game.getFreeColGameObject(sender) instanceof Player)) {
             throw new IllegalStateException("not a player: " + sender);
         }
-        player = (Player) game.getFreeColGameObject(sender);
         message = element.getAttribute("message");
-        privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
+        privateChat = Boolean.valueOf(element.getAttribute("privateChat"))
+            .booleanValue();
     }
 
     /**
      * Who sent this ChatMessage?
      *
-     * @return The name of the player that sent this ChatMessage.
+     * @param game The <code>Game</code> the player is in.
+     * @return The player that sent this ChatMessage.
      */
-    public Player getPlayer() {
-        return player;
+    public Player getPlayer(Game game) {
+        return (Player)game.getFreeColGameObject(sender);
     }
 
     /**

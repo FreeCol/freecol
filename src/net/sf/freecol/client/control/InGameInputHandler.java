@@ -572,11 +572,13 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chat(Element element) {
-        final ChatMessage chatMessage = new ChatMessage(getGame(), element);
+        final Game game = getGame();
+        final ChatMessage chatMessage = new ChatMessage(game, element);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                gui.displayChatMessage(chatMessage.getMessage(),
+                gui.displayChatMessage(chatMessage.getPlayer(game),
+                                       chatMessage.getMessage(),
                                        chatMessage.isPrivate());
             }
         });

@@ -219,10 +219,11 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
      * @return Null.
      */
     private Element chat(Element element)  {
-        ChatMessage chatMessage = new ChatMessage(getGame(), element);
-        gui.displayChat(chatMessage.getPlayer().getName(),
-                                               chatMessage.getMessage(),
-                                               chatMessage.isPrivate());
+        Game game = getGame();
+        ChatMessage chatMessage = new ChatMessage(game, element);
+        gui.displayChatMessage(chatMessage.getPlayer(game),
+                               chatMessage.getMessage(),
+                               chatMessage.isPrivate());
         return null;
     }
 
