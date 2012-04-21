@@ -203,16 +203,18 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private void collectDestinationsFromEurope(Unit unit,
                                                List<GoodsType> goodsTypes) {
+        Player player = unit.getOwner();
         Game game = getGame();
         Map map = game.getMap();
         int sailTurns = unit.getSailTurns();
         for (Player p : game.getPlayers()) {
             for (Settlement s : p.getSettlements()) {
-                if (!s.isConnected()) continue;
+                if (!s.isConnected()
+                    || (s instanceof IndianSettlement
+                        && !((IndianSettlement)s).hasContactedSettlement(player)))
+                    continue;
                 PathNode path = unit.findPathToEurope(s.getTile());
-                if (path != null
-                    && unit.getMoveType(path.getTile(), s.getTile(),
-                                        unit.getInitialMovesLeft()).isLegal()) {
+                if (path != null) {
                     String extras = (s.getOwner() != unit.getOwner())
                         ? getExtras(unit, s, goodsTypes) : "";
                     destinations.add(new Destination(s,
