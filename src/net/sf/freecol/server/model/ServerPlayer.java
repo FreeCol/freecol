@@ -1121,6 +1121,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addPartial(See.only(this), this, "liberty");
             if (getPlayerType() == PlayerType.REBEL
                 && interventionBells >= getSpecification().getInteger("model.option.interventionBells")) {
+                interventionBells = Integer.MIN_VALUE;
                 // TODO: this assumes that the entry location will
                 // always be a tile. This seems safe enough at the moment.
                 Tile entryLocation = ((Tile) getEntryLocation()).getSafeTile(this, random);
