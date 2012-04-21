@@ -903,10 +903,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unload succeeded.
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null && carrier.isInEurope()) {
-            return (!carrier.getOwner().canTrade(goods)) ? false
-                : sellGoods(goods);
-        }
+        if (colony == null && carrier.isInEurope()
+            && carrier.getOwner().canTrade(goods)) return sellGoods(goods);
+
         GoodsType type = goods.getType();
         GoodsContainer container = carrier.getGoodsContainer();
         int oldAmount = container.getGoodsCount(type);
@@ -3759,7 +3758,9 @@ public final class InGameController implements NetworkConstants {
         } else {
             if (inEurope) { // In Europe, unload non-boycotted goods
                 for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
-                    if (player.canTrade(goods)) unloadCargo(goods, false);
+                    if (player.canTrade(goods)) {
+                        unloadCargo(goods, false);
+                    }
                 }
             }
             // Goods left here must be dumped.
