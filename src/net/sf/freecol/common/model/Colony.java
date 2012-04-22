@@ -2114,24 +2114,29 @@ public class Colony extends Settlement implements Nameable {
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
+        final int veryGoodGovernment = getSpecification()
+            .getIntegerOption("model.option.veryGoodGovernmentLimit").getValue();
+        final int goodGovernment = getSpecification()
+            .getIntegerOption("model.option.goodGovernmentLimit").getValue();
+
 
         int rebelPercent = calculateMembership(unitCount);
         int rebelCount = Math.round(0.01f * rebelPercent * unitCount);
         int loyalistCount = unitCount - rebelCount;
 
         int result = 0;
-        if (rebelPercent >= 100) { // There are no tories left.
-            if (sonsOfLiberty < 100) {
+        if (rebelPercent >= veryGoodGovernment) { // There are no tories left.
+            if (sonsOfLiberty < veryGoodGovernment) {
                 result = 1;
             }
-        } else if (rebelPercent >= 50) {
-            if (sonsOfLiberty >= 100) {
+        } else if (rebelPercent >= goodGovernment) {
+            if (sonsOfLiberty >= veryGoodGovernment) {
                 result = -1;
-            } else if (sonsOfLiberty < 50) {
+            } else if (sonsOfLiberty < goodGovernment) {
                 result = 1;
             }
         } else {
-            if (sonsOfLiberty >= 50) {
+            if (sonsOfLiberty >= goodGovernment) {
                 result = -1;
             } else { // Now that no bonus is applied, penalties may.
                 if (loyalistCount > veryBadGovernment) {
@@ -2159,27 +2164,36 @@ public class Colony extends Settlement implements Nameable {
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
+        final int veryGoodGovernment = getSpecification()
+            .getIntegerOption("model.option.veryGoodGovernmentLimit").getValue();
+        final int goodGovernment = getSpecification()
+            .getIntegerOption("model.option.goodGovernmentLimit").getValue();
 
         String msgId = null;
+        int number = 0;
         ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
-        if (sonsOfLiberty == 100) {
+        if (sonsOfLiberty >= veryGoodGovernment) {
             // there are no tories left
-            if (oldSonsOfLiberty < 100) {
-                msgId = "model.colony.SoL100";
+            if (oldSonsOfLiberty < veryGoodGovernment) {
+                msgId = "model.colony.veryGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+                number = veryGoodGovernment;
             }
-        } else if (sonsOfLiberty >= 50) {
-            if (oldSonsOfLiberty == 100) {
-                msgId = "model.colony.lostSoL100";
+        } else if (sonsOfLiberty >= goodGovernment) {
+            if (oldSonsOfLiberty == veryGoodGovernment) {
+                msgId = "model.colony.lostVeryGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
-            } else if (oldSonsOfLiberty < 50) {
-                msgId = "model.colony.SoL50";
+                number = veryGoodGovernment;
+            } else if (oldSonsOfLiberty < goodGovernment) {
+                msgId = "model.colony.goodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+                number = goodGovernment;
             }
         } else {
-            if (oldSonsOfLiberty >= 50) {
-                msgId = "model.colony.lostSoL50";
+            if (oldSonsOfLiberty >= goodGovernment) {
+                msgId = "model.colony.lostGoodGovernment";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+                number = goodGovernment;
             }
 
             // Now that no bonus is applied, penalties may.
@@ -2205,7 +2219,8 @@ public class Colony extends Settlement implements Nameable {
         GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
         return (msgId == null) ? null
             : new ModelMessage(msgType, msgId, this, bells)
-            .addName("%colony%", getName());
+            .addName("%colony%", getName())
+            .addAmount("%number%", number);
     }
 
 
@@ -2217,8 +2232,12 @@ public class Colony extends Settlement implements Nameable {
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
-        int newBonus = (sonsOfLiberty >= 100) ? 2
-            : (sonsOfLiberty >= 50) ? 1
+        final int veryGoodGovernment = getSpecification()
+            .getIntegerOption("model.option.veryGoodGovernmentLimit").getValue();
+        final int goodGovernment = getSpecification()
+            .getIntegerOption("model.option.goodGovernmentLimit").getValue();
+        int newBonus = (sonsOfLiberty >= veryGoodGovernment) ? 2
+            : (sonsOfLiberty >= goodGovernment) ? 1
             : (tories > veryBadGovernment) ? -2
             : (tories > badGovernment) ? -1
             : 0;

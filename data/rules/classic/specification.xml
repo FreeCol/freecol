@@ -1779,6 +1779,8 @@
         <integerOption id="model.option.crossesIncrement" value="6"/>
         <integerOption id="model.option.badGovernmentLimit" value="8"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         <integerOption id="model.option.landPriceFactor" value="40"/>
         <integerOption id="model.option.foundingFatherFactor" value="24"/>
         <integerOption id="model.option.arrearsFactor" value="300"/>
@@ -1877,6 +1879,8 @@
         <integerOption id="model.option.crossesIncrement" value="8"/>
         <integerOption id="model.option.badGovernmentLimit" value="7"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         <integerOption id="model.option.landPriceFactor" value="50"/>
         <integerOption id="model.option.foundingFatherFactor" value="32"/>
         <integerOption id="model.option.arrearsFactor" value="400"/>
@@ -1970,6 +1974,8 @@
         <integerOption id="model.option.crossesIncrement" value="10"/>
         <integerOption id="model.option.badGovernmentLimit" value="6"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         <integerOption id="model.option.landPriceFactor" value="60"/>
         <integerOption id="model.option.foundingFatherFactor" value="40"/>
         <integerOption id="model.option.arrearsFactor" value="500"/>
@@ -2058,6 +2064,8 @@
         <integerOption id="model.option.crossesIncrement" value="12"/>
         <integerOption id="model.option.badGovernmentLimit" value="5"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         <integerOption id="model.option.landPriceFactor" value="70"/>
         <integerOption id="model.option.foundingFatherFactor" value="48"/>
         <integerOption id="model.option.arrearsFactor" value="600"/>
@@ -2139,6 +2147,8 @@
         <integerOption id="model.option.crossesIncrement" value="14"/>
         <integerOption id="model.option.badGovernmentLimit" value="4"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         <integerOption id="model.option.landPriceFactor" value="80"/>
         <integerOption id="model.option.foundingFatherFactor" value="56"/>
         <integerOption id="model.option.arrearsFactor" value="700"/>
@@ -2220,6 +2230,9 @@
         <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
+        <!-- these limits are intentially higher than 100 %, so they can be effectively disabled -->
+        <integerOption id="model.option.goodGovernmentLimit" value="50" mininumValue="0" maximumValue="150"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100" mininumValue="0" maximumValue="150"/>
         <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>

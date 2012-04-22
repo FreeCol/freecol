@@ -49,7 +49,9 @@ public class ConceptDetailPanel extends FreeColPanel
     private static final String[] concepts = new String[] {
         "taxes",
         "efficiency",
-        "independence"
+        "independence",
+        "ref",
+        "interventionForce"
     };
 
     private static final Comparator<DefaultMutableTreeNode> nodeComparator

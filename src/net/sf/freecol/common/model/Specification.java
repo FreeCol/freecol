@@ -1341,6 +1341,18 @@ public final class Specification {
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
+        id = "model.option.goodGovernmentLimit";
+        if (allOptions.get(id) == null) {
+            IntegerOption goodGovernmentLimit = new IntegerOption(id);
+            goodGovernmentLimit.setValue(50);
+            allOptions.put(id, goodGovernmentLimit);
+        }
+        id = "model.option.veryGoodGovernmentLimit";
+        if (allOptions.get(id) == null) {
+            IntegerOption veryGoodGovernmentLimit = new IntegerOption(id);
+            veryGoodGovernmentLimit.setValue(100);
+            allOptions.put(id, veryGoodGovernmentLimit);
+        }
         // end compatibility code
 
         initialized = true;
