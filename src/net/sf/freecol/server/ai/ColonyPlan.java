@@ -1610,7 +1610,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Log and return the scratch colony on success.
         // Otherwise abandon this rearrangement, disposing of the
         // scratch colony and returning null.
-        logger.finest(report.substring(0, report.length()-1));
+        report += "Final population = " + scratch.getWorkLocationUnitCount();
+        logger.finest(report);
         if (scratch.getWorkLocationUnitCount() > 0) return scratch;
 
         scratch.disposeScratchColony();
