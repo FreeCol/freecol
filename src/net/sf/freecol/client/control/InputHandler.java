@@ -34,17 +34,22 @@ import org.w3c.dom.Element;
  * Provides common methods for input handlers.
  */
 public abstract class InputHandler implements MessageHandler {
-    @SuppressWarnings("unused")
+
     private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
 
+    /** The main FreeCol client object. */
     private final FreeColClient freeColClient;
 
+    /** The GUI to display to. */
     protected GUI gui;
 
+
     /**
-    * The constructor to use.
-    * @param freeColClient The main freecol client object.
-    */
+     * The constructor to use.
+     *
+     * @param freeColClient The main <code>FreeColClient</code> object.
+     * @param gui The <code>GUI</code> to display to.
+     */
     public InputHandler(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
@@ -52,54 +57,70 @@ public abstract class InputHandler implements MessageHandler {
 
 
     /**
-    * Returns the main freecol client object.
-    * @return The main freecol client object.
-    */
+     * Gets the main freecol client object.
+     *
+     * @return The main freecol client object.
+     */
     protected FreeColClient getFreeColClient() {
         return freeColClient;
     }
 
     /**
-     * Returns the Game.
+     * Gets the Game.
      *
-     * @return a <code>Game</code> value
+     * @return The <code>Game</code>.
      */
     protected Game getGame() {
         return freeColClient.getGame();
     }
 
-
     /**
-    * Deals with incoming messages that have just been received.
-    *
-    * @param connection The <code>Connection</code> the message was received on.
-    * @param element The root element of the message.
-    * @return The reply.
-    */
+     * Deals with incoming messages that have just been received.
+     *
+     * @param connection The <code>Connection</code> the message was
+     *     received on.
+     * @param element The root <code>Element</code> of the message.
+     * @return The reply.
+     */
     public abstract Element handle(Connection connection, Element element);
 
 
+    // Useful handlers
+
     /**
-    * Handles a "disconnect"-message.
-    *
-    * @param disconnectElement The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
-    * @return <code>null</code>.
-    */
+     * Handles a "disconnect"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     * @return Null.
+     */
     protected Element disconnect(Element disconnectElement) {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (gui.containsInGameComponents()) {
-                    if (freeColClient.getFreeColServer() == null) {
-                        gui.returnToTitle();
-                    } else {
-                        gui.removeInGameComponents();
+                @Override
+                public void run() {
+                    if (gui.containsInGameComponents()) {
+                        if (freeColClient.getFreeColServer() == null) {
+                            gui.returnToTitle();
+                        } else {
+                            gui.removeInGameComponents();
+                        }
                     }
                 }
-            }
-        });
+            });
 
+        return null;
+    }
+
+    /**
+     * Handles a message of unknown type.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     * @return Null.
+     */
+    protected Element unknown(Element element) {
+        logger.warning("Unknown message type: " + element.getTagName());
         return null;
     }
 }

@@ -215,7 +215,6 @@ public class Connection {
     public void close() throws IOException {
         Element disconnectElement = DOMMessage.createNewRootElement("disconnect");
         send(disconnectElement);
-
         reallyClose();
     }
 
@@ -284,6 +283,20 @@ public class Connection {
     }
 
     /**
+     * Sends the given message over this <code>Connection</code> and waits for
+     * confirmation of receiveval before returning.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information
+     * @throws IOException If an error occur while sending the message.
+     * @see #send(Element)
+     * @see #ask(Element)
+     */
+    public void sendAndWait(Element element) throws IOException {
+        askDumping(element);
+    }
+
+    /**
      * Sends a message to the other peer and returns the reply.
      *
      * @param element The question for the other peer.
@@ -313,43 +326,46 @@ public class Connection {
     }
 
     /**
-     * Starts a session for asking a question using streaming. There is also a
-     * simpler method for sending data using {@link #ask(Element) XML Elements}
-     * that can be used when streaming is not required (that is: when the
-     * messages to be transmitted are small).
+     * Dumping version of ask().
+     * Dumps to System.err with a faked-XML prefix so the whole line can
+     * be fed to an XML-pretty printer if required.
      *
-     * <br>
-     * <br>
-     *
-     * <b>Example:</b>
-     *
-     * <PRE>
-     *
-     * try { XMLStreamWriter out = ask(); // Write XML here XMLStreamReader in =
-     * connection.getReply(); // Read XML here connection.endTransmission(in); }
-     * catch (IOException e) { logger.warning("Could not send XML."); }
-     *
-     * </PRE>
-     *
-     * @return The <code>XMLStreamWriter</code> for sending the question. The
-     *         method {@link #getReply()} should be called when the message has
-     *         been written and the reply is required.
-     * @throws IOException if thrown by the underlying network stream.
-     * @see #getReply()
-     * @see #endTransmission(XMLStreamReader)
+     * @param request The <code>Element</code> to send.
+     * @return The reply element.
+     * @exception Throws IOException if ask() fails.
      */
-    public XMLStreamWriter ask() throws IOException {
-        waitForAndSetNewQuestionId();
-        try {
-            xmlOut = xof.createXMLStreamWriter(out);
-            xmlOut.writeStartElement("question");
-            xmlOut.writeAttribute("networkReplyId", Integer.toString(currentQuestionID));
-            return xmlOut;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to ask question (" + currentQuestionID + ")", e);
-            releaseQuestionId();
-            throw new IOException(e.toString());
+    public Element askDumping(Element request) throws IOException {
+        boolean dump = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
+        if (dump) {
+            try {
+                System.err.println("<" + getName() + "-request>"
+                    + DOMMessage.elementToString(request)
+                    + "</" + getName() + "-request>\n");
+            } catch (Exception e) {}
         }
+
+        Element reply;
+        if (dump) {
+            try {
+                reply = ask(request);
+                try {
+                    System.err.println("<" + getName() + "-reply>"
+                        + ((reply == null) ? ""
+                            : DOMMessage.elementToString(reply))
+                        + "</" + getName() + "-reply>\n");
+                } catch (Exception x) {}
+            } catch (IOException e) {
+                try {
+                    System.err.println("<" + getName() + "-reply><exception "
+                        + e.getMessage() + "\n");
+                } catch (Exception x) {}
+                throw e;
+            }
+        } else {
+            reply = ask(request);
+        }
+
+        return reply;
     }
 
     /**
@@ -392,122 +408,6 @@ public class Connection {
     }
 
     /**
-     * Starts a session for sending a message using streaming. There is also a
-     * simpler method for sending data using {@link #send(Element) XML Elements}
-     * that can be used when streaming is not required (that is: when the
-     * messages to be transmitted are small).
-     *
-     * <br>
-     * <br>
-     *
-     * <b>Example:</b>
-     *
-     * <PRE>
-     *
-     * try { XMLStreamWriter out = send(); // Write XML here
-     * connection.endTransmission(in); } catch (IOException e) {
-     * logger.warning("Could not send XML."); }
-     *
-     * </PRE>
-     *
-     * @return The <code>XMLStreamWriter</code> for sending the question. The
-     *         method {@link #endTransmission(XMLStreamReader)} should be called
-     *         when the message has been written.
-     * @throws IOException if thrown by the underlying network stream.
-     * @see #getReply()
-     * @see #endTransmission(XMLStreamReader)
-     */
-    public XMLStreamWriter send() throws IOException {
-        waitForAndSetNewQuestionId();
-        try {
-            xmlOut = xof.createXMLStreamWriter(out);
-            return xmlOut;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to send message", e);
-            releaseQuestionId();
-            throw new IOException(e.toString());
-        }
-    }
-
-    /**
-     * Gets the reply being received after sending a question.
-     *
-     * @return An <code>XMLStreamReader</code> for reading the incoming data.
-     * @throws IOException if thrown by the underlying network stream.
-     * @see #ask()
-     */
-    public XMLStreamReader getReply() throws IOException {
-        try {
-            NetworkReplyObject nro = thread.waitForStreamedNetworkReply(currentQuestionID);
-            xmlOut.writeEndElement();
-            xmlOut.writeCharacters("\n");
-            xmlOut.flush();
-            xmlOut.close();
-            xmlOut = null;
-
-            XMLStreamReader in = (XMLStreamReader) nro.getResponse();
-            in.nextTag();
-
-            return in;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, toString() + " failed to get reply (" + currentQuestionID + ")", e);
-            throw new IOException(e.toString());
-        }
-    }
-
-    /**
-     * Ends the transmission of a message or a ask/get-reply session.
-     *
-     * @throws IOException if thrown by the underlying network stream.
-     * @see #ask()
-     * @see #send()
-     */
-    public void endTransmission(XMLStreamReader in) throws IOException {
-        try {
-            if (in != null) {
-                try {
-                    while (in.hasNext()) in.next();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "error draining input stream", e);
-                } finally {
-                    thread.unlock();
-                    in.close();
-                }
-            } else {
-                try {
-                    xmlOut.writeCharacters("\n");
-                    xmlOut.flush();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "error closing output stream", e);
-                } finally {
-                    xmlOut.close();
-                    xmlOut = null;
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "unexpected exception in endTransmission",
-                e);
-            throw new IOException(e.toString());
-        } finally { // Unless the question id is released, can we ever recover?
-            releaseQuestionId();
-        }
-    }
-
-    /**
-     * Sends the given message over this <code>Connection</code> and waits for
-     * confirmation of receiveval before returning.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @throws IOException If an error occur while sending the message.
-     * @see #send(Element)
-     * @see #ask(Element)
-     */
-    public void sendAndWait(Element element) throws IOException {
-        ask(element);
-    }
-
-    /**
      * Sets the MessageHandler for this Connection.
      *
      * @param mh The new MessageHandler for this Connection.
@@ -540,43 +440,20 @@ public class Connection {
             final String networkReplyId = xmlIn.getAttributeValue(null, "networkReplyId");
 
             final boolean question = xmlIn.getLocalName().equals("question");
-            boolean messagedConsumed = false;
-            if (messageHandler instanceof StreamedMessageHandler) {
-                StreamedMessageHandler smh = (StreamedMessageHandler) messageHandler;
-                if (question) {
-                    xmlIn.nextTag();
-                }
-                if (smh.accepts(xmlIn.getLocalName())) {
-                    XMLStreamWriter xmlOut = null;
-                    if (question) {
-                        xmlOut = send();
-                        xmlOut.writeStartElement("reply");
-                        xmlOut.writeAttribute("networkReplyId", networkReplyId);
-                    }
-                    smh.handle(this, xmlIn, xmlOut);
-                    if (question) {
-                        xmlOut.writeEndElement();
-                        endTransmission(null);
-                    }
-                    thread.unlock();
-                    messagedConsumed = true;
-                }
-            }
-            if (!messagedConsumed) {
-                xmlIn.close();
-                in.reset();
-                final DOMMessage msg = new DOMMessage(in);
-
-                final Connection connection = this;
-                Thread t = new Thread(msg.getType()) {
+            xmlIn.close();
+            in.reset();
+            final DOMMessage msg = new DOMMessage(in);
+            
+            final Connection connection = this;
+            Thread t = new Thread(msg.getType()) {
                     @Override
                     public void run() {
                         try {
                             Element element = msg.getDocument().getDocumentElement();
-
+                            
                             if (question) {
                                 Element reply = messageHandler.handle(connection, (Element) element.getFirstChild());
-
+                                
                                 if (reply == null) {
                                     reply = DOMMessage.createNewRootElement("reply");
                                     reply.setAttribute("networkReplyId", networkReplyId);
@@ -602,84 +479,11 @@ public class Connection {
                         }
                     }
                 };
-                t.setName(name + "MessageHandler:" + t.getName());
-                t.start();
-            }
+            t.setName(name + "MessageHandler:" + t.getName());
+            t.start();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to handle and send reply", e);
         }
-    }
-
-    /**
-     * Handles a message using the registered <code>MessageHandler</code>.
-     *
-     * @param element The message as a DOM-parsed XML-tree.
-     */
-    /*
-     * public void handleAndSendReply(Element element) { try { if
-     * (element.getTagName().equals("question")) { String networkReplyId =
-     * element.getAttribute("networkReplyId");
-     *
-     * Element reply = messageHandler.handle(this, (Element)
-     * element.getFirstChild());
-     *
-     * if (reply == null) { reply = Message.createNewRootElement("reply");
-     * reply.setAttribute("networkReplyId", networkReplyId); logger.info("reply ==
-     * null"); } else { Element replyHeader =
-     * reply.getOwnerDocument().createElement("reply");
-     * replyHeader.setAttribute("networkReplyId", networkReplyId);
-     * replyHeader.appendChild(reply); reply = replyHeader; }
-     *
-     * send(reply); } else { Element reply = messageHandler.handle(this,
-     * element);
-     *
-     * if (reply != null) { send(reply); } } } catch (FreeColException e) {
-     * StringWriter sw = new StringWriter(); e.printStackTrace(new
-     * PrintWriter(sw)); logger.warning(sw.toString()); } catch (IOException e) {
-     * StringWriter sw = new StringWriter(); e.printStackTrace(new
-     * PrintWriter(sw)); logger.warning(sw.toString()); } }
-     */
-
-    /**
-     * Dumping version of ask().
-     * Dumps to System.err with a faked-XML prefix so the whole line can
-     * be fed to an XML-pretty printer if required.
-     *
-     * @param request The <code>Element</code> to send.
-     * @return The reply element.
-     * @exception Throws IOException if ask() fails.
-     */
-    public Element askDumping(Element request) throws IOException {
-        boolean dump = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
-        if (dump) {
-            try {
-                System.err.println("<" + getName() + "-request>"
-                    + DOMMessage.elementToString(request) + "\n");
-            } catch (Exception e) {}
-        }
-
-        Element reply;
-        if (dump) {
-            try {
-                reply = ask(request);
-                try {
-                    System.err.println("<" + getName() + "-reply>"
-                        + ((reply == null) ? ""
-                            : DOMMessage.elementToString(reply))
-                        + "\n");
-                } catch (Exception x) {}
-            } catch (IOException e) {
-                try {
-                    System.err.println("<" + getName() + "-reply><exception "
-                        + e.getMessage() + "\n");
-                } catch (Exception x) {}
-                throw e;
-            }
-        } else {
-            reply = ask(request);
-        }
-
-        return reply;
     }
 
     /**

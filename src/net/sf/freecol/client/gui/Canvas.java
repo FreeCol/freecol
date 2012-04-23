@@ -561,14 +561,21 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Paints this component. This method will use {@link MapViewer#display} to draw
-     * the map/background on this component.
+     * Paints this component.
+     *
+     * Uses {@link MapViewer#display} to draw the map/background on this
+     * component.
      *
      * @param g The Graphics context in which to draw this component.
      * @see MapViewer#display
      */
     @Override
     public void paintComponent(Graphics g) {
+        if (freeColClient.getGame() == null) {
+            // Defend against a race with ConnectController.logout().
+            return;
+        }
+
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         mapViewer.display(g2d);

@@ -101,22 +101,7 @@ final class ReceivingThread extends Thread {
      *         message.
      */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
-        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId, false);
-        threadsWaitingForNetworkReply.put(networkReplyId, nro);
-        return nro;
-    }
-
-    /**
-     * Creates and registers a new <code>NetworkReplyObject</code> with the
-     * specified ID.
-     * 
-     * @param networkReplyId The id of the message the calling thread should
-     *            wait for.
-     * @return The <code>NetworkReplyObject</code> containing the network
-     *         message.
-     */
-    public NetworkReplyObject waitForStreamedNetworkReply(int networkReplyId) {
-        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId, true);
+        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
         threadsWaitingForNetworkReply.put(networkReplyId, nro);
         return nro;
     }
@@ -201,17 +186,12 @@ final class ReceivingThread extends Thread {
                     Integer.valueOf(networkReplyID));
 
             if (nro != null) {
-                if (nro.isStreamed()) {
-                    locked = true;
-                    nro.setResponse(xmlIn);
-                } else {
-                    xmlIn.close();
-                    xmlIn = null;
-                    bis.reset();
+                xmlIn.close();
+                xmlIn = null;
+                bis.reset();
 
-                    final DOMMessage msg = new DOMMessage(bis);
-                    nro.setResponse(msg);
-                }
+                final DOMMessage msg = new DOMMessage(bis);
+                nro.setResponse(msg);
             } else {
                 while (xmlIn.hasNext()) {
                     xmlIn.next();

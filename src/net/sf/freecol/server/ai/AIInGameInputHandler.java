@@ -49,7 +49,6 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
-import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -61,7 +60,7 @@ import org.w3c.dom.NodeList;
 /**
  * Handles the network messages that arrives while in the game.
  */
-public final class AIInGameInputHandler implements MessageHandler, StreamedMessageHandler {
+public final class AIInGameInputHandler implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
@@ -187,28 +186,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      */
     private AIUnit getAIUnit(Unit unit) {
         return aiMain.getAIUnit(unit);
-    }
-
-    /**
-     * Handles the main element of an XML message.
-     *
-     * @param connection The connection the message came from.
-     * @param in The stream containing the message.
-     * @param out The output stream for the reply.
-     */
-    public void handle(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
-        // TODO: not yet implemented!
-    }
-
-    /**
-     *
-     * Checks if the message handler support the given message.
-     *
-     * @param tagName The tag name of the message to check.
-     * @return The result (currently always false).
-     */
-    public boolean accepts(String tagName) {
-        return false;
     }
 
     /**

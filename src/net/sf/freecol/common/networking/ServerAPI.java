@@ -802,6 +802,21 @@ public class ServerAPI {
     }
 
     /**
+     * Server query-response for logging in a player.
+     *
+     * @param username The user name.
+     * @param version The client version.
+     * @return A <code>LoginMessage</code> on success, or null on error.
+     */
+    public LoginMessage login(String username, String version) {
+        Element reply = askExpecting(new TrivialMessage("login",
+                                                        "userName", username,
+                                                        "version", version),
+                                     "login", null);
+        return (reply == null) ? null : new LoginMessage(null, reply);
+    }
+
+    /**
      * Server query-response for looting.  Handles both an initial query and
      * the actual looting.
      *

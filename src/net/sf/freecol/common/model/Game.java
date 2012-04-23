@@ -42,6 +42,8 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
+import org.w3c.dom.Element;
+
 
 /**
  * The main component of the game model.
@@ -148,24 +150,23 @@ public class Game extends FreeColGameObject {
         super(game, in);
     }
 
-    /*
-     * Initiate a new <code>Game</code> object from a <code>Element</code>
+    /**
+     * Creates a new <code>Game</code> object from a <code>Element</code>
      * in a DOM-parsed XML-tree.
      *
-     * Currently not used, commented.
-     *
-     * @param modelController A controller object the model can use to make
-     * actions not allowed from the model (generate random numbers etc). @param
-     * viewOwnerUsername The username of the owner of this view of the game.
-     * @param e An XML-element that will be used to initialize this object.
-     *
-     * public Game(ModelController modelController, Element e, String
-     * viewOwnerUsername){ super(null, e);
-     *
-     * this.modelController = modelController; canGiveID = false;
-     * readFromXMLElement(e); this.viewOwner =
-     * getPlayerByName(viewOwnerUsername); }
+     * @param element The <code>Element</code> containing the game.
+     * @param viewOwnerUsername The username of the owner of this view of the
+     *            game.
      */
+    public Game(Element element, String viewOwnerUsername) {
+        super(null, element);
+     
+        this.combatModel = new SimpleCombatModel();
+        readFromXMLElement(element);
+        this.viewOwner = getPlayerByName(viewOwnerUsername);
+        // setId() does not add Games to the freeColGameObjects
+        this.setFreeColGameObject(getId(), this);
+    }
 
     /**
      * Initiate a new <code>Game</code> object from an XML-representation.

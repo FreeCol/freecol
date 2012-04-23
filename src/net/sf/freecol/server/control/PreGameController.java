@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -45,6 +46,7 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -103,11 +105,12 @@ public final class PreGameController extends Controller {
         // Add AI players
         game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
                                               false, null, null, null));
-        Set<Entry<Nation, NationState>> entries =
-            new HashSet<Entry<Nation, NationState>>(game.getNationOptions().getNations().entrySet());
+        Set<Entry<Nation, NationState>> entries
+            = new HashSet<Entry<Nation, NationState>>(game.getNationOptions()
+                .getNations().entrySet());
         for (Entry<Nation, NationState> entry : entries) {
-            if (entry.getValue() != NationState.NOT_AVAILABLE &&
-                game.getPlayer(entry.getKey().getId()) == null) {
+            if (entry.getValue() != NationState.NOT_AVAILABLE
+                && game.getPlayer(entry.getKey().getId()) == null) {
                 freeColServer.addAIPlayer(entry.getKey());
             }
         }
@@ -115,10 +118,9 @@ public final class PreGameController extends Controller {
 
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
-        // createMap should not really use the entire loadGame method
+        // createMap should not really use the entire loadGame method.
         OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
-        Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createNewRootElement("oldGameOptions")
-                                                          .getOwnerDocument());
+        Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createNewRootElement("oldGameOptions").getOwnerDocument());
 
         // Make the map.
         mapGenerator.createMap(game);
@@ -146,14 +148,13 @@ public final class PreGameController extends Controller {
         for (Player player : game.getPlayers()) {
             if (!player.isAI()) {
                 Connection conn = ((ServerPlayer) player).getConnection();
+                Element updateGameElement = DOMMessage.createNewRootElement("updateGame");
+                Document doc = updateGameElement.getOwnerDocument();
+                updateGameElement.appendChild(game.toXMLElement(player, doc, false, false));
                 try {
-                    XMLStreamWriter out = conn.send();
-                    out.writeStartElement("updateGame");
-                    game.toXML(out, player, false, false);
-                    out.writeEndElement();
-                    conn.endTransmission(null);
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "EXCEPTION: ", e);
+                    conn.askDumping(updateGameElement);
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Unable to updateGame", e);
                 }
             }
         }

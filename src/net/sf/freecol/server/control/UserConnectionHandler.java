@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -32,13 +33,14 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -46,142 +48,102 @@ import org.w3c.dom.Element;
  * Handles a new client connection. {@link PreGameInputHandler} is set
  * as the message handler when the client has successfully logged on.
  */
-public final class UserConnectionHandler
-    implements MessageHandler, StreamedMessageHandler {
+public final class UserConnectionHandler implements MessageHandler {
 
     private static Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 
 
+    /** The main server object. */
     private final FreeColServer freeColServer;
 
 
     /**
      * The constructor to use.
+     *
      * @param freeColServer The main control object.
      */
     public UserConnectionHandler(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
     }
 
-    /**
-    * Handles a network message.
-    *
-    * @param connection The <code>Connection</code> the message came from.
-    * @param element The message to be processed.
-    * @return The reply.
-    */
-    public synchronized Element handle(Connection connection, Element element) {
-        Element reply = null;
-
-        String type = element.getTagName();
-
-        if (type.equals("getVacantPlayers")) {
-            reply = getVacantPlayers(connection, element);
-        } else if (type.equals("disconnect")) {
-            reply = disconnect(connection, element);
-        } else {
-            logger.warning("Unkown request: " + type);
-        }
-
-        return reply;
-    }
-
 
     /**
-     * Handles the main element of an XML message.
+     * Handles a network message.
      *
-     * @param connection The connection the message came from.
-     * @param in The stream containing the message.
-     * @param out The output stream for the reply.
+     * @param conn The <code>Connection</code> the message came from.
+     * @param element The message to be processed.
+     * @return The reply.
      */
-    public void handle(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
-        if (in.getLocalName().equals("login")) {
-            login(connection, in, out);
-        } else {
-            logger.warning("Unkown (streamed) request: " + in.getLocalName());
-        }
+    public synchronized Element handle(Connection conn, Element element) {
+        String type = (element == null) ? "(null)" : element.getTagName();
+        return ("disconnect".equals(type)) 
+            ? disconnect(conn, element)
+            : ("getVacantPlayers".equals(type))
+            ? getVacantPlayers(conn, element)
+            : ("login".equals(type))
+            ? login(conn, element)
+            : unknown(type);
+    }
+
+    private Element unknown(String type) {
+        logger.warning("Unknown user connection request: " + type);
+        return null;
     }
 
     /**
-     * Checks if the message handler support the given message.
-     * @param tagName The tag name of the message to check.
-     * @return The result.
-     */
-    public boolean accepts(String tagName) {
-        return tagName.equals("login");
-    }
-
-    /**
-     * Handles a "getVacantPlayers"-request.
+     * Handles a "disconnect"-message.
      *
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return The reply: An XML element containing a list of the
-     *       vacant players.
+     * @param connection The <code>Connection</code> the message was
+     *     received on.
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information.
+     * @return The reply.
      */
-    private Element getVacantPlayers(Connection connection, Element element) {
-        Game game = freeColServer.getGame();
-
-        if (freeColServer.getGameState() == FreeColServer.GameState.STARTING_GAME) {
-            return null;
+    private Element disconnect(Connection connection, Element element) {
+        try {
+            connection.reallyClose();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not close the connection.", e);
         }
-
-        Element reply = DOMMessage.createNewRootElement("vacantPlayers");
-        Iterator<Player> playerIterator = game.getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            if (!player.isDead() && player.isEuropean() && !player.isREF()
-                    && (!player.isConnected() || player.isAI())) {
-                Element playerElement = reply.getOwnerDocument().createElement("player");
-                playerElement.setAttribute("username", player.getName());
-                reply.appendChild(playerElement);
-            }
-        }
-
-        return reply;
+        return null;
     }
-
 
     /**
      * Handles a "login"-request.
      *
-     * @param connection The connection the message is comming from.
-     * @param in The stream with the incoming data.
-     * @param out The target stream for the reply.
+     * TODO: Do not allow more than one (human) player to connect
+     * to a single player game. This would be easy if we used a
+     * dummy connection for single player games.
+     *
+     * @param connection The <code>Connection</code> the message was
+     *     received on.
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information.
+     * @return The reply.
      */
-    private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
-        // TODO: Do not allow more than one (human) player to connect
-        // to a singleplayer game. This would be easy if we used a
-        // dummy connection for single-player games.
+    private Element login(Connection connection, Element element) {
+        final String userName = element.getAttribute("userName");
+        final String version = element.getAttribute("version");
+
+        if (userName == null || "".equals(userName)) {
+            return DOMMessage.createError("server.missingUserName", null);
+        } else if (version == null || "".equals(version)) {
+            return DOMMessage.createError("server.missingVersion", null);
+        } else if (!version.equals(FreeCol.getVersion())) {
+            return DOMMessage.createError("server.wrongFreeColVersion",
+                version + " != " + FreeCol.getVersion());
+        }
+
         Game game = freeColServer.getGame();
         Server server = freeColServer.getServer();
-
-        String username = in.getAttributeValue(null, "username");
-        if (username == null) {
-            throw new IllegalArgumentException("The attribute 'username' is missing.");
-        }
-
-        final String freeColVersion = in.getAttributeValue(null, "freeColVersion");
-        if (freeColVersion == null) {
-            throw new IllegalArgumentException("The attribute 'freeColVersion' is missing.");
-        }
-
-        if (!freeColVersion.equals(FreeCol.getVersion())) {
-            DOMMessage.createError(out, "server.wrongFreeColVersion", "The game versions do not match.");
-            return;
-        }
-
-        if (freeColServer.getGameState() != FreeColServer.GameState.STARTING_GAME) {
-            if (game.getPlayerByName(username) == null) {
-                DOMMessage.createError(out, "server.alreadyStarted", "The game has already been started!");
-                logger.warning("game state: " + freeColServer.getGameState().toString());
-                return;
-            }
-
-            ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
-            if (player.isConnected() && !player.isAI()) {
-                DOMMessage.createError(out, "server.usernameInUse", "The specified username is already in use.");
-                return;
+        if (freeColServer.getGameState()
+            != FreeColServer.GameState.STARTING_GAME) {
+            ServerPlayer player = (ServerPlayer)game.getPlayerByName(userName);
+            if (player == null) {
+                return DOMMessage.createError("server.alreadyStarted", null);
+            } else if (player.isConnected() && !player.isAI()) {
+                return DOMMessage.createError("server.userNameInUse",
+                    userName + " is already in use.");
             }
             player.setConnection(connection);
             player.setConnected(true);
@@ -194,45 +156,26 @@ public final class UserConnectionHandler
                 server.sendToAll(setAIElement);
             }
 
-            // In case this player is the first to reconnect:
-            boolean isCurrentPlayer = (game.getCurrentPlayer() == null);
-            if (isCurrentPlayer) {
-                game.setCurrentPlayer(player);
-            }
+            // If this player is the first to reconnect, it is the
+            // current player.
+            boolean isCurrentPlayer = game.getCurrentPlayer() == null;
+            if (isCurrentPlayer) game.setCurrentPlayer(player);
 
             connection.setMessageHandler(freeColServer.getInGameInputHandler());
+            server.addConnection(connection);
 
             try {
                 freeColServer.updateMetaServer();
             } catch (NoRouteToServerException e) {}
 
-            // Make the reply:
-            try {
-                out.writeStartElement("loginConfirmed");
-                out.writeAttribute("admin", Boolean.toString(player.isAdmin()));
-                out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-                out.writeAttribute("startGame", "true");
-                out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
-                if (isCurrentPlayer && freeColServer.getActiveUnit() != null) {
-                    out.writeAttribute("activeUnit",
-                                       freeColServer.getActiveUnit().getId());
-                }
-                freeColServer.getGame().toXML(out, player, false, false);
-                freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
-                out.writeEndElement();
-            } catch (XMLStreamException e) {
-                logger.warning("Could not write XML to stream (2).");
-            }
-
-            // Successful login:
-            server.addConnection(connection);
-            return;
+            return new LoginMessage(player, userName, version,
+                true, freeColServer.isSingleplayer(), isCurrentPlayer,
+                ((isCurrentPlayer) ? freeColServer.getActiveUnit() : null),
+                freeColServer.getGame()).toXMLElement();
         }
 
-        // TODO: is this still needed?  If game is null, the code above
-        // should NPE, several times.
-        // Wait until the game has been created:
-        int timeOut = 20000;
+        // TODO: is this still needed?
+        int timeOut = 20000; // Wait until the game has been created:
         while (freeColServer.getGame() == null) {
             try {
                 Thread.sleep(1000);
@@ -241,28 +184,22 @@ public final class UserConnectionHandler
             timeOut -= 1000;
 
             if (timeOut <= 0) {
-                DOMMessage.createError(out, "server.timeOut", "Timeout when connecting to the server.");
-                return;
+                return DOMMessage.createError("server.timeOut", null);
             }
         }
 
         if (!game.canAddNewPlayer()) {
-            DOMMessage.createError(out, "server.maximumPlayers", "Sorry, the maximum number of players reached.");
-            return;
+            return DOMMessage.createError("server.maximumPlayers", null);
+        } else if (game.playerNameInUse(userName)) {
+            return DOMMessage.createError("server.userNameInUse",
+                userName + " is already in use.");
         }
-
-        if (game.playerNameInUse(username)) {
-            DOMMessage.createError(out, "server.usernameInUse", "The specified username is already in use.");
-            return;
-        }
-
 
         // Create and add the new player:
         boolean admin = game.getPlayers().size() == 0;
         ServerPlayer newPlayer
-            = new ServerPlayer(game, username, admin, game.getVacantNation(),
+            = new ServerPlayer(game, userName, admin, game.getVacantNation(),
                                connection.getSocket(), connection);
-
         freeColServer.getGame().addPlayer(newPlayer);
 
         // Send message to all players except to the new player:
@@ -271,42 +208,46 @@ public final class UserConnectionHandler
         freeColServer.getServer().sendToAll(addNewPlayer, connection);
 
         connection.setMessageHandler(freeColServer.getPreGameInputHandler());
-
+        server.addConnection(connection);
         try {
             freeColServer.updateMetaServer();
-        } catch (NoRouteToServerException e) {}
-
-        // Make the reply:
-        try {
-            out.writeStartElement("loginConfirmed");
-            out.writeAttribute("admin", (admin ? "true" : "false"));
-            out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-            freeColServer.getGame().toXML(out, newPlayer, false, false);
-            freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
-            out.writeEndElement();
-        }  catch (XMLStreamException e) {
-            logger.warning("Could not write XML to stream (2).");
+        } catch (NoRouteToServerException e) {
+            logger.log(Level.WARNING, "Unable to update meta-server.", e);
         }
 
-        // Successful login:
-        server.addConnection(connection);
+        return new LoginMessage(newPlayer, userName, version,
+            false, freeColServer.isSingleplayer(), false,
+            null,
+            game).toXMLElement();
     }
 
     /**
-     * Handles a "disconnect"-message.
+     * Handles a "getVacantPlayers"-request.
      *
-     * @param connection The <code>Connection</code> the message was received on.
-     * @param disconnectElement The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
-     * @return The reply.
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return The reply: An XML element containing a list of the
+     *       vacant players.
      */
-    private Element disconnect(Connection connection, Element disconnectElement) {
-        try {
-            connection.reallyClose();
-        } catch (IOException e) {
-            logger.warning("Could not close the connection.");
+    private Element getVacantPlayers(Connection connection, Element element) {
+        Game game = freeColServer.getGame();
+        if (freeColServer.getGameState()
+            == FreeColServer.GameState.STARTING_GAME) {
+            return null;
         }
 
-        return null;
+        Element reply = DOMMessage.createNewRootElement("vacantPlayers");
+        Document doc = reply.getOwnerDocument();
+        for (Player player : game.getPlayers()) {
+            if (!player.isDead()
+                && player.isEuropean()
+                && !player.isREF()
+                && (!((ServerPlayer)player).isConnected() || player.isAI())) {
+                Element playerElement = doc.createElement("player");
+                playerElement.setAttribute("username", player.getName());
+                reply.appendChild(playerElement);
+            }
+        }
+        return reply;
     }
 }
