@@ -2231,8 +2231,8 @@
         <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
         <!-- these limits are intentially higher than 100 %, so they can be effectively disabled -->
-        <integerOption id="model.option.goodGovernmentLimit" value="50" mininumValue="0" maximumValue="150"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100" mininumValue="0" maximumValue="150"/>
+        <integerOption id="model.option.goodGovernmentLimit" value="50" minimumValue="0" maximumValue="150"/>
+        <integerOption id="model.option.veryGoodGovernmentLimit" value="100" minimumValue="0" maximumValue="150"/>
         <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
         <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
