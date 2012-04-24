@@ -571,11 +571,6 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public void paintComponent(Graphics g) {
-        if (freeColClient.getGame() == null) {
-            // Defend against a race with ConnectController.logout().
-            return;
-        }
-
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         mapViewer.display(g2d);

@@ -2003,17 +2003,22 @@ public final class MapViewer {
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Fog of war will be drawn.
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
+     * location specified by the coordinates.  Fog of war will be drawn.
+     *
+     * @param g The <code>Graphics2D</code> object on which to draw
+     *     the <code>Tile</code>.
+     * @param tile The <code>Tile</code> to draw.
      */
     private void displayFogOfWar(Graphics2D g, Tile tile) {
-        if (freeColClient.getGame().getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
+        if (freeColClient.getGame() != null
+            && freeColClient.getGame().getSpecification()
+                .getBoolean(GameOptions.FOG_OF_WAR)
             && freeColClient.getMyPlayer() != null
             && !freeColClient.getMyPlayer().canSee(tile)) {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                                                      0.2f));
             g.fill(fog);
             g.setComposite(oldComposite);
         }

@@ -462,6 +462,7 @@ public final class InGameInputHandler extends InputHandler {
                     fcc.getClientOptions());
             } catch (IOException e) {}
             fcc.quit();
+            return null;
         }
 
         if (SwingUtilities.isEventDispatchThread()) {
