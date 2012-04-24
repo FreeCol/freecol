@@ -60,6 +60,21 @@ public class AIGoods extends AIObject implements Transportable {
 
 
     /**
+     * Creates a new uninitialized <code>AIGoods</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public AIGoods(AIMain aiMain, String id) {
+        super(aiMain, id);
+
+        goods = null;
+        destination = null;
+        transportPriority = -1;
+        transport = null;
+    }
+
+    /**
      * Creates a new <code>AIGoods</code>.
      *
      * @param aiMain The main AI-object.
@@ -69,28 +84,32 @@ public class AIGoods extends AIObject implements Transportable {
      * @param destination The destination of the goods. This is the
      *      <code>Location</code> to which the goods should be transported.
      */
-    public AIGoods(AIMain aiMain, Location location, GoodsType type, int amount,
-                   Location destination) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+    public AIGoods(AIMain aiMain, Location location, GoodsType type,
+                   int amount, Location destination) {
+        this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
+        uninitialized = false;
     }
 
     /**
-     * Creates a new <code>AIGoods</code>.
+     * Creates a new <code>AIGoods</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
      */
     public AIGoods(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
+        super(aiMain, element);
 
+        uninitialized = getGoods() == null;
+    }
+    
     /**
-     * Creates a new <code>AIGoods</code>.
+     * Creates a new <code>AIGoods</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -99,40 +118,11 @@ public class AIGoods extends AIObject implements Transportable {
      */
     public AIGoods(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
+        super(aiMain, in);
+
+        uninitialized = getGoods() == null;
     }
 
-    /**
-     * Creates a new <code>AIGoods</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public AIGoods(AIMain aiMain, String id) {
-        super(aiMain, id);
-        uninitialized = true;
-    }
-
-
-    /**
-     * Gets the goods this <code>AIGoods</code> is controlling.
-     *
-     * @return The <code>Goods</code>.
-     */
-    public Goods getGoods() {
-        return goods;
-    }
-
-    /**
-     * Sets the goods this <code>AIGoods</code> is controlling.
-     *
-     * @param goods The <code>Goods</code>.
-     */
-    public void setGoods(Goods goods) {
-        if (goods == null) throw new IllegalArgumentException("null goods");
-        this.goods = goods;
-    }
 
     /**
      * Disposes this object.
@@ -151,6 +141,24 @@ public class AIGoods extends AIObject implements Transportable {
         }
         goods = null;
         super.dispose();
+    }
+
+    /**
+     * Gets the goods this <code>AIGoods</code> is controlling.
+     *
+     * @return The <code>Goods</code>.
+     */
+    public Goods getGoods() {
+        return goods;
+    }
+
+    /**
+     * Sets the goods this <code>AIGoods</code> is controlling.
+     *
+     * @param goods The new <code>Goods</code>.
+     */
+    public void setGoods(Goods goods) {
+        this.goods = goods;
     }
 
     /**
@@ -313,26 +321,29 @@ public class AIGoods extends AIObject implements Transportable {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (goods == null) return; // Workaround for BR#3456180
-
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
+
         if (destination != null) {
             out.writeAttribute("destination", destination.getId());
         }
-        out.writeAttribute("transportPriority", Integer.toString(transportPriority));
+
+        out.writeAttribute("transportPriority",
+            Integer.toString(transportPriority));
+
         if (transport != null) {
             if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
             } else if (transport.getMission() != null
-                    && transport.getMission() instanceof TransportMission
-                    && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+                && transport.getMission() instanceof TransportMission
+                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
                 logger.warning("We should not be on the transport list.");
             } else {
                 out.writeAttribute("transport", transport.getId());
             }
         }
+
         goods.toXML(out);
 
         out.writeEndElement();
@@ -347,43 +358,42 @@ public class AIGoods extends AIObject implements Transportable {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        final String destinationStr = in.getAttributeValue(null, "destination");
-        if (destinationStr != null) {
-            destination = (Location) getAIMain().getFreeColGameObject(destinationStr);
+
+        String str = in.getAttributeValue(null, "destination");
+        if (str != null) {
+            destination = (Location)aiMain.getFreeColGameObject(str);
             if (destination == null) {
-                logger.warning("Could not find destination: " + destinationStr);
+                logger.warning("Could not find destination: " + str);
             }
         } else {
             destination = null;
         }
+
         transportPriority = getAttribute(in, "transportPriority", -1);
 
-        final String transportStr = in.getAttributeValue(null, "transport");
-        if (transportStr != null) {
-            transport = (AIUnit) getAIMain().getAIObject(transportStr);
-            if (transport == null) {
-                transport = new AIUnit(getAIMain(), transportStr);
+        if ((str = in.getAttributeValue(null, "transport")) != null) {
+            if ((transport = (AIUnit)aiMain.getAIObject(str)) == null) {
+                transport = new AIUnit(aiMain, str);
             }
         } else {
             transport = null;
         }
-
         in.nextTag();
 
         if (goods != null) {
             goods.readFromXML(in);
         } else {
-            goods = new Goods(getAIMain().getGame(), in);
+            goods = new Goods(aiMain.getGame(), in);
         }
+
         in.nextTag();
     }
 
     /**
-     * Returns a <code>String</code>-representation of this object.
-     *
-     * @return A <code>String</code> representing this object for
-     *     debugging purposes.
+     * {@inherit-doc}
      */
     @Override
     public String toString() {

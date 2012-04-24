@@ -19,7 +19,18 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Element;
+
+
+/**
+ * Abstract class of AI object with a simple enclosed comparable
+ * integer value.
+ */
 public abstract class ValuedAIObject extends AIObject
     implements Comparable<ValuedAIObject> {
 
@@ -39,13 +50,41 @@ public abstract class ValuedAIObject extends AIObject
     }
 
     /**
-     * Creates a new <code>ValuedAIObject</code> instance.
+     * Creates a new uninitialized <code>ValuedAIObject</code> instance.
      *
      * @param aiMain an <code>AIMain</code> value
      * @param id a <code>String</code> value
      */
     public ValuedAIObject(AIMain aiMain, String id) {
         super(aiMain, id);
+
+        value = 0;
+    }
+
+    /**
+     * Creates a new <code>ValuedAIObject</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
+     */
+    public ValuedAIObject(AIMain aiMain, Element element) {
+        super(aiMain, element);
+    }
+    
+    /**
+     * Creates a new <code>ValuedAIObject</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public ValuedAIObject(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain, in);
     }
 
 
@@ -66,6 +105,9 @@ public abstract class ValuedAIObject extends AIObject
     public final void setValue(final int newValue) {
         this.value = newValue;
     }
+
+
+    // Comparable interface
 
     /**
      * Compare valued AI objects by value.

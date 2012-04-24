@@ -47,32 +47,23 @@ public class UnitWanderHostileMission extends Mission {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
 
-    /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    *
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    */
-    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
-    }
-
 
     /**
-     * Loads a mission from the given element.
+     * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
      */
-    public UnitWanderHostileMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
+        super(aiMain, aiUnit);
+
+        uninitialized = false;
     }
 
     /**
-     * Creates a new <code>UnitWanderHostileMission</code> and reads the given element.
+     * Creates a new <code>UnitWanderHostileMission</code> and reads
+     * the given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -80,19 +71,22 @@ public class UnitWanderHostileMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public UnitWanderHostileMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public UnitWanderHostileMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
 
     /**
-    * Performs the mission. This is done by searching for hostile units
-    * that are located within one tile and attacking them. If no such units
-    * are found, then wander in a random direction.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
+     * Performs the mission. This is done by searching for hostile units
+     * that are located within one tile and attacking them. If no such units
+     * are found, then wander in a random direction.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
         if (!(unit.getLocation() instanceof Tile)) {
@@ -130,6 +124,8 @@ public class UnitWanderHostileMission extends Mission {
         return true;
     }
 
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related

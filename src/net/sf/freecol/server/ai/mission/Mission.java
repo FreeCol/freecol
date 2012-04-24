@@ -52,6 +52,7 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
+import org.w3c.dom.Element;
 
 
 /**
@@ -63,8 +64,11 @@ public abstract class Mission extends AIObject {
 
     private static final Logger logger = Logger.getLogger(Mission.class.getName());
 
-    protected static final int MINIMUM_TRANSPORT_PRIORITY = 60,     // A transport can be used
-                               NORMAL_TRANSPORT_PRIORITY = 100;     // Transport is required
+    /** A transport can be used.*/
+    protected static final int MINIMUM_TRANSPORT_PRIORITY = 60;
+
+    /** Transport is required. */
+    protected static final int NORMAL_TRANSPORT_PRIORITY = 100;
 
     protected static final int NO_PATH_TO_TARGET = -2,
                                NO_MORE_MOVES_LEFT = -1;
@@ -74,25 +78,37 @@ public abstract class Mission extends AIObject {
 
 
     /**
-     * Creates a mission.
+     * Creates an uninitialized mission.
      *
      * @param aiMain The main AI-object.
      */
     public Mission(AIMain aiMain) {
-        this(aiMain, null);
+        super(aiMain);
+
+        this.aiUnit = null;
     }
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
      *
+     * Note that missions are attached to their units, and thus do
+     * not need AI ids, hence the plain superclass constructor.
+     *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
-     * @exception NullPointerException if <code>aiUnit == null</code>.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
     public Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
+
         this.aiUnit = aiUnit;
+    }
+
+
+    /**
+     * Disposes this mission by removing any references to it.
+     */
+    public void dispose() {
+        // Nothing to do yet.
     }
 
     /**
@@ -106,19 +122,12 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Disposes this mission by removing any references to it.
-     */
-    public void dispose() {
-        // Nothing to do yet.
-    }
-
-    /**
      * Gets the unit this mission has been created for.
      *
      * @return The <code>Unit</code>.
      */
     public Unit getUnit() {
-        return aiUnit.getUnit();
+        return (aiUnit == null) ? null : aiUnit.getUnit();
     }
 
     /**
@@ -753,16 +762,6 @@ public abstract class Mission extends AIObject {
      * @param connection The <code>Connection</code> to the server.
      */
     public abstract void doMission(Connection connection);
-
-    /**
-     * Gets debugging information about this mission.  This string is
-     * a short representation of this object's state.
-     *
-     * @return "".
-     */
-    public String getDebuggingInfo() {
-        return "";
-    }
 
 
     // Serialization

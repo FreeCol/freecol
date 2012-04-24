@@ -104,18 +104,7 @@ public class PioneeringMission extends Mission {
         setTarget(findTarget(aiUnit));
         logger.finest(tag + " starts with target " + target
             + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public PioneeringMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -131,7 +120,9 @@ public class PioneeringMission extends Mission {
     public PioneeringMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
     /**
@@ -218,6 +209,7 @@ public class PioneeringMission extends Mission {
         abandonTileImprovementPlan();
         super.dispose();
     }
+
 
     /**
      * Does a supplied unit have tools?

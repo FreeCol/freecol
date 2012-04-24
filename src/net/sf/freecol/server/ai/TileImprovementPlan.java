@@ -62,6 +62,24 @@ public class TileImprovementPlan extends ValuedAIObject {
 
 
     /**
+     * Creates a new uninitialized <code>TileImprovementPlan</code>
+     * from the given XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The ID.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public TileImprovementPlan(AIMain aiMain, String id)
+        throws XMLStreamException {
+        super(aiMain, id);
+
+        type = null;
+        pioneer = null;
+        target = null;
+    }
+
+    /**
      * Creates a new <code>TileImprovementPlan</code>.
      *
      * @param aiMain The main AI-object.
@@ -72,12 +90,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      *        signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
-        TileImprovementType type, int value) {
+                               TileImprovementType type, int value) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
         
         this.target = target;
         this.type = type;
         setValue(value);
+        uninitialized = getType() == null || getTarget() == null;
     }
 
     /**
@@ -89,8 +108,9 @@ public class TileImprovementPlan extends ValuedAIObject {
      *       of a <code>Wish</code>.
      */
     public TileImprovementPlan(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
+        super(aiMain, element);
+
+        uninitialized = getType() == null || getTarget() == null;
     }
     
     /**
@@ -104,22 +124,9 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     public TileImprovementPlan(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
-    }
-    
-    /**
-     * Creates a new <code>TileImprovementPlan</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The ID.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public TileImprovementPlan(AIMain aiMain, String id)
-        throws XMLStreamException {
-        super(aiMain, id);
+        super(aiMain, in);
+
+        uninitialized = getType() == null || getTarget() == null;
     }
 
 
@@ -260,6 +267,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
         out.writeAttribute("type", type.getId());
@@ -284,7 +292,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        super.readAttributes(in);
+
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String str = in.getAttributeValue(null, "type");
         type = getSpecification().getTileImprovementType(str);

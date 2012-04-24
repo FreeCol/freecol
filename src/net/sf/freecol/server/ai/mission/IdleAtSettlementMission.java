@@ -53,19 +53,8 @@ public class IdleAtSettlementMission extends Mission {
      */
     public IdleAtSettlementMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-    }
 
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public IdleAtSettlementMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -81,7 +70,9 @@ public class IdleAtSettlementMission extends Mission {
     public IdleAtSettlementMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
 

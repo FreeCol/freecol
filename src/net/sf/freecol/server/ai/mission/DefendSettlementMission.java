@@ -81,18 +81,7 @@ public class DefendSettlementMission extends Mission {
         this.settlement = settlement;
         logger.finest(tag + " started with " + settlement
             + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Creates a new <code>DefendSettlementMission</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public DefendSettlementMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -108,7 +97,9 @@ public class DefendSettlementMission extends Mission {
     public DefendSettlementMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
     
     /**
@@ -369,22 +360,6 @@ public class DefendSettlementMission extends Mission {
         }
     }
     
-    /**
-     * Gets debugging information about this mission.  This string is
-     * a short representation of this object's state.
-     *
-     * @return The <code>String</code>:
-     *      "(x, y) ColonyName"
-     *      where <code>x</code> and <code>y</code> is the
-     *      coordinates of the settlement for this mission,
-     *      and <code>ColonyName</code> is the name
-     *      (if available).
-     */
-    public String getDebuggingInfo() {
-        return settlement.getTile().getPosition().toString()
-            + " " + settlement.getName();
-    }
-
 
     // Serialization
 
@@ -408,6 +383,7 @@ public class DefendSettlementMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         writeAttribute(out, "settlement", settlement);
     }
 
@@ -417,6 +393,7 @@ public class DefendSettlementMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         settlement = (Settlement) getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "settlement"));
     }

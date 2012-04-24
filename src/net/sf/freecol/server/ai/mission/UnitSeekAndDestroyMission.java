@@ -88,18 +88,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         this.target = target;
         logger.finest(tag + " begins with target " + target
             + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public UnitSeekAndDestroyMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -115,14 +104,18 @@ public class UnitSeekAndDestroyMission extends Mission {
     public UnitSeekAndDestroyMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Gets the object we are trying to destroy.
      *
      * @return The object which should be destroyed.
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -435,29 +428,6 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
     }
 
-    /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
-     *
-     * @return The <code>String</code>.
-     */
-    @Override
-    public String getDebuggingInfo() {
-        if (target == null) {
-            return "No target";
-        } else {
-            final String name;
-            if (target instanceof Unit) {
-                name = ((Unit) target).toString();
-            } else if (target instanceof Colony) {
-                name = ((Colony) target).getName();
-            } else {
-                name = "";
-            }
-            return target.getTile().getPosition() + " " + name;
-        }
-    }
 
     // Serialization
 
@@ -480,6 +450,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         if (target != null) {
             writeAttribute(out, "target", (FreeColGameObject)target);
         }
@@ -492,6 +463,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         target = (Location)getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
     }

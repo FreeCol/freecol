@@ -77,7 +77,6 @@ public class AIMain extends FreeColObject
      */
     public AIMain(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
-        setId(getNextId());
         findNewObjects();
     }
 
@@ -92,6 +91,7 @@ public class AIMain extends FreeColObject
      */
     public AIMain(FreeColServer freeColServer, Element element) {
         this(freeColServer);
+
         readFromXMLElement(element);
     }
 
@@ -108,6 +108,7 @@ public class AIMain extends FreeColObject
     public AIMain(FreeColServer freeColServer, XMLStreamReader in)
         throws XMLStreamException {
         this(freeColServer);
+
         readFromXML(in);
     }
     
@@ -373,16 +374,14 @@ public class AIMain extends FreeColObject
      * @see FreeColGameObject#getId
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
-        if (aiObjects.containsKey(id)) {
-            return;
-        }
+        if (aiObjects.containsKey(id)) return;
         if (!id.equals(fcgo.getId())) {
             throw new IllegalArgumentException("!id.equals(fcgo.getId())");
         }
-        if (fcgo instanceof Unit) {
-            new AIUnit(this, (Unit) fcgo);
+        if (fcgo instanceof Colony) {
+            new AIColony(this, (Colony)fcgo);
         } else if (fcgo instanceof ServerPlayer) {
-            ServerPlayer p = (ServerPlayer) fcgo;
+            ServerPlayer p = (ServerPlayer)fcgo;
             if (p.isIndian()) {
                 new NativeAIPlayer(this, p);
             } else if (p.isREF()) {
@@ -390,22 +389,20 @@ public class AIMain extends FreeColObject
             } else if (p.isEuropean()) {
                 new EuropeanAIPlayer(this, p);
             }
-        } else if (fcgo instanceof Colony) {
-            new AIColony(this, (Colony) fcgo);
-        }
+        } else if (fcgo instanceof Unit) {
+            new AIUnit(this, (Unit)fcgo);
+        } 
     }
 
     /**
-     * Removes the <code>AIObject</code> for the given
-     * <code>FreeColGameObject</code>.
+     * Removes the <code>AIObject</code> for a given AI id.
+     * Needed for interface FreeColGameObjectListener.
      *
-     * @param id The ID of the <code>FreeColGameObject</code>.
+     * @param id The AI object identifier.
      */
     public void removeFreeColGameObject(String id) {
         AIObject o = getAIObject(id);
-        if (o != null) {
-            o.dispose();
-        }
+        if (o != null) o.dispose();
         removeAIObject(id);
     }
 
@@ -461,8 +458,6 @@ public class AIMain extends FreeColObject
     @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-
         out.writeAttribute("nextID", Integer.toString(nextId));
     }
 
@@ -481,7 +476,7 @@ public class AIMain extends FreeColObject
         // Using a copy of the objects defensively against races.
         for (AIObject aio : new ArrayList<AIObject>(aiObjects.values())) {
             if (!aio.checkIntegrity()) {
-                logger.log(Level.WARNING, "Integrity failure: " + aio);
+                logger.warning("Integrity failure: " + aio);
                 continue;
             }
             if (aio instanceof Wish) {
@@ -491,7 +486,7 @@ public class AIMain extends FreeColObject
 
             try {
                 if (aio.getId() == null) {
-                    logger.warning("Null AI ID for: "
+                    logger.warning("Null AI identifier for: "
                         + aio.getClass().getName());
                 } else {
                     aio.toXML(out);
@@ -517,10 +512,7 @@ public class AIMain extends FreeColObject
         if (!in.getLocalName().equals(getXMLElementTagName())) {
             logger.warning("Expected element name, got: " + in.getLocalName());
         }
-        final String nextIdStr = in.getAttributeValue(null, "nextID");
-        if (nextIdStr != null) {
-            nextId = Integer.parseInt(nextIdStr);
-        }
+        nextId = getAttribute(in, "nextID", 0);
 
         String lastTag = "";
         Wish wish;
@@ -570,8 +562,8 @@ public class AIMain extends FreeColObject
                     ) {
                     new TileImprovementPlan(this, in);
                 } else {
-                    logger.warning("Unknown AI-object read: " + tagName
-                        + "(" + lastTag + ")");
+                    throw new IllegalStateException("Unknown AI-object read: "
+                        + tagName + "(" + lastTag + ")");
                 }
                 if (wish != null) {
                     AIColony ac = wish.getDestinationAIColony();
@@ -593,7 +585,7 @@ public class AIMain extends FreeColObject
         }
 
         if (!in.getLocalName().equals(getXMLElementTagName())) {
-            logger.warning("Expected element name (2), got: "
+            logger.warning("Expected closing element name, got: "
                 + in.getLocalName());
         }
 

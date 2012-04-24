@@ -49,6 +49,19 @@ public class GoodsWish extends Wish {
 
 
     /**
+     * Creates a new uninitialized <code>GoodsWish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public GoodsWish(AIMain aiMain, String id) {
+        super(aiMain, id);
+
+        goodsType = null;
+        amountRequested = -1;
+    }
+
+    /**
      * Creates a new <code>GoodsWish</code>.
      *
      * @param aiMain The main AI-object.
@@ -63,7 +76,7 @@ public class GoodsWish extends Wish {
      */
     public GoodsWish(AIMain aiMain, Location destination, int value,
                      int amountRequested, GoodsType goodsType) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+        this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -73,22 +86,26 @@ public class GoodsWish extends Wish {
         setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
+        uninitialized = false;
     }
 
     /**
-     * Creates a new <code>GoodsWish</code> from the given XML-representation.
+     * Creates a new <code>GoodsWish</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation of a
-     *     <code>GoodsWish</code>.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
      */
     public GoodsWish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
+        super(aiMain, element);
 
+        uninitialized = getDestination() == null;
+    }
+    
     /**
-     * Creates a new <code>GoodsWish</code>.
+     * Creates a new <code>GoodsWish</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -97,18 +114,9 @@ public class GoodsWish extends Wish {
      */
     public GoodsWish(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
-    }
+        super(aiMain, in);
 
-    /**
-     * Creates a new <code>GoodsWish</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public GoodsWish(AIMain aiMain, String id) {
-        super(aiMain, id);
+        uninitialized = getDestination() == null;
     }
 
 
@@ -179,11 +187,15 @@ public class GoodsWish extends Wish {
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
         out.writeAttribute("destination", destination.getId());
+
         if (transportable != null) {
             out.writeAttribute("transportable", transportable.getId());
         }
+
         out.writeAttribute("value", Integer.toString(getValue()));
+
         out.writeAttribute("goodsType", goodsType.getId());
+
         out.writeAttribute("amountRequested", Integer.toString(amountRequested));
 
         out.writeEndElement();
@@ -202,6 +214,7 @@ public class GoodsWish extends Wish {
 
         String str = in.getAttributeValue(null, "destination");
         destination = (Location) getAIMain().getFreeColGameObject(str);
+
         if ((str = in.getAttributeValue(null, "transportable")) != null) {
             transportable = (Transportable) getAIMain().getAIObject(str);
             if (transportable == null) {
@@ -210,9 +223,12 @@ public class GoodsWish extends Wish {
         } else {
             transportable = null;
         }
+
         setValue(getAttribute(in, "value", -1));
+
         str = in.getAttributeValue(null, "goodsType");
         goodsType = getSpecification().getGoodsType(str);
+
         amountRequested = getAttribute(in, "amountRequested",
                                        GoodsContainer.CARGO_SIZE);
 

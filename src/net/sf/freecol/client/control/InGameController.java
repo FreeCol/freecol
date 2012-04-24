@@ -2267,7 +2267,6 @@ public final class InGameController implements NetworkConstants {
         if (unit.getTradeRoute() != null) return followTradeRoute(unit);
         gui.setActiveUnit(unit);
         Player player = freeColClient.getMyPlayer();
-
         Location destination;
         while (unit.getMovesLeft() > 0
             && unit.getState() != UnitState.SKIPPED) {

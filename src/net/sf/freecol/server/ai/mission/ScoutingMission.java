@@ -81,21 +81,11 @@ public class ScoutingMission extends Mission {
      */
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
+
         target = findTarget(aiUnit);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public ScoutingMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -109,8 +99,11 @@ public class ScoutingMission extends Mission {
     public ScoutingMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Gets the object we are trying to destroy.

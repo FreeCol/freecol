@@ -105,28 +105,18 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private HashMap<String, Integer> sessionRegister = new HashMap<String, Integer>();
 
+
     /**
-     * Creates a new <code>AIPlayer</code>.
+     * Creates a new <code>EuropeanAIPlayer</code>.
      *
      * @param aiMain The main AI-class.
      * @param player The player that should be associated with this
      *            <code>AIPlayer</code>.
      */
     public EuropeanAIPlayer(AIMain aiMain, ServerPlayer player) {
-        super(aiMain, player.getId());
-        setPlayer(player);
-    }
+        super(aiMain, player);
 
-    /**
-     * Creates a new <code>AIPlayer</code> and reads the information from the
-     * given <code>Element</code>.
-     *
-     * @param aiMain The main AI-class.
-     * @param element The XML-element containing information.
-     */
-    public EuropeanAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
+        uninitialized = getPlayer() == null;
     }
 
     /**
@@ -138,8 +128,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public EuropeanAIPlayer(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
+        super(aiMain, in);
+
+        uninitialized = getPlayer() == null;
     }
 
 

@@ -95,14 +95,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private ColonyPlan colonyPlan;
 
     // Goods to export from the colony.
-    private final List<AIGoods> aiGoods = new ArrayList<AIGoods>();
+    private List<AIGoods> aiGoods;
 
     // Useful things for the colony.
-    private final List<Wish> wishes = new ArrayList<Wish>();
+    private List<Wish> wishes;
 
     // Plans to improve neighbouring tiles.
-    private final List<TileImprovementPlan> tileImprovementPlans
-        = new ArrayList<TileImprovementPlan>();
+    private List<TileImprovementPlan> tileImprovementPlans;
 
     // When should the workers in this Colony be rearranged?
     private Turn rearrangeTurn = new Turn(0);
@@ -129,54 +128,99 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
+     * Creates a new uninitialized <code>AIColony</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The identifier of this colony.
+     */
+    public AIColony(AIMain aiMain, String id) {
+        super(aiMain, id);
+
+        colony = null;
+        colonyPlan = null;
+    }
+
+    /**
      * Creates a new <code>AIColony</code>.
      *
      * @param aiMain The main AI-object.
      * @param colony The colony to make an {@link AIObject} for.
      */
     public AIColony(AIMain aiMain, Colony colony) {
-        super(aiMain, colony.getId());
+        this(aiMain, colony.getId());
 
         this.colony = colony;
         colonyPlan = new ColonyPlan(aiMain, colony);
         colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
+        initialize();
+        uninitialized = false;
     }
 
     /**
-     * Creates a new <code>AIColony</code>.
+     * Creates a new <code>AIColony</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
      */
     public AIColony(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
+        super(aiMain, element);
 
+        initialize();
+        uninitialized = getColony() == null;
+    }
+    
     /**
-     * Creates a new <code>AIColony</code>.
+     * Creates a new <code>AIColony</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
     public AIColony(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
+        super(aiMain, in);
+
+        initialize();
+        uninitialized = getColony() == null;
+    }
+
+    private void initialize() {
+        aiGoods = new ArrayList<AIGoods>();
+        wishes = new ArrayList<Wish>();
+        tileImprovementPlans = new ArrayList<TileImprovementPlan>();
     }
 
     /**
-     * Creates a new <code>AIColony</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The identifier of this colony.
+     * Disposes this <code>AIColony</code>.
      */
-    public AIColony(AIMain aiMain, String id) {
-        this(aiMain, (Colony) aiMain.getGame().getFreeColGameObject(id));
+    public void dispose() {
+        List<AIObject> disposeList = new ArrayList<AIObject>();
+        for (AIGoods ag : aiGoods) {
+            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
+        }
+        for (Wish w : wishes) disposeList.add(w);
+        for (TileImprovementPlan ti : tileImprovementPlans) disposeList.add(ti);
+        for (AIObject o : disposeList) o.dispose();
+        super.dispose();
     }
 
+    /**
+     * Gets this AI object's identifier.
+     *
+     * @return The id of the colony.
+     */
+    @Override
+    public String getId() {
+        if (colony == null) {
+            logger.warning("Uninitialized AI colony");
+            return null;
+        }
+        return colony.getId();
+    }
 
     /**
      * Gets the <code>Colony</code> this <code>AIColony</code> controls.
@@ -196,7 +240,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return colonyPlan;
     }
 
-
     protected AIUnit getAIUnit(Unit unit) {
         return getAIMain().getAIUnit(unit);
     }
@@ -207,21 +250,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     protected Connection getConnection() {
         return getAIOwner().getConnection();
-    }
-
-
-    /**
-     * Disposes this <code>AIColony</code>.
-     */
-    public void dispose() {
-        List<AIObject> disposeList = new ArrayList<AIObject>();
-        for (AIGoods ag : aiGoods) {
-            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
-        }
-        for (Wish w : wishes) disposeList.add(w);
-        for (TileImprovementPlan ti : tileImprovementPlans) disposeList.add(ti);
-        for (AIObject o : disposeList) o.dispose();
-        super.dispose();
     }
 
     /**
@@ -1357,6 +1385,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+
         out.writeAttribute(ID_ATTRIBUTE, getId());
 
         for (AIGoods ag : aiGoods) {
@@ -1398,70 +1427,72 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+        String tag, str;
+        initialize();
 
-        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if ((colony = (Colony)getAIMain().getFreeColGameObject(str)) == null) {
+        str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if ((colony = (Colony)aiMain.getFreeColGameObject(str)) == null) {
             throw new NullPointerException("Could not find Colony: " + str);
         }
 
         aiGoods.clear();
         tileImprovementPlans.clear();
         wishes.clear();
-        colonyPlan = new ColonyPlan(getAIMain(), colony);
+        colonyPlan = new ColonyPlan(aiMain, colony);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(AIGoods
-                    .getXMLElementTagName() + LIST_ELEMENT)) {
+            tag = in.getLocalName();
+            if (tag.equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
                 str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                AIGoods ag = (AIGoods)getAIMain().getAIObject(str);
-                if (ag == null) ag = new AIGoods(getAIMain(), str);
+                AIGoods ag = (AIGoods)aiMain.getAIObject(str);
+                if (ag == null) ag = new AIGoods(aiMain, str);
                 aiGoods.add(ag);
-                in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovementPlan
-                    .getXMLElementTagName() + LIST_ELEMENT)
+            } else if (tag.equals(TileImprovementPlan.getXMLElementTagName()
+                    + LIST_ELEMENT)
                 // @compat 0.10.3
                 || in.getLocalName().equals("tileimprovementplan"
                     + LIST_ELEMENT)
                 // end compatibility code
                 ) {
                 str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                TileImprovementPlan ti = (TileImprovementPlan)getAIMain()
+                TileImprovementPlan ti = (TileImprovementPlan)aiMain
                     .getAIObject(str);
-                if (ti == null) ti = new TileImprovementPlan(getAIMain(), str);
+                if (ti == null) ti = new TileImprovementPlan(aiMain, str);
                 tileImprovementPlans.add(ti);
-                in.nextTag();
-            } else if (in.getLocalName().equals(GoodsWish
-                    .getXMLElementTagName() + LIST_ELEMENT)
+            } else if (tag.equals(GoodsWish.getXMLElementTagName()
+                    + LIST_ELEMENT)
                 // @compat 0.10.3
                 || in.getLocalName().equals(GoodsWish.getXMLElementTagName()
                     + "Wish" + LIST_ELEMENT)
                 // end compatibility code
                 ) {
                 str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                Wish w = (Wish)getAIMain().getAIObject(str);
-                if (w == null) w = new GoodsWish(getAIMain(), str);
+                Wish w = (Wish)aiMain.getAIObject(str);
+                if (w == null) w = new GoodsWish(aiMain, str);
                 wishes.add(w);
-                in.nextTag();
-            } else if (in.getLocalName().equals(WorkerWish
-                    .getXMLElementTagName() + LIST_ELEMENT)
+            } else if (tag.equals(WorkerWish.getXMLElementTagName()
+                    + LIST_ELEMENT)
                 // @compat 0.10.3
                 || in.getLocalName().equals(WorkerWish.getXMLElementTagName()
                     + "Wish" + LIST_ELEMENT)
                 // end compatibility code
                 ) {
                 str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                Wish w = (Wish)getAIMain().getAIObject(str);
-                if (w == null) w = new WorkerWish(getAIMain(), str);
+                Wish w = (Wish)aiMain.getAIObject(str);
+                if (w == null) w = new WorkerWish(aiMain, str);
                 wishes.add(w);
-                in.nextTag();
             } else {
                 logger.warning("Unknown tag name: " + in.getLocalName());
             }
+
+            in.nextTag();
         }
 
-        if (!in.getLocalName().equals(getXMLElementTagName())) {
+        tag = in.getLocalName();
+        if (!tag.equals(getXMLElementTagName())) {
             logger.warning("Expected end " + getXMLElementTagName()
-                + " tag, received: " + in.getLocalName());
+                + " tag, received: " + tag);
         }
     }
 

@@ -72,18 +72,7 @@ public class CashInTreasureTrainMission extends Mission {
         target = findTarget(aiUnit);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public CashInTreasureTrainMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -99,6 +88,7 @@ public class CashInTreasureTrainMission extends Mission {
     public CashInTreasureTrainMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
     }
 

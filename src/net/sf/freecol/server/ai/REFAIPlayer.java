@@ -60,17 +60,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      */
     public REFAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
-    }
 
-    /**
-     * Creates a new <code>REFAIPlayer</code> and reads the
-     * information from the given <code>Element</code>.
-     *
-     * @param aiMain The main AI-class.
-     * @param element The XML-element containing information.
-     */
-    public REFAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element);
+        uninitialized = getPlayer() == null;
     }
 
     /**
@@ -83,7 +74,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     public REFAIPlayer(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain, in);
+
+        uninitialized = getPlayer() == null;
     }
+
 
     /**
      * Initialize the REF.

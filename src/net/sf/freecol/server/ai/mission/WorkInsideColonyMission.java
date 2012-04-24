@@ -58,19 +58,9 @@ public class WorkInsideColonyMission extends Mission {
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
                                    AIColony aiColony) {
         super(aiMain, aiUnit);
-        this.aiColony = aiColony;
-    }
 
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public WorkInsideColonyMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        this.aiColony = aiColony;
+        uninitialized = false;
     }
 
     /**
@@ -86,8 +76,11 @@ public class WorkInsideColonyMission extends Mission {
     public WorkInsideColonyMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Convenience accessor for the colony to work in.
@@ -96,13 +89,6 @@ public class WorkInsideColonyMission extends Mission {
      */
     public AIColony getAIColony() {
         return aiColony;
-    }
-
-    /**
-     * Disposes of this <code>Mission</code>.
-     */
-    public void dispose() {
-        super.dispose();
     }
 
 

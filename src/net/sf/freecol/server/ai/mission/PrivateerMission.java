@@ -69,24 +69,14 @@ public class PrivateerMission extends Mission {
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
         Unit unit = aiUnit.getUnit();
-        logger.finest("Assigning PrivateerMission to unit=" + unit + " at " + unit.getTile());
-    }
-
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public PrivateerMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        logger.finest("Assigning PrivateerMission to unit=" + unit
+            + " at " + unit.getTile());
+        uninitialized = false;
     }
 
     /**
-     * Creates a new <code>UnitWanderHostileMission</code> and reads the given element.
+     * Creates a new <code>UnitWanderHostileMission</code> and reads
+     * the given element.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
@@ -94,9 +84,12 @@ public class PrivateerMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public PrivateerMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public PrivateerMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
 
@@ -355,23 +348,6 @@ public class PrivateerMission extends Mission {
     }
 
     /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     */
-    public String getDebuggingInfo() {
-    	StringBuffer sb = new StringBuffer("State: " + state.name());
-    	if(state == PrivateerMissionState.HUNTING && target != null){
-    		Unit targetUnit = target.getDefendingUnit(getUnit());
-    		if(targetUnit != null){
-    			String coord = " (" + target.getX() + "," + target.getY() + ")";
-    			sb.append(" target=" + targetUnit + coord);
-    		}
-    	}
-        return sb.toString();
-    }
-
-    /**
      * Calculates the modifier used when assessing the value of a
      * target to a privateer.
      * Note: it gives a modifier value, other parameters should be
@@ -380,23 +356,28 @@ public class PrivateerMission extends Mission {
      *
      * @param combatModel The <code>Combat Model</code> used.
      * @param attacker The <code>Unit</code> attacking, should be a privateer.
-     * @param defender The <code>Unit</code> the attacker is considering as a target.
-     * @return The modifier value the defender is worth as a target to the privateer
+     * @param defender The <code>Unit</code> the attacker is considering
+     *            as a target.
+     * @return The modifier value the defender is worth as a target to
+     *     the privateer
      */
-    public static int getModifierValueForTarget(CombatModel combatModel, Unit attacker, Unit defender){
-    	// pirates are greedy ;)
-    	int modifier = 100;
-    	modifier += defender.getGoodsCount() * 200;
-    	modifier += defender.getUnitCount() * 100;
+    public static int getModifierValueForTarget(CombatModel combatModel,
+                                                Unit attacker, Unit defender) {
+        // pirates are greedy ;)
+        int modifier = 100;
+        modifier += defender.getGoodsCount() * 200;
+        modifier += defender.getUnitCount() * 100;
 
         // they are also coward
-        if(defender.isOffensiveUnit()){
-        	modifier -= combatModel.getDefencePower(attacker, defender) * 100;
+        if (defender.isOffensiveUnit()) {
+            modifier -= combatModel.getDefencePower(attacker, defender) * 100;
         }
 
         return modifier;
     }
 
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -410,14 +391,25 @@ public class PrivateerMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("state", state.toString());
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
-        state = PrivateerMissionState.valueOf(in.getAttributeValue(null, "state"));
+
+        state = PrivateerMissionState.valueOf(in.getAttributeValue(null,
+                                                                   "state"));
     }
 
     /**

@@ -77,18 +77,17 @@ public class AIUnit extends AIObject implements Transportable {
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
     /**
-     * The FreeColGameObject this AIObject contains AI-information for.
+     * The Unit this AIObject contains AI-information for.
      */
     private Unit unit;
 
     /**
-     * The mission this unit has been assigned.
+     * The mission to which this AI unit has been assigned.
      */
     private Mission mission;
 
     /**
-     * The goal this AIUnit belongs to,
-     * if one has been assigned.
+     * The goal this AIUnit belongs to, if one has been assigned.
      */
     private Goal goal = null;
 
@@ -99,11 +98,26 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * The <code>AIUnit</code> which has this <code>Transportable</code> in
-     * it's transport list. This <code>Transportable</code> has not been
-     * scheduled for transport if this value is <code>null</code>.
+     * its transport list.
      */
-    private AIUnit transport = null;
+    private AIUnit transport;
 
+
+    /**
+     * Creates a new uninitialized <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The identifier for the uninitialized unit.
+     */
+    public AIUnit(AIMain aiMain, String id) {
+        super(aiMain, id);
+
+        unit = null;
+        mission = null;
+        goal = null;
+        dynamicPriority = 0;
+        transport = null;
+    }
 
     /**
      * Creates a new <code>AIUnit</code>.
@@ -112,52 +126,65 @@ public class AIUnit extends AIObject implements Transportable {
      * @param unit The unit to make an {@link AIObject} for.
      */
     public AIUnit(AIMain aiMain, Unit unit) {
-        super(aiMain, unit.getId());
+        this(aiMain, unit.getId());
 
         this.unit = unit;
         mission = new UnitWanderHostileMission(aiMain, this);
+        uninitialized = getUnit() == null;
     }
 
     /**
-     * Creates a new <code>AIUnit</code>.
+     * Creates a new <code>AIUnit</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
      */
     public AIUnit(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
+        super(aiMain, element);
 
+        uninitialized = getUnit() == null;
+    }
+    
     /**
-     * Creates a new <code>AIUnit</code>.
+     * Creates a new <code>AIUnit</code> from the given
+     * XML-representation.
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     * @see AIObject#readFromXML
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
-    public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
+    public AIUnit(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain, in);
+
+        uninitialized = getUnit() == null;
+    }
+
+
+    /**
+     * Disposes this object and any attached mission.
+     */
+    public void dispose() {
+        abortMission("disposed");
+        setTransport(null);
+        super.dispose();
     }
 
     /**
-     * Creates a new <code>AIUnit</code>.
+     * Gets this AI object's identifier.
      *
-     * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
+     * @return The id of the unit.
      */
-    public AIUnit(AIMain aiMain, String id) {
-        super(aiMain, id);
-        unit = (Unit) getAIMain().getFreeColGameObject(id);
+    public String getId() {
         if (unit == null) {
-            logger.warning("Could not find unit: " + id);
+            logger.warning("Uninitialized AI unit");
+            return null;
         }
-        uninitialized = true;
+        return unit.getId();
     }
-
 
     /**
      * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
@@ -178,138 +205,21 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Aborts the given <code>Wish</code>.
+     * Gets the AIPlayer that owns this AIUnit.
      *
-     * @param w The <code>Wish</code> to be aborted.
+     * @return The owning AIPlayer.
      */
-    public void abortWish(Wish w) {
-        if (mission instanceof WishRealizationMission) {
-            // TODO: should we use setMission and dispose the mission as well?
-            mission = null;
-            dynamicPriority = 0;
-        }
-        if (w.getTransportable() == this) {
-            w.dispose();
-        }
+    public AIPlayer getAIOwner() {
+        return getAIMain().getAIPlayer(unit.getOwner());
     }
 
     /**
-     * Gets the <code>Locatable</code> which should be transported.
+     * Convenience accessor for the owning player connection.
      *
-     * @return The <code>Locatable</code>.
+     * @return The connection.
      */
-    public Locatable getTransportLocatable() {
-        return unit;
-    }
-
-    /**
-     * Returns the source for this <code>Transportable</code>. This is
-     * normally the location of the {@link #getTransportLocatable locatable}.
-     *
-     * @return The source for this <code>Transportable</code>.
-     */
-    public Location getTransportSource() {
-        return (getUnit() == null || getUnit().isDisposed()) ? null
-            : getUnit().getLocation();
-    }
-
-    /**
-     * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link
-     * net.sf.freecol.common.model.Tile} of the transport or the
-     * target for the entire <code>Transportable</code>'s mission. The
-     * target for the tansport is determined by {@link
-     * TransportMission} in the latter case.
-     *
-     * @return The destination for this <code>Transportable</code>.
-     */
-    public Location getTransportDestination() {
-        return (getUnit() == null || getUnit().isDisposed() || !hasMission())
-            ? null
-            : mission.getTransportDestination();
-    }
-
-    /**
-     * Gets the priority of transporting this <code>Transportable</code> to
-     * it's destination.
-     *
-     * @return The priority of the transport.
-     */
-    public int getTransportPriority() {
-        if (hasMission()) {
-            return mission.getTransportPriority() + dynamicPriority;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Sets the priority of getting the goods to the {@link
-     * #getTransportDestination}.
-     *
-     * @param transportPriority The priority.
-     */
-    public void setTransportPriority(int transportPriority) {
-        if (hasMission()) {
-            dynamicPriority = transportPriority;
-        }
-    }
-
-    /**
-     * Increases the transport priority of this <code>Transportable</code>.
-     * This method gets called every turn the <code>Transportable</code> have
-     * not been put on a carrier's transport list.
-     */
-    public void increaseTransportPriority() {
-        if (hasMission()) {
-            ++dynamicPriority;
-        }
-    }
-
-    /**
-     * Gets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @return The <code>AIUnit</code> which has this
-     *         <code>Transportable</code> in it's transport list. This
-     *         <code>Transportable</code> has not been scheduled for transport
-     *         if this value is <code>null</code>.
-     *
-     */
-    public AIUnit getTransport() {
-        return transport;
-    }
-
-    /**
-     * Sets the carrier responsible for transporting this
-     * <code>Transportable</code>.
-     *
-     * @param transport The <code>AIUnit</code> which has this
-     *            <code>Transportable</code> in it's transport list. This
-     *            <code>Transportable</code> has not been scheduled for
-     *            transport if this value is <code>null</code>.
-     *
-     */
-    public void setTransport(AIUnit transport) {
-        if (this.transport == transport) return;
-        AIUnit oldTransport = this.transport;
-        this.transport = transport;
-
-        if (oldTransport != null) {
-            // Remove from old carrier:
-            if (oldTransport.getMission() != null && oldTransport.getMission() instanceof TransportMission) {
-                TransportMission tm = (TransportMission) oldTransport.getMission();
-                if (tm.isOnTransportList(this)) {
-                    tm.removeFromTransportList(this);
-                }
-            }
-        }
-
-        if (transport != null && transport.getMission() instanceof TransportMission
-                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
-            // Add to new carrier:
-            ((TransportMission) transport.getMission()).addToTransportList(this);
-        }
+    public Connection getConnection() {
+        return getAIOwner().getConnection();
     }
 
     /**
@@ -373,57 +283,27 @@ public class AIUnit extends AIObject implements Transportable {
      *            with the server.
      */
     public void doMission(Connection connection) {
-        if (mission != null && mission.isValid()) mission.doMission(connection);
-    }
-
-    /**
-     * Disposes this object and any attached mission.
-     */
-    public void dispose() {
-        abortMission("disposed");
-        setTransport(null);
-        super.dispose();
-    }
-
-    /**
-     * Returns the ID of this <code>AIObject</code>.
-     *
-     * @return The same ID as the <code>Unit</code> this <code>AIObject</code>
-     *         controls.
-     */
-    public String getId() {
-        if (unit != null) {
-            return unit.getId();
-        } else {
-            logger.warning("unit == null");
-            return null;
+        if (mission != null && mission.isValid()) {
+            mission.doMission(connection);
         }
     }
 
-    public void setGoal(Goal g) {
-        goal = g;
-    }
-
+    /**
+     * Gets the goal of this AI unit.
+     *
+     * @return The goal of this AI unit.
+     */
     public Goal getGoal() {
         return goal;
     }
 
     /**
-     * Gets the AIPlayer that owns this AIUnit.
+     * Sets the goal of this AI unit.
      *
-     * @return The owning AIPlayer.
+     * @param goal The new <code>Goal</code>.
      */
-    public AIPlayer getAIOwner() {
-        return getAIMain().getAIPlayer(unit.getOwner());
-    }
-
-    /**
-     * Convenience accessor for the owning player connection.
-     *
-     * @return The connection.
-     */
-    public Connection getConnection() {
-        return getAIOwner().getConnection();
+    public void setGoal(Goal goal) {
+        this.goal = goal;
     }
 
     /**
@@ -492,7 +372,145 @@ public class AIUnit extends AIObject implements Transportable {
             && unit != null && !unit.isDisposed();
     }
 
-    
+
+    // Transportable interface
+
+    /**
+     * Returns the source for this <code>Transportable</code>. This is
+     * normally the location of the {@link #getTransportLocatable locatable}.
+     *
+     * @return The source for this <code>Transportable</code>.
+     */
+    public Location getTransportSource() {
+        return (getUnit() == null || getUnit().isDisposed()) ? null
+            : getUnit().getLocation();
+    }
+
+    /**
+     * Returns the destination for this <code>Transportable</code>.
+     * This can either be the target {@link
+     * net.sf.freecol.common.model.Tile} of the transport or the
+     * target for the entire <code>Transportable</code>'s mission. The
+     * target for the tansport is determined by {@link
+     * TransportMission} in the latter case.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */
+    public Location getTransportDestination() {
+        return (getUnit() == null || getUnit().isDisposed() || !hasMission())
+            ? null
+            : mission.getTransportDestination();
+    }
+
+    /**
+     * Gets the priority of transporting this <code>Transportable</code> to
+     * it's destination.
+     *
+     * @return The priority of the transport.
+     */
+    public int getTransportPriority() {
+        if (hasMission()) {
+            return mission.getTransportPriority() + dynamicPriority;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Sets the priority of getting the goods to the {@link
+     * #getTransportDestination}.
+     *
+     * @param transportPriority The priority.
+     */
+    public void setTransportPriority(int transportPriority) {
+        if (hasMission()) {
+            dynamicPriority = transportPriority;
+        }
+    }
+
+    /**
+     * Increases the transport priority of this <code>Transportable</code>.
+     * This method gets called every turn the <code>Transportable</code> have
+     * not been put on a carrier's transport list.
+     */
+    public void increaseTransportPriority() {
+        if (hasMission()) {
+            ++dynamicPriority;
+        }
+    }
+
+    /**
+     * Gets the <code>Locatable</code> which should be transported.
+     *
+     * @return The <code>Locatable</code>.
+     */
+    public Locatable getTransportLocatable() {
+        return unit;
+    }
+
+    /**
+     * Gets the carrier responsible for transporting this
+     * <code>Transportable</code>.
+     *
+     * @return The <code>AIUnit</code> which has this
+     *         <code>Transportable</code> in it's transport list. This
+     *         <code>Transportable</code> has not been scheduled for transport
+     *         if this value is <code>null</code>.
+     *
+     */
+    public AIUnit getTransport() {
+        return transport;
+    }
+
+    /**
+     * Sets the carrier responsible for transporting this
+     * <code>Transportable</code>.
+     *
+     * @param transport The <code>AIUnit</code> which has this
+     *            <code>Transportable</code> in it's transport list. This
+     *            <code>Transportable</code> has not been scheduled for
+     *            transport if this value is <code>null</code>.
+     *
+     */
+    public void setTransport(AIUnit transport) {
+        if (this.transport == transport) return;
+        AIUnit oldTransport = this.transport;
+        this.transport = transport;
+
+        if (oldTransport != null) {
+            // Remove from old carrier:
+            if (oldTransport.getMission() != null && oldTransport.getMission() instanceof TransportMission) {
+                TransportMission tm = (TransportMission) oldTransport.getMission();
+                if (tm.isOnTransportList(this)) {
+                    tm.removeFromTransportList(this);
+                }
+            }
+        }
+
+        if (transport != null && transport.getMission() instanceof TransportMission
+                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+            // Add to new carrier:
+            ((TransportMission) transport.getMission()).addToTransportList(this);
+        }
+    }
+
+    /**
+     * Aborts the given <code>Wish</code>.
+     *
+     * @param w The <code>Wish</code> to be aborted.
+     */
+    public void abortWish(Wish w) {
+        if (mission instanceof WishRealizationMission) {
+            // TODO: should we use setMission and dispose the mission as well?
+            mission = null;
+            dynamicPriority = 0;
+        }
+        if (w.getTransportable() == this) {
+            w.dispose();
+        }
+    }
+
+   
     // Serialization
 
     /**
@@ -506,24 +524,27 @@ public class AIUnit extends AIObject implements Transportable {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
+
         if (transport != null) {
             if (transport.getUnit() == null) {
                 logger.warning("transport.getUnit() == null");
             } else if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
-            } else if (transport.getMission() != null && transport.getMission() instanceof TransportMission
-                    && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+            } else if (transport.getMission() != null
+                && transport.getMission() instanceof TransportMission
+                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
                 logger.warning("We should not be on the transport list.");
             } else {
                 out.writeAttribute("transport", transport.getUnit().getId());
             }
         }
+
         if (mission != null) {
             if (mission.isValid()) {
                 mission.toXML(out);
             } else {
                 logger.warning("AI unit with invalid mission " + mission
-                               + ": " + this);
+                    + ": " + this);
             }
         }
 
@@ -539,80 +560,82 @@ public class AIUnit extends AIObject implements Transportable {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        final String inID = in.getAttributeValue(null, ID_ATTRIBUTE);
-        unit = (Unit) getAIMain().getFreeColGameObject(inID);
+        final AIMain aiMain = getAIMain();
+        String str, tag;
 
-        if (unit == null) {
-            logger.warning("Could not find unit: " + inID);
-        }
+        str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        unit = (Unit)aiMain.getFreeColGameObject(str);
+        if (unit == null) logger.warning("Could not find unit: " + str);
 
-        final String transportStr = in.getAttributeValue(null, "transport");
-        if (transportStr != null) {
-            transport = (AIUnit) getAIMain().getAIObject(transportStr);
-            if (transport == null) {
-                transport = new AIUnit(getAIMain(), transportStr);
+        str = in.getAttributeValue(null, "transport");
+        if (str != null) {
+            if ((transport = (AIUnit)aiMain.getAIObject(str)) == null) {
+                transport = new AIUnit(aiMain, str);
             }
         } else {
             transport = null;
         }
 
         if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
-                mission = new UnitWanderHostileMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(UnitWanderMission.getXMLElementTagName())) {
-                mission = new UnitWanderMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(IndianBringGiftMission.getXMLElementTagName())) {
-                mission = new IndianBringGiftMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(BuildColonyMission.getXMLElementTagName())) {
-                mission = new BuildColonyMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(IndianDemandMission.getXMLElementTagName())) {
-                mission = new IndianDemandMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(TransportMission.getXMLElementTagName())) {
-                mission = new TransportMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(WishRealizationMission.getXMLElementTagName())) {
-                mission = new WishRealizationMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
-                mission = new UnitSeekAndDestroyMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(PioneeringMission.getXMLElementTagName())
-                // @compat 0.10.3
-                || in.getLocalName().equals("tileImprovementPlanMission")) {
-                // @end compatibility code                
-                mission = new PioneeringMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(DefendSettlementMission.getXMLElementTagName())) {
-                mission = new DefendSettlementMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
-                mission = new WorkInsideColonyMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(ScoutingMission.getXMLElementTagName())) {
-                mission = new ScoutingMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(CashInTreasureTrainMission.getXMLElementTagName())) {
-                mission = new CashInTreasureTrainMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(IdleAtSettlementMission.getXMLElementTagName())
+            tag = in.getLocalName();
+            if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
+                mission = new BuildColonyMission(aiMain, in);
+            } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
+                mission = new CashInTreasureTrainMission(aiMain, in);
+            } else if (tag.equals(DefendSettlementMission.getXMLElementTagName())) {
+                mission = new DefendSettlementMission(aiMain, in);
+            } else if (tag.equals(IdleAtSettlementMission.getXMLElementTagName())
                 // @compat 0.10.5
-                || in.getLocalName().equals("idleAtColonyMission")
+                || tag.equals("idleAtColonyMission")
                 // @end compatibility code
                 ) {
-                mission = new IdleAtSettlementMission(getAIMain(), in);
-            } else if (in.getLocalName().equals(PrivateerMission.getXMLElementTagName())) {
-                mission = new PrivateerMission(getAIMain(), in);
+                mission = new IdleAtSettlementMission(aiMain, in);
+            } else if (tag.equals(IndianBringGiftMission.getXMLElementTagName())) {
+                mission = new IndianBringGiftMission(aiMain, in);
+            } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
+                mission = new IndianDemandMission(aiMain, in);
+            } else if (tag.equals(PioneeringMission.getXMLElementTagName())
+                // @compat 0.10.3
+                || tag.equals("tileImprovementPlanMission")) {
+                // @end compatibility code                
+                mission = new PioneeringMission(aiMain, in);
+            } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
+                mission = new PrivateerMission(aiMain, in);
+            } else if (tag.equals(ScoutingMission.getXMLElementTagName())) {
+                mission = new ScoutingMission(aiMain, in);
+            } else if (tag.equals(TransportMission.getXMLElementTagName())) {
+                mission = new TransportMission(aiMain, in);
+            } else if (tag.equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
+                mission = new UnitSeekAndDestroyMission(aiMain, in);
+            } else if (tag.equals(UnitWanderHostileMission.getXMLElementTagName())) {
+                mission = new UnitWanderHostileMission(aiMain, in);
+            } else if (tag.equals(UnitWanderMission.getXMLElementTagName())) {
+                mission = new UnitWanderMission(aiMain, in);
+            } else if (tag.equals(WishRealizationMission.getXMLElementTagName())) {
+                mission = new WishRealizationMission(aiMain, in);
+            } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
+                mission = new WorkInsideColonyMission(aiMain, in);
             } else {
-                logger.warning("Could not find mission-class for: " + in.getLocalName());
-                mission = new UnitWanderHostileMission(getAIMain(), this);
-                return;
+                mission = null;
+                logger.warning("Could not find mission-class for: " + tag);
             }
 
             in.nextTag();
         }
+
+        tag = in.getLocalName();
+        if (!tag.equals(getXMLElementTagName())) {
+            logger.warning("Expected end " + getXMLElementTagName()
+                + " tag, received: " + tag);
+        }
     }
 
     /**
-     * Returns a <code>String</code>-representation of this object.
-     *
-     * @return A <code>String</code> representing this object for
-     *     debugging purposes.
+     * {@inherit-doc}
      */
     @Override
     public String toString() {
-        return "AIUnit@" + hashCode() + "[ " + unit + " ]";
+        return "[AIUnit " + unit + " ]";
     }
 
     /**

@@ -19,8 +19,15 @@
 
 package net.sf.freecol.common.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -28,6 +35,12 @@ import java.util.logging.Logger;
  * Collection of small static helper methods.
  */
 public class Utils {
+
+    private static final Logger logger = Logger.getLogger(Utils.class.getName());
+
+    /** Hex constant digits for get/restoreRandomState. */
+    private static final String HEX_DIGITS = "0123456789ABCDEF";
+
 
     /**
      * Joins the given strings.
@@ -152,5 +165,55 @@ public class Utils {
     public static <T> T getRandomMember(Logger logger, String logMe,
                                         List<T> list, Random random) {
         return list.get(randomInt(logger, logMe, random, list.size()));
+    }
+
+    /**
+     * Get the internal state of a random number generator as a
+     * string.  It would have been more convenient to simply return
+     * the current seed, but unfortunately it is private.
+     *
+     * @return A <code>String</code> encapsulating the object state.
+     */
+    public static synchronized String getRandomState(Random random) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(random);
+            oos.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException("IO exception in memory!?", e);
+        }
+        byte[] bytes = bos.toByteArray();
+        StringBuffer sb = new StringBuffer(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
+            sb.append(HEX_DIGITS.charAt(b & 0x0F));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Restore a previously saved state.
+     *
+     * @param state The saved state (@see #getRandomState()).
+     * @return The restored <code>Random</code>.
+     */
+    public static synchronized Random restoreRandomState(String state) {
+        if (state == null || state.length() == 0) return null;
+        byte[] bytes = new byte[state.length() / 2];
+        int pos = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+            bytes[i] <<= 4;
+            bytes[i] |= (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+        }
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        try {
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            return (Random) ois.readObject();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Unable to restore random state.", e);
+        }
+        return null;
     }
 }

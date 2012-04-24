@@ -51,40 +51,54 @@ public abstract class Wish extends ValuedAIObject {
 
 
     /**
-     * Creates a new <code>Wish</code> from the given XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *       of a <code>Wish</code>.
-     */
-    public Wish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
-
-    /**
-     * Creates a new <code>Wish</code> from the given XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public Wish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
-    }
-
-    /**
-     * Creates a new <code>Wish</code>.
+     * Creates a new uninitialized <code>Wish</code>.
      *
      * @param aiMain The main AI-object.
      * @param id The unique ID of this object.
      */
     public Wish(AIMain aiMain, String id) {
         super(aiMain, id);
+
+        destination = null;
+        transportable = null;
     }
 
+    /**
+     * Creates a new <code>Wish</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
+     */
+    public Wish(AIMain aiMain, Element element) {
+        super(aiMain, element);
+    }
+    
+    /**
+     * Creates a new <code>Wish</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Wish(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain, in);
+    }
+
+
+    /**
+     * Disposes of this <code>AIObject</code> by removing any references
+     * to this object.
+     */
+    public void dispose() {
+        destination = null;
+        transportable = null;
+        super.dispose();
+    }
 
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.
@@ -117,16 +131,6 @@ public abstract class Wish extends ValuedAIObject {
      */
     public void setTransportable(Transportable transportable) {
         this.transportable = transportable;
-    }
-
-    /**
-     * Disposes of this <code>AIObject</code> by removing any references
-     * to this object.
-     */
-    public void dispose() {
-        destination = null;
-        transportable = null;
-        super.dispose();
     }
 
     /**

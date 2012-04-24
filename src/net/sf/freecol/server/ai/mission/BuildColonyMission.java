@@ -90,21 +90,11 @@ public class BuildColonyMission extends Mission {
      */
     public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
+
         setTarget(target);
         logger.finest(tag + " starts with target " + target
             + " and value " + colonyValue + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Creates a new <code>BuildColonyMission</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public BuildColonyMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -119,8 +109,11 @@ public class BuildColonyMission extends Mission {
     public BuildColonyMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Sets the target of this mission.
@@ -455,24 +448,6 @@ public class BuildColonyMission extends Mission {
         }
     }
 
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!"
-     *         where <code>x</code> and <code>y</code> is the
-     *         coordinates of the target tile for this mission, and
-     *         <code>z</code> is the value of building the colony. The
-     *         exclamation mark is added if the unit should continue
-     *         searching for a colony site if the targeted site is
-     *         lost.
-     */
-    public String getDebuggingInfo() {
-        final String targetName = (target != null) ? target.toString()
-            : "unassigned";
-        return targetName + " " + colonyValue;
-    }
-
 
     // Serialization
 
@@ -496,23 +471,30 @@ public class BuildColonyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         if (target != null) {
             writeAttribute(out, "target", (FreeColGameObject)target);
+
+            if (colonyValue > 0) {
+                out.writeAttribute("value", Integer.toString(colonyValue));
+            }
         }
     }
 
     /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
+     * {@inherit-doc}
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         FreeColGameObject fcgo = getGame()
             .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
-        if (fcgo instanceof Location) setTarget((Location)fcgo);
+        if (fcgo instanceof Tile || fcgo instanceof Colony) {
+            target = (Location)fcgo;
+        }
+
+        colonyValue = getAttribute(in, "value", -1);
     }
 
     /**

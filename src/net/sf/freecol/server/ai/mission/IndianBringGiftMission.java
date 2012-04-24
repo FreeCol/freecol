@@ -83,21 +83,9 @@ public class IndianBringGiftMission extends Mission {
         this.completed = false;
 
         if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
-            logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
             throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
         }
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public IndianBringGiftMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -109,10 +97,14 @@ public class IndianBringGiftMission extends Mission {
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public IndianBringGiftMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public IndianBringGiftMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Performs the mission.
@@ -226,23 +218,8 @@ public class IndianBringGiftMission extends Mission {
         return false;
     }
 
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
-     *         "[ColonyName] Getting gift: (x, y)".
-     */
-    public String getDebuggingInfo() {
-        if (!hasGift()) {
-            return "[" + target.getName() + "] Getting gift: "
-                    + getUnit().getIndianSettlement().getTile().getPosition();
-        } else {
-            return "[" + target.getName() + "] "
-                + getUnit().getGoodsIterator().next().getNameKey();
-        }
-    }
 
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -256,11 +233,17 @@ public class IndianBringGiftMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (target != null) {
             out.writeAttribute("target", target.getId());
         }
+
         out.writeAttribute("completed", Boolean.toString(completed));
     }
 
@@ -272,16 +255,18 @@ public class IndianBringGiftMission extends Mission {
      * @throws XMLStreamException if there are any problems reading
      *             from the stream.
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
-        String targetString = in.getAttributeValue(null, "target");
-        target = (targetString == null) ? null
-            : (Colony) getGame().getFreeColGameObject(targetString);
-        String completedString = in.getAttributeValue(null, "completed");
-        if (completedString == null) { // @compat 0.9.x
-            completedString = in.getAttributeValue(null, "giftDelivered");
-        } // end compatibility code
-        completed = Boolean.valueOf(completedString).booleanValue();
+
+        String str = in.getAttributeValue(null, "target");
+        target = (Colony)getGame().getFreeColGameObject(str);
+
+        str = in.getAttributeValue(null, "completed");
+        // @compat 0.9.x
+        if (str == null) str = in.getAttributeValue(null, "giftDelivered");
+        // end compatibility code
+        completed = Boolean.valueOf(str).booleanValue();
     }
 
     /**

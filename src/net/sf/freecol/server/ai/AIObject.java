@@ -28,6 +28,8 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 
+import org.w3c.dom.Element;
+
 
 /**
  * An <code>AIObject</code> contains AI-related information and methods.
@@ -47,7 +49,7 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
-     * Creates a new <code>AIObject</code>.
+     * Creates a new uninitialized <code>AIObject</code>.
      *
      * @param aiMain The main AI-object.
      */
@@ -57,20 +59,68 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>AIObject</code> and registers
-     * this object with <code>AIMain</code>.
+     * Creates a new uninitialized <code>AIObject</code> with a registerable
+     * AI id.
      *
      * @param aiMain The main AI-object.
      * @param id The unique identifier.
      * @see AIMain#addAIObject(String, AIObject)
      */
     public AIObject(AIMain aiMain, String id) {
-        this.aiMain = aiMain;
+        this(aiMain);
+
+        if (id == null) {
+            throw new IllegalArgumentException("Can not register AIObject with null id.");
+        }
         setId(id);
         aiMain.addAIObject(id, this);
-        uninitialized = false;
+        uninitialized = true;
     }
 
+    /**
+     * Creates a new <code>AIObject</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an XML-representation
+     *            of this object.
+     */
+    public AIObject(AIMain aiMain, Element element) {
+        this(aiMain);
+
+        readFromXMLElement(element);
+        if (getId() != null) {
+            aiMain.addAIObject(getId(), this);
+            uninitialized = false;
+        }
+    }
+
+    /**
+     * Creates a new <code>AIObject</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
+     * @see AIObject#readFromXML
+     */
+    public AIObject(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        this(aiMain);
+
+        readFromXML(in);
+        if (getId() != null) {
+            aiMain.addAIObject(getId(), this);
+            uninitialized = false;
+        }
+    }
+
+
+    /**
+     * Disposes this <code>AIObject</code> by removing the reference
+     * to this object from the enclosing AIMain.
+     */
+    public void dispose() {
+        getAIMain().removeAIObject(getId());
+    }
 
     /**
      * Convenience accessor for the main AI-object.
@@ -109,14 +159,6 @@ public abstract class AIObject extends FreeColObject {
      */
     public boolean isUninitialized() {
         return uninitialized;
-    }
-
-    /**
-     * Disposes this <code>AIObject</code> by removing
-     * any referances to this object.
-     */
-    public void dispose() {
-        getAIMain().removeAIObject(getId());
     }
 
     /**

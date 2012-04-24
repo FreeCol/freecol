@@ -119,6 +119,7 @@ public class TransportMission extends Mission {
         }
     }
 
+
     /**
      * Creates a mission for the given <code>AIUnit</code>.
      *
@@ -129,21 +130,9 @@ public class TransportMission extends Mission {
         super(aiMain, aiUnit);
 
         if (!getUnit().isCarrier()) {
-            logger.warning("Only carriers can transport unit/goods.");
-            throw new IllegalArgumentException("Only carriers can transport unit/goods.");
+            throw new IllegalArgumentException("Carrier required: " + aiUnit);
         }
-    }
-
-    /**
-     * Loads a <code>TransportMission</code> from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public TransportMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -158,7 +147,37 @@ public class TransportMission extends Mission {
     public TransportMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
+    }
+
+
+    /**
+     * Disposes this <code>Mission</code>.
+     */
+    public void dispose() {
+        // a new list must be created as the first one may be changed
+        //elsewhere in between loop calls
+        List<Transportable> cargoList = new ArrayList<Transportable>();
+        List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
+
+        Iterator<Transportable> ti = transportList.iterator();
+        while (ti.hasNext()) {
+            Transportable t = ti.next();
+            // the cargo is on board, add to list to be disposed of
+            if (isCarrying(t)) {
+                cargoList.add(t);
+            } else {
+                // the cargo was scheduled to be transported
+                // cancel order
+                scheduledCargoList.add(t);
+            }
+        }
+
+        for (Transportable t : cargoList) ((AIObject) t).dispose();
+        for (Transportable t : scheduledCargoList) t.setTransport(null);
+        super.dispose();
     }
 
     /**
@@ -230,33 +249,6 @@ public class TransportMission extends Mission {
         return t != null
             && t.getTransportLocatable() != null
             && t.getTransportLocatable().getLocation() == getUnit();
-    }
-
-    /**
-     * Disposes this <code>Mission</code>.
-     */
-    public void dispose() {
-        // a new list must be created as the first one may be changed
-        //elsewhere in between loop calls
-        List<Transportable> cargoList = new ArrayList<Transportable>();
-        List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
-
-        Iterator<Transportable> ti = transportList.iterator();
-        while (ti.hasNext()) {
-            Transportable t = ti.next();
-            // the cargo is on board, add to list to be disposed of
-            if (isCarrying(t)) {
-                cargoList.add(t);
-            } else {
-                // the cargo was scheduled to be transported
-                // cancel order
-                scheduledCargoList.add(t);
-            }
-        }
-
-        for (Transportable t : cargoList) ((AIObject) t).dispose();
-        for (Transportable t : scheduledCargoList) t.setTransport(null);
-        super.dispose();
     }
 
     /**
@@ -1468,20 +1460,8 @@ public class TransportMission extends Mission {
         return units;
     }
 
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
-     *         <code>x</code> and <code>y</code> is the coordinates of the
-     *         target tile for this mission, and <code>z</code> is the value
-     *         of building the colony. The exclamation mark is added if the unit
-     *         should continue searching for a colony site if the targeted site
-     *         is lost.
-     */
-    public String getDebuggingInfo() {
-        return this.toString();
-    }
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -1495,22 +1475,28 @@ public class TransportMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        Iterator<Transportable> tli = transportList.iterator();
-        while (tli.hasNext()) {
-            Transportable t = tli.next();
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeChildren(XMLStreamWriter out)
+        throws XMLStreamException {
+        for (Transportable t : transportList) {
             out.writeStartElement(ELEMENT_TRANSPORTABLE);
-            out.writeAttribute(ID_ATTRIBUTE, ((AIObject) t).getId());
+            out.writeAttribute(ID_ATTRIBUTE, ((AIObject)t).getId());
             out.writeEndElement();
         }
     }
 
+    /**
+     * {@inherit-doc}
+     */
     protected void readChildren(XMLStreamReader in)
         throws XMLStreamException {
         transportList.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(ELEMENT_TRANSPORTABLE)) {
+            String tag = in.getLocalName();
+            if (tag.equals(ELEMENT_TRANSPORTABLE)) {
                 String tid = in.getAttributeValue(null, ID_ATTRIBUTE);
                 AIObject ao = getAIMain().getAIObject(tid);
                 if (ao == null) {
@@ -1520,15 +1506,14 @@ public class TransportMission extends Mission {
                         ao = new AIGoods(getAIMain(), tid);
                     }
                 }
-                if (!(ao instanceof Transportable)) {
-                    logger.warning("AIObject not Transportable, ID: "
-                                   + in.getAttributeValue(null, ID_ATTRIBUTE));
-                } else {
+                if (ao instanceof Transportable) {
                     transportList.add((Transportable) ao);
+                } else {
+                    logger.warning("Transportable expected: " + tid);
                 }
-                in.nextTag();
+                in.nextTag(); // Consume closing tag
             } else {
-                logger.warning("Unknown tag.");
+                logger.warning("Unknown TransportMission tag: " + tag);
             }
         }
     }

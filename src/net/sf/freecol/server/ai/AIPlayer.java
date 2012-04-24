@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -73,8 +74,8 @@ public abstract class AIPlayer extends AIObject {
      */
     private ServerPlayer player;
 
-    // A PRNG to use for this AI player.
-    private Random aiRandom = null;
+    /** The PRNG to use for this AI player. */
+    private Random aiRandom;
 
     /**
      * Temporary variable, used for debugging purposes only.
@@ -95,16 +96,47 @@ public abstract class AIPlayer extends AIObject {
      * Creates a new AI player.
      *
      * @param aiMain The <code>AIMain</code> the player exists within.
-     * @param id The identifier for the player.
+     * @param player The <code>ServerPlayer</code> to associate this
+     *            AI player with.
      */
-    public AIPlayer(AIMain aiMain, String id) {
-        super(aiMain, id);
-        aiRandom = new Random(aiMain.getRandomSeed("Seed for " + id));
+    public AIPlayer(AIMain aiMain, ServerPlayer player) {
+        super(aiMain, player.getId());
+
+        setPlayer(player);
+        aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
+    }
+
+    /**
+     * Creates a new <code>AIPlayer</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public AIPlayer(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain, in);
     }
 
 
     /**
-     * Returns the <code>Player</code> this <code>AIPlayer</code> is
+     * Gets this AI object's identifier.
+     *
+     * @return The id of the player.
+     */
+    @Override
+    public String getId() {
+        if (player == null) {
+            logger.warning("Uninitialized AI player");
+            return null;
+        }
+        return player.getId();
+    }
+
+    /**
+     * Gets the <code>Player</code> this <code>AIPlayer</code> is
      * controlling.
      *
      * @return The <code>Player</code>.
@@ -119,17 +151,6 @@ public abstract class AIPlayer extends AIObject {
      */
     protected void setPlayer(ServerPlayer p) {
         player = p;
-    }
-
-    /**
-     * Returns the ID for this <code>AIPlayer</code>. This is the same as the
-     * ID for the {@link Player} this <code>AIPlayer</code> controls.
-     *
-     * @return The ID.
-     */
-    @Override
-    public String getId() {
-        return player.getId();
     }
 
     /**
@@ -593,7 +614,11 @@ public abstract class AIPlayer extends AIObject {
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+
         out.writeAttribute(ID_ATTRIBUTE, getId());
+
+        out.writeAttribute("randomState", Utils.getRandomState(aiRandom));
+
         out.writeEndElement();
     }
 
@@ -607,8 +632,15 @@ public abstract class AIPlayer extends AIObject {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
-        setPlayer((ServerPlayer) getAIMain()
-            .getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
+        final AIMain aiMain = getAIMain();
+
+        setPlayer((ServerPlayer)aiMain.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
+        
+        Random rnd = Utils.restoreRandomState(in.getAttributeValue(null,
+                "randomState"));
+        aiRandom = (rnd != null) ? rnd
+            : new Random(aiMain.getRandomSeed("Seed for " + getId()));
+
         in.nextTag();
     }
 

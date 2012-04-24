@@ -51,19 +51,8 @@ public class UnitWanderMission extends Mission {
      */
     public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-    }
 
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public UnitWanderMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -76,33 +65,43 @@ public class UnitWanderMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public UnitWanderMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public UnitWanderMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
-    /**
-    * Performs the mission. This is done by moving in a random direction
-    * until the move points are zero or the unit gets stuck.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
-    public void doMission(Connection connection) {
-        Unit unit = getUnit();
 
-        while(unit.getMovesLeft() > 0) {
-            moveRandomly();
-        }
-    }
+    // Mission interface
 
     /**
      * Returns true if this Mission should only be carried out once.
      *
-     * @return true
+     * @return True.
      */
+    @Override
     public boolean isOneTime() {
         return true;
     }
+
+    /**
+     * Performs the mission. This is done by moving in a random direction
+     * until the move points are zero or the unit gets stuck.
+     *
+     * @param connection The <code>Connection</code> to the server.
+     */
+    public void doMission(Connection connection) {
+        Unit unit = getUnit();
+
+        while (unit.getMovesLeft() > 0) {
+            moveRandomly();
+        }
+    }
+
+
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related

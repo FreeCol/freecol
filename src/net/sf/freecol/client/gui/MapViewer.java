@@ -2710,8 +2710,7 @@ public final class MapViewer {
         }
 
         // FOR DEBUGGING:
-        if (debugShowMission
-            && freeColClient.getFreeColServer() != null
+        if (freeColClient.getFreeColServer() != null
             && (unit.getOwner().isAI()
                 || unit.hasAbility(Ability.PIRACY))) {
             net.sf.freecol.server.ai.AIUnit au = freeColClient
@@ -2719,21 +2718,16 @@ public final class MapViewer {
             if (au != null) {
                 g.setColor(Color.WHITE);
                 String text = (unit.getOwner().isAI()) ? "" : "(";
-                String debuggingInfo = "";
                 if (au.getMission() != null) {
                     String missionName = au.getMission().getClass().toString();
                     missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
 
                     text += missionName;
-                    if (debugShowMissionInfo) {
-                        debuggingInfo = au.getMission().getDebuggingInfo();
-                    }
                 } else {
                     text += "No mission";
                 }
                 text += (unit.getOwner().isAI()) ? "" : ")";
                 g.drawString(text, 0 , 0);
-                g.drawString(debuggingInfo, 0 , 25);
             }
         }
     }

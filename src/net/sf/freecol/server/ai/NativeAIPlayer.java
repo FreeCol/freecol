@@ -114,20 +114,9 @@ public class NativeAIPlayer extends AIPlayer {
      *            <code>AIPlayer</code>.
      */
     public NativeAIPlayer(AIMain aiMain, ServerPlayer player) {
-        super(aiMain, player.getId());
-        setPlayer(player);
-    }
+        super(aiMain, player);
 
-    /**
-     * Creates a new <code>AIPlayer</code> and reads the information from the
-     * given <code>Element</code>.
-     *
-     * @param aiMain The main AI-class.
-     * @param element The XML-element containing information.
-     */
-    public NativeAIPlayer(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
+        uninitialized = getPlayer() == null;
     }
 
     /**
@@ -137,14 +126,15 @@ public class NativeAIPlayer extends AIPlayer {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public NativeAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
+    public NativeAIPlayer(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
+        super(aiMain, in);
+
+        uninitialized = getPlayer() == null;
     }
 
 
-/* IMPLEMENTATION (AIPlayer interface) ****************************************/
-
+    // AIPlayer interface
 
     /**
      * Tells this <code>AIPlayer</code> to make decisions. The

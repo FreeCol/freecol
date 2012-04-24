@@ -48,6 +48,20 @@ public class WorkerWish extends Wish {
 
 
     /**
+     * Creates a new uninitialized <code>WorkerWish</code> from the given
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public WorkerWish(AIMain aiMain, String id) {
+        super(aiMain, id);
+
+        unitType = null;
+        expertNeeded = false;
+    }
+
+    /**
      * Creates a new <code>WorkerWish</code>.
      *
      * @param aiMain The main AI-object.
@@ -63,7 +77,7 @@ public class WorkerWish extends Wish {
      */
     public WorkerWish(AIMain aiMain, Location destination, int value,
                       UnitType unitType, boolean expertNeeded) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+        this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -73,6 +87,7 @@ public class WorkerWish extends Wish {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
+        uninitialized = false;
     }
 
     /**
@@ -80,14 +95,15 @@ public class WorkerWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *       of a <code>WorkerWish</code>.
+     * @param element The root element for the XML-representation 
+     *       of a <code>Wish</code>.
      */
     public WorkerWish(AIMain aiMain, Element element) {
-        super(aiMain, element.getAttribute(ID_ATTRIBUTE));
-        readFromXMLElement(element);
-    }
+        super(aiMain, element);
 
+        uninitialized = getDestination() == null;
+    }
+    
     /**
      * Creates a new <code>WorkerWish</code> from the given
      * XML-representation.
@@ -99,19 +115,9 @@ public class WorkerWish extends Wish {
      */
     public WorkerWish(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in.getAttributeValue(null, ID_ATTRIBUTE));
-        readFromXML(in);
-    }
+        super(aiMain, in);
 
-    /**
-     * Creates a new <code>WorkerWish</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
-     */
-    public WorkerWish(AIMain aiMain, String id) {
-        super(aiMain, id);
+        uninitialized = getDestination() == null;
     }
 
 
@@ -164,21 +170,20 @@ public class WorkerWish extends Wish {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (destination == null) {
-            // Avoid writing corrupt WorkerWish, mitigating #3084370.
-            return;
-        }
-
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
+
         out.writeAttribute("destination", destination.getId());
+
         if (transportable != null) {
             out.writeAttribute("transportable", transportable.getId());
         }
+
         out.writeAttribute("value", Integer.toString(getValue()));
 
         out.writeAttribute("unitType", unitType.getId());
+
         out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
 
         out.writeEndElement();
@@ -193,22 +198,27 @@ public class WorkerWish extends Wish {
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String str = in.getAttributeValue(null, "destination");
-        destination = (Location) getAIMain().getFreeColGameObject(str);
+        destination = (Location)aiMain.getFreeColGameObject(str);
 
         if ((str = in.getAttributeValue(null, "transportable")) != null) {
-            transportable = (Transportable) getAIMain().getAIObject(str);
-            if (transportable == null) {
-                transportable = new AIUnit(getAIMain(), str);
+            if ((transportable = (AIUnit)aiMain.getAIObject(str)) == null) {
+                transportable = new AIUnit(aiMain, str);
             }
         } else {
             transportable = null;
         }
+
         setValue(getAttribute(in, "value", -1));
+
         str = in.getAttributeValue(null, "unitType");
+
         unitType = getSpecification().getUnitType(str);
+
         expertNeeded = getAttribute(in, "expertNeeded", false);
 
         in.nextTag();

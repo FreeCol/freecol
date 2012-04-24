@@ -20,14 +20,10 @@
 package net.sf.freecol.server;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -83,6 +79,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
@@ -122,9 +119,6 @@ public final class FreeColServer {
 
     private static final int NUMBER_OF_HIGH_SCORES = 10;
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
-
-    /** Hex constant digits for get/restoreRandomState. */
-    private static final String HEX_DIGITS = "0123456789ABCDEF";
 
     /**
      * The save game format used for saving games.
@@ -871,7 +865,7 @@ public final class FreeColServer {
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
-            xsw.writeAttribute("randomState", getRandomState(random));
+            xsw.writeAttribute("randomState", Utils.getRandomState(random));
             if (getActiveUnit() != null) {
                 xsw.writeAttribute("activeUnit", getActiveUnit().getId());
             }
@@ -980,13 +974,7 @@ public final class FreeColServer {
                 server.setPublicServer(FreeColObject.getAttribute(xsr,
                         "publicServer", false));
                 String randomState = xsr.getAttributeValue(null, "randomState");
-                if (randomState != null && randomState.length() > 0) {
-                    try {
-                        server.setServerRandom(restoreRandomState(randomState));
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "Failed to restore random state!", e);
-                    }
-                }
+                server.setServerRandom(Utils.restoreRandomState(randomState));
                 server.setOwner(xsr.getAttributeValue(null, "owner"));
                 active = xsr.getAttributeValue(null, "activeUnit");
             }
@@ -1690,57 +1678,5 @@ public final class FreeColServer {
 
     public void shutdown() {
         server.shutdown();
-    }
-
-
-    /**
-     * Get the internal state of a random number generator as a
-     * string.  It would have been more convenient to simply return
-     * the current seed, but unfortunately it is private.
-     *
-     * @param random The <code>Random</code> to use.
-     * @return A <code>String</code> encapsulating the object state.
-     */
-    public static synchronized String getRandomState(Random random) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(random);
-            oos.flush();
-        } catch (IOException e) {
-            throw new IllegalStateException("IO exception in memory!?", e);
-        }
-        byte[] bytes = bos.toByteArray();
-        StringBuffer sb = new StringBuffer(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
-            sb.append(HEX_DIGITS.charAt(b & 0x0F));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Restore a previously saved state.
-     *
-     * @param state The saved state (@see #getRandomState()).
-     * @return The restored <code>Random</code>.
-     * @throws IOException if unable to restore state.
-     */
-    public static synchronized Random restoreRandomState(String state)
-        throws IOException {
-        byte[] bytes = new byte[state.length() / 2];
-        int pos = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
-            bytes[i] <<= 4;
-            bytes[i] |= (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
-        }
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        try {
-            return (Random) ois.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Failed to restore ServerRandom!");
-        }
     }
 }

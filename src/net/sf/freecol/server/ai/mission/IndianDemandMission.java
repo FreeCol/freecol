@@ -74,21 +74,9 @@ public class IndianDemandMission extends Mission {
         this.target = target;
 
         if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
-            logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
             throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
         }
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public IndianDemandMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -100,10 +88,14 @@ public class IndianDemandMission extends Mission {
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public IndianDemandMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public IndianDemandMission(AIMain aiMain, XMLStreamReader in)
+        throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
+
 
     /**
      * Performs the mission.
@@ -317,27 +309,7 @@ public class IndianDemandMission extends Mission {
     }
 
 
-    /**
-     * Gets debugging information about this mission. This string is a short
-     * representation of this object's state.
-     *
-     * @return The <code>String</code>: "[ColonyName] GIFT_TYPE" or
-     *         "[ColonyName] Getting gift: (x, y)".
-     */
-    public String getDebuggingInfo() {
-        if (getUnit().getIndianSettlement() == null) {
-            return "invalid";
-        }
-        final String targetName = (target != null) ? target.getName() : "null";
-        if (!hasTribute()) {
-            return "[" + targetName + "] Getting tribute: "
-                + getUnit().getIndianSettlement().getTile().getPosition();
-        } else {
-            return "[" + targetName + "] "
-                + getUnit().getGoodsIterator().next().getNameKey();
-        }
-    }
-
+    // Serialization
 
     /**
      * Writes all of the <code>AIObject</code>s and other AI-related
@@ -351,12 +323,19 @@ public class IndianDemandMission extends Mission {
         toXML(out, getXMLElementTagName());
     }
 
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    /**
+     * {@inherit-doc}
+     */
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
         super.writeAttributes(out);
+
         if (target != null) {
             out.writeAttribute("target", target.getId());
         }
+
         out.writeAttribute("completed", Boolean.toString(completed));
+
         out.writeAttribute("demanded", Boolean.toString(demanded));
     }
 
@@ -368,16 +347,19 @@ public class IndianDemandMission extends Mission {
      * @throws XMLStreamException if there are any problems reading
      *             from the stream.
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
-        String targetString = in.getAttributeValue(null, "target");
-        target = (targetString == null) ? null
-            : (Colony) getGame().getFreeColGameObject(targetString);
-        String completedString = in.getAttributeValue(null, "completed");
-        completed = Boolean.valueOf(completedString).booleanValue();
-        String demandedString = in.getAttributeValue(null, "demanded");
-        demanded = (demandedString == null) ? false
-            : Boolean.valueOf(demandedString).booleanValue();
+
+        String str = in.getAttributeValue(null, "target");
+        target = (str == null) ? null
+            : (Colony)getGame().getFreeColGameObject(str);
+
+        str = in.getAttributeValue(null, "completed");
+        completed = Boolean.valueOf(str).booleanValue();
+
+        str = in.getAttributeValue(null, "demanded");
+        demanded = Boolean.valueOf(str).booleanValue();
     }
 
     /**

@@ -65,9 +65,11 @@ public class WorkLocationPlan extends ValuedAIObject {
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation,
                             GoodsType goodsType) {
         super(aiMain);
+
         this.workLocation = workLocation;
         this.goodsType = goodsType;
         setValue(getProductionOf(goodsType));
+        uninitialized = false;
     }
 
     /**
@@ -78,8 +80,8 @@ public class WorkLocationPlan extends ValuedAIObject {
      *      XML-representation of this object.
      */
     public WorkLocationPlan(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        super(aiMain, element);
+
         setValue(getProductionOf(goodsType));
     }
 
@@ -186,6 +188,8 @@ public class WorkLocationPlan extends ValuedAIObject {
     }
 
 
+    // Serialization
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // do nothing
     }
@@ -213,8 +217,10 @@ public class WorkLocationPlan extends ValuedAIObject {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute(ID_ATTRIBUTE));
+        workLocation = (WorkLocation)getAIMain().getFreeColGameObject(element.getAttribute(ID_ATTRIBUTE));
+
         priority = Integer.parseInt(element.getAttribute("priority"));
+
         goodsType = getSpecification().getGoodsType(element.getAttribute("goodsType"));
     }
 

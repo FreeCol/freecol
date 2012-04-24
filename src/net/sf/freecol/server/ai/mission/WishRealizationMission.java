@@ -65,22 +65,12 @@ public class WishRealizationMission extends Mission {
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
+
         this.wish = wish;
         logger.finest("AI wish unit starting"
             + " with destination " + wish.getDestination()
             + ": " + aiUnit.getUnit());
-    }
-
-    /**
-     * Loads a mission from the given element.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public WishRealizationMission(AIMain aiMain, Element element) {
-        super(aiMain);
-        readFromXMLElement(element);
+        uninitialized = false;
     }
 
     /**
@@ -96,7 +86,9 @@ public class WishRealizationMission extends Mission {
     public WishRealizationMission(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
         super(aiMain);
+
         readFromXML(in);
+        uninitialized = getAIUnit() == null;
     }
 
 
@@ -185,20 +177,6 @@ public class WishRealizationMission extends Mission {
         }
     }
 
-    /**
-     * Gets debugging information about this mission.  This string is
-     * a short representation of this object's state.
-     *
-     * @return The <code>String</code>.
-     */
-    public String getDebuggingInfo() {
-        if (wish == null) {
-            return "No wish";
-        } else {
-            return wish.getDestination().getTile() + " " + wish.getValue();
-        }
-    }
-
     // Serialization
 
     /**
@@ -221,6 +199,7 @@ public class WishRealizationMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("wish", wish.getId());
     }
 
@@ -230,6 +209,7 @@ public class WishRealizationMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         final String wid = in.getAttributeValue(null, "wish");
         wish = (Wish)getAIMain().getAIObject(wid);
 
