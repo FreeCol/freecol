@@ -309,7 +309,7 @@ public class CashInTreasureTrainMission extends Mission {
         if (unit.canCashInTreasureTrain()) {
             if (unit.isInEurope()
                 || europe == null
-                || player.getCarriersForUnit(unit).isEmpty()
+                || Player.getCarriersForUnit(unit).isEmpty()
                 || unit.getTransportFee() == 0) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                     logger.finest(tag + " completed cash in at "

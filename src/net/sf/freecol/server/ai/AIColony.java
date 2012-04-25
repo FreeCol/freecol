@@ -1390,7 +1390,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         for (AIGoods ag : aiGoods) {
             if (!ag.checkIntegrity()) continue;
-            out.writeStartElement(ag.getXMLElementTagName() + LIST_ELEMENT);
+            out.writeStartElement(AIGoods.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, ag.getId());
             out.writeEndElement();
         }
@@ -1410,7 +1410,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
             if (!tip.checkIntegrity()) continue;
-            out.writeStartElement(tip.getXMLElementTagName() + LIST_ELEMENT);
+            out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, tip.getId());
             out.writeEndElement();
         }

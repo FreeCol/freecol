@@ -109,7 +109,7 @@ public class ConceptDetailPanel extends FreeColPanel
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {
-        if (this.id.equals(id)) {
+        if (ConceptDetailPanel.id.equals(id)) {
             return;
         }
 
