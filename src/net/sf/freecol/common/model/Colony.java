@@ -521,6 +521,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public int getImportAmount(GoodsType goodsType) {
         int present = getGoodsContainer().getGoodsCount(goodsType);
+        if (goodsType.isFoodType()) return Integer.MAX_VALUE;
         int capacity = getWarehouseCapacity();
         return (present > capacity) ? 0 : capacity - present;
     }
