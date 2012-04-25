@@ -40,8 +40,6 @@ import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.WorkerWish;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Mission for realizing a <code>Wish</code>.

@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -45,8 +44,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
-
-import org.w3c.dom.Element;
 
 
 /**

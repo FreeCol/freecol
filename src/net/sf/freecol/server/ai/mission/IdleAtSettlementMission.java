@@ -33,8 +33,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Mission for idling in a settlement.

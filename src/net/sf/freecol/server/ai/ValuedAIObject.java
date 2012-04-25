@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 

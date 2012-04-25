@@ -34,8 +34,6 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Mission for attacking any unit owned by a player we do not like that

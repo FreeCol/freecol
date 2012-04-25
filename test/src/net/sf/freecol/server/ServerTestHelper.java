@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;

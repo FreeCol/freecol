@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -66,8 +65,6 @@ import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Transportable;
 import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.WorkerWish;
-
-import org.w3c.dom.Element;
 
 
 /**
