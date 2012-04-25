@@ -1080,6 +1080,39 @@ public class GUI {
         mapViewer.getViewMode().toggleViewMode();
     }
 
+    /**
+     * Try to remove a unit from a colony.
+     * - Check for population limit.
+     * - Query if education should be abandoned.
+     *
+     * @param unit The <code>Unit</code> that is leaving the colony.
+     * @return True if the unit is allowed to leave.
+     */
+    public boolean tryLeaveColony(Unit unit) {
+        Colony colony = unit.getColony();
+        String message = colony.getReducePopulationMessage();
+        if (message != null) {
+            showInformationMessage(message);
+            return false;
+        }
+        return confirmAbandonEducation(unit, true);
+    }
+
+    /**
+     * Confirms that a unit should move somewhere where it would have
+     * to abandon its participation in education (if any).
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param checkStudent Should we check for student movements.
+     * @return True if the unit should proceed to move.
+     */
+    public boolean confirmAbandonEducation(Unit unit, boolean checkStudent) {
+        StringTemplate message = unit.getAbandonEducationMessage(checkStudent);
+        return message == null
+            || showConfirmDialog(unit.getTile(), message,
+                "abandonEducation.yes", "abandonEducation.no");
+    }
+
     public void updateGameOptions() {
         canvas.updateGameOptions();
     }

@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Settlement;
 
@@ -440,6 +441,25 @@ public class Colony extends Settlement implements Nameable {
         return getUnitCount() >
             FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
                                               getModifierSet("model.modifier.minimumColonySize"));
+    }
+
+    /**
+     * Gets the message to display if the colony can not reduce its population.
+     *
+     * @return A string to describing why a colony can not reduce its
+     *     population, or null if it can.
+     */
+    public String getReducePopulationMessage() {
+        if (canReducePopulation()) return null;
+        String message = "";
+        Set<Modifier> modifierSet
+            = getModifierSet("model.modifier.minimumColonySize");
+        for (Modifier modifier : modifierSet) {
+            message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
+                .addName("%object%", modifier.getSource()))
+                + "\n";
+        }
+        return message;
     }
 
     /**

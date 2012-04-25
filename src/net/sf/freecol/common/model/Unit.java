@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -1019,6 +1020,31 @@ public class Unit extends FreeColGameObject
                 throw new IllegalStateException("unit can not be teacher: " + newTeacher);
             }
         }
+    }
+
+    /**
+     * Gets a message to display if moving a unit would cause it to
+     * abandon its participation in education (if any).
+     *
+     * @param checkStudent Should we check for student movements.
+     * @return A message to display, or null if education is not an issue.
+     */
+    public StringTemplate getAbandonEducationMessage(boolean checkStudent) {
+        if (!(getLocation() instanceof WorkLocation)) return null;
+        boolean teacher = getStudent() != null;
+        boolean student = checkStudent && getTeacher() != null;
+        if (!teacher && !student) return null;
+
+        Building school = (Building)((teacher) ? getLocation()
+            : getTeacher().getLocation());
+        String action = (teacher)
+            ? Messages.message("abandonEducation.action.teaching")
+            : Messages.message("abandonEducation.action.studying");
+        return StringTemplate.template("abandonEducation.text")
+                .addStringTemplate("%unit%", Messages.getLabel(this))
+                .addName("%colony%", getColony().getName())
+                .add("%building%", school.getNameKey())
+                .addName("%action%", action);
     }
 
     /**

@@ -130,8 +130,9 @@ public final class QuickActionMenu extends JPopupMenu {
                                 JMenuItem menuItem = new JMenuItem(Messages.message("Board " + Messages.message(unit.getLabel())));
                                 menuItem.addActionListener(new ActionListener() {
                                     public void actionPerformed(ActionEvent e){
-                                        freeColClient.getInGameController().putOutsideColony(tempUnit);
-                                        freeColClient.getInGameController().boardShip(tempUnit, funit);
+                                        if (freeColClient.getInGameController().putOutsideColony(tempUnit)) {
+                                            freeColClient.getInGameController().boardShip(tempUnit, funit);
+                                        }
                                     }
                                 });
                                 this.add(menuItem);
@@ -271,7 +272,13 @@ public final class QuickActionMenu extends JPopupMenu {
                     JMenuItem menuItem = null;
                     ImageIcon teacherIcon = imageLibrary.getUnitImageIcon(teacher, 0.5);
                     if (teacher.getStudent() != unit) {
-                        menuItem = new JMenuItem(Messages.message("assignToTeacher"), teacherIcon);
+                        String assign = Messages.message("assignToTeacher");
+                        if (teacher.getStudent() != null) {
+                            assign += " (" + teacher.getTurnsOfTraining()
+                                + "/" + teacher.getNeededTurnsOfTraining()
+                                + ")";
+                        }
+                        menuItem = new JMenuItem(assign, teacherIcon);
                         menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
                         menuItem.addActionListener(unitLabel);
                     } else {

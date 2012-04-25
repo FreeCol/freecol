@@ -291,19 +291,11 @@ public final class DefaultTransferHandler extends TransferHandler {
                         ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
                         ColonyPanel.OutsideColonyPanel outside = ((ColonyPanel.OutsideColonyPanel) comp);
-                        if (outside.getColony().canReducePopulation()) {
-                            outside.add(data, true);
-                        } else {
-                            String message = "";
-                            Set<Modifier> modifierSet = outside.getColony()
-                                .getModifierSet("model.modifier.minimumColonySize");
-                            for (Modifier modifier : modifierSet) {
-                                message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
-                                                            .addName("%object%", modifier.getSource()))
-                                    + "\n";
-                            }
-                            gui.showInformationMessage(message);
-                        }
+                        if (!gui.tryLeaveColony(unit)) return false;
+                        outside.add(data, true);
+                    } else if (comp instanceof ColonyPanel.ColonyCargoPanel) {
+                        if (!gui.tryLeaveColony(unit)) return false;
+                        ((CargoPanel)comp).add(data, true);
                     } else if (comp instanceof CargoPanel) {
                         ((CargoPanel)comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {
