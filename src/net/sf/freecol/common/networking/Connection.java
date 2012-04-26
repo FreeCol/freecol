@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
@@ -45,11 +46,12 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 
 /**
- * A network connection. Responsible for both sending and receiving network
- * messages.
+ * A network connection.
+ * Responsible for both sending and receiving network messages.
  *
  * @see #send(Element)
  * @see #sendAndWait(Element)
@@ -57,75 +59,42 @@ import org.w3c.dom.Element;
  */
 public class Connection {
 
-    private class MultipleOutputStream extends OutputStream {
-       
-        private final List<OutputStream> streams
-            = new ArrayList<OutputStream>();
-
-        public MultipleOutputStream() {}
-
-        public void close() throws IOException {
-            for (OutputStream o : streams) o.close();
-        }
-
-        public void flush() throws IOException {
-            for (OutputStream o : streams) o.flush();
-        }
-            
-        public void write(byte[] b) throws IOException {
-            for (OutputStream o : streams) o.write(b);
-        }
-
-        public void write(byte[] b, int off, int len) throws IOException {
-            for (OutputStream o : streams) o.write(b, off, len);
-        }
-
-        public void write(int b) throws IOException {
-            for (OutputStream o : streams) o.write(b);
-        }
-
-        public MultipleOutputStream add(OutputStream o) {
-            streams.add(o);
-            return this;
-        }
-    }
-
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
     private static final int TIMEOUT = 5000;
 
-    private final MultipleOutputStream out = new MultipleOutputStream();
-
-    private final InputStream in;
-
-    private final Socket socket;
-
-    private final Transformer xmlTransformer;
-
-    private final ReceivingThread thread;
-
     private final XMLOutputFactory xof = XMLOutputFactory.newInstance();
+
+    private InputStream in;
+
+    private Socket socket;
+
+    private OutputStream out;
+
+    private Transformer xmlTransformer;
+
+    private ReceivingThread thread;
 
     private MessageHandler messageHandler;
 
-    private XMLStreamWriter xmlOut = null;
+    private String name;
 
-    private int currentQuestionID = -1;
-
-    private String name = null;
+    protected static boolean dump
+        = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
 
 
     /**
-     * Trivial constructor for DummyConnection to use.
+     * Trivial constructor.
+     *
+     * @param name The name of the connection.
      */
     protected Connection(String name) {
-        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-            out.add(System.err);
-        }
-        in = null;
-        socket = null;
-        thread = null;
-        xmlTransformer = null;
+        this.in = null;
+        this.socket = null;
+        this.out = null;
+        this.xmlTransformer = null;
+        this.thread = null;
+        this.messageHandler = null;
         this.name = name;
     }
 
@@ -155,32 +124,37 @@ public class Connection {
      */
     public Connection(Socket socket, MessageHandler messageHandler,
                       String name) throws IOException {
-        this.messageHandler = messageHandler;
+        this(name);
+
+        this.in = socket.getInputStream();
         this.socket = socket;
-        this.name = name;
-
-        out.add(socket.getOutputStream());
-        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS) {
-            out.add((OutputStream)System.err);
-        }
-        in = socket.getInputStream();
-
-        Transformer myTransformer;
+        this.out = socket.getOutputStream();
+        Transformer myTransformer = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             myTransformer = factory.newTransformer();
-            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+                                            "yes");
         } catch (TransformerException e) {
             logger.log(Level.WARNING, "Failed to install transformer!", e);
-            myTransformer = null;
         }
-        xmlTransformer = myTransformer;
+        this.xmlTransformer = myTransformer;
+        this.thread = new ReceivingThread(this, in, name);
+        this.messageHandler = messageHandler;
+        this.name = name;
 
-        thread = new ReceivingThread(this, in, name);
         thread.start();
     }
 
-    private static Socket createSocket(String host, int port) throws IOException {
+    /**
+     * Creates a socket to communication with a given host, port pair.
+     *
+     * @param host The host to connect to.
+     * @param port The port to connect to.
+     * @return A new socket.
+     */
+    private static Socket createSocket(String host, int port)
+        throws IOException {
         Socket socket = new Socket();
         SocketAddress addr = new InetSocketAddress(host, port);
         socket.connect(addr, TIMEOUT);
@@ -199,6 +173,24 @@ public class Connection {
     }
 
     /**
+     * Sets the MessageHandler for this Connection.
+     *
+     * @param mh The new MessageHandler for this Connection.
+     */
+    public void setMessageHandler(MessageHandler mh) {
+        messageHandler = mh;
+    }
+
+    /**
+     * Gets the MessageHandler for this Connection.
+     *
+     * @return The MessageHandler for this Connection.
+     */
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
+    }
+
+    /**
      * Gets the connection name.
      *
      * @return The connection name.
@@ -213,34 +205,49 @@ public class Connection {
      * @throws IOException
      */
     public void close() throws IOException {
-        Element disconnectElement = DOMMessage.createNewRootElement("disconnect");
-        send(disconnectElement);
+        Element disconnect = DOMMessage.createNewRootElement("disconnect");
+        sendDumping(disconnect);
         reallyClose();
     }
 
     /**
-     * Closes this connection.
+     * Really closes this connection.
      *
      * @throws IOException
      */
     public void reallyClose() throws IOException {
-        if (thread != null) {
-            thread.askToStop();
-        }
+        if (thread != null) thread.askToStop();
 
-        if (out != null) {
-            out.close();
-        }
+        if (out != null) out.close();
 
-        if (socket != null) {
-            socket.close();
-        }
+        if (socket != null) socket.close();
 
-        if (in != null) {
-            in.close();
-        }
+        if (in != null) in.close();
+        logger.fine("Connection really closed.");
+    }
 
-        logger.info("Connection closed.");
+    /**
+     * Fundamental routine to send a message over this Connection.
+     *
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information
+     * @param logOK Log the send if true.
+     * @throws IOException If an error occur while sending the message.
+     */
+    private void send(Element element, boolean logOK) throws IOException {
+        synchronized (out) {
+            try {
+                xmlTransformer.transform(new DOMSource(element),
+                                         new StreamResult(out));
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to transform and send!", e);
+            }
+
+            out.write('\n');
+            out.flush();
+            out.notifyAll(); // Just in case others are waiting
+        }
+        if (logOK) logger.fine("Send: " + element.getTagName());
     }
 
     /**
@@ -253,33 +260,28 @@ public class Connection {
      * @see #ask(Element)
      */
     public void send(Element element) throws IOException {
-        // Note - waits for question but does not install a new value.
-        // Must hold out for entire call.
-        synchronized (out) {
-            while (currentQuestionID != -1) {
-                try {
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("Waiting to send element " + element.getTagName() + "...");
-                    }
-                    out.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Sending element " + element.getTagName() + "...");
-            }
+        send(element, logger.isLoggable(Level.FINE));
+    }
+
+    /**
+     * Dumping wrapper for send().
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information
+     * @throws IOException If an error occur while sending the message.
+     * @see #sendAndWait(Element)
+     * @see #ask(Element)
+     */
+    public void sendDumping(Element element) throws IOException {
+        if (dump) {
+            String x = getName() + "-send";
             try {
-                xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to transform and send element!", e);
-            }
-
-            out.write('\n');
-            out.flush();
-
-            // Just in case others are waiting
-            out.notifyAll();
+                System.err.println("<" + x + ">"
+                    + DOMMessage.elementToString(element)
+                    + "</" + x + ">\n");
+            } catch (Exception e) {}
         }
+        send(element);
     }
 
     /**
@@ -307,26 +309,33 @@ public class Connection {
      */
     public Element ask(Element element) throws IOException {
         int networkReplyId = thread.getNextNetworkReplyId();
-
-        Element questionElement = element.getOwnerDocument().createElement("question");
-        questionElement.setAttribute("networkReplyId", Integer.toString(networkReplyId));
-        questionElement.appendChild(element);
+        String tag = element.getTagName();
 
         if (Thread.currentThread() == thread) {
-            logger.warning("Attempt to 'wait()' the ReceivingThread for sending " + element.getTagName());
-            throw new IOException("Attempt to 'wait()' the ReceivingThread.");
-        } else {
-            NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
-            send(questionElement);
-            DOMMessage response = (DOMMessage) nro.getResponse();
-            if (response == null) return null;
-            Element rootElement = response.getDocument().getDocumentElement();
-            return (Element) rootElement.getFirstChild();
+            throw new IOException("wait(ReceivingThread) for: " + tag);
         }
+
+        Element question = element.getOwnerDocument()
+            .createElement("question");
+        question.setAttribute("networkReplyId",
+                              Integer.toString(networkReplyId));
+        question.appendChild(element);
+
+        NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
+        send(question, false);
+        DOMMessage response = (DOMMessage)nro.getResponse();
+        Element reply = (response == null) ? null
+            : response.getDocument().getDocumentElement();
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Ask(" + networkReplyId + "): " + tag + ", reply: "
+                + ((reply == null) ? "null" : reply.getTagName()));
+        }
+        return (reply == null) ? null : (Element)reply.getFirstChild();
     }
 
     /**
-     * Dumping version of ask().
+     * Dumping wrapper for ask().
      * Dumps to System.err with a faked-XML prefix so the whole line can
      * be fed to an XML-pretty printer if required.
      *
@@ -335,12 +344,12 @@ public class Connection {
      * @exception Throws IOException if ask() fails.
      */
     public Element askDumping(Element request) throws IOException {
-        boolean dump = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
         if (dump) {
+            String x = getName() + "-request";
             try {
-                System.err.println("<" + getName() + "-request>"
+                System.err.println("<" + x + ">"
                     + DOMMessage.elementToString(request)
-                    + "</" + getName() + "-request>\n");
+                    + "</" + x + ">\n");
             } catch (Exception e) {}
         }
 
@@ -349,15 +358,15 @@ public class Connection {
             try {
                 reply = ask(request);
                 try {
-                    System.err.println("<" + getName() + "-reply>"
-                        + ((reply == null) ? ""
-                            : DOMMessage.elementToString(reply))
-                        + "</" + getName() + "-reply>\n");
+                    String x = getName() + "-reply";
+                    System.err.println("<" + x + ">"
+                        + DOMMessage.elementToString(reply)
+                        + "</" + x + ">\n");
                 } catch (Exception x) {}
             } catch (IOException e) {
                 try {
-                    System.err.println("<" + getName() + "-reply><exception "
-                        + e.getMessage() + "\n");
+                    System.err.println("<" + getName() + "-exception e=\""
+                        + e.getMessage() + "\" />\n");
                 } catch (Exception x) {}
                 throw e;
             }
@@ -369,121 +378,75 @@ public class Connection {
     }
 
     /**
-     * Release a previously obtained question id. This is absolutely necessary
-     * as other questions will be blocked as long as the old id is in place.
-     *
-     * @see #waitForAndSetNewQuestionId()
-     */
-    private void releaseQuestionId() {
-        synchronized (out) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine(toString() + " released question id " + currentQuestionID);
-            }
-            currentQuestionID = -1;
-            out.notifyAll();
-        }
-    }
-
-    /**
-     * Wait until the previous question has been released, then install a new
-     * question id. The caller is then free to send.
-     */
-    private void waitForAndSetNewQuestionId() {
-        synchronized (out) {
-            while (currentQuestionID != -1) {
-                try {
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine(toString() + " waiting for question id...");
-                    }
-                    out.wait();
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Interrupted waiting for question id!", e);
-                }
-            }
-            currentQuestionID = thread.getNextNetworkReplyId();
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine(toString() + " installed new question id " + currentQuestionID);
-            }
-        }
-    }
-
-    /**
-     * Sets the MessageHandler for this Connection.
-     *
-     * @param mh The new MessageHandler for this Connection.
-     */
-    public void setMessageHandler(MessageHandler mh) {
-        messageHandler = mh;
-    }
-
-    /**
-     * Gets the MessageHandler for this Connection.
-     *
-     * @return The MessageHandler for this Connection.
-     */
-    public MessageHandler getMessageHandler() {
-        return messageHandler;
-    }
-
-    /**
      * Handles a message using the registered <code>MessageHandler</code>.
      *
      * @param in The stream containing the message.
      */
-    public void handleAndSendReply(final BufferedInputStream in) {
+    public void handleAndSendReply(final BufferedInputStream in) 
+        throws IOException {
+
+        // Peek at the reply id and tag.
+        in.mark(200);
+        final XMLInputFactory xif = XMLInputFactory.newInstance();
+
+        final String networkReplyId;
+        final boolean question;
         try {
-            in.mark(200);
-            final XMLInputFactory xif = XMLInputFactory.newInstance();
             final XMLStreamReader xmlIn = xif.createXMLStreamReader(in);
             xmlIn.nextTag();
-
-            final String networkReplyId = xmlIn.getAttributeValue(null, "networkReplyId");
-
-            final boolean question = xmlIn.getLocalName().equals("question");
+            networkReplyId = xmlIn.getAttributeValue(null, "networkReplyId");
+            question = xmlIn.getLocalName().equals("question");
             xmlIn.close();
-            in.reset();
-            final DOMMessage msg = new DOMMessage(in);
-            
-            final Connection connection = this;
-            Thread t = new Thread(msg.getType()) {
-                    @Override
-                    public void run() {
-                        try {
-                            Element element = msg.getDocument().getDocumentElement();
-                            
-                            if (question) {
-                                Element reply = messageHandler.handle(connection, (Element) element.getFirstChild());
-                                
-                                if (reply == null) {
-                                    reply = DOMMessage.createNewRootElement("reply");
-                                    reply.setAttribute("networkReplyId", networkReplyId);
-                                    logger.finest("reply == null");
-                                } else {
-                                    Element replyHeader = reply.getOwnerDocument().createElement("reply");
-                                    replyHeader.setAttribute("networkReplyId", networkReplyId);
-                                    replyHeader.appendChild(reply);
-                                    reply = replyHeader;
-                                }
+        } catch (XMLStreamException xme) {
+            logger.log(Level.WARNING, "XML stream failure", xme);
+            return;
+        } 
 
-                                connection.send(reply);
-                            } else {
-                                Element reply = messageHandler.handle(connection, element);
-
-                                if (reply != null) {
-                                    connection.send(reply);
-                                }
-                            }
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Message handler failed!", e);
-                            logger.warning(msg.getDocument().getDocumentElement().toString());
-                        }
-                    }
-                };
-            t.setName(name + "MessageHandler:" + t.getName());
-            t.start();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to handle and send reply", e);
+        // Reset and build a message.
+        final DOMMessage msg;
+        in.reset();
+        try {
+            msg = new DOMMessage(in);
+        } catch (SAXException e) {
+            logger.log(Level.WARNING, "Unable to read message.", e);
+            return;
         }
+
+        // Process the message in its own thread.
+        final Connection conn = this;
+        Thread t = new Thread(msg.getType()) {
+                @Override
+                public void run() {
+                    Element reply, element = msg.getDocument()
+                        .getDocumentElement();
+                    try {
+                        if (question) {
+                            reply = messageHandler.handle(conn,
+                                (Element)element.getFirstChild());
+                            if (reply == null) {
+                                reply = DOMMessage.createNewRootElement("reply");
+                                reply.setAttribute("networkReplyId",
+                                    networkReplyId);
+                            } else {
+                                Element header = reply.getOwnerDocument()
+                                    .createElement("reply");
+                                header.setAttribute("networkReplyId",
+                                    networkReplyId);
+                                header.appendChild(reply);
+                                reply = header;
+                            }
+                        } else {
+                            reply = messageHandler.handle(conn, element);
+                        }
+                        if (reply != null) conn.sendDumping(reply);
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "Handler failed: "
+                            + element.toString(), e);
+                    }
+                }
+            };
+        t.setName(name + "-MessageHandler-" + t.getName());
+        t.start();
     }
 
     /**
@@ -493,6 +456,6 @@ public class Connection {
      */
     @Override
     public String toString() {
-        return "Connection[" + getSocket() + "]";
+        return "[Connection " + name + " (" + socket + ") ]";
     }
 }

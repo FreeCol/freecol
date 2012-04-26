@@ -118,7 +118,7 @@ public final class MetaRegister {
             try {                
                 mc = new Connection(address, port, null, FreeCol.METASERVER_THREAD);
                 Element element = DOMMessage.createNewRootElement("disconnect");
-                mc.send(element);
+                mc.sendDumping(element);
             } catch (IOException e) {
                 logger.info("Server rejected (no route to destination):" + address + ":" + port);
                 throw e;

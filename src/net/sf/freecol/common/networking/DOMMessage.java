@@ -367,10 +367,10 @@ public class DOMMessage {
     }
 
     /**
-     * Inserts <code>newRoot</code> as the new root element and appends the
-     * old root element.
+     * Inserts an element as a new root element to the existing
+     * element of this message.
      *
-     * @param newRoot The new root element.
+     * @param newRoot The new root <code>Element</code>.
      */
     public void insertAsRoot(Element newRoot) {
         Element oldRoot = document.getDocumentElement();
@@ -384,22 +384,22 @@ public class DOMMessage {
     }
 
     /**
-     * Convenience method: returns the first child element with the specified
-     * tagname.
+     * Convenience method to find the first child element with the
+     * specified tagname.
      *
      * @param element The <code>Element</code> to search for the child
-     *            element.
+     *     element in.
      * @param tagName The tag name of the child element to be found.
      * @return The first child element with the given name.
      */
     public static Element getChildElement(Element element, String tagName) {
         NodeList n = element.getChildNodes();
         for (int i = 0; i < n.getLength(); i++) {
-            if (n.item(i) instanceof Element && ((Element) n.item(i)).getTagName().equals(tagName)) {
-                return (Element) n.item(i);
+            if (n.item(i) instanceof Element
+                && ((Element)n.item(i)).getTagName().equals(tagName)) {
+                return (Element)n.item(i);
             }
         }
-
         return null;
     }
 
@@ -407,7 +407,7 @@ public class DOMMessage {
      * Convert an element to a string.
      *
      * @param element The <code>Element</code> to convert.
-     * @return A string representation of an element.
+     * @return The <code>String</code> representation of an element.
      */
     public static String elementToString(Element element) {
         XMLInputFactory xif = XMLInputFactory.newInstance();
@@ -416,22 +416,33 @@ public class DOMMessage {
             Transformer xt = factory.newTransformer();
             StringWriter sw = new StringWriter();
             xt.transform(new DOMSource(element), new StreamResult(sw));
-            return sw.toString();
+            String result = sw.toString();
+
+            // Drop the <?xml...?> part if present to keep logging concise.
+            if (result.startsWith("<?xml")) {
+                final String xmlEnd = "?>";
+                int index = result.indexOf(xmlEnd);
+                if (index > 0) {
+                    result = result.substring(index + xmlEnd.length());
+                }
+            }
+            return result;
         } catch (TransformerException e) {
             logger.log(Level.WARNING, "TransformerException", e);
         }
         return null;
     }
 
-
+    /**
+     * {@inherit-doc}
+     */
     public Element toXMLElement() {
-        // do nothing
-        return null;
+        return null; // do nothing
     }
 
     /**
-     * Returns the <code>String</code> representation of the message. This is
-     * what actually gets transmitted to the other peer.
+     * Gets the string representation of the message.  This is what
+     * actually gets transmitted to the other peer.
      *
      * @return The <code>String</code> representation of the message.
      */

@@ -20,11 +20,10 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
@@ -104,7 +103,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
                 return handler.handle(connection, element);
             } catch (Exception e) {
                 // TODO: should we really catch Exception? The old code did.
-                logException(e);
+                logger.log(Level.WARNING, "Handler failed", e);
                 sendReconnectSafely(connection);
             }
         } else {
@@ -121,22 +120,9 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      */
     private void sendReconnectSafely(Connection connection) {
         try {
-            connection.send(DOMMessage.createNewRootElement("reconnect"));
-        } catch (IOException ex) {
-            logger.warning("Could not send reconnect message!");
-        }
-    }
-
-    /**
-     * Log an exception as a warning.
-     * 
-     * @param e The exception to log.
-     */
-    protected void logException(Exception e) {
-        if (e != null) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            connection.sendDumping(DOMMessage.createNewRootElement("reconnect"));
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send reconnect message!", e);
         }
     }
 
@@ -193,7 +179,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
                 try {
                     return handle(player, conn, element);
                 } catch (Exception e) {
-                    logException(e);
+                    logger.log(Level.WARNING, "Handler failure.", e);
                     sendReconnectSafely(conn);
                     return null;
                 }

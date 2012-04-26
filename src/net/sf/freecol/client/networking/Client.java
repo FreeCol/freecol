@@ -126,7 +126,7 @@ public final class Client {
      */
     public void send(Element element) {
         try {
-            c.send(element);
+            c.sendDumping(element);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send: " + element, e);
         }

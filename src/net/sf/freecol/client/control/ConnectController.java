@@ -20,7 +20,6 @@
 
 package net.sf.freecol.client.control;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -575,56 +574,40 @@ public final class ConnectController {
         }
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
+        freeColClient.setIsRetired(false);
         freeColClient.setClient(null);
-
         freeColClient.setLoggedIn(false);
     }
 
     /**
-     * Quits the current game. If a server is running it will be
-     * stopped if bStopServer is <i>true</i>.  If a server is running
-     * through this client and bStopServer is true then the clients
-     * connected to that server will be notified. If a local client is
-     * connected to a server then the server will be notified with a
-     * logout in case <i>notifyServer</i> is true.
+     * Quits the current game, optionally notifying and stopping the server.
      *
-     * @param bStopServer Indicates whether or not a server that was
-     *     started through this client should be stopped.
-     *
+     * @param stopServer Whether to stop the server.
      * @param notifyServer Whether or not the server should be
      *     notified of the logout.  For example: if the server kicked us
      *     out then we don't need to confirm with a logout message.
      */
-    public void quitGame(boolean bStopServer, boolean notifyServer) {
+    public void quitGame(boolean stopServer, boolean notifyServer) {
+        if (freeColClient.isLoggedIn()) logout(notifyServer);
+
         final FreeColServer server = freeColClient.getFreeColServer();
-        if (bStopServer && server != null) {
+        if (stopServer && server != null) {
             server.getController().shutdown();
             freeColClient.setFreeColServer(null);
-
-            ResourceManager.setScenarioMapping(null);
-            ResourceManager.setCampaignMapping(null);
-            freeColClient.setInGame(false);
-            freeColClient.setGame(null);
-            freeColClient.setMyPlayer(null);
-            freeColClient.setIsRetired(false);
-            freeColClient.setClient(null);
-            freeColClient.setLoggedIn(false);
-        } else if (freeColClient.isLoggedIn()) {
-            logout(notifyServer);
         }
     }
 
     /**
      * Quits the current game. If a server is running it will be
-     * stopped if bStopServer is <i>true</i>.  The server and perhaps
+     * stopped if stopServer is <i>true</i>.  The server and perhaps
      * the clients (if a server is running through this client and
-     * bStopServer is true) will be notified.
+     * stopServer is true) will be notified.
      *
-     * @param bStopServer Indicates whether or not a server that was
+     * @param stopServer Indicates whether or not a server that was
      *     started through this client should be stopped.
      */
-    public void quitGame(boolean bStopServer) {
-        quitGame(bStopServer, true);
+    public void quitGame(boolean stopServer) {
+        quitGame(stopServer, true);
     }
 
     /**
@@ -647,7 +630,7 @@ public final class ConnectController {
         ArrayList<String> items = new ArrayList<String>();
         Element element = DOMMessage.createNewRootElement("getVacantPlayers");
         try {
-            Element reply = mc.askDumping(element);
+            Element reply = mc.ask(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
@@ -694,7 +677,7 @@ public final class ConnectController {
 
         try {
             Element gslElement = DOMMessage.createNewRootElement("getServerList");
-            Element reply = mc.askDumping(gslElement);
+            Element reply = mc.ask(gslElement);
             if (reply == null) {
                 gui.errorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");

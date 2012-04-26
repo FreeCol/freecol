@@ -750,7 +750,7 @@ public final class FreeColServer {
         try {
             Element element = DOMMessage.createNewRootElement("remove");
             element.setAttribute("port", Integer.toString(port));
-            mc.send(element);
+            mc.sendDumping(element);
         } catch (IOException e) {
             logger.warning("Network error while communicating with the meta-server.");
             return;
@@ -1361,7 +1361,7 @@ public final class FreeColServer {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             Element reconnect = DOMMessage.createNewRootElement("reconnect");
             try {
-                player.getConnection().send(reconnect);
+                player.getConnection().sendDumping(reconnect);
             } catch (IOException ex) {
                 logger.warning("Could not send reconnect message!");
             }

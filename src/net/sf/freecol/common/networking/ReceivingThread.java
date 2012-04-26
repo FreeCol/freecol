@@ -20,11 +20,12 @@
 package net.sf.freecol.common.networking;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -44,219 +45,17 @@ final class ReceivingThread extends Thread {
 
     private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
 
-    /** Maximum number og retries before closing the connection. */
-    private static final int MAXIMUM_RETRIES = 5;
-
-    private final FreeColNetworkInputStream in;
-
-    private XMLStreamReader xmlIn = null;
-
-    private boolean shouldRun;
-
-    private int nextNetworkReplyId = 1;
-
-    private final Map<Integer, NetworkReplyObject> threadsWaitingForNetworkReply;
-
-    private final Connection connection;
-
-    private boolean locked = false;
-
-
-    /**
-     * The constructor to use.
-     * 
-     * @param connection The <code>Connection</code> this
-     *            <code>ReceivingThread</code> belongs to.
-     * @param in The stream to read from.
-     */
-    ReceivingThread(Connection connection, InputStream in, String threadName) {
-        super(threadName + "ReceivingThread - " + connection.toString());
-
-        this.connection = connection;
-        this.in = new FreeColNetworkInputStream(in);
-
-        shouldRun = true;
-
-        threadsWaitingForNetworkReply = Collections.synchronizedMap(
-                new HashMap<Integer, NetworkReplyObject>());
-    }
-
-    /**
-     * Gets the next <code>networkReplyId</code> that will be used when
-     * identifing a network message.
-     * 
-     * @return The next available <code>networkReplyId</code>.
-     */
-    public synchronized int getNextNetworkReplyId() {
-        return nextNetworkReplyId++;
-    }
-
-    /**
-     * Creates and registers a new <code>NetworkReplyObject</code> with the
-     * specified ID.
-     * 
-     * @param networkReplyId The id of the message the calling thread should
-     *            wait for.
-     * @return The <code>NetworkReplyObject</code> containing the network
-     *         message.
-     */
-    public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
-        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
-        threadsWaitingForNetworkReply.put(networkReplyId, nro);
-        return nro;
-    }
-
-    /**
-     * Receives messages from the network in a loop. This method is invoked when
-     * the thread starts and the thread will stop when this method returns.
-     */
-    public void run() {
-        int timesFailed = 0;
-
-        try {
-            while (shouldRun()) {
-                try {
-                    listen();
-                    timesFailed = 0;
-                } catch (XMLStreamException e) {
-                    timesFailed++;
-                    // warnOf(e);
-                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                        disconnect();
-                    }
-                } catch (SAXException e) {
-                    timesFailed++;
-                    // warnOf(e);
-                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                        disconnect();
-                    }
-                } catch (IOException e) {
-                    // warnOf(e);
-                    if (shouldRun) {
-                        disconnect();
-                    }
-                }
-            }
-        } finally {
-            askToStop();
-        }
-    }
-
-    public void unlock() {
-        locked = false;
-    }
-
-
-    /**
-     * Listens to the inputstream and calls the messagehandler for each message
-     * received.
-     * 
-     * @exception IOException If thrown by the {@link FreeColNetworkInputStream}.
-     * @exception SAXException if a problem occured during parsing.
-     * @exception XMLStreamException if a problem occured during parsing.
-     */
-    private void listen() throws IOException, SAXException, XMLStreamException {
-        while (locked) {
-            try {
-                // TODO: Fix this sleep(1) is not a solution
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                // Do nothing here.
-            }
-        }
-
-        final int LOOK_AHEAD = 500;
-        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
-        in.enable();
-        bis.mark(LOOK_AHEAD);
-        if (!shouldRun()) return;
-
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        xmlIn = xif.createXMLStreamReader(bis);
-        xmlIn.nextTag();
-
-        boolean disconnectMessage =
-                (xmlIn.getLocalName().equals("disconnect")) ? true : false;
-        if (xmlIn.getLocalName().equals("reply")) {
-
-            String networkReplyID =
-                    xmlIn.getAttributeValue(null, "networkReplyId");
-
-            NetworkReplyObject nro = threadsWaitingForNetworkReply.remove(
-                    Integer.valueOf(networkReplyID));
-
-            if (nro != null) {
-                xmlIn.close();
-                xmlIn = null;
-                bis.reset();
-
-                final DOMMessage msg = new DOMMessage(bis);
-                nro.setResponse(msg);
-            } else {
-                while (xmlIn.hasNext()) {
-                    xmlIn.next();
-                }
-                xmlIn.close();
-                xmlIn = null;
-                logger.warning("Could not find networkReplyId="
-                        + networkReplyID);
-            }
-        } else {
-            xmlIn.close();
-            xmlIn = null;
-            bis.reset();
-            connection.handleAndSendReply(bis);
-        }
-
-        if (disconnectMessage) {
-            askToStop();
-        }
-    }
-
-    /**
-     * Checks if this thread has been halted.
-     */
-    private synchronized boolean shouldRun() {
-        return shouldRun;
-    }
-
-    /**
-     * Tells this thread that it doesn't need to do any more work.
-     */
-    synchronized void askToStop() {
-        shouldRun = false;
-        for (NetworkReplyObject o : threadsWaitingForNetworkReply.values()) {
-            o.interrupt();
-        }
-    }
-
-    private void disconnect() {
-        if (connection.getMessageHandler() != null) {
-            try {
-                Element disconnectElement =
-                        DOMMessage.createNewRootElement("disconnect");
-                disconnectElement.setAttribute("reason", "reception exception");
-                connection.getMessageHandler().handle(connection,
-                        disconnectElement);
-            } catch (FreeColException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
      * Input stream for buffering the data from the network.
      * 
-     * <br>
-     * <br>
-     * 
-     * This is just a buffered input stream that signals end-of-stream when a
-     * given token {@link #END_OF_STREAM} is encountered. In order to continue
-     * receiving data, the method {@link #enable} has to be called. Calls to
-     * <code>close()</code> has no effect, the underlying input stream has to
-     * be closed directly.
+     * This is just a buffered input stream that signals end-of-stream
+     * when a given token {@link #END_OF_STREAM} is encountered.  In
+     * order to continue receiving data, the method {@link #enable}
+     * has to be called.  Calls to <code>close()</code> have no effect,
+     * the underlying input stream has to be closed directly.
      */
-    class FreeColNetworkInputStream extends InputStream {
+    private class FreeColNetworkInputStream extends InputStream {
+
         private static final int BUFFER_SIZE = 8192;
 
         private static final char END_OF_STREAM = '\n';
@@ -311,7 +110,6 @@ final class ReceivingThread extends Thread {
             }
 
             empty = false;
-
             bEnd += r;
             if (bEnd == BUFFER_SIZE) {
                 bEnd = 0;
@@ -320,12 +118,11 @@ final class ReceivingThread extends Thread {
         }
 
         /**
-         * Prepares the input stream for a new message. <br>
-         * <br>
+         * Prepares the input stream for a new message.
          * Makes the subsequent calls to <code>read</code> return the data
          * instead of <code>-1</code>.
          */
-        void enable() {
+        public void enable() {
             wait = false;
         }
 
@@ -335,9 +132,7 @@ final class ReceivingThread extends Thread {
          * @see #read(byte[], int, int)
          */
         public int read() throws IOException {
-            if (wait) {
-                return -1;
-            }
+            if (wait) return -1;
 
             if (empty) {
                 if (!fill()) {
@@ -374,17 +169,15 @@ final class ReceivingThread extends Thread {
          * Reads from the buffer and returns the data.
          * 
          * @param b The place where the data will be put.
-         * @param off The offset to use when writing the data to <code>b</code>.
+         * @param off The offset to use when writing the data to
+         *      <code>b</code>.
          * @param len Number of bytes to read.
          * @return The actual number of bytes read and <code>-1</code> if the
          *         message has ended, that is; if the token
          *         {@link #END_OF_STREAM} is encountered.
-         * 
          */
         public int read(byte[] b, int off, int len) throws IOException {
-            if (wait) {
-                return -1;
-            }
+            if (wait) return -1;
 
             if (empty) {
                 if (!fill()) {
@@ -408,7 +201,6 @@ final class ReceivingThread extends Thread {
                 }
 
                 b[r + off] = buffer[bStart];
-
                 bStart++;
                 if (bStart == bEnd || bEnd == 0 && bStart == BUFFER_SIZE) {
                     empty = true;
@@ -417,12 +209,185 @@ final class ReceivingThread extends Thread {
                         return r + 1;
                     }
                 }
-                if (bStart == BUFFER_SIZE) {
-                    bStart = 0;
-                }
+                if (bStart == BUFFER_SIZE) bStart = 0;
             }
 
             return len;
+        }
+    }
+
+    /** Maximum number of retries before closing the connection. */
+    private static final int MAXIMUM_RETRIES = 5;
+
+    /** A map of network ids to the corresponding waiting thread. */
+    private final Map<Integer, NetworkReplyObject> waitingThreads
+        = Collections.synchronizedMap(new HashMap<Integer,
+                                                  NetworkReplyObject>());
+
+    /** The wrapped version of the input stream. */
+    private final FreeColNetworkInputStream in;
+
+    /** The connection to receive on. */
+    private final Connection connection;
+
+    /** Whether the thread should run. */
+    private boolean shouldRun;
+
+    /** A counter for reply ids. */
+    private int nextNetworkReplyId;
+
+
+    /**
+     * The constructor to use.
+     * 
+     * @param connection The <code>Connection</code> this
+     *            <code>ReceivingThread</code> belongs to.
+     * @param in The stream to read from.
+     */
+    ReceivingThread(Connection connection, InputStream in, String threadName) {
+        super(threadName + "ReceivingThread - " + connection.toString());
+
+        this.in = new FreeColNetworkInputStream(in);
+        this.connection = connection;
+        this.shouldRun = true;
+        this.nextNetworkReplyId = 1;
+    }
+
+    /**
+     * Gets the next network reply identifier that will be used when
+     * identifing a network message.
+     * 
+     * @return The next available network reply identifier.
+     */
+    public synchronized int getNextNetworkReplyId() {
+        return nextNetworkReplyId++;
+    }
+
+    /**
+     * Creates and registers a new <code>NetworkReplyObject</code> with the
+     * specified ID.
+     * 
+     * @param networkReplyId The id of the message the calling thread should
+     *            wait for.
+     * @return The <code>NetworkReplyObject</code> containing the network
+     *         message.
+     */
+    public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
+        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
+        waitingThreads.put(networkReplyId, nro);
+        return nro;
+    }
+
+    /**
+     * Checks if this thread should run.
+     */
+    private synchronized boolean shouldRun() {
+        return shouldRun;
+    }
+
+    /**
+     * Tells this thread that it does not need to do any more work.
+     */
+    public synchronized void askToStop() {
+        shouldRun = false;
+        for (NetworkReplyObject o : waitingThreads.values()) {
+            o.interrupt();
+        }
+    }
+
+    /**
+     * Disconnects this thread.
+     */
+    private void disconnect(String reason) {
+        if (connection.getMessageHandler() != null) {
+            try {
+                Element disconnect = DOMMessage.createNewRootElement("disconnect");
+                disconnect.setAttribute("reason", reason);
+                connection.getMessageHandler().handle(connection, disconnect);
+            } catch (FreeColException e) {
+                logger.log(Level.WARNING, "Rx disconnect", e);
+            }
+        }
+        askToStop();
+    }
+
+    /**
+     * Listens to the InputStream and calls the MessageHandler for
+     * each message received.
+     * 
+     * @throws IOException If thrown by the {@link FreeColNetworkInputStream}.
+     * @throws SAXException if a problem occured during parsing.
+     * @throws XMLStreamException if a problem occured during parsing.
+     */
+    private void listen() throws IOException, SAXException,
+                                 XMLStreamException {
+        final int LOOK_AHEAD = 500;
+        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
+        in.enable();
+        bis.mark(LOOK_AHEAD);
+        if (!shouldRun()) return;
+
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStreamReader xmlIn = xif.createXMLStreamReader(bis);
+        xmlIn.nextTag();
+
+        String tag = xmlIn.getLocalName();
+        if ("disconnect".equals(tag)) {
+            askToStop();
+        } else if ("reply".equals(tag)) {
+            String id = xmlIn.getAttributeValue(null, "networkReplyId");
+            NetworkReplyObject nro
+                = waitingThreads.remove(Integer.valueOf(id));
+            if (nro == null) {
+                // while (xmlIn.hasNext()) xmlIn.next();
+                logger.warning("Could not find networkReplyId: " + id);
+            } else {
+                bis.reset();
+                nro.setResponse(new DOMMessage(bis));
+            }
+        } else {
+            bis.reset();
+            try {
+                connection.handleAndSendReply(bis);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "IO error", ioe);
+            }
+        }
+
+        xmlIn.close();
+    }
+
+    /**
+     * Receives messages from the network in a loop. This method is
+     * invoked when the thread starts and the thread will stop when
+     * this method returns.
+     */
+    public void run() {
+        int timesFailed = 0;
+
+        try {
+            while (shouldRun()) {
+                try {
+                    listen();
+                    timesFailed = 0;
+                } catch (XMLStreamException e) {
+                    timesFailed++;
+                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect("XML failure: " + e.getMessage());
+                    }
+                } catch (SAXException e) {
+                    timesFailed++;
+                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect("SAX failure: " + e.getMessage());
+                    }
+                } catch (IOException e) {
+                    if (shouldRun) {
+                        disconnect("IO failure: " + e.getMessage());
+                    }
+                }
+            }
+        } finally {
+            askToStop();
         }
     }
 }

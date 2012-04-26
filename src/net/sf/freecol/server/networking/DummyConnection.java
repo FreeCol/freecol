@@ -108,7 +108,7 @@ public final class DummyConnection extends Connection {
      * @see #ask(Element)
      */
     public void sendAndWait(Element element) throws IOException {
-        ask(element);
+        askDumping(element);
     }
 
     /**
@@ -145,6 +145,6 @@ public final class DummyConnection extends Connection {
      * @return string for debugging.
      */
     public String toString() {
-        return "DummyConnection[" + getName() + "]";
+        return "[DummyConnection " + getName() + "]";
     }
 }

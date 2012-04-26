@@ -20,14 +20,12 @@
 
 package net.sf.freecol.server.networking;
 
-
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -36,7 +34,6 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
-
 
 
 /**
@@ -59,7 +56,8 @@ public final class Server extends Thread {
     private ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap<Socket, Connection> connections = new HashMap<Socket, Connection>();
+    private HashMap<Socket, Connection> connections
+        = new HashMap<Socket, Connection>();
 
     /**
      * Whether to keep running the main loop that is awaiting new
@@ -76,6 +74,7 @@ public final class Server extends Thread {
     /** For information about this variable see the run method. */
     private final Object shutdownLock = new Object();
 
+
     /**
      * Creates a new network server. Use {@link #run server.start()} to start
      * listening for new connections.
@@ -88,8 +87,96 @@ public final class Server extends Thread {
         super(FreeCol.SERVER_THREAD+"Server");
         this.freeColServer = freeColServer;
         this.port = port;
-        //serverSocket = new ServerSocket(port, freeColServer.getMaximumPlayers());
         serverSocket = new ServerSocket(port);
+    }
+
+
+    /**
+     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
+     *
+     * @param socket The <code>Socket</code> that identifies the
+     *               <code>Connection</code>
+     * @return The <code>Connection</code>.
+     */
+    public Connection getConnection(Socket socket) {
+        return connections.get(socket);
+    }
+
+    /**
+     * Adds a (usually Dummy)Connection into the hashmap.
+     *
+     * @param connection The connection to add.
+     */
+    public void addDummyConnection(Connection connection) {
+        if (!running) return;
+        connections.put(new Socket(), connection);
+    }
+
+    /**
+     * Adds a Connection into the hashmap.
+     *
+     * @param connection The connection to add.
+     */
+    public void addConnection(Connection connection) {
+        if (!running) return;
+        connections.put(connection.getSocket(), connection);
+    }
+
+    /**
+     * Removes the given connection.
+     *
+     * @param connection The connection that should be removed.
+     */
+    public void removeConnection(Connection connection) {
+        if (!running) return;
+        connections.remove(connection.getSocket());
+    }
+
+    /**
+     * Sets the specified <code>MessageHandler</code> to all connections.
+     *
+     * @param mh The <code>MessageHandler</code> to use.
+     */
+    public void setMessageHandlerToAllConnections(MessageHandler mh) {
+        for (Connection c : connections.values()) {
+            c.setMessageHandler(mh);
+        }
+    }
+
+    /**
+     * Sends a network message to all connections with an optional exception.
+     *
+     * @param element The root <code>Element</code> of the message to send.
+     * @param exceptConnection An optional <code>Connection</code> not
+     *     to send to.
+     */
+    public void sendToAll(Element element, Connection exceptConnection) {
+        for (Connection c : new ArrayList<Connection>(connections.values())) {
+            if (c == exceptConnection) continue;
+            try {
+                c.sendAndWait(element);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Unable to send to: " + c, e);
+            }
+        }
+    }
+
+    /**
+     * Sends a network message to all connections.
+     *
+     * @param element The root element of the message to send.
+     */
+    public void sendToAll(Element element) {
+        sendToAll(element, null);
+    }
+
+    /**
+     * Gets the TCP port that is beeing used for the public socket.
+     *
+     * @return The TCP port.
+     */
+    public int getPort() {
+        return port;
     }
 
     /**
@@ -122,84 +209,17 @@ public final class Server extends Thread {
                     logger.info("Got client connection from "
                                 + clientSocket.getInetAddress().toString());
                     //Connection connection =
-                        new Connection(clientSocket, freeColServer.getUserConnectionHandler(),
-                                       FreeCol.SERVER_THREAD);
+                    new Connection(clientSocket,
+                                   freeColServer.getUserConnectionHandler(),
+                                   FreeCol.SERVER_THREAD);
                     //connections.put(clientSocket, connection);
                 } catch (IOException e) {
                     if (running) {
-                        StringWriter sw = new StringWriter();
-                        e.printStackTrace(new PrintWriter(sw));
-                        logger.warning(sw.toString());
+                        logger.log(Level.WARNING, "Connection failed: ", e);
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Sends a network message to all connections except
-     * <code>exceptConnection</code> (if the argument is non-null).
-     *
-     * @param element The root element of the message to send.
-     * @param exceptConnection If non-null, the
-     *        <code>Connection</code> not to send to.
-     */
-    public void sendToAll(Element element, Connection exceptConnection) {
-        Iterator<Connection> connectionIterator = getConnectionIterator();
-
-        while (connectionIterator.hasNext()) {
-            Connection connection = connectionIterator.next();
-            if (connection != exceptConnection) {
-                try {
-                    connection.sendAndWait(element);
-                } catch (IOException e) {
-                    logger.warning("Exception while attempting to send to "
-                                   + connection);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sends a network message to all connections.
-     *
-     * @param element The root element of the message to send.
-     */
-    public void sendToAll(Element element) {
-        sendToAll(element, null);
-    }
-
-    /**
-     * Gets the TCP port that is beeing used for the public socket.
-     *
-     * @return The TCP port.
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
-     * Sets the specified <code>MessageHandler</code> to all connections.
-     *
-     * @param messageHandler The <code>MessageHandler</code>.
-     */
-    public void setMessageHandlerToAllConnections(MessageHandler messageHandler) {
-        Iterator<Connection> connectionIterator = getConnectionIterator();
-
-        while (connectionIterator.hasNext()) {
-            Connection connection = connectionIterator.next();
-            connection.setMessageHandler(messageHandler);
-        }
-    }
-
-    /**
-     * Gets an iterator of every connection to this server.
-     *
-     * @return The <code>Iterator</code>.
-     * @see Connection
-     */
-    public Iterator<Connection> getConnectionIterator() {
-        return connections.values().iterator();
     }
 
     /**
@@ -212,7 +232,7 @@ public final class Server extends Thread {
             serverSocket.close();
             logger.fine("Closed server socket.");
         } catch (IOException e) {
-            logger.warning("Could not close the server socket!");
+            logger.log(Level.WARNING, "Could not close the server socket!", e);
         }
 
         synchronized (shutdownLock) {
@@ -220,60 +240,21 @@ public final class Server extends Thread {
             // thread to finish.  For more info see the run() method
         }
 
-        Iterator<Connection> connectionsIterator = getConnectionIterator();
-        while (connectionsIterator.hasNext()) {
-            Connection c = connectionsIterator.next();
-
+        Connection c;
+        while ((c = connections.remove(0)) != null) {
             try {
                 if (c != null) {
                     //c.reallyClose();
                     c.close();
                 }
             } catch (IOException e) {
-                logger.warning("Could not close the connection.");
+                logger.log(Level.WARNING, "Could not close connection: " + c,
+                    e);
             }
         }
+        connections.clear();
 
         freeColServer.removeFromMetaServer();
-
         logger.fine("Server shutdown.");
-    }
-
-    /**
-     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
-     *
-     * @param socket The <code>Socket</code> that identifies the
-     *               <code>Connection</code>
-     * @return The <code>Connection</code>.
-     */
-    public Connection getConnection(Socket socket) {
-        return connections.get(socket);
-    }
-
-    /**
-     * Adds a (usually Dummy)Connection into the hashmap.
-     *
-     * @param connection The connection to add.
-     */
-    public void addDummyConnection(Connection connection) {
-        connections.put(new Socket(), connection);
-    }
-
-    /**
-     * Adds a Connection into the hashmap.
-     *
-     * @param connection The connection to add.
-     */
-    public void addConnection(Connection connection) {
-        connections.put(connection.getSocket(), connection);
-    }
-
-    /**
-     * Removes the given connection.
-     *
-     * @param connection The connection that should be removed.
-     */
-    public void removeConnection(Connection connection) {
-        connections.remove(connection.getSocket());
     }
 }
