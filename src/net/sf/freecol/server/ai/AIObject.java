@@ -69,11 +69,10 @@ public abstract class AIObject extends FreeColObject {
     public AIObject(AIMain aiMain, String id) {
         this(aiMain);
 
-        if (id == null) {
-            throw new IllegalArgumentException("Can not register AIObject with null id.");
+        if (id != null) {
+            setId(id);
+            aiMain.addAIObject(id, this);
         }
-        setId(id);
-        aiMain.addAIObject(id, this);
         uninitialized = true;
     }
 
@@ -88,10 +87,7 @@ public abstract class AIObject extends FreeColObject {
         this(aiMain);
 
         readFromXMLElement(element);
-        if (getId() != null) {
-            aiMain.addAIObject(getId(), this);
-            uninitialized = false;
-        }
+        addAIObjectWithId();
     }
 
     /**
@@ -107,12 +103,8 @@ public abstract class AIObject extends FreeColObject {
         this(aiMain);
 
         readFromXML(in);
-        if (getId() != null) {
-            aiMain.addAIObject(getId(), this);
-            uninitialized = false;
-        }
+        addAIObjectWithId();
     }
-
 
     /**
      * Disposes this <code>AIObject</code> by removing the reference
@@ -169,6 +161,24 @@ public abstract class AIObject extends FreeColObject {
      */
     public boolean checkIntegrity() {
         return !isUninitialized();
+    }
+
+    /**
+     * Fixes integrity problems with this AI object.
+     * This simplest solution is just to dispose of the object.
+     */
+    public void fixIntegrity() {
+        dispose();
+    }
+
+    /**
+     * Adds this object to the AI main if it has a non-null id.
+     */
+    protected void addAIObjectWithId() {
+        if (getId() != null) {
+            aiMain.addAIObject(getId(), this);
+            uninitialized = false;
+        }
     }
 
 

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -171,6 +172,18 @@ public class GoodsWish extends Wish {
         amountRequested = amount;
     }
 
+    /**
+     * Checks the integrity of this AI object.
+     *
+     * @return True if this <code>GoodsWish</code> is valid.
+     */
+    @Override
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && goodsType != null
+            && amountRequested > 0;
+    }
+
 
     // Serialization
 
@@ -240,7 +253,8 @@ public class GoodsWish extends Wish {
      */
     @Override
     public String toString() {
-        return "[" + getId() + " " + amountRequested
+        return "[" + getId() + " for " + destination
+            + " on " + transportable + " " + amountRequested
             + " " + goodsType + " (" + getValue() + ")]";
     }
 

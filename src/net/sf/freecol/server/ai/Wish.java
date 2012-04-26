@@ -20,6 +20,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -40,14 +41,14 @@ public abstract class Wish extends ValuedAIObject {
     private static final Logger logger = Logger.getLogger(Wish.class.getName());
 
     /** The requesting location of this wish. */
-    protected Location destination = null;
+    protected Location destination;
 
     /**
      * The <code>Transportable</code> which will realize the wish,
      * or <code>null</code> if no <code>Transportable</code> has
      * been chosen.
      */
-    protected Transportable transportable = null;
+    protected Transportable transportable;
 
 
     /**
@@ -162,6 +163,7 @@ public abstract class Wish extends ValuedAIObject {
      *
      * @return True if the wish is valid.
      */
+    @Override
     public boolean checkIntegrity() {
         return super.checkIntegrity()
             && (destination != null

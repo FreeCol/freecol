@@ -160,6 +160,18 @@ public class WorkerWish extends Wish {
             : unit.getType().isNaval() == unitType.isNaval();
     }
 
+    /**
+     * Checks the integrity of this AI object.
+     *
+     * @return True if the <code>WorkerWish</code> is valid.
+     */
+    @Override
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && unitType != null;
+    }
+
+
     // Serialization
 
     /**

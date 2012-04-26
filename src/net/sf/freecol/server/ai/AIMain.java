@@ -196,7 +196,7 @@ public class AIMain extends FreeColObject
             if (!ao.checkIntegrity()) {
                 logger.warning("Dropping invalid AIObject: " + ao.getId()
                     + " (" + ao.getClass() + ")");
-                ao.dispose();
+                ao.fixIntegrity();
             }
         }
 

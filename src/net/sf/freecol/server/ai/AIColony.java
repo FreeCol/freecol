@@ -95,13 +95,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private ColonyPlan colonyPlan;
 
     // Goods to export from the colony.
-    private List<AIGoods> aiGoods;
+    private final List<AIGoods> aiGoods;
 
     // Useful things for the colony.
-    private List<Wish> wishes;
+    private final List<Wish> wishes;
 
     // Plans to improve neighbouring tiles.
-    private List<TileImprovementPlan> tileImprovementPlans;
+    private final List<TileImprovementPlan> tileImprovementPlans;
 
     // When should the workers in this Colony be rearranged?
     private Turn rearrangeTurn = new Turn(0);
@@ -138,6 +138,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         colony = null;
         colonyPlan = null;
+        aiGoods = new ArrayList<AIGoods>();
+        wishes = new ArrayList<Wish>();
+        tileImprovementPlans = new ArrayList<TileImprovementPlan>();
     }
 
     /**
@@ -152,7 +155,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         this.colony = colony;
         colonyPlan = new ColonyPlan(aiMain, colony);
         colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
-        initialize();
         uninitialized = false;
     }
 
@@ -165,9 +167,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *       of a <code>Wish</code>.
      */
     public AIColony(AIMain aiMain, Element element) {
-        super(aiMain, element);
+        this(aiMain, (String)null);
 
-        initialize();
+        readFromXMLElement(element);
+        addAIObjectWithId();
         uninitialized = getColony() == null;
     }
     
@@ -182,16 +185,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public AIColony(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain, in);
+        this(aiMain, (String)null);
 
-        initialize();
+        readFromXML(in);
+        addAIObjectWithId();
         uninitialized = getColony() == null;
-    }
-
-    private void initialize() {
-        aiGoods = new ArrayList<AIGoods>();
-        wishes = new ArrayList<Wish>();
-        tileImprovementPlans = new ArrayList<TileImprovementPlan>();
     }
 
     /**
@@ -202,9 +200,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (AIGoods ag : aiGoods) {
             if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
         }
-        for (Wish w : wishes) disposeList.add(w);
-        for (TileImprovementPlan ti : tileImprovementPlans) disposeList.add(ti);
+        for (Wish w : wishes) {
+            disposeList.add(w);
+        }
+        for (TileImprovementPlan ti : tileImprovementPlans) {
+            disposeList.add(ti);
+        }
         for (AIObject o : disposeList) o.dispose();
+        colonyPlan = null;
+        // Do not clear this.colony, the id is still required.
         super.dispose();
     }
 
@@ -1121,11 +1125,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Specification spec = getSpecification();
         int goodsWishValue = 50;
 
-        // request goods
+        // Request goods.
         // TODO: improve heuristics
         TypeCountMap<GoodsType> required = new TypeCountMap<GoodsType>();
 
-        // add building materials
+        // Add building materials.
         if (colony.getCurrentlyBuilding() != null) {
             for (AbstractGoods ag : colony.getCurrentlyBuilding()
                      .getGoodsRequired()) {
@@ -1135,7 +1139,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
-        // add materials required to improve tiles
+        // Add materials required to improve tiles.
         for (TileImprovementPlan plan : tileImprovementPlans) {
             for (AbstractGoods ag : plan.getType().getExpendedEquipmentType()
                      .getGoodsRequired()) {
@@ -1143,7 +1147,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
 
-        // add raw materials for buildings
+        // Add raw materials for buildings.
         for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
             if (workLocation instanceof Building) {
                 Building building = (Building) workLocation;
@@ -1429,7 +1433,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         String tag, str;
-        initialize();
 
         str = in.getAttributeValue(null, ID_ATTRIBUTE);
         if ((colony = (Colony)aiMain.getFreeColGameObject(str)) == null) {
@@ -1468,7 +1471,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // end compatibility code
                 ) {
                 str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                Wish w = (Wish)aiMain.getAIObject(str);
+                GoodsWish w = (GoodsWish)aiMain.getAIObject(str);
                 if (w == null) w = new GoodsWish(aiMain, str);
                 wishes.add(w);
             } else if (tag.equals(WorkerWish.getXMLElementTagName()
