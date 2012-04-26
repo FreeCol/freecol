@@ -510,7 +510,7 @@ public abstract class AIPlayer extends AIObject {
             if (au.hasMission() && au.getMission().isValid()
                 && !au.getUnit().isOnCarrier()) {
                 try {
-                    au.doMission(getConnection());
+                    au.doMission();
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "doMissions failed", e);
                 }

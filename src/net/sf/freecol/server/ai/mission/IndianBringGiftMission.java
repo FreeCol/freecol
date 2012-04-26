@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -106,10 +105,8 @@ public class IndianBringGiftMission extends Mission {
 
     /**
      * Performs the mission.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
 
         if (!isValid()) {
             // the destination colony may have been destroyed

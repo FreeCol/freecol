@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -123,10 +122,8 @@ public class WorkInsideColonyMission extends Mission {
 
     /**
      * Performs this mission.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         final Unit unit = getUnit();
         if (unit == null || unit.isDisposed() || !isValid()) {
             logger.finest("AI worker broken: " + unit);

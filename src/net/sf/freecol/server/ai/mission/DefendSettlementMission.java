@@ -37,7 +37,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -234,10 +233,8 @@ public class DefendSettlementMission extends Mission {
 
     /**
      * Performs this mission.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         final Unit unit = getUnit();
         if (unit == null || unit.isDisposed()) {
             logger.warning(tag + " broken: " + unit);
@@ -276,7 +273,7 @@ public class DefendSettlementMission extends Mission {
         }                
         if (m != null) {
             aiUnit.setMission(m);
-            m.doMission(aiUnit.getConnection());
+            m.doMission();
             return; // No log, setMission() logs this mission going away.
         }
 

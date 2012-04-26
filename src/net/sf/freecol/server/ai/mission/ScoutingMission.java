@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -291,10 +290,8 @@ public class ScoutingMission extends Mission {
 
     /**
      * Performs this mission.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         final Unit unit = getUnit();
         if (unit == null || unit.isDisposed()) {
             logger.warning(tag + " broken: " + unit);

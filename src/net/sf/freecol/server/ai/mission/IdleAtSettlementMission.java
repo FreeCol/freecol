@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -104,10 +103,8 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * Performs the mission. This is done by moving in a random direction
      * until the move points are zero or the unit gets stuck.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         final Unit unit = getUnit();
         if (unit == null || unit.isDisposed()) {
             logger.warning("AI idler broken: " + unit);

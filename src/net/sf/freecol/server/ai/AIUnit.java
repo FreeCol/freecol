@@ -37,7 +37,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
@@ -65,7 +64,7 @@ import org.w3c.dom.Element;
  * <br>
  * <br>
  *
- * The method {@link #doMission(Connection)} is called once each turn, by
+ * The method {@link #doMission()} is called once each turn, by
  * {@link AIPlayer#startWorking()}, to perform the assigned
  * <code>Mission</code>. Most of the methods in this class just delegates the
  * call to that mission.
@@ -214,15 +213,6 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Convenience accessor for the owning player connection.
-     *
-     * @return The connection.
-     */
-    public Connection getConnection() {
-        return getAIOwner().getConnection();
-    }
-
-    /**
      * Gets the mission this unit has been assigned.
      *
      * @return The <code>Mission</code>.
@@ -278,13 +268,10 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Performs the mission this unit has been assigned.
-     *
-     * @param connection The <code>Connection</code> to use when communicating
-     *            with the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         if (mission != null && mission.isValid()) {
-            mission.doMission(connection);
+            mission.doMission();
         }
     }
 

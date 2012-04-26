@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -82,10 +81,8 @@ public class UnitWanderHostileMission extends Mission {
      * Performs the mission. This is done by searching for hostile units
      * that are located within one tile and attacking them. If no such units
      * are found, then wander in a random direction.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         Unit unit = getUnit();
         if (!(unit.getLocation() instanceof Tile)) {
             return;

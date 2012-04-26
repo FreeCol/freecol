@@ -42,7 +42,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -754,11 +753,9 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Performs the mission. Must be implemented by the subclasses.
-     *
-     * @param connection The <code>Connection</code> to the server.
+     * Performs the mission.
      */
-    public abstract void doMission(Connection connection);
+    public abstract void doMission();
 
 
     // Serialization

@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -95,10 +94,8 @@ public class PrivateerMission extends Mission {
      * Performs the mission. This is done by searching for hostile units
      * that are located within one tile and attacking them. If no such units
      * are found, then wander in a random direction.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
     	logger.finest("Entering doMission");
     	Unit unit = getUnit();
         while(isValid() && unit.getMovesLeft() > 0){
@@ -109,16 +106,16 @@ public class PrivateerMission extends Mission {
         	}
             switch(state){
                 case HUNTING:
-                    hunt4Target(connection);
+                    hunt4Target();
                     break;
                 case TRANSPORTING:
-                    gotoNearestPort(connection);
+                    gotoNearestPort();
                     break;
             }
         }
     }
 
-    private void hunt4Target(Connection  connection){
+    private void hunt4Target() {
         Unit unit = getUnit();
 
         if(unit.getLocation() instanceof Europe){
@@ -174,11 +171,11 @@ public class PrivateerMission extends Mission {
     	unit.setMovesLeft(0);
     }
 
-    private void gotoNearestPort(Connection connection){
+    private void gotoNearestPort() {
         Unit unit = getUnit();
 
         if(isUnitInPort()){
-            dumpCargoInPort(connection);
+            dumpCargoInPort();
             state = PrivateerMissionState.HUNTING;
             return;
         }
@@ -291,7 +288,7 @@ public class PrivateerMission extends Mission {
         return unit.getTile() == nearestPort.getTile();
     }
 
-    private void dumpCargoInPort(Connection connection){
+    private void dumpCargoInPort() {
     	logger.finest("Dumping goods");
         Unit unit = getUnit();
         boolean inEurope = unit.getLocation() instanceof Europe;

@@ -184,7 +184,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askAttack(AIUnit aiUnit, Direction direction) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new AttackMessage(aiUnit.getUnit(), direction));
     }
 
@@ -197,7 +197,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askBuildColony(AIUnit aiUnit, String name) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new BuildColonyMessage(name, aiUnit.getUnit()));
     }
 
@@ -212,7 +212,7 @@ public class AIMessage {
      */
     public static boolean askBuyGoods(AIUnit aiUnit, GoodsType type,
                                       int amount) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new BuyGoodsMessage(aiUnit.getUnit(), type,
                                                amount));
     }
@@ -225,7 +225,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askCashInTreasureTrain(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new CashInTreasureTrainMessage(aiUnit.getUnit()));
     }
 
@@ -238,7 +238,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeState(AIUnit aiUnit, UnitState state) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new ChangeStateMessage(aiUnit.getUnit(), state));
     }
 
@@ -251,7 +251,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkType(AIUnit aiUnit, GoodsType type) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new ChangeWorkTypeMessage(aiUnit.getUnit(), type));
     }
 
@@ -265,7 +265,7 @@ public class AIMessage {
      */
     public static boolean askChangeWorkImprovementType(AIUnit aiUnit,
                                                   TileImprovementType type) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
             new ChangeWorkImprovementTypeMessage(aiUnit.getUnit(), type));
     }
 
@@ -305,7 +305,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askClearSpeciality(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new ClearSpecialityMessage(aiUnit.getUnit()));
     }
 
@@ -319,7 +319,7 @@ public class AIMessage {
      */
     public static boolean askCloseTransaction(AIUnit aiUnit,
                                               Settlement settlement) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new CloseTransactionMessage(aiUnit.getUnit(),
                                                        settlement));
     }
@@ -335,7 +335,7 @@ public class AIMessage {
      */
     public static boolean askDeliverGift(AIUnit aiUnit, Settlement settlement,
                                          Goods goods) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new DeliverGiftMessage(aiUnit.getUnit(),
                                                   settlement, goods));
     }
@@ -348,7 +348,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisembark(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new DisembarkMessage(aiUnit.getUnit()));
     }
 
@@ -363,7 +363,7 @@ public class AIMessage {
      */
     public static boolean askEmbark(AIUnit aiUnit, Unit unit,
                                     Direction direction) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new EmbarkMessage(unit, aiUnit.getUnit(),
                                              direction));
     }
@@ -403,7 +403,7 @@ public class AIMessage {
      */
     public static boolean askEquipUnit(AIUnit aiUnit, EquipmentType type,
                                        int amount) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new EquipUnitMessage(aiUnit.getUnit(), type,
                                                 amount));
     }
@@ -420,7 +420,7 @@ public class AIMessage {
     public static boolean askEstablishMission(AIUnit aiUnit,
                                               Direction direction,
                                               boolean denounce) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new MissionaryMessage(aiUnit.getUnit(), direction,
                                                  denounce));
     }
@@ -435,7 +435,7 @@ public class AIMessage {
      */
     public static boolean askGetTransaction(AIUnit aiUnit,
                                             Settlement settlement) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new GetTransactionMessage(aiUnit.getUnit(),
                                                      settlement));
     }
@@ -453,7 +453,7 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           Goods goods, int gold) {
-        Element reply = askMessage(aiUnit.getConnection(),
+        Element reply = askMessage(aiUnit.getAIOwner().getConnection(),
             new IndianDemandMessage(aiUnit.getUnit(), colony,
                 goods, gold).toXMLElement());
         IndianDemandMessage message
@@ -470,7 +470,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askLoadCargo(AIUnit aiUnit, Goods goods) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new LoadCargoMessage(goods, aiUnit.getUnit()));
     }
 
@@ -485,7 +485,7 @@ public class AIMessage {
      */
     public static boolean askLoot(AIUnit aiUnit, String defenderId,
                                   List<Goods> goods) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
             new LootCargoMessage(aiUnit.getUnit(), defenderId, goods));
     }
 
@@ -498,7 +498,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMove(AIUnit aiUnit, Direction direction) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new MoveMessage(aiUnit.getUnit(), direction));
     }
 
@@ -511,7 +511,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMoveTo(AIUnit aiUnit, Location destination) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new MoveToMessage(aiUnit.getUnit(), destination));
     }
 
@@ -523,7 +523,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new PutOutsideColonyMessage(aiUnit.getUnit()));
     }
 
@@ -537,7 +537,7 @@ public class AIMessage {
      */
     public static boolean askScoutIndianSettlement(AIUnit aiUnit,
                                                    Direction direction) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new ScoutIndianSettlementMessage(aiUnit.getUnit(),
                                                             direction));
     }
@@ -551,7 +551,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askSellGoods(AIUnit aiUnit, Goods goods) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new SellGoodsMessage(goods, aiUnit.getUnit()));
     }
 
@@ -565,7 +565,7 @@ public class AIMessage {
      */
     public static boolean askSetBuildQueue(AIColony aiColony,
                                            List<BuildableType> queue) {
-        return sendMessage(aiColony.getConnection(),
+        return sendMessage(aiColony.getAIOwner().getConnection(),
                            new SetBuildQueueMessage(aiColony.getColony(),
                                                     queue));
     }
@@ -593,7 +593,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askUnloadCargo(AIUnit aiUnit, Goods goods) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new UnloadCargoMessage(goods));
     }
 
@@ -606,7 +606,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askWork(AIUnit aiUnit, WorkLocation workLocation) {
-        return sendMessage(aiUnit.getConnection(),
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new WorkMessage(aiUnit.getUnit(), workLocation));
     }
 }

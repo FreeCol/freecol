@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -87,10 +86,8 @@ public class UnitWanderMission extends Mission {
     /**
      * Performs the mission. This is done by moving in a random direction
      * until the move points are zero or the unit gets stuck.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         Unit unit = getUnit();
 
         while (unit.getMovesLeft() > 0) {

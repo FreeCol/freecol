@@ -52,7 +52,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -460,8 +459,7 @@ public class TransportMission extends Mission {
      *
      * @return True if this ship is still capable of its mission.
      */
-    private boolean attackIfEnemyShipIsBlocking(Connection connection,
-                                                Direction direction) {
+    private boolean attackIfEnemyShipIsBlocking(Direction direction) {
         final Unit carrier = getUnit();
         if (canAttackEnemyShips()
             && carrier.getMoveType(direction) == MoveType.ATTACK_UNIT) {
@@ -479,7 +477,7 @@ public class TransportMission extends Mission {
      *
      * @return True if this ship is still capable of its mission.
      */
-    private boolean attackEnemyShips(Connection connection) {
+    private boolean attackEnemyShips() {
         if (!canAttackEnemyShips()) {
             return true;
         }
@@ -560,10 +558,8 @@ public class TransportMission extends Mission {
 
     /**
      * Performs the mission.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {
+    public void doMission() {
         logger.finest("Doing transport mission for unit " + getUnit()
             + "(" + getUnit().getId() + ")");
         if (transportList == null || transportList.size() <= 0) {
@@ -574,13 +570,13 @@ public class TransportMission extends Mission {
         if (carrier.getMovesLeft() == 0) return;
         if (carrier.isAtSea()) return; // Going to/from Europe, do nothing
         if (carrier.isInEurope()) { // Actually in Europe
-            inEurope(connection);
+            inEurope();
             return;
         }
 
-        if (!attackEnemyShips(connection)) return;
-        restockCargoAtDestination(connection);
-        if (!attackEnemyShips(connection)) return;
+        if (!attackEnemyShips()) return;
+        restockCargoAtDestination();
+        if (!attackEnemyShips()) return;
 
         boolean transportListChanged = false;
         boolean moreWork = true;
@@ -622,7 +618,7 @@ public class TransportMission extends Mission {
             }
 
             if (destination.isAtDestination()) {
-                transportListChanged = restockCargoAtDestination(connection);
+                transportListChanged = restockCargoAtDestination();
                 continue;
             }
 
@@ -650,10 +646,10 @@ public class TransportMission extends Mission {
                 }
             }
             if (r != null) {
-                if (!attackIfEnemyShipIsBlocking(connection, r)) return;
+                if (!attackIfEnemyShipIsBlocking(r)) return;
             }
-            transportListChanged = restockCargoAtDestination(connection);
-            if (!attackEnemyShips(connection)) return;
+            transportListChanged = restockCargoAtDestination();
+            if (!attackEnemyShips()) return;
         }
     }
 
@@ -765,10 +761,8 @@ public class TransportMission extends Mission {
      *
      * <b>Warning:</b> This method can only be called when the carrier is
      * located in {@link Europe}.
-     *
-     * @param connection The <code>Connection</code> to the server.
      */
-    private void buyCargo(Connection connection) {
+    private void buyCargo() {
         if (!getUnit().isInEurope()) {
             throw new IllegalStateException("Carrier not in Europe");
         }
@@ -786,7 +780,7 @@ public class TransportMission extends Mission {
             AIUnit newUnit;            
             for (int space = getAvailableSpace(); space > 0;
                  space -= newUnit.getUnit().getSpaceTaken()) {
-                newUnit = getCheapestUnitInEurope(connection);
+                newUnit = getCheapestUnitInEurope();
                 if (newUnit == null
                     || !BuildColonyMission.isValid(newUnit)) break;
                 addToTransportList(newUnit);
@@ -849,7 +843,7 @@ public class TransportMission extends Mission {
                 if (w.getTransportable() != null) continue;
                 if (w instanceof WorkerWish) {
                     WorkerWish ww = (WorkerWish) w;
-                    AIUnit newUnit = getUnitInEurope(connection, ww.getUnitType());
+                    AIUnit newUnit = getUnitInEurope(ww.getUnitType());
                     if (newUnit != null) {
                         newUnit.setMission(new WishRealizationMission(getAIMain(), newUnit, ww));
                         ww.setTransportable(newUnit);
@@ -858,7 +852,7 @@ public class TransportMission extends Mission {
                     }
                 } else if (w instanceof GoodsWish) {
                     GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(),
+                    AIGoods ag = buyGoodsInEurope(gw.getGoodsType(),
                                                   GoodsContainer.CARGO_SIZE, gw.getDestination());
                     if (ag != null) {
                         gw.setTransportable(ag);
@@ -874,7 +868,7 @@ public class TransportMission extends Mission {
         // Fill the transport with cheap colonists:
         int space = getAvailableSpace();
         while (space > 0) {
-            AIUnit newUnit = getCheapestUnitInEurope(connection);
+            AIUnit newUnit = getCheapestUnitInEurope();
             if (newUnit != null) {
                 addToTransportList(newUnit);
                 space--;
@@ -893,15 +887,13 @@ public class TransportMission extends Mission {
      * <b>Warning:</b> This method can only be called when the carrier is
      * located in {@link Europe}.
      *
-     * @param connection The <code>Connection</code> to use when communicating
-     *            with the server.
      * @param type The type of goods to buy.
      * @param amount The amount of goods to buy.
      * @param destination The <code>Location</code> to which the goods should
      *            be transported.
      * @return The goods.
      */
-    public AIGoods buyGoodsInEurope(Connection connection, GoodsType type, int amount, Location destination) {
+    public AIGoods buyGoodsInEurope(GoodsType type, int amount, Location destination) {
         AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
@@ -934,11 +926,10 @@ public class TransportMission extends Mission {
      * <li>Training the unit.
      * </ol>
      *
-     * @param connection The <code>Connection</code> to the server.
      * @param unitType The type of {@link Unit} to be found/recruited/trained.
      * @return The <code>AIUnit</code>.
      */
-    private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
+    private AIUnit getUnitInEurope(UnitType unitType) {
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
@@ -984,11 +975,9 @@ public class TransportMission extends Mission {
     /**
      * Returns the cheapest unit which can be bought in <code>Europe</code>.
      *
-     * @param connection The connection to use when communicating with the
-     *            server.
      * @return The <code>AIUnit</code>.
      */
-    private AIUnit getCheapestUnitInEurope(Connection connection) {
+    private AIUnit getCheapestUnitInEurope() {
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
@@ -1138,24 +1127,21 @@ public class TransportMission extends Mission {
     /**
      * Loads and unloads any <code>Transportable</code>.
      *
-     * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been loaded/unloaded and
      *         <code>false</code>otherwise.
      */
-    private boolean restockCargoAtDestination(Connection connection) {
-        return unloadCargoAtDestination(connection)
-            || loadCargoAtDestination(connection);
+    private boolean restockCargoAtDestination() {
+        return unloadCargoAtDestination() || loadCargoAtDestination();
     }
 
     /**
      * Unloads any <code>Transportable</code>s which have reached their
      * destination.
      *
-     * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been unloaded and
      *         <code>false</code>otherwise.
      */
-    private boolean unloadCargoAtDestination(Connection connection) {
+    private boolean unloadCargoAtDestination() {
         Map map = getGame().getMap();
         Unit carrier = getUnit();
         boolean transportListChanged = false;
@@ -1209,7 +1195,7 @@ public class TransportMission extends Mission {
                             && (d = dropNode.getTile().getDistanceTo(carrier.getTile())) != Map.COST_INFINITY
                             && d <= 1) {
                             // Next to the drop node, proceed with mission
-                            mission.doMission(connection);
+                            mission.doMission();
                             reason = "Next to drop node " + dropNode.getTile();
                         }
                     } else {
@@ -1280,11 +1266,10 @@ public class TransportMission extends Mission {
     /**
      * Loads any <code>Transportable</code>s being in range of the carrier.
      *
-     * @param connection The <code>Connection</code> to the server.
      * @return <code>true</code> if something has been unloaded and
      *         <code>false</code>otherwise.
      */
-    private boolean loadCargoAtDestination(Connection connection) {
+    private boolean loadCargoAtDestination() {
         Unit carrier = getUnit();
         if (carrier.isAtSea()) return false;
 
@@ -1407,13 +1392,11 @@ public class TransportMission extends Mission {
     /**
      * Unit is in Europe, unload cargo on board, buy required goods
      * and board unit.
-     *
-     * @param connection  The <code>Connection</code> to the server.
      */
-    private void inEurope(Connection connection){
-        restockCargoAtDestination(connection);
-        buyCargo(connection);
-        restockCargoAtDestination(connection);
+    private void inEurope() {
+        restockCargoAtDestination();
+        buyCargo();
+        restockCargoAtDestination();
 
         // Move back to America:
         Unit carrier = getUnit();

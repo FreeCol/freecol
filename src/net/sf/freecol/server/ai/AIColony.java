@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -250,10 +249,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     protected AIPlayer getAIOwner() {
         return getAIMain().getAIPlayer(colony.getOwner());
-    }
-
-    protected Connection getConnection() {
-        return getAIOwner().getConnection();
     }
 
     /**
