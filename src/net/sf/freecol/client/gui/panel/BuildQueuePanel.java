@@ -158,9 +158,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         Action deleteAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
                     for (Object type : buildQueueList.getSelectedValues()) {
-                        model.removeElement(type);
+                        removeBuildable(type);
                     }
                     updateAllLists();
                 }
@@ -229,6 +228,11 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         add(compact);
         add(showAll);
         add(okButton, "tag ok");
+    }
+
+    private void removeBuildable(Object type) {
+        DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
+        model.removeElement(type);
     }
 
     private void updateUnitList() {
@@ -556,22 +560,29 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     /**
      * This function analyses an event and calls the right methods to take
      * care of the user's requests.
+     *
      * @param event The incoming ActionEvent.
      */
     @Override
     public void actionPerformed(ActionEvent event) {
+        final String FAIL = "FAIL";
         if (colony.getOwner() == getMyPlayer()) {
             String command = event.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
-            if (!buildables.isEmpty() && lockReasons.get(buildables.get(0)) != null) {
+            while (!buildables.isEmpty()
+                && lockReasons.get(buildables.get(0)) != null) {
                 getGUI().showInformationMessage(buildables.get(0),
-                                                   StringTemplate.template("colonyPanel.unbuildable")
-                                                   .addName("%colony%", colony.getName())
-                                                   .add("%object%", buildables.get(0).getNameKey()));
-                return;
+                    StringTemplate.template("colonyPanel.unbuildable")
+                        .addName("%colony%", colony.getName())
+                        .add("%object%", buildables.get(0).getNameKey()));
+                command = FAIL;
+                removeBuildable(buildables.remove(0));
             }
             getController().setBuildQueue(colony, buildables);
-            if (OK.equals(command)) {
+            if (FAIL.equals(command)) { // Let the user reconsider.
+                updateAllLists();
+                return;
+            } else if (OK.equals(command)) {
                 // do nothing?
             } else if (BUY.equals(command)) {
                 getController().payForBuilding(colony);
