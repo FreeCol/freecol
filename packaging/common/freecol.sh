@@ -43,7 +43,11 @@ if test "x${FCDAT}" = "x" ; then
 # - Is it in a likely linux FHS place?
     elif test -d "/usr/share/freecol/data" ; then
         FCDAT="/usr/share/freecol/data"
-# Give up.
+# - It it in $HOME/freecol?
+    elif test "x${HOME}" != "x" -a -d "${HOME}/freecol" \
+           -a -d "${HOME}/freecol/${FREECOLDATA}" ; then
+        FCDAT="${HOME}/freecol/${FREECOLDATA}"
+# - Give up.
     else
         echo "can not find freecol data directory" >&2
         exit 1
@@ -76,4 +80,4 @@ if test "x${FCDAT}" = "xDONTSET!" ; then
 else
     FCDAT="--freecol-data ${FCDAT}"
 fi
-exec java -Xmx512M -jar "${FCJAR}" "${FCDAT}" ${1+"$@"}
+exec java -Xmx512M -cp "${FCJAR}" net.sf.freecol.FreeCol "${FCDAT}" ${1+"$@"}
