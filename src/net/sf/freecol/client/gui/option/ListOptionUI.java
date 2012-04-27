@@ -38,7 +38,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.AbstractOption;
@@ -69,7 +68,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private JButton[] buttons = new JButton[] {
         editButton, addButton, removeButton, upButton, downButton
     };
-    private FreeColClient freeColClient;
 
 
     /**
@@ -79,7 +77,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * @param option
      * @param editable boolean whether user can modify the setting
      */
-    public ListOptionUI(FreeColClient freeColClient, final GUI gui, final ListOption<T> option, boolean editable) {
+    public ListOptionUI(final GUI gui, final ListOption<T> option, boolean editable) {
         super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -100,7 +98,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             ? option.getTemplate()
             : option.getValue().get(0);
         if (o != null) {
-            OptionUI ui = OptionUI.getOptionUI(freeColClient, gui, o, editable);
+            OptionUI ui = OptionUI.getOptionUI(gui, o, editable);
             if (ui != null && ui.getListCellRenderer() != null) {
                 list.setCellRenderer(ui.getListCellRenderer());
             }

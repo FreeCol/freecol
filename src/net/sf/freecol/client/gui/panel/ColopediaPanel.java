@@ -36,6 +36,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import net.miginfocom.swing.MigLayout;
@@ -160,9 +161,9 @@ public final class ColopediaPanel extends FreeColPanel
         tree.addTreeSelectionListener(this);
 
         listPanel.add(tree);
-        Enumeration allNodes = root.depthFirstEnumeration();
+        Enumeration<DefaultMutableTreeNode> allNodes = root.depthFirstEnumeration();
         while (allNodes.hasMoreElements()) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) allNodes.nextElement();
+            DefaultMutableTreeNode node = allNodes.nextElement();
             ColopediaTreeItem item = (ColopediaTreeItem) node.getUserObject();
             nodeMap.put(item.getId(), node);
         }

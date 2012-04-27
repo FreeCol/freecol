@@ -36,7 +36,6 @@ import net.sf.freecol.common.model.Specification;
  */
 public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ListOption.class.getName());
 
     /**

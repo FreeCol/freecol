@@ -124,7 +124,6 @@ public class GUI {
     private FreeColClient freeColClient;
 
 
-    // GUI:
     private GraphicsDevice gd;
 
     private FreeColFrame frame;

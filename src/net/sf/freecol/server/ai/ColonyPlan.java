@@ -80,7 +80,6 @@ import org.w3c.dom.Element;
  */
 public class ColonyPlan {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
 
     // Require production plans to always produce an amount exceeding this.
@@ -222,14 +221,6 @@ public class ColonyPlan {
         return aiMain;
     }
 
-    /**
-     * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.
-     *
-     * @return The <code>Colony</code>.
-     */
-    private Colony getColony() {
-        return colony;
-    }
 
     /**
      * Gets the specification.
@@ -329,7 +320,6 @@ public class ColonyPlan {
      */
     public void update() {
         UnitType defaultUnitType = spec().getDefaultUnitType();
-        GoodsType goodsType;
 
         // Update the profile type.
         profileType = ProfileType

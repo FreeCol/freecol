@@ -24,7 +24,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -177,7 +176,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
 
     @SuppressWarnings("unchecked")
-    public static OptionUI getOptionUI(FreeColClient freeColClient, GUI gui, Option option, boolean editable) {
+    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
         if (option instanceof BooleanOption) {
             return new BooleanOptionUI(gui, (BooleanOption) option, editable);
         } else if (option instanceof FileOption) {
@@ -203,9 +202,9 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof ModOption) {
             return new ModOptionUI(gui, (ModOption) option, editable);
         } else if (option instanceof UnitListOption) {
-            return new ListOptionUI(freeColClient, gui, (UnitListOption) option, editable);
+            return new ListOptionUI(gui, (UnitListOption) option, editable);
         } else if (option instanceof ModListOption) {
-            return new ListOptionUI(freeColClient, gui, (ModListOption) option, editable);
+            return new ListOptionUI(gui, (ModListOption) option, editable);
         } else {
             return null;
         }
