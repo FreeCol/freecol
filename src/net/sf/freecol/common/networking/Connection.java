@@ -204,10 +204,13 @@ public class Connection {
      *
      * @throws IOException
      */
-    public void close() throws IOException {
-        Element disconnect = DOMMessage.createNewRootElement("disconnect");
-        sendDumping(disconnect);
-        reallyClose();
+    public void close() {
+        try {
+            sendDumping(DOMMessage.createMessage("disconnect"));
+            reallyClose();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing " + this.toString(), e);
+        }
     }
 
     /**
@@ -424,9 +427,8 @@ public class Connection {
                             reply = messageHandler.handle(conn,
                                 (Element)element.getFirstChild());
                             if (reply == null) {
-                                reply = DOMMessage.createNewRootElement("reply");
-                                reply.setAttribute("networkReplyId",
-                                    networkReplyId);
+                                reply = DOMMessage.createMessage("reply",
+                                    "networkReplyId", networkReplyId);
                             } else {
                                 Element header = reply.getOwnerDocument()
                                     .createElement("reply");

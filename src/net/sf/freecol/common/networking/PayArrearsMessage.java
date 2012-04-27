@@ -86,9 +86,8 @@ public class PayArrearsMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("goodsType", goodsTypeId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "goodsType", goodsTypeId);
     }
 
     /**

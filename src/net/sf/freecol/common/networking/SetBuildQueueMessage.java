@@ -140,9 +140,9 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("colony", colonyId);
-        result.setAttribute("size", Integer.toString(queue.length));
+        Element result = createMessage(getXMLElementTagName(),
+            "colony", colonyId,
+            "size", Integer.toString(queue.length));
         for (int i = 0; i < queue.length; i++) {
             result.setAttribute("x" + Integer.toString(i), queue[i]);
         }

@@ -137,10 +137,9 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("improvementType", improvementId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "improvementType", improvementId);
     }
 
     /**

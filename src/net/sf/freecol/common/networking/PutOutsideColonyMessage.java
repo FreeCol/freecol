@@ -98,9 +98,8 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId);
     }
 
     /**

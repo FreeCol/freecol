@@ -51,13 +51,11 @@ public final class DummyConnection extends Connection {
         setMessageHandler(incomingMessageHandler);
     }
 
+
     /**
      * Closes this connection.
-     *
-     * @throws IOException Will not be thrown by a <code>DummyConnection</code>,
-     *             but added because of the superclass' specification.
      */
-    public void close() throws IOException {
+    public void close() {
         // Do nothing.
     }
 

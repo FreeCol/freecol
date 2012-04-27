@@ -204,9 +204,9 @@ public class DiplomacyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
+        Element result = createMessage(getXMLElementTagName(),
+            "settlement", settlement.getId());
         Document doc = result.getOwnerDocument();
-        result.setAttribute("settlement", settlement.getId());
         result.appendChild(agreement.toXMLElement(null, doc));
         result.appendChild(unit.toXMLElement(null, doc));
         return result;

@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -106,10 +104,9 @@ import org.w3c.dom.Element;
 /**
  * The main control class for the FreeCol server. This class both starts and
  * keeps references to all of the server objects and the game model objects.
- * <br>
- * <br>
- * If you would like to start a new server you just create a new object of this
- * class.
+ *
+ * If you would like to start a new server you just create a new
+ * object of this class.
  */
 public final class FreeColServer {
 
@@ -683,52 +680,44 @@ public final class FreeColServer {
      * @throws NoRouteToServerException if the meta-server cannot connect to
      *      this server.
      */
-    public void updateMetaServer(boolean firstTime) throws NoRouteToServerException {
-        if (!publicServer) {
-            return;
-        }
+    public void updateMetaServer(boolean firstTime)
+        throws NoRouteToServerException {
+        if (!publicServer) return;
+
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.SERVER_THREAD);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
+                                FreeCol.META_SERVER_PORT, null,
+                                FreeCol.SERVER_THREAD);
         } catch (IOException e) {
-            logger.warning("Could not connect to meta-server.");
+            logger.log(Level.WARNING, "Could not connect to meta-server.", e);
             return;
         }
+
+        String tag = (firstTime) ? "register" : "update";
+        String addr = (name != null) ? name
+            : (mc.getSocket().getLocalAddress().getHostAddress() + ":"
+                + Integer.toString(port));
+        int nPlayers = getNumberOfLivingHumanPlayers();
+        boolean started = gameState != GameState.STARTING_GAME;
         try {
-            Element element;
-            if (firstTime) {
-                element = DOMMessage.createNewRootElement("register");
-            } else {
-                element = DOMMessage.createNewRootElement("update");
-            }
-            // TODO: Add possibility of choosing a name:
-            if (name != null) {
-                element.setAttribute("name", name);
-            } else {
-                element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":"
-                                     + Integer.toString(port));
-            }
-            element.setAttribute("port", Integer.toString(port));
-            element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
-            element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
-            element.setAttribute("isGameStarted", Boolean.toString(gameState != GameState.STARTING_GAME));
-            element.setAttribute("version", FreeCol.getVersion());
-            element.setAttribute("gameState", Integer.toString(getGameState().ordinal()));
-            Element reply = mc.askDumping(element);
-            if (reply != null && reply.getTagName().equals("noRouteToServer")) {
+            Element reply = mc.askDumping(DOMMessage.createMessage(tag,
+                    "name", addr,
+                    "port", Integer.toString(port),
+                    "slotsAvailable", Integer.toString(getSlotsAvailable()),
+                    "currentlyPlaying", Integer.toString(nPlayers),
+                    "isGameStarted", Boolean.toString(started),
+                    "version", FreeCol.getVersion(),
+                    "gameState", Integer.toString(getGameState().ordinal())));
+            if (reply != null
+                && reply.getTagName().equals("noRouteToServer")) {
                 throw new NoRouteToServerException();
             }
         } catch (IOException e) {
-            logger.warning("Network error while communicating with the meta-server.");
+            logger.log(Level.WARNING, "Network error with meta-server.", e);
             return;
         } finally {
-            try {
-                // mc.reallyClose();
-                mc.close();
-            } catch (IOException e) {
-                logger.warning("Could not close connection to meta-server.");
-                return;
-            }
+            mc.close();
         }
     }
 
@@ -737,39 +726,35 @@ public final class FreeColServer {
      * sent if <code>public == true</code>.
      */
     public void removeFromMetaServer() {
-        if (!publicServer) {
-            return;
-        }
+        if (!publicServer) return;
+
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.SERVER_THREAD);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
+                                FreeCol.META_SERVER_PORT,
+                                null, FreeCol.SERVER_THREAD);
         } catch (IOException e) {
-            logger.warning("Could not connect to meta-server.");
+            logger.log(Level.WARNING, "Could not connect to meta-server.", e);
             return;
         }
+
         try {
-            Element element = DOMMessage.createNewRootElement("remove");
-            element.setAttribute("port", Integer.toString(port));
-            mc.sendDumping(element);
+            mc.sendDumping(DOMMessage.createMessage("remove",
+                    "port", Integer.toString(port)));
         } catch (IOException e) {
-            logger.warning("Network error while communicating with the meta-server.");
+            logger.log(Level.WARNING, "Network error with meta-server.", e);
             return;
         } finally {
-            try {
-                // mc.reallyClose();
-                mc.close();
-            } catch (IOException e) {
-                logger.warning("Could not close connection to meta-server.");
-                return;
-            }
+            mc.close();
         }
     }
 
     /**
      * Gets the number of player that may connect.
      *
-     * @return The number of available slots for human players. This number also
-     *         includes european players currently controlled by the AI.
+     * @return The number of available slots for human players.  This
+     *     number also includes european players currently controlled
+     *     by the AI.
      */
     public int getSlotsAvailable() {
         List<Player> players = game.getPlayers();
@@ -789,16 +774,15 @@ public final class FreeColServer {
     /**
      * Gets the number of human players in this game that is still playing.
      *
-     * @return The number.
+     * @return The number of living human players.
      */
     public int getNumberOfLivingHumanPlayers() {
-        List<Player> players = game.getPlayers();
         int n = 0;
-        for (int i = 0; i < players.size(); i++) {
-            if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead()
-                && ((ServerPlayer) players.get(i)).isConnected()) {
-                n++;
-            }
+        for (Player p : game.getPlayers()) {
+            ServerPlayer serverPlayer = (ServerPlayer)p;
+            if (!serverPlayer.isAI()
+                && !serverPlayer.isDead()
+                && !serverPlayer.isConnected()) n++;
         }
         return n;
     }
@@ -811,7 +795,8 @@ public final class FreeColServer {
      * @throws IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveGame(File file, String username, OptionGroup options) throws IOException {
+    public void saveGame(File file, String username, OptionGroup options)
+        throws IOException {
         saveGame(file, username, options, null);
     }
 
@@ -821,10 +806,11 @@ public final class FreeColServer {
      * @param file The file where the data will be written.
      * @param username The username of the player saving the game.
      * @param image an <code>Image</code> value
-     * @exception IOException If a problem was encountered while trying to open,
-     *             write or close the file.
+     * @throws IOException If a problem was encountered while trying
+     *     to open, write or close the file.
      */
-    public void saveGame(File file, String username, OptionGroup options, BufferedImage image)
+    public void saveGame(File file, String username, OptionGroup options,
+                         BufferedImage image)
         throws IOException {
         final ServerGame game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -889,20 +875,12 @@ public final class FreeColServer {
             xsw.flush();
             xsw.close();
         } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
+            throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException(e.toString());
+            throw new IOException("Exception: " + e.getMessage());
         } finally {
             try {
-                if (fos != null) {
-                    fos.close();
-                }
+                if (fos != null) fos.close();
             } catch (IOException e) {
                 // do nothing
             }
@@ -1033,10 +1011,7 @@ public final class FreeColServer {
             }
             return game;
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException(e.toString());
+            throw new IOException("Exception: " + e.getMessage());
         } finally {
             if (xs != null) xs.close();
         }
@@ -1359,11 +1334,11 @@ public final class FreeColServer {
         playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            Element reconnect = DOMMessage.createNewRootElement("reconnect");
             try {
-                player.getConnection().sendDumping(reconnect);
-            } catch (IOException ex) {
-                logger.warning("Could not send reconnect message!");
+                player.getConnection()
+                    .sendDumping(DOMMessage.createMessage("reconnect"));
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error sending reconnect.", e);
             }
         }
     }
@@ -1485,11 +1460,12 @@ public final class FreeColServer {
         throws IllegalStateException {
         Settlement settlement = getAdjacentSettlementSafely(settlementId, unit);
         if (!(settlement instanceof IndianSettlement)) {
-            throw new IllegalStateException("Not an indianSettlement: " + settlementId);
+            throw new IllegalStateException("Not an indianSettlement: "
+                + settlementId);
         }
         if (!unit.getOwner().hasContacted(settlement.getOwner())) {
             throw new IllegalStateException("Player has not established contact with the "
-                                            + settlement.getOwner().getNation());
+                + settlement.getOwner().getNation());
         }
         return (IndianSettlement) settlement;
     }
@@ -1504,14 +1480,15 @@ public final class FreeColServer {
     public ServerPlayer addAIPlayer(Nation nation) {
         String name = nation.getRulerNameKey();
         DummyConnection theConnection =
-            new DummyConnection("Server connection - " + name, getInGameInputHandler());
+            new DummyConnection("Server connection - " + name,
+                getInGameInputHandler());
         ServerPlayer aiPlayer
             = new ServerPlayer(getGame(), name, false, nation,
                                null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + name,
-                                  new AIInGameInputHandler(this, aiPlayer, getAIMain()));
+                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
 
         aiConnection.setOutgoingMessageHandler(theConnection);
         theConnection.setOutgoingMessageHandler(aiConnection);
@@ -1522,9 +1499,10 @@ public final class FreeColServer {
 
         // Send message to all players except to the new player:
         // TODO: null-destination-player is unnecessarily generous visibility
-        Element addNewPlayer = DOMMessage.createNewRootElement("addPlayer");
-        addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
-        getServer().sendToAll(addNewPlayer, theConnection);
+        Element player = DOMMessage.createMessage("addPlayer");
+        player.appendChild(aiPlayer.toXMLElement(null, 
+                player.getOwnerDocument()));
+        getServer().sendToAll(player, theConnection);
         return aiPlayer;
     }
 
@@ -1593,8 +1571,8 @@ public final class FreeColServer {
         FileOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
-            fos = new FileOutputStream(new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE));
-
+            fos = new FileOutputStream(new File(FreeCol.getDataDirectory(),
+                                                HIGH_SCORE_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
             xsw.writeStartDocument("UTF-8", "1.0");
             xsw.writeStartElement("highScores");
@@ -1611,20 +1589,12 @@ public final class FreeColServer {
             xsw.flush();
             xsw.close();
         } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
+            throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException(e.toString());
+            throw new IOException("Exception: " + e.getMessage());
         } finally {
             try {
-                if (fos != null) {
-                    fos.close();
-                }
+                if (fos != null) fos.close();
             } catch (IOException e) {
                 // do nothing
             }
@@ -1659,19 +1629,11 @@ public final class FreeColServer {
             xsr.close();
             Collections.sort(highScores, highScoreComparator);
         } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
+            throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException(e.toString());
+            throw new IOException("Exception: " + e.getMessage());
         } finally {
-            if (fis != null) {
-                fis.close();
-            }
+            if (fis != null) fis.close();
         }
     }
 

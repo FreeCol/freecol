@@ -120,9 +120,8 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("slot", slotString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "slot", slotString);
     }
 
     /**

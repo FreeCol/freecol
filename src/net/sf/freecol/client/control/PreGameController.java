@@ -48,99 +48,99 @@ import org.w3c.dom.Element;
 
 
 /**
-* The controller that will be used before the game starts.
-*/
+ * The controller that will be used before the game starts.
+ */
 public final class PreGameController {
 
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
 
+    /** The main client. */
     private FreeColClient freeColClient;
 
+    /** The GUI to display on. */
     private GUI gui;
 
+
     /**
-    * The constructor to use.
-    * @param freeColClient The main controller.
-    */
+     * The constructor to use.
+     *
+     * @param freeColClient The main client.
+     * @param gui The <code>GUI</code> to display on.
+     */
     public PreGameController(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
     }
 
+
     /**
-    * Sets this client to be (or not be) ready to start the game.
-    * @param ready Indicates wether or not this client is ready
-    *              to start the game.
-    */
+     * Sets this client to be (or not be) ready to start the game.
+     *
+     * @param ready Indicates whether or not this client is ready to
+     *     start the game.
+     */
     public void setReady(boolean ready) {
-        // Make the change:
         freeColClient.getMyPlayer().setReady(ready);
 
-        // Inform the server:
-        Element readyElement = DOMMessage.createNewRootElement("ready");
-        readyElement.setAttribute("value", Boolean.toString(ready));
-
-        freeColClient.getClient().send(readyElement);
+        freeColClient.getClient().send(DOMMessage.createMessage("ready",
+                "value", Boolean.toString(ready)));
     }
-
 
     /**
      * Sets this client's player's nation.
-     * @param nation Which nation this player wishes to set.
+     *
+     * @param nation Which <code>Nation</code> this player wishes to set.
      */
     public void setNation(Nation nation) {
-        // Make the change:
         freeColClient.getMyPlayer().setNation(nation);
 
-        // Inform the server:
-        Element nationElement = DOMMessage.createNewRootElement("setNation");
-        nationElement.setAttribute("value", nation.getId());
-
-        freeColClient.getClient().sendAndWait(nationElement);
+        freeColClient.getClient()
+            .sendAndWait(DOMMessage.createMessage("setNation",
+                    "value", nation.getId()));
     }
-
 
     /**
      * Sets this client's player's nation type.
-     * @param nationType Which nation this player wishes to set.
+     *
+     * @param nationType Which nation type this player wishes to set.
      */
     public void setNationType(NationType nationType) {
-        // Make the change:
         freeColClient.getMyPlayer().setNationType(nationType);
 
-        // Inform the server:
-        Element nationTypeElement = DOMMessage.createNewRootElement("setNationType");
-        nationTypeElement.setAttribute("value", nationType.getId());
-
-        freeColClient.getClient().sendAndWait(nationTypeElement);
+        freeColClient.getClient()
+            .sendAndWait(DOMMessage.createMessage("setNationType",
+                    "value", nationType.getId()));
     }
-
-
-    public void setAvailable(Nation nation, NationState state) {
-        freeColClient.getGame().getNationOptions().getNations().put(nation, state);
-        Element availableElement = DOMMessage.createNewRootElement("setAvailable");
-        availableElement.setAttribute("nation", nation.getId());
-        availableElement.setAttribute("state", state.toString());
-        freeColClient.getClient().sendAndWait(availableElement);
-    }
-
 
     /**
-    * Requests the game to be started. This will only be successful
-    * if all players are ready to start the game.
-    */
-    public void requestLaunch() {
-        if (!freeColClient.getGame().isAllPlayersReadyToLaunch()) {
-            gui.errorMessage("server.notAllReady");
-            return;
-        }
+     * Sets a nation's state.
+     *
+     * @param nation The <code>Nation</code> to set.
+     * @param state The <code>NationState</code> value to set.
+     */
+    public void setAvailable(Nation nation, NationState state) {
+        freeColClient.getGame().getNationOptions()
+            .getNations().put(nation, state);
 
-        Element requestLaunchElement = DOMMessage.createNewRootElement("requestLaunch");
-        freeColClient.getClient().send(requestLaunchElement);
-
-        gui.showStatusPanel( Messages.message("status.startingGame") );
+        freeColClient.getClient()
+            .sendAndWait(DOMMessage.createMessage("setAvailable",
+                    "nation", nation.getId(),
+                    "state", state.toString()));
     }
 
+    /**
+     * Requests the game to be started.  This will only be successful
+     * if all players are ready to start the game.
+     */
+    public void requestLaunch() {
+        if (freeColClient.getGame().isAllPlayersReadyToLaunch()) {
+            gui.showStatusPanel(Messages.message("status.startingGame"));
+            freeColClient.getClient()
+                .send(DOMMessage.createMessage("requestLaunch"));
+        } else {
+            gui.errorMessage("server.notAllReady");
+        }
+    }
 
     /**
      * Sends a chat message.
@@ -148,36 +148,37 @@ public final class PreGameController {
      * @param message The text of the message.
      */
     public void chat(String message) {
-        ChatMessage chatMessage = new ChatMessage(freeColClient.getMyPlayer(),
-                                                  message,
-                                                  Boolean.FALSE);
-        freeColClient.getClient().send(chatMessage.toXMLElement());
+        freeColClient.getClient()
+            .send(new ChatMessage(freeColClient.getMyPlayer(),
+                    message, Boolean.FALSE).toXMLElement());
     }
 
-
     /**
-    * Sends the {@link GameOptions} to the server.
-    * This method should be called after updating that object.
-    */
+     * Sends the {@link GameOptions} to the server.
+     * This method should be called after updating that object.
+     */
     public void sendGameOptions() {
-        Element updateGameOptionsElement = DOMMessage.createNewRootElement("updateGameOptions");
-        OptionGroup gameOptions = freeColClient.getGame().getSpecification().getOptionGroup("gameOptions");
-        updateGameOptionsElement.appendChild(gameOptions.toXMLElement(updateGameOptionsElement.getOwnerDocument()));
-        freeColClient.getClient().send(updateGameOptionsElement);
+        OptionGroup gameOptions = freeColClient.getGame().getSpecification()
+            .getOptionGroup("gameOptions");
+
+        Element up = DOMMessage.createMessage("updateGameOptions");
+        up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
+        freeColClient.getClient().send(up);
     }
 
     /**
      * Sends the {@link MapGeneratorOptions} to the server.
      * This method should be called after updating that object.
      */
-     public void sendMapGeneratorOptions() {
-         OptionGroup mapGeneratorOptions = freeColClient.getGame().getMapGeneratorOptions();
-         Element updateMapGeneratorOptionsElement = DOMMessage.createNewRootElement("updateMapGeneratorOptions");
-         updateMapGeneratorOptionsElement
-             .appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
-         //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
-         freeColClient.getClient().send(updateMapGeneratorOptionsElement);
-     }
+    public void sendMapGeneratorOptions() {
+        OptionGroup mapOptions = freeColClient.getGame()
+            .getMapGeneratorOptions();
+
+        Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
+        up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
+        //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
+        freeColClient.getClient().send(up);
+    }
 
     /**
      * Add player-specific resources to the resource manager.

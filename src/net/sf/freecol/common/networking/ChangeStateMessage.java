@@ -112,10 +112,9 @@ public class ChangeStateMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("state", stateString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "state", stateString);
     }
 
     /**

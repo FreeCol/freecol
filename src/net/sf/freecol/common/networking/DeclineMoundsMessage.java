@@ -117,10 +117,9 @@ public class DeclineMoundsMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("direction", directionString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "direction", directionString);
     }
 
     /**

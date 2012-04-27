@@ -168,11 +168,7 @@ public class AIMessage {
         if ((attributes.length & 1) == 1) {
             throw new IllegalArgumentException("Attributes list must have even length");
         }
-        Element element = DOMMessage.createNewRootElement(tag);
-        for (int i = 0; i < attributes.length; i += 2) {
-            element.setAttribute(attributes[i], attributes[i+1]);
-        }
-        return element;
+        return DOMMessage.createMessage(tag, attributes);
     }
 
 

@@ -233,9 +233,9 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("newLandName", newLandName);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "newLandName", newLandName);
         if (welcomerId != null) result.setAttribute("welcomer", welcomerId);
         if (campCount != null) result.setAttribute("camps", campCount);
         if (acceptString != null) result.setAttribute("accept", acceptString);

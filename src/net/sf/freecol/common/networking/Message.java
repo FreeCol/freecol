@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
 /**
  * Class for parsing raw message data into an XML-tree and for creating new
  * XML-trees.
@@ -62,8 +63,8 @@ public class Message {
     }
 
     /**
-     * Constructs a new Message with data from the given String. The constructor
-     * to use if this is an INCOMING message.
+     * Constructs a new Message with data from the given String. The
+     * constructor to use if this is an INCOMING message.
      * 
      * @param msg The raw message data.
      * @exception IOException should not be thrown.
@@ -98,7 +99,7 @@ public class Message {
     private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
-        boolean dumpMsgOnError = true; // FreeCol.isInDebugMode();
+        boolean dumpMsgOnError = FreeCol.isInDebugMode();
         if (dumpMsgOnError) {
             /*
              * inputSource.setByteStream( new
@@ -138,7 +139,6 @@ public class Message {
             }
             throw e;
         }
-
         document = tempDocument;
     }
 
@@ -151,112 +151,6 @@ public class Message {
         this.document = document;
     }
 
-    /**
-     * Gets the current version of the FreeCol protocol.
-     * 
-     * @return The version of the FreeCol protocol.
-     */
-    public static String getFreeColProtocolVersion() {
-        return FREECOL_PROTOCOL_VERSION;
-    }
-
-    /**
-     * Creates and returns a new XML-document.
-     * 
-     * @return the new XML-document.
-     */
-    public static Document createNewDocument() {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            return builder.newDocument();
-        } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            pce.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Creates a new root element. This is done by creating a new document and
-     * using this document to create the root element.
-     * 
-     * @param tagName The tag name of the root element beeing created,
-     * @return the new root element.
-     */
-    public static Element createNewRootElement(String tagName) {
-        return createNewDocument().createElement(tagName);
-    }
-
-    /**
-     * Creates an error message.
-     * 
-     * @param messageID Identifies the "i18n"-keyname. Not specified in the
-     *            message if <i>null</i>.
-     * @param message The error in plain text. Not specified in the message if
-     *            <i>null</i>.
-     * @return The root <code>Element</code> of the error message.
-     */
-    public static Element createError(String messageID, String message) {
-        Element errorElement = createNewRootElement("error");
-
-        if (messageID != null && !messageID.equals("")) {
-            errorElement.setAttribute("messageID", messageID);
-        }
-
-        if (message != null && !message.equals("")) {
-            errorElement.setAttribute("message", message);
-        }
-
-        return errorElement;
-    }
-
-    /**
-     * Creates an error message.
-     * 
-     * @param out The output stream for the message.
-     * @param messageID Identifies the "i18n"-keyname. Not specified in the
-     *            message if <i>null</i>.
-     * @param message The error in plain text. Not specified in the message if
-     *            <i>null</i>.
-     */
-    public static void createError(XMLStreamWriter out, String messageID, String message) {
-        try {
-            out.writeStartElement("error");
-
-            if (messageID != null && !messageID.equals("")) {
-                out.writeAttribute("messageID", messageID);
-            }
-
-            if (message != null && !message.equals("")) {
-                out.writeAttribute("message", message);
-            }
-            out.writeEndElement();
-        } catch (XMLStreamException e) {
-            logger.warning("Could not send error message.");
-        }
-    }
-
-    /**
-     * Creates an error message in response to bad client data.
-     *
-     * @param message The error in plain text.
-     * @return The root <code>Element</code> of the error message.
-     */
-    public static Element clientError(String message) {
-        if (FreeCol.isInDebugMode()) {
-            try {
-                throw new IllegalStateException(message);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Client error", e);
-            }
-        }
-        Element errorElement = createNewRootElement("error");
-        errorElement.setAttribute("messageID", "server.reject");
-        errorElement.setAttribute("message", message);
-        return errorElement;
-    }
 
     /**
      * Gets the <code>Document</code> holding the message data.
@@ -273,45 +167,19 @@ public class Message {
      * @return The type of this Message.
      */
     public String getType() {
-
-        if (document != null && document.getDocumentElement() != null) {
-
-            return document.getDocumentElement().getTagName();
-        }
-
-        return INVALID_MESSAGE;
+        return (document != null && document.getDocumentElement() != null)
+            ? document.getDocumentElement().getTagName()
+            : INVALID_MESSAGE;
     }
 
     /**
      * Checks if this message is of a given type.
      * 
      * @param type The type you wish to test against.
-     * @return <code>true</code> if the type of this message equals the given
-     *         type and <code>false</code> otherwise.
+     * @return True if the type of this message equals the given type.
      */
     public boolean isType(String type) {
-
         return getType().equals(type);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     * 
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, String value) {
-        document.getDocumentElement().setAttribute(key, value);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     * 
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, int value) {
-        document.getDocumentElement().setAttribute(key, (new Integer(value)).toString());
     }
 
     /**
@@ -335,56 +203,49 @@ public class Message {
     }
 
     /**
-     * Inserts <code>newRoot</code> as the new root element and appends the
-     * old root element.
+     * Sets an attribute on the root element.
      * 
-     * @param newRoot The new root element.
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
      */
-    public void insertAsRoot(Element newRoot) {
-        Element oldRoot = document.getDocumentElement();
-
-        if (oldRoot != null) {
-            document.removeChild(oldRoot);
-            newRoot.appendChild(oldRoot);
-        }
-
-        document.appendChild(newRoot);
+    public void setAttribute(String key, String value) {
+        document.getDocumentElement().setAttribute(key, value);
     }
 
     /**
-     * Convenience method: returns the first child element with the specified
-     * tagname.
-     *
-     * @param element The <code>Element</code> to search for the child
-     *            element.
-     * @param tagName The tag name of the child element to be found.
-     * @return The first child element with the given name.
+     * Sets an attribute on the root element.
+     * 
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
      */
-    public static Element getChildElement(Element element, String tagName) {
-        NodeList n = element.getChildNodes();
-        for (int i = 0; i < n.getLength(); i++) {
-            if (n.item(i) instanceof Element && ((Element) n.item(i)).getTagName().equals(tagName)) {
-                return (Element) n.item(i);
-            }
-        }
-
-        return null;
+    public void setAttribute(String key, int value) {
+        setAttribute(key, (new Integer(value)).toString());
     }
 
-
+    /**
+     * {@inherit-doc}
+     */
     public Element toXMLElement() {
-        // do nothing
-        return null;
+        return null; // do nothing
     }
 
     /**
-     * Returns the <code>String</code> representation of the message. This is
-     * what actually gets transmitted to the other peer.
+     * Returns the <code>String</code> representation of the message.
+     * This is what actually gets transmitted to the other peer.
      * 
      * @return The <code>String</code> representation of the message.
      */
     @Override
     public String toString() {
         return document.getDocumentElement().toString();
+    }
+
+    /**
+     * Gets the current version of the FreeCol protocol.
+     * 
+     * @return The version of the FreeCol protocol.
+     */
+    public static String getFreeColProtocolVersion() {
+        return FREECOL_PROTOCOL_VERSION;
     }
 }

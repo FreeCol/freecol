@@ -166,11 +166,10 @@ public class ClaimLandMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("tile", tileId);
-        result.setAttribute("claimant", claimantId);
-        result.setAttribute("price", priceString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "tile", tileId,
+            "claimant", claimantId,
+            "price", priceString);
     }
 
     /**

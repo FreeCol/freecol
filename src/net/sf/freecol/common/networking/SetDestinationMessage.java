@@ -106,8 +106,8 @@ public class SetDestinationMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId);
         if (destinationId != null) {
             result.setAttribute("destination", destinationId);
         }

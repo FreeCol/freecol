@@ -137,11 +137,10 @@ public class SellGoodsMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("carrier", carrierId);
-        result.setAttribute("type", goodsTypeId);
-        result.setAttribute("amount", amountString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "carrier", carrierId,
+            "type", goodsTypeId,
+            "amount", amountString);
     }
 
     /**

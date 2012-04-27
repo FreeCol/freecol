@@ -555,16 +555,11 @@ public final class ConnectController {
      */
     public void logout(boolean notifyServer) {
         if (notifyServer) {
-            Element logoutElement = DOMMessage.createNewRootElement("logout");
-            logoutElement.setAttribute("reason", "User has quit the client.");
-            freeColClient.getClient().sendAndWait(logoutElement);
+            freeColClient.getClient()
+                .sendAndWait(DOMMessage.createMessage("logout",
+                        "reason", "User has quit the client."));
         }
-
-        try {
-            freeColClient.getClient().getConnection().close();
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not close connection!", e);
-        }
+        freeColClient.getClient().getConnection().close();
 
         ResourceManager.setScenarioMapping(null);
         ResourceManager.setCampaignMapping(null);
@@ -627,15 +622,14 @@ public final class ConnectController {
             return null;
         }
 
-        ArrayList<String> items = new ArrayList<String>();
-        Element element = DOMMessage.createNewRootElement("getVacantPlayers");
+        List<String> items = new ArrayList<String>();
+        Element element = DOMMessage.createMessage("getVacantPlayers");
         try {
             Element reply = mc.ask(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
-            }
-            if (!reply.getTagName().equals("vacantPlayers")) {
+            } else if (!reply.getTagName().equals("vacantPlayers")) {
                 logger.warning("The reply has an unknown type: "
                     + reply.getTagName());
                 return null;
@@ -648,11 +642,7 @@ public final class ConnectController {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send message to server.", e);
         } finally {
-            try {
-                mc.close();
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not close connection.", e);
-            }
+            mc.close();
         }
 
         return items;
@@ -663,7 +653,7 @@ public final class ConnectController {
      *
      * @return A list of {@link ServerInfo} objects.
      */
-    public ArrayList<ServerInfo> getServerList() {
+    public List<ServerInfo> getServerList() {
         Connection mc;
         try {
             mc = new Connection(FreeCol.META_SERVER_ADDRESS,
@@ -676,14 +666,13 @@ public final class ConnectController {
         }
 
         try {
-            Element gslElement = DOMMessage.createNewRootElement("getServerList");
-            Element reply = mc.ask(gslElement);
+            Element reply = mc.ask(DOMMessage.createMessage("getServerList"));
             if (reply == null) {
                 gui.errorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");
                 return null;
             } else {
-                ArrayList<ServerInfo> items = new ArrayList<ServerInfo>();
+                List<ServerInfo> items = new ArrayList<ServerInfo>();
                 NodeList nl = reply.getChildNodes();
                 for (int i = 0; i < nl.getLength(); i++) {
                     items.add(new ServerInfo((Element)nl.item(i)));
@@ -695,12 +684,7 @@ public final class ConnectController {
             logger.log(Level.WARNING, "Network error with meta-server.", e);
             return null;
         } finally {
-            try {
-                mc.close();
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not close meta-server.", e);
-                return null;
-            }
+            mc.close();
         }
     }
 }

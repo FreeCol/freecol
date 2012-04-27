@@ -1808,7 +1808,8 @@ public final class Canvas extends JDesktopPane {
      *            metaserver.
      * @see ServerListPanel
      */
-    public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
+    public void showServerListPanel(String username,
+                                    List<ServerInfo> serverList) {
         closeMenus();
 
         serverListPanel.initialize(username, serverList);

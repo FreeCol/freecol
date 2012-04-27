@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -291,32 +290,31 @@ public abstract class FreeColObject {
             }
             xsw.close();
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory factory
+                = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;
             try {
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
-                return (Element) document.importNode(tempDocument.getDocumentElement(), true);
+                return (Element)document.importNode(tempDocument.getDocumentElement(), true);
             } catch (ParserConfigurationException pce) {
                 // Parser with specified options can't be built
-                StringWriter swe = new StringWriter();
-                pce.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                throw new IllegalStateException("ParserConfigurationException: " + pce.getMessage());
+                logger.log(Level.WARNING, "ParserConfigurationException", pce);
+                throw new IllegalStateException("ParserConfigurationException: "
+                    + pce.getMessage());
             } catch (SAXException se) {
-                StringWriter swe = new StringWriter();
-                se.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                throw new IllegalStateException("SAXException: " + se.getMessage());
+                logger.log(Level.WARNING, "SAXException", se);
+                throw new IllegalStateException("SAXException: "
+                    + se.getMessage());
             } catch (IOException ie) {
-                StringWriter swe = new StringWriter();
-                ie.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                throw new IllegalStateException("IOException: " + ie.getMessage());
+                logger.log(Level.WARNING, "IOException", ie);
+                throw new IllegalStateException("IOException: "
+                    + ie.getMessage());
             }
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
-            throw new IllegalStateException("XMLStreamException: " + e.getMessage());
+            throw new IllegalStateException("XMLStreamException: "
+                + e.getMessage());
         }
     }
 
@@ -468,13 +466,11 @@ public abstract class FreeColObject {
                 xsr.nextTag();
                 readFromXML(xsr);
             } catch (TransformerException e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
+                logger.log(Level.WARNING, "TransformerException", e);
                 throw new IllegalStateException("TransformerException");
             }
         } catch (XMLStreamException e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "XMLStreamException", e);
             throw new IllegalStateException("XMLStreamException");
         }
     }

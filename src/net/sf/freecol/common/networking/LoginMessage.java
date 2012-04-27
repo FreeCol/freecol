@@ -173,16 +173,16 @@ public class LoginMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.setAttribute("userName", userName);
-        result.setAttribute("version", version);
-        result.setAttribute("admin", Boolean.toString(admin));
-        result.setAttribute("startGame", Boolean.toString(startGame));
-        result.setAttribute("singlePlayer", Boolean.toString(singlePlayer));
-        result.setAttribute("currentPlayer", Boolean.toString(currentPlayer));
-        result.setAttribute("activeUnit", activeUnitId);
-        result.appendChild(game.toXMLElement(player, doc, false, false));
+        Element result = createMessage(getXMLElementTagName(),
+            "userName", userName,
+            "version", version,
+            "admin", Boolean.toString(admin),
+            "startGame", Boolean.toString(startGame),
+            "singlePlayer", Boolean.toString(singlePlayer),
+            "currentPlayer", Boolean.toString(currentPlayer),
+            "activeUnit", activeUnitId);
+        result.appendChild(game.toXMLElement(player, result.getOwnerDocument(),
+                                             false, false));
         return result;
     }
 

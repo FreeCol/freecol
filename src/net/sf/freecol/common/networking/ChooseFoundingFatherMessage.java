@@ -124,7 +124,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
+        Element result = createMessage(getXMLElementTagName());
         for (FoundingFather f : fathers) {
             result.setAttribute(f.getType().toString(), f.getId());
         }

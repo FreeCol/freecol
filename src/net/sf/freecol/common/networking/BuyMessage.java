@@ -128,11 +128,12 @@ public class BuyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("settlement", settlementId);
-        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
-        result.setAttribute("gold", goldString);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "settlement", settlementId,
+            "gold", goldString);
+        result.appendChild(goods.toXMLElement(null,
+                                              result.getOwnerDocument()));
         return result;
     }
 

@@ -120,7 +120,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      */
     private void sendReconnectSafely(Connection connection) {
         try {
-            connection.sendDumping(DOMMessage.createNewRootElement("reconnect"));
+            connection.sendDumping(DOMMessage.createMessage("reconnect"));
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send reconnect message!", e);
         }
@@ -128,27 +128,26 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
 
     /**
      * Create a reply message with an error.
+     * TODO: should this be localized (return message name)?
      * 
      * @param message The error message.
-     * @return reply element with message.
+     * @return An error message.
      */
     protected Element createErrorReply(String message) {
-        Element reply = DOMMessage.createNewRootElement("error");
-        // TODO: should this be localized (return message name)?
-        reply.setAttribute("message", message);
-        return reply;
+        return DOMMessage.createMessage("error",
+            "message", message);
     }
 
     /**
      * Handles a "logout"-message.
      * 
      * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param logoutElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
+     *     on.
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information.
      * @return The reply.
      */
-    abstract protected Element logout(Connection connection, Element logoutElement);
+    abstract protected Element logout(Connection connection, Element element);
 
 
     /**

@@ -118,10 +118,9 @@ public class BuildColonyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("name", colonyName);
-        result.setAttribute("unit", builderId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "name", colonyName,
+            "unit", builderId);
     }
 
     /**

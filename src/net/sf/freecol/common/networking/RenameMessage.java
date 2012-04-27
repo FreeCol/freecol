@@ -103,10 +103,9 @@ public class RenameMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("nameable", id);
-        result.setAttribute("name", newName);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "nameable", id,
+            "name", newName);
     }
 
     /**

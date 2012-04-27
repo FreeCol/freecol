@@ -124,11 +124,11 @@ public class GoodsForSaleMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.setAttribute("unit", unitId);
-        result.setAttribute("settlement", settlementId);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "settlement", settlementId);
         if (sellGoods != null) {
+            Document doc = result.getOwnerDocument();
             for (Goods goods : sellGoods) {
                 result.appendChild(goods.toXMLElement(null, doc));
             }

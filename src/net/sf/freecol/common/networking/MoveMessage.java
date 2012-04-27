@@ -120,10 +120,9 @@ public class MoveMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", this.unitId);
-        result.setAttribute("direction", this.directionString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", this.unitId,
+            "direction", this.directionString);
     }
 
     /**

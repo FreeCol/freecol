@@ -241,17 +241,7 @@ public final class Server extends Thread {
         }
 
         Connection c;
-        while ((c = connections.remove(0)) != null) {
-            try {
-                if (c != null) {
-                    //c.reallyClose();
-                    c.close();
-                }
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not close connection: " + c,
-                    e);
-            }
-        }
+        while ((c = connections.remove(0)) != null) c.close();
         connections.clear();
 
         freeColServer.removeFromMetaServer();

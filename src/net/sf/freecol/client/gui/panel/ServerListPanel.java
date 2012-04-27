@@ -129,15 +129,15 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * Initializes the data that is displayed in this panel.
      * 
      * @param username The username to be used when connecting to a server.
-     * @param arrayList A list of <code>ServerInfo</code>-objects to be
+     * @param servers A list of <code>ServerInfo</code>-objects to be
      *            displayed.
      */
-    public void initialize(String username, ArrayList<ServerInfo> arrayList) {
+    public void initialize(String username, List<ServerInfo> servers) {
         this.username = username;
 
         // TODO: This should be added as a filtering rule:
         // Remove servers with an incorrect version from the list:
-        Iterator<ServerInfo> it = arrayList.iterator();
+        Iterator<ServerInfo> it = servers.iterator();
         while (it.hasNext()) {
             ServerInfo si = it.next();
             if (!si.getVersion().equals(FreeCol.getVersion())) {
@@ -145,9 +145,9 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
             }
         }
 
-        tableModel.setItems(arrayList);
+        tableModel.setItems(servers);
         setEnabled(true);
-        if (arrayList.size() == 0) {
+        if (servers.size() == 0) {
             connect.setEnabled(false);
         } else {
             table.setRowSelectionInterval(0, 0);

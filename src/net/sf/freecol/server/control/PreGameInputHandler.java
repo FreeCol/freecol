@@ -19,8 +19,7 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
@@ -48,6 +47,7 @@ public final class PreGameInputHandler extends InputHandler {
 
     private static Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
+    /** Is the game launching yet. */
     private boolean launching = false;
 
 
@@ -101,43 +101,47 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a &quot;updateGameOptions&quot;-message from a client.
+     * Handles a "updateGameOptions"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return The reply.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null.
      */
     private Element updateGameOptions(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (!player.isAdmin()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Not an admin");
         }
-        OptionGroup gameOptions = getFreeColServer().getGame().getSpecification().getOptionGroup("gameOptions");
-        gameOptions.readFromXMLElement((Element) element.getChildNodes().item(0));
-        Element updateGameOptionsElement = DOMMessage.createNewRootElement("updateGameOptions");
-        updateGameOptionsElement.appendChild(gameOptions.toXMLElement(
-                updateGameOptionsElement.getOwnerDocument()));
-        getFreeColServer().getServer().sendToAll(updateGameOptionsElement, connection);
+        OptionGroup gameOptions = getFreeColServer().getGame()
+            .getSpecification().getOptionGroup("gameOptions");
+        Element child = (Element)element.getChildNodes().item(0);
+        gameOptions.readFromXMLElement(child);
+
+        Element up = DOMMessage.createMessage("updateGameOptions");
+        up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
+        getFreeColServer().getServer().sendToAll(up, connection);
         return null;
     }
 
     /**
      * Handles a "updateMapGeneratorOptions"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return The reply.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null.
      */
-    private Element updateMapGeneratorOptions(Connection connection, Element element) {
+    private Element updateMapGeneratorOptions(Connection connection,
+                                              Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (!player.isAdmin()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Not an admin");
         }
-        getFreeColServer().getMapGenerator().getMapGeneratorOptions().readFromXMLElement(
-                (Element) element.getChildNodes().item(0));
-        Element umge = DOMMessage.createNewRootElement("updateMapGeneratorOptions");
-        umge.appendChild(getFreeColServer().getMapGenerator().getMapGeneratorOptions().toXMLElement(
-                umge.getOwnerDocument()));
+        Element child = (Element)element.getChildNodes().item(0);
+        getFreeColServer().getMapGenerator().getMapGeneratorOptions()
+            .readFromXMLElement(child);
+        Element umge = DOMMessage.createMessage("updateMapGeneratorOptions");
+        umge.appendChild(getFreeColServer().getMapGenerator()
+            .getMapGeneratorOptions().toXMLElement(umge.getOwnerDocument()));
         getFreeColServer().getServer().sendToAll(umge, connection);
         return null;
     }
@@ -145,18 +149,21 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "ready"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null.
      */
     private Element ready(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            boolean ready = (new Boolean(element.getAttribute("value"))).booleanValue();
+            boolean ready = (new Boolean(element.getAttribute("value")))
+                .booleanValue();
             player.setReady(ready);
-            Element playerReady = DOMMessage.createNewRootElement("playerReady");
-            playerReady.setAttribute("player", player.getId());
-            playerReady.setAttribute("value", Boolean.toString(ready));
-            getFreeColServer().getServer().sendToAll(playerReady, player.getConnection());
+            getFreeColServer().getServer()
+                .sendToAll(DOMMessage.createMessage("playerReady",
+                        "player", player.getId(),
+                        "value", Boolean.toString(ready)),
+                    player.getConnection());
         } else {
             logger.warning("Ready from unknown connection.");
         }
@@ -166,20 +173,23 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "setNation"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null.
      */
     private Element nation(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            Nation nation = getGame().getSpecification().getNation(element.getAttribute("value"));
-            if (getFreeColServer().getGame().getNationOptions().getNations().get(nation) ==
-                NationState.AVAILABLE) {
+            Nation nation = getGame().getSpecification()
+                .getNation(element.getAttribute("value"));
+            if (getFreeColServer().getGame().getNationOptions().getNations()
+                .get(nation) == NationState.AVAILABLE) {
                 player.setNation(nation);
-                Element updateNation = DOMMessage.createNewRootElement("updateNation");
-                updateNation.setAttribute("player", player.getId());
-                updateNation.setAttribute("value", nation.getId());
-                getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
+                getFreeColServer().getServer()
+                    .sendToAll(DOMMessage.createMessage("updateNation",
+                            "player", player.getId(),
+                            "value", nation.getId()),
+                        player.getConnection());
             } else {
                 logger.warning("Selected non-selectable nation.");
             }
@@ -192,22 +202,28 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "setNationType"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null, or an error message on failure.
      */
     private Element nationType(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            NationType nationType = getGame().getSpecification().getNationType(element.getAttribute("value"));
-            NationType fixedNationType = getGame().getSpecification().getNation(player.getNationID()).getType();
-            Advantages advantages = getFreeColServer().getGame().getNationOptions().getNationalAdvantages();
+            NationType nationType = getGame().getSpecification()
+                .getNationType(element.getAttribute("value"));
+            NationType fixedNationType = getGame().getSpecification()
+                .getNation(player.getNationID()).getType();
+            Advantages advantages = getFreeColServer().getGame()
+                .getNationOptions().getNationalAdvantages();
             if (advantages == Advantages.SELECTABLE
-                || (advantages == Advantages.FIXED && nationType.equals(fixedNationType))) {
+                || (advantages == Advantages.FIXED
+                    && nationType.equals(fixedNationType))) {
                 player.setNationType(nationType);
-                Element updateNationType = DOMMessage.createNewRootElement("updateNationType");
-                updateNationType.setAttribute("player", player.getId());
-                updateNationType.setAttribute("value", nationType.getId());
-                getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
+                getFreeColServer().getServer()
+                    .sendToAll(DOMMessage.createMessage("updateNationType",
+                            "player", player.getId(),
+                            "value", nationType.getId()),
+                        player.getConnection());
             } else {
                 logger.warning("NationType is not selectable");
             }
@@ -220,16 +236,21 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "setAvailable"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null, or an error message on failure.
      */
     private Element available(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            Nation nation = getGame().getSpecification().getNation(element.getAttribute("nation"));
-            NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
-            getFreeColServer().getGame().getNationOptions().setNationState(nation, state);
-            getFreeColServer().getServer().sendToAll(element, player.getConnection());
+            Nation nation = getGame().getSpecification()
+                .getNation(element.getAttribute("nation"));
+            NationState state = Enum.valueOf(NationState.class,
+                                             element.getAttribute("state"));
+            getFreeColServer().getGame().getNationOptions()
+                .setNationState(nation, state);
+            getFreeColServer().getServer().sendToAll(element, 
+                player.getConnection());
         } else {
             logger.warning("Available from unknown connection.");
         }
@@ -239,82 +260,71 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "requestLaunch"-message from a client.
      * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return Null, or an error message on failure.
      */
     private Element requestLaunch(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
+
         // Check if launching player is an admin.
+        ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
         if (!launchingPlayer.isAdmin()) {
-            Element reply = DOMMessage.createNewRootElement("error");
-            reply.setAttribute("message", "Sorry, only the server admin can launch the game.");
-            reply.setAttribute("messageID", "server.onlyAdminCanLaunch");
-            return reply;
+            return DOMMessage.createError("server.onlyAdminCanLaunch",
+                "Only the server admin can launch the game.");
         }
-        if (launching) {
-            return null;
-        }
+
+        if (launching) return null;
         launching = true;
-        // Check that no two players have the same color or nation
-        Iterator<Player> playerIterator = freeColServer.getGame().getPlayerIterator();
-        LinkedList<Nation> nations = new LinkedList<Nation>();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            final Nation nation = getGame().getSpecification().getNation(player.getNationID());
-            // Check the nation.
-            for (int i = 0; i < nations.size(); i++) {
-                if (nations.get(i) == nation) {
-                    Element reply = DOMMessage.createNewRootElement("error");
-                    reply.setAttribute("message",
-                        "All players need to pick a unique nation before the game can start.");
-                    reply.setAttribute("messageID", "server.invalidPlayerNations");
-                    return reply;
-                }
+
+        // Check that no two players have the same nation
+        ArrayList<Nation> nations = new ArrayList<Nation>();
+        for (Player player : freeColServer.getGame().getPlayers()) {
+            final Nation nation = getGame().getSpecification()
+                .getNation(player.getNationID());
+            if (nations.contains(nation)) {
+                return DOMMessage.createError("server.invalidPlayerNations",
+                    "All players need to pick a unique nation before the game can start.");
             }
             nations.add(nation);
         }
+
         // Check if all players are ready.
         if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {
-            Element reply = DOMMessage.createNewRootElement("error");
-            reply.setAttribute("message", "Not all players are ready to begin the game!");
-            reply.setAttribute("messageID", "server.notAllReady");
-            return reply;
+            return DOMMessage.createError("server.notAllReady",
+                "Not all players are ready to begin the game!");
         }
         try {
-            ((PreGameController) freeColServer.getController()).startGame();
+            ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
-            // send an error message to the client(s)
-            Element reply = DOMMessage.createNewRootElement("error");
-            reply.setAttribute("message", "An error occurred while starting the game!");
-            reply.setAttribute("messageID", "server.errorStartingGame");
-            return reply;
+            return DOMMessage.createError("server.errorStartingGame",
+                "An error occurred while starting the game!");
         }
+
         return null;
     }
 
     /**
-     * Handles a &quot;logout&quot;-message.
+     * Handles a "logout"-message.
      * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param logoutElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     * @return The reply.
+     * @param connection The <code>Connection</code> the message came from.
+     * @param element The <code>Element</code> containing the request.
+     * @return A logout reply message.
      */
-    protected Element logout(Connection connection, Element logoutElement) {
+    protected Element logout(Connection connection, Element element) {
+        logger.info("Logout from: " + connection);
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
-        Element logoutMessage = DOMMessage.createNewRootElement("logout");
-        logoutMessage.setAttribute("reason", "User has logged out.");
-        logoutMessage.setAttribute("player", player.getId());
         player.setConnected(false);
         getFreeColServer().getGame().removePlayer(player);
-        getFreeColServer().getServer().sendToAll(logoutMessage, connection);
+        getFreeColServer().getServer()
+            .sendToAll(DOMMessage.createMessage("logout",
+                    "reason", "User has logged out.",
+                    "player", player.getId()),
+                connection);
+
         try {
             getFreeColServer().updateMetaServer();
         } catch (NoRouteToServerException e) {}
-        
         return null;
     }
 }

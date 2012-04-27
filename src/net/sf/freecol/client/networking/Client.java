@@ -108,11 +108,7 @@ public final class Client {
      * Disconnects this client from the server.
      */
     public void disconnect() {
-        try {
-            c.close();
-        } catch (IOException e) {
-            logger.warning("Exception while closing connection: " + e);
-        }
+        c.close();
     }
 
 

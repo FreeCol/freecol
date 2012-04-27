@@ -145,10 +145,9 @@ public final class UserConnectionHandler implements MessageHandler {
 
             if (player.isAI()) {
                 player.setAI(false);
-                Element setAIElement = DOMMessage.createNewRootElement("setAI");
-                setAIElement.setAttribute("player", player.getId());
-                setAIElement.setAttribute("ai", Boolean.toString(false));
-                server.sendToAll(setAIElement);
+                server.sendToAll(DOMMessage.createMessage("setAI",
+                        "player", player.getId(),
+                        "ai", Boolean.toString(false)));
             }
 
             // If this player is the first to reconnect, it is the
@@ -198,9 +197,9 @@ public final class UserConnectionHandler implements MessageHandler {
         freeColServer.getGame().addPlayer(newPlayer);
 
         // Send message to all players except to the new player:
-        Element addNewPlayer = DOMMessage.createNewRootElement("addPlayer");
-        addNewPlayer.appendChild(newPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
-        freeColServer.getServer().sendToAll(addNewPlayer, connection);
+        Element add = DOMMessage.createMessage("addPlayer");
+        add.appendChild(newPlayer.toXMLElement(null, add.getOwnerDocument()));
+        freeColServer.getServer().sendToAll(add, connection);
 
         connection.setMessageHandler(freeColServer.getPreGameInputHandler());
         server.addConnection(connection);
@@ -231,7 +230,7 @@ public final class UserConnectionHandler implements MessageHandler {
             return null;
         }
 
-        Element reply = DOMMessage.createNewRootElement("vacantPlayers");
+        Element reply = DOMMessage.createMessage("vacantPlayers");
         Document doc = reply.getOwnerDocument();
         for (Player player : game.getPlayers()) {
             if (!player.isDead()

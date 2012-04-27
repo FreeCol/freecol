@@ -23,6 +23,7 @@ package net.sf.freecol.metaserver;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -32,26 +33,25 @@ import net.sf.freecol.common.networking.DOMMessage;
 import org.w3c.dom.Element;
 
 
-
 /**
-* The <code>MetaRegister</code> stores information about running servers.
-* Each server has it's own {@link MetaItem} object.
-*/
+ * The <code>MetaRegister</code> stores information about running servers.
+ * Each server has it's own {@link MetaItem} object.
+ */
 public final class MetaRegister {
+
     private static Logger logger = Logger.getLogger(MetaRegister.class.getName());
 
-    
     private ArrayList<MetaItem> items = new ArrayList<MetaItem>();
     
     
     /**
-    * Gets the server entry with the diven address and port.
-    *
-    * @param address The IP-address of the server.
-    * @param port The port number of the server.
-    * @return The server entry or <code>null</code> if the given 
-    *         entry could not be found.
-    */
+     * Gets the server entry with the diven address and port.
+     *
+     * @param address The IP-address of the server.
+     * @param port The port number of the server.
+     * @return The server entry or <code>null</code> if the given 
+     *         entry could not be found.
+     */
     private MetaItem getItem(String address, int port) {
         int index = indexOf(address, port);
         if (index >= 0) {
@@ -63,12 +63,13 @@ public final class MetaRegister {
     
 
     /**
-    * Gets the index of the server entry with the diven address and port.
-    *
-    * @param address The IP-address of the server.
-    * @param port The port number of the server.
-    * @return The index or <code>-1</code> if the given entry could not be found.
-    */
+     * Gets the index of the server entry with the diven address and port.
+     *
+     * @param address The IP-address of the server.
+     * @param port The port number of the server.
+     * @return The index or <code>-1</code> if the given entry could
+     *     not be found.
+     */
     private int indexOf(String address, int port) {
         for (int i=0; i<items.size(); i++) {
             if (address.equals(items.get(i).getAddress()) && port == items.get(i).getPort()) {
@@ -81,8 +82,8 @@ public final class MetaRegister {
 
 
     /**
-    * Removes servers that have not sent an update for some time.
-    */
+     * Removes servers that have not sent an update for some time.
+     */
     public synchronized void removeDeadServers() {
         logger.info("Removing dead servers.");
 
@@ -97,17 +98,17 @@ public final class MetaRegister {
 
 
     /**
-    * Adds a new server with the given attributes.
-    *
-    * @param name The name of the server.
-    * @param address The IP-address of the server.
-    * @param port The port number in which clients may connect.
-    * @param slotsAvailable Number of players that may conncet.
-    * @param currentlyPlaying Number of players that are currently connected.
-    * @param isGameStarted <i>true</i> if the game has started.
-    * @param version The version of the server.
-    * @param gameState The current state of the game.
-    */
+     * Adds a new server with the given attributes.
+     *
+     * @param name The name of the server.
+     * @param address The IP-address of the server.
+     * @param port The port number in which clients may connect.
+     * @param slotsAvailable Number of players that may conncet.
+     * @param currentlyPlaying Number of players that are currently connected.
+     * @param isGameStarted <i>true</i> if the game has started.
+     * @param version The version of the server.
+     * @param gameState The current state of the game.
+     */
     public synchronized void addServer(String name, String address, int port, int slotsAvailable,
                 int currentlyPlaying, boolean isGameStarted, String version, int gameState)
                 throws IOException {
@@ -117,17 +118,12 @@ public final class MetaRegister {
             Connection mc = null;
             try {                
                 mc = new Connection(address, port, null, FreeCol.METASERVER_THREAD);
-                Element element = DOMMessage.createNewRootElement("disconnect");
-                mc.sendDumping(element);
+                mc.send(DOMMessage.createMessage("disconnect"));
             } catch (IOException e) {
-                logger.info("Server rejected (no route to destination):" + address + ":" + port);
+                logger.log(Level.WARNING, "Server rejected disconnect.", e);
                 throw e;
             } finally {
-                try {
-                    if (mc != null) {
-                        mc.close();
-                    }
-                } catch (IOException e) {}
+                if (mc != null) mc.close();
             }
             items.add(new MetaItem(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState));
             logger.info("Server added:" + address + ":" + port);
@@ -138,17 +134,17 @@ public final class MetaRegister {
 
 
     /**
-    * Updates a server with the given attributes.
-    *
-    * @param name The name of the server.
-    * @param address The IP-address of the server.
-    * @param port The port number in which clients may connect.
-    * @param slotsAvailable Number of players that may conncet.
-    * @param currentlyPlaying Number of players that are currently connected.
-    * @param isGameStarted <i>true</i> if the game has started.
-    * @param version The version of the server.
-    * @param gameState The current state of the game.
-    */
+     * Updates a server with the given attributes.
+     *
+     * @param name The name of the server.
+     * @param address The IP-address of the server.
+     * @param port The port number in which clients may connect.
+     * @param slotsAvailable Number of players that may conncet.
+     * @param currentlyPlaying Number of players that are currently connected.
+     * @param isGameStarted <i>true</i> if the game has started.
+     * @param version The version of the server.
+     * @param gameState The current state of the game.
+     */
     public synchronized void updateServer(String name, String address, int port, int slotsAvailable,
             int currentlyPlaying, boolean isGameStarted, String version, int gameState)
             throws IOException {
@@ -162,10 +158,11 @@ public final class MetaRegister {
 
 
     /**
-    * Removes a server from the register.
-    * @param address The IP-address of the server to remove.
-    * @param port The port number of the server to remove.
-    */
+     * Removes a server from the register.
+     *
+     * @param address The IP-address of the server to remove.
+     * @param port The port number of the server to remove.
+     */
     public synchronized void removeServer(String address, int port) {
         int index = indexOf(address, port);
         if (index >= 0) {
@@ -178,12 +175,13 @@ public final class MetaRegister {
 
     
     /**
-    * Creates a server list.
-    * @return The server list as an XML DOM Element.
-    */
+     * Creates a server list.
+     *
+     * @return The server list as an XML DOM Element.
+     */
     public synchronized Element createServerList() {
-        Element element = DOMMessage.createNewRootElement("serverList");
-        for (int i=0; i<items.size(); i++) {
+        Element element = DOMMessage.createMessage("serverList");
+        for (int i = 0; i < items.size(); i++) {
             element.appendChild(items.get(i).toXMLElement(element.getOwnerDocument()));
         }
         return element;
@@ -191,23 +189,21 @@ public final class MetaRegister {
 
 
     /**
-    * Updates a given <code>MetaItem</code>.
-    *
-    * @param mi The <code>MetaItem</code> that should be updated.
-    * @param name The name of the server.
-    * @param address The IP-address of the server.
-    * @param port The port number in which clients may connect.
-    * @param slotsAvailable Number of players that may conncet.
-    * @param currentlyPlaying Number of players that are currently connected.
-    * @param isGameStarted <i>true</i> if the game has started.
-    * @param version The version of the server.
-    * @param gameState The current state of the game: {@link
-    *       net.sf.freecol.server.FreeColServer.GameState#STARTING_GAME},
-    *       {@link
-    *       net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
-    *       {@link
-    *       net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
-    */
+     * Updates a given <code>MetaItem</code>.
+     *
+     * @param mi The <code>MetaItem</code> that should be updated.
+     * @param name The name of the server.
+     * @param address The IP-address of the server.
+     * @param port The port number in which clients may connect.
+     * @param slotsAvailable Number of players that may conncet.
+     * @param currentlyPlaying Number of players that are currently connected.
+     * @param isGameStarted <i>true</i> if the game has started.
+     * @param version The version of the server.
+     * @param gameState The current state of the game:
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#STARTING_GAME},
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
+     */
     private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable,
             int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
         mi.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);

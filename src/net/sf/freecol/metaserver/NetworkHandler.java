@@ -125,20 +125,10 @@ public final class NetworkHandler implements MessageHandler {
         try {
             metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
         } catch (IOException e) {
-            if (version.compareTo("0.6.0") > 0) {
-                Element reply = DOMMessage.createNewRootElement("noRouteToServer");
-                return reply;
-            } else {
-                return null;
-            }
+            return DOMMessage.createMessage("noRouteToServer");
         }
 
-        if (version.compareTo("0.6.0") > 0) {
-            Element reply = DOMMessage.createNewRootElement("ok");
-            return reply;
-        } else {
-            return null;
-        }
+        return DOMMessage.createMessage("ok");
     }
 
 

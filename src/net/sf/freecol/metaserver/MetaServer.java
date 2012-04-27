@@ -20,18 +20,18 @@
 package net.sf.freecol.metaserver;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
+
 
 /**
  * The entry point and main controller object for the meta server.
@@ -137,14 +137,13 @@ public final class MetaServer extends Thread {
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
-                logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
-                Connection connection = new Connection(clientSocket, getNetworkHandler(), FreeCol.METASERVER_THREAD);
+                logger.info("Client connection from: "
+                    + clientSocket.getInetAddress().toString());
+                Connection connection = new Connection(clientSocket,
+                    getNetworkHandler(), FreeCol.METASERVER_THREAD);
                 connections.put(clientSocket, connection);
             } catch (IOException e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-
-                logger.warning(sw.toString());
+                logger.log(Level.WARNING, "Meta-run", e);
             }
         }
     }
@@ -186,23 +185,11 @@ public final class MetaServer extends Thread {
         try {
             serverSocket.close();
         } catch (IOException e) {
-            logger.warning("Could not close the server socket!");
+            logger.log(Level.WARNING, "Could not close the server socket!", e);
         }
 
-        Iterator<Connection> connectionsIterator = connections.values().iterator();
-        while (connectionsIterator.hasNext()) {
-            Connection c = connectionsIterator.next();
-
-            try {
-                if (c != null) {
-                    // c.reallyClose();
-                    c.close();
-                }
-            } catch (IOException e) {
-                logger.warning("Could not close the connection.");
-            }
-        }
-
+        Connection c;
+        while ((c = connections.remove(0)) != null) c.close();
         logger.info("Server shutdown.");
     }
 

@@ -101,8 +101,8 @@ public class LoadCargoMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("carrier", carrierId);
+        Element result = createMessage(getXMLElementTagName(),
+            "carrier", carrierId);
         result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
         return result;
     }

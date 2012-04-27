@@ -107,10 +107,9 @@ public class JoinColonyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("colony", colonyId);
-        result.setAttribute("unit", builderId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "colony", colonyId,
+            "unit", builderId);
     }
 
     /**

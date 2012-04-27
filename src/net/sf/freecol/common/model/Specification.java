@@ -21,8 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -221,10 +220,9 @@ public final class Specification {
             xsr.nextTag();
             readFromXMLImpl(xsr);
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new RuntimeException("Error parsing specification: " + e.toString());
+            logger.log(Level.WARNING, "Load exception", e);
+            throw new RuntimeException("Error parsing specification: "
+                + e.getMessage());
         }
     }
 

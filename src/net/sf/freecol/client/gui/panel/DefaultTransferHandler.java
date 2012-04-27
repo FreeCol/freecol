@@ -40,8 +40,7 @@ import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -463,13 +462,9 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             logger.warning("The dragged component is of an invalid type.");
 
-        } catch (Exception e) {
-            // TODO: Suggest a reconnect.
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+        } catch (Exception e) { // TODO: Suggest a reconnect.
+            logger.log(Level.WARNING, "Import data fail", e);
         }
-
         return false;
     }
 

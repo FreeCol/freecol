@@ -879,7 +879,7 @@ public class GUI {
         return canvas.showSellDialog(unit, settlement, goods, gold);
     }
 
-    public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
+    public void showServerListPanel(String username, List<ServerInfo> serverList) {
         canvas.showServerListPanel(username, serverList);
 
     }

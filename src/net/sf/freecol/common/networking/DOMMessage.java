@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
 /**
  * Class for parsing raw message data into an XML-tree and for creating new
  * XML-trees.
@@ -61,13 +62,14 @@ public class DOMMessage {
 
     private static final String INVALID_MESSAGE = "invalid";
 
-    /** The actual Message data. */
+    /** The actual message data. */
     protected Document document;
 
 
-    protected DOMMessage() {
-        // empty constructor
-    }
+    /**
+     * Deliberately empty constructor for the benefit of the subclasses.
+     */
+    protected DOMMessage() {}
 
     /**
      * Constructs a new DOMMessage with data from the given
@@ -113,7 +115,6 @@ public class DOMMessage {
             /*
              * inputSource.setByteStream( new
              * ReplayableInputStream(inputSource.getByteStream()) );
-             *
              */
             inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
 
@@ -161,6 +162,106 @@ public class DOMMessage {
         this.document = document;
     }
 
+
+    /**
+     * Gets the <code>Document</code> holding the message data.
+     *
+     * @return The <code>Document</code> holding the message data.
+     */
+    public Document getDocument() {
+        return document;
+    }
+
+    /**
+     * Gets the type of this DOMMessage.
+     *
+     * @return The type of this DOMMessage.
+     */
+    public String getType() {
+        return (document != null && document.getDocumentElement() != null)
+            ? document.getDocumentElement().getTagName()
+            : INVALID_MESSAGE;
+    }
+
+    /**
+     * Checks if this message is of a given type.
+     *
+     * @param type The type you wish to test against.
+     * @return <code>true</code> if the type of this message equals the given
+     *         type and <code>false</code> otherwise.
+     */
+    public boolean isType(String type) {
+        return getType().equals(type);
+    }
+
+    /**
+     * Gets an attribute from the root element.
+     *
+     * @param key The key of the attribute.
+     * @return The value of the attribute with the given key.
+     */
+    public String getAttribute(String key) {
+        return document.getDocumentElement().getAttribute(key);
+    }
+
+    /**
+     * Sets an attribute on the root element.
+     *
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     */
+    public void setAttribute(String key, String value) {
+        document.getDocumentElement().setAttribute(key, value);
+    }
+
+    /**
+     * Sets an attribute on the root element.
+     *
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     */
+    public void setAttribute(String key, int value) {
+        setAttribute(key, (new Integer(value)).toString());
+    }
+
+    /**
+     * Checks if an attribute is set on the root element.
+     *
+     * @param attribute The attribute in which to verify the existence of.
+     * @return <code>true</code> if the root element has the given attribute.
+     */
+    public boolean hasAttribute(String attribute) {
+        return document.getDocumentElement().hasAttribute(attribute);
+    }
+
+    /**
+     * Inserts an element as a new root element to the existing
+     * element of this message.
+     *
+     * @param newRoot The new root <code>Element</code>.
+     */
+    public void insertAsRoot(Element newRoot) {
+        Element oldRoot = document.getDocumentElement();
+
+        if (oldRoot != null) {
+            document.removeChild(oldRoot);
+            newRoot.appendChild(oldRoot);
+        }
+
+        document.appendChild(newRoot);
+    }
+
+    /**
+     * {@inherit-doc}
+     */
+    public Element toXMLElement() {
+        return null; // do nothing
+    }
+
+
+    // Collection of static methods.
+    // Much of the Element manipulation needs to go away.
+
     /**
      * Gets the current version of the FreeCol protocol.
      *
@@ -177,15 +278,14 @@ public class DOMMessage {
      */
     public static Document createNewDocument() {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            return builder.newDocument();
+            DocumentBuilderFactory factory
+                = DocumentBuilderFactory.newInstance();
+            return factory.newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
-            pce.printStackTrace();
-            return null;
+            logger.log(Level.WARNING, "Parser failure", pce);
         }
+        return null;
     }
 
     /**
@@ -197,6 +297,22 @@ public class DOMMessage {
      */
     public static Element createNewRootElement(String tagName) {
         return createNewDocument().createElement(tagName);
+    }
+
+    /**
+     * Creates a new element with specified attributes.
+     *
+     * @param tagName The tag name of the element beeing created,
+     * @param attributes Key,value string pairs.
+     * @return A new <code>Element</code>.
+     */
+    public static Element createMessage(String tagName, String... attributes) {
+        Element root = createNewRootElement(tagName);
+        String[] all = attributes;
+        for (int i = 0; i < all.length; i += 2) {
+            root.setAttribute(all[i], all[i+1]);
+        }
+        return root;
     }
 
     /**
@@ -236,16 +352,13 @@ public class DOMMessage {
      * @return The root <code>Element</code> of the error message.
      */
     public static Element createError(String messageID, String message) {
-        Element errorElement = createNewRootElement("error");
-
+        Element errorElement = createMessage("error");
         if (messageID != null && !messageID.equals("")) {
             errorElement.setAttribute("messageID", messageID);
         }
-
         if (message != null && !message.equals("")) {
             errorElement.setAttribute("message", message);
         }
-
         return errorElement;
     }
 
@@ -284,103 +397,9 @@ public class DOMMessage {
     public static Element clientError(String message) {
         logger.warning(message);
         if (FreeCol.isInDebugMode()) Thread.dumpStack();
-        Element errorElement = createNewRootElement("error");
-        errorElement.setAttribute("messageID", "server.reject");
-        errorElement.setAttribute("message", message);
-        return errorElement;
-    }
-
-    /**
-     * Gets the <code>Document</code> holding the message data.
-     *
-     * @return The <code>Document</code> holding the message data.
-     */
-    public Document getDocument() {
-        return document;
-    }
-
-    /**
-     * Gets the type of this DOMMessage.
-     *
-     * @return The type of this DOMMessage.
-     */
-    public String getType() {
-
-        if (document != null && document.getDocumentElement() != null) {
-
-            return document.getDocumentElement().getTagName();
-        }
-
-        return INVALID_MESSAGE;
-    }
-
-    /**
-     * Checks if this message is of a given type.
-     *
-     * @param type The type you wish to test against.
-     * @return <code>true</code> if the type of this message equals the given
-     *         type and <code>false</code> otherwise.
-     */
-    public boolean isType(String type) {
-
-        return getType().equals(type);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     *
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, String value) {
-        document.getDocumentElement().setAttribute(key, value);
-    }
-
-    /**
-     * Sets an attribute on the root element.
-     *
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     */
-    public void setAttribute(String key, int value) {
-        document.getDocumentElement().setAttribute(key, (new Integer(value)).toString());
-    }
-
-    /**
-     * Gets an attribute from the root element.
-     *
-     * @param key The key of the attribute.
-     * @return The value of the attribute with the given key.
-     */
-    public String getAttribute(String key) {
-        return document.getDocumentElement().getAttribute(key);
-    }
-
-    /**
-     * Checks if an attribute is set on the root element.
-     *
-     * @param attribute The attribute in which to verify the existence of.
-     * @return <code>true</code> if the root element has the given attribute.
-     */
-    public boolean hasAttribute(String attribute) {
-        return document.getDocumentElement().hasAttribute(attribute);
-    }
-
-    /**
-     * Inserts an element as a new root element to the existing
-     * element of this message.
-     *
-     * @param newRoot The new root <code>Element</code>.
-     */
-    public void insertAsRoot(Element newRoot) {
-        Element oldRoot = document.getDocumentElement();
-
-        if (oldRoot != null) {
-            document.removeChild(oldRoot);
-            newRoot.appendChild(oldRoot);
-        }
-
-        document.appendChild(newRoot);
+        return createMessage("error",
+            "messageID", "server.reject",
+            "message", message);
     }
 
     /**
@@ -431,13 +450,6 @@ public class DOMMessage {
             logger.log(Level.WARNING, "TransformerException", e);
         }
         return null;
-    }
-
-    /**
-     * {@inherit-doc}
-     */
-    public Element toXMLElement() {
-        return null; // do nothing
     }
 
     /**

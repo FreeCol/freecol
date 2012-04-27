@@ -126,10 +126,9 @@ public class AssignTeacherMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("student", studentId);
-        result.setAttribute("teacher", teacherId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "student", studentId,
+            "teacher", teacherId);
     }
 
     /**

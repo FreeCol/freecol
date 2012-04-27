@@ -117,11 +117,11 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.setAttribute("player", playerId);
+        Element result = createMessage(getXMLElementTagName(),
+            "player", playerId);
         if (summary != null) {
-            result.appendChild(summary.toXMLElement(null, doc));
+            result.appendChild(summary.toXMLElement(null,
+                    result.getOwnerDocument()));
         }
         return result;
     }

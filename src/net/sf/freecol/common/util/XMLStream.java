@@ -22,13 +22,13 @@ package net.sf.freecol.common.util;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 
 /**
  * A wrapper for <code>XMLStreamReader</code> and the underlying stream.
@@ -44,6 +44,7 @@ public class XMLStream implements Closeable {
 
     private InputStream inputStream;
     private XMLStreamReader xmlStreamReader;
+
 
     /**
      * Creates a new <code>XMLStream</code>.
@@ -83,24 +84,20 @@ public class XMLStream implements Closeable {
         try {
             inputStream.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Close input stream fail", e);
         }
     }
 
-    private XMLStreamReader createXMLStreamReader(InputStream inputStream) throws IOException{
+    private XMLStreamReader createXMLStreamReader(InputStream inputStream)
+        throws IOException{
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             return xif.createXMLStreamReader(inputStream, "UTF-8");
         } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
+            throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (NullPointerException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new NullPointerException("NullPointerException.");
+            throw new NullPointerException("NullPointerException: "
+                + e.getMessage());
         }
     }
 }

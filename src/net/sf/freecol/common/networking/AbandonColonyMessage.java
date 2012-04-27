@@ -103,9 +103,8 @@ public class AbandonColonyMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("colony", colonyId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "colony", colonyId);
     }
 
     /**

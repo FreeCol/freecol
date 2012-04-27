@@ -17,20 +17,22 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package net.sf.freecol.client.gui.i18n;
 
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Number.Category;
+
 
 /**
  * See the
@@ -108,14 +110,12 @@ public class NumberRules {
      * @param in an <code>InputStream</code> value
      */
     public static void load(InputStream in) {
-
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            XMLStreamReader xsr = XMLInputFactory.newInstance()
+                .createXMLStreamReader(in);
             readFromXML(xsr);
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            logger.log(Level.WARNING, "Load parse", e);
             throw new RuntimeException("Error parsing number rules.");
         }
     }

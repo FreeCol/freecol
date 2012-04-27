@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -49,6 +49,7 @@ import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
+
 
 /**
  * This dialog allows the user to start a single player or multiplayer
@@ -319,7 +320,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     }
                     break;
                 case META_SERVER:
-                    ArrayList<ServerInfo> serverList = connectController.getServerList();
+                    List<ServerInfo> serverList = connectController.getServerList();
                     if (serverList != null) {
                         getGUI().showServerListPanel(name.getText(), serverList);
                     }

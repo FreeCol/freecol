@@ -146,11 +146,10 @@ public class MissionaryMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unitId", unitId);
-        result.setAttribute("direction", directionString);
-        result.setAttribute("denounce", Boolean.toString(denounce));
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unitId", unitId,
+            "direction", directionString,
+            "denounce", Boolean.toString(denounce));
     }
 
     /**

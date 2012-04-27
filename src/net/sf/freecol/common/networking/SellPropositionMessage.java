@@ -144,12 +144,12 @@ public class SellPropositionMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.setAttribute("unit", unitId);
-        result.setAttribute("settlement", settlementId);
-        result.appendChild(goods.toXMLElement(null, doc));
-        result.setAttribute("gold", goldString);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "settlement", settlementId,
+            "gold", goldString);
+        result.appendChild(goods.toXMLElement(null,
+                                              result.getOwnerDocument()));
         return result;
     }
 

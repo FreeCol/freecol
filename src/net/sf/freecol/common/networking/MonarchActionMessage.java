@@ -159,16 +159,12 @@ public class MonarchActionMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
-        result.setAttribute("action", action.toString());
-        if (tax != null) {
-            result.setAttribute("tax", tax);
-        }
-        if (resultString != null) {
-            result.setAttribute("result", resultString);
-        }
-        result.appendChild(template.toXMLElement(null, doc));
+        Element result = createMessage(getXMLElementTagName(),
+            "action", action.toString());
+        if (tax != null) result.setAttribute("tax", tax);
+        if (resultString != null) result.setAttribute("result", resultString);
+        result.appendChild(template.toXMLElement(null,
+                                                 result.getOwnerDocument()));
         return result;
     }
 

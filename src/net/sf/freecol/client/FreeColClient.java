@@ -308,7 +308,7 @@ public final class FreeColClient {
      * Continue playing after winning the game.
      */
     public void continuePlaying() {
-        client.send(DOMMessage.createNewRootElement("continuePlaying"));
+        client.send(DOMMessage.createMessage("continuePlaying"));
     }
 
     public boolean currentPlayerIsMyPlayer() {

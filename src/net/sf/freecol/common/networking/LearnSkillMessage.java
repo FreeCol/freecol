@@ -124,10 +124,9 @@ public class LearnSkillMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unitId", unitId);
-        result.setAttribute("direction", directionString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unitId", unitId,
+            "direction", directionString);
     }
 
     /**

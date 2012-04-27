@@ -151,11 +151,10 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("region", regionId);
-        result.setAttribute("tile", tileId);
-        result.setAttribute("newRegionName", newRegionName);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "region", regionId,
+            "tile", tileId,
+            "newRegionName", newRegionName);
     }
 
     /**

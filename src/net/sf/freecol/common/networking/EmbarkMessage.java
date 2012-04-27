@@ -169,9 +169,9 @@ public class EmbarkMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("carrier", carrierId);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "carrier", carrierId);
         if (directionString != null) {
             result.setAttribute("direction", directionString);
         }

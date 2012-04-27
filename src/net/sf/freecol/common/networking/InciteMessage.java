@@ -159,12 +159,11 @@ public class InciteMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unitId", unitId);
-        result.setAttribute("direction", directionString);
-        result.setAttribute("enemyId", enemyId);
-        result.setAttribute("gold", goldString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unitId", unitId,
+            "direction", directionString,
+            "enemyId", enemyId,
+            "gold", goldString);
     }
 
     /**

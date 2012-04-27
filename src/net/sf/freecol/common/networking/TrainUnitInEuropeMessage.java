@@ -89,9 +89,8 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unitType", typeId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unitType", typeId);
     }
 
     /**

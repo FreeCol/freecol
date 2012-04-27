@@ -134,11 +134,10 @@ public class ChatMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("sender", sender);
-        result.setAttribute("message", message);
-        result.setAttribute("privateChat", String.valueOf(privateChat));
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "sender", sender,
+            "message", message,
+            "privateChat", String.valueOf(privateChat));
     }
 
     /**

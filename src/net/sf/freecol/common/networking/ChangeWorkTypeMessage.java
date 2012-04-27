@@ -107,10 +107,9 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("workType", workTypeId);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "workType", workTypeId);
     }
 
     /**

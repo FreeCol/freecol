@@ -215,15 +215,16 @@ public class IndianDemandMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element ret = createNewRootElement(getXMLElementTagName());
-        ret.setAttribute("unit", unitId);
-        ret.setAttribute("colony", colonyId);
-        if (goldString != null) ret.setAttribute("gold", goldString);
-        if (resultString != null) ret.setAttribute("result", resultString);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "colony", colonyId);
+        if (goldString != null) result.setAttribute("gold", goldString);
+        if (resultString != null) result.setAttribute("result", resultString);
         if (goods != null) {
-            ret.appendChild(goods.toXMLElement(null, ret.getOwnerDocument()));
+            result.appendChild(goods.toXMLElement(null, 
+                                                  result.getOwnerDocument()));
         }
-        return ret;
+        return result;
     }
 
     /**

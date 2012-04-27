@@ -162,7 +162,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
+        Element result = createMessage(getXMLElementTagName());
         Document doc = result.getOwnerDocument();
         for (TradeRoute tradeRoute : tradeRoutes) {
             result.appendChild(tradeRoute.toXMLElement(null, doc));

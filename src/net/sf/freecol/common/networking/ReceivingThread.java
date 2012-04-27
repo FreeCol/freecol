@@ -301,9 +301,9 @@ final class ReceivingThread extends Thread {
     private void disconnect(String reason) {
         if (connection.getMessageHandler() != null) {
             try {
-                Element disconnect = DOMMessage.createNewRootElement("disconnect");
-                disconnect.setAttribute("reason", reason);
-                connection.getMessageHandler().handle(connection, disconnect);
+                connection.getMessageHandler().handle(connection,
+                    DOMMessage.createMessage("disconnect",
+                        "reason", reason));
             } catch (FreeColException e) {
                 logger.log(Level.WARNING, "Rx disconnect", e);
             }

@@ -96,11 +96,7 @@ public class ServerAPI {
         }
 
         public Element toXMLElement() {
-            Element e = createNewRootElement(tag);
-            for (int i = 0; i < attributes.length; i += 2) {
-                e.setAttribute(attributes[i], attributes[i+1]);
-            }
-            return e;
+            return DOMMessage.createMessage(tag, attributes);
         }
     };
 

@@ -111,8 +111,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
+        Element result = createMessage(getXMLElementTagName(),
+            "unit", unitId);
         if (tradeRouteId != null) {
             result.setAttribute("tradeRoute", tradeRouteId);
         }

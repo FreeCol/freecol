@@ -142,11 +142,10 @@ public class EquipUnitMessage extends DOMMessage {
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
-        Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("unit", unitId);
-        result.setAttribute("type", typeId);
-        result.setAttribute("amount", amountString);
-        return result;
+        return createMessage(getXMLElementTagName(),
+            "unit", unitId,
+            "type", typeId,
+            "amount", amountString);
     }
 
     /**
