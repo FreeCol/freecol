@@ -2092,27 +2092,31 @@ public final class InGameController extends Controller {
             result = "die";
         } else {
             // Otherwise player gets to visit, and learn about the settlement.
+            List<UnitType> scoutTypes = getGame().getSpecification()
+                .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
+            UnitType scoutSkill = (scoutTypes.isEmpty()) ? null
+                : scoutTypes.get(0);
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
+            int rnd = Utils.randomInt(logger, "scouting", random, 10);
             if (settlement.hasSpokenToChief()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
-            } else if (skill != null
-                       && skill.hasAbility(Ability.EXPERT_SCOUT)
-                       && unit.getType().canBeUpgraded(skill,
-                                                       ChangeType.NATIVES)) {
+            } else if (scoutSkill != null
+                && unit.getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)
+                && ((skill != null && skill.hasAbility(Ability.EXPERT_SCOUT))
+                    || rnd == 0)) {
                 // If the scout can be taught to be an expert it will be.
                 // TODO: in the old code the settlement retains the
                 // teaching ability.  WWC1D?
-                unit.setType(settlement.getLearnableSkill());
+                unit.setType(scoutSkill);
                 result = "expert";
             } else {
                 // Choose tales 1/3 of the time, or if there are no beads.
                 RandomRange gifts = settlement.getType().getGifts(unit);
                 int gold = (gifts == null) ? 0
                     : gifts.getAmount("Base beads amount", random, true);
-                if (gold <= 0
-                    || Utils.randomInt(logger, "Tales", random, 3) == 0) {
+                if (gold <= 0 || rnd <= 3) {
                     radius = Math.max(radius, IndianSettlement.TALES_RADIUS);
                     result = "tales";
                 } else {
