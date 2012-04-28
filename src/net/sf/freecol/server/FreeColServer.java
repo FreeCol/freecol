@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -227,17 +228,24 @@ public final class FreeColServer {
         for (int i = tries; i > 0; i--) {
             try {
                 server = new Server(this, port);
+                this.port = port;
+                server.start();
                 break;
-            } catch (IOException e) {
+            } catch (BindException be) {
                 if (i == 1) {
-                    logger.log(Level.WARNING, "Exception starting server.", e);
-                    throw e;
+                    logger.log(Level.WARNING, "Bind exception starting server.",
+                        be);
+                    throw new IOException(be.getMessage());
+                }
+            } catch (IOException ie) {
+                if (i == 1) {
+                    logger.log(Level.WARNING, "IO exception starting server.",
+                        ie);
+                    throw ie;
                 }
             }
             port++;
         }
-        this.port = port;
-        server.start();
         return server;
     }
 

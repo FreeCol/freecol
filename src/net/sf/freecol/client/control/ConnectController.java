@@ -194,15 +194,14 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        int port = FreeCol.getDefaultPort();
-        if (!unblockServer(port)) return;
+        if (!unblockServer(FreeCol.getDefaultPort())) return;
 
         loadModFragments(specification);
 
         FreeColServer freeColServer;
         try {
             freeColServer = new FreeColServer(specification, false,
-                                              true, port, null, advantages);
+                                              true, -1, null, advantages);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
