@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.client.FreeColClient;
@@ -60,8 +59,6 @@ public class CargoPanel extends FreeColPanel
 
     private final TitledBorder border;
 
-    private JPanel parentPanel;
-
 
     /**
      * Creates this CargoPanel.
@@ -87,23 +84,7 @@ public class CargoPanel extends FreeColPanel
         initialize();
     }
 
-    /**
-     * Get the <code>ParentPanel</code> value.
-     *
-     * @return a <code>JPanel</code> value
-     */
-    public final JPanel getParentPanel() {
-        return parentPanel;
-    }
 
-    /**
-     * Set the <code>ParentPanel</code> value.
-     *
-     * @param newParentPanel The new ParentPanel value.
-     */
-    public final void setParentPanel(final JPanel newParentPanel) {
-        this.parentPanel = newParentPanel;
-    }
 
     /**
      * Whether this panel is active.

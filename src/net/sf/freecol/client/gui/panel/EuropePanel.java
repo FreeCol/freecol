@@ -142,7 +142,6 @@ public final class EuropePanel extends FreeColPanel {
         toEuropePanel = new DestinationPanel();
         inPortPanel = new InPortPanel();
         cargoPanel = new EuropeCargoPanel(freeColClient, getGUI());
-        cargoPanel.setParentPanel(this);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
 
