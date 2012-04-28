@@ -20,7 +20,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;

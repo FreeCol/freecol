@@ -44,7 +44,6 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 

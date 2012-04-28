@@ -20,8 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.FreeColException;
 
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 
