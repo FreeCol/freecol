@@ -455,9 +455,20 @@ public class Colony extends Settlement implements Nameable {
         Set<Modifier> modifierSet
             = getModifierSet("model.modifier.minimumColonySize");
         for (Modifier modifier : modifierSet) {
+            if (modifier.getSource() instanceof BuildingType) {
+                // If the modifier source is a building type, insist
+                // on an exact match between the modifier source type
+                // and the actual building type present in the colony.
+                // This prevents the stockade modifier from matching a
+                // colony-fort, and thus the message attributing the
+                // failure to reduce population to a non-existing
+                // stockade, BR#3522055.
+                BuildingType type = (BuildingType)modifier.getSource();
+                Building building = getBuilding(type);
+                if (building == null || building.getType() != type) continue;
+            }
             message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
-                .addName("%object%", modifier.getSource()))
-                + "\n";
+                .addName("%object%", modifier.getSource())) + "\n";
         }
         return message;
     }
