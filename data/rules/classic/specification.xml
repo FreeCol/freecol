@@ -1248,8 +1248,6 @@
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.modifier.defence" delete="true" />
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
-      <modifier id="model.modifier.minimumColonySize" delete="true" />
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.fortress" extends="model.building.fort"
@@ -1258,8 +1256,6 @@
       <required-goods id="model.goods.tools" value="200"/>
       <modifier id="model.modifier.defence" delete="true" />
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
-      <modifier id="model.modifier.minimumColonySize" delete="true" />
-      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
     <building-type id="model.building.depot" workplaces="0" priority="750">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
