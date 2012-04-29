@@ -3332,6 +3332,13 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), unit);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         } else if (settlement != null) {
+            Unit carrier = unit.getCarrier();
+            if (carrier != null
+                && carrier.getInitialMovesLeft() != carrier.getMovesLeft()
+                && carrier.getMovesLeft() != 0) {
+                carrier.setMovesLeft(0);
+                cs.add(See.only(serverPlayer), carrier);
+            }
             if (tileDirty) {
                 cs.add(See.perhaps(), settlement.getTile());
             } else {
