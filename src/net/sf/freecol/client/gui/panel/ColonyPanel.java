@@ -712,11 +712,12 @@ public final class ColonyPanel extends FreeColPanel
             BuildableType buildable = getColony().getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getPopulationRequired() > getColony().getUnitCount()
-                && !getGUI().showConfirmDialog(null, StringTemplate.template("colonyPanel.reducePopulation")
-                                             .addName("%colony%", getColony().getName())
-                                             .addAmount("%number%", buildable.getPopulationRequired())
-                                             .add("%buildable%", buildable.getNameKey()),
-                                             "ok", "cancel")) {
+                && !getGUI().showConfirmDialog(null,
+                    StringTemplate.template("colonyPanel.reducePopulation")
+                        .addName("%colony%", getColony().getName())
+                        .addAmount("%number%", buildable.getPopulationRequired())
+                        .add("%buildable%", buildable.getNameKey()),
+                    "ok", "cancel")) {
                 return;
             }
             getGUI().removeFromCanvas(this);
@@ -736,9 +737,9 @@ public final class ColonyPanel extends FreeColPanel
             if (getFreeColClient().currentPlayerIsMyPlayer()) {
                 getController().nextModelMessage();
                 Unit activeUnit = getGUI().getActiveUnit();
-                if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
-                    || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    getGUI().setActiveUnit(null);
+                if (activeUnit == null || activeUnit.getTile() == null
+                    || (!(activeUnit.getLocation() instanceof Tile)
+                        && !activeUnit.isOnCarrier())) {
                     getController().nextActiveUnit();
                 }
             }
@@ -750,8 +751,7 @@ public final class ColonyPanel extends FreeColPanel
      * Generates a menu containing the units currently accessible
      * from the Colony Panel allowing keyboard access to said units.
      */
-    private void generateColonyUnitsMenu()
-    {
+    private void generateColonyUnitsMenu() {
         JPopupMenu colonyUnitsMenu = new JPopupMenu("Colony Units");
         ImageLibrary imageLibrary = super.getLibrary();
         ImageIcon unitIcon = null;

@@ -334,10 +334,16 @@ public final class QuickActionMenu extends JPopupMenu {
         final boolean isUnitAtSea = tempUnit.isAtSea();
 
         JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
-        menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.getState() != Unit.UnitState.ACTIVE
-                                && !isUnitAtSea);
+        menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (tempUnit.getState() != Unit.UnitState.ACTIVE) {
+                        freeColClient.getInGameController()
+                            .changeState(tempUnit, Unit.UnitState.ACTIVE);
+                    }
+                    gui.setActiveUnit(tempUnit);
+                }
+            });
+        menuItem.setEnabled(!isUnitAtSea);
         this.add(menuItem);
 
         if (!(tempUnit.getLocation() instanceof Europe)) {
