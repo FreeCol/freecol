@@ -64,7 +64,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
+     * @param freeColClient
      *
      * @param colopediaPanel the ColopediaPanel
      */
@@ -213,6 +213,9 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 panel.add(getGoodsButton(outputType));
             }
         }
+
+        panel.add(localizedLabel("colopedia.buildings.basicProduction"), "newline");
+        panel.add(new JLabel(Integer.toString(buildingType.getBasicProduction())), "span");
 
         int workplaces = buildingType.getWorkPlaces();
         panel.add(localizedLabel("colopedia.buildings.workplaces"), "newline");

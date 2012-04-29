@@ -160,9 +160,9 @@ public final class ColopediaPanel extends FreeColPanel
         tree.addTreeSelectionListener(this);
 
         listPanel.add(tree);
-        Enumeration<DefaultMutableTreeNode> allNodes = root.depthFirstEnumeration();
+        Enumeration allNodes = root.depthFirstEnumeration();
         while (allNodes.hasMoreElements()) {
-            DefaultMutableTreeNode node = allNodes.nextElement();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) allNodes.nextElement();
             ColopediaTreeItem item = (ColopediaTreeItem) node.getUserObject();
             nodeMap.put(item.getId(), node);
         }
