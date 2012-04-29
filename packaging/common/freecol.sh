@@ -76,8 +76,7 @@ fi
 
 # Clean up the data argument and run.
 if test "x${FCDAT}" = "xDONTSET!" ; then
-    FCDAT=""
+    exec java -Xmx512M -cp "${FCJAR}" net.sf.freecol.FreeCol ${1+"$@"}
 else
-    FCDAT="--freecol-data ${FCDAT}"
+    exec java -Xmx512M -cp "${FCJAR}" net.sf.freecol.FreeCol --freecol-data "${FCDAT}" ${1+"$@"}
 fi
-exec java -Xmx512M -cp "${FCJAR}" net.sf.freecol.FreeCol "${FCDAT}" ${1+"$@"}
