@@ -84,14 +84,10 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Colony colony;
-        if (game.getFreeColGameObject(colonyId) instanceof Colony) {
-            colony = (Colony) game.getFreeColGameObject(colonyId);
-        } else {
-            return DOMMessage.clientError("Not a colony: " + colonyId);
-        }
-        if (player != colony.getOwner()) {
-            return DOMMessage.clientError("Player does not own colony: "
-                + colonyId);
+        try {
+            colony = player.getFreeColGameObject(colonyId, Colony.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Proceed to set.

@@ -74,9 +74,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the assignTradeRouted unit,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the assignTradeRouted unit, or an
+     *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
@@ -84,20 +83,17 @@ public class AssignTradeRouteMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         TradeRoute tradeRoute;
-        if (tradeRouteId == null) {
-            tradeRoute = null;
-        } else if (game.getFreeColGameObjectSafely(tradeRouteId)
-            instanceof TradeRoute) {
-            tradeRoute
-                = (TradeRoute) game.getFreeColGameObjectSafely(tradeRouteId);
-        } else {
-            return DOMMessage.clientError("Not a trade route: "
-                + tradeRouteId);
+        try {
+            tradeRoute = serverPlayer.getFreeColGameObject(tradeRouteId, 
+                                                           TradeRoute.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Proceed to assign.

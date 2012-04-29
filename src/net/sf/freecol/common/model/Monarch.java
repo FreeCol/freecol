@@ -603,15 +603,21 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        Game game = getGame();
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
-        player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+        player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                           Player.class);
         if (player == null) {
-            player = new Player(getGame(), in.getAttributeValue(null, "player"));
+            player = new Player(game, in.getAttributeValue(null, "player"));
         }
+
         name = getAttribute(in, "name", player.getNation().getRulerNameKey());
+
         supportSea = getAttribute(in, "supportSea", false);
+
         displeasure = getAttribute(in, "displeasure", false);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

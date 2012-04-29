@@ -310,7 +310,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         UnitAction command = Enum.valueOf(UnitAction.class, commandString.toUpperCase());
         switch(command) {
         case ASSIGN:
-            Unit teacher = (Unit) unit.getGame().getFreeColGameObject(arg);
+            Unit teacher = unit.getGame().getFreeColGameObject(arg, Unit.class);
             inGameController.assignTeacher(unit, teacher);
             Component uc = getParent();
             while (uc != null) {

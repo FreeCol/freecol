@@ -62,16 +62,16 @@ public class UpdateCurrentStopMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> the message is from.
-     *
-     * @return An update containing the unit after updating its current stop,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the unit after updating its
+     *     current stop, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

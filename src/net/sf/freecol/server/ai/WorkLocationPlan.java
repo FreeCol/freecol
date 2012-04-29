@@ -217,11 +217,14 @@ public class WorkLocationPlan extends ValuedAIObject {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        workLocation = (WorkLocation)getAIMain().getFreeColGameObject(element.getAttribute(ID_ATTRIBUTE));
+        String str = element.getAttribute(ID_ATTRIBUTE);
+        workLocation = getAIMain().getGame()
+            .getFreeColGameObject(str, WorkLocation.class);
 
         priority = Integer.parseInt(element.getAttribute("priority"));
 
-        goodsType = getSpecification().getGoodsType(element.getAttribute("goodsType"));
+        str = element.getAttribute("goodsType");
+        goodsType = getSpecification().getGoodsType(str);
     }
 
     /**

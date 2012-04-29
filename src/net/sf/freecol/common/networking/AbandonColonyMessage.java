@@ -65,25 +65,20 @@ public class AbandonColonyMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the request.
      * @param player The <code>Player</code> abandoning the colony.
      * @param connection The <code>Connection</code> the message is from.
-     *
      * @return An update <code>Element</code> defining the new colony
-     *         and updating its surrounding tiles,
-     *         or an error <code>Element</code> on failure.
+     *     and updating its surrounding tiles, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Colony colony;
-        if (game.getFreeColGameObject(colonyId) instanceof Colony) {
-            colony = (Colony) game.getFreeColGameObject(colonyId);
-        } else {
-            return DOMMessage.clientError("Not a colony: " + colonyId);
-        }
-        if (player != colony.getOwner()) {
-            return DOMMessage.clientError("Player does not own colony: "
-                + colonyId);
+        try {
+            colony = player.getFreeColGameObject(colonyId, Colony.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
         if (colony.getUnitCount() != 0) {
             return DOMMessage.clientError("Attempt to abandon colony "

@@ -188,8 +188,11 @@ public class GoodsTradeItem extends TradeItem {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         super.readFromXMLImpl(in);
-        this.settlement = (Settlement) game
-            .getFreeColGameObject(in.getAttributeValue(null, "settlement"));
+
+        String settlementId = in.getAttributeValue(null, "settlement");
+        this.settlement = game.getFreeColGameObject(settlementId,
+                                                    Settlement.class);
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
                 this.goods = new Goods(game, in);

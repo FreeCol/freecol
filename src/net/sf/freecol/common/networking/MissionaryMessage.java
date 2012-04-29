@@ -84,33 +84,34 @@ public class MissionaryMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An element containing the result of the mission operation,
-     *         or an error <code>Element</code> on failure.
+     * @return An element containing the result of the mission
+     *     operation, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
+
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+
+        Tile tile;
+        try {
+            tile = unit.getNeighbourTile(directionString);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (tile == null) {
-            return DOMMessage.clientError("Could not find tile"
-                + " in direction: " + direction + " from unit: " + unitId);
-        }
+
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return DOMMessage.clientError("There is no native settlement at: "
                 + tile.getId());
         }
+
         Unit missionary = is.getMissionary();
         if (denounce) {
             if (missionary == null) {
@@ -126,6 +127,7 @@ public class MissionaryMessage extends DOMMessage {
                     + is.getId());
             }
         }
+
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return DOMMessage.clientError("Unable to enter " + is.getName()

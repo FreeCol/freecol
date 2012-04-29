@@ -330,10 +330,12 @@ public class LostCityRumour extends TileItem {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
+
         String typeString = getAttribute(in, "type", null);
         if (typeString != null) {
             type = Enum.valueOf(RumourType.class, typeString);
         }
+
         name = getAttribute(in, "name", null);
 
         in.nextTag();

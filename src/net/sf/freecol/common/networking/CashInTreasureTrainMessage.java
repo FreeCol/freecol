@@ -64,25 +64,24 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
      * @return An update resulting from cashing in the treasure train,
-     *         or an error <code>Element</code> on failure.
+     *     or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!unit.canCarryTreasure()) {
             return DOMMessage.clientError("Can not cash in unit " + unitId
                 + ", can not carry treasure.");
-        }
-        if (!unit.canCashInTreasureTrain()) {
+        } else if (!unit.canCashInTreasureTrain()) {
             return DOMMessage.clientError("Can not cash in unit " + unitId
                 + ", unsuitable location.");
         }

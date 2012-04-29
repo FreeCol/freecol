@@ -27,6 +27,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
@@ -117,11 +118,11 @@ public final class PreGameInputHandler extends InputHandler {
         Element playerElement = (Element)element
             .getElementsByTagName(Player.getXMLElementTagName()).item(0);
         String id = playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE);
-        if (game.getFreeColGameObject(id) == null) {
-           Player newPlayer = new Player(game, playerElement);
-           getFreeColClient().getGame().addPlayer(newPlayer);
+        FreeColGameObject fcgo = game.getFreeColGameObject(id);
+        if (fcgo == null) {
+            game.addPlayer(new Player(game, playerElement));
         } else {
-           game.getFreeColGameObject(id).readFromXMLElement(playerElement);
+            fcgo.readFromXMLElement(playerElement);
         }
         gui.refreshPlayersTable();
 
@@ -177,7 +178,7 @@ public final class PreGameInputHandler extends InputHandler {
             logger.info("Client logging out: " + reason);
         }
 
-        Player player = (Player) game.getFreeColGameObject(playerID);
+        Player player = game.getFreeColGameObject(playerID, Player.class);
         game.removePlayer(player);
         gui.refreshPlayersTable();
 
@@ -212,8 +213,8 @@ public final class PreGameInputHandler extends InputHandler {
     private Element playerReady(Element element) {
         Game game = getFreeColClient().getGame();
 
-        Player player = (Player)game
-            .getFreeColGameObject(element.getAttribute("player"));
+        Player player = game
+            .getFreeColGameObject(element.getAttribute("player"), Player.class);
         boolean ready = Boolean.valueOf(element.getAttribute("value"))
             .booleanValue();
 
@@ -361,8 +362,8 @@ public final class PreGameInputHandler extends InputHandler {
     private Element updateNation(Element element) {
         Game game = getFreeColClient().getGame();
 
-        Player player = (Player)game
-            .getFreeColGameObject(element.getAttribute("player"));
+        Player player = game
+            .getFreeColGameObject(element.getAttribute("player"), Player.class);
         Nation nation = getGame().getSpecification()
             .getNation(element.getAttribute("value"));
 
@@ -382,8 +383,8 @@ public final class PreGameInputHandler extends InputHandler {
     private Element updateNationType(Element element) {
         Game game = getFreeColClient().getGame();
 
-        Player player = (Player)game
-            .getFreeColGameObject(element.getAttribute("player"));
+        Player player = game
+            .getFreeColGameObject(element.getAttribute("player"), Player.class);
         NationType nationType = getGame().getSpecification()
             .getNationType(element.getAttribute("value"));
 

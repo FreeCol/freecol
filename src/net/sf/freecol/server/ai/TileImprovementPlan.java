@@ -310,7 +310,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         }
 
         str = in.getAttributeValue(null, "target");
-        target = (Tile) getAIMain().getFreeColGameObject(str);
+        target = getAIMain().getGame().getFreeColGameObject(str, Tile.class);
 
         in.nextTag();
     }

@@ -74,7 +74,7 @@ public class UnloadCargoMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        // Sanity checks.
+
         Location loc = goods.getLocation();
         if (loc == null) {
             return DOMMessage.clientError("Goods in a null location.");

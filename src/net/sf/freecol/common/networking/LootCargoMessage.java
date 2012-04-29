@@ -94,8 +94,7 @@ public class LootCargoMessage extends DOMMessage {
      * @return The winner unit.
      */
     public Unit getUnit(Game game) {
-        FreeColGameObject o = game.getFreeColGameObjectSafely(winnerId);
-        return (o instanceof Unit) ? ((Unit) o) : null;
+        return game.getFreeColGameObject(winnerId, Unit.class);
     }
 
     /**
@@ -122,15 +121,16 @@ public class LootCargoMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     * @return An Element encapsulating the looting.
-     * @throws IllegalStateException if there is problem with the arguments.
+     * @return An <code>Element</code> encapsulating the looting.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
+
         Unit winner;
         try {
-            winner = server.getUnitSafely(winnerId, serverPlayer);
+            winner = player.getFreeColGameObject(winnerId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

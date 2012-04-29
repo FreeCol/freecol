@@ -255,7 +255,7 @@ public class IndianBringGiftMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "target");
-        target = (Colony)getGame().getFreeColGameObject(str);
+        target = getGame().getFreeColGameObject(str, Colony.class);
 
         str = in.getAttributeValue(null, "completed");
         // @compat 0.9.x

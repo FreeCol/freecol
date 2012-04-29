@@ -434,16 +434,25 @@ public class TileImprovement extends TileItem implements Named {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
+        Game game = getGame();
+
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
-        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
+        tile = game.getFreeColGameObject(in.getAttributeValue(null, "tile"),
+                                         Tile.class);
         if (tile == null) {
-            tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
+            tile = new Tile(game, in.getAttributeValue(null, "tile"));
         }
-        type = getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
+
+        String str = in.getAttributeValue(null, "type");
+        type = getSpecification().getTileImprovementType(str);
+
         turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
+
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
+
         style = Integer.parseInt(in.getAttributeValue(null, "style"));
+
         virtual = getAttribute(in, "virtual", false);
 
         in.nextTag();

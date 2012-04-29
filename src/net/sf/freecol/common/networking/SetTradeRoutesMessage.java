@@ -116,36 +116,35 @@ public class SetTradeRoutesMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
-     *
      * @return Null, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
-        String errors = "";
+        Game game = server.getGame();
 
+        String errors = "";
         for (TradeRoute tradeRoute : tradeRoutes) {
             if (tradeRoute.getId() == null || !hasPrefix(tradeRoute)) {
                 errors += "Bogus route: " + tradeRoute.getId() + ". ";
                 continue;
             }
             String id = removePrefix(tradeRoute);
-            if (!(game.getFreeColGameObject(id) instanceof TradeRoute)) {
-                errors += "Not a trade route: " + id + ". ";
-                continue;
-            }
-            TradeRoute realRoute = (TradeRoute) game.getFreeColGameObject(id);
-            if (tradeRoute.getOwner() != (Player) serverPlayer) {
-                errors += "Not your trade route: " + id + ". ";
+            TradeRoute realRoute;
+            try {
+                realRoute = serverPlayer.getFreeColGameObject(id,
+                                                              TradeRoute.class);
+            } catch (Exception e) {
+                errors += e.getMessage() + ". ";
                 continue;
             }
         }
         if (!"".equals(errors)) return DOMMessage.clientError(errors);
         
+        List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
         for (TradeRoute tradeRoute : tradeRoutes) {
-            TradeRoute realRoute = (TradeRoute) game
-                .getFreeColGameObject(removePrefix(tradeRoute));
+            TradeRoute realRoute
+                = game.getFreeColGameObject(removePrefix(tradeRoute),
+                                            TradeRoute.class);
             realRoute.updateFrom(tradeRoute);
             newRoutes.add(realRoute);
             tradeRoute.dispose();

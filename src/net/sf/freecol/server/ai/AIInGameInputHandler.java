@@ -192,9 +192,12 @@ public final class AIInGameInputHandler implements MessageHandler {
      * @param setCurrentPlayerElement The element (root element in a DOM-parsed
      *            XML tree) that holds all the information.
      */
-    private Element setCurrentPlayer(final DummyConnection connection, final Element setCurrentPlayerElement) {
+    private Element setCurrentPlayer(final DummyConnection connection,
+                                     final Element setCurrentPlayerElement) {
         final Game game = freeColServer.getGame();
-        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+
+        String str = setCurrentPlayerElement.getAttribute("player");
+        final Player currentPlayer = game.getFreeColGameObject(str, Player.class);
 
         if (currentPlayer != null
             && serverPlayer.getId() == currentPlayer.getId()) {

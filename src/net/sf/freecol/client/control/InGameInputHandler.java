@@ -232,9 +232,9 @@ public final class InGameInputHandler extends InputHandler {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-            FreeColGameObject fcgo = getGame().getFreeColGameObjectSafely(id);
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
             if (fcgo == null) {
-                logger.warning("Object in update not present in client: " + id);
+                logger.warning("Update object not present in client: " + id);
             } else {
                 fcgo.readFromXMLElement(element);
             }
@@ -249,18 +249,14 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element remove(Element removeElement) {
         Game game = getGame();
-        String divertString = removeElement.getAttribute("divert");
-        FreeColGameObject divert
-            = (divertString == null || divertString.isEmpty()) ? null
-            : game.getFreeColGameObject(divertString);
+        String ds = removeElement.getAttribute("divert");
+        FreeColGameObject divert = game.getFreeColGameObject(ds);
         Player player = getFreeColClient().getMyPlayer();
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             String idString = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-            FreeColGameObject fcgo
-                = (idString == null || idString.isEmpty()) ? null
-                : game.getFreeColGameObject(idString);
+            FreeColGameObject fcgo = game.getFreeColGameObject(idString);
             if (fcgo == null) {
                 logger.warning("Could not find FreeColGameObject with ID: "
                                + idString);
@@ -326,7 +322,7 @@ public final class InGameInputHandler extends InputHandler {
         String unitId = element.getAttribute("unit");
         Unit unit;
         if (unitId == null
-            || ((unit = (Unit) game.getFreeColGameObjectSafely(unitId)) == null
+            || ((unit = game.getFreeColGameObject(unitId, Unit.class)) == null
                 && (unit = selectUnitFromElement(game, element, unitId)) == null)) {
             throw new IllegalStateException("Animation"
                 + " for: " + client.getMyPlayer().getId()
@@ -339,13 +335,13 @@ public final class InGameInputHandler extends InputHandler {
             String newTileId = element.getAttribute("newTile");
             Tile oldTile, newTile;
             if (oldTileId == null
-                || (oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId)) == null) {
-                throw new IllegalStateException("Amimation"
+                || (oldTile = game.getFreeColGameObject(oldTileId, Tile.class)) == null) {
+                throw new IllegalStateException("Animation"
                     + " for: " + client.getMyPlayer().getId()
                     + " missing oldTile: " + oldTileId);
             }
             if (newTileId == null
-                || (newTile = (Tile) game.getFreeColGameObjectSafely(newTileId)) == null) {
+                || (newTile = game.getFreeColGameObject(newTileId, Tile.class)) == null) {
                 throw new IllegalStateException("Animation"
                     + " for: " + client.getMyPlayer().getId()
                     + " missing newTile: " + newTileId);
@@ -378,8 +374,9 @@ public final class InGameInputHandler extends InputHandler {
         FreeColClient client = getFreeColClient();
         if (client.isHeadless()) return null;
         Game game = getGame();
+
         String attackerId = element.getAttribute("attacker");
-        Unit attacker = (Unit) game.getFreeColGameObjectSafely(attackerId);
+        Unit attacker = game.getFreeColGameObject(attackerId, Unit.class);
         if (attacker == null
             && (attacker = selectUnitFromElement(game, element,
                                                  attackerId)) == null) {
@@ -388,8 +385,9 @@ public final class InGameInputHandler extends InputHandler {
                            + " incorrectly omitted attacker: " + attackerId);
             return null;
         }
+
         String defenderId = element.getAttribute("defender");
-        Unit defender = (Unit) game.getFreeColGameObjectSafely(defenderId);
+        Unit defender = game.getFreeColGameObject(defenderId, Unit.class);
         if (defender == null
             && (defender = selectUnitFromElement(game, element,
                                                  defenderId)) == null) {
@@ -447,8 +445,8 @@ public final class InGameInputHandler extends InputHandler {
     private Element setCurrentPlayer(Element element) {
         final FreeColClient fcc = getFreeColClient();
         final Player player = fcc.getMyPlayer();
-        final Player newPlayer = (Player) getGame()
-            .getFreeColGameObject(element.getAttribute("player"));
+        final Player newPlayer = getGame()
+            .getFreeColGameObject(element.getAttribute("player"), Player.class);
         final boolean newTurn = player.equals(newPlayer);
         if (FreeCol.isInDebugMode()
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
@@ -523,7 +521,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setDead(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
+        Player player = getGame().getFreeColGameObject(element.getAttribute("player"),
+                                                       Player.class);
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
             if (freeColClient.isSingleplayer()) {
@@ -558,7 +557,8 @@ public final class InGameInputHandler extends InputHandler {
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
 
-        Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
+        Player winner = getGame().getFreeColGameObject(element.getAttribute("winner"),
+                                                       Player.class);
         if (winner == freeColClient.getMyPlayer()) {
             new ShowVictoryPanelSwingTask().invokeLater();
         } // else: The client has already received the message of defeat.
@@ -611,7 +611,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setAI(Element element) {
 
-        Player p = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
+        Player p = getGame().getFreeColGameObject(element.getAttribute("player"),
+                                                  Player.class);
         p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
 
         return null;
@@ -845,13 +846,11 @@ public final class InGameInputHandler extends InputHandler {
         final Element normalTile = (Element) nodeList.item(1);
         String tileId = element.getAttribute("tile");
         FreeColGameObject fcgo;
-        if (tileId == null
-            || (fcgo = game.getFreeColGameObjectSafely(tileId)) == null
-            || !(fcgo instanceof Tile)) {
+        final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
+        if (tile == null) {
             logger.warning("spyResult bad tile = " + tileId);
             return null;
         }
-        final Tile tile = (Tile) fcgo;
         tile.readFromXMLElement(fullTile);
         Colony colony = tile.getColony();
         if (colony == null) {
@@ -902,8 +901,10 @@ public final class InGameInputHandler extends InputHandler {
         Player player = freeColClient.getMyPlayer();
         Game game = getGame();
         Stance stance = Enum.valueOf(Stance.class, element.getAttribute("stance"));
-        Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
-        Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
+        Player first = game.getFreeColGameObject(element.getAttribute("first"),
+                                                 Player.class);
+        Player second = game.getFreeColGameObject(element.getAttribute("second"),
+                                                  Player.class);
 
         Stance old = first.getStance(second);
         try {
@@ -930,7 +931,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element addPlayer(Element element) {
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        if (getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)) == null) {
+        if (getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE), Player.class) == null) {
             Player newPlayer = new Player(getGame(), playerElement);
             getGame().addPlayer(newPlayer);
         } else {
@@ -957,12 +958,11 @@ public final class InGameInputHandler extends InputHandler {
             // server may have already done so and its view will only
             // mislead us here in the client.
             Element e = (Element) nodes.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(e.getAttribute(FreeColObject.ID_ATTRIBUTE));
-
-            if (fcgo instanceof Unit) {
-                ((Unit) fcgo).dispose();
+            Unit u = game.getFreeColGameObject(e.getAttribute(FreeColObject.ID_ATTRIBUTE), Unit.class);
+            if (u == null) {
+                logger.warning("Object is not a unit");
             } else {
-                logger.warning("Object is not a unit: " + ((fcgo == null) ? "null" : fcgo.getId()));
+                u.dispose();
             }
         }
         return null;
@@ -982,13 +982,12 @@ public final class InGameInputHandler extends InputHandler {
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);
             String owner = e.getAttribute("owner");
-            Player player = null;
-            if (!(game.getFreeColGameObjectSafely(owner) instanceof Player)) {
+            Player player = game.getFreeColGameObject(owner, Player.class);
+            if (player == null) {
                 logger.warning("addObject with broken owner: "
                                + ((owner == null) ? "(null)" : owner));
                 continue;
             }
-            player = (Player) game.getFreeColGameObjectSafely(owner);
             String tag = e.getTagName();
             if (tag == null) {
                 logger.warning("addObject null tag");

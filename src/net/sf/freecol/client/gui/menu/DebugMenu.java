@@ -100,7 +100,7 @@ public class DebugMenu extends JMenu {
         final Game serverGame = (server == null) ? null : server.getGame();
         final Player player = freeColClient.getMyPlayer();
         final Player serverPlayer = (server == null) ? null
-            : (Player) serverGame.getFreeColGameObject(player.getId());
+            : serverGame.getFreeColGameObject(player.getId(), Player.class);
 
         this.setOpaque(false);
         this.setMnemonic(KeyEvent.VK_D);
@@ -378,7 +378,7 @@ public class DebugMenu extends JMenu {
                     }
                     for (Colony c : player.getColonies()) {
                         c.addLiberty(liberty);
-                        ((Colony) serverGame.getFreeColGameObject(c.getId()))
+                        serverGame.getFreeColGameObject(c.getId(), Colony.class)
                             .addLiberty(liberty);
                     }
                 }
@@ -659,7 +659,7 @@ public class DebugMenu extends JMenu {
                 while (unitIterator.hasNext()) {
                     Unit u = unitIterator.next();
                     if (u.isVisibleTo(serverPlayer)) {
-                        if (game.getFreeColGameObject(u.getId()) == null) {
+                        if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
                             System.out.println("Desynchronization detected: Unit missing on client-side");
                             System.out.println(Messages.message(Messages.getLabel(u))
                                 + "(" + u.getId() + "). Position: "
@@ -673,7 +673,7 @@ public class DebugMenu extends JMenu {
                             System.out.println();
                             problemDetected = true;
                         } else {
-                            Unit clientSideUnit = (Unit) game.getFreeColGameObject(u.getId());
+                            Unit clientSideUnit = game.getFreeColGameObject(u.getId(), Unit.class);
                             if (clientSideUnit.getTile() != null
                                 && !clientSideUnit.getTile().getId().equals(u.getTile().getId())) {
                                 System.out.println("Unsynchronization detected: Unit located on different tiles");
@@ -701,7 +701,7 @@ public class DebugMenu extends JMenu {
     private void displayEuropeAction(Game serverGame, AIMain aiMain) {
         StringBuilder sb = new StringBuilder();
         for (Player tp : serverGame.getPlayers()) {
-            Player p = (Player) serverGame.getFreeColGameObject(tp.getId());
+            Player p = serverGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
             List<Unit> inEurope = new ArrayList<Unit>();
             List<Unit> toEurope = new ArrayList<Unit>();

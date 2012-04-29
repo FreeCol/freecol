@@ -74,21 +74,26 @@ public class BuildColonyMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the request.
      * @param player The <code>Player</code> building the colony.
      * @param connection The <code>Connection</code> the message is from.
-     *
      * @return An update <code>Element</code> defining the new colony
-     *         and updating its surrounding tiles,
-     *         or an error <code>Element</code> on failure.
+     *     and updating its surrounding tiles, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(builderId, serverPlayer);
+            unit = player.getFreeColGameObject(builderId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+        if (!unit.canBuildColony()) {
+            return DOMMessage.clientError("Unit " + builderId
+                + " can not build colony.");
+        }
+
         if (colonyName == null) {
             return DOMMessage.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
@@ -97,10 +102,7 @@ public class BuildColonyMessage extends DOMMessage {
             return DOMMessage.clientError("Non-unique colony name "
                 + colonyName);
         }
-        if (!unit.canBuildColony()) {
-            return DOMMessage.clientError("Unit " + builderId
-                + " can not build colony.");
-        }
+
         Tile tile = unit.getTile();
         if (!player.canClaimToFoundSettlement(tile)) {
             return DOMMessage.clientError("Can not build colony on tile: "

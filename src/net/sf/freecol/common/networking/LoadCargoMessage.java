@@ -73,19 +73,21 @@ public class LoadCargoMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message received on.
-     *
-     * @return An update containing the carrier,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the carrier, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
+
         Unit unit;
         try {
-            unit = server.getUnitSafely(carrierId, serverPlayer);
+            unit = player.getFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         if (goods.getLocation() == null) {
             return DOMMessage.clientError("Goods with no location: " + goods);
         }

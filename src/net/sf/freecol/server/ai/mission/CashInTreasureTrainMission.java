@@ -359,11 +359,8 @@ public class CashInTreasureTrainMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
         
-        FreeColGameObject fcgo = getGame()
-            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
-        target = (fcgo instanceof Europe || fcgo instanceof Tile)
-            ? (Location)fcgo
-            : null;
+        String str = in.getAttributeValue(null, "target");
+        target = getGame().getFreeColLocation(str);
     }
 
     /**

@@ -288,6 +288,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
+
         colony = getFreeColGameObject(in, "colony", Colony.class);
     }
 
@@ -296,7 +297,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("colony", colony.getId());
     }
-
 }

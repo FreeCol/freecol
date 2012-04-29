@@ -228,8 +228,8 @@ public final class TilePopup extends JPopupMenu {
         if (FreeCol.isInDebugMode()
             && freeColClient.getFreeColServer() != null) {
             final Game serverGame = freeColClient.getFreeColServer().getGame();
-            final Player serverPlayer = (Player)
-                serverGame.getFreeColGameObject(player.getId());
+            final Player serverPlayer = serverGame.getFreeColGameObject(player.getId(),
+                                                                        Player.class);
             boolean notEmpty = false;
             addSeparator();
             JMenu takeOwnership = new JMenu("Take ownership");
@@ -242,7 +242,7 @@ public final class TilePopup extends JPopupMenu {
                 toMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             // Server:
-                            final Unit serverUnit = (Unit) serverGame.getFreeColGameObject(currentUnit.getId());
+                            final Unit serverUnit = serverGame.getFreeColGameObject(currentUnit.getId(), Unit.class);
                             serverUnit.setOwner(serverPlayer);
                             for (Unit serverChildUnit : currentUnit.getUnitList()) {
                                 serverChildUnit.setOwner(serverPlayer);
@@ -277,8 +277,7 @@ public final class TilePopup extends JPopupMenu {
                 toMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         // Server:
-                        final Tile serverTile = (Tile)
-                            serverGame.getFreeColGameObject(tile.getId());
+                        final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(), Tile.class);
                         serverTile.getSettlement().changeOwner(serverPlayer);
                         freeColClient.getConnectController().reconnect();
                     }
@@ -290,8 +289,7 @@ public final class TilePopup extends JPopupMenu {
                 displayColonyPlan.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         // Server:
-                        final Tile serverTile = (Tile)
-                            serverGame.getFreeColGameObject(tile.getId());
+                        final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(), Tile.class);
                         final AIColony ac = freeColClient.getFreeColServer()
                             .getAIMain().getAIColony(serverTile.getColony());
                         StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());
@@ -320,8 +318,7 @@ public final class TilePopup extends JPopupMenu {
                 final IndianSettlement is = tile.getIndianSettlement();
                 displayGoods.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            final IndianSettlement sis = (IndianSettlement)
-                                serverGame.getFreeColGameObject(is.getId());
+                            final IndianSettlement sis = serverGame.getFreeColGameObject(is.getId(), IndianSettlement.class);
                             gui.showInformationMessage(
                                 debugSummarizeSettlement(serverGame, sis));
                         }
@@ -581,8 +578,8 @@ public final class TilePopup extends JPopupMenu {
         RumourType rumourChoice = gui.showChoiceDialog(null, "Select Lost City Rumour", "Cancel",
                               rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
-        final Tile serverTile = (Tile) serverGame
-            .getFreeColGameObject(tile.getId());
+        final Tile serverTile = serverGame.getFreeColGameObject(tile.getId(),
+                                                                Tile.class);
         serverTile.getTileItemContainer().getLostCityRumour()
             .setType(rumourChoice);
     }
@@ -604,10 +601,10 @@ public final class TilePopup extends JPopupMenu {
         if (unitChoice == null) return;
 
         Player player = freeColClient.getMyPlayer();
-        Player serverPlayer = (Player) serverGame
-            .getFreeColGameObject(player.getId());
-        Tile serverTile = (Tile) serverGame
-            .getFreeColGameObject(tile.getId());
+        Player serverPlayer = serverGame.getFreeColGameObject(player.getId(),
+                                                              Player.class);
+        Tile serverTile = serverGame.getFreeColGameObject(tile.getId(),
+                                                          Tile.class);
         Unit carrier = null;
         if (!serverTile.isLand() && !unitChoice.isNaval()) {
             for (Unit u : serverTile.getUnitList()) {
@@ -628,7 +625,7 @@ public final class TilePopup extends JPopupMenu {
         if (carrier == null) {
             tile.add(unit);
         } else {
-            ((Unit)game.getFreeColGameObject(carrier.getId())).add(unit);
+            game.getFreeColGameObject(carrier.getId(), Unit.class).add(unit);
         }
         gui.setActiveUnit(unit);
         player.invalidateCanSeeTiles();
@@ -644,7 +641,7 @@ public final class TilePopup extends JPopupMenu {
     private void debugResetUnitsMoves(final Game serverGame, List<Unit> units) {
         boolean first = true;
         for (Unit u : units) {
-            Unit su = (Unit)serverGame.getFreeColGameObject(u.getId());
+            Unit su = serverGame.getFreeColGameObject(u.getId(), Unit.class);
             u.setMovesLeft(u.getInitialMovesLeft());
             su.setMovesLeft(su.getInitialMovesLeft());
             if (first) {
@@ -684,8 +681,8 @@ public final class TilePopup extends JPopupMenu {
         }
         GoodsType sGoodsType = spec.getGoodsType(goodsType.getId());
         GoodsContainer ugc = unit.getGoodsContainer();
-        GoodsContainer sgc = (GoodsContainer) serverGame
-            .getFreeColGameObject(ugc.getId());
+        GoodsContainer sgc = serverGame.getFreeColGameObject(ugc.getId(),
+                                                             GoodsContainer.class);
         ugc.setAmount(goodsType, a);
         sgc.setAmount(sGoodsType, a);
     }

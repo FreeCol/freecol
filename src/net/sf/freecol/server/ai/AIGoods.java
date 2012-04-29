@@ -363,14 +363,7 @@ public class AIGoods extends AIObject implements Transportable {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String str = in.getAttributeValue(null, "destination");
-        if (str != null) {
-            destination = (Location)aiMain.getFreeColGameObject(str);
-            if (destination == null) {
-                logger.warning("Could not find destination: " + str);
-            }
-        } else {
-            destination = null;
-        }
+        destination = aiMain.getGame().getFreeColLocation(str);
 
         transportPriority = getAttribute(in, "transportPriority", -1);
 

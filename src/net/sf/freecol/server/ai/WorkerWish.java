@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -215,7 +216,7 @@ public class WorkerWish extends Wish {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String str = in.getAttributeValue(null, "destination");
-        destination = (Location)aiMain.getFreeColGameObject(str);
+        destination = aiMain.getGame().getFreeColLocation(str);
 
         if ((str = in.getAttributeValue(null, "transportable")) != null) {
             if ((transportable = (AIUnit)aiMain.getAIObject(str)) == null) {

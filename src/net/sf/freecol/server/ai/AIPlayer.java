@@ -634,7 +634,10 @@ public abstract class AIPlayer extends AIObject {
         throws XMLStreamException {
         final AIMain aiMain = getAIMain();
 
-        setPlayer((ServerPlayer)aiMain.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE)));
+        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        ServerPlayer serverPlayer = aiMain.getGame().getFreeColGameObject(str,
+            ServerPlayer.class);
+        setPlayer(serverPlayer);
         
         Random rnd = Utils.restoreRandomState(in.getAttributeValue(null,
                 "randomState"));

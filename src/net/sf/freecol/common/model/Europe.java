@@ -402,6 +402,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
         owner = getFreeColGameObject(in, "owner", Player.class);
 
         recruitPrice = getAttribute(in, "recruitPrice", RECRUIT_PRICE_INITIAL);
+
         recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
 
         unitPrices.clear();

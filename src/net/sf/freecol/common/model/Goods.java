@@ -302,9 +302,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         setAmount(getAttribute(in, "amount", 1));
 
         str = in.getAttributeValue(null, "location");
-        if (str != null) {
-            location = (Location)getGame().getFreeColGameObject(str);
-        }
+        location = getGame().getFreeColLocation(str);
 
         in.nextTag();
     }

@@ -29,7 +29,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * The ID of the colony to change hands.
      */
-    private String colonyID;
+    private String colonyId;
 
     /**
      * The colony to change hands.
@@ -54,7 +54,7 @@ public class ColonyTradeItem extends TradeItem {
                            Colony colony) {
         super(game, "tradeItem.colony", source, destination);
         this.colony = colony;
-        colonyID = colony.getId();
+        colonyId = colony.getId();
         colonyName = colony.getName();
     }
 
@@ -146,7 +146,7 @@ public class ColonyTradeItem extends TradeItem {
         throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("colony", colonyID);
+        out.writeAttribute("colony", colonyId);
         out.writeAttribute("colonyName", colonyName);
     }
 
@@ -160,9 +160,12 @@ public class ColonyTradeItem extends TradeItem {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         super.readFromXMLImpl(in);
-        colonyID = in.getAttributeValue(null, "colony");
+
         colonyName = in.getAttributeValue(null, "colonyName");
-        colony = (Colony) game.getFreeColGameObject(colonyID);
+
+        colonyId = in.getAttributeValue(null, "colony");
+        colony = game.getFreeColGameObject(colonyId, Colony.class);
+
         in.nextTag();
     }
 

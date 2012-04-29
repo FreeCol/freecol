@@ -383,8 +383,8 @@ public class DefendSettlementMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        settlement = (Settlement) getGame()
-            .getFreeColGameObjectSafely(in.getAttributeValue(null, "settlement"));
+        String str = in.getAttributeValue(null, "settlement");
+        settlement = getGame().getFreeColGameObject(str, Settlement.class);
     }
 
     /**

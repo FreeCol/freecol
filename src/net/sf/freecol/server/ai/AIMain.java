@@ -331,18 +331,6 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>FreeColGameObject</code> with the given ID.
-     * This is just a convenience method for:
-     * {@link Game#getFreeColGameObject}
-     *
-     * @param id The ID of the <code>FreeColGameObject</code> to find.
-     * @return The <code>FreeColGameObject</code>.
-     */
-    public FreeColGameObject getFreeColGameObject(String id) {
-        return freeColServer.getGame().getFreeColGameObject(id);
-    }
-
-    /**
      * Replaces the AI object when ownership changes.
      *
      * @param source The <code>FreeColGameObject</code> that has changed.
@@ -524,7 +512,7 @@ public class AIMain extends FreeColObject
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
                 } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
-                    Player p = (Player) getGame().getFreeColGameObject(oid);
+                    Player p = getGame().getFreeColGameObject(oid, Player.class);
                     if (p != null) {
                         if (p.isIndian()) {
                             new NativeAIPlayer(this, in);

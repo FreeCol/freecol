@@ -110,8 +110,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The unit of this message.
      */
     public Unit getUnit(Game game) {
-        Object o = game.getFreeColGameObjectSafely(unitId);
-        return (o instanceof Unit) ? (Unit) o : null;
+        return game.getFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -130,8 +129,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @return The welcomer of this message.
      */
     public Player getWelcomer(Game game) {
-        Object o = game.getFreeColGameObjectSafely(welcomerId);
-        return (o instanceof Player) ? (Player) o : null;
+        return game.getFreeColGameObject(welcomerId, Player.class);
     }
 
     /**
@@ -158,9 +156,8 @@ public class NewLandNameMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update setting the new land name,
-     *         or an error <code>Element</code> on failure.
+     * @return An update setting the new land name, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -169,18 +166,19 @@ public class NewLandNameMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Tile tile = unit.getTile();
         if (tile == null) {
             return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        }
-        if (!tile.isLand()) {
+        } else if (!tile.isLand()) {
             return DOMMessage.clientError("Unit is not in the new world: "
                 + unitId);
         }
+
         if (newLandName == null || newLandName.length() == 0) {
             return DOMMessage.clientError("Empty new land name");
         }
@@ -188,14 +186,13 @@ public class NewLandNameMessage extends DOMMessage {
         ServerPlayer welcomer = null;
         int camps = 0;
         if (welcomerId != null) {
-            if (game.getFreeColGameObjectSafely(welcomerId) instanceof ServerPlayer) {
-                welcomer = (ServerPlayer) game.getFreeColGameObjectSafely(welcomerId);
-                if (!welcomer.isIndian()) {
-                    return DOMMessage.clientError("Not a native player: "
-                        + welcomerId);
-                }
-            } else {
+            welcomer = game.getFreeColGameObject(welcomerId,
+                                                 ServerPlayer.class);
+            if (welcomer == null) {
                 return DOMMessage.clientError("Not a player: " + welcomerId);
+            } else if (!welcomer.isIndian()) {
+                return DOMMessage.clientError("Not a native player: "
+                    + welcomerId);
             }
             boolean foundWelcomer = false;
             for (Tile t : tile.getSurroundingTiles(1)) {
@@ -207,8 +204,7 @@ public class NewLandNameMessage extends DOMMessage {
             }
             if (!foundWelcomer) {
                 return DOMMessage.clientError("Unit is not next to welcomer.");
-            }
-            if (!welcomer.owns(tile)) {
+            } else if (!welcomer.owns(tile)) {
                 return DOMMessage.clientError("Welcomer offers unowned tile: "
                     + tile.getId());
             }
@@ -219,6 +215,7 @@ public class NewLandNameMessage extends DOMMessage {
                     + campCount);
             }
         }
+
         boolean accept = Boolean.valueOf(acceptString);
 
         // Set name.

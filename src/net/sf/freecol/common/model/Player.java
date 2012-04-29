@@ -3222,6 +3222,32 @@ public class Player extends FreeColGameObject implements Nameable {
         return (data == null) ? null : String.valueOf(data.getPrice());
     }
 
+    /**
+     * Get a <code>FreeColGameObject</code> with the specified id and
+     * class, owned by this player.
+     *
+     * @param id The id.
+     * @param returnClass The expected class of the object.
+     * @return The game object, or null if not found.
+     * @throws IllegalStateException on failure to validate the object
+     *     in any way.
+     */
+    public <T extends FreeColGameObject> T getFreeColGameObject(String id,
+        Class<T> returnClass) throws IllegalStateException {
+        T t = getGame().getFreeColGameObject(id, returnClass);
+        if (t == null) {
+            throw new IllegalStateException("Not a " + returnClass.getName()
+                + ": " + id);
+        } else if (t instanceof Ownable) {
+            if (this != ((Ownable)t).getOwner()) {
+                throw new IllegalStateException(returnClass.getName()
+                    + " not owned by " + getId() + ": " + id);
+            }
+        } else {
+            throw new IllegalStateException("Not ownable: " + id);
+        }
+        return t;
+    }
 
     /**
      * An <code>Iterator</code> of {@link Unit}s that can be made active.
@@ -3338,6 +3364,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -3546,7 +3574,7 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
         if (entryLocationStr != null) {
-            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
+            entryLocation = getGame().getFreeColLocation(entryLocationStr);
             if (entryLocation == null) {
                 entryLocation = new Tile(getGame(), entryLocationStr);
             }
@@ -3581,7 +3609,8 @@ public class Player extends FreeColGameObject implements Nameable {
         highSeas = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                               Player.class);
                 tension.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {

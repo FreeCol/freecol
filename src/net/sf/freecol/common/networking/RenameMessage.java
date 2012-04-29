@@ -79,22 +79,24 @@ public class RenameMessage extends DOMMessage {
      * @return An update containing the renamed unit,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = player.getGame();
 
-        Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
-        if (object == null) {
-            return DOMMessage.clientError("Tried to rename an object with id "
-                + id + " which could not be found.");
+        FreeColGameObject fcgo;
+        try {
+            fcgo = player.getFreeColGameObject(id, FreeColGameObject.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        if (!(object instanceof Ownable)
-            || ((Ownable) object).getOwner() != serverPlayer) {
-            return DOMMessage.clientError("Not the owner of nameable: " + id);
+        if (!(fcgo instanceof Nameable)) {
+            return DOMMessage.clientError("Not a nameable: " + id);
         }
 
         // Proceed to rename.
         return server.getInGameController()
-            .renameObject(serverPlayer, object, newName);
+            .renameObject(serverPlayer, (Nameable)fcgo, newName);
     }
 
     /**

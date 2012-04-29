@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
@@ -32,6 +33,7 @@ import org.w3c.dom.Element;
  * The message sent when the client requests setting a unit destination.
  */
 public class SetDestinationMessage extends DOMMessage {
+
     /**
      * The ID of the unit whose destination is to be set.
      **/
@@ -71,9 +73,8 @@ public class SetDestinationMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> the message is from.
-     *
      * @return An update containing the unit with the new destination,
-     *         or an error <code>Element</code> on failure.
+     *     or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
@@ -81,18 +82,14 @@ public class SetDestinationMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        Location destination;
-        if (destinationId == null || destinationId.length() == 0) {
-            destination = null;
-        } else if (!(game.getFreeColGameObject(destinationId) instanceof Location)) {
-            return DOMMessage.clientError("Not a location ID: "
-                + destinationId);
-        } else {
-            destination = (Location) game.getFreeColGameObject(destinationId);
+
+        Location destination = game.getFreeColLocation(destinationId);
+        if (destination == null) {
+            return DOMMessage.clientError("Not a location: " + destinationId);
         }
 
         // Set destination

@@ -302,10 +302,9 @@ public final class ReportColonyPanel extends ReportPanel
             String command = event.getActionCommand();
             if (command.startsWith(BUILDQUEUE)) {
                 command = command.substring(BUILDQUEUE.length());
-                FreeColGameObject fcgo
-                    = getGame().getFreeColGameObject(command);
-                if (fcgo instanceof Colony) {
-                    getGUI().showBuildQueuePanel((Colony) fcgo, new Runnable() {
+                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
+                if (colony != null) {
+                    getGUI().showBuildQueuePanel(colony, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }
@@ -313,10 +312,9 @@ public final class ReportColonyPanel extends ReportPanel
                     return;
                 }
             } else {
-                FreeColGameObject fcgo
-                    = getGame().getFreeColGameObject(command);
-                if (fcgo instanceof Colony) {
-                    getGUI().showColonyPanel((Colony) fcgo, new Runnable() {
+                Colony colony = getGame().getFreeColGameObject(command, Colony.class);
+                if (colony != null) {
+                    getGUI().showColonyPanel(colony, new Runnable() {
                         public void run() {
                             updateCompactColonyPanel();
                         }

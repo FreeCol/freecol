@@ -65,24 +65,23 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update encapsulating the change.
-     *         or an error <code>Element</code> on failure.
+     * @return An update encapsulating the change, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
             return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        }
-        if (unit.getColony() == null) {
+        } else if (unit.getColony() == null) {
             return DOMMessage.clientError("Unit is not in a colony: "
                 + unitId);
         }

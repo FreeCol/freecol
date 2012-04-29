@@ -80,23 +80,20 @@ public class DiplomacyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
-        FreeColGameObject fcgo = game.getFreeColGameObject(element.getAttribute("settlement"));
-        this.settlement = (fcgo instanceof Settlement) ? (Settlement) fcgo
-            : null;
+        String settlementId = element.getAttribute("settlement");
+        Settlement settlement = game.getFreeColGameObject(settlementId,
+                                                          Settlement.class);
+
         NodeList nodes = element.getChildNodes();
         this.agreement = (nodes.getLength() < 1) ? null
-            : new DiplomaticTrade(game, (Element) nodes.item(0));
+            : new DiplomaticTrade(game, (Element)nodes.item(0));
         if (nodes.getLength() < 2) {
             this.unit = null;
         } else {
-            Element unitElement = (Element) nodes.item(1);
-            String unitId = unitElement.getAttribute(FreeColObject.ID_ATTRIBUTE);
-            fcgo = game.getFreeColGameObject(unitId);
-            if (fcgo instanceof Unit) {
-                this.unit = (Unit) fcgo;
-            } else {
-                this.unit = new Unit(game, unitElement);
-            }
+            Element ue = (Element)nodes.item(1);
+            String unitId = ue.getAttribute(FreeColObject.ID_ATTRIBUTE);
+            this.unit = game.getFreeColGameObject(unitId, Unit.class);
+            if (this.unit == null) this.unit = new Unit(game, ue);
         }
     }
 

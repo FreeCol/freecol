@@ -579,15 +579,18 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
 
         workTile = getFreeColGameObject(in, "workTile", Tile.class);
-        colonyCenterTile = (getTile() == workTile);
+
+        colonyCenterTile = getTile() == workTile;
 
         super.readChildren(in);
     }

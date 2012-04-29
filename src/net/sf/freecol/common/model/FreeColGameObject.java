@@ -353,8 +353,10 @@ abstract public class FreeColGameObject extends FreeColObject {
     protected Location newLocation(String locationString) {
         Location destination = null;
         if (locationString != null) {
-            destination = (Location) game.getFreeColGameObject(locationString);
-            if (destination == null) {
+            FreeColGameObject fcgo = game.getFreeColGameObject(locationString);
+            if (fcgo instanceof Location) {
+                destination = (Location)fcgo;
+            } else {
                 String XMLElementTag = locationString.substring(0, locationString.indexOf(':'));
                 if (XMLElementTag.equals(Tile.getXMLElementTagName())) {
                     return new Tile(game, locationString);

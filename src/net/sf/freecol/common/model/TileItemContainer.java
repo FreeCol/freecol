@@ -595,36 +595,43 @@ public class TileItemContainer extends FreeColGameObject {
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
+        Game game = getGame();
+
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
-        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
+        tile = game.getFreeColGameObject(in.getAttributeValue(null, "tile"),
+                                         Tile.class);
         if (tile == null) {
-            tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
+            tile = new Tile(game, in.getAttributeValue(null, "tile"));
         }
 
         tileItems.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            TileItem item = (TileItem) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+            TileItem item = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                      TileItem.class);
             if (item == null) {
                 if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                    item = new Resource(getGame(), in);
+                    item = new Resource(game, in);
                 } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-                    item = new LostCityRumour(getGame(), in);
+                    item = new LostCityRumour(game, in);
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                    item = new TileImprovement(getGame(), in);
+                    item = new TileImprovement(game, in);
                 }
             } else {
                 item.readFromXML(in);
             }
             tileItems.add(item);
         }
-        // TODO: remove this some time; at this point, sorting is only
-        // required for old savegames
+
+        // @compat 0.9.x
         Collections.sort(tileItems, tileItemComparator);
+        // @end compat
     }
 
     /**

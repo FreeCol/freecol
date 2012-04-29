@@ -142,9 +142,8 @@ public class LoginMessage extends DOMMessage {
     }
 
     public Unit getActiveUnit() {
-        if (activeUnitId == null) return null;
-        FreeColGameObject fcgo = game.getFreeColGameObjectSafely(activeUnitId);
-        return (fcgo instanceof Unit) ? (Unit)fcgo : null;
+        return (activeUnitId == null) ? null
+            : game.getFreeColGameObject(activeUnitId, Unit.class);
     }
 
     public Game getGame() {

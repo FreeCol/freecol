@@ -347,8 +347,7 @@ public class IndianDemandMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "target");
-        target = (str == null) ? null
-            : (Colony)getGame().getFreeColGameObject(str);
+        target = getGame().getFreeColGameObject(str, Colony.class);
 
         str = in.getAttributeValue(null, "completed");
         completed = Boolean.valueOf(str).booleanValue();

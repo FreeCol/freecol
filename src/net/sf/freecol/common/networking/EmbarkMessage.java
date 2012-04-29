@@ -88,25 +88,28 @@ public class EmbarkMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     * @return An update containing the embarked unit,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the embarked unit, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Unit carrier;
         try {
-            carrier = server.getUnitSafely(carrierId, serverPlayer);
+            carrier = player.getFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Location sourceLocation = unit.getLocation();
         Tile sourceTile = null;
         Tile destinationTile = null;
@@ -132,24 +135,15 @@ public class EmbarkMessage extends DOMMessage {
         } else {
             // Units have to be on the map and have moves left if a
             // move is involved.
-            try {
-                direction = Enum.valueOf(Direction.class, directionString);
-            } catch (Exception e) {
-                return DOMMessage.clientError(e.getMessage());
-            }
-            sourceTile = unit.getTile();
-            if (sourceTile == null) {
-                return DOMMessage.clientError("Unit is not on the map: "
-                    + unitId);
-            }
             if (unit.getMovesLeft() <= 0) {
                 return DOMMessage.clientError("Unit has no moves left: "
                     + unitId);
             }
-            destinationTile = sourceTile.getNeighbourOrNull(direction);
-            if (destinationTile == null) {
-                return DOMMessage.clientError("Could not find tile"
-                    + " in direction: " + direction + " from unit: " + unitId);
+
+            try {
+                destinationTile = unit.getNeighbourTile(directionString);
+            } catch (Exception e) {
+                return DOMMessage.clientError(e.getMessage());
             }
             if (carrier.getTile() != destinationTile) {
                 return DOMMessage.clientError("Carrier: " + carrierId

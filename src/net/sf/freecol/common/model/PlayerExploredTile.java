@@ -276,13 +276,20 @@ public class PlayerExploredTile extends FreeColGameObject {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         
         player = getFreeColGameObject(in, "player", Player.class);
+
         tile = getFreeColGameObject(in, "tile", Tile.class);
+
         owner = getFreeColGameObject(in, "owner", Player.class, null);
+
         owningSettlement = getFreeColGameObject(in, "owningSettlement",
                                                 Settlement.class, null);
+
         colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
+
         colonyStockadeKey = in.getAttributeValue(null, "colonyStockadeKey");
+
         skill = spec.getType(in, "learnableSkill", UnitType.class, null);
+
         wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class,
                                       null);
         wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class,
@@ -298,7 +305,8 @@ public class PlayerExploredTile extends FreeColGameObject {
                 missionary = updateFreeColGameObject(in, Unit.class);
                 in.nextTag(); // close <missionary> tag
             } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                Resource resource = (Resource) game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                Resource resource = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                              Resource.class);
                 if (resource != null) {
                     resource.readFromXML(in);
                 } else {
@@ -306,7 +314,8 @@ public class PlayerExploredTile extends FreeColGameObject {
                 }
                 tileItems.add(resource);
             } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-                LostCityRumour lostCityRumour = (LostCityRumour) game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                LostCityRumour lostCityRumour = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                                          LostCityRumour.class);
                 if (lostCityRumour != null) {
                     lostCityRumour.readFromXML(in);
                 } else {
@@ -314,7 +323,8 @@ public class PlayerExploredTile extends FreeColGameObject {
                 }
                 tileItems.add(lostCityRumour);
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                TileImprovement ti = (TileImprovement) game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                TileImprovement ti = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                               TileImprovement.class);
                 if (ti != null) {
                     ti.readFromXML(in);
                 } else {

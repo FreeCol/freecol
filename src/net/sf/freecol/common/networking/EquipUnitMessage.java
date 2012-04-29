@@ -81,9 +81,8 @@ public class EquipUnitMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message received on.
-     *
      * @return An update encapsulating the equipUnit location change
-     *         or an error <code>Element</code> on failure.
+     *     or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -92,7 +91,7 @@ public class EquipUnitMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
@@ -105,10 +104,12 @@ public class EquipUnitMessage extends DOMMessage {
             return DOMMessage.clientError("Unit is not in a settlement: "
                 + unitId);
         }
+
         EquipmentType type = game.getSpecification().getEquipmentType(typeId);
         if (type == null) {
             return DOMMessage.clientError("Bad equipment type: " + typeId);
         }
+
         int amount;
         try {
             amount = Integer.parseInt(amountString);

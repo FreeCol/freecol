@@ -106,20 +106,29 @@ public class BuyPropositionMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
      * @return This <code>BuyProposition</code> message as an
-     *         <code>Element</code> with updated gold value,
-     *         or an error <code>Element</code> on failure.
+     *     <code>Element</code> with updated gold value, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
+
         Unit unit;
+        try {
+            unit = player.getFreeColGameObject(unitId, Unit.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
+        }
+        if (unit.getSpaceLeft() == 0) {
+            return DOMMessage.clientError("No space left on unit: "
+                + unit.getId());
+        }
+ 
         IndianSettlement settlement;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
-            settlement = server.getAdjacentIndianSettlementSafely(settlementId,
-                                                                  unit);
+            settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
@@ -128,10 +137,7 @@ public class BuyPropositionMessage extends DOMMessage {
             return DOMMessage.createError("server.trade.noGoods", "Goods "
                 + goods.getId() + " are not in settlement " + settlementId);
         }
-        if (unit.getSpaceLeft() == 0) {
-            return DOMMessage.clientError("No space left on unit: "
-                + unit.getId());
-        }
+ 
         int gold;
         try {
             gold = Integer.parseInt(goldString);

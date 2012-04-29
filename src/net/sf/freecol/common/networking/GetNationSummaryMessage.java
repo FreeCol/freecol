@@ -93,14 +93,10 @@ public class GetNationSummaryMessage extends DOMMessage {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = serverPlayer.getGame();
 
-        Player player;
-        FreeColGameObject fcgo = game.getFreeColGameObjectSafely(playerId);
-        if (fcgo instanceof Player) {
-            player = (Player) fcgo;
-        } else {
+        Player player = game.getFreeColGameObject(playerId, Player.class);
+        if (player == null) {
             return DOMMessage.clientError("Not a player: " + playerId);
-        }
-        if (player.isIndian() && !serverPlayer.hasContacted(player)) {
+        } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
             return DOMMessage.clientError("Not contacted: " + playerId);
         }
 

@@ -1887,16 +1887,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super.readAttributes(in);
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
+
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
+
         style = getAttribute(in, "style", 0);
 
         String typeString = in.getAttributeValue(null, "type");
         if (typeString != null) {
             type = getSpecification().getTileType(typeString);
         }
+
         connected = getAttribute(in, "connected", false);
+
         owner = getFreeColGameObject(in, "owner", Player.class, null);
+
         region = getFreeColGameObject(in, "region", Region.class, null);
+
         moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
             ? null
             : getAttribute(in, "moveToEurope", false);
@@ -1905,19 +1911,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             = in.getAttributeValue(null, "owningSettlement");
         Settlement newOwningSettlement = null;
         if (owningSettlementStr != null) {
-            newOwningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
+            newOwningSettlement = getGame().getFreeColGameObject(owningSettlementStr,
+                                                                 Settlement.class);
             if (newOwningSettlement == null) {
                 if (owningSettlementStr.startsWith(IndianSettlement.getXMLElementTagName())) {
                     newOwningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
                 } else if (owningSettlementStr.startsWith(Colony.getXMLElementTagName())) {
                     newOwningSettlement = new Colony(getGame(), owningSettlementStr);
                 } else {
-                    logger.warning("Unknown type of Settlement.");
+                    logger.warning("Unknown type of Settlement: "
+                        + owningSettlementStr);
                 }
             }
         } else {
             newOwningSettlement = null;
         }
+
         changeOwningSettlement(newOwningSettlement);
     }
 
@@ -1974,7 +1983,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
             // end compatibility code
         } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
-            tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+            tileItemContainer = getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                               TileItemContainer.class);
             if (tileItemContainer != null) {
                 tileItemContainer.readFromXML(in);
             } else {
@@ -1982,7 +1992,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
             // Only from a savegame:
-            Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                           Player.class);
             PlayerExploredTile pet = getPlayerExploredTile(player);
             if (pet == null) {
                 pet = new PlayerExploredTile(getGame(), in);

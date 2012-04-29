@@ -106,15 +106,12 @@ public class SetBuildQueueMessage extends DOMMessage {
         Specification spec = game.getSpecification();
 
         Colony colony;
-        if (game.getFreeColGameObject(colonyId) instanceof Colony) {
-            colony = (Colony) game.getFreeColGameObject(colonyId);
-        } else {
-            return DOMMessage.clientError("Not a colony: " + colonyId);
+        try {
+            colony = player.getFreeColGameObject(colonyId, Colony.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        if (player != colony.getOwner()) {
-            return DOMMessage.clientError("Player does not own colony: "
-                + colonyId);
-        }
+
         if (queue == null) {
             return DOMMessage.clientError("Empty queue");
         }

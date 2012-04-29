@@ -93,18 +93,24 @@ public class SellMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return Null.
-     * @throws IllegalStateException if there is problem with the arguments.
+     * @return An update as a result of the sale, or an error
+     *      <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit;
-        IndianSettlement settlement;
+        Game game = server.getGame();
 
+        Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
-            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
+        }
+
+        IndianSettlement settlement;
+        try {
+            settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
@@ -114,6 +120,7 @@ public class SellMessage extends DOMMessage {
             return DOMMessage.createError("server.trade.noGoods", "Goods "
                 + goods.getId() + " is not with unit " + unitId);
         }
+
         int gold;
         try {
             gold = Integer.parseInt(goldString);

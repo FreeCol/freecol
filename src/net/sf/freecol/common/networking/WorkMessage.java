@@ -75,9 +75,8 @@ public class WorkMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message received on.
-     *
-     * @return An update encapsulating the work location change
-     *         or an error <code>Element</code> on failure.
+     * @return An update encapsulating the work location change or an
+     *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -86,34 +85,32 @@ public class WorkMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Tile tile = unit.getTile();
         if (tile == null) {
             return DOMMessage.clientError("Unit is not on the map: "
                 + unitId);
         }
+
         Colony colony = tile.getColony();
         if (colony == null) {
             return DOMMessage.clientError("Unit is not at a colony: "
                 + unitId);
         }
-        WorkLocation workLocation;
-        if (game.getFreeColGameObjectSafely(workLocationId)
-            instanceof WorkLocation) {
-            workLocation = (WorkLocation) game
-                .getFreeColGameObjectSafely(workLocationId);
-        } else {
+
+        WorkLocation workLocation
+            = game.getFreeColGameObject(workLocationId, WorkLocation.class);
+        if (workLocation == null) {
             return DOMMessage.clientError("Not a work location: "
                 + workLocationId);
-        }
-        if (workLocation.getColony() != colony) {
-            return DOMMessage.clientError("Work location is not in the colony where the unit is: "
-                + workLocationId);
-        }
-        if (!workLocation.canAdd(unit)) {
+        } else if (workLocation.getColony() != colony) {
+            return DOMMessage.clientError("Work location is not in the colony"
+                + " where the unit is: " + workLocationId);
+        } else if (!workLocation.canAdd(unit)) {
             return DOMMessage.clientError("Can not add " + unit.toString()
                 + " to " + workLocation.toString()
                 + ": " + workLocation.getNoAddReason(unit));

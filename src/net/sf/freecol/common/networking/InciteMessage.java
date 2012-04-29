@@ -93,9 +93,8 @@ public class InciteMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An element containing the result of the incite,
-     *         or an error <code>Element</code> on failure.
+     * @return An element containing the result of the incite, or an
+     *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -104,43 +103,38 @@ public class InciteMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+
+        Tile tile;
+        try {
+            tile = unit.getNeighbourTile(directionString);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (tile == null) {
-            return DOMMessage.clientError("Could not find tile"
-                + " in direction: " + direction + " from unit: " + unitId);
-        }
+
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return DOMMessage.clientError("There is no native settlement at: "
                 + tile.getId());
         }
-        Player enemy;
-        if (enemyId == null || enemyId.length() == 0) {
-            return DOMMessage.clientError("Empty enemyId.");
-        }
-        if (!(game.getFreeColGameObjectSafely(enemyId) instanceof Player)) {
+
+        MoveType type;
+        Player enemy = game.getFreeColGameObject(enemyId, Player.class);
+        if (enemy == null) {
             return DOMMessage.clientError("Not a player: " + enemyId);
-        }
-        enemy = (Player) game.getFreeColGameObjectSafely(enemyId);
-        if (enemy == player) {
+        } else if (enemy == player) {
             return DOMMessage.clientError("Inciting against oneself!");
-        }
-        if (!enemy.isEuropean()) {
+        } else if (!enemy.isEuropean()) {
             return DOMMessage.clientError("Inciting against non-European!");
-        }
-        MoveType type = unit.getMoveType(is.getTile());
-        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+        } else if ((type = unit.getMoveType(is.getTile()))
+            != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
             return DOMMessage.clientError("Unable to enter "
                 + is.getName() + ": " + type.whyIllegal());
         }
+
         int gold;
         try {
             gold = Integer.parseInt(goldString);

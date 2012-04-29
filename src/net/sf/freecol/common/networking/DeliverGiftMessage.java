@@ -84,11 +84,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The unit, or null if none.
      */
     public Unit getUnit() {
-        try {
-            return (Unit) goods.getGame().getFreeColGameObject(unitId);
-        } catch (Exception e) {
-        }
-        return null;
+        return goods.getGame().getFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -99,11 +95,8 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The settlement, or null if none.
      */
     public Settlement getSettlement() {
-        try {
-            return (Settlement) goods.getGame().getFreeColGameObject(settlementId);
-        } catch (Exception e) {
-        }
-        return null;
+        return goods.getGame().getFreeColGameObject(settlementId,
+                                                    Settlement.class);
     }
 
     /**
@@ -123,22 +116,24 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the unit and settlement,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the unit and settlement, or an
+     *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
+
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Settlement settlement;
         try {
-            settlement = server.getAdjacentSettlementSafely(settlementId, unit);
+            settlement = unit.getAdjacentSettlementSafely(settlementId);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

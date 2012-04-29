@@ -75,25 +75,23 @@ public class MoveToMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the moved unit,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the moved unit, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = player.getGame();
+
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        FreeColGameObject obj = game.getFreeColGameObjectSafely(destinationId);
-        Location destination;
-        if (obj instanceof Location) {
-            destination = (Location) obj;
-        } else {
+
+        Location destination = game.getFreeColLocation(destinationId);
+        if (destination == null) {
             return DOMMessage.clientError("Not a location: " + destinationId);
         }
 

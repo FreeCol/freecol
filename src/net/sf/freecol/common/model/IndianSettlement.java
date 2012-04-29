@@ -1243,11 +1243,13 @@ public class IndianSettlement extends Settlement {
 
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
-            Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                           Player.class);
             spokenTo.add(player);
             in.nextTag(); // close tag is always generated.
         } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
-            Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                           Player.class);
             alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
             in.nextTag(); // close element
         } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {

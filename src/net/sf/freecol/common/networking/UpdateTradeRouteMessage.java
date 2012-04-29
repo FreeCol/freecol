@@ -78,14 +78,15 @@ public class UpdateTradeRouteMessage extends DOMMessage {
             || !SetTradeRoutesMessage.hasPrefix(tradeRoute)) {
             return DOMMessage.clientError("Bogus route");
         }
+
         String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
-        if (!(game.getFreeColGameObject(id) instanceof TradeRoute)) {
-            return DOMMessage.clientError("Not a trade route: " + id);
+        TradeRoute realRoute;
+        try {
+            realRoute = serverPlayer.getFreeColGameObject(id, TradeRoute.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        TradeRoute realRoute = (TradeRoute) game.getFreeColGameObject(id);
-        if (tradeRoute.getOwner() != (Player) serverPlayer) {
-            return DOMMessage.clientError("Not your trade route: " + id);
-        }
+
         realRoute.updateFrom(tradeRoute);
         tradeRoute.dispose();
         return null;

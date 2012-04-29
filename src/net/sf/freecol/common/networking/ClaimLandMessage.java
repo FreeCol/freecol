@@ -81,40 +81,42 @@ public class ClaimLandMessage extends DOMMessage {
      *
      * @return An update, or error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
 
-        Tile tile;
-        if (game.getFreeColGameObjectSafely(tileId) instanceof Tile) {
-            tile = (Tile) game.getFreeColGameObjectSafely(tileId);
-        } else {
-            return DOMMessage.clientError("Invalid tileId");
+        Tile tile = game.getFreeColGameObject(tileId, Tile.class);
+        if (tile == null) {
+            return DOMMessage.clientError("Not a file: " + tileId);
         }
 
-        Unit unit = null;
+        Unit unit;
+        try {
+            unit = player.getFreeColGameObject(claimantId, Unit.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
+        }
+        if (unit.getTile() != tile) {
+            return DOMMessage.clientError("Unit not at tile: " + tileId);
+        }
+
         Settlement settlement = null;
-        FreeColGameObject fcgo = game.getFreeColGameObjectSafely(claimantId);
-        if (fcgo instanceof Unit) {
-            unit = (Unit)fcgo;
-            if (unit.getOwner() != player) {
-                return DOMMessage.clientError("Not your unit");
-            }
-            if (unit.getTile() != tile) {
-                return DOMMessage.clientError("Unit can not claim tile: "
-                    + tileId);
-            }
-        } else if (fcgo instanceof Settlement) {
-            settlement = (Settlement)fcgo;
-            if (settlement.getOwner() != player) {
-                return DOMMessage.clientError("Not your settlement");
+        if (unit == null) {
+            try {
+                settlement = player.getFreeColGameObject(claimantId,
+                                                         Settlement.class);
+            } catch (Exception e) {
+                return DOMMessage.clientError(e.getMessage());
             }
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return DOMMessage.clientError("Settlement can not claim tile: "
                     + tileId);
             }
-        } else {
+        }
+
+        if (unit == null && settlement == null) {
             return DOMMessage.clientError("Claimant is neither unit"
                 + " nor settlement: " + claimantId);
         }

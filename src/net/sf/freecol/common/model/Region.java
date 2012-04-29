@@ -536,7 +536,9 @@ public class Region extends FreeColGameObject implements Nameable {
         if (turn > 0) {
             discoveredIn = new Turn(turn);
         }
-        discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class, null);
+
+        discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class);
+
         parent = getFreeColGameObject(in, "parent", Region.class);
 
         children = new ArrayList<Region>();

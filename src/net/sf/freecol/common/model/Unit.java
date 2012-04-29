@@ -48,6 +48,7 @@ import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Represents all pieces that can be moved on the map-board. This includes:
  * colonists, ships, wagon trains e.t.c.
@@ -61,14 +62,16 @@ import org.w3c.dom.Element;
 public class Unit extends FreeColGameObject
     implements Consumer, Locatable, Location, Movable, Nameable, Ownable {
 
-    private static Comparator<Unit> skillLevelComp =
-        new Comparator<Unit>() {
-        public int compare(Unit u1, Unit u2) {
-            return u1.getSkillLevel() - u2.getSkillLevel();
-        }
-    };
-
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
+
+    /** A comparator to order units by skill level. */
+    private static Comparator<Unit> skillLevelComp
+        = new Comparator<Unit>() {
+            public int compare(Unit u1, Unit u2) {
+                return u1.getSkillLevel() - u2.getSkillLevel();
+            }
+        };
+
 
     /**
      * XML tag name for equipment list.
@@ -3592,6 +3595,92 @@ public class Unit extends FreeColGameObject
         return lose;
     }
 
+    // Routines for message unpacking.
+
+    /**
+     * Gets the tile in a given direction.
+     *
+     * @param directionString The direction.
+     * @return The <code>Tile</code> in the given direction.
+     * @throws IllegalStateException if there is trouble.
+     */
+    public Tile getNeighbourTile(String directionString) {
+        if (getTile() == null) {
+            throw new IllegalStateException("Unit is not on the map: "
+                + getId());
+        }
+
+        Direction direction = Enum.valueOf(Direction.class, directionString);
+        Tile tile = getTile().getNeighbourOrNull(direction);
+        if (tile == null) {
+            throw new IllegalStateException("Could not find tile"
+                + " in direction: " + direction + " from unit: " + getId());
+        }
+        return tile;
+    }
+    
+    /**
+     * Get a settlement by id, validating as much as possible.
+     * Designed for message unpacking where the id should not be trusted.
+     *
+     * @param settlementId The id of the <code>Settlement</code> to be found.
+     * @return The settlement corresponding to the settlementId argument.
+     * @throws IllegalStateException on failure to validate the settlementId
+     *     in any way.
+     */
+    public Settlement getAdjacentSettlementSafely(String settlementId)
+        throws IllegalStateException {
+        Game game = getOwner().getGame();
+        
+        Settlement settlement = game.getFreeColGameObject(settlementId,
+                                                          Settlement.class);
+        if (settlement == null) {
+            throw new IllegalStateException("Not a settlement: "
+                + settlementId);
+        } else if (settlement.getTile() == null) {
+            throw new IllegalStateException("Settlement is not on the map: "
+                + settlementId);
+        }
+
+        if (getTile() == null) {
+            throw new IllegalStateException("Unit is not on the map: "
+                + getId());
+        } else if (getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Unit " + getId()
+                + " is not adjacent to settlement: " + settlementId);
+        } else if (getOwner() == settlement.getOwner()) {
+            throw new IllegalStateException("Unit: " + getId()
+                + " and settlement: " + settlementId
+                + " are both owned by player: " + getOwner().getId());
+        }
+
+        return settlement;
+    }
+
+    /**
+     * Get an adjacent Indian settlement by id, validating as much as
+     * possible, including checking whether the nation involved has
+     * been contacted.  Designed for message unpacking where the id
+     * should not be trusted.
+     *
+     * @param id The id of the <code>IndianSettlement</code> to be found.
+     * @return The settlement corresponding to the settlementId argument.
+     * @throws IllegalStateException on failure to validate the settlementId
+     *     in any way.
+     */
+    public IndianSettlement getAdjacentIndianSettlementSafely(String id)
+        throws IllegalStateException {
+        Settlement settlement = getAdjacentSettlementSafely(id);
+        if (!(settlement instanceof IndianSettlement)) {
+            throw new IllegalStateException("Not an indianSettlement: " + id);
+        } else if (!getOwner().hasContacted(settlement.getOwner())) {
+            throw new IllegalStateException("Player has not contacted the "
+                + settlement.getOwner().getNation());
+        }
+
+        return (IndianSettlement)settlement;
+    }
+
     // Interface Consumer
 
     /**
@@ -3767,9 +3856,12 @@ public class Unit extends FreeColGameObject
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
-     * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
+     * @throws javax.xml.stream.XMLStreamException is thrown if
+     *     something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        Game game = getGame();
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         UnitType oldUnitType = unitType;
@@ -3781,9 +3873,7 @@ public class Unit extends FreeColGameObject
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
         attrition = getAttribute(in, "attrition", 0);
 
-        String ownerId = in.getAttributeValue(null, "owner");
-        owner = (Player) getGame().getFreeColGameObject(ownerId);
-        if (owner == null) owner = new Player(getGame(), ownerId);
+        owner = getFreeColGameObject(in, "owner", Player.class);
 
         nationality = in.getAttributeValue(null, "nationality");
         ethnicity = in.getAttributeValue(null, "ethnicity");
@@ -3798,13 +3888,15 @@ public class Unit extends FreeColGameObject
         hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
 
         teacher = getFreeColGameObject(in, "teacher", Unit.class);
+
         student = getFreeColGameObject(in, "student", Unit.class);
 
         final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
         if (indianSettlementStr != null) {
-            indianSettlement = (IndianSettlement) getGame().getFreeColGameObject(indianSettlementStr);
+            indianSettlement = game.getFreeColGameObject(indianSettlementStr,
+                                                         IndianSettlement.class);
             if (indianSettlement == null) {
-                indianSettlement = new IndianSettlement(getGame(), indianSettlementStr);
+                indianSettlement = new IndianSettlement(game, indianSettlementStr);
             }
         } else {
             setIndianSettlement(null);
@@ -3818,7 +3910,8 @@ public class Unit extends FreeColGameObject
         tradeRoute = null;
         final String tradeRouteStr = in.getAttributeValue(null, "tradeRoute");
         if (tradeRouteStr != null) {
-            tradeRoute = (TradeRoute) getGame().getFreeColGameObject(tradeRouteStr);
+            tradeRoute = game.getFreeColGameObject(tradeRouteStr,
+                                                   TradeRoute.class);
             final String currentStopStr = in.getAttributeValue(null, "currentStop");
             if (currentStopStr != null) {
                 currentStop = Integer.parseInt(currentStopStr);
@@ -3866,11 +3959,12 @@ public class Unit extends FreeColGameObject
                     }
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                goodsContainer = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                    GoodsContainer.class);
                 if (goodsContainer != null) {
                     goodsContainer.readFromXML(in);
                 } else {
-                    goodsContainer = new GoodsContainer(getGame(), this, in);
+                    goodsContainer = new GoodsContainer(game, this, in);
                 }
             } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
                 String xLength = in.getAttributeValue(null, ARRAY_SIZE);
@@ -3897,7 +3991,7 @@ public class Unit extends FreeColGameObject
         // ensure all carriers have a goods container, just in case
         if (goodsContainer == null && getType().canCarryGoods()) {
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
-            goodsContainer = new GoodsContainer(getGame(), this);
+            goodsContainer = new GoodsContainer(game, this);
         }
 
         setRole();

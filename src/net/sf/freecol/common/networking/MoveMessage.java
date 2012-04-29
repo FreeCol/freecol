@@ -76,42 +76,39 @@ public class MoveMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the moved unit,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the moved unit, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        Tile oldTile = unit.getTile();
-        if (oldTile == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+
+        Tile tile;
+        try {
+            tile = unit.getNeighbourTile(directionString);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        Location oldLocation = unit.getLocation();
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile newTile = oldTile.getNeighbourOrNull(direction);
-        if (newTile == null) {
-            return DOMMessage.clientError("Could not find tile"
-                + " in direction: " + direction + " from unit: " + unitId);
-        }
-        MoveType moveType = unit.getMoveType(direction);
+
+        MoveType moveType = unit.getMoveType(tile);
         if (!moveType.isProgress()) {
             return DOMMessage.clientError("Illegal move for: " + unitId
                 + " type: " + moveType
-                + " from: " + oldLocation.getId()
-                + " to: " + newTile.getId());
+                + " from: " + unit.getLocation().getId()
+                + " to: " + tile.getId());
         }
 
         // Proceed to move.
         return server.getInGameController()
-            .move(serverPlayer, unit, newTile);
+            .move(serverPlayer, unit, tile);
     }
 
     /**

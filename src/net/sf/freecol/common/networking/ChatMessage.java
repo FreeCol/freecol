@@ -72,11 +72,6 @@ public class ChatMessage extends DOMMessage {
      */
     public ChatMessage(Game game, Element element) {
         sender = element.getAttribute("sender");
-        if (sender == null) {
-            throw new IllegalStateException("sender is null");
-        } else if (!(game.getFreeColGameObject(sender) instanceof Player)) {
-            throw new IllegalStateException("not a player: " + sender);
-        }
         message = element.getAttribute("message");
         privateChat = Boolean.valueOf(element.getAttribute("privateChat"))
             .booleanValue();
@@ -89,7 +84,7 @@ public class ChatMessage extends DOMMessage {
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
-        return (Player)game.getFreeColGameObject(sender);
+        return game.getFreeColGameObject(sender, Player.class);
     }
 
     /**

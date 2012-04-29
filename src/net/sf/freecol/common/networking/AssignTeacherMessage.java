@@ -74,23 +74,24 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the student-teacher assignment
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the student-teacher assignment or
+     *     an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit student;
         try {
-            student = server.getUnitSafely(studentId, serverPlayer);
+            student = player.getFreeColGameObject(studentId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+
         Unit teacher;
         try {
-            teacher = server.getUnitSafely(teacherId, serverPlayer);
+            teacher = player.getFreeColGameObject(teacherId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

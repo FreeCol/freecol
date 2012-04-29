@@ -73,36 +73,38 @@ public class SpySettlementMessage extends DOMMessage {
     /**
      * Handle a "spySettlement"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
-     * @param connection The <code>Connection</code> the message was received on.
-     *
-     * @return An <code>Element</code> containing a representation of the
-     *         settlement being spied upon and any units at that position,
-     *         or an error <code>Element</code> on failure.
+     * @param server The <code>FreeColServer</code> that is handling
+     *     the message.
+     * @param connection The <code>Connection</code> the message was
+     *     received on.
+     * @return An <code>Element</code> containing a representation of
+     *     the settlement being spied upon and any units at that
+     *     position, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+
+        Tile tile;
+        try {
+            tile = unit.getNeighbourTile(directionString);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (tile == null) {
-            return DOMMessage.clientError("Could not find tile"
-                + " in direction: " + direction + " from unit: " + unitId);
-        }
+
         Settlement settlement = tile.getSettlement();
         if (settlement == null) {
             return DOMMessage.clientError("There is no settlement at: "
                 + tile.getId());
         }
+
         MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
             return DOMMessage.clientError("Unable to enter at: "

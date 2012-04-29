@@ -306,7 +306,8 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (GoodsContainer.getXMLElementTagName().equals(in.getLocalName())) {
-            goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+            goodsContainer = getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                            GoodsContainer.class);
             if (goodsContainer == null) {
                 goodsContainer = new GoodsContainer(getGame(), this, in);
             } else {

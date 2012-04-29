@@ -74,23 +74,24 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the changes,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the changes, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
         if (unit.getTile() == null) {
             return DOMMessage.clientError("Unit is not on the map: " + unitId);
         }
+
         GoodsType type = server.getSpecification().getGoodsType(workTypeId);
         if (type == null) {
             return DOMMessage.clientError("Not a goods type: " + workTypeId);

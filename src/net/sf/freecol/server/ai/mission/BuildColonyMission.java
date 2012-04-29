@@ -482,11 +482,8 @@ public class BuildColonyMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        FreeColGameObject fcgo = getGame()
-            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
-        if (fcgo instanceof Tile || fcgo instanceof Colony) {
-            target = (Location)fcgo;
-        }
+        String str = in.getAttributeValue(null, "target");
+        target = getGame().getFreeColLocation(str);
 
         colonyValue = getAttribute(in, "value", -1);
     }

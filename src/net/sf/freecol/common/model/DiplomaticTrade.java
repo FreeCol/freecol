@@ -335,10 +335,10 @@ public class DiplomaticTrade extends FreeColObject {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         String senderString = in.getAttributeValue(null, "sender");
-        sender = (Player) game.getFreeColGameObject(senderString);
+        sender = game.getFreeColGameObject(senderString, Player.class);
 
         String recipientString = in.getAttributeValue(null, "recipient");
-        recipient = (Player) game.getFreeColGameObject(recipientString);
+        recipient = game.getFreeColGameObject(recipientString, Player.class);
 
         status = Enum.valueOf(TradeStatus.class,
                               in.getAttributeValue(null, "status"));

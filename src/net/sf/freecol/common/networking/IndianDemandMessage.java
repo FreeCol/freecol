@@ -94,7 +94,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param game The <code>Game</code> to look for the unit in.
      */
     public Unit getUnit(Game game) {
-        return (Unit) game.getFreeColGameObjectSafely(unitId);
+        return game.getFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -103,7 +103,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param game The <code>Game</code> to look for the colony in.
      */
     public Colony getColony(Game game) {
-        return (Colony) game.getFreeColGameObjectSafely(colonyId);
+        return game.getFreeColGameObject(colonyId, Colony.class);
     }
 
     /**
@@ -144,9 +144,8 @@ public class IndianDemandMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the indianDemandd unit,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the indianDemandd unit, or an
+     *     error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -154,33 +153,31 @@ public class IndianDemandMessage extends DOMMessage {
         Game game = player.getGame();
 
         Unit unit;
-        if (resultString == null) { // Initial demand
-            try {
-                unit = server.getUnitSafely(unitId, serverPlayer);
-            } catch (Exception e) {
-                return DOMMessage.clientError(e.getMessage());
+        try {
+            if (resultString == null) { // Initial demand
+                unit = player.getFreeColGameObject(unitId, Unit.class);
+                if (unit.getMovesLeft() <= 0) {
+                    return DOMMessage.clientError("Unit has no moves left: "
+                        + unitId);
+                }
+            } else { // Reply from colony
+                unit = game.getFreeColGameObject(unitId, Unit.class);
+                if (unit == null) {
+                    return DOMMessage.clientError("Not a unit: " + unitId);
+                }
             }
-           if (unit.getMovesLeft() <= 0) {
-                return DOMMessage.clientError("Unit has no moves left: "
-                    + unitId);
-            }
-        } else { // Reply from colony
-            if (game.getFreeColGameObject(unitId) instanceof Unit) {
-                unit = (Unit) game.getFreeColGameObject(unitId);
-            } else {
-                return DOMMessage.clientError("Not a unit: " + unitId);
-            }
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
 
         Colony colony;
         try {
             Settlement settlement
-                = server.getAdjacentSettlementSafely(colonyId, unit);
-            if (settlement instanceof Colony) {
-                colony = (Colony) settlement;
-            } else {
+                = unit.getAdjacentSettlementSafely(colonyId);
+            if (!(settlement instanceof Colony)) {
                 return DOMMessage.clientError("Not a colony: " + colonyId);
             }
+            colony = (Colony)settlement;
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

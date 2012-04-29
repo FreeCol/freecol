@@ -135,8 +135,10 @@ public class UnitTradeItem extends TradeItem {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         super.readFromXMLImpl(in);
-        String unitID = in.getAttributeValue(null, "unit");
-        this.unit = (Unit) game.getFreeColGameObject(unitID);
+
+        String unitId = in.getAttributeValue(null, "unit");
+        this.unit = game.getFreeColGameObject(unitId, Unit.class);
+
         in.nextTag();
     }
 

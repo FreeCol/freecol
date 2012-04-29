@@ -220,9 +220,11 @@ public abstract class TradeItem extends FreeColObject {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        String sourceID = in.getAttributeValue(null, "source");
-        this.source = (Player) game.getFreeColGameObject(sourceID);
-        String destinationID = in.getAttributeValue(null, "destination");
-        this.destination = (Player) game.getFreeColGameObject(destinationID);
+
+        String src = in.getAttributeValue(null, "source");
+        this.source = game.getFreeColGameObject(src, Player.class);
+
+        String dst = in.getAttributeValue(null, "destination");
+        this.destination = game.getFreeColGameObject(dst, Player.class);
     }
 }

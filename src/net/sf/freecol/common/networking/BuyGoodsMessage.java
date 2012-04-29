@@ -80,34 +80,34 @@ public class BuyGoodsMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the carrier,
-     *         or an error <code>Element</code> on failure.
+     * @return An update containing the carrier, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit carrier;
         try {
-            carrier = server.getUnitSafely(carrierId, serverPlayer);
+            carrier = player.getFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {
             return DOMMessage.clientError("Not a carrier: " + carrierId);
-        }
-        if (!carrier.isInEurope()) {
+        } else if (!carrier.isInEurope()) {
             return DOMMessage.clientError("Not in Europe: " + carrierId);
         }
+
         GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
             return DOMMessage.clientError("Not a goods type: " + goodsTypeId);
-        }
-        if (!player.canTrade(type)) {
+        } else if (!player.canTrade(type)) {
             return DOMMessage.clientError("Goods are boycotted: "
                 + goodsTypeId);
         }
+
         int amount;
         try {
             amount = Integer.parseInt(amountString);

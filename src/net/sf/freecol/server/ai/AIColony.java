@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -1427,11 +1428,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     protected void readFromXMLImpl(XMLStreamReader in)
         throws XMLStreamException {
         final AIMain aiMain = getAIMain();
+        final Game game = aiMain.getGame();
         String tag, str;
 
         str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if ((colony = (Colony)aiMain.getFreeColGameObject(str)) == null) {
-            throw new NullPointerException("Could not find Colony: " + str);
+        if ((colony = game.getFreeColGameObject(str, Colony.class)) == null) {
+            throw new IllegalStateException("Not a Colony: " + str);
         }
 
         aiGoods.clear();

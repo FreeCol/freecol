@@ -74,26 +74,27 @@ public class JoinColonyMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the request.
      * @param player The <code>Player</code> building the colony.
      * @param connection The <code>Connection</code> the message is from.
-     *
      * @return An update <code>Element</code> defining the new colony
-     *         and updating its surrounding tiles,
-     *         or an error <code>Element</code> on failure.
+     *     and updating its surrounding tiles, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = player.getGame();
 
         Unit unit;
-        Colony colony;
         try {
-            unit = server.getUnitSafely(builderId, serverPlayer);
-            colony = (Colony) unit.getGame().getFreeColGameObject(colonyId);
+            unit = player.getFreeColGameObject(builderId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (colony == null || unit.getOwner() != colony.getOwner()) {
-            return DOMMessage.createError("server.buildColony.badUnit", "Unit "
-                + builderId + " can not join colony " + colony.getName());
+
+        Colony colony;
+        try {
+            colony = player.getFreeColGameObject(colonyId, Colony.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Try to buy.

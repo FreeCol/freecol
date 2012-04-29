@@ -1683,7 +1683,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      */
     public void readFromXMLElement(Element element) {
         String colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-        colony = (Colony) getAIMain().getFreeColGameObject(colonyId);
+        colony = getAIMain().getGame()
+            .getFreeColGameObject(colonyId, Colony.class);
 
         // TODO: serialize profile?
         profileType = ProfileType

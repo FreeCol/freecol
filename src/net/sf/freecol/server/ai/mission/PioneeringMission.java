@@ -646,11 +646,9 @@ public class PioneeringMission extends Mission {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        FreeColGameObject fcgo = getGame()
-            .getFreeColGameObjectSafely(in.getAttributeValue(null, "target"));
-        if (fcgo instanceof Colony || fcgo instanceof Tile) {
-            target = (Location)fcgo; // Do not use setTarget in serialization
-        }
+        // Do not use setTarget in serialization
+        String str = in.getAttributeValue(null, "target");
+        target = getGame().getFreeColLocation(str);
     }
 
     /**

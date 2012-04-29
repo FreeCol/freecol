@@ -76,29 +76,28 @@ public class DeclineMoundsMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> that sent the message.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An <code>Element</code> to update the originating player
-     *         with the result of the demand.
+     * @return An <code>Element</code> to update the originating
+     *     player with the result of the demand.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = server.getGame();
 
         Unit unit;
         try {
-            unit = server.getUnitSafely(unitId, serverPlayer);
+            unit = player.getFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+
+        Tile tile;
+        try {
+            tile = unit.getNeighbourTile(directionString);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
-        Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (tile == null) {
-            return DOMMessage.clientError("Could not find tile"
-                + " in direction: " + direction + " from unit: " + unitId);
-        }
+
         LostCityRumour rumour = tile.getLostCityRumour();
         if (rumour == null
             || rumour.getType() != LostCityRumour.RumourType.MOUNDS) {

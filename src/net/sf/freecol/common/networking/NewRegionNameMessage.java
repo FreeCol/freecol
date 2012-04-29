@@ -84,8 +84,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The region of this message.
      */
     public Region getRegion(Game game) {
-        Object o = game.getFreeColGameObjectSafely(regionId);
-        return (o instanceof Region) ? (Region) o : null;
+        return game.getFreeColGameObject(regionId, Region.class);
     }
 
     /**
@@ -95,8 +94,7 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return The tile of this message.
      */
     public Tile getTile(Game game) {
-        Object o = game.getFreeColGameObjectSafely(tileId);
-        return (o instanceof Tile) ? (Tile)o : null;
+        return game.getFreeColGameObject(tileId, Tile.class);
     }
 
     /**

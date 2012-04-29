@@ -415,11 +415,12 @@ public class TradeRoute extends FreeColGameObject
             } else if (id.startsWith(Europe.getXMLElementTagName())) {
                 return new Europe(game, id);
             } else {
-                try { throw new IllegalStateException("STOP = " + id + " => null"); } catch (Exception e) { e.printStackTrace(); }
+                logger.warning("STOP = " + id + " => null");
+                Thread.dumpStack();
                 return null;
             }
         }
-        return (Location) fcgo;
+        return (Location)fcgo;
     }
 
     /**
@@ -427,13 +428,14 @@ public class TradeRoute extends FreeColGameObject
      * 
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         String ownerID = in.getAttributeValue(null, "owner");
         
         Game game = getGame();
-        owner = (Player) game.getFreeColGameObject(ownerID);
+        owner = game.getFreeColGameObject(ownerID, Player.class);
         if (owner == null) owner = new Player(game, ownerID);
 
         stops.clear();

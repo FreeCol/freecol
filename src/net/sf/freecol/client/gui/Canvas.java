@@ -465,9 +465,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void debugForeignColony(Settlement settlement) {
         if (settlement instanceof Colony) {
-            FreeColGameObject fcgo = freeColClient.getFreeColServer().getGame()
-                .getFreeColGameObject(settlement.getId());
-            showColonyPanel((Colony) fcgo);
+            Colony colony = freeColClient.getFreeColServer().getGame()
+                .getFreeColGameObject(settlement.getId(), Colony.class);
+            showColonyPanel(colony);
         }
     }
 

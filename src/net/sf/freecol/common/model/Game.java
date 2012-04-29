@@ -304,6 +304,14 @@ public class Game extends FreeColGameObject {
         this.combatModel = newCombatModel;
     }
 
+    public void setFreeColGameObjectListener(FreeColGameObjectListener freeColGameObjectListener) {
+        this.freeColGameObjectListener = freeColGameObjectListener;
+    }
+
+    public FreeColGameObjectListener getFreeColGameObjectListener() {
+        return freeColGameObjectListener;
+    }
+
     /**
      * Get the <code>OptionGroup</code> value.
      *
@@ -356,72 +364,47 @@ public class Game extends FreeColGameObject {
      * Registers a new <code>FreeColGameObject</code> with the specified ID.
      *
      * @param id The unique ID of the <code>FreeColGameObject</code>.
-     * @param freeColGameObject The <code>FreeColGameObject</code> that shall
-     *            be added to this <code>Game</code>.
+     * @param fcgo The <code>FreeColGameObject</code> to add to this
+     *      <code>Game</code>.
      * @exception IllegalArgumentException If either <code>id</code>
      *                or <code>freeColGameObject </code> are
      *                <i>null</i>.
      */
-    public void setFreeColGameObject(String id, FreeColGameObject freeColGameObject) {
+    public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("Parameter 'id' must not be 'null' or empty string.");
-        } else if (freeColGameObject == null) {
-            throw new IllegalArgumentException("Parameter 'freeColGameObject' must not be 'null'.");
+            throw new IllegalArgumentException("Null/empty id.");
+        } else if (fcgo == null) {
+            throw new IllegalArgumentException("Null FreeColGameObject.");
         }
 
-        final WeakReference<FreeColGameObject> wr = new WeakReference<FreeColGameObject>(freeColGameObject);
-        final FreeColGameObject old = getFreeColGameObjectSafely(id);
+        final WeakReference<FreeColGameObject> wr
+            = new WeakReference<FreeColGameObject>(fcgo);
+        final FreeColGameObject old = getFreeColGameObject(id);
         if (old != null) {
             throw new IllegalArgumentException("Replacing FreeColGameObject "
                 + id + ": " + old.getClass()
-                + " with " + freeColGameObject.getClass());
+                + " with " + fcgo.getClass());
         }
         freeColGameObjects.put(id, wr);
 
         if (freeColGameObjectListener != null) {
-            freeColGameObjectListener.setFreeColGameObject(id, freeColGameObject);
+            freeColGameObjectListener.setFreeColGameObject(id, fcgo);
         }
     }
 
-    public void setFreeColGameObjectListener(FreeColGameObjectListener freeColGameObjectListener) {
-        this.freeColGameObjectListener = freeColGameObjectListener;
-    }
-
-    public FreeColGameObjectListener getFreeColGameObjectListener() {
-        return freeColGameObjectListener;
-    }
-
     /**
-     * Gets the <code>FreeColGameObject</code> with the specified ID.
+     * Gets the <code>FreeColGameObject</code> with the given id.
      *
-     * @param id The identifier of the <code>FreeColGameObject</code>.
-     * @return The <code>FreeColGameObject</code>.
-     * @exception IllegalArgumentException If <code>id == null</code>, or <code>id = ""</code>.
+     * @param id The id, which may be null or invalid.
+     * @return The game object, or null if not found.
      */
     public FreeColGameObject getFreeColGameObject(String id) {
-        if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
-        }
-        return getFreeColGameObjectSafely(id);
-    }
-
-    /**
-     * Get the {@link FreeColGameObject} with the given id or null. This method
-     * does NOT throw if the id is invalid.
-     *
-     * @param id The id, may be null or invalid.
-     * @return game object with id or null.
-     */
-    public FreeColGameObject getFreeColGameObjectSafely(String id) {
-        if (id == null || id.length() == 0) {
-            return null;
-        }
-        final WeakReference<FreeColGameObject> ro = freeColGameObjects.get(id);
-        if (ro != null) {
-            final FreeColGameObject o = ro.get();
-            if (o != null) {
-                return o;
-            } else {
+        if (id != null && id.length() > 0) {
+            final WeakReference<FreeColGameObject> ro
+                = freeColGameObjects.get(id);
+            if (ro != null) {
+                final FreeColGameObject o = ro.get();
+                if (o != null) return o;
                 freeColGameObjects.remove(id);
             }
         }
@@ -429,19 +412,53 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Gets the <code>FreeColGameObject</code> with the specified id and
+     * class.
+     *
+     * @param id The id.
+     * @param returnClass The expected class of the object.
+     * @return The game object, or null if not found.
+     */
+    public <T extends FreeColGameObject> T getFreeColGameObject(String id,
+        Class<T> returnClass) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        try {
+            return returnClass.cast(fcgo);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Convenience wrapper to get a location (which is an interface, precluding
+     * using the typed version of getFreeColGameObject()) by id.
+     *
+     * @param id The id.
+     * @return The <code>Location</code> if any.
+     */
+    public Location getFreeColLocation(String id) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        if (fcgo instanceof Location) return (Location)fcgo;
+        logger.warning("Not a location: " + id);
+        return null;
+    }
+
+
+    /**
      * Removes the <code>FreeColGameObject</code> with the specified ID.
      *
      * @param id The identifier of the <code>FreeColGameObject</code> that
      *            shall be removed from this <code>Game</code>.
      * @return The <code>FreeColGameObject</code> that has been removed.
-     * @exception IllegalArgumentException If <code>id == null</code>, or <code>id = ""</code>.
+     * @throws IllegalArgumentException If <code>id == null</code>,
+     *     or <code>id = ""</code>.
      */
     public FreeColGameObject removeFreeColGameObject(String id) {
         if (id == null || id.equals("")) {
             throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
 
-        final FreeColGameObject o = getFreeColGameObjectSafely(id);
+        final FreeColGameObject o = getFreeColGameObject(id);
 
         if (freeColGameObjectListener != null) {
             freeColGameObjectListener.removeFreeColGameObject(id);
@@ -871,7 +888,7 @@ public class Game extends FreeColGameObject {
      * @return The source object.
      */
     public FreeColGameObject getMessageSource(ModelMessage message) {
-        return getFreeColGameObjectSafely(message.getSourceId());
+        return getFreeColGameObject(message.getSourceId());
     }
 
     /**
@@ -884,7 +901,7 @@ public class Game extends FreeColGameObject {
     public FreeColObject getMessageDisplay(ModelMessage message) {
         String id = message.getDisplayId();
         if (id == null) id = message.getSourceId();
-        FreeColObject o = getFreeColGameObjectSafely(id);
+        FreeColObject o = getFreeColGameObject(id);
         if (o == null) {
             try {
                 o = getSpecification().getType(id);
@@ -1069,7 +1086,7 @@ public class Game extends FreeColGameObject {
 
         final String currentPlayerStr = in.getAttributeValue(null, "currentPlayer");
         if (currentPlayerStr != null) {
-            currentPlayer = (Player) getFreeColGameObject(currentPlayerStr);
+            currentPlayer = getFreeColGameObject(currentPlayerStr, Player.class);
             if (currentPlayer == null) {
                 currentPlayer = new Player(this, currentPlayerStr);
                 players.add(currentPlayer);
@@ -1094,7 +1111,8 @@ public class Game extends FreeColGameObject {
                 }
                 nationOptions.readFromXML(in);
             } else if (tagName.equals(Player.getXMLElementTagName())) {
-                Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                Player player = getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                     Player.class);
                 if (player == null) {
                     player = new Player(this, in);
                     if (player.isUnknownEnemy()) {
@@ -1107,7 +1125,7 @@ public class Game extends FreeColGameObject {
                 }
             } else if (tagName.equals(Map.getXMLElementTagName())) {
                 String mapId = in.getAttributeValue(null, ID_ATTRIBUTE);
-                map = (Map) getFreeColGameObject(mapId);
+                map = getFreeColGameObject(mapId, Map.class);
                 if (map == null) {
                     map = new Map(this, mapId);
                 }
@@ -1119,7 +1137,7 @@ public class Game extends FreeColGameObject {
                 // When this goes, remove getOwnerId().
                 String owner = m.getOwnerId();
                 if (owner != null) {
-                    Player player = (Player) getFreeColGameObjectSafely(owner);
+                    Player player = getFreeColGameObject(owner, Player.class);
                     player.addModelMessage(m);
                 }
             } else if (tagName.equals("citiesOfCibola")) {

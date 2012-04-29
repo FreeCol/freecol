@@ -508,8 +508,8 @@ public final class ColonyPanel extends FreeColPanel
         GoodsType sGoodsType = getFreeColClient().getFreeColServer()
             .getSpecification().getGoodsType(goodsType.getId());
         GoodsContainer cgc = colony.getGoodsContainer();
-        GoodsContainer sgc = (GoodsContainer) getFreeColClient()
-            .getFreeColServer().getGame().getFreeColGameObject(cgc.getId());
+        GoodsContainer sgc = getFreeColClient().getFreeColServer()
+            .getGame().getFreeColGameObject(cgc.getId(), GoodsContainer.class);
         cgc.setAmount(goodsType, a);
         sgc.setAmount(sGoodsType, a);
         updateConstructionPanel();

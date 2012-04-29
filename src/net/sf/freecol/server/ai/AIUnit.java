@@ -551,8 +551,7 @@ public class AIUnit extends AIObject implements Transportable {
         String str, tag;
 
         str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        unit = (Unit)aiMain.getFreeColGameObject(str);
-        if (unit == null) logger.warning("Could not find unit: " + str);
+        unit = aiMain.getGame().getFreeColGameObject(str, Unit.class);
 
         str = in.getAttributeValue(null, "transport");
         if (str != null) {

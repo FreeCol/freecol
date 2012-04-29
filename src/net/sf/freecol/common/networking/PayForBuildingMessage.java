@@ -75,13 +75,10 @@ public class PayForBuildingMessage extends DOMMessage {
         Game game = server.getGame();
 
         Colony colony;
-        if (game.getFreeColGameObject(colonyId) instanceof Colony) {
-            colony = (Colony) game.getFreeColGameObject(colonyId);
-        } else {
-            return DOMMessage.clientError("Not a colony: " + colonyId);
-        }
-        if (!player.owns(colony)) {
-            return DOMMessage.clientError("Not your colony: " + colonyId);
+        try {
+            colony = player.getFreeColGameObject(colonyId, Colony.class);
+        } catch (Exception e) {
+            return DOMMessage.clientError(e.getMessage());
         }
 
         // Proceed to pay.

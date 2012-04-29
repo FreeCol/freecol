@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -30,6 +32,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class TradeRouteStop {
 
+    private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
+
+    /**
+     * The location of the stop.
+     */
     private Location location;
 
     /**
@@ -162,9 +169,10 @@ public class TradeRouteStop {
      * Initialize this object from an XML-representation of this object.
      * 
      * @param in The input stream with the XML.
-     * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
+     * @throws XMLStreamException is thrown if something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         readFromXMLImpl(in, null);
     }
 
@@ -172,12 +180,15 @@ public class TradeRouteStop {
      * Initialize this object from an XML-representation of this object.
      * 
      * @param in The input stream with the XML.
-     * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
+     * @throws XMLStreamException is thrown if something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in, Game game) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in, Game game)
+        throws XMLStreamException {
         if (game != null) {
-            location = (Location) game.getFreeColGameObject(in.getAttributeValue(null, "location"));
+            String str = in.getAttributeValue(null, "location");
+            location = game.getFreeColLocation(str);
         }
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("goodsToUnload")) {
                 goodsToUnload = new ArrayList<AbstractGoods>();
@@ -210,7 +221,6 @@ public class TradeRouteStop {
     public static String getXMLElementTagName() {
         return "tradeRouteStop";
     }
-
 }
 
 
