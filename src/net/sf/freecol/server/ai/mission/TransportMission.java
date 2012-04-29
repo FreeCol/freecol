@@ -1310,7 +1310,8 @@ public class TransportMission extends Mission {
      */
     public static boolean isValid(AIUnit aiUnit) {
         return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isCarrier();
+            && aiUnit.getUnit().isCarrier()
+            && !aiUnit.getUnit().isUnderRepair();
     }
 
     /**
@@ -1319,13 +1320,9 @@ public class TransportMission extends Mission {
      * @return True as long as the unit exists and is a carrier.
      */
     public boolean isValid() {
-        if (super.isValid()
-            && getUnit().isCarrier()) {
-            // TODO: this routine should not modify the list!
-            updateTransportList();
-            return !transportables.isEmpty();
-        }
-        return false;
+        return super.isValid()
+            && getUnit().isCarrier()
+            && !getUnit().isUnderRepair();
     }
 
     /**
