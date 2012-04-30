@@ -402,9 +402,10 @@ public final class InGameController implements NetworkConstants {
         List<ModelMessage> messages = new ArrayList<ModelMessage>();
         boolean detailed = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
-        List<Stop> stops = tr.getStops();
+        final List<Stop> stops = tr.getStops();
         Stop stop;
         boolean result = false;
+        int tries = stops.size();
 
         for (;;) {
             stop = unit.getStop();
@@ -445,14 +446,40 @@ public final class InGameController implements NetworkConstants {
                 // Update the stop.
                 int index = unit.validateCurrentStop();
                 askServer().updateCurrentStop(unit);
-
-                // Check if the server reset this stop as the current one.
-                // This means there is no work to do anywhere in the whole
+                
+                // Check if we have tried all the stops.  If so, this
+                // means there is no work to do anywhere in the whole
                 // trade route.  Skip the unit if so.
+                // Otherwise optionally add messages notifying that a
+                // stop has been skipped.
                 int next = unit.validateCurrentStop();
-                if (next == index) {
-                    Location loc = stop.getLocation();
+                for (;;) {
+                    if (++index >= stops.size()) index = 0;
+                    tries--;
+                    if (index == next) break;
                     if (detailed) {
+                        Location loc = stops.get(index).getLocation();
+                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                                "traderoute.skipStop", unit)
+                            .addName("%route%", name)
+                            .addStringTemplate("%unit%",
+                                Messages.getLabel(unit))
+                            .addStringTemplate("%location%",
+                                loc.getLocationNameFor(player)));
+                    }
+                }
+                if (tries < 0) {
+                    Location loc = stop.getLocation();
+                    if (detailed) { 
+                        int i = 0; // Drop skip-messages if skipping them all.
+                        while (i < messages.size()) {
+                            ModelMessage m = messages.get(i);
+                            if (m.getId().equals("traderoute.skipStop")) {
+                                messages.remove(i);
+                            } else {
+                                i++;
+                            }
+                        }
                         messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
                                 "traderoute.noWork", unit)
                             .addName("%route%", name)
@@ -465,21 +492,6 @@ public final class InGameController implements NetworkConstants {
                     break;
                 }
 
-                // Check for and notify of missing stops.
-                if (detailed) {
-                    for (;;) {
-                        if (++index >= stops.size()) index = 0;
-                        if (index == next) break;
-                        Location loc = stops.get(index).getLocation();
-                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                "traderoute.skipStop", unit)
-                            .addName("%route%", name)
-                            .addStringTemplate("%unit%",
-                                Messages.getLabel(unit))
-                            .addStringTemplate("%location%",
-                                loc.getLocationNameFor(player)));
-                    }
-                }
                 continue; // Stop was updated, loop.
             }
 
