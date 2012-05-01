@@ -91,34 +91,28 @@ public class ClaimLandMessage extends DOMMessage {
             return DOMMessage.clientError("Not a file: " + tileId);
         }
 
-        Unit unit;
-        try {
-            unit = player.getFreeColGameObject(claimantId, Unit.class);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
-        }
-        if (unit.getTile() != tile) {
-            return DOMMessage.clientError("Unit not at tile: " + tileId);
-        }
-
-        Settlement settlement = null;
-        if (unit == null) {
-            try {
-                settlement = player.getFreeColGameObject(claimantId,
-                                                         Settlement.class);
-            } catch (Exception e) {
-                return DOMMessage.clientError(e.getMessage());
+        Unit unit = game.getFreeColGameObject(claimantId, Unit.class);
+        Settlement settlement = game.getFreeColGameObject(claimantId,
+                                                          Settlement.class);
+        if (unit != null) {
+            if (!player.owns(unit)) {
+                return DOMMessage.clientError("Not your unit: " + claimantId);
+            } else if (unit.getTile() != tile) {
+                return DOMMessage.clientError("Unit not at tile: "
+                    + tileId);
             }
-            if (settlement.getOwner().isEuropean()
+        } else if (settlement != null) {
+            if (!player.owns(settlement)) {
+                return DOMMessage.clientError("Not your settlement: "
+                    + claimantId);
+            } else if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return DOMMessage.clientError("Settlement can not claim tile: "
                     + tileId);
             }
-        }
-
-        if (unit == null && settlement == null) {
-            return DOMMessage.clientError("Claimant is neither unit"
-                + " nor settlement: " + claimantId);
+        } else {
+            return DOMMessage.clientError("Not a unit or settlement: "
+                + claimantId);
         }
 
         int price;
