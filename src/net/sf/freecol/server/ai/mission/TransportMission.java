@@ -162,7 +162,7 @@ public class TransportMission extends Mission {
      */
     public void dispose() {
         List<Transportable> cargoList = new ArrayList<Transportable>();
-        List<Transportable> scheduledCargoList = new ArrayList<Transportable>();
+        List<Transportable> scheduledList = new ArrayList<Transportable>();
         while (!transportables.isEmpty()) {
             Transportable t = transportables.remove(0);
             if (isCarrying(t)) {
@@ -170,12 +170,12 @@ public class TransportMission extends Mission {
                 cargoList.add(t);
             } else {
                 // The cargo was scheduled to be transported, cancel order
-                scheduledCargoList.add(t);
+                scheduledList.add(t);
             }
         }
 
-        for (Transportable t : cargoList) ((AIObject) t).dispose();
-        for (Transportable t : scheduledCargoList) t.setTransport(null);
+        for (Transportable t : cargoList) ((AIObject)t).dispose();
+        for (Transportable t : scheduledList) t.setTransport(null);
         super.dispose();
     }
 
@@ -188,7 +188,9 @@ public class TransportMission extends Mission {
      *         {@link Unit#getLocation located} in the carrier.
      */
     private boolean isCarrying(Transportable t) {
-        return t.getTransportLocatable().getLocation() == getUnit();
+        return t != null
+            && t.getTransportLocatable() != null
+            && t.getTransportLocatable().getLocation() == getUnit();
     }
 
     /**
@@ -1493,7 +1495,7 @@ public class TransportMission extends Mission {
         List<Transportable> ts = new ArrayList<Transportable>();
         for (Transportable t : transportables) {
             Locatable l = t.getTransportLocatable();
-            sb.append(l.toString());
+            sb.append((l == null) ? "(null)" : l.toString());
             sb.append(" (");
             Location target;
             if (ts.contains(t) || isCarrying(t)) {
