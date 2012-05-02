@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;

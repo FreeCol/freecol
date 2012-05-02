@@ -22,7 +22,6 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
