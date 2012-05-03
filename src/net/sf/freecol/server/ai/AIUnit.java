@@ -621,7 +621,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return "[AIUnit " + unit + " ]";
+        return "[AIUnit " + unit + "]";
     }
 
     /**

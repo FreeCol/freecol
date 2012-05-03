@@ -211,6 +211,7 @@ public class TransportMission extends Mission {
      * @param t The <code>Transportable</code> to remove.
      */
     public void removeFromTransportList(Transportable t) {
+        logger.finest(tag + " removing transportable " + t + ": " + getUnit());
         while (transportables.remove(t));
         if (t.getTransport() == getAIUnit()) t.setTransport(null);
     }
@@ -385,22 +386,16 @@ public class TransportMission extends Mission {
      * @param newTransportable The <code>Transportable</code>.
      */
     public void addToTransportList(Transportable newTransportable) {
-        Unit carrier = getUnit();
-        if (newTransportable.getTransportLocatable() instanceof Unit
-            && ((Unit) newTransportable.getTransportLocatable()).isCarrier()) {
-            throw new IllegalArgumentException("Can not add a carrier to a transport list.");
-        }
+        final Unit carrier = getUnit();
         Location newSource = newTransportable.getTransportSource();
         Location newDestination = newTransportable.getTransportDestination();
-
         if (newDestination == null) {
-            logger.warning("No destination for: "
-                + newTransportable.toString());
+            logger.warning(tag + " no destination for " + newTransportable
+                + ": " + carrier);
             return;
-        }
-
-        if (newSource == null && !isCarrying(newTransportable)) {
-            logger.warning("No source for: " + newTransportable.toString());
+        } else if (newSource == null && !isCarrying(newTransportable)) {
+            logger.warning(tag + " no source for " + newTransportable
+                + ": " + carrier);
             return;
         }
 
@@ -657,7 +652,7 @@ public class TransportMission extends Mission {
     public Destination getNextDestination() {
         final Unit carrier = getUnit();
         if (transportables.isEmpty() && !hasCargo()) {
-            logger.finest("Next destination for " + carrier + ": default");
+            logger.finest(tag + " next destination = default: " + carrier);
             return getDefaultDestination();
         }
 
@@ -675,30 +670,27 @@ public class TransportMission extends Mission {
             if (dst.getTile() == null) {
                 if (dst instanceof Europe
                     && (path = carrier.findPathToEurope()) != null) {
-                    logger.finest("Next destination for " + carrier
-                        + ": " + dst
+                    logger.finest(tag + " next destination = " + dst
                         + " (" + ((isCarrying(t)) ? "transport" : "collect") 
-                        + " " + t + ")");
+                        + " " + t + "): " + carrier);
                     return new Destination(true, path);
                 }
             } else {
                 if (dst.getTile() == carrier.getTile()) {
-                    logger.finest("Next destination for " + carrier
-                        + ": already at " + dst
-                        + " (for " + t + ")");
+                    logger.finest(tag + " next destination = already at " + dst
+                        + " (for " + t + "): " + carrier);
                     return new Destination(); // Already at dst!
                 }
                 if ((path = getTransportPath(t)) != null) {
-                    logger.finest("Next destination for " + carrier
-                        + ": " + dst
+                    logger.finest(tag + " next destination = " + dst
                         + " (" + ((isCarrying(t)) ? "transport" : "collect") 
-                        + " " + t + ")");
+                        + " " + t + "): " + carrier);
                     return new Destination(false, path);
                 }
             }
             unavailable.add(dst);
         }
-        logger.finest("Next destination for " + carrier + ": none found");
+        logger.finest(tag + " next destination = none found: " + carrier);
         return null;
     }
 
@@ -708,42 +700,42 @@ public class TransportMission extends Mission {
      * @return The default <code>Destination</code> for the unit.
      */
     Destination getDefaultDestination() {
-        Unit unit = getUnit();
+        final Unit carrier = getUnit();
         PathNode path = null;
 
         // If in Europe, stay in Europe
-        if (unit.getLocation() instanceof Europe) {
+        if (carrier.getLocation() instanceof Europe) {
             return new Destination();
         }
 
         // Otherwise should be on the map
-        if (unit.getTile() == null) {
+        if (carrier.getTile() == null) {
             throw new IllegalStateException("Unit not on the map: "
-                                            + unit.getId());
+                                            + carrier.getId());
         }
 
         // Already at a settlement
-        if (unit.getSettlement() != null) {
+        if (carrier.getSettlement() != null) {
             return new Destination();
         }
 
         // Try nearest colony
-        if ((path = unit.findOurNearestOtherSettlement()) != null) {
+        if ((path = carrier.findOurNearestOtherSettlement()) != null) {
             return new Destination(false, path);
         }
 
         // Try Europe
-        if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
-            if (unit.canMoveToEurope()) {
+        if (carrier.isNaval() && carrier.getOwner().canMoveToEurope()) {
+            if (carrier.canMoveToEurope()) {
                 return new Destination(true, null);
             }
-            if ((path = unit.findPathToEurope()) != null) {
+            if ((path = carrier.findPathToEurope()) != null) {
                 return new Destination(true, path);
             }
         }
 
         // Can fail intermittantly.  For example: up river and blocked in.
-        logger.warning("Could not get default destination for " + unit);
+        logger.warning(tag + " could not get default destination: " + carrier);
         return null;
     }
 
@@ -1211,10 +1203,9 @@ public class TransportMission extends Mission {
                     transportablesChanged = true;
                 }
                 if (reason != null) {
-                    logger.finest("Unloading(" + reason + "," + unload
-                                  + "): " + u
-                                  + " from: " + carrier
-                                  + " -> " + (u.getLocation() != carrier));
+                    logger.finest(tag + " unloading(" + reason + "," + unload
+                        + ") " + u + " -> " + (u.getLocation() != carrier)
+                        + ": " + carrier);
                 }
 
             } else if (t instanceof AIGoods) {
@@ -1226,8 +1217,8 @@ public class TransportMission extends Mission {
                 if (ag.getTransportDestination() == null ||
                     (ag.getTransportDestination() != null
                      && ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
-                    logger.finest(carrier + "("
-                                  + carrier.getId() + ") unloading " + ag + " at " + locStr);
+                    logger.finest(tag + " unloading " + ag + "/" + ag.getGoods()
+                        + " at " + locStr + ": " + carrier);
                     if (carrier.isInEurope()) {
                         boolean success = sellCargoInEurope(ag.getGoods());
                         if(success){
@@ -1245,7 +1236,8 @@ public class TransportMission extends Mission {
                     }
                 }
             } else {
-                logger.warning("Unknown Transportable.");
+                logger.warning(tag + " unknown Transportable " + t
+                    + ": " + carrier);
             }
             // Kick the colony if the unit or goods available changes.
             Colony colony = carrier.getColony();
@@ -1330,7 +1322,8 @@ public class TransportMission extends Mission {
                     }
                 }
             } else {
-                logger.warning("Unknown Transportable: " + t);
+                logger.warning(tag + " unknown Transportable " + t
+                    + ": " + carrier);
             }
             // Kick the colony if the unit or goods available changes.
             Colony colony = carrier.getColony();
@@ -1340,23 +1333,6 @@ public class TransportMission extends Mission {
         }
 
         return transportablesChanged;
-    }
-
-    /**
-     * Unit is in Europe, unload cargo on board, buy required goods
-     * and board unit.
-     */
-    private void inEurope() {
-        restockCargoAtDestination();
-        buyCargo();
-        restockCargoAtDestination();
-
-        // Move back to America:
-        Unit carrier = getUnit();
-        if (!carrier.getOwner().checkGold(MINIMUM_GOLD_TO_STAY_IN_EUROPE)
-            || transportables.size() > 0) {
-            moveUnitToAmerica();
-        }
     }
 
     /**
@@ -1433,13 +1409,26 @@ public class TransportMission extends Mission {
         }
         updateTransportables();
 
-        if (carrier.getMovesLeft() == 0) return;
-        if (carrier.isAtSea()) return; // Going to/from Europe, do nothing
         if (carrier.isInEurope()) { // Actually in Europe
-            inEurope();
+            restockCargoAtDestination();
+            buyCargo();
+            restockCargoAtDestination();
+            if (carrier.getOwner().checkGold(MINIMUM_GOLD_TO_STAY_IN_EUROPE)
+                && transportables.isEmpty()) {
+                logger.finest(tag + " waiting in Europe: " + carrier);
+            } else {
+                || transportables.size() > 0) {
+                moveUnitToAmerica();
+                logger.finest(tag + " returning from Europe: " + carrier);
+            }
+            return;
+        } else if (carrier.isAtSea()) {
+            logger.finest(tag + " on the high seas: " + carrier);
             return;
         }
 
+        if (carrier.getMovesLeft() == 0) return;
+        
         if (!attackEnemyShips()) return;
         restockCargoAtDestination();
         if (!attackEnemyShips()) return;
@@ -1476,9 +1465,8 @@ public class TransportMission extends Mission {
                     }
                 }
 
-                logger.info("Could not get a next move for unit " + carrier
-                    + "(" + carrier.getId()
-                    + "), staying put at " + carrierLoc);
+                logger.finest(tag + " waiting at " + carrierLoc
+                    + ": " + carrier);
                 //carrier.setMovesLeft(0);
                 return;
             }
@@ -1585,7 +1573,7 @@ public class TransportMission extends Mission {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
-        sb.append("Transport list:\n");
+        sb.append("\nTransport list:\n");
         List<Transportable> carrying = new ArrayList<Transportable>();
         List<Transportable> carried = new ArrayList<Transportable>();
         for (Transportable t : transportables) {
