@@ -370,59 +370,47 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Adds the given <code>Transportable</code> to the transport list. The
-     * method returns immediately if the {@link Transportable} has already be
-     * added.
-     *
-     * <br>
-     * <br>
+     * Adds the given <code>Transportable</code> to the transport list.
      *
      * Both the source and destination {@link Location} for the
-     * <code>Transportable</code> is entered into the transport list if the
-     * <code>Transportable</code> is not already loaded onto the transport. If
-     * the <code>Transportable</code> is onboard the transport, then only the
-     * destination is put on the transport list.
+     * <code>Transportable</code> is entered into the transport list
+     * if the <code>Transportable</code> is not already loaded onto
+     * the transport.  If the <code>Transportable</code> is on board
+     * the transport, then only the destination is put on the
+     * transport list.
      *
-     * @param newTransportable The <code>Transportable</code>.
+     * @param t The <code>Transportable</code> to add.
+     * @return True if the <code>Transportable</code> was added (so check
+     *     isOnTransportList before calling this if really interested in
+     *     whether the transport is accepted).
      */
-    public void addToTransportList(Transportable newTransportable) {
+    public boolean addToTransportList(Transportable t) {
         final Unit carrier = getUnit();
-        Location newSource = newTransportable.getTransportSource();
-        Location newDestination = newTransportable.getTransportDestination();
-        if (newDestination == null) {
-            logger.warning(tag + " no destination for " + newTransportable
-                + ": " + carrier);
-            return;
-        } else if (newSource == null && !isCarrying(newTransportable)) {
-            logger.warning(tag + " no source for " + newTransportable
-                + ": " + carrier);
-            return;
-        }
-
-        if (isOnTransportList(newTransportable)) return;
+        Locatable l = t.getTransportLocatable();
+        Location src = t.getTransportSource();
+        Location dst = t.getTransportDestination();
+        if (l == null || dst == null || (src == null && !isCarrying(t))
+            || isOnTransportList(t)) return false;
 
         int bestSourceIndex = -1;
-        if (!isCarrying(newTransportable)) {
+        if (!isCarrying(t)) {
             int distToSource;
-            if (carrier.getLocation().getTile() == newSource.getTile()) {
+            if (carrier.getLocation().getTile() == src.getTile()) {
                 distToSource = 0;
             } else {
-                Tile t = (carrier.getTile() != null) ? carrier.getTile()
+                Tile tile = (carrier.getTile() != null) ? carrier.getTile()
                     : carrier.getFullEntryLocation();
-                distToSource = getDistanceTo(newTransportable, t, true);
-                // Sanitation
+                distToSource = getDistanceTo(t, tile, true);
                 // Carrier cant reach source
-                if(distToSource == Map.COST_INFINITY){
-                    return;
-                }
+                if (distToSource == Map.COST_INFINITY) return false;
             }
             bestSourceIndex = 0;
             int bestSourceDistance = distToSource;
             for (int i = 1; i < transportables.size() && bestSourceDistance > 0; i++) {
                 Transportable t1 = transportables.get(i - 1);
-                if (t1.getTransportSource() != null && t1.getTransportSource().getTile() == newSource.getTile()
+                if (t1.getTransportSource() != null && t1.getTransportSource().getTile() == src.getTile()
                     || t1.getTransportDestination() != null
-                    && t1.getTransportDestination().getTile() == newSource.getTile()) {
+                    && t1.getTransportDestination().getTile() == src.getTile()) {
                     bestSourceIndex = i;
                     bestSourceDistance = 0;
                 }
@@ -433,37 +421,33 @@ public class TransportMission extends Mission {
                 Transportable t1 = transportables.get(i - 1);
 
                 if (isCarrying(t1)){
-                    int distToDestination = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
-                    if(distToDestination == Map.COST_INFINITY){
-                        continue;
-                    }
+                    int distToDestination = getDistanceTo(t, t1.getTransportDestination(), true);
+                    if (distToDestination == Map.COST_INFINITY) continue;
                     if(distToDestination <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToDestination;
                     }
                 } else{
-                    distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), true);
-                    if(distToSource == Map.COST_INFINITY){
-                        continue;
-                    }
+                    distToSource = getDistanceTo(t, t1.getTransportSource(), true);
+                    if (distToSource == Map.COST_INFINITY) continue;
                     if (distToSource <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToSource;
                     }
                 }
             }
-            transportables.add(bestSourceIndex, newTransportable);
+            transportables.add(bestSourceIndex, t);
         }
 
         int bestDestinationIndex = bestSourceIndex + 1;
         int bestDestinationDistance = Integer.MAX_VALUE;
         if (bestSourceIndex == -1) {
             bestDestinationIndex = 0;
-            if (carrier.getTile() == newSource.getTile()) {
+            if (carrier.getTile() == src.getTile()) {
                 bestDestinationDistance = 0;
             } else {
-                int distToCarrier = getDistanceTo(newTransportable, carrier.getTile(), false);
-                if(distToCarrier != Map.COST_INFINITY){
+                int distToCarrier = getDistanceTo(t, carrier.getTile(), false);
+                if (distToCarrier != Map.COST_INFINITY) {
                     bestDestinationDistance = distToCarrier;
                 }
             }
@@ -472,10 +456,10 @@ public class TransportMission extends Mission {
             Transportable t1 = transportables.get(i - 1);
             if ((t1.getTransportSource() != null
                     && t1.getTransportSource().getTile()
-                    == newDestination.getTile())
+                    == dst.getTile())
                 || (t1.getTransportDestination() != null
                     && t1.getTransportDestination().getTile()
-                    == newDestination.getTile())) {
+                    == dst.getTile())) {
                 bestDestinationIndex = i;
                 bestDestinationDistance = 0;
             }
@@ -483,30 +467,27 @@ public class TransportMission extends Mission {
         for (int i = Math.max(bestSourceIndex, 1); i < transportables.size() && bestDestinationDistance > 0; i++) {
             Transportable t1 = transportables.get(i - 1);
             if (isCarrying(t1)){
-                int distToDestination = getDistanceTo(newTransportable, t1.getTransportDestination(), false);
-                if(distToDestination == Map.COST_INFINITY){
-                    continue;
-                }
+                int distToDestination = getDistanceTo(t, t1.getTransportDestination(), false);
+                if (distToDestination == Map.COST_INFINITY) continue;
                 if(distToDestination <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance = distToDestination;
                 }
             } else{
-                int distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), false);
-                if(distToSource == Map.COST_INFINITY){
-                    continue;
-                }
-                if(distToSource <= bestDestinationDistance) {
+                int distToSource = getDistanceTo(t, t1.getTransportSource(), false);
+                if (distToSource == Map.COST_INFINITY) continue;
+                if (distToSource <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance =  distToSource;
                 }
             }
         }
-        transportables.add(bestDestinationIndex, newTransportable);
+        transportables.add(bestDestinationIndex, t);
 
-        if (newTransportable.getTransport() != getAIUnit()) {
-            newTransportable.setTransport(getAIUnit());
+        if (t.getTransport() != getAIUnit()) {
+            t.setTransport(getAIUnit());
         }
+        return true;
     }
 
     /**
@@ -528,6 +509,11 @@ public class TransportMission extends Mission {
         return (path == null) ? Map.COST_INFINITY : path.getTotalTurns();
     }
 
+    /**
+     * Checks if the mission unit is capable of naval offence.
+     *
+     * @return True if this unit can make a naval attack.
+     */
     private boolean canAttackEnemyShips() {
         final Unit carrier = getUnit();
         return carrier.getTile() != null
@@ -535,6 +521,11 @@ public class TransportMission extends Mission {
             && carrier.isOffensiveUnit();
     }
 
+    /**
+     * Checks if there is cargo on board the mission unit.
+     *
+     * @return True if there is cargo present.
+     */
     private boolean hasCargo() {
         final Unit carrier = getUnit();
         return (carrier.getGoodsCount() + carrier.getUnitCount()) > 0;
@@ -1417,26 +1408,24 @@ public class TransportMission extends Mission {
                 && transportables.isEmpty()) {
                 logger.finest(tag + " waiting in Europe: " + carrier);
             } else {
-                || transportables.size() > 0) {
                 moveUnitToAmerica();
-                logger.finest(tag + " returning from Europe: " + carrier);
+                logger.finest(tag + " set sail from Europe: " + carrier);
             }
             return;
         } else if (carrier.isAtSea()) {
             logger.finest(tag + " on the high seas: " + carrier);
             return;
         }
-
-        if (carrier.getMovesLeft() == 0) return;
         
-        if (!attackEnemyShips()) return;
-        restockCargoAtDestination();
-        if (!attackEnemyShips()) return;
-
         boolean transportablesChanged = false;
         boolean moreWork = true;
         for (int i = 0; i < transportables.size() && moreWork || i == 0; i++) {
-            if (carrier.getMovesLeft() == 0) return;
+            if (carrier.getMovesLeft() == 0) break;
+
+            if (canAttackEnemyShips() && !hasCargo() && !attackEnemyShips()) {
+                logger.finest(tag + " aborted by failed attack: " + carrier);
+                return;
+            }
 
             moreWork = false;
             if (transportablesChanged) {
@@ -1453,22 +1442,7 @@ public class TransportMission extends Mission {
 
             if (destination == null
                 || (destination.getPath() == null && !canMoveToEurope)) {
-                String carrierLoc = "";
-                if (carrier.getLocation() instanceof Europe) {
-                    carrierLoc = "Europe";
-                } else {
-                    Tile carrierTile = carrier.getTile();
-                    carrierLoc = carrierTile.toString();
-                    if (carrierTile.getColony() != null) {
-                        carrierLoc += " (" + carrierTile.getColony().getName()
-                            + ")";
-                    }
-                }
-
-                logger.finest(tag + " waiting at " + carrierLoc
-                    + ": " + carrier);
-                //carrier.setMovesLeft(0);
-                return;
+                break;
             }
 
             if (destination.isAtDestination()) {
@@ -1480,6 +1454,7 @@ public class TransportMission extends Mission {
             // just make the move
             if (canMoveToEurope) {
                 moveUnitToEurope();
+                logger.finest(tag + " set sail for Europe: " + carrier);
                 return;
             }
 
@@ -1492,7 +1467,10 @@ public class TransportMission extends Mission {
                     && moveToEurope) {
                     moveUnitToEurope();
                 } else {
-                    if (!moveButDontAttack(r)) return;
+                    if (!moveButDontAttack(r)) {
+                        logger.finest(tag + " died moving: " + carrier);
+                        return;
+                    }
                 }
 
                 if (!(carrier.getLocation() instanceof Europe)) {
@@ -1500,11 +1478,22 @@ public class TransportMission extends Mission {
                 }
             }
             if (r != null) {
-                if (!attackIfEnemyShipIsBlocking(r)) return;
+                if (!attackIfEnemyShipIsBlocking(r)) {
+                    logger.finest(tag + " died attacking: " + carrier);
+                    return;
+                }
             }
             transportablesChanged = restockCargoAtDestination();
-            if (!attackEnemyShips()) return;
         }
+
+        String doing = (transportables.isEmpty()) ? "waiting" : "idling";
+        Location loc = carrier.getLocation();
+        logger.finest(tag + " " + doing
+            + " at " + (((loc instanceof Tile)
+                    && ((Tile)loc).getColony() != null)
+                ? ((Tile)loc).getColony().getName()
+                : loc.toString())
+            + ": " + carrier);
     }
 
 

@@ -1419,7 +1419,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      * transport lists.
      */
     private void createTransportLists() {
-        logger.finest("Entering method createTransportLists");
         if (!getPlayer().isEuropean()) return;
         List<Transportable> transportables = new ArrayList<Transportable>();
 
@@ -1448,44 +1447,20 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         // Order the transportables by priority.
-        Collections.sort(transportables, new Comparator<Transportable>() {
-            public int compare(Transportable o1, Transportable o2) {
-                if (o1 == o2) return 0;
-                int result = o2.getTransportPriority() - o1.getTransportPriority();
-                return (result == 0) ? o1.getId().compareTo(o2.getId())
-                    : result;
-            }
-        });
+        Collections.sort(transportables,
+            Transportable.transportableComparator);
 
-        // Collect current transport missions with space available.
+        // Collect current transport missions.
         ArrayList<TransportMission> availableMissions
             = new ArrayList<TransportMission>();
         for (AIUnit au : getAIUnits()) {
-            if (au.hasMission() && au.getMission() instanceof TransportMission
-                && au.getUnit().getSpaceLeft() > 0) {
-                availableMissions.add((TransportMission) au.getMission());
+            if (au.getMission() instanceof TransportMission) {
+                availableMissions.add((TransportMission)au.getMission());
             }
         }
 
-        // If a transportable is already on a carrier, just add it to
-        // its transport list.  Note however that it may not be
-        // possible to complete such transport, in which case, the
-        // carrier should dump the transportable in the nearest
-        // colony.
-        for (Transportable t : new ArrayList<Transportable>(transportables)) {
-            Location transportableLoc = t.getTransportLocatable().getLocation();
-            boolean onCarrier = transportableLoc instanceof Unit;
-            if (onCarrier) {
-                AIUnit carrierAI = getAIUnit((Unit) transportableLoc);
-                Mission m = carrierAI.getMission();
-                if (m instanceof TransportMission) {
-                    ((TransportMission) m).addToTransportList(t);
-                }
-                transportables.remove(t);
-            }
-        }
-
-        // For all remaining transportables, find the best carrier.
+        // For all transportables, find the best carrier.
+        // 
         // That is the one with space available that is closest.
         // TODO: this concentrates on packing, but ignores destinations
         // which is definitely going to be inefficient
@@ -1493,6 +1468,22 @@ public class EuropeanAIPlayer extends AIPlayer {
         // availableMissions when it is full.
         while (!transportables.isEmpty() && !availableMissions.isEmpty()) {
             Transportable t = transportables.remove(0);
+            Location loc = t.getTransportLocatable().getLocation();
+
+            // Leave existing transport arrangements intact.
+            if (loc instanceof Unit) {
+                AIUnit aiCarrier = getAIUnit((Unit)loc);
+                Mission m = aiCarrier.getMission();
+                if (m instanceof TransportMission) {
+                    TransportMission tm = (TransportMission)m;
+                    if (tm.isOnTransportList(t)
+                        || tm.addToTransportList(t)) {
+                        logger.finest("Transport continuing: " + t);
+                        continue;
+                    }
+                }
+            }
+        
             TransportMission bestTransport = null;
             int bestTransportSpace = 0;
             int bestTransportTurns = Integer.MAX_VALUE;
@@ -1527,26 +1518,15 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             if (bestTransport == null) {
-                logger.finest("Transport failed for: " + t);
+                logger.finest("Transport unavailable: " + t);
                 continue;
-            }
-            bestTransport.addToTransportList(t);
-            logger.finest("Transport found for: " + t
-                          + " using: " + bestTransport
-                          + "  unit: " + bestTransport.getUnit());
-
-            // See if any other transportables are present at the same
-            // location and can fit.
-            for (int i = 0; i < transportables.size(); i++) {
-                Transportable t2 = transportables.get(i);
-                if (t2.getTransportLocatable().getLocation()
-                    == t.getTransportLocatable().getLocation()
-                    && bestTransport.getAvailableSpace(t2) > 0) {
-                    transportables.remove(t2);
-                    bestTransport.addToTransportList(t2);
-                    logger.finest("Transport piggyback for: " + t2
-                                  + " using: " + t);
-                }
+            } else if (bestTransport.addToTransportList(t)) {
+                logger.finest("Transport found for: " + t
+                    + " using: " + bestTransport
+                    + "  unit: " + bestTransport.getUnit());
+            } else {
+                logger.finest("Transport failed for: " + t
+                    + " using: " + bestTransport);
             }
         }
     }
