@@ -86,10 +86,8 @@ public class SetDestinationMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
+        // destination == null is OK.
         Location destination = game.getFreeColLocation(destinationId);
-        if (destination == null) {
-            return DOMMessage.clientError("Not a location: " + destinationId);
-        }
 
         // Set destination
         return server.getInGameController()
