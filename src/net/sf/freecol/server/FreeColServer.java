@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -565,7 +566,7 @@ public final class FreeColServer {
     public void setServerRandom(Random random) {
         this.random = random;
     }
-        
+
     /**
      * Gets the <code>MapGenerator</code> this <code>FreeColServer</code> is
      * using when creating random maps.
@@ -1045,7 +1046,7 @@ public final class FreeColServer {
             for (Player p : game.getPlayers()) {
                 if(!p.isIndian() && p.getEurope() != null) {
                     p.initializeHighSeas();
-                    
+
                     for (Unit u : p.getEurope().getUnitList()) {
                         // move units to high seas use setLocation()
                         // so that units are removed from Europe, and
@@ -1072,7 +1073,7 @@ public final class FreeColServer {
             }
         }
         // end compatibility code
-        
+
         // @compat 0.9.x, 0.10.x
         fixGameOptions();
         // end compatibility code
@@ -1202,52 +1203,36 @@ public final class FreeColServer {
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {
-        Specification spec = game.getSpecification();
-        if (!spec.hasOption(id)) {
-            BooleanOption op = new BooleanOption(id);
-            op.setGroup(gr);
-            op.setValue(defaultValue);
-            spec.addAbstractOption(op);
-            if ("".equals(gr)) {
-                for (OptionGroup level : spec.getDifficultyLevels()) {
-                    level.add(op);
-                }
-            } else {
-                spec.getOptionGroup(gr).add(op);
-            }
-        }
+        BooleanOption op = new BooleanOption(id);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        addOption(op);
     }
 
     private void addIntegerOption(String id, String gr, int defaultValue) {
-        Specification spec = game.getSpecification();
-        if (!spec.hasOption(id)) {
-            IntegerOption op = new IntegerOption(id);
-            op.setGroup(gr);
-            op.setValue(defaultValue);
-            spec.addAbstractOption(op);
-            if ("".equals(gr)) {
-                for (OptionGroup level : spec.getDifficultyLevels()) {
-                    level.add(op);
-                }
-            } else {
-                spec.getOptionGroup(gr).add(op);
-            }
-        }
+        IntegerOption op = new IntegerOption(id);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        addOption(op);
     }
 
     private void addStringOption(String id, String gr, String defaultValue) {
+        StringOption op = new StringOption(id);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        addOption(op);
+    }
+
+    private void addOption(AbstractOption option) {
         Specification spec = game.getSpecification();
-        if (!spec.hasOption(id)) {
-            StringOption op = new StringOption(id);
-            op.setGroup(gr);
-            op.setValue(defaultValue);
-            spec.addAbstractOption(op);
-            if ("".equals(gr)) {
+        if (!spec.hasOption(option.getId())) {
+            spec.addAbstractOption(option);
+            if ("".equals(option.getGroup())) {
                 for (OptionGroup level : spec.getDifficultyLevels()) {
-                    level.add(op);
+                    level.add(option);
                 }
             } else {
-                spec.getOptionGroup(gr).add(op);
+                spec.getOptionGroup(option.getGroup()).add(option);
             }
         }
     }
@@ -1395,7 +1380,7 @@ public final class FreeColServer {
         // Send message to all players except to the new player:
         // TODO: null-destination-player is unnecessarily generous visibility
         Element player = DOMMessage.createMessage("addPlayer");
-        player.appendChild(aiPlayer.toXMLElement(null, 
+        player.appendChild(aiPlayer.toXMLElement(null,
                 player.getOwnerDocument()));
         getServer().sendToAll(player, theConnection);
         return aiPlayer;
@@ -1411,8 +1396,8 @@ public final class FreeColServer {
         return getAIMain().getAIPlayer(player);
     }
 
-    
-    
+
+
     /**
      * Get the <code>HighScores</code> value.
      *
