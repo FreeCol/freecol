@@ -92,6 +92,15 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     }
 
     /**
+     * Are these goods in Europe?  No.
+     *
+     * @return False.
+     */
+    public boolean isInEurope() {
+        return false;
+    }
+
+    /**
      * Returns the <code>Tile</code> where this <code>TileItem</code> is located,
      * or <code>null</code> if it's location is <code>Europe</code>.
      *

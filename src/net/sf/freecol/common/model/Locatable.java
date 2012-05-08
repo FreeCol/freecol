@@ -27,32 +27,37 @@ public interface Locatable {
 
     /**
      * Sets the location for this <code>Locatable</code>.
-     * @param newLocation The new <code>Location</code> for the <code>Locatable</code>.
+     *
+     * @param newLocation The new <code>Location</code> for the
+     *     <code>Locatable</code>.
      */
     public void setLocation(Location newLocation);
 
-
     /**
      * Gets the location of this <code>Locatable</code>.
+     *
      * @return The location of this <code>Locatable</code>.
      */
     public Location getLocation();
 
+    /**
+     * Is this locatable in Europe.
+     */
+    public boolean isInEurope();
 
     /**
-     * Returns the <code>Tile</code> where this <code>Locatable</code> is located,
-     * or <code>null</code> if it's location is <code>Europe</code>.
+     * Returns the <code>Tile</code> where this <code>Locatable</code>
+     * is located, or <code>null</code> if it's location is
+     * <code>Europe</code>.
      *
-     * @return The Tile where this Unit is located. Or null if
-     * its location is Europe.
+     * @return The Tile where this Unit is located if any.
      */
     public Tile getTile();
 
-
     /**
      * Gets the amount of space this <code>Locatable</code> take.
+     *
      * @return The space it takes on a carrier.
      */
     public int getSpaceTaken();
-
 }

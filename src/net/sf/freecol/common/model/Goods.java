@@ -197,6 +197,16 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         this.location = location;
     }
 
+    /**
+     * Are these goods in Europe?
+     *
+     * @return True if the goods are in Europe.
+     */
+    public boolean isInEurope() {
+        return (location instanceof Europe)
+            || (location instanceof Unit && ((Unit)location).isInEurope());
+    }
+
     /** DO NOT USE, this is going away (into the server) soon. */
     public void changeLocation(Location location) {
        if (location != null && location.getGoodsContainer() == null) {
