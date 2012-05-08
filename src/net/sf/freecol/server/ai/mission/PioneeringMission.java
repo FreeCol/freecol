@@ -558,7 +558,7 @@ public class PioneeringMission extends Mission {
             turnsNeeded = Math.min(turnsNeeded, unit.getWorkLeft());
         }
         if (unit.isInDanger(turnsNeeded, 0.25f)) {
-            PathNode safe = unit.findOurNearestSettlement(false, 1);
+            PathNode safe = unit.findOurNearestSettlement(false, 1, false);
             if (safe != null) {
                 travelToTarget(tag + " (evading)",
                                safe.getLastNode().getTile());

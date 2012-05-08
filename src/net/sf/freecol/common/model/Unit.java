@@ -1385,10 +1385,11 @@ public class Unit extends FreeColGameObject
      * @param excludeStart If true, ignore any settlement the unit is
      *     currently in.
      * @param range An upper bound on the number of moves.
+     * @param coastal If true, the settlement must have a path to Europe.
      * @return The nearest matching settlement if any, otherwise null.
      */
     public PathNode findOurNearestSettlement(final boolean excludeStart,
-                                              int range) {
+                                             int range, final boolean coastal) {
         final Player player = getOwner();
         if (player.getNumberOfSettlements() <= 0
             || getTile() == null) return null;
@@ -1407,6 +1408,7 @@ public class Unit extends FreeColGameObject
                     int value;
                     if (settlement != null
                         && settlement.getOwner() == player
+                        && (!coastal || settlement.isConnected())
                         && (value = path.getTotalTurns()) < bestValue) {
                         bestValue = value;
                         best = path;
@@ -1425,7 +1427,18 @@ public class Unit extends FreeColGameObject
      * @return The nearest settlement if any, otherwise null.
      */
     public PathNode findOurNearestSettlement() {
-        return findOurNearestSettlement(false, Integer.MAX_VALUE);
+        return findOurNearestSettlement(false, Integer.MAX_VALUE, false);
+    }
+
+    /**
+     * Find a path for this unit to the nearest settlement with the
+     * same owner that is reachable without a carrier and is connected to
+     * Europe by sea.
+     *
+     * @return The nearest settlement if any, otherwise null.
+     */
+    public PathNode findOurNearestPort() {
+        return findOurNearestSettlement(false, Integer.MAX_VALUE, true);
     }
 
     /**
@@ -1436,7 +1449,7 @@ public class Unit extends FreeColGameObject
      * @return The nearest settlement if any, otherwise null.
      */
     public PathNode findOurNearestOtherSettlement() {
-        return findOurNearestSettlement(true, Integer.MAX_VALUE);
+        return findOurNearestSettlement(true, Integer.MAX_VALUE, false);
     }
 
     /**
