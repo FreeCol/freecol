@@ -1763,8 +1763,7 @@ public class Unit extends FreeColGameObject
                 return (isOffensiveUnit())
                     ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.canMoveToEurope()
-                       && getOwner().canMoveToEurope()) {
+            } else if (target.canMoveToEurope()) {
                 return MoveType.MOVE_HIGH_SEAS;
             } else {
                 return MoveType.MOVE;
@@ -2867,16 +2866,6 @@ public class Unit extends FreeColGameObject
             && !isOnCarrier();
     }
 
-    /**
-     * Returns a String representation of this Unit.
-     *
-     * @return A String representation of this Unit.
-     */
-    public String toString() {
-        return getId() + " [" + getType().getId() + " " + getMovesAsString() +"] "
-            + owner.getNationID() + " (" + getRole() + ")";
-    }
-
     public String getMovesAsString() {
         String moves = "";
         int quotient = getMovesLeft() / 3;
@@ -3089,15 +3078,13 @@ public class Unit extends FreeColGameObject
      * @return <code>true</code> if this unit can move to Europe.
      */
     public boolean canMoveToEurope() {
-        if (getLocation() instanceof Europe) {
-            return true;
-        }
-        if (!getOwner().canMoveToEurope()) {
-            return false;
-        }
+        if (getLocation() instanceof Europe) return true;
+        if (!getOwner().canMoveToEurope() || !isNaval()) return false;
 
-        for (Tile tile : getTile().getSurroundingTiles(1)) {
-            if (tile.canMoveToEurope()) return true;
+        Tile tile = getTile();
+        if (tile.canMoveToEurope()) return true;
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.canMoveToEurope() && getMoveType(t).isLegal()) return true;
         }
         return false;
     }
@@ -4037,6 +4024,18 @@ public class Unit extends FreeColGameObject
     protected void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * Gets a string representation of this unit.
+     *
+     * @return A string representation of this <code>Unit</code>.
+     */
+    public String toString() {
+        return "[" + getId() + " " + getType().getId()
+            + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
+            + " " + owner.getNationID()
+            + " " + getMovesAsString() + "]";
     }
 
     /**
