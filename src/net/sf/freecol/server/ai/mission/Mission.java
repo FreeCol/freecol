@@ -575,8 +575,9 @@ public abstract class Mission extends AIObject {
      * do so.  Return an indicative MoveType for the result of the travel.
      * - MOVE if the unit has arrived at the target.  The unit may not
      *   have moved, or have exhausted its moves.
-     * - MOVE_NO_MOVES if out of moves short of the target
+     * - MOVE_HIGH_SEAS if the unit has successfully set sail.
      * - MOVE_ILLEGAL if the unit is unable to proceed for now
+     * - MOVE_NO_MOVES if out of moves short of the target
      * - MOVE_NO_REPAIR if the unit died for whatever reason
      * - other results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
@@ -599,9 +600,34 @@ public abstract class Mission extends AIObject {
         boolean inTransit = false;
         boolean needTransport = false;
         if (target instanceof Europe) {
+            if (!unit.getOwner().canMoveToEurope()) {
+                return MoveType.MOVE_ILLEGAL;
+            }
             if (unit.isInEurope()) return MoveType.MOVE;
 
-            if (unit.isOnCarrier()) {
+            if (unit.isNaval()) {
+                if (unit.isAtSea()) {
+                    logger.finest(logMe + " at sea: " + unit);
+                    return MoveType.MOVE_ILLEGAL;
+                }
+                if (unit.getTile().canMoveToEurope()) {
+                    if (moveUnitToEurope()) {
+                        logger.finest(logMe + " set sail for Europe: " + unit);
+                        return MoveType.MOVE_HIGH_SEAS;
+                    } else {
+                        logger.finest(logMe + " failed to sail for Europe: "
+                            + unit);
+                        return MoveType.MOVE_ILLEGAL;
+                    }
+                }
+                path = unit.findPathToEurope();
+                if (path == null) {
+                    logger.finest(logMe
+                        + " can not get from " + unit.getTile()
+                        + " to Europe: " + unit);
+                    return MoveType.MOVE_ILLEGAL;
+                }
+            } else if (unit.isOnCarrier()) {
                 inTransit = true;
             } else {
                 needTransport = true;
@@ -609,7 +635,30 @@ public abstract class Mission extends AIObject {
         } else {
             if (unit.getTile() == targetTile) return MoveType.MOVE;
 
-            if (unit.isOnCarrier()) {
+            if (unit.isNaval()) {
+                if (unit.isAtSea()) {
+                    logger.finest(logMe + " at sea: " + unit);
+                    return MoveType.MOVE_ILLEGAL;
+                } else if (unit.isInEurope()) {
+                    if (moveUnitToAmerica()) {
+                        logger.finest(logMe + " set sail for the New World: "
+                            + unit);
+                        return MoveType.MOVE_HIGH_SEAS;
+                    } else {
+                        logger.finest(logMe + " in Europe failed to set sail: "
+                            + unit);
+                        return MoveType.MOVE_ILLEGAL;
+                    }
+                } else {
+                    path = unit.findPath(targetTile);
+                    if (path == null) {
+                        logger.finest(logMe
+                            + " can not sail from " + unit.getTile()
+                            + " to " + targetTile + ": " + unit);
+                        return MoveType.MOVE_ILLEGAL;
+                    }
+                }
+            } else if (unit.isOnCarrier()) {
                 if (carrier.getTile() == null) {
                     inTransit = true;
                 } else {
@@ -646,28 +695,51 @@ public abstract class Mission extends AIObject {
 
         // This can not happen.
         if (path == null) throw new IllegalStateException("Path == null");
+        return followPath(logMe, path, target instanceof Europe);
+    }
 
-        // Follow the path towards the target.
+    /**
+     * Follow a path to a target.
+     *
+     * @param logMe A prefix string for the log messages.
+     * @param path The <code>PathNode</code> to follow.
+     * @param europe The ultimate target is Europe, move there if possible.
+     * @return The type of move the unit stopped at.
+     */
+    protected MoveType followPath(String logMe, PathNode path,
+                                  boolean europe) {
+        final Unit unit = getUnit();
         for (; path != null; path = path.next) {
             if (unit.getMovesLeft() <= 0) {
                 logger.finest(logMe + " at " + unit.getTile()
-                    + " en route to " + targetTile + ": " + unit);
+                    + " en route to " + path.getLastNode().getTile()
+                    + ": " + unit);
                 return MoveType.MOVE_NO_MOVES;
             }
 
             MoveType mt = unit.getMoveType(path.getDirection());
             if (!mt.isProgress()) return mt; // Special handling required
 
-            if (!AIMessage.askMove(aiUnit, path.getDirection())) {
+            if (!AIMessage.askMove(getAIUnit(), path.getDirection())) {
                 logger.finest(logMe + " at " + unit.getTile()
                     + " failed to move: " + unit);
                 return MoveType.MOVE_ILLEGAL;
             } else if (unit.isDisposed()) {
-                logger.finest(logMe + " died en route to " + targetTile
+                logger.finest(logMe + " died en route to " + path.getTile()
                     + ": " + unit);
                 return MoveType.MOVE_NO_REPAIR;
             }
         }
+        if (europe && unit.getTile().canMoveToEurope()) {
+            if (!AIMessage.askMoveTo(getAIUnit(),
+                    unit.getOwner().getEurope())) {
+                logger.finest(logMe + " at " + unit.getTile()
+                    + " failed to sail for Europe: " + unit);
+                return MoveType.MOVE_ILLEGAL;
+            }
+            logger.finest(logMe + " sailed for Europe: " + unit);
+            return MoveType.MOVE_HIGH_SEAS;
+        }             
         return MoveType.MOVE; // Must have completed path
     }
 
