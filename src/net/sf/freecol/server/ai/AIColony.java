@@ -746,12 +746,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param action The state of the goods.
      */
     private void goodsLog(AIGoods ag, String action) {
-        int amount = ag.getGoods().getAmount();
+        Goods goods = (ag == null) ? null : ag.getGoods();
+        int amount = (goods == null) ? -1 : goods.getAmount();
+        String type = (goods == null) ? "(null)"
+            : ag.getGoods().getType().toString().substring(12);
         logger.finest(String.format("%-20s %-10s %s %s %s",
-                colony.getName(), action, ag.getId(),
+                colony.getName(), action,
+                ((ag == null) ? "(null)" : ag.getId()),
                 ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
-                    : Integer.toString(amount)),
-                ag.getGoods().getType().toString().substring(12)));
+                    : Integer.toString(amount)), type));
     }
 
     /**
