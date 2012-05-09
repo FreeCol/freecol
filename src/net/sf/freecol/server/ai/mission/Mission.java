@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.AIColony;
+import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
@@ -102,6 +104,7 @@ public abstract class Mission extends AIObject {
 
     /**
      * Disposes this mission by removing any references to it.
+     * Subclasses should override as needed.
      */
     public void dispose() {
         // Nothing to do yet.
@@ -115,15 +118,6 @@ public abstract class Mission extends AIObject {
      */
     public Location getTarget() {
         return null;
-    }
-
-    /**
-     * Gets the unit this mission has been created for.
-     *
-     * @return The <code>Unit</code>.
-     */
-    public Unit getUnit() {
-        return (aiUnit == null) ? null : aiUnit.getUnit();
     }
 
     /**
@@ -142,6 +136,15 @@ public abstract class Mission extends AIObject {
      */
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
+    }
+
+    /**
+     * Gets the unit this mission has been created for.
+     *
+     * @return The <code>Unit</code>.
+     */
+    public Unit getUnit() {
+        return (aiUnit == null) ? null : aiUnit.getUnit();
     }
 
     /**
@@ -175,6 +178,7 @@ public abstract class Mission extends AIObject {
     protected Random getAIRandom() {
         return aiUnit.getAIRandom();
     }
+
 
     /**
      * Moves the unit owning this mission towards the given
@@ -241,26 +245,6 @@ public abstract class Mission extends AIObject {
             unit.setMovesLeft(0);
         }
     }
-
-    /**
-     * Moves a unit to the new world.
-     *
-     * @return True if there was no c-s problem.
-     */
-    protected boolean moveUnitToAmerica() {
-        return AIMessage.askMoveTo(aiUnit,
-            getUnit().getOwner().getGame().getMap());
-    }
-
-    /**
-     * Moves a unit to Europe.
-     *
-     * @return True if there was no c-s problem.
-     */
-    protected boolean moveUnitToEurope() {
-        return AIMessage.askMoveTo(aiUnit, getUnit().getOwner().getEurope());
-    }
-
 
     /**
      * Move in a specified direction, but do not attack.
@@ -391,18 +375,22 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Unload a unit.
+     * A unit leaves a ship.
      * Fulfills a wish if possible.
      *
      * @param aiUnit The <code>AIUnit</code> to unload.
+     * @param direction The <code>Direction</code> to move, if any.
      * @return True if the unit is unloaded.
      */
-    protected boolean unitLeavesShip(AIUnit aiUnit) {
-        boolean result = AIMessage.askDisembark(aiUnit);
-        Colony colony = aiUnit.getUnit().getColony();
+    protected boolean unitLeavesTransport(AIUnit aiUnit, Direction direction) {
+        final Unit unit = aiUnit.getUnit();
+        boolean result = (direction == null)
+            ? AIMessage.askDisembark(aiUnit)
+            : AIMessage.askMove(aiUnit, direction);
+        Colony colony = unit.getColony();
         if (result && colony != null) {
             AIColony ac = getAIMain().getAIColony(colony);
-            if (ac != null) ac.completeWish(aiUnit.getUnit());
+            if (ac != null) ac.completeWish(unit);
 
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
@@ -410,37 +398,123 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Unload some goods.
-     * Fulfills a wish if possible.
+     * A unit joins a ship.
      *
-     * @param goods The <code>Goods</code> to unload.
-     * @return True if the goods are unloaded.
+     * @param aiUnit The <code>AIUnit</code> to load.
+     * @param direction The <code>Direction</code> to move, if any.
+     * @return True if the unit is loaded.
      */
-    protected boolean unloadCargoInColony(Goods goods) {
-        boolean result = AIMessage.askUnloadCargo(aiUnit, goods);
-        Colony colony = aiUnit.getUnit().getColony();
-        AIColony ac;
-        if (result && colony != null
-            && (ac = getAIMain().getAIColony(colony)) != null) {
-            ac.completeWish(goods);
+    protected boolean unitJoinsTransport(AIUnit aiUnit, Direction direction) {
+        final Unit unit = aiUnit.getUnit();
+        Colony colony = unit.getColony();
+        boolean result = (direction == null)
+            ? AIMessage.askEmbark(getAIUnit(), unit, direction)
+            : AIMessage.askMove(aiUnit, direction);
+        if (result && colony != null) {
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
         return result;
     }
 
     /**
-     * Sell some goods in Europe.
+     * Goods leaves a ship.
      *
-     * @param goods The <code>Goods</code> to sell.
-     * @return True if the goods are sold.
+     * @param goods The <code>Goods</code> to unload.
+     * @return True if the unload succeeds.
      */
-    protected boolean sellCargoInEurope(Goods goods) {
-        // CHEAT: Remove when the AI is good enough
-        Player p = getUnit().getOwner();
-        if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
-            // Double the income by adding this bonus:
-            p.modifyGold(p.getMarket().getSalePrice(goods));
+    protected boolean goodsLeavesTransport(Goods goods) {
+        final Unit carrier = getUnit();
+        final AIUnit aiUnit = getAIUnit();
+        final Colony colony = carrier.getTile().getColony();
+        boolean result = (carrier.isInEurope()
+            && carrier.getOwner().canTrade(goods.getType())) 
+            ? AIMessage.askSellGoods(aiUnit, goods)
+            : AIMessage.askUnloadCargo(aiUnit, goods);
+        if (result && colony != null) {
+            AIColony aiColony = getAIMain().getAIColony(colony);
+            if (aiColony != null) aiColony.completeWish(goods);
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
-        return AIMessage.askSellGoods(aiUnit, goods);
+        return result;
+    }
+
+    /**
+     * Goods leaves a ship.
+     * Completes a wish if possible.
+     *
+     * @param aiGoods The <code>AIGoods</code> to unload.
+     * @return True if the unload succeeds.
+     */
+    protected boolean goodsLeavesTransport(AIGoods aiGoods) {
+        final Unit carrier = getUnit();
+        final AIUnit aiUnit = getAIUnit();
+        Goods goods = aiGoods.getGoods();
+        boolean result = goodsLeavesTransport(goods);
+        Colony colony = carrier.getColony();
+        AIColony ac;
+        if (result) {
+            if (colony != null
+                && (ac = getAIMain().getAIColony(colony)) != null) {
+                ac.completeWish(goods);
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            }
+            aiGoods.dispose();
+        }
+        return result;
+    }
+
+    /**
+     * Goods joins a ship.
+     *
+     * @param aiGoods The <code>AIGoods</code> to load.
+     * @return True if the load succeeds.
+     */
+    protected boolean goodsJoinsTransport(AIGoods aiGoods) {
+        final Unit carrier = getUnit();
+        final AIUnit aiUnit = getAIUnit();
+        final Goods goods = aiGoods.getGoods();
+        GoodsType goodsType = goods.getType();
+        int goodsAmount = goods.getAmount();
+        boolean result;
+        if (carrier.isInEurope()) {
+            result = AIMessage.askBuyGoods(aiUnit, goodsType, goodsAmount);
+        } else {
+            result = AIMessage.askLoadCargo(aiUnit, goods);
+            Colony colony = carrier.getColony();
+            if (colony != null) {
+                getAIMain().getAIColony(colony).removeAIGoods(aiGoods);
+            }
+        }
+        if (result) {
+            aiGoods.setGoods(new Goods(getGame(), carrier,
+                                       goodsType, goodsAmount));
+        }
+        return result;
+    }
+
+    // Deprecated, going away.
+    protected void unitLeavesShip(AIUnit aiUnit) {
+        unitLeavesTransport(aiUnit, null);
+    }
+
+    // Deprecated, going away.
+    protected boolean sellCargoInEurope(Goods goods) {
+        return goodsLeavesTransport(goods);
+    }
+
+    // Deprecated, going away.
+    protected boolean unloadCargoInColony(Goods goods) {
+        return goodsLeavesTransport(goods);
+    }
+
+    // Deprecated, going away.
+    protected boolean moveUnitToEurope() {
+        return getAIUnit().moveToEurope();
+    }
+
+    // Deprecated, going away.
+    protected boolean moveUnitToAmerica() {
+        return getAIUnit().moveToAmerica();
     }
 
     /**
@@ -595,6 +669,7 @@ public abstract class Mission extends AIObject {
         }
 
         final Unit unit = getUnit();
+        final AIUnit aiUnit = getAIUnit();
         final Unit carrier = unit.getCarrier();
         PathNode path = null;
         boolean inTransit = false;
@@ -611,7 +686,7 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 }
                 if (unit.getTile().canMoveToEurope()) {
-                    if (moveUnitToEurope()) {
+                    if (aiUnit.moveToEurope()) {
                         logger.finest(logMe + " set sail for Europe: " + unit);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
@@ -640,7 +715,7 @@ public abstract class Mission extends AIObject {
                     logger.finest(logMe + " at sea: " + unit);
                     return MoveType.MOVE_ILLEGAL;
                 } else if (unit.isInEurope()) {
-                    if (moveUnitToAmerica()) {
+                    if (aiUnit.moveToAmerica()) {
                         logger.finest(logMe + " set sail for the New World: "
                             + unit);
                         return MoveType.MOVE_HIGH_SEAS;

@@ -1424,7 +1424,7 @@ public class Unit extends FreeColGameObject
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
      *
-     * @return The nearest settlement if any, otherwise null.
+     * @return A path to the nearest settlement if any, otherwise null.
      */
     public PathNode findOurNearestSettlement() {
         return findOurNearestSettlement(false, Integer.MAX_VALUE, false);
@@ -1433,12 +1433,26 @@ public class Unit extends FreeColGameObject
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier and is connected to
-     * Europe by sea.
+     * Europe by sea, or Europe if it is closer.
      *
-     * @return The nearest settlement if any, otherwise null.
+     * @return A path to the nearest settlement if any, otherwise null
+     *     (for now including if in Europe or at sea).
      */
     public PathNode findOurNearestPort() {
-        return findOurNearestSettlement(false, Integer.MAX_VALUE, true);
+        PathNode ePath = null;
+        int eTurns = -1;
+        if (isNaval()) {
+            if (isInEurope() || isAtSea()) return null;
+            ePath = findPathToEurope();
+            eTurns = (ePath == null) ? -1
+                : ePath.getTotalTurns() + getSailTurns();
+        }
+        PathNode sPath = findOurNearestSettlement(false, Integer.MAX_VALUE,
+                                                  true);
+        int sTurns = (sPath == null) ? -1 : sPath.getTotalTurns();
+        return (sPath == null && ePath == null) ? null
+            : (ePath == null || sTurns <= eTurns) ? sPath
+            : ePath;
     }
 
     /**

@@ -49,6 +49,8 @@ public class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
+    private static String tag = "AI privateer";
+
     private static enum PrivateerMissionState {HUNTING,TRANSPORTING};
     private PrivateerMissionState state = PrivateerMissionState.HUNTING;
     private Location nearestPort = null;
@@ -118,8 +120,8 @@ public class PrivateerMission extends Mission {
     private void hunt4Target() {
         Unit unit = getUnit();
 
-        if(unit.getLocation() instanceof Europe){
-            moveUnitToAmerica();
+        if (unit.getLocation() instanceof Europe){
+            getAIUnit().moveToAmerica();
             unit.setMovesLeft(0);
             return;
         }
@@ -172,105 +174,35 @@ public class PrivateerMission extends Mission {
     }
 
     private void gotoNearestPort() {
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
 
-        if(isUnitInPort()){
+        if (isUnitInPort()) {
             dumpCargoInPort();
             state = PrivateerMissionState.HUNTING;
             return;
         }
 
-        PathNode path = getValidPathForNearestPort();
-        if(path == null){
-            findNearestPort();
-            if (nearestPort == null) {
+        PathNode path
+            = (nearestPort instanceof Europe) ? unit.findPathToEurope()
+            : (nearestPort instanceof Tile) ? unit.findPath((Tile)nearestPort)
+            : null;
+        if (path == null) {
+            if ((path = unit.findOurNearestPort()) == null) {
                 logger.finest("Failed to find port for goods");
                 valid = false;
                 return;
             }
-            path = getValidPathForNearestPort();
-            if (path == null) {
-                logger.finest("Failed to deliver goods to "
-                              + nearestPort + ", no path");
-                valid = false;
-                return;
-            }
+            Tile last = path.getLastNode().getTile();
+            nearestPort = (last.getSettlement() != null) ? last
+                : unit.getOwner().getEurope();
         }
 
-        boolean moveToEurope = nearestPort instanceof Europe;
-        Direction direction = moveTowards(path);
-        if (direction == null) {
-            unit.setMovesLeft(0);
-            return;
-        }
+        if (followPath(tag, path, nearestPort instanceof Europe)
+            != MoveType.MOVE) return;
 
-        if (moveToEurope && unit.getMoveType(direction) == MoveType.MOVE_HIGH_SEAS) {
-        	moveUnitToEurope();
-        	unit.setMovesLeft(0);
-        	return;
-        }
-
-        if(unit.getMoveType(direction) == MoveType.MOVE){
-        	Position unitPos = unit.getTile().getPosition();
-        	Position ColPos = unitPos.getAdjacent(direction);
-        	Colony colony = getGame().getMap().getTile(ColPos).getColony();
-        	if(colony == nearestPort){
-              AIMessage.askMove(getAIUnit(), direction);
-              return;
-        	}
-        	else{
-        		String errMsg = "Privateer (" + unit.getId() + ") with PrivateerMission trying to enter settlement";
-        		throw new IllegalStateException(errMsg);
-        	}
-        }
-
-        // some movement points may still remain
-    	//due to some block or just not enough points for next node
-    	// we need to make sure the unit has no points left,
-    	//so the game can move to next unit
-    	unit.setMovesLeft(0);
-    }
-
-    private PathNode getValidPathForNearestPort(){
-        Unit unit = getUnit();
-        Player player = unit.getOwner();
-
-        if(nearestPort == null){
-        	return null;
-        }
-
-        if(nearestPort instanceof Europe){
-            if(player.getEurope() == null){
-                nearestPort = null;
-                return null;
-            }
-            return unit.findPathToEurope();
-        }
-
-        Colony nearestColony = (Colony) nearestPort;
-        if(nearestColony == null
-        		|| nearestColony.isDisposed()
-        		|| nearestColony.getOwner() != player){
-            nearestPort = null;
-            return null;
-        }
-
-        return unit.findPath(nearestColony.getTile());
-    }
-
-    private void findNearestPort(){
-        nearestPort = null;
-        Unit unit = getUnit();
-
-        PathNode path = unit.findOurNearestOtherSettlement();
-        if(path != null){
-            nearestPort = path.getLastNode().getTile().getColony();
-        }
-        else{
-            Europe europe = unit.getOwner().getEurope();
-            if(europe != null){
-                nearestPort = europe;
-            }
+        if (isUnitInPort()) {
+            dumpCargoInPort();
+            state = PrivateerMissionState.HUNTING;
         }
     }
 
@@ -297,7 +229,7 @@ public class PrivateerMission extends Mission {
         for(Goods goods : goodsLst){
             if(inEurope){
             	logger.finest("Before dumping: money=" + unit.getOwner().getGold());
-                sellCargoInEurope(goods);
+              goodsLeavesTransport(goods);
             	logger.finest("After dumping: money=" + unit.getOwner().getGold());
             } else{
             	Colony colony = unit.getTile().getColony();
@@ -308,7 +240,7 @@ public class PrivateerMission extends Mission {
         }
 
         for (Unit u : unit.getUnitList()) {
-            unitLeavesShip(getAIMain().getAIUnit(u));
+            unitLeavesTransport(getAIMain().getAIUnit(u), null);
         }
     }
 

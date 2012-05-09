@@ -222,6 +222,24 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Moves a unit to the new world.
+     *
+     * @return True if there was no c-s problem.
+     */
+    public boolean moveToAmerica() {
+        return AIMessage.askMoveTo(this, unit.getOwner().getGame().getMap());
+    }
+
+    /**
+     * Moves a unit to Europe.
+     *
+     * @return True if there was no c-s problem.
+     */
+    public boolean moveToEurope() {
+        return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
+    }
+
+    /**
      * Checks if this unit has been assigned a mission.
      *
      * @return <code>true</code> if this unit has a mission.
