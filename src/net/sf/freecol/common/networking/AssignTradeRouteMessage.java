@@ -89,11 +89,15 @@ public class AssignTradeRouteMessage extends DOMMessage {
         }
 
         TradeRoute tradeRoute;
-        try {
-            tradeRoute = serverPlayer.getFreeColGameObject(tradeRouteId, 
-                                                           TradeRoute.class);
-        } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+        if (tradeRouteId == null) {
+            tradeRoute = null;
+        } else {
+            try {
+                tradeRoute = serverPlayer.getFreeColGameObject(tradeRouteId, 
+                    TradeRoute.class);
+            } catch (Exception e) {
+                return DOMMessage.clientError(e.getMessage());
+            }
         }
 
         // Proceed to assign.
