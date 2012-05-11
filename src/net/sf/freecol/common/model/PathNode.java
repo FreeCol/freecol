@@ -20,30 +20,40 @@
 
 package net.sf.freecol.common.model;
 
+import  net.sf.freecol.common.model.Location;
 import  net.sf.freecol.common.model.Map.Direction;
+import  net.sf.freecol.common.model.Tile;
+
 
 /**
- * Represents a single <code>Tile</code> in a path.
- *
- * <br><br>
+ * Represents a single <code>Location</code> in a path.
  *
  * You will most likely be using: {@link #next}, {@link #getDirection},
- * {@link #getTile} and {@link #getTotalTurns}, when evaluating/following a path.
+ * {@link #getTile} and {@link #getTotalTurns}, when
+ * evaluating/following a path.
  */
-public class PathNode implements Comparable<PathNode> {
-
-    private Tile tile;
-    private int cost;
+public class PathNode {
 
     /**
-     * This is <code>cost + heuristics</code>. The latter one is an estimate
-     * for the cost from this <code>tile</code> and to the goal.
+     * The location this node refers to.  Usually a Tile.
      */
-    private int f;
+    private Location location;
 
-    private Direction direction;
+    /**
+     * The number of moves left at this node for the unit traversing
+     * this path.
+     */
     private int movesLeft;
+
+    /**
+     * The number of turns used to get to this node by the unit
+     * traversing the path.
+     */
     private int turns;
+
+    /**
+     * Whether the unit traversing this path is on a carrier at this node.
+     */
     private boolean onCarrier = false;
 
     /**
@@ -60,65 +70,82 @@ public class PathNode implements Comparable<PathNode> {
     /**
      * Creates a new <code>PathNode</code>.
      *
-     * @param tile The <code>Tile</code> this <code>PathNode</code>
-     *             represents in the path.
-     * @param cost The cost of moving to this <code>PathNode</code>'s
-     *             <code>Tile</code>, given in {@link Unit#getMovesLeft}
-     *             move points.
-     * @param f    This is <code>cost + heuristics</code>. The latter one is
-     *             an estimate for the cost from this <code>Tile</code> and
-     *             to the goal.
-     * @param direction The direction to move on the map in order to
-     *             get to the next <code>Tile</code> in the path.
-     * @param movesLeft The number of moves remaining at this point in the path.
+     * @param location The <code>Location</code> this
+     *      <code>PathNode</code> represents in the path.
+     * @param movesLeft The number of moves remaining at this point in
+     *      the path.
      * @param turns The number of turns it takes to reach this
-     *             <code>PathNode</code>'s <code>Tile</code> from the
-     *             start of the path.
+     *      <code>PathNode</code>'s <code>Tile</code> from the start
+     *      of the path.
+     * @param onCarrier Whether the path is still using a carrier.
+     * @param previous The previous <code>PathNode</code> in the path.
+     * @param next The next <code>PathNode</code> in the path.
      */
-    public PathNode(Tile tile, int cost, int f, Direction direction,
-                    int movesLeft, int turns) {
-        this.tile = tile;
-        this.cost = cost;
-        this.f = f;
-        this.direction = direction;
+    public PathNode(Location location, int movesLeft, int turns,
+                    boolean onCarrier, PathNode previous, PathNode next) {
+        this.location = location;
         this.movesLeft = movesLeft;
         this.turns = turns;
+        this.onCarrier = onCarrier;
+        this.previous = previous;
+        this.next = next;
     }
 
     /**
-     * Returns the cost of moving to this <code>PathNode</code>'s tile.
+     * Gets the location of this path.
      *
-     * @return The cost of moving to this <code>PathNode</code>'s
-     *         <code>Tile</code>, given in {@link Unit#getMovesLeft}
-     *         move points.
+     * @return The <code>Location</code>.
      */
-    public int getCost() {
-        return cost;
+    public Location getLocation() {
+        return location;
     }
 
     /**
      * Gets the <code>Tile</code> of this <code>PathNode</code>.
      *
-     * <br><br>
-     *
-     * That is; the <code>Tile</code> you reach if you move in the direction
-     * given by {@link #getDirection} from the previous tile. Explained by code:
-     * <br><br>
-     * <code>map.getNeighbourOrNull(getDirection(),
-     *     previous.getTile()) == getTile()</code>
-     *
      * @return The <code>Tile</code> this <code>PathNode</code>
-     *         represents in the path.
+     *     represents in the path.
      */
     public Tile getTile() {
-        return tile;
+        return (location instanceof Tile) ? (Tile)location : null;
+    }
+
+    /**
+     * Gets the number of moves remaining at this point in the path.
+     *
+     * @return The number of moves remaining. <code>-1</code> is
+     *     returned if the number of moves left has not been calculated.
+     */
+    public int getMovesLeft() {
+        return movesLeft;
+    }
+
+    /**
+     * Sets the number of moves remaining at this point in the path.
+     *
+     * @param movesLeft The number of moves remaining.
+     */
+    public void setMovesLeft(int movesLeft) {
+        this.movesLeft = movesLeft;
+    }
+
+    /**
+     * Gets the number of turns it will take to reach this
+     * <code>PathNode</code>'s <code>Tile</code> in the path.
+     *
+     * @return The number of turns, using zero for the first
+     *     move. <code>-1</code> is returned if the number of turns
+     *     has not been calculated.
+     */
+    public int getTurns() {
+        return turns;
     }
 
     /**
      * Checks if the unit using this path is still onboard its transport.
      *
      * @return <code>true</code> if the unit is still onboard a
-     *         carrier when using this path.
+     *     carrier when using this path.
      * @see #getTransportDropTurns
      */
     public boolean isOnCarrier() {
@@ -129,8 +156,8 @@ public class PathNode implements Comparable<PathNode> {
      * Sets if the unit using this path is still onboard its transport.
      *
      * @param onCarrier Should be set to <code>true</code> in order to
-     *        indicate that the unit using this path is still onboard
-     *        the carrier on this path node.
+     *     indicate that the unit using this path is still onboard the
+     *     carrier on this path node.
      * @see #getTransportDropTurns
      */
     public void setOnCarrier(boolean onCarrier) {
@@ -138,23 +165,24 @@ public class PathNode implements Comparable<PathNode> {
     }
 
     /**
-     * Returns the number of turns it takes to reach the
-     * {@link #getTransportDropNode transport node}.
+     * Gets the direction to move in order to get to this path node.
      *
-     * @return The number of turns in takes to get to the node where
-     *         the unit using this path should leave it's transport.
+     * @return The direction to move on the map in order to get to the
+     *     <code>Tile</code> returned by this <code>PathNode</code>'s
+     *     {@link #getTile}, or null if there is no previous node or either
+     *     this or the previous node location is not on the map.
      */
-    public int getTransportDropTurns() {
-        PathNode temp = this;
-        while (temp.next != null && temp.isOnCarrier()) {
-            temp = temp.next;
-        }
-        return temp.getTurns();
+    public Direction getDirection() {
+        if (previous == null
+            || previous.getTile() == null
+            || getTile() == null) return null;
+        Tile prev = previous.getTile();
+        return prev.getMap().getDirection(prev, getTile());
     }
 
     /**
-     * Returns the node where the unit using this path should
-     * leave its transport.
+     * Gets the node where the unit using this path should leave its
+     * transport.
      *
      * @return The node where the unit leaves it's carrier.
      */
@@ -167,7 +195,7 @@ public class PathNode implements Comparable<PathNode> {
     }
 
     /**
-     * Returns the last node of this path.
+     * Gets the last node of this path.
      *
      * @return The last <code>PathNode</code>.
      */
@@ -180,127 +208,79 @@ public class PathNode implements Comparable<PathNode> {
     }
 
     /**
-     * Returns the estimated cost of the path at this stage.
-     *
-     * @return The <code>cost + heuristics</code>. The latter one is
-     *         an estimate for the cost from this <code>tile</code>
-     *         and to the goal.
-     */
-    public int getF() {
-        return f;
-    }
-
-    /**
-     * Returns the direction to move in order to get closer towards the goal.
-     *
-     * @return The direction to move on the map in order to get to the
-     *         <code>Tile</code> returned by this <code>PathNode</code>'s
-     *         {@link #getTile} in the path.
-     */
-    public Direction getDirection() {
-        return direction;
-    }
-
-    /**
-     * Returns the number of turns it will take to reach this
-     * <code>PathNode</code>'s <code>Tile</code> in the path.
-     *
-     * @return The number of turns, using zero for the first
-     *         move. <code>-1</code> is returned if the number of
-     *         turns has not been calculated.
-     */
-    public int getTurns() {
-        return turns;
-    }
-
-    /**
-     * Returns the number of turns it will take to move the entire path,
+     * Gets the number of turns it will take to move the entire path,
      * from the starting <code>PathNode</code> until the end.
      *
      * @return The number of turns, using zero for the first move.
      */
     public int getTotalTurns() {
-        PathNode temp = this;
-        while (temp.next != null) {
-            temp = temp.next;
+        return getLastNode().getTurns();
+    }
+
+    /**
+     * Gets the number of turns it takes to reach the
+     * {@link #getTransportDropNode transport node}.
+     *
+     * @return The number of turns in takes to get to the node where
+     *     the unit using this path should leave it's transport.
+     */
+    public int getTransportDropTurns() {
+        return getTransportDropNode().getTurns();
+    }
+
+    /**
+     * Standard function to get the cost of moving to a <code>PathNode</code>.
+     * Static version provided for path calculation comparisons.
+     *
+     * @param turns The number of turns taken.
+     * @param movesLeft The number of moves left for the moving unit.
+     * @return The cost of moving to a <code>PathNode</code>.
+     */
+    public static int getCost(int turns, int movesLeft) {
+        return 100 * turns + (100 - movesLeft);
+    }
+        
+    /**
+     * Gets the cost of moving to this <code>PathNode</code>.
+     *
+     * @return The cost of moving to this <code>PathNode</code>.
+     */
+    public int getCost() {
+        return getCost(turns, movesLeft);
+    }
+
+    /**
+     * Reverses this path.
+     * Only operates on the forward part of the path, any previous part will
+     * be dropped.
+     * Beware of the side-effect!
+     *
+     * @return The reversed path.
+     */
+    public PathNode reverse() {
+        PathNode result = this;
+        PathNode curr = this.next;
+        result.next = null;
+        while (curr != null) {
+            PathNode next = curr.next;
+            curr.next = result;
+            result.previous = curr;
+            result = curr;
+            curr = next;
         }
-        return temp.getTurns();
+        result.previous = null;
+        return result;            
     }
 
     /**
-     * Returns the number of moves remaining at this point in the path.
-     * @return The number of moves remaining. <code>-1</code> is
-     *         returned if the number of moves left has not been calculated.
-     */
-    public int getMovesLeft() {
-        return movesLeft;
-    }
-
-    /**
-     * Sets the number of moves remaining at this point in the path.
-     * @param movesLeft The number of moves remaining.
-     */
-    public void setMovesLeft(int movesLeft) {
-        this.movesLeft = movesLeft;
-    }
-
-    /**
-     * Compares this <code>PathNode</code>'s {@link #getF f} with the
-     * <code>f</code> of the given object.
-     *
-     * <br><br>
-     *
-     * Note: this class has a natural ordering that is inconsistent with equals.
-     *
-     * @param o the object to be compared.
-
-     * @return A negative integer, zero or a positive integer as this
-     *         object is less than, equal to, or greater than the
-     *         specified object.
-     * @exception ClassCastException if the given object is not a
-     *         <code>PathNode</code>.
-     */
-    public int compareTo(PathNode o) {
-        return o.getF() - f;
-    }
-
-    /**
-     * Checks if this <code>PathNode</code> is equal to another object.
-     *
-     * @param o The <code>Object</code> to compare with.
-     * @return <code>true</code> if the given object is a
-     *      <code>PathNode</code> with the same {@link #getTile()}
-     *      tile as this one.
-     */
-    public boolean equals(Object o) {
-        if (!(o instanceof PathNode)) {
-            return false;
-        } else {
-            return tile.getId().equals(((PathNode) o).getTile().getId());
-        }
-    }
-
-    /**
-     * Returns the hashCode of this object.
-     */
-    public int hashCode() {
-        return tile.getX() * 10000 + tile.getY();
-    }
-
-    /**
-     * Debug helper.
+     * {@inherit-doc}
      */
     public String toString() {
-        return "PathNode"
-            + " tile=\"" + tile.getId() + "(" + Integer.toString(tile.getX())
-            + "," + Integer.toString(tile.getY()) + ")\""
-            + " cost=\"" + Integer.toString(cost) + "\""
-            + " f=\"" + Integer.toString(f) + "\""
-            + " direction=\"" + String.valueOf(direction) + "\""
-            + " movesLeft=\"" + Integer.toString(movesLeft) + "\""
-            + " turns=\"" + Integer.toString(turns) + "\""
-            + " onCarrier=\"" + Boolean.toString(onCarrier) + "\""
-            ;
+        return "PathNode loc=" + ((FreeColGameObject)location).getId()
+            + " movesLeft=" + Integer.toString(movesLeft)
+            + " turns=" + Integer.toString(turns)
+            + " onCarrier=" + Boolean.toString(onCarrier)
+            + " direction=" + getDirection();
     }
 
     /**
@@ -310,11 +290,10 @@ public class PathNode implements Comparable<PathNode> {
      */
     public String fullPathToString() {
         StringBuilder sb = new StringBuilder(500);
-        PathNode p = this;
-        while (p != null) {
+        PathNode p;
+        for (p = this; p != null; p = p.next) {
             sb.append(p.toString());
             sb.append("\n");
-            p = p.next;
         }
         return sb.toString();
     }
