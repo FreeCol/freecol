@@ -266,6 +266,11 @@ public class ChangeSet {
          */
         public void attachToElement(Element element) {
         }
+
+        /**
+         * Debug helper.
+         */
+        public abstract String toString();
     }
 
     /**
@@ -337,6 +342,15 @@ public class ChangeSet {
             }
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName()
+                + " " + attacker.getId() + " " + success
+                + " " + defender.getId() + "]";
+        } 
     }
 
     /**
@@ -399,6 +413,13 @@ public class ChangeSet {
         public void attachToElement(Element element) {
             element.setAttribute(key, value);
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + key + " " + value + "]";
+        } 
     }
 
     /**
@@ -441,6 +462,14 @@ public class ChangeSet {
             Element element = message.toXMLElement();
             return (Element) doc.importNode(element, true);
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + priority
+                + " " + message + "]";
+        } 
     }
 
     /**
@@ -544,6 +573,15 @@ public class ChangeSet {
             }
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + unit.getId()
+                + " " + ((FreeColGameObject)oldLocation).getId()
+                + " " + newTile.getId() + "]";
+        } 
     }
 
     /**
@@ -618,6 +656,13 @@ public class ChangeSet {
                                                   false, false));
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + fcgo.getId() + "]";
+        } 
     }
 
     /**
@@ -673,6 +718,15 @@ public class ChangeSet {
                                                   false, false, fields));
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            String ret = "[" + getClass().getName() + " " + fcgo.getId();
+            for (String f : fields) ret += " " + f;
+            return ret + "]";
+        } 
     }
 
     private static class RemoveChange extends Change {
@@ -714,9 +768,12 @@ public class ChangeSet {
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return tile != null && serverPlayer.canSee(tile)
-                && (tile.getSettlement() == null
-                    || (ServerPlayer) tile.getSettlement().getOwner() == serverPlayer);
+            Settlement settlement;
+            return tile != null 
+                && serverPlayer.canSee(tile)
+                && ((settlement = tile.getSettlement()) == null
+                    || settlement.isDisposed()
+                    || (ServerPlayer)settlement.getOwner() == serverPlayer);
         }
 
         /**
@@ -731,7 +788,7 @@ public class ChangeSet {
             // The main object may be visible, but the contents are by
             // only visible if the deeper ownership test succeeds.
             if (fcgo instanceof Ownable
-                && ((Ownable) fcgo).getOwner() == serverPlayer) {
+                && ((Ownable)fcgo).getOwner() == serverPlayer) {
                 for (FreeColGameObject o : contents) {
                     element.appendChild(o.toXMLElementPartial(doc));
                 }
@@ -741,6 +798,16 @@ public class ChangeSet {
             element.appendChild(fcgo.toXMLElementPartial(doc));
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            String ret = "[" + getClass().getName()
+                + " " + ((tile == null) ? "<null>" : tile.getId());
+            for (FreeColGameObject f : contents) ret += " " + f.getId();
+            return ret + " " + fcgo.getId() + "]";
+        } 
     }
 
     /**
@@ -784,6 +851,13 @@ public class ChangeSet {
             element.appendChild(child);
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + fco.getId() + "]";
+        } 
     }
 
     private static class SpyChange extends Change {
@@ -827,6 +901,13 @@ public class ChangeSet {
                                                   false, false));
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + tile.getId() + "]";
+        } 
     }
 
     /**
@@ -876,6 +957,14 @@ public class ChangeSet {
             element.setAttribute("second", second.getId());
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName() + " " + first.getId()
+                + " " + stance + " " + second.getId() + "]";
+        } 
     }
 
     /**
@@ -927,6 +1016,16 @@ public class ChangeSet {
             }
             return element;
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            String ret = "[" + getClass().getName() + " " + priority
+                + " " + name;
+            for (String a : attributes) ret += " " + a;
+            return ret + "]";
+        } 
     }
 
     /**
@@ -1364,4 +1463,15 @@ public class ChangeSet {
         return result;
     }
 
+    /**
+     * {@inherit-doc}
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Change c : changes) {
+            sb.append(c.toString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }
