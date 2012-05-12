@@ -154,7 +154,12 @@ public final class InGameController implements NetworkConstants {
      * Informs this controller that a game has been newly loaded.
      */
     public void setGameConnected () {
-       turnsPlayed = 0;
+        turnsPlayed = 0;
+        Player player = freeColClient.getMyPlayer();
+        if (player != null) {
+            player.refilterModelMessages(freeColClient.getClientOptions());
+        }
+        gui.updateMenuBar();
     }
 
     /**
