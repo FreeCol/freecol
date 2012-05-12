@@ -85,7 +85,7 @@ public class ChangeSet {
     private static Comparator<Change> changeComparator
         = new Comparator<Change>() {
         public int compare(final Change c1, final Change c2) {
-            return c1.sortPriority() - c2.sortPriority();
+            return c1.getPriority() - c2.getPriority();
         }
     };
 
@@ -186,12 +186,27 @@ public class ChangeSet {
             return this;
         }
 
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            String ret = (type == ALL) ? "ALL" : (type == PERHAPS) ? "PERHAPS"
+                : (type == ONLY) ? "ONLY" : "BADTYPE";
+            if (seeAlways != null) ret += ",always(" + seeAlways.getId() + ")";
+            if (seePerhaps != null) ret += ",perhaps(" + seePerhaps.getId() + ")";
+            if (seeNever != null) ret += ",never(" + seeNever.getId() + ")";
+            return ret;
+        }
     }
 
     // Abstract template for all types of Change.
     private abstract static class Change {
 
+        /**
+         * The visibility of the change.
+         */
         protected See see;
+
 
         /**
          * Make a new Change.
@@ -201,10 +216,10 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority of a change, to be used by the
+         * Gets the sort priority of a change, to be used by the
          * changeComparator.
          */
-        public abstract int sortPriority();
+        public abstract int getPriority();
 
         /**
          * Should a player be notified of this Change?
@@ -221,8 +236,11 @@ public class ChangeSet {
          * visibility is delegated to the change type, allowing
          * special change-specific overrides.
          *
+         * This is false by default, subclasses should override when
+         * special case handling is required.
+         *
          * @param serverPlayer The <code>ServerPlayer</code> to consider.
-         * @return False.  This is the default, to be overridden as required.
+         * @return False.
          */
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return false;
@@ -297,11 +315,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_ANIMATION".
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
 
@@ -347,7 +365,8 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName()
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
                 + " " + attacker.getId() + " " + success
                 + " " + defender.getId() + "]";
         } 
@@ -374,11 +393,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_ATTRIBUTE", attributes are special.
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_ATTRIBUTE.getPriority();
         }
 
@@ -418,7 +437,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + key + " " + value + "]";
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + key + "=" + value + "]";
         } 
     }
 
@@ -443,11 +464,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return The priority.
          */
-        public int sortPriority() {
+        public int getPriority() {
             return priority.getPriority();
         }
 
@@ -467,7 +488,8 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + priority
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
                 + " " + message + "]";
         } 
     }
@@ -510,11 +532,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_ANIMATION"
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
 
@@ -578,7 +600,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + unit.getId()
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + unit.getId()
                 + " " + ((FreeColGameObject)oldLocation).getId()
                 + " " + newTile.getId() + "]";
         } 
@@ -602,11 +626,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_UPDATE"
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_UPDATE.getPriority();
         }
 
@@ -661,7 +685,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + fcgo.getId() + "]";
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + fcgo.getId() + "]";
         } 
     }
 
@@ -685,11 +711,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return CHANGE_UPDATE.  Special update, but still an update.
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_UPDATE.getPriority();
         }
 
@@ -723,7 +749,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + fcgo.getId();
+            String ret = "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + fcgo.getId();
             for (String f : fields) ret += " " + f;
             return ret + "]";
         } 
@@ -750,11 +778,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_REMOVE"
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_REMOVE.getPriority();
         }
 
@@ -803,7 +831,8 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            String ret = "[" + getClass().getName()
+            String ret = "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
                 + " " + ((tile == null) ? "<null>" : tile.getId());
             for (FreeColGameObject f : contents) ret += " " + f.getId();
             return ret + " " + fcgo.getId() + "]";
@@ -828,11 +857,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_OWNER"
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_OWNED.getPriority();
         }
 
@@ -856,7 +885,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + fco.getId() + "]";
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + fco.getId() + "]";
         } 
     }
 
@@ -875,11 +906,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return priority.
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_NORMAL.getPriority();
         }
 
@@ -906,7 +937,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + tile.getId() + "]";
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + tile.getId() + "]";
         } 
     }
 
@@ -934,11 +967,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return "CHANGE_STANCE"
          */
-        public int sortPriority() {
+        public int getPriority() {
             return ChangePriority.CHANGE_STANCE.getPriority();
         }
 
@@ -962,7 +995,9 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + first.getId()
+            return "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
+                + " " + first.getId()
                 + " " + stance + " " + second.getId() + "]";
         } 
     }
@@ -994,11 +1029,11 @@ public class ChangeSet {
         }
 
         /**
-         * The sort priority.
+         * Gets the sort priority.
          *
          * @return priority.
          */
-        public int sortPriority() {
+        public int getPriority() {
             return priority;
         }
 
@@ -1021,7 +1056,8 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + priority
+            String ret = "[" + getClass().getName() + " " + see.toString()
+                + " #" + getPriority()
                 + " " + name;
             for (String a : attributes) ret += " " + a;
             return ret + "]";
