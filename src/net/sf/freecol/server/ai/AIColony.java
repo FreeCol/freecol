@@ -356,14 +356,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         boolean preferScouts = aiPlayer.preferScoutsToSoldiers();
         Colony scratch = colonyPlan.assignWorkers(workers, preferScouts);
         if (scratch == null) {
-            for (UnitWas w : was) {
-                Unit u = w.getUnit();
-                if (u.getLocation() != w.getLocation()) {
-                    u.setLocation(w.getLocation());
-                }
-                if (u.getWorkType() != w.getWorkType()) {
-                    u.setWorkType(w.getWorkType());
-                }
+            if (!UnitWas.revertAll(was)) {
+                String complain = "Failed to revert:";
+                for (UnitWas w : was) complain += " " + w.getUnit() + ",";
+                logger.warning(complain.substring(0, complain.length()-1));
             }
             rearrangeTurn = new Turn(turn + 1);
             return false;

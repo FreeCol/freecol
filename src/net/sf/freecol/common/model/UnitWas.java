@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -30,7 +33,7 @@ import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
  * Helper container to remember a unit state prior to some change,
  * and fire off any consequent property changes.
  */
-public class UnitWas {
+public class UnitWas implements Comparable<UnitWas> {
 
     private static final Logger logger = Logger.getLogger(UnitWas.class.getName());
 
@@ -63,6 +66,92 @@ public class UnitWas {
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().saveState();
         }
+    }
+
+    /**
+     * Compares this UnitWas with another.
+     *
+     * Order by decreasing capacity of the location the unit is to be
+     * moved to, so that if we traverse a sorted list of UnitWas we
+     * minimize the chance of a unit being moved to a full location.
+     * Unfortunately this also tends to move units that need equipment
+     * first, leading to failures to rearm, so it is best to make two
+     * passes anyway.  See revertAll() below.  However we can still
+     * try our best by using the amount of equipment the unit needs as
+     * a secondary criterion (favouring the least equipped).
+     *
+     * @param modifier a <code>Modifier</code> value
+     * @return an <code>int</code> value
+     */
+    public int compareTo(UnitWas uw) {
+        int cmp = ((UnitLocation)uw.loc).getUnitCapacity()
+            - ((UnitLocation)this.loc).getUnitCapacity();
+        if (cmp != 0) return cmp;
+        return this.equipment.keySet().size() - uw.equipment.keySet().size();
+    }
+
+    /**
+     * Reverts the unit to the previous state, if possible.
+     *
+     * @return True if the reversion succeeds.
+     */
+    public boolean revert() {
+        if (unit.isDisposed()
+            || unit.getType() != type) return false;
+
+        if (unit.getLocation() != loc) {
+            unit.setLocation(loc);
+        }
+        if (unit.getWorkType() != work) {
+            unit.setWorkType(work);
+        }
+
+        if (unit.getRole() != role) { // Try to restore role equipment.
+            if (colony == null || unit.getColony() != colony) return false;
+            Set<EquipmentType> eq = new HashSet<EquipmentType>();
+            TypeCountMap<EquipmentType> unitEquipment = unit.getEquipment();
+            eq.addAll(equipment.keySet());
+            eq.addAll(unitEquipment.keySet());
+            // Give back first, avoiding incompatible equipment problems.
+            for (EquipmentType et : eq) {
+                int count = equipment.getCount(et) - unitEquipment.getCount(et);
+                if (count < 0) {
+                    unit.changeEquipment(et, count);
+                    colony.addEquipmentGoods(et, -count);
+                }
+            }
+            for (EquipmentType et : eq) {
+                int count = equipment.getCount(et) - unitEquipment.getCount(et);
+                if (count > 0 && colony.canProvideEquipment(et)
+                    && unit.canBeEquippedWith(et)) {
+                    unit.changeEquipment(et, count);
+                    colony.addEquipmentGoods(et, -count);
+                }
+            }
+        }
+        return unit.getRole() == role;
+    }
+
+    /**
+     * Tries hard to revert all of a list of UnitWas.
+     *
+     * @param was The list of <code>UnitWas</code> to revert (the reverted
+     *     members will be removed from this list).
+     * @return True if the reversion was complete.
+     */
+    public static boolean revertAll(List<UnitWas> was) {
+        Collections.sort(was);
+        List<UnitWas> retry = new ArrayList<UnitWas>();
+        while (!was.isEmpty()) {
+            UnitWas w = was.remove(0);
+            if (!w.revert()) retry.add(w);
+        }
+        Collections.sort(retry);
+        while (!retry.isEmpty()) {
+            UnitWas w = was.remove(0);
+            if (!w.revert()) was.add(w);
+        }
+        return was.isEmpty();
     }
 
     /**
