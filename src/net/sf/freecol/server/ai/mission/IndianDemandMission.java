@@ -48,6 +48,8 @@ public class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
+    private static final String tag = "AI native demander";
+
     /** The <code>Colony</code> receiving the demand. */
     private Colony target;
 
@@ -114,8 +116,8 @@ public class IndianDemandMission extends Mission {
                     Goods tribute = container.removeGoods(goods.getType());
                     is.addGoods(tribute);
                 }
-                logger.info("IndianDemand by " + unit
-                            + " complete, tribute unloaded at " + is.getName());
+                logger.finest(tag + " completed unloading tribute at "
+                    + is.getName() + ": " + unit);
                 completed = true;
             }
         } else {
@@ -151,10 +153,11 @@ public class IndianDemandMission extends Mission {
                     au.abortMission("completed demand");
                 }
                 if (accepted) {
-                    logger.info("Indian demand by " + unit
+                    logger.finest(tag + " demand "
                         + " accepted at " + target.getName()
                         + " tribute: " + ((goods != null) ? goods.toString()
-                            : (Integer.toString(gold) + " gold")));
+                            : (Integer.toString(gold) + " gold"))
+                        + ": " + unit);
                 } else { // If the demand was rejected and not content, attack.
                     int unitTension = (unit.getIndianSettlement() == null) ? 0
                         : unit.getIndianSettlement().getAlarm(enemy).getValue();
@@ -165,15 +168,16 @@ public class IndianDemandMission extends Mission {
                             .getDirection(target.getTile());
                         if (d != null) AIMessage.askAttack(au, d);
                     }
-                    logger.info("Indian demand by " + unit
-                        + " refused at " + target.getName());
+                    logger.finest(tag + " demand "
+                        + " refused at " + target.getName()
+                        + ": " + unit);
                 }
                 return;
             }
         }
 
         // Walk in a random direction if we have any moves left:
-        moveRandomly();
+        moveRandomly(tag, null);
     }
 
     /**

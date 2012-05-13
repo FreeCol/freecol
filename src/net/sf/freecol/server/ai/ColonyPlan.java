@@ -63,15 +63,16 @@ import org.w3c.dom.Element;
  * Objects of this class describes the plan the AI has for a
  * <code>Colony</code>.
  *
- * A <code>ColonyPlan</code> contains a list of {@link
- * WorkLocationPlan}s which suggests the food and non-food production
- * of each {@link WorkLocation}, and a list of {@link BuildableType}s
- * to build.  It takes account of the available tiles and building
- * production, but does not make decisions to claim tiles or change
- * the current buildable.  It does takes account of goods present in
- * the colony, and overall colony size but not the exact composition
- * of the units involved.  However there is extensive structure for
- * making a trial assignment of workers in {@link assignWorkers}.
+ * A <code>ColonyPlan</code> contains a list of
+ * {@link WorkLocationPlan}s which suggests the food and non-food
+ * production of each {@link WorkLocation}, and a list of
+ * {@link BuildableType}s to build.  It takes account of the available
+ * tiles and building production, but does not make decisions to claim
+ * tiles or change the current buildable.  It does takes account of
+ * goods present in the colony, and overall colony size but not the
+ * exact composition of the units involved.  However there is
+ * extensive structure for making a trial assignment of workers in
+ * {@link assignWorkers}.
  *
  * {@link AIColony.rearrangeWorkers} is responsible for making
  * the real decisions.

@@ -38,16 +38,13 @@ import org.w3c.dom.Element;
  * Objects of this class contains AI-information for a single {@link
  * net.sf.freecol.common.model.WorkLocation}.
  */
-public class WorkLocationPlan extends ValuedAIObject {
+public class WorkLocationPlan extends AIObject {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
 
     /** The work location the plan is for. */
     private WorkLocation workLocation;
-
-    /** The plan priority. */
-    private int priority;
 
     /** The goods to produce. */
     private GoodsType goodsType;
@@ -68,7 +65,7 @@ public class WorkLocationPlan extends ValuedAIObject {
 
         this.workLocation = workLocation;
         this.goodsType = goodsType;
-        setValue(getProductionOf(goodsType));
+
         uninitialized = false;
     }
 
@@ -81,8 +78,6 @@ public class WorkLocationPlan extends ValuedAIObject {
      */
     public WorkLocationPlan(AIMain aiMain, Element element) {
         super(aiMain, element);
-
-        setValue(getProductionOf(goodsType));
     }
 
 
@@ -97,94 +92,26 @@ public class WorkLocationPlan extends ValuedAIObject {
     }
 
     /**
-     * Gets the production of the given type of goods according to
-     * this <code>WorkLocationPlan</code>. The plan has been created
-     * for either a {@link net.sf.freecol.common.model.ColonyTile} or
-     * a {@link net.sf.freecol.common.model.Building}. If this is a
-     * plan for a <code>ColonyTile</code> then the maximum possible
-     * production of the tile gets returned, while the
-     * <code>Building</code>-plans only returns a number used for
-     * identifying the value of the goods produced.
+     * Gets the type of goods which should be produced at the
+     * <code>WorkLocation</code>.
      *
-     * @param goodsType The type of goods to get the production for.
-     * @return The production.
+     * @return The type of goods.
+     * @see net.sf.freecol.common.model.Goods
+     * @see net.sf.freecol.common.model.WorkLocation
      */
-    public int getProductionOf(GoodsType goodsType) {
-        if (goodsType == null || goodsType != this.goodsType) {
-            return 0;
-        }
-
-        if (workLocation instanceof ColonyTile) {
-            if (!goodsType.isFarmed()) {
-                return 0;
-            }
-
-            ColonyTile ct = (ColonyTile) workLocation;
-            Tile t = ct.getWorkTile();
-            UnitType expertUnitType = getSpecification().getExpertForProducing(goodsType);
-
-            int base = t.getMaximumPotential(goodsType, expertUnitType);
-
-            if (t.isLand() && base != 0) {
-                base++;
-            }
-            /**
-             * What's this supposed to be? Are we checking for the
-             * possible production bonus granted by Henry Hudson? If
-             * so, we should check all possible production bonuses instead.
-             *
-             * return expertUnitType.getProductionFor(goodsType, base) * ((goodsType == Goods.FURS) ? 2 : 1);
-             */
-            if (base == 0) {
-                return 0;
-            }
-
-            base = (int) expertUnitType.applyModifier(base, goodsType.getId());
-            return Math.max(base, 1);
-
-        } else {
-            if (goodsType.isFarmed()) {
-                return 0;
-            } else {
-                /* These values are not really the production, but are
-                   being used while sorting the WorkLocationPlans:
-                */
-
-                if (goodsType == getSpecification().getGoodsType("model.goods.hammers")) {
-                    return 16;
-                } else if (goodsType == getSpecification().getGoodsType("model.goods.bells")) {
-                    return 12;
-                } else if (goodsType == getSpecification().getGoodsType("model.goods.crosses")) {
-                    return 10;
-                } else {
-                    return workLocation.getColony().getOwner().getMarket().getSalePrice(goodsType, 1);
-                }
-            }
-        }
-    }
-
-    /**
-    * Gets the type of goods which should be produced at the <code>WorkLocation</code>.
-    *
-    * @return The type of goods.
-    * @see net.sf.freecol.common.model.Goods
-    * @see net.sf.freecol.common.model.WorkLocation
-    */
     public GoodsType getGoodsType() {
         return goodsType;
     }
 
-
     /**
-    * Sets the type of goods to be produced at the <code>WorkLocation</code>.
-    *
-    * @param goodsType The type of goods.
-    * @see net.sf.freecol.common.model.Goods
-    * @see net.sf.freecol.common.model.WorkLocation
-    */
+     * Sets the type of goods to be produced at the <code>WorkLocation</code>.
+     *
+     * @param goodsType The type of goods.
+     * @see net.sf.freecol.common.model.Goods
+     * @see net.sf.freecol.common.model.WorkLocation
+     */
     public void setGoodsType(GoodsType goodsType) {
         this.goodsType = goodsType;
-        setValue(getProductionOf(goodsType));
     }
 
 
@@ -204,7 +131,6 @@ public class WorkLocationPlan extends ValuedAIObject {
         Element element = document.createElement(getXMLElementTagName());
 
         element.setAttribute(ID_ATTRIBUTE, workLocation.getId());
-        element.setAttribute("priority", Integer.toString(priority));
         element.setAttribute("goodsType", goodsType.getId());
 
         return element;
@@ -220,8 +146,6 @@ public class WorkLocationPlan extends ValuedAIObject {
         String str = element.getAttribute(ID_ATTRIBUTE);
         workLocation = getAIMain().getGame()
             .getFreeColGameObject(str, WorkLocation.class);
-
-        priority = Integer.parseInt(element.getAttribute("priority"));
 
         str = element.getAttribute("goodsType");
         goodsType = getSpecification().getGoodsType(str);

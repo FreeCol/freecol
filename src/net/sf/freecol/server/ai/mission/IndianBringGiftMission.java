@@ -44,9 +44,6 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * Mission for bringing a gift to a specified player.
  *
- * <BR>
- * <BR>
- *
  * The mission has three different tasks to perform:
  * <ol>
  * <li>Get the gift (goods) from the {@link IndianSettlement} that owns the
@@ -58,6 +55,8 @@ import net.sf.freecol.server.ai.AIUnit;
 public class IndianBringGiftMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
+
+    private static final String tag = "AI native gifter";
 
     /** The <code>Colony</code> receiving the gift. */
     private Colony target;
@@ -150,18 +149,18 @@ public class IndianBringGiftMission extends Mission {
                     && AIMessage.askDeliverGift(getAIUnit(), target,
                                                 getUnit().getGoodsIterator().next())) {
                     AIMessage.askCloseTransaction(getAIUnit(), target);
-                    logger.info("IndianBringGift for " + getUnit().getId()
-                                + " delivered at " + target.getName());
+                    logger.finest(tag + " completed at " + target.getName()
+                        + ": " + getUnit());
                 } else {
-                    logger.warning("IndianBringGift for " + getUnit().getId()
-                                   + " failed at " + target.getName());
+                    logger.warning(tag + " failed at " + target.getName()
+                        + ": " + getUnit());
                 }
                 completed = true;
             }
         }
 
         // Walk in a random direction if we have any moves left:
-        moveRandomly();
+        moveRandomly(tag, null);
     }
 
     /**

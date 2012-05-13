@@ -249,7 +249,7 @@ public class Map extends FreeColGameObject implements Location {
             ret[0] = this;
 
             int step = 1, mask = 1, ord = this.ordinal();
-            for (int i = 1; i < NUMBER_OF_DIRECTIONS; i += 2) {
+            for (int i = 1; i < NUMBER_OF_DIRECTIONS - 1; i += 2) {
                 Direction dr = this.rotate(step);
                 Direction dl = this.rotate(NUMBER_OF_DIRECTIONS - step);
                 ret[i] = ((r & mask) == 0) ? dr : dl;

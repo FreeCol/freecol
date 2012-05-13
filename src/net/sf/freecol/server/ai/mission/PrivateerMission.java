@@ -164,7 +164,7 @@ public class PrivateerMission extends Mission {
             target = null;
             logger.finest("Privateer at " + unit.getTile()
                           + " without target, wandering");
-        	moveRandomly();
+            moveRandomly(tag, null);
         }
         // some movement points may still remain
     	//due to some block or just not enough points for next node

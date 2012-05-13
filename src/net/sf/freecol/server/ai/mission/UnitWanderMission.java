@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -37,6 +38,8 @@ public class UnitWanderMission extends Mission {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderMission.class.getName());
+
+    private static final String tag = "AI wanderer";
 
 
     /**
@@ -84,15 +87,21 @@ public class UnitWanderMission extends Mission {
     }
 
     /**
-     * Performs the mission. This is done by moving in a random direction
-     * until the move points are zero or the unit gets stuck.
+     * Performs the mission.  Just move in a random direction until
+     * the move points are zero or the unit gets stuck.
      */
     public void doMission() {
-        Unit unit = getUnit();
-
-        while (unit.getMovesLeft() > 0) {
-            moveRandomly();
+        final Unit unit = getUnit();
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        } else if (unit.getTile() == null) {
+            logger.warning(tag + " not on the map: " + unit);
+            return;
         }
+
+        Direction d = Direction.getRandomDirection(tag, getAIRandom());
+        while ((d = moveRandomly(tag, d)) != null);
     }
 
 

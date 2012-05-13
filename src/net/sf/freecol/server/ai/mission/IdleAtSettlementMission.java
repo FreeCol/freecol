@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -39,6 +40,8 @@ import net.sf.freecol.server.ai.AIUnit;
 public class IdleAtSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IdleAtSettlementMission.class.getName());
+
+    private static final String tag = "AI idler";
 
 
     /**
@@ -107,7 +110,7 @@ public class IdleAtSettlementMission extends Mission {
     public void doMission() {
         final Unit unit = getUnit();
         if (unit == null || unit.isDisposed()) {
-            logger.warning("AI idler broken: " + unit);
+            logger.warning(tag + " broken: " + unit);
             return;
         }
 
@@ -119,10 +122,10 @@ public class IdleAtSettlementMission extends Mission {
 
         PathNode path = unit.findOurNearestOtherSettlement();
         if (path != null) {
-            travelToTarget("AI idler", path.getLastNode().getTile());
+            travelToTarget(tag, path.getLastNode().getTile());
         } else { // Just make a random move if no target can be found.
-            moveRandomly();
-            logger.finest("AI idler wandered randomly: " + unit);
+            Direction d = Direction.getRandomDirection(tag, getAIRandom());
+            while ((d = moveRandomly(tag, d)) != null);
         }
     }
 

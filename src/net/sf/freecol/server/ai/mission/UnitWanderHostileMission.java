@@ -25,8 +25,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIMain;
@@ -35,14 +37,15 @@ import net.sf.freecol.server.ai.AIUnit;
 
 
 /**
- * Mission for attacking any unit owned by a player we do not like that
- * is within a radius of 1 tile. If no such unit can be found; just
- * wander around.
+ * Mission for wandering around, attacking targets owned by a player we 
+ * do not like.
  */
 public class UnitWanderHostileMission extends Mission {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
+
+    private static final String tag = "AI hostile-wanderer";
 
 
     /**
@@ -78,36 +81,72 @@ public class UnitWanderHostileMission extends Mission {
 
 
     /**
+     * Looks for a target of opportunity, move to it and attack.
+     * Pretend to be a UnitSeekAndDestroyMission which has the targeting
+     * code.
+     *
+     * @param aiUnit The <code>AIUnit</code> that attacks.
+     * @return True if the move is completed by this action.
+     */
+    private boolean seekAndAttack(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        if (!unit.isOffensiveUnit()) return false;
+        PathNode path = Mission.findTargetPath(aiUnit, 1,
+                                               UnitSeekAndDestroyMission.class);
+        Location target = UnitSeekAndDestroyMission.extractTarget(aiUnit, path);
+        if (target == null) return false;
+        Unit.MoveType mt = travelToTarget(tag, target);
+        switch (mt) {
+        case MOVE_NO_MOVES:
+            logger.finest(tag + " en route to " + target + ": " + unit);
+            break;
+        case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+            Tile unitTile = unit.getTile();
+            Settlement settlement = unitTile.getSettlement();
+            if (settlement != null && settlement.getUnitCount() < 2) {
+                // Do not risk attacking out of a settlement that
+                // might collapse.  Defend instead.
+                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
+                        aiUnit, settlement));
+                break;
+            }
+            Direction dirn = unitTile.getDirection(target.getTile());
+            if (dirn == null) {
+                throw new IllegalStateException("No direction");
+            }
+            logger.finest(tag + " attacking " + target + ": " + unit);
+            AIMessage.askAttack(aiUnit, dirn);
+            break;
+        default:
+            logger.finest(tag + " unexpected move type: " + mt
+                + ": " + unit);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Performs the mission. This is done by searching for hostile units
      * that are located within one tile and attacking them. If no such units
      * are found, then wander in a random direction.
      */
     public void doMission() {
-        Unit unit = getUnit();
-        if (!(unit.getLocation() instanceof Tile)) {
+        final Unit unit = getUnit();
+        if (unit == null || unit.isDisposed()) {
+            logger.warning(tag + " broken: " + unit);
+            return;
+        } else if (unit.getTile() == null) {
+            logger.warning(tag + " not on the map: " + unit);
             return;
         }
 
-        PathNode pathToTarget = null;
-        if (unit.isOffensiveUnit()) {
-            pathToTarget = findTarget(5);
-        }
-
-        if (pathToTarget != null) {
-            Direction direction = moveTowards(pathToTarget);
-            if (direction != null && unit.getMoveType(direction).isAttack()) {
-                if (unit.getTile().getSettlement() != null
-                    && unit.getTile().getSettlement().getUnitCount() < 2) {
-                    // Do not risk attacking out of a settlement that
-                    // might collapse.
-                } else {
-                    AIMessage.askAttack(getAIUnit(), direction);
-                }
-            }
-        } else {
-            // Just make a random move if no target can be found.
-            moveRandomly();
-        }
+        // Make random moves in a reasonably consistent direction,
+        // checking for a target along the way.
+        final AIUnit aiUnit = getAIUnit();
+        Direction d = Direction.getRandomDirection(tag, getAIRandom());
+        while (unit.getMovesLeft() > 0
+            && !seekAndAttack(aiUnit)
+            && (d = moveRandomly(tag, d)) != null);
     }
 
     /**

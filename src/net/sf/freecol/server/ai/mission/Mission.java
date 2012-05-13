@@ -225,25 +225,33 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Move a unit randomly.
+     * Moves a unit one step randomly.
+     *
+     * @param logMe A string to log the random number generation with.
+     * @param direction An optional preferred <code>Direction</code>.
+     * @return The direction of the move, or null if no move was made.
      */
-    protected void moveRandomly() {
-        Unit unit = getUnit();
-        Direction[] randomDirections
-            = Direction.getRandomDirections("moveRandomly", getAIRandom());
+    protected Direction moveRandomly(String tag, Direction direction) {
+        final Unit unit = getUnit();
+        if (unit.getMovesLeft() <= 0) return null;
+        if (tag == null) tag = "moveRandomly";
 
-        while (isValid() && unit.getMovesLeft() > 0) {
-            Tile thisTile = getUnit().getTile();
-            for (int j = 0; j < randomDirections.length; j++) {
-                Direction direction = randomDirections[j];
-                if (thisTile.getNeighbourOrNull(direction) != null
-                    && unit.getMoveType(direction) == MoveType.MOVE) {
-                    AIMessage.askMove(aiUnit, direction);
-                    break;
-                }
-            }
-            unit.setMovesLeft(0);
+        Random aiRandom = getAIRandom();
+        if (direction == null) {
+            direction = Direction.getRandomDirection(tag, aiRandom);
         }
+
+        Direction[] directions
+            = direction.getClosestDirections(tag, aiRandom);
+        for (int j = 0; j < directions.length; j++) {
+            Direction d = directions[j];
+            if (unit.getTile().getNeighbourOrNull(d) != null
+                && unit.getMoveType(d) == MoveType.MOVE) {
+                AIMessage.askMove(aiUnit, d);
+                return d;
+            }
+        }
+        return null; // Stuck!
     }
 
     /**
