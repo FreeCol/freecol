@@ -738,6 +738,27 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Builds a simple goal decider to find a single target tile.
+     *
+     * @param target The target <code>Tile</code>.
+     * @return A simple <code>GoalDecider</code> that only succeeds for the
+     *     target tile.
+     */
+    private GoalDecider getTileGoalDecider(final Tile target) {
+        return new GoalDecider() {
+            private PathNode goal = null;
+
+            public PathNode getGoal() { return goal; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                if (path.getTile() != target) return false;
+                goal = path;
+                return true;
+            }
+        };
+    }
+
+    /**
      * Version of findPath that includes the start tile and generalized
      * start and end locations.
      *
@@ -773,13 +794,25 @@ public class Map extends FreeColGameObject implements Location {
                 return new PathNode(start, unit.getMovesLeft(), 0,
                                     carrier != null, null, null);
             } else {
+                // Search backwards from target to get best entry location.
                 path = search(moveUnit, (Tile)end,
                               europeGoalDecider, costDecider,
                               INFINITY, null, null);
                 if (path == null) return null;
-                path = new PathNode(end, path.getMovesLeft(), path.getTurns(),
-                    path.isOnCarrier(), null, path);
-                return path.reverse();
+                // Now search forward from there to get a path in the right
+                // order.
+                Tile entry = path.getLastNode().getTile();
+                path = search(moveUnit, entry,
+                              getTileGoalDecider((Tile)end), costDecider,
+                              INFINITY, null, null);
+                // At the front of the path insert a node for the
+                // starting location in Europe, correcting for the turns
+                // to sail to the entry location.
+                for (PathNode p = path; p != null; p = p.next) {
+                    p.setTurns(p.getTurns() + moveUnit.getSailTurns());
+                }
+                return new PathNode(start, moveUnit.getMovesLeft(), 0,
+                                    path.isOnCarrier(), null, path);
             }
         } else { // start instanceof Tile
             if (end instanceof Europe) {
@@ -787,32 +820,24 @@ public class Map extends FreeColGameObject implements Location {
                               europeGoalDecider, costDecider,
                               INFINITY, null, null);
                 if (path == null) return null;
+                // Append a final node for the European end point.
                 PathNode last = path.getLastNode();
-                last.next = new PathNode(end, last.getMovesLeft(), 
-                                         last.getTurns(), last.isOnCarrier(),
+                last.next = new PathNode(end, moveUnit.getInitialMovesLeft(), 
+                                         last.getTurns() + moveUnit.getSailTurns(),
+                                         last.isOnCarrier(),
                                          last, null);
                 return path;
             } else {
-                // Build a simple goal decider to find the end tile.
-                final GoalDecider gd = new GoalDecider() {
-                        private PathNode goal = null;
-
-                        public PathNode getGoal() { return goal; }
-                        public boolean hasSubGoals() { return false; }
-                        public boolean check(Unit u, PathNode path) {
-                            if (path.getTile() != (Tile)end) return false;
-                            goal = path;
-                            return true;
-                        }
-                    };
-                // Make a heuristic for the Manhatten distance to the end tile.
-                final SearchHeuristic sh = new SearchHeuristic() {
-                        public int getValue(Tile tile) {
-                            return tile.getDistanceTo((Tile)end);
-                        }
-                    };
-                return search(unit, (Tile)start, gd, costDecider, INFINITY,
-                              carrier, sh);
+                final Tile endTile = (Tile)end;
+                return search(unit, (Tile)start,
+                              getTileGoalDecider(endTile), costDecider,
+                              INFINITY, carrier,
+                              new SearchHeuristic() {
+                                  // Manhatten distance to the end tile.
+                                  public int getValue(Tile tile) {
+                                      return tile.getDistanceTo(endTile);
+                                  }
+                              });
             }
         }
     }
@@ -856,6 +881,9 @@ public class Map extends FreeColGameObject implements Location {
                                    goalDecider, costDecider,
                                    maxTurns, carrier, null);
             if (path == null) return null;
+            for (PathNode p = path; p != null; p = p.next) {
+                p.setTurns(p.getTurns() + moveUnit.getSailTurns());
+            }
             return new PathNode(start, moveUnit.getMovesLeft(), 0,
                                 carrier != null, null, path);
         }

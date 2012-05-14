@@ -142,6 +142,16 @@ public class PathNode {
     }
 
     /**
+     * Sets the number of turns it will take to reach this
+     * <code>PathNode</code>'s <code>Tile</code> in the path.
+     *
+     * @param turns The new number of turns.
+     */
+    public void setTurns(int turns) {
+        this.turns = turns;
+    }
+
+    /**
      * Checks if the unit using this path is still onboard its transport.
      *
      * @return <code>true</code> if the unit is still onboard a
@@ -247,29 +257,6 @@ public class PathNode {
      */
     public int getCost() {
         return getCost(turns, movesLeft);
-    }
-
-    /**
-     * Reverses this path.
-     * Only operates on the forward part of the path, any previous part will
-     * be dropped.
-     * Beware of the side-effect!
-     *
-     * @return The reversed path.
-     */
-    public PathNode reverse() {
-        PathNode result = this;
-        PathNode curr = this.next;
-        result.next = null;
-        while (curr != null) {
-            PathNode next = curr.next;
-            curr.next = result;
-            result.previous = curr;
-            result = curr;
-            curr = next;
-        }
-        result.previous = null;
-        return result;            
     }
 
     /**
