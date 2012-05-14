@@ -98,7 +98,6 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 
 
-
 /**
  * The controller that will be used while the game is played.
  */
@@ -128,9 +127,12 @@ public final class InGameController implements NetworkConstants {
             }
         };
 
-    // A map of messages to be ignored.
+    /** A map of messages to be ignored. */
     private HashMap<String, Integer> messagesToIgnore
         = new HashMap<String, Integer>();
+
+    /** The messages in the last turn report. */
+    private ModelMessage[] turnReportMessages;
 
     private GUI gui;
 
@@ -383,6 +385,9 @@ public final class InGameController implements NetworkConstants {
         // Restart the selection cycle.
         moveMode = MODE_NEXT_ACTIVE_UNIT;
         turnsPlayed++;
+
+        // Clear outdated turn report messages.
+        turnReportMessages = null;
 
         // Inform the server of end of turn.
         askServer().endTurn();
@@ -1176,6 +1181,13 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Displays the messages in the current turn report.
+     */
+    public void displayTurnReportMessages() {
+        gui.showReportTurnPanel(turnReportMessages);
+    }
+
+    /**
      * Displays pending <code>ModelMessage</code>s.
      *
      * @param allMessages Display all messages or just the undisplayed ones.
@@ -1238,16 +1250,22 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (messages.size() > 0) {
-            final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
-            Runnable uiTask = new Runnable() {
-                    public void run() {
-                        if (endOfTurn) {
-                            gui.showReportTurnPanel(a);
-                        } else {
+            Runnable uiTask;
+            if (endOfTurn) {
+                turnReportMessages = messages.toArray(new ModelMessage[0]);
+                uiTask = new Runnable() {
+                        public void run() {
+                            displayTurnReportMessages();
+                        }
+                    };
+            } else {
+                final ModelMessage[] a = messages.toArray(new ModelMessage[0]);
+                uiTask = new Runnable() {
+                        public void run() {
                             gui.showModelMessages(a);
                         }
-                    }
-                };
+                    };
+            }
             freeColClient.getActionManager().update();
             if (SwingUtilities.isEventDispatchThread()) {
                 uiTask.run();

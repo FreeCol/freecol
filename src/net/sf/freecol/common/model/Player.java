@@ -38,11 +38,11 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
 
@@ -513,13 +513,15 @@ public class Player extends FreeColGameObject implements Nameable {
      * Refilters the current model messages, removing the ones that
      * are no longer valid.
      *
-     * @param options The <code>ClientOptions</code> for message display
+     * @param options The <code>OptionGroup</code> for message display
      *     to enforce.
      */
-    public void refilterModelMessages(ClientOptions options) {
+    public void refilterModelMessages(OptionGroup options) {
         for (ModelMessage m : new ArrayList<ModelMessage>(modelMessages)) {
-            BooleanOption op = options.getBooleanOption(m);
-            if (op != null && !op.getValue()) modelMessages.remove(m);
+            try {
+                String id = m.getMessageType().getOptionName();
+                if (!options.getBoolean(id)) modelMessages.remove(m);
+            } catch (Exception e) {};
         }
     }
 
