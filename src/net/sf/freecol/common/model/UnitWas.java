@@ -148,7 +148,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         Collections.sort(retry);
         while (!retry.isEmpty()) {
-            UnitWas w = was.remove(0);
+            UnitWas w = retry.remove(0);
             if (!w.revert()) was.add(w);
         }
         return was.isEmpty();
