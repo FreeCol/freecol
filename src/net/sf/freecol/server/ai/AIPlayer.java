@@ -368,6 +368,12 @@ public abstract class AIPlayer extends AIObject {
         return false;
     }
 
+    /**
+     * Resolves a diplomatic trade offer.
+     *
+     * @param agreement The proposed <code>DiplomaticTrade</code>.
+     * @return True if the agreement is accepted.
+     */
     public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
 
     /**
@@ -388,9 +394,10 @@ public abstract class AIPlayer extends AIObject {
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
-    public abstract int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold);
+    public abstract int buyProposition(Unit unit, Settlement settlement,
+                                       Goods goods, int gold);
 
     /**
      * Called when another <code>Player</code> proposes a sale.
@@ -402,9 +409,10 @@ public abstract class AIPlayer extends AIObject {
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
      */
-    public abstract int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold);
+    public abstract int sellProposition(Unit unit, Settlement settlement,
+                                        Goods goods, int gold);
 
     /**
      * Decides to accept a tax raise or not.
@@ -528,8 +536,8 @@ public abstract class AIPlayer extends AIObject {
         int defenders = 0;
         for (AIUnit au : getAIUnits()) {
             Mission m = au.getMission();
-            if (m != null && m instanceof DefendSettlementMission
-                && ((DefendSettlementMission) m).getTarget() == settlement
+            if (m instanceof DefendSettlementMission
+                && ((DefendSettlementMission)m).getTarget() == settlement
                 && au.getUnit().getSettlement() == settlement) {
                 defenders++;
             }

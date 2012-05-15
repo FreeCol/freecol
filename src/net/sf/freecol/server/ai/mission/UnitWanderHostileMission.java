@@ -108,7 +108,7 @@ public class UnitWanderHostileMission extends Mission {
                 // might collapse.  Defend instead.
                 aiUnit.setMission(new DefendSettlementMission(getAIMain(),
                         aiUnit, settlement));
-                break;
+                return true;
             }
             Direction dirn = unitTile.getDirection(target.getTile());
             if (dirn == null) {
@@ -120,7 +120,7 @@ public class UnitWanderHostileMission extends Mission {
         default:
             logger.finest(tag + " unexpected move type: " + mt
                 + ": " + unit);
-            return false;
+            break;
         }
         return true;
     }
@@ -144,9 +144,17 @@ public class UnitWanderHostileMission extends Mission {
         // checking for a target along the way.
         final AIUnit aiUnit = getAIUnit();
         Direction d = Direction.getRandomDirection(tag, getAIRandom());
-        while (unit.getMovesLeft() > 0
-            && !seekAndAttack(aiUnit)
-            && (d = moveRandomly(tag, d)) != null);
+        boolean moved = false;
+        while (unit.getMovesLeft() > 0) {
+            if (seekAndAttack(aiUnit)) return;
+            if ((d = moveRandomly(tag, d)) == null) break;
+            moved = true;
+        }
+        if (moved) {
+            logger.finest(tag + " moved to " + unit.getTile() + ": " + unit);
+        } else {
+            logger.finest(tag + " failed to move: " + unit);
+        }
     }
 
     /**

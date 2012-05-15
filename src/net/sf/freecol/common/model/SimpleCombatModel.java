@@ -684,7 +684,9 @@ public class SimpleCombatModel extends CombatModel {
      */
     private boolean isAmbush(FreeColGameObject attacker,
                              FreeColGameObject defender) {
-        return attacker.hasAbility("model.ability.ambushBonus")
-            || defender.hasAbility("model.ability.ambushPenalty");
+        return (attacker != null
+            && attacker.hasAbility("model.ability.ambushBonus"))
+            || (defender != null
+                && defender.hasAbility("model.ability.ambushPenalty"));
     }
 }

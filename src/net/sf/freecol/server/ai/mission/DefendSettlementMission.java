@@ -103,7 +103,6 @@ public class DefendSettlementMission extends Mission {
         return settlement;
     }
 
-
     /**
      * Is a settlement suitable for a defence mission?
      *
@@ -178,6 +177,16 @@ public class DefendSettlementMission extends Mission {
         return (path == null) ? null : extractTarget(aiUnit, path);
     }
 
+    /**
+     * Is a unit able to defend itself?
+     *
+     * @return True if the unit has some defence capability.
+     */
+    private static boolean isDefender(Unit unit) {
+        return unit.getGame().getCombatModel()
+            .getDefencePower(null, unit) > 0.0f;
+    }
+
 
     // Fake Transportable interface
 
@@ -214,7 +223,7 @@ public class DefendSettlementMission extends Mission {
      */
     public static boolean isValid(AIUnit aiUnit) {
         return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isDefensiveUnit()
+            && isDefender(aiUnit.getUnit())
             && aiUnit.getUnit().getOwner().getNumberOfSettlements() > 0;
     }
 
@@ -225,7 +234,7 @@ public class DefendSettlementMission extends Mission {
      */
     public boolean isValid() {
         return super.isValid()
-            && getUnit().isDefensiveUnit()
+            && isDefender(getUnit())
             && settlement != null
             && !settlement.isDisposed()
             && settlement.getOwner() == getUnit().getOwner();
@@ -239,13 +248,11 @@ public class DefendSettlementMission extends Mission {
         if (unit == null || unit.isDisposed()) {
             logger.warning(tag + " broken: " + unit);
             return;
-        } else if (!unit.isDefensiveUnit()) {
+        } else if (!isDefender(unit)) {
             logger.finest(tag + " disarmed: " + unit);
             return;
-        }
-
-        // Check target.
-        if (!isValid()) {
+        } else if (settlement == null || settlement.isDisposed()
+            || settlement.getOwner() != unit.getOwner()) {
             logger.finest(tag + " has invalid settlement " + settlement
                 + ": " + unit);
             return;
@@ -265,16 +272,10 @@ public class DefendSettlementMission extends Mission {
                 || (unit.isPerson() && settlement.getUnitCount() <= 1)) {
                 m = new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));
+                aiUnit.setMission(m);
+                m.doMission();
+                return; // No log, setMission logs this mission going away.
             }
-        } else if (settlement instanceof IndianSettlement) {
-            if (unit.isPerson() && settlement.getUnitCount() <= 1) {
-                m = new IdleAtSettlementMission(aiMain, aiUnit);
-            }
-        }                
-        if (m != null) {
-            aiUnit.setMission(m);
-            m.doMission();
-            return; // No log, setMission() logs this mission going away.
         }
 
         // Anything more to do?
@@ -288,9 +289,9 @@ public class DefendSettlementMission extends Mission {
         List<Unit> units = settlement.getUnitList();
         units.addAll(settlement.getTile().getUnitList());
         for (Unit u : units) {
-            if (unit.isDefensiveUnit()) {
+            if (isDefender(u)) {
                 defenderCount++;
-                if (unit.getState() == UnitState.FORTIFIED) fortifiedCount++;
+                if (u.getState() == UnitState.FORTIFIED) fortifiedCount++;
             }
         }
         if (defenderCount <= 2 || fortifiedCount <= 1) {
@@ -316,36 +317,39 @@ public class DefendSettlementMission extends Mission {
         Unit bestTarget = null;
         float bestDifference = Float.MIN_VALUE;
         Direction bestDirection = null;
-        for (Direction direction : Direction.getRandomDirections("defendSettlements", getAIRandom())) {
-            Tile t = unit.getTile().getNeighbourOrNull(direction);
+        for (Direction d : Direction.getRandomDirections("defendSettlements",
+                                                         getAIRandom())) {
+            Tile t = unit.getTile().getNeighbourOrNull(d);
             if (t == null) continue;
             Unit defender = t.getFirstUnit();
             if (defender != null
                 && defender.getOwner().atWarWith(unit.getOwner())
-                && unit.getMoveType(direction).isAttack()) {
+                && unit.getMoveType(d).isAttack()) {
                 Unit enemyUnit = t.getDefendingUnit(unit);
                 float enemyAttack = cm.getOffencePower(enemyUnit, unit);
                 float weAttack = cm.getOffencePower(unit, enemyUnit);
                 float enemyDefend = cm.getDefencePower(unit, enemyUnit);
                 float weDefend = cm.getDefencePower(enemyUnit, unit);
-                
                 float difference = weAttack / (weAttack + enemyDefend)
                     - enemyAttack / (enemyAttack + weDefend);
                 if (difference > bestDifference) {
                     if (difference > 0 || weAttack > enemyDefend) {
                         bestDifference = difference;
                         bestTarget = enemyUnit;
-                        bestDirection = direction;
+                        bestDirection = d;
                     }
                 }
             }
         }
 
-        // Attack if a target is available.  Do not log if nothing happening.
+        // Attack if a target is available.
         if (bestTarget != null) {
             logger.finest(tag + " attacking " + bestTarget
                 + " from " + settlement.getName() + ": " + unit);
             AIMessage.askAttack(getAIUnit(), bestDirection);
+        } else {
+            logger.finest(tag + " defending " + settlement.getName()
+                + ": " + unit);
         }
     }
     
