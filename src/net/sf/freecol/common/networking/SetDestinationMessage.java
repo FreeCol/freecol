@@ -87,7 +87,8 @@ public class SetDestinationMessage extends DOMMessage {
         }
 
         // destination == null is OK.
-        Location destination = game.getFreeColLocation(destinationId);
+        Location destination = (destinationId == null) ? null
+            : game.getFreeColLocation(destinationId);
 
         // Set destination
         return server.getInGameController()
