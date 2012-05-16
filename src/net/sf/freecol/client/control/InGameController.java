@@ -2520,7 +2520,7 @@ public final class InGameController implements NetworkConstants {
         if (confirmHostileAction(unit, target)
             && confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
-            nextModelMessage();
+            nextActiveUnit();
         }
     }
 
