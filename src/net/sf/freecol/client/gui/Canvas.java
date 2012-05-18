@@ -314,12 +314,15 @@ public final class Canvas extends JDesktopPane {
     /**
      * The constructor to use.
      *
-     * @param client main control class.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param size The bounds of this <code>Canvas</code>.
-     * @param mapViewer The object responsible of drawing the map onto this component.
+     * @param mapViewer The object responsible of drawing the map onto
+     *     this component.
      */
-    public Canvas(FreeColClient client, GUI gui, Dimension size, MapViewer mapViewer) {
-        this.freeColClient = client;
+    public Canvas(final FreeColClient freeColClient, GUI gui, Dimension size,
+                  MapViewer mapViewer) {
+        this.freeColClient = freeColClient;
         this.gui = gui;
         this.mapViewer = mapViewer;
 

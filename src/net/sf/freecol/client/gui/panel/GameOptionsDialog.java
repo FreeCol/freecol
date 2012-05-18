@@ -36,14 +36,17 @@ public final class GameOptionsDialog extends OptionsDialog {
 
     public static final String OPTION_GROUP_ID = "gameOptions";
 
+
     /**
-     * The constructor that will add the items to this panel.
+     * Creates a game options dialog.
      *
-     * @param parent The parent of this panel.
-     * @param editable whether the game options can be modified
-     * @param loadCustomOptions whether to load custom options
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param editable Whether the game options can be modified.
+     * @param loadCustomOptions Whether to load custom options.
      */
-    public GameOptionsDialog(FreeColClient freeColClient, GUI gui, boolean editable, boolean loadCustomOptions) {
+    public GameOptionsDialog(FreeColClient freeColClient, GUI gui,
+                             boolean editable, boolean loadCustomOptions) {
         super(freeColClient, gui, editable);
 
         if (editable && loadCustomOptions) {
@@ -57,12 +60,14 @@ public final class GameOptionsDialog extends OptionsDialog {
         // Disable victory option "All humans defeated"
         // when playing single player
         if (editable && getFreeColClient().isSingleplayer()) {
-            BooleanOptionUI comp = (BooleanOptionUI) getOptionUI().getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
+            BooleanOptionUI comp = (BooleanOptionUI) getOptionUI()
+                .getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
 
             comp.setValue(false);
             comp.getComponent().setEnabled(false);
         }
     }
+
 
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -82,5 +87,4 @@ public final class GameOptionsDialog extends OptionsDialog {
     public String getOptionGroupId() {
         return OPTION_GROUP_ID;
     }
-
 }

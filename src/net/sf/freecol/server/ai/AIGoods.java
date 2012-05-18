@@ -386,7 +386,7 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

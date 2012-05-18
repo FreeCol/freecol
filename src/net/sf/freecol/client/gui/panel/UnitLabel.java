@@ -91,10 +91,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     /**
-     * Initializes this JLabel with the given unit data.
+     * Creates a JLabel to display a unit.
      *
-     * @param unit The Unit that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> to display.
+     * @param gui The <code>GUI</code> to display on.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui) {
         this.freeColClient = freeColClient;
@@ -110,28 +111,32 @@ public final class UnitLabel extends JLabel implements ActionListener {
     }
 
     /**
-     * Initializes this JLabel with the given unit data.
+     * Creates a JLabel to display a unit.
      *
-     * @param unit The Unit that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> to display.
+     * @param gui The <code>GUI</code> to display on.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui, boolean isSmall) {
+    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui,
+                     boolean isSmall) {
         this(freeColClient, unit, gui);
         setSmall(isSmall);
         setIgnoreLocation(false);
     }
 
     /**
-     * Initializes this JLabel with the given unit data.
+     * Creates a JLabel to display a unit.
      *
-     * @param unit The Unit that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> to display.
+     * @param gui The <code>GUI</code> to display on.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui, boolean isSmall, boolean ignoreLocation) {
+    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui,
+                     boolean isSmall, boolean ignoreLocation) {
         this(freeColClient, unit, gui);
         setSmall(isSmall);
         setIgnoreLocation(ignoreLocation);

@@ -517,10 +517,12 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     protected JButton cancelButton = new JButton(Messages.message("cancel"));
 
+
     /**
-     * Constructor.
+     * Creates a FreeCol dialog.
      *
-     * @param parent The parent <code>Canvas</code>.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public FreeColDialog(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -530,6 +532,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         enterPressesWhenFocused(cancelButton);
         setCancelComponent(cancelButton);
     }
+
 
     /**
      * This function analyses an event and calls the right methods to

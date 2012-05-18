@@ -83,9 +83,7 @@ public class FreeColModFile extends FreeColDataFile {
     /**
      * Reads a file object representing this mod.
      *
-     * @return The meta information for this mod file.
-     * @throws IOException if thrown while reading the
-     *      "mod.xml" file.
+     * @throws IOException if thrown while reading the "mod.xml" file.
      */
     protected void readModDescriptor() throws IOException {
         XMLInputFactory xif = XMLInputFactory.newInstance();

@@ -43,18 +43,19 @@ import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
-* A panel filled with 'main' items.
-*/
+ * A panel filled with 'main' items.
+ */
 public final class MainPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
 
     /**
-    * The constructor that will add the items to this panel.
-     * @param freeColClient 
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     */
     public MainPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
         boolean canContinue = getFreeColClient().getInGameController()

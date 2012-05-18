@@ -63,16 +63,15 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
-* The transferhandler that is capable of creating ImageSelection objects.
-* Those ImageSelection objects are Transferable. The DefaultTransferHandler
-* should be attached to JPanels or custom JLabels.
-*/
+ * The TransferHandler that is capable of creating ImageSelection objects.
+ * Those ImageSelection objects are Transferable.  The DefaultTransferHandler
+ * should be attached to JPanels or custom JLabels.
+ */
 public final class DefaultTransferHandler extends TransferHandler {
 
     private static Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
 
     public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
-
 
     private final FreeColPanel parentPanel;
 
@@ -80,35 +79,39 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private GUI gui;
 
+
     /**
-    * The constructor to use.
-     * @param freeColClient 
-    * @param canvas The <code>Canvas</code>.
-    * @param parentPanel The layered pane that holds all kinds of information.
-    */
-    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui, FreeColPanel parentPanel) {
+     * Creates the default FreeCol transfer handler.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param parentPanel The layered pane that holds all kinds of information.
+     */
+    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui,
+                                  FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.parentPanel = parentPanel;
     }
 
+
     /**
-    * Returns the action that can be done to an ImageSelection on the given component.
-    * @return The action that can be done to an ImageSelection on the given component.
-    */
+     * Returns the action that can be done to an ImageSelection on the given component.
+     * @return The action that can be done to an ImageSelection on the given component.
+     */
     public int getSourceActions(JComponent comp) {
         return COPY_OR_MOVE;
     }
 
 
     /**
-    * Returns 'true' if the given component can import a selection of the
-    * flavor that is indicated by the second parameter, 'false' otherwise.
-    * @param comp The component that needs to be checked.
-    * @param flavor The flavor that needs to be checked for.
-    * @return 'true' if the given component can import a selection of the
-    * flavor that is indicated by the second parameter, 'false' otherwise.
-    */
+     * Returns 'true' if the given component can import a selection of the
+     * flavor that is indicated by the second parameter, 'false' otherwise.
+     * @param comp The component that needs to be checked.
+     * @param flavor The flavor that needs to be checked for.
+     * @return 'true' if the given component can import a selection of the
+     * flavor that is indicated by the second parameter, 'false' otherwise.
+     */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (!(comp instanceof UnitLabel) &&
             !(comp instanceof GoodsLabel) &&
@@ -126,12 +129,12 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     /**
-    * Creates a Transferable (an ImageSelection to be precise) of the
-    * data that is represented by the given component and returns that
-    * object.
-    * @param comp The component to create a Transferable of.
-    * @return The resulting Transferable (an ImageSelection object).
-    */
+     * Creates a Transferable (an ImageSelection to be precise) of the
+     * data that is represented by the given component and returns that
+     * object.
+     * @param comp The component to create a Transferable of.
+     * @return The resulting Transferable (an ImageSelection object).
+     */
     public Transferable createTransferable(JComponent comp) {
         if (comp instanceof UnitLabel) {
             return new ImageSelection((UnitLabel)comp);
@@ -144,19 +147,19 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     /**
-    * Imports the data represented by the given Transferable into
-    * the given component. Returns 'true' on success, 'false' otherwise.
-    * @param comp The component to import the data to.
-    * @param t The Transferable that holds the data.
-    * @return 'true' on success, 'false' otherwise.
-    */
+     * Imports the data represented by the given Transferable into
+     * the given component. Returns 'true' on success, 'false' otherwise.
+     * @param comp The component to import the data to.
+     * @param t The Transferable that holds the data.
+     * @return 'true' on success, 'false' otherwise.
+     */
     public boolean importData(JComponent comp, Transferable t) {
         try {
             JLabel data;
 
             /*
-                This variable is used to temporarily keep the old selected unit,
-                while moving cargo from one carrier to another:
+              This variable is used to temporarily keep the old selected unit,
+              while moving cargo from one carrier to another:
             */
             UnitLabel oldSelectedUnit = null;
 
@@ -185,7 +188,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                  *
                  * If not, assume that the user wished to drop the
                  * unit/cargo on the panel below.
-                */
+                 */
                 if (unitLabel.getUnit().isCarrier()
                     && unitLabel.getParent() instanceof EuropePanel.InPortPanel) {
                     if (data instanceof UnitLabel
@@ -197,7 +200,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     ((EuropePanel) parentPanel).setSelectedUnitLabel(unitLabel);
                     comp = ((EuropePanel) parentPanel).getCargoPanel();
                 } else if (unitLabel.getUnit().isCarrier()
-                           && unitLabel.getParent() instanceof ColonyPanel.InPortPanel) {
+                    && unitLabel.getParent() instanceof ColonyPanel.InPortPanel) {
                     if (data instanceof UnitLabel
                         && ((UnitLabel) data).getUnit().isOnCarrier()
                         || data instanceof GoodsLabel
@@ -249,7 +252,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 if (unit.getLocation() instanceof HighSeas
                     && !(comp instanceof EuropePanel.DestinationPanel)) {
-                        return false;
+                    return false;
                 }
 
                 if (!unit.isNaval()
@@ -306,7 +309,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     //if this unit was moved to ToAmericaPanel
 
                     if (oldSelectedUnit != null) {
-                    	if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                        if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
                         } else {
                             ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
@@ -344,13 +347,13 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 /*
-                if (!(comp instanceof ColonyPanel.WarehousePanel ||
-                      comp instanceof CargoPanel ||
-                      comp instanceof EuropePanel.MarketPanel) ||
-                    (comp instanceof CargoPanel && !((CargoPanel) comp).isActive())) {
+                  if (!(comp instanceof ColonyPanel.WarehousePanel ||
+                  comp instanceof CargoPanel ||
+                  comp instanceof EuropePanel.MarketPanel) ||
+                  (comp instanceof CargoPanel && !((CargoPanel) comp).isActive())) {
 
-                    return false;
-                }
+                  return false;
+                  }
                 */
 
                 if (comp instanceof UnitLabel) {
@@ -365,7 +368,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                 if (requiredGoods.getType().equals(goods.getType())
                                     && requiredGoods.getAmount() <= goods.getAmount()) {
                                     int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
-                                                          equipment.getMaximumCount());
+                                        equipment.getMaximumCount());
                                     freeColClient.getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
@@ -431,7 +434,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                 if (requiredGoods.getType().equals(label.getType())
                                     && requiredGoods.getAmount() <= label.getAmount()) {
                                     int amount = Math.min(label.getAmount() / requiredGoods.getAmount(),
-                                                          equipment.getMaximumCount());
+                                        equipment.getMaximumCount());
                                     freeColClient.getInGameController()
                                         .equipUnit(unit, equipment, amount);
                                     unitLabel.updateIcon();
@@ -470,8 +473,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
 
     /**
-    * Displays an input dialog box where the user should specify a goods transfer amount.
-    */
+     * Displays an input dialog box where the user should specify a goods transfer amount.
+     */
     private int getAmount(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
         return gui.showSelectAmountDialog(goodsType, available, defaultAmount, needToPay);
     }
@@ -551,7 +554,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                         /*
                           We have to use a MediaTracker to ensure that the
                           image has been scaled before we use it.
-                         */
+                        */
                         MediaTracker mt = new MediaTracker(c);
                         mt.addImage(image, 0, bestSize.width, bestSize.height);
                         try {

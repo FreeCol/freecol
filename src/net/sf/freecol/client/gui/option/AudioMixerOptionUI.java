@@ -137,15 +137,15 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
     /**
-     * Updates the value of the {@link
-     * net.sf.freecol.common.getOption().Option} this object keeps.
+     * Updates the value of the
+     * {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         getOption().setValue((MixerWrapper) cbox.getSelectedItem());
     }
 
     /**
-     * Reset with the value from the getOption().
+     * Reset with the value from the option.
      */
     public void reset() {
         cbox.setSelectedItem(getOption().getValue());

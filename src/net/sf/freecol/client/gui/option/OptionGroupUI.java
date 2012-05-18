@@ -64,7 +64,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
      * <code>OptionGroup</code>. This is the same as using
-     * {@link #OptionGroupUI(OptionGroup, boolean)} with
+     * {@link #OptionGroupUI(GUI, OptionGroup, boolean)} with
      * <code>editable == true</code>.
      *
      * @param option The <code>OptionGroup</code> to make a user interface for.

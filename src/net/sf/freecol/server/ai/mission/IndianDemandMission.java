@@ -323,7 +323,7 @@ public class IndianDemandMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {

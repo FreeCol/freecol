@@ -29,7 +29,7 @@ import net.sf.freecol.common.model.Player;
 
 /**
  * Can be used as a single choice for the
- * {@link FreeColDialog#createChoiceDialog(String, String, List) choice dialog}.
+ * {@link net.sf.freecol.client.gui.panel.FreeColDialog#createChoiceDialog(FreeColClient, GUI, String, String, List) choice dialog}.
  */
 public class ChoiceItem<T> {
 
@@ -37,14 +37,13 @@ public class ChoiceItem<T> {
     private T object;
     private boolean enabled;
 
+
     /**
      * Creates a new <code>ChoiceItem</code> with the
      * given object.
      *
-     * @param text The text that should be used to represent 
-     *        this choice.
-     * @param object The <code>Object</code> contained by this
-     *        choice.
+     * @param text The text that should be used to represent this choice.
+     * @param object The object contained by this choice.
      * @param enable Sets if the option should be enabled or not       
      */
     public ChoiceItem(String text, T object, boolean enable) {
@@ -52,19 +51,17 @@ public class ChoiceItem<T> {
         this.object = object;
         this.enabled = enable;
     }
-    
-    
+
+
     /**
      * Creates a new <code>ChoiceItem</code> with the
      * given object.
      *
-     * @param text The text that should be used to represent 
-     *        this choice.
-     * @param object The <code>Object</code> contained by this
-     *        choice.
+     * @param text The text that should be used to represent this choice.
+     * @param object The object contained by this choice.
      */
     public ChoiceItem(String text, T object) {
-    	this(text, object, true);
+        this(text, object, true);
     }
 
 
@@ -72,8 +69,7 @@ public class ChoiceItem<T> {
      * Creates a new <code>ChoiceItem</code> with the
      * given object.
      *
-     * @param object The <code>Object</code> contained by this
-     *        choice.
+     * @param object The object contained by this choice.
      */
     public ChoiceItem(T object) {
         this(Messages.message(object.toString()), object, true);

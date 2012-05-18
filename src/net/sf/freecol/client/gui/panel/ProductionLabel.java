@@ -96,45 +96,53 @@ public final class ProductionLabel extends AbstractGoodsLabel {
 
 
     /**
-     * Creates a new <code>ProductionLabel</code> instance.
+     * Creates a new production label.
      *
-     * @param goods a <code>AbstractGoods</code> value
-     * @param parent a <code>Canvas</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param goods The <code>AbstractGoods</code> to create a label for.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods) {
+    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+                           AbstractGoods goods) {
         this(freeColClient, gui, goods, -1);
     }
 
     /**
-     * Creates a new <code>ProductionLabel</code> instance.
+     * Creates a new production label.
      *
-     * @param goods a <code>AbstractGoods</code> value
-     * @param maximum an <code>AbstractGoods</code> value
-     * @param parent a <code>Canvas</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param goods The <code>AbstractGoods</code> to create a label for.
+     * @param maximum An <code>AbstractGoods</code> defining a maximum amount.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods, AbstractGoods maximum) {
+    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+                           AbstractGoods goods, AbstractGoods maximum) {
         this(freeColClient, gui, goods, maximum.getAmount());
     }
 
     /**
-     * Creates a new <code>ProductionLabel</code> instance.
+     * Creates a new production label.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param amount an <code>int</code> value
-     * @param parent a <code>Canvas</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param goodsType The <code>GoodsType</code> for the label.
+     * @param amount The amount of goods.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui, GoodsType goodsType, int amount) {
+    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+                           GoodsType goodsType, int amount) {
         this(freeColClient, gui, new AbstractGoods(goodsType, amount), -1);
     }
 
     /**
-     * Creates a new <code>ProductionLabel</code> instance.
+     * Creates a new production label.
      *
-     * @param goods a <code>AbstractGoods</code> value
-     * @param maximum a <code>AbstractGoods</code> value
-     * @param parent a <code>Canvas</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param goods The <code>AbstractGoods</code> to create a label for.
+     * @param maximum The maximum amount of goods.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui, AbstractGoods goods, int maximum) {
+    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+                           AbstractGoods goods, int maximum) {
         super(goods, gui);
         this.maximumProduction = maximum;
         ClientOptions options = freeColClient.getClientOptions();
@@ -152,6 +160,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             updateToolTipText();
         }
     }
+
 
     /**
      * Get the <code>ToolTipPrefix</code> value.
@@ -479,6 +488,4 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         }
         return stringImage;
     }
-
-
 }

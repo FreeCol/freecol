@@ -67,8 +67,9 @@ public final class ColopediaPanel extends FreeColPanel
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param parent The parent of this panel.
-     * @param id a <code>String</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param id An identifier for the initial item to select.
      */
     public ColopediaPanel(FreeColClient freeColClient, GUI gui, String id) {
         super(freeColClient, gui);
@@ -120,12 +121,13 @@ public final class ColopediaPanel extends FreeColPanel
      * only for the construction of ColopediaDetailPanels. TODO: find
      * a more elegant solution.
      *
-     * @param canvas a <code>Canvas</code> value
-     * @see ChooseFoundingFatherDialog
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
-    ColopediaPanel(FreeColClient freeColClient, GUI gui) {
+    public ColopediaPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
     }
+
 
     /**
      * Builds the JTree which represents the navigation menu and then returns it

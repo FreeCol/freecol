@@ -237,7 +237,7 @@ public class WorkerWish extends Wish {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

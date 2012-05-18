@@ -64,13 +64,15 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     
     /**
-     * The constructor that will add the items to this panel.
+     * Creates a panel to display the meta-server.
      * 
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param connectController The controller responsible for creating new
-     *            connections.
+     *     connections.
      */
-    public ServerListPanel(FreeColClient freeColClient, GUI gui, ConnectController connectController) {
+    public ServerListPanel(FreeColClient freeColClient, GUI gui,
+                           ConnectController connectController) {
         super(freeColClient, gui);
         this.connectController = connectController;
 
@@ -120,6 +122,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
         setSize(getPreferredSize());
     }
+
 
     public void requestFocus() {
         connect.requestFocus();

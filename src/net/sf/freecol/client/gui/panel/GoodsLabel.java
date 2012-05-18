@@ -45,12 +45,13 @@ public final class GoodsLabel extends AbstractGoodsLabel {
      * Initializes this JLabel with the given goods data.
      *
      * @param goods The Goods that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+     * @param gui The <code>GUI</code> to display on.
      */
     public GoodsLabel(Goods goods, GUI gui) {
         super(goods, gui);
         initializeDisplay();
     }
+
 
     /**
      * Initializes the display that shows the goods.

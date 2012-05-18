@@ -60,7 +60,6 @@ public class GetNationSummaryMessage extends DOMMessage {
      * Create a new <code>GetNationSummaryMessage</code> from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
     public GetNationSummaryMessage(Element element) {

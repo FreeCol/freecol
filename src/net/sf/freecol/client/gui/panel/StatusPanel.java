@@ -30,20 +30,22 @@ import net.sf.freecol.client.gui.GUI;
 
 
 /**
-* A <code>Panel</code> for showing status information on screen.
-*/
+ * A <code>Panel</code> for showing status information on screen.
+ */
 public final class StatusPanel extends FreeColPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatusPanel.class.getName());
 
-    private final JLabel        statusLabel;
+    private final JLabel statusLabel;
+
 
     /**
-    * Creates a new <code>StatusPanel</code>.
-     * @param freeColClient 
-    * @param parent The parent of this panel.
-    */
+     * Creates a basic status panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     */
     public StatusPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new FlowLayout());
 
@@ -55,13 +57,14 @@ public final class StatusPanel extends FreeColPanel {
 
         setSize(260, 60);
     }
+
     
     /**
-    * Sets a new status message to be displayed by this
-    * <code>StatusPanel</code>.
-    *
-    * @param message The message to be displayed.
-    */
+     * Sets a new status message to be displayed by this
+     * <code>StatusPanel</code>.
+     *
+     * @param message The message to be displayed.
+     */
     public void setStatusMessage(String message) {
         statusLabel.setText(message);
         setSize(getPreferredSize());

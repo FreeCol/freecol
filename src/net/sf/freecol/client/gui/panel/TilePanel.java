@@ -60,9 +60,11 @@ public final class TilePanel extends FreeColPanel {
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param parent The parent panel.
-     * @param tile a <code>Tile</code> value
+     * Creates a panel describing a tile.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param tile The <code>Tile</code> to describe.
      */
     public TilePanel(FreeColClient freeColClient, GUI gui, Tile tile) {
         super(freeColClient, gui);
@@ -154,7 +156,6 @@ public final class TilePanel extends FreeColPanel {
         add(colopediaButton, "tag help");
 
         setSize(getPreferredSize());
-
     }
 
 

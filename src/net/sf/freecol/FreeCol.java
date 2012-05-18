@@ -956,12 +956,12 @@ public final class FreeCol {
      * to `infinite' in single player and the DEFAULT_TIMEOUT for
      * multiplayer.
      *
-     * @param singleplayer True if this is a single player game.
+     * @param singlePlayer True if this is a single player game.
      * @return A suitable timeout value.
      */
-    public static int getFreeColTimeout(boolean single) {
+    public static int getFreeColTimeout(boolean singlePlayer) {
         return (freeColTimeout >= TIMEOUT_MIN) ? freeColTimeout
-            : (single) ? Integer.MAX_VALUE
+            : (singlePlayer) ? Integer.MAX_VALUE
             : DEFAULT_TIMEOUT;
     }
 

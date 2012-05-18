@@ -51,10 +51,11 @@ public final class AboutPanel extends FreeColPanel {
     public static final String PROJECT_URL = "http://sourceforge.net/projects/freecol/";
 
     /**
-    * The constructor that will add the items to this panel.
-    *
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     */
     public AboutPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new MigLayout("wrap 2"));
 

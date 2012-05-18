@@ -125,13 +125,11 @@ public final class ReportColonyPanel extends ReportPanel
     private Color cGood;
 
 
-
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param gui 
+     * Creates a colony report.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ReportColonyPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, Messages.message("reportColonyAction.name"));
@@ -150,6 +148,7 @@ public final class ReportColonyPanel extends ReportPanel
             classicColonyPanel(colonies);
         }
     }
+
 
     // Standard pretty version
     private void classicColonyPanel(List<Colony> colonies) {

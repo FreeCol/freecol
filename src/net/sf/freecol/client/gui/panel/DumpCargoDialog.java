@@ -54,12 +54,13 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
     private List<JCheckBox> checkBoxes;
 
+
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * 
-     * @param parent The parent panel.
-     * @param unit an <code>Unit</code> value
+     * Creates a dialog for choosing cargo for a unit to dump.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param unit The <code>Unit</code> that is dumping cargo.
      */
     public DumpCargoDialog(FreeColClient freeColClient, GUI gui, Unit unit) {
         super(freeColClient, gui);
@@ -93,6 +94,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
 
         setSize(getPreferredSize());
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care

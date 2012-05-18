@@ -32,17 +32,18 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
 
+
 /**
  * This panel provides detailed information about rebels in a colony.
  */
 public class RebelToolTip extends JToolTip {
 
     /**
-     * Creates this RebelToolTip.
-     * @param freeColClient 
+     * Creates a RebelToolTip.
      *
-     * @param colony the colony for which to display information
-     * @param parent a <code>Canvas</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param colony The <code>Colony</code> for which to display information.
      */
     public RebelToolTip(FreeColClient freeColClient, GUI gui, Colony colony) {
 
@@ -112,5 +113,3 @@ public class RebelToolTip extends JToolTip {
         return new Dimension(350, 250);
     }
 }
-
-

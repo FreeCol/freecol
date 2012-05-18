@@ -38,26 +38,31 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class InformationDialog extends FreeColDialog<Boolean> {
 
     /**
-     * Returns an information dialog that shows the given
-     * texts and images, and an "OK" button.
+     * Creates an information dialog that shows the given texts and
+     * images, and an "OK" button.
      *
-     * @param canvas The parent Canvas.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, GUI gui, String text, ImageIcon image) {
-        this(freeColClient, gui, new String[] { text }, new ImageIcon[] { image });
+    public InformationDialog(FreeColClient freeColClient, GUI gui,
+                             String text, ImageIcon image) {
+        this(freeColClient, gui, new String[] { text },
+             new ImageIcon[] { image });
     }
 
     /**
-     * Returns an information dialog that shows the given
+     * Creates an information dialog that shows the given
      * texts and images, and an "OK" button.
      *
-     * @param parent The parent Canvas.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, GUI gui, String[] texts, ImageIcon[] images) {
+    public InformationDialog(FreeColClient freeColClient, GUI gui,
+                             String[] texts, ImageIcon[] images) {
         super(freeColClient,  gui);
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
@@ -101,6 +106,7 @@ public class InformationDialog extends FreeColDialog<Boolean> {
 
     }
 
+
     /**
      * Paints this component.
      *
@@ -111,5 +117,4 @@ public class InformationDialog extends FreeColDialog<Boolean> {
         Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
         g.drawImage(bgImage, 0, 0, this);
     }
-
 }

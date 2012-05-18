@@ -410,7 +410,7 @@ public class Unit extends FreeColGameObject
     /**
      * Is this unit able to carry a specified one?
      *
-     * @param The potential cargo <code>Unit</code>.
+     * @param u The potential cargo <code>Unit</code>.
      * @return True if this unit can carry the cargo unit.
      */
     public boolean canCarryUnit(Unit u) {
@@ -1470,17 +1470,17 @@ public class Unit extends FreeColGameObject
      * Convenience wrapper for the
      * {@link net.sf.freecol.common.model.Map#search} function.
      *
-     * @param startTile The <code>Tile</code> to start the search from.
+     * @param start The <code>Tile</code> to start the search from.
      * @param gd The object responsible for determining whether a
-     *        given <code>PathNode</code> is a goal or not.
-     * @param costDecider An optional <code>CostDecider</code>
-     *        responsible for determining the path cost.
+     *     given <code>PathNode</code> is a goal or not.
+     * @param cd An optional <code>CostDecider</code> responsible for
+     *     determining the path cost.
      * @param maxTurns The maximum number of turns the given
-     *        <code>Unit</code> is allowed to move.
+     *     <code>Unit</code> is allowed to move.
      * @param carrier The carrier the <code>unit</code> is currently
-     *        onboard or <code>null</code> if the <code>unit</code> is
-     *        either not onboard a carrier or should not use the
-     *        carrier while finding the path.
+     *     onboard or <code>null</code> if the <code>unit</code> is
+     *     either not onboard a carrier or should not use the carrier
+     *     while finding the path.
      * @return The path to a goal determined by the given
      *        <code>GoalDecider</code>.
      */
@@ -3249,7 +3249,6 @@ public class Unit extends FreeColGameObject
     /**
      * Is the unit a beached ship?
      *
-     * @param unit The <code>Unit</code> to test.
      * @return True if the unit is a beached ship.
      */
     public boolean isBeached() {

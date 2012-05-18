@@ -106,13 +106,15 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     private final JLabel destinationLabel = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
 
 
-
     /**
-     * The constructor that will add the items to this panel.
+     * Create a dialog to define trade route cargos.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param newRoute The <code>TradeRoute</code> to operate on.
      */
-    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui, TradeRoute newRoute) {
+    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
+                                 TradeRoute newRoute) {
         super(freeColClient, gui);
         originalRoute = newRoute;
 
@@ -237,6 +239,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         restoreSavedSize(getPreferredSize());
 
     }
+
 
     /**
      * Enables the remove stop button if a stop is selected and disables it
@@ -616,7 +619,5 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
             return panel;
         }
-
     }
-
 }

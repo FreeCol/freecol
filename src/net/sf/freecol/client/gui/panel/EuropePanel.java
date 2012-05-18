@@ -115,9 +115,10 @@ public final class EuropePanel extends FreeColPanel {
 
     /**
      * The constructor for a EuropePanel.
-     * @param freeColClient 
      *
-     * @param parent The parent of this panel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param canvas The enclosing <code>Canvas</code>.
      */
     public EuropePanel(FreeColClient freeColClient, GUI gui, Canvas canvas) {
         super(freeColClient, gui);

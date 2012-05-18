@@ -316,7 +316,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

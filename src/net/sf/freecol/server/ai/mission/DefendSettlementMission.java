@@ -371,7 +371,7 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
@@ -381,7 +381,7 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {

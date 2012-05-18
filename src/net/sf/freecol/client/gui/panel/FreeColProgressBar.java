@@ -76,7 +76,7 @@ public class FreeColProgressBar extends JPanel {
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param parent a <code>Canvas</code> value
+     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      */
     public FreeColProgressBar(GUI gui, GoodsType goodsType) {
@@ -86,7 +86,7 @@ public class FreeColProgressBar extends JPanel {
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param parent a <code>Canvas</code> value
+     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
@@ -98,14 +98,15 @@ public class FreeColProgressBar extends JPanel {
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param parent a <code>Canvas</code> value
+     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public FreeColProgressBar(GUI gui, GoodsType goodsType, int min, int max, int value, int step) {
+    public FreeColProgressBar(GUI gui, GoodsType goodsType, int min, int max,
+                              int value, int step) {
         this.goodsType = goodsType;
         this.min = min;
         this.max = max;
@@ -113,17 +114,19 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
 
         setBorder(BorderFactory.createLineBorder(PRIMARY_1));
-		if (goodsType != null) {
-			ImageIcon icon = gui.getImageLibrary().getGoodsImageIcon(goodsType);
-			// scale to a height of 16px, preserving aspect ratio
-			image = icon.getImage().getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
-			iconWidth = image.getWidth(this);
+        if (goodsType != null) {
+            ImageIcon icon = gui.getImageLibrary().getGoodsImageIcon(goodsType);
+            // scale to a height of 16px, preserving aspect ratio
+            image = icon.getImage()
+                .getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
+            iconWidth = image.getWidth(this);
         }
-		setPreferredSize(new Dimension(200, 20));
+        setPreferredSize(new Dimension(200, 20));
     }
 
+
     /**
-     * Upate the data of the progress bar.
+     * Update the data of the progress bar.
      *
      * @param value the current value of the progress bar
      * @param step the expected increase next turn

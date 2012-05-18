@@ -25,9 +25,9 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
- * Determines the cost of a single move. Used by {@link
- * net.sf.freecol.common.model.Map#findPath(Unit, Tile, Tile)
- * findPath} and {@link net.sf.freecol.common.model.Map#search}.
+ * Determines the cost of a single move.
+ * Used by {@link net.sf.freecol.common.model.Map#findPath}
+ * and {@link net.sf.freecol.common.model.Map#search}.
  */
 public interface CostDecider {
 

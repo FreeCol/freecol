@@ -151,7 +151,7 @@ public class PioneeringMission extends Mission {
      * Sets the target for this mission, and the tile improvement plan
      * as required.
      *
-     * @return The target for this mission.
+     * @param target The new target for this mission.
      */
     public void setTarget(Location target) {
         this.target = target;
@@ -208,7 +208,7 @@ public class PioneeringMission extends Mission {
     /**
      * Does a supplied unit have tools?
      *
-     * @param unit The pioneer <code>Unit</code> to check.
+     * @param aiUnit The pioneer <code>AIUnit</code> to check.
      * @return True if the pioneer has tools.
      */
     private static boolean hasTools(AIUnit aiUnit) {
@@ -628,7 +628,7 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
@@ -640,7 +640,7 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {

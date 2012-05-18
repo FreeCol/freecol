@@ -43,12 +43,14 @@ public final class MarketLabel extends AbstractGoodsLabel {
 
     private final Market market;
 
+
     /**
      * Initializes this JLabel with the given goods type.
+     *
      * @param type The Goods type that this JLabel will visually represent.
      * @param market The <code>Market</code> being used to buy
-     *       and sell <code>Goods</code>.
-     * @param parent The parent that knows more than we do.
+     *     and sell <code>Goods</code>.
+     * @param gui The <code>GUI</code> to display on.
      */
     public MarketLabel(GoodsType type, Market market, GUI gui) {
         super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), gui);
@@ -58,6 +60,7 @@ public final class MarketLabel extends AbstractGoodsLabel {
 
         this.market = market;
     }
+
 
     /**
      * Returns this MarketLabel's market.
@@ -99,6 +102,4 @@ public final class MarketLabel extends AbstractGoodsLabel {
                       + "/" + Integer.toString(market.getCostToBuy(getType())));
         super.paintComponent(g);
     }
-
 }
-

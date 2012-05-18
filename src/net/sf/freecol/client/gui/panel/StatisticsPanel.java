@@ -151,12 +151,13 @@ public final class StatisticsPanel extends FreeColPanel
         }
     }
     
+
     /**
-    * The constructor that will add the items to this panel.
-     * @param freeColClient 
-    * 
-    * @param parent The parent of this panel.
-    */
+     * Creates the statistics panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     */
     public StatisticsPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new BorderLayout());
         
@@ -188,7 +189,8 @@ public final class StatisticsPanel extends FreeColPanel
 
         setSize(getPreferredSize());
     }
-    
+
+
     private JPanel displayStatsMessage(String title,
                                        Map<String, String> stats) {
         final String[] memoryKeys = {

@@ -41,12 +41,14 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
 
     /**
-     * The constructor that will add the items to this panel.
+     * Creates the foreign affairs report.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param prefix An optional message to add at the top of the panel.
      */
-    public ReportHighScoresPanel(FreeColClient freeColClient, GUI gui, String prefix) {
+    public ReportHighScoresPanel(FreeColClient freeColClient, GUI gui,
+                                 String prefix) {
         super(freeColClient, gui, Messages.message("reportHighScoresAction.name"));
         // Display Panel
         reportPanel.removeAll();
@@ -121,6 +123,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
         reportPanel.doLayout();
     }
+
 
     /**
      * Just drop the panel.  Retired players quitting is handled in

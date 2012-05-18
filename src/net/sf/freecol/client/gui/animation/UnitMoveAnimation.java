@@ -54,13 +54,14 @@ final class UnitMoveAnimation {
     /**
      * Constructor
      *
-     * @param canvas The <code>Canvas</code> to draw the animation on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param unit The <code>Unit</code> to be animated.
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(FreeColClient freeColClient, GUI gui, Unit unit, Tile sourceTile,
-                             Tile destinationTile) {
+    public UnitMoveAnimation(FreeColClient freeColClient, GUI gui, Unit unit,
+                             Tile sourceTile, Tile destinationTile) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.unit = unit;

@@ -72,9 +72,9 @@ import org.w3c.dom.Element;
  * goods present in the colony, and overall colony size but not the
  * exact composition of the units involved.  However there is
  * extensive structure for making a trial assignment of workers in
- * {@link assignWorkers}.
+ * {@link #assignWorkers}.
  *
- * {@link AIColony.rearrangeWorkers} is responsible for making
+ * {@link AIColony#rearrangeWorkers} is responsible for making
  * the real decisions.
  *
  * @see Colony
@@ -1245,7 +1245,6 @@ public class ColonyPlan {
     /**
      * Tries to apply a colony plan given a list of workers.
      *
-     * @param colonyPlan The <code>ColonyPlan</code> to apply.
      * @param workers A list of <code>Unit</code>s to assign.
      * @param preferScout Prefer to make scouts rather than soldiers.
      * @return A scratch colony with the workers in place.
@@ -1618,7 +1617,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     public String toString() {
         final Tile tile = colony.getTile();

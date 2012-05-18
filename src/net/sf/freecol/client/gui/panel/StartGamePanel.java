@@ -45,6 +45,7 @@ import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
  * The panel where you choose your nation and color and connected players are
  * shown.
@@ -74,14 +75,15 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param gui 
+     * Create the panel from which to start a game.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public StartGamePanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
     }
+
 
     public void initialize(boolean singlePlayer) {
 
@@ -329,5 +331,4 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     public void refreshPlayersTable() {
         table.update();
     }
-
 }

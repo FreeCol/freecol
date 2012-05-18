@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
  * This panel is used to show information about an Indian settlement.
  */
@@ -42,15 +43,16 @@ public final class IndianSettlementPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
 
+
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates a panel to show information about a native settlement.
      *
-     * @param canvas <code>Canvas</code>
-     * @param settlement <code>IndianSettlement</code>
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param settlement The <code>IndianSettlement</code> to display.
      */
-    public IndianSettlementPanel(FreeColClient freeColClient, GUI gui, IndianSettlement settlement) {
-        
+    public IndianSettlementPanel(FreeColClient freeColClient, GUI gui,
+                                 IndianSettlement settlement) {
         super(freeColClient, gui);
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
@@ -137,5 +139,4 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         setSize(getPreferredSize());
     }
-
 }

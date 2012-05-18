@@ -44,8 +44,9 @@ public class AbstractGoodsLabel extends JLabel {
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param goods The AbstractGoods that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+     * @param goods The <code>AbstractGoods</code> that this JLabel
+     *     will visually represent.
+     * @param gui The <code>GUI</code> to extract an icon from.
      */
     public AbstractGoodsLabel(AbstractGoods goods, GUI gui) {
         super(gui.getImageLibrary().getGoodsImageIcon(goods.getType()));

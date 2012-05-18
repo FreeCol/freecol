@@ -248,7 +248,7 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

@@ -27,6 +27,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 
+
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
@@ -38,17 +39,19 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
     // dragging units.
     private Tile lastTile;
     
+
     /**
-     * The constructor to use.
+     * Creates a new listener for mouse movement.
      *
-     * @param canvas The component this object gets created for.
-     * @param mapViewer The GUI that holds information such as screen resolution.
-     * @param m The Map that is currently being drawn on the Canvas (by the
-     *            GUI).
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param mapViewer The <code>MapViewer</code> that holds
+     *     information such as screen resolution.
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient, MapViewer mapViewer) {
+    public CanvasMouseMotionListener(FreeColClient freeColClient,
+                                     MapViewer mapViewer) {
         super(freeColClient, mapViewer);
     }
+
 
     /**
      * Invoked when the mouse has been moved.
@@ -113,6 +116,4 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
             }
         }
     }
-
- 
 }

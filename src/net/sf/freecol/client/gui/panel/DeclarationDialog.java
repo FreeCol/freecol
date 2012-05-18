@@ -56,10 +56,10 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * 
-     * @param parent The parent of this panel.
+     * Creates a DeclarationDialog.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public DeclarationDialog(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -94,6 +94,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
         initialize();
     }
+
 
     /**
      * Paints an image of the Declaration of Independence on this panel.

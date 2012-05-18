@@ -94,7 +94,7 @@ public abstract class InputHandler implements MessageHandler {
      *                holds all the information.
      * @return Null.
      */
-    protected Element disconnect(Element disconnectElement) {
+    protected Element disconnect(Element element) {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 @Override

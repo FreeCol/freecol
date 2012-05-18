@@ -42,11 +42,12 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ConfirmDeclarationDialog(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -92,5 +93,4 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
             super.actionPerformed(event);
         }
     }
-
 }

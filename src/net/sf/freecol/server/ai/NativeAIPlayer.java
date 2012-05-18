@@ -393,13 +393,14 @@ public class NativeAIPlayer extends AIPlayer {
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
+     *     which the given <code>Unit</code> if trying to sell goods.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE*}.
+     *     {@link NetworkConstants#NO_TRADE}.
      */
-    public int sellProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+    public int sellProposition(Unit unit, Settlement settlement, Goods goods,
+                               int gold) {
         logger.finest("Entering method sellProposition");
         Specification spec = getSpecification();
         IndianSettlement is = (IndianSettlement) settlement;

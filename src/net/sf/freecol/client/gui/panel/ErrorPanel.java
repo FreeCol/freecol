@@ -46,11 +46,12 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
 
     private static final String SHOW = "show";
 
+
     /**
-     * Displays the given error message.
-     * @param freeColClient 
+     * Creates a panel to display the given error message.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(FreeColClient freeColClient, GUI gui, String message) {
@@ -68,9 +69,10 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     }
 
     /**
-     * Displays the contents of the log file.
+     * Creates a plain error panel.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ErrorPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -118,7 +120,4 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
             super.actionPerformed(event);
         }
     }
-
-
-
 }

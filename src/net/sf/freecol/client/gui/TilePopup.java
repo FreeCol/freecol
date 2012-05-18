@@ -88,12 +88,12 @@ public final class TilePopup extends JPopupMenu {
     /**
      * The constructor that will insert the MenuItems.
      * @param freeColClient The main controller object for the client.
+     * @param gui The GUI frontend.
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
-     * @param gui The GUI frontend.
-     * @param gui An object with methods used for making the popup.
      */
-    public TilePopup(final FreeColClient freeColClient, final GUI gui, final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final GUI gui,
+                     final Tile tile) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
@@ -655,7 +655,7 @@ public final class TilePopup extends JPopupMenu {
      * Debug action to add goods to a unit.
      *
      * @param serverGame The server <code>Game</code> containing the tile.
-     * @param tile The <code>Unit</code> to add to.
+     * @param unit The <code>Unit</code> to add to.
      */
     private void debugAddGoodsToUnit(final Game serverGame, Unit unit) {
         Specification spec = serverGame.getSpecification();

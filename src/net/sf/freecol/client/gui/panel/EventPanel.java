@@ -43,13 +43,12 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param parent The parent of this panel.
-     * @param type The type of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param type The <code>EventType</code> for this panel.
      */
     public EventPanel(FreeColClient freeColClient, GUI gui, EventType type) {
-
         super(freeColClient, gui);
 
         setLayout(new MigLayout("wrap 1", "[center]", "[]20"));
@@ -98,7 +97,5 @@ public final class EventPanel extends FreeColDialog<Boolean> {
         add(okButton, "tag ok");
 
         setSize(getPreferredSize());
-
     }
-
 }

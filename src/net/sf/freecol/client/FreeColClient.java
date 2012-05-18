@@ -276,11 +276,14 @@ public final class FreeColClient {
     }
 
     /**
-     * Quits the application. This method uses {@link #showConfirmDialog} in
+     * Quits the application.
+     * This method uses
+     * {@link net.sf.freecol.client.gui.GUI#showConfirmDialog} in
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void askToQuit() {
-        if (gui.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+        if (gui.showConfirmDialog("quitDialog.areYouSure.text",
+                                  "ok", "cancel")) {
             quit();
         }
     }
@@ -526,12 +529,13 @@ public final class FreeColClient {
     }
 
     /**
-     * Quits the application. This method uses {@link #showConfirmDialog} in
-     * order to get a "Are you sure"-confirmation from the user.
+     * Quits the application.
+     * This method uses {@link net.sf.freecol.client.gui.GUI#showConfirmDialog}
+     * in order to get a "Are you sure"-confirmation from the user.
      */
     public void retire() {
         if (gui.showConfirmDialog("retireDialog.areYouSure.text",
-                              "ok", "cancel")) {
+                                  "ok", "cancel")) {
             setIsRetired(true);
             if (askServer().retire()) {
                 // Panel exit calls quit.
@@ -545,7 +549,7 @@ public final class FreeColClient {
      * Sets the <code>Client</code> that shall be used to send messages to the
      * server.
      *
-     * @param client the <code>Client</code>
+     * @param client The <code>Client</code>.
      * @see #getClient
      */
     public void setClient(Client client) {

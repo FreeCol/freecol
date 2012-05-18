@@ -436,7 +436,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out)
@@ -449,7 +449,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in)

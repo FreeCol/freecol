@@ -851,12 +851,7 @@ public final class ImageLibrary {
         return getUnitImageIcon(unitType, role, false, grayscale, scale);
     }
 
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     *
-     * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
-     *
+    /*
     private Image getPathIllegalImage(Unit u) {
         if (u == null || u.isNaval()) {
             return (Image) UIManager.get("path.naval.illegal.image");
@@ -870,6 +865,14 @@ public final class ImageLibrary {
     }
     */
 
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     *
+     * @param unitType The <code>UnitType</code> to search for.
+     * @param role The unit <code>Role</code>.
+     * @param scale The scale for the image.
+     * @return A suitable <code>Image</code>.
+     */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, double scale) {
         return getUnitImageIcon(unitType, role, false, false, scale);
     }

@@ -260,7 +260,7 @@ public class PathNode {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     public String toString() {
         return "PathNode loc=" + ((FreeColGameObject)location).getId()
@@ -273,7 +273,7 @@ public class PathNode {
     /**
      * Another debug helper.
      *
-     * @param A string describing the whole path.
+     * @return A string describing the whole path.
      */
     public String fullPathToString() {
         StringBuilder sb = new StringBuilder(500);

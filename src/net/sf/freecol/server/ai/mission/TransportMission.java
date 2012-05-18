@@ -1512,7 +1512,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeChildren(XMLStreamWriter out)
         throws XMLStreamException {
@@ -1526,7 +1526,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void readChildren(XMLStreamReader in)
         throws XMLStreamException {
@@ -1557,7 +1557,7 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

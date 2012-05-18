@@ -374,9 +374,9 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * Compatibility hack, called from the specification when it is
      * finishing up.
-     * @compat 0.9.x
      */
     public void fixup09x() {
+        // @compat 0.9.x
         try {
             // Cortes has changed
             if (!getModifierSet("model.modifier.nativeTreasureModifier").isEmpty()) {
@@ -385,6 +385,7 @@ public class FoundingFather extends FreeColGameObjectType {
         } catch (Exception e) {
             // we don't care
         }
+        // @end compatibility code
     }
 
     /**

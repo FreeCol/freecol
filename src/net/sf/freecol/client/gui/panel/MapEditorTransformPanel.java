@@ -90,10 +90,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private static Player nativePlayer;
 
+
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param parent The parent of this panel.
+     * Creates a panel to choose a map transform.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public MapEditorTransformPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new BorderLayout());
@@ -122,7 +124,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         sl.getViewport().setOpaque(false);
         add(sl);
     }
-
 
 
     /**

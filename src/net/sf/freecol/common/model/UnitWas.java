@@ -80,8 +80,8 @@ public class UnitWas implements Comparable<UnitWas> {
      * try our best by using the amount of equipment the unit needs as
      * a secondary criterion (favouring the least equipped).
      *
-     * @param modifier a <code>Modifier</code> value
-     * @return an <code>int</code> value
+     * @param uw The <code>UnitWas</code> to compare to.
+     * @return A comparison result.
      */
     public int compareTo(UnitWas uw) {
         int cmp = ((UnitLocation)uw.loc).getUnitCapacity()

@@ -167,11 +167,13 @@ public final class ColonyPanel extends FreeColPanel
     private JButton setGoodsButton = (FreeCol.isInDebugMode())
         ? new JButton("Set Goods") : null;
 
+
     /**
      * The constructor for the panel.
-     * @param freeColClient
      *
-     * @param parent The parent of this panel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param colony The <code>Colony</code> to display in this panel.
      */
     public ColonyPanel(FreeColClient freeColClient, GUI gui, Colony colony) {
         super(freeColClient, gui);
@@ -479,7 +481,6 @@ public final class ColonyPanel extends FreeColPanel
     /**
      * Interactive debug-mode change of goods amount in a colony.
      *
-     * @param canvas The <code>Canvas</code> to use.
      * @param colony The <code>Colony</code> to set goods amounts in.
      */
     private void debugSetGoods(Colony colony) {

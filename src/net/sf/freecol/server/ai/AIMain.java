@@ -354,7 +354,7 @@ public class AIMain extends FreeColObject
      * whenever a new object gets added to the {@link Game}.
      *
      * @param id The ID of the <code>FreeColGameObject</code> to add.
-     * @param freeColGameObject The <code>FreeColGameObject</code> to add.
+     * @param fcgo The <code>FreeColGameObject</code> to add.
      * @see AIObject
      * @see FreeColGameObject
      * @see FreeColGameObject#getId

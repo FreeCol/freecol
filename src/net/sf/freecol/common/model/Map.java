@@ -263,7 +263,10 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
-    /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
+    /**
+     * The infinite cost used by
+     * {@link #findPath(Unit, Tile, Tile, Unit, CostDecider)}.
+     */
     public static final int COST_INFINITY = Integer.MIN_VALUE;
 
     private Tile[][] tiles;

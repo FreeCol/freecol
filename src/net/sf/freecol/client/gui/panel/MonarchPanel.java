@@ -41,16 +41,17 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
     private static final Logger logger = Logger.getLogger(MonarchPanel.class.getName());
 
+ 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates a panel to handle monarch interactions.
      *
-     * @param parent The parent panel.
-     * @param action The MonarchAction
-     * @param template The StringTemplate to use
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param action The <code>MonarchAction</code> the monarch is performing.
+     * @param template The <code>StringTemplate</code> describing the action.
      */
-    public MonarchPanel(FreeColClient freeColClient, GUI gui, MonarchAction action,
-                        StringTemplate template) {
+    public MonarchPanel(FreeColClient freeColClient, GUI gui,
+                        MonarchAction action, StringTemplate template) {
         super(freeColClient, gui);
 
         String messageId = "model.monarch.action." + action.toString();
@@ -98,6 +99,7 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         }
         setSize(getPreferredSize());
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care

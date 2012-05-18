@@ -1148,8 +1148,6 @@ public abstract class FreeColObject {
      *
      * @param number The number to modify.
      * @param id The id of the modifiers to apply.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
      * @return The modified number.
      */
     public float applyModifier(float number, String id) {

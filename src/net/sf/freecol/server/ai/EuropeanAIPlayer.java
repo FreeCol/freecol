@@ -1296,7 +1296,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Calls {@link AIColony#createAIGoods()} for every colony this player owns.
+     * Calls {@link AIColony#updateAIGoods()} for every colony this
+     * player owns.
      */
     private void createAIGoodsInColonies() {
         logger.finest("Entering method createAIGoodsInColonies");

@@ -41,6 +41,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
  * Dialog for setting some options when loading a game.
  */
@@ -65,10 +66,10 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates a dialog to set the options for loading a saved game.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public LoadingSavegameDialog(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -120,6 +121,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         setSize(getPreferredSize());
 
     }
+
 
     public boolean isSingleplayer() {
         return singleplayer.isSelected();

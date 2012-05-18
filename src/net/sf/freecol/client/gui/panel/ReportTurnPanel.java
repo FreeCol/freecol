@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 
+
 /**
  * This panel displays the Turn Report.
  */
@@ -65,14 +66,16 @@ public final class ReportTurnPanel extends ReportPanel {
     private Hashtable<String, Vector<JComponent>> textPanesByMessage = new Hashtable<String, Vector<JComponent>>();
     private Hashtable<String, Vector<JComponent>> labelsByMessage = new Hashtable<String, Vector<JComponent>>();
 
+
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates the turn report.
      *
-     * @param parent The parent of this panel.
-     * @param messages A variable number of ModelMessages
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param messages The <code>ModelMessages</code> to display in the report.
      */
-    public ReportTurnPanel(FreeColClient freeColClient, GUI gui, ModelMessage... messages) {
+    public ReportTurnPanel(FreeColClient freeColClient, GUI gui,
+                           ModelMessage... messages) {
         super(freeColClient, gui, Messages.message("reportTurnAction.name"));
 
         ClientOptions options = getClientOptions();
@@ -394,5 +397,4 @@ public final class ReportTurnPanel extends ReportPanel {
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
-
 }

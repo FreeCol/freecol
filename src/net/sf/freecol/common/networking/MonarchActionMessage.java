@@ -134,8 +134,8 @@ public class MonarchActionMessage extends DOMMessage {
      *
      * @param accept The new result.
      */
-    public void setResult(boolean accepted) {
-        this.resultString = Boolean.toString(accepted);
+    public void setResult(boolean accept) {
+        this.resultString = Boolean.toString(accept);
     }
 
     /**

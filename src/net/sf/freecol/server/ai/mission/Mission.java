@@ -231,18 +231,18 @@ public abstract class Mission extends AIObject {
      * @param direction An optional preferred <code>Direction</code>.
      * @return The direction of the move, or null if no move was made.
      */
-    protected Direction moveRandomly(String tag, Direction direction) {
+    protected Direction moveRandomly(String logMe, Direction direction) {
         final Unit unit = getUnit();
         if (unit.getMovesLeft() <= 0) return null;
-        if (tag == null) tag = "moveRandomly";
+        if (logMe == null) logMe = "moveRandomly";
 
         Random aiRandom = getAIRandom();
         if (direction == null) {
-            direction = Direction.getRandomDirection(tag, aiRandom);
+            direction = Direction.getRandomDirection(logMe, aiRandom);
         }
 
         Direction[] directions
-            = direction.getClosestDirections(tag, aiRandom);
+            = direction.getClosestDirections(logMe, aiRandom);
         for (int j = 0; j < directions.length; j++) {
             Direction d = directions[j];
             if (unit.getTile().getNeighbourOrNull(d) != null
@@ -916,7 +916,7 @@ public abstract class Mission extends AIObject {
     // Serialization
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
@@ -924,7 +924,7 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {

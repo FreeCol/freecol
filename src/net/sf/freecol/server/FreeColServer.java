@@ -1150,8 +1150,8 @@ public final class FreeColServer {
         }
     }
 
-    // @compat 0.9.x, 0.10.x
     private void fixGameOptions() {
+        // @compat 0.9.x, 0.10.x
         // Add a default value for options new to each version
         // that are not part of the difficulty settings.
         // Annotate with save format version where introduced
@@ -1247,10 +1247,10 @@ public final class FreeColServer {
      *
      * @param serverStrings A list of server object {type, id} pairs to add to.
      * @param fis The savegame to scan.
-     * @compat 0.10.x
      */
     private static void v11FixServerObjects(List<String> serverStrings,
                                             final FreeColSavegameFile fis) {
+        // @compat 0.10.x
         XMLStream xs = null;
         try {
             xs = createXMLStreamReader(fis);

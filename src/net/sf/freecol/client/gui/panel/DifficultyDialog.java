@@ -72,14 +72,18 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         }
     }
 
+
     /**
      * Use this constructor to display the difficulty level of the
      * current game read-only.
      *
-     * @param parent a <code>Canvas</code> value
-     * @param level an <code>OptionGroup</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param level An <code>OptionGroup</code> encapsulating the difficulty
+     *     level to display.
      */
-    public DifficultyDialog(FreeColClient freeColClient, GUI gui, OptionGroup level) {
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui,
+                            OptionGroup level) {
         super(freeColClient, gui, false);
         difficultyBox.setRenderer(new BoxRenderer());
         specification = getSpecification();
@@ -95,10 +99,13 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      * Use this constructor to allow the selection of a difficulty
      * level when starting a new game.
      *
-     * @param parent The parent of this panel.
-     * @param specification a <code>Specification</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param specification The <code>Specification</code> containing the
+     *     difficulty levels in this game.
      */
-    public DifficultyDialog(FreeColClient freeColClient, GUI gui, Specification specification) {
+    public DifficultyDialog(FreeColClient freeColClient, GUI gui,
+                            Specification specification) {
         super(freeColClient, gui, true);
         difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
@@ -129,6 +136,7 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
         initialize(group, Messages.message("difficulty"), difficultyBox);
 
     }
+
 
     @Override
     protected boolean isGroupEditable() {

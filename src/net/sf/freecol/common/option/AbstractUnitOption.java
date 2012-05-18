@@ -59,13 +59,12 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     private IntegerOption number;
 
+
     /**
      * Creates a new <code>AbstractUnitOption</code>.
-     * Get the <code>UnitType</code> value.
      *
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
-     * @return a <code>StringOption</code> value
      */
     public AbstractUnitOption(String id) {
         super(id);
@@ -256,5 +255,4 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     public String toString() {
         return getId() + " <" + value.toString() + ">";
     }
-
 }

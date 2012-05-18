@@ -60,15 +60,17 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
     private JList goodsList;
     private int maxCargo;
 
+
     /**
      * Creates a new CaptureGoodsDialog.
-     * @param freeColClient 
      *
-     * @param parent The parent <code>Canvas</code>.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param winner The <code>Unit</code> that is looting.
      * @param loot The <code>Goods</code> to loot.
      */
-    public CaptureGoodsDialog(FreeColClient freeColClient, GUI gui, Unit winner, List<Goods> loot) {
+    public CaptureGoodsDialog(FreeColClient freeColClient, GUI gui,
+                              Unit winner, List<Goods> loot) {
         super(freeColClient, gui);
         
         maxCargo = winner.getSpaceLeft();
@@ -116,6 +118,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
 
         setSize(getPreferredSize());
     }
+
 
     private void updateComponents() {
         int selectedCount = 0;

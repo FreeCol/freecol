@@ -635,7 +635,7 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

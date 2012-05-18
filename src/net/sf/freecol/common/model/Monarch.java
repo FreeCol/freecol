@@ -788,11 +788,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         /**
          * Returns true if this Force does not contain any units.
          *
-         * @compat 0.10.4
-         *
-         * @return a <code>boolean</code> value
+         * @return True if there are no land or naval units.
          */
         public boolean isEmpty() {
+            // @compat 0.10.4
             return landUnits.isEmpty() && navalUnits.isEmpty();
         }
 

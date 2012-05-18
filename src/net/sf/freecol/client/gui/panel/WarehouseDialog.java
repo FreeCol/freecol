@@ -41,8 +41,9 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 
+
 /**
- * Asks the user if he's sure he wants to quit.
+ * A dialog to display a colony warehouse.
  */
 public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
@@ -52,12 +53,14 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates a dialog to display the warehouse.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param colony The <code>Colony</code> containing the warehouse.
      */
-    public WarehouseDialog(FreeColClient freeColClient, GUI gui, Colony colony) {
+    public WarehouseDialog(FreeColClient freeColClient, GUI gui,
+                           Colony colony) {
         super(freeColClient, gui);
 
         warehouseDialog = new JPanel(new MigLayout("wrap 4"));
@@ -87,6 +90,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
         setSize(getPreferredSize());
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care

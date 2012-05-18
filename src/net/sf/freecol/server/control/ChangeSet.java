@@ -1500,7 +1500,7 @@ public class ChangeSet {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();

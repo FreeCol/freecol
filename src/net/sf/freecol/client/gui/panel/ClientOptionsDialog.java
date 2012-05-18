@@ -40,16 +40,19 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     public static final String OPTION_GROUP_ID = "clientOptions";
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param parent The parent of this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ClientOptionsDialog(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, true);
         getButtons().clear();
         initialize(getClientOptions(), getClientOptions().getName(), null);
     }
+
 
     /**
      * {@inheritDoc}

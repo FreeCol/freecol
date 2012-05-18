@@ -306,10 +306,10 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
      * Applies the given value to the given base value, depending on
      * the give modifier Type.
      *
-     * @param base a <code>float</code> value
-     * @param value a <code>float</code> value
-     * @param value a <code>Type</code> value
-     * @return a <code>float</code> value
+     * @param base The base value.
+     * @param value The modifier value.
+     * @param type The <code>Type</code> of modifier.
+     * @return The result of applying the value to the base.
      */
     private float apply(float base, float value, Type type) {
         switch (type) {

@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
  * This panel displays a report.
  */
@@ -82,10 +83,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         }
     };
 
+
     /**
-     * The constructor that will add the items to this panel.
+     * Creates the basic FreeCol report panel.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param title The title to display on the panel.
      */
     public ReportPanel(FreeColClient freeColClient, GUI gui, String title) {
@@ -114,6 +117,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         restoreSavedSize(850, 600);
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care

@@ -53,12 +53,14 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
     /**
      * The constructor to use.
      *
-     * @param parent <code>Canvas</code>
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param text <code>String</code>
      * @param cancelText <code>String</code>
      * @param choices List of <code>ChoiceItem<T></code>
      */
-    public ChoiceDialog(FreeColClient freeColClient, GUI gui, String text, String cancelText, List<ChoiceItem<T>> choices) {
+    public ChoiceDialog(FreeColClient freeColClient, GUI gui, String text,
+                        String cancelText, List<ChoiceItem<T>> choices) {
         super(freeColClient, gui);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");

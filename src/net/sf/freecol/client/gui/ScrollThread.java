@@ -33,7 +33,6 @@ public class ScrollThread extends Thread {
     /**
      * The constructor to use.
      * 
-     * @param m The Map that needs to be scrolled.
      * @param mapViewer The GUI that holds information such as screen
      *            resolution.
      */

@@ -42,7 +42,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  * 
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
- * 
  */
 public final class RiverStylePanel extends FreeColDialog<Integer> {
 
@@ -51,10 +50,13 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
     
     private static final int CANCEL = -1;
     private static final int DELETE = 0;
+
+
     /**
-     * The constructor that will add the items to this panel. 
-     * @param freeColClient 
-     * @param parent The parent of this panel.
+     * Creates a dialog to choose a river style.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public RiverStylePanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
@@ -91,5 +93,4 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
         int style = Integer.parseInt(event.getActionCommand());
         setResponse(new Integer(style));
     }
-
 }

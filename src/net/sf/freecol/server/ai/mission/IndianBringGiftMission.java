@@ -228,7 +228,7 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {

@@ -45,10 +45,9 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 
 /**
- * This class provides visualization for a List of {@link
- * net.sf.freecol.common.option.AbstractOption<T>}s. In order to
+ * This class provides visualization for a List of
+ * {@link net.sf.freecol.common.option.AbstractOption}s in order to
  * enable values to be both seen and changed.
- *
  */
 public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     implements ListSelectionListener {
@@ -74,10 +73,12 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * Creates a new <code>ListOptionUI</code> for the given
      * <code>ListOption</code>.
      *
-     * @param option
+     * @param gui The <code>GUI</code> to display on.
+     * @param option The <code>ListOption</code> to display.
      * @param editable boolean whether user can modify the setting
      */
-    public ListOptionUI(final GUI gui, final ListOption<T> option, boolean editable) {
+    public ListOptionUI(final GUI gui, final ListOption<T> option,
+                        boolean editable) {
         super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -198,7 +199,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     }
 
     /**
-     * Updates the value of the {@link net.sf.freecol.common.getOption().Option} this object keeps.
+     * Updates the value of the
+     * {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
         getOption().setValue(getValue());
@@ -232,7 +234,4 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             downButton.setEnabled(enabled);
         }
     }
-
-
-
 }

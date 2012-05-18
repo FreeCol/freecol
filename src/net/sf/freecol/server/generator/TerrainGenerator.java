@@ -370,15 +370,17 @@ public class TerrainGenerator {
     }
 
     /**
+     * Gets a random ocean tile type.
      *
-     * @param game
-     * @param latitude
-     * @return
+     * @param game The <code>Game</code> to query for tile types.
+     * @param latitude The latitude of the proposed tile.
+     * @return A suitable random tile type.
      */
     private TileType getRandomOceanTileType(Game game, int latitude) {
-    	// create the main list of TileTypes the first time, and reuse it afterwards
-        if (oceanTileTypes==null) {
-        	oceanTileTypes = new ArrayList<TileType>();
+        if (oceanTileTypes == null) {
+            // create the main list of TileTypes the first time, and
+            // reuse it afterwards
+            oceanTileTypes = new ArrayList<TileType>();
             for (TileType tileType : game.getSpecification().getTileTypeList()) {
                 if (tileType.isWater() && tileType.isConnected()
                 	&& !tileType.hasAbility("model.ability.moveToEurope")) {

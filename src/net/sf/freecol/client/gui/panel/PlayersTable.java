@@ -92,15 +92,17 @@ public final class PlayersTable extends JTable {
 
     private final ImageLibrary library;
 
+
     /**
-     * The constructor that will add the items to this panel.
-     * @param gui 
+     * Creates a players table.
      *
-     * @param canvas a <code>Canvas</code> value
-     * @param nationOptions a <code>NationOptions</code> value
-     * @param myPlayer a <code>Player</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param nationOptions The <code>NationOptions</code> for this game.
+     * @param myPlayer The client <code>Player</code>.
      */
-    public PlayersTable(final FreeColClient freeColClient, final GUI gui, NationOptions nationOptions, Player myPlayer) {
+    public PlayersTable(final FreeColClient freeColClient, final GUI gui,
+                        NationOptions nationOptions, Player myPlayer) {
         super();
 
         library = gui.getImageLibrary();
@@ -157,6 +159,7 @@ public final class PlayersTable extends JTable {
         playerColumn.setCellRenderer(new PlayerCellRenderer());
 
     }
+
 
     public void update() {
         ((PlayersTableModel) getModel()).update();

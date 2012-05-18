@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
  * Dialog for changing the options of an {@link OptionGroup}.
  */
@@ -78,14 +79,16 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
     };
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param parent <code>Canvas</code> The parent of this panel
-     * @param editable boolean
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param editable Whether the dialog is editable.
      */
-    public OptionsDialog(FreeColClient freeColClient, GUI gui, boolean editable) {
+    public OptionsDialog(FreeColClient freeColClient, GUI gui,
+                         boolean editable) {
         super(freeColClient, gui);
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
@@ -106,8 +109,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         setCancelComponent(cancelButton);
 
         setSize(850, 600);
-
     }
+
 
     protected void initialize(OptionGroup group, String header, Component component) {
 
@@ -280,5 +283,4 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             return false;
         }
     }
-
 }

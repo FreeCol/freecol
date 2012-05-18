@@ -123,8 +123,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * Creates a map given for a game.
      *
      * @param game The <code>Game</code> to use.
-     * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
-     * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
+     * @see net.sf.freecol.server.generator.MapGenerator#createMap(net.sf.freecol.common.model.Game)
      */
     public void createMap(Game game) throws FreeColException {
         // Prepare imports:

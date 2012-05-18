@@ -26,67 +26,75 @@ import java.awt.event.WindowListener;
 import net.sf.freecol.client.FreeColClient;
 
 /**
-* The WindowListener for the WindowedFrame class.
-*/
+ * The WindowListener for the WindowedFrame class.
+ */
 public final class WindowedFrameListener implements WindowListener {
 
     private FreeColClient freeColClient;
 
     /**
-    * Constructs this WindowListener.
-    * @param canvas The <code>Canvas</code>.
-    */
+     * Constructs this WindowListener.
+     *
+     * @param freeColClient The <code>FreeColClient</code> to notify.
+     */
     public WindowedFrameListener(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
     }
     
     /**
-    * Invoked when the window gets activated.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets activated.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowActivated(WindowEvent event) {
     }
     
     /**
-    * Invoked when the window gets closed.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets closed.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowClosed(WindowEvent event) {
     }
     
     /**
-    * Invoked when the window is closing.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window is closing.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowClosing(WindowEvent event) {
         freeColClient.askToQuit();
     }
     
     /**
-    * Invoked when the window gets deactivated.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets deactivated.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowDeactivated(WindowEvent event) {
     }
     
     /**
-    * Invoked when the window gets deiconified.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets deiconified.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowDeiconified(WindowEvent event) {
     }
     
     /**
-    * Invoked when the window gets iconified.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets iconified.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowIconified(WindowEvent event) {
     }
     
     /**
-    * Invoked when the window gets opened.
-    * @param event The event that has information on the action.
-    */
+     * Invoked when the window gets opened.
+     *
+     * @param event The event that has information on the action.
+     */
     public void windowOpened(WindowEvent event) {
     }
 }

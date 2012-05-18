@@ -55,11 +55,12 @@ public class BuildingToolTip extends JToolTip {
     /**
      * Creates this BuildingToolTip.
      *
-     * @param freeColClient
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param building The building to display information from.
-     * @param parent a <code>Canvas</code> value
+     * @param gui The <code>GUI</code> to display on.
      */
-    public BuildingToolTip(FreeColClient freeColClient, Building building, GUI gui) {
+    public BuildingToolTip(FreeColClient freeColClient, Building building,
+                           GUI gui) {
         this.gui = gui;
 
         int workplaces = building.getUnitCapacity();

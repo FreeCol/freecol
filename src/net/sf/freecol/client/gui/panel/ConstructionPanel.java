@@ -60,21 +60,26 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
 
     private GUI gui;
 
-    /**
-     * Creates this BuildingToolTip.
-     * @param freeColClient 
-     *
-     * @param parent a <code>Canvas</code> value
-     * @param colony a <code>Colony</code> value
-     */
-    public ConstructionPanel(FreeColClient freeColClient, GUI gui, Colony colony, boolean openBuildQueue) {
 
+    /**
+     * Creates a ConstructionPanel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param colony The <code>Colony</code> whose construction is to be
+     *     modified.
+     * @param openBuildQueue True if the build queue should be immediately
+     *     shown.
+     */
+    public ConstructionPanel(FreeColClient freeColClient, GUI gui,
+                             Colony colony, boolean openBuildQueue) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.openBuildQueue = openBuildQueue;
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
         setColony(colony);
     }
+
 
     public void setColony(Colony newColony) {
         if (newColony != colony) {

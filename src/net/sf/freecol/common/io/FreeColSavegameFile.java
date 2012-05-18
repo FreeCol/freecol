@@ -40,15 +40,15 @@ public class FreeColSavegameFile extends FreeColDataFile {
     /**
      *  The name of a properties file that contains information about
      *  the saved game, such as the size of the map, the date and time
-     *  it was started, and so on. The map size is used in the {@link
-     *  net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
+     *  it was started, and so on.  The map size is used in the
+     *  {@link net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog},
      *  for example.
      */
     public static final String SAVEGAME_PROPERTIES = "savegame.properties";
 
     /**
-     * The name of the file that contains the {@link
-     * net.sf.freecol.client.ClientOptions} saved with the game.
+     * The name of the file that contains the
+     * {@link net.sf.freecol.client.ClientOptions} saved with the game.
      */
     public static final String CLIENT_OPTIONS = "client-options.xml";
 

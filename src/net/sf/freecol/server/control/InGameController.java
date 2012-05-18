@@ -460,7 +460,7 @@ public final class InGameController extends Controller {
      * Asks a question that must be answered this turn.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param question The <code>DOMMessage</code> question.
+     * @param message The <code>DOMMessage</code> question.
      * @param handler The <code>DOMMessageHandler</code> handler to process
      *     the reply with.
      * @param runnable An optional <code>Runnable</code> to run if the
@@ -475,7 +475,7 @@ public final class InGameController extends Controller {
      * Asks a question of a player with a timeout.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param question The <code>DOMMessage</code> question.
+     * @param request The <code>DOMMessage</code> question.
      * @return The response to the question, or null if none.
      */
     private DOMMessage askTimeout(ServerPlayer serverPlayer,
@@ -820,7 +820,6 @@ public final class InGameController extends Controller {
      * Queries a player to choose their next founding father in a future.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @return A <code>Future</code> to encapsulate the query.
      */
     private void nextFoundingFather(final ServerPlayer serverPlayer) {
         if (!serverPlayer.canRecruitFoundingFather()) return;

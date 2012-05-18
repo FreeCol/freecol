@@ -57,10 +57,12 @@ public class ColopediaAction extends FreeColAction {
 
     /**
      * Creates this action.
+     *
      * @param freeColClient The main controller object for the client.
-     * @param panelId a <code>String</code> value
+     * @param gui The <code>GUI</code> to display on.
+     * @param panelType The <code>PanelType</code> to use.
      */
-    ColopediaAction(FreeColClient freeColClient, GUI gui, PanelType panelType) {
+    public ColopediaAction(FreeColClient freeColClient, GUI gui, PanelType panelType) {
         super(freeColClient, gui, id + panelType);
         setMnemonic(mnemonics[panelType.ordinal()]);
     }

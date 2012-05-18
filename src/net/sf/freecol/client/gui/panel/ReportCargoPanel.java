@@ -40,13 +40,15 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportCargoPanel extends ReportUnitPanel {
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient
-     * @param parent The parent of this panel.
+     * Creates a cargo report.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ReportCargoPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, "reportCargoAction.name", false);
     }
+
 
     protected void addREFUnits() {}
 
@@ -83,5 +85,4 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
-
 }

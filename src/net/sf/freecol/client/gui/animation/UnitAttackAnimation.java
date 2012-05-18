@@ -39,16 +39,18 @@ final class UnitAttackAnimation {
     private GUI gui;
     private FreeColClient freeColClient;
 
+
     /**
      * Build a new attack animation.
      *
-     * @param canvas The <code>Canvas</code> to draw the animation on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(FreeColClient freeColClient, GUI gui, Unit attacker, Unit defender,
-                               boolean success) {
+    public UnitAttackAnimation(FreeColClient freeColClient, GUI gui,
+                               Unit attacker, Unit defender, boolean success) {
         this.freeColClient = freeColClient;
         this.gui = gui;
         this.attacker = attacker;
@@ -86,7 +88,6 @@ final class UnitAttackAnimation {
         return sza;
     }
 
-
     /**
      * Do the animation.
      */
@@ -101,7 +102,8 @@ final class UnitAttackAnimation {
             }
         }
 
-        if (!success && Animations.getAnimationSpeed(freeColClient, defender) > 0) {
+        if (!success
+            && Animations.getAnimationSpeed(freeColClient, defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
                 new UnitImageAnimation(gui, defender, sza).animate();

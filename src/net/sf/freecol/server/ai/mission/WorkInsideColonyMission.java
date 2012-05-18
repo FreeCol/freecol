@@ -151,7 +151,7 @@ public class WorkInsideColonyMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
@@ -160,7 +160,7 @@ public class WorkInsideColonyMission extends Mission {
     }
 
     /**
-     * {@inherit-doc}
+     * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {

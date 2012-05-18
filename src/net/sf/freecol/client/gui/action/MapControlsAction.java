@@ -36,25 +36,25 @@ public class MapControlsAction extends SelectableAction {
     public static final String id = "mapControlsAction";
 
 
-
     /**
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui
+     * @param gui The <code>GUI</code> to display on.
      */
     MapControlsAction(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, id, ClientOptions.DISPLAY_MAP_CONTROLS);
     }
 
     /**
-     * Updates the "enabled"-status and calls {@link #showMapControls(boolean)}.
+     * Updates the "enabled"-status and calls
+     * {@link net.sf.freecol.client.gui.GUI#showMapControls(boolean)}.
      */
     @Override
     public void update() {
         super.update();
 
-        gui.showMapControls((enabled && isSelected()));
+        gui.showMapControls(enabled && isSelected());
     }
 
     /**

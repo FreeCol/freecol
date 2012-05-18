@@ -49,20 +49,30 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     private TypeCountMap<UnitType> unitCount;
     private List<Colony> colonies;
     private UnitType unitType;
+
     
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param parent The parent of this panel.
+     * Creates the detail portion of a labour report.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param unitType The <code>UnitType</code> to display detail for.
+     * @param data The location data.
+     * @param unitCount The unit counts by type.
+     * @param colonies A list of <code>Colony</code>s for this player.
      */
-    public ReportLabourDetailPanel(FreeColClient freeColClient, GUI gui, UnitType unitType, Map<UnitType, Map<Location, Integer>> data,  
-            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+    public ReportLabourDetailPanel(FreeColClient freeColClient, GUI gui,
+                                   UnitType unitType,
+                                   Map<UnitType, Map<Location, Integer>> data,  
+                                   TypeCountMap<UnitType> unitCount,
+                                   List<Colony> colonies) {
         super(freeColClient, gui, Messages.message("report.labour.details"));
         this.unitType = unitType;
         this.data = data;
         this.unitCount = unitCount;
         this.colonies = colonies;
     }
+
 
     public void initialize() {
 
@@ -114,5 +124,4 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
         }
         reportPanel.add(detailPanel);
     }
-
 }

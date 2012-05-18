@@ -100,7 +100,6 @@ public class Mods {
      * Loads all valid mods from a specified directory.
      *
      * @param directory The directory to load from.
-     * @return A list of valid mods.
      */
     private static void getDirectoryMods(File directory) {
         if (directory != null && directory.isDirectory()) {

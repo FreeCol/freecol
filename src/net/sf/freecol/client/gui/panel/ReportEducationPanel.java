@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * This panel displays the Education Report.
  */
@@ -41,9 +42,10 @@ public final class ReportEducationPanel extends ReportPanel {
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param parent The parent of this panel.
+     * Creates the education report.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ReportEducationPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, Messages.message("reportEducationAction.name"));
@@ -78,6 +80,7 @@ public final class ReportEducationPanel extends ReportPanel {
 
     }
 
+
     private JPanel getPanel(String title) {
         JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT));
         result.setOpaque(false);
@@ -85,6 +88,4 @@ public final class ReportEducationPanel extends ReportPanel {
                                                           Messages.message(title)));
         return result;
     }
-
 }
-

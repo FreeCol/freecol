@@ -344,9 +344,9 @@ public final class BuildingType extends BuildableType
     /**
      * Compatibility hack, called from the specification reader when
      * it is finishing up.
-     * @compat 0.9.x
      */
     public void fixup09x() {
+        // @compat 0.9.x
         try {
             if (hasAbility(Ability.AUTO_PRODUCTION)) {
                 if (!hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
@@ -376,6 +376,7 @@ public final class BuildingType extends BuildableType
         } catch(Exception e) {
             // no such ability, we don't care
         }
+        // @end compatibility code
     }
 
     /**

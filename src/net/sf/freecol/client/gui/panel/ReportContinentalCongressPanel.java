@@ -53,10 +53,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
     static final String none = Messages.message("report.continentalCongress.none");
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates the continental congress report.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      */
     public ReportContinentalCongressPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, title);
@@ -126,8 +126,4 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
         setMainComponent(tabs);
     }
-
-
-
-
 }

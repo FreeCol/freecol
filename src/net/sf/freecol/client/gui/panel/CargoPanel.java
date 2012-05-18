@@ -63,8 +63,9 @@ public class CargoPanel extends FreeColPanel
     /**
      * Creates this CargoPanel.
      *
-     * @param parent The parent Canvas that holds this CargoPanel
-     * @param withTitle boolean
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
+     * @param withTitle Should the panel have a title?
      */
     public CargoPanel(FreeColClient freeColClient, GUI gui, boolean withTitle) {
         super(freeColClient, gui);
@@ -83,7 +84,6 @@ public class CargoPanel extends FreeColPanel
         setBorder(border);
         initialize();
     }
-
 
 
     /**

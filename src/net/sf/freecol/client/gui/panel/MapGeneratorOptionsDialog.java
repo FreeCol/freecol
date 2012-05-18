@@ -61,15 +61,17 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
 
 
     /**
-     * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * Creates a dialog to set the map generator options.
      *
-     * @param parent The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gui The <code>GUI</code> to display on.
      * @param mgo the map generator options
      * @param editable whether the options may be edited
      * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui, OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
+    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui,
+                                     OptionGroup mgo, boolean editable,
+                                     boolean loadCustomOptions) {
         super(freeColClient, gui, editable);
 
         if (editable && loadCustomOptions) {
@@ -132,6 +134,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         initialize(mgo, mgo.getName(), scrollPane);
 
     }
+
 
     public String getDefaultFileName() {
         return "map_generator_options.xml";

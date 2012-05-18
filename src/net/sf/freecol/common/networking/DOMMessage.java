@@ -252,7 +252,10 @@ public class DOMMessage {
     }
 
     /**
-     * {@inherit-doc}
+     * Dummy serialization stub.
+     * Must be overridden by subclasses.
+     *
+     * @return Null.
      */
     public Element toXMLElement() {
         return null; // do nothing
