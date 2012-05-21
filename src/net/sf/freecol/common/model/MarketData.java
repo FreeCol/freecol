@@ -181,7 +181,7 @@ public class MarketData extends FreeColGameObject {
                 amountPrice -= newPrice - (costToBuy + diff);
                 amountInMarket = Math.round(goodsType.getInitialAmount()
                     * (initialPrice / amountPrice));
-                logger.warning("Clamped price rise for " + getId()
+                logger.info("Clamped price rise for " + getId()
                     + " from " + newPrice
                     + " to " + (costToBuy + diff));
                 newPrice = costToBuy + diff;
@@ -189,7 +189,7 @@ public class MarketData extends FreeColGameObject {
                 amountPrice += (costToBuy - diff) - newPrice;
                 amountInMarket = Math.round(goodsType.getInitialAmount()
                     * (initialPrice / amountPrice));
-                logger.warning("Clamped price fall for " + getId()
+                logger.info("Clamped price fall for " + getId()
                     + " from " + newPrice
                     + " to " + (costToBuy - diff));
                 newPrice = costToBuy - diff;

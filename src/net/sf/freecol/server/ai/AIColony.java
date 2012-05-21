@@ -406,7 +406,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // will not loop indefinitely.  The compromise is to just
         // rearrange next turn until we get out of this state.
         if (build != null && !colony.canBuild(build)) {
-            logger.warning(colony.getName() + " reneged building " + build);
+            logger.warning(colony.getName() + " reneged building " + build
+                + " " + colony.getNoBuildReason(build));
             List<BuildableType> queue = new ArrayList<BuildableType>();
             build = colonyPlan.getBestBuildableType();
             if (build != null) queue.add(build);

@@ -3592,10 +3592,9 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
         if (entryLocationStr != null) {
-            entryLocation = getGame().getFreeColLocation(entryLocationStr);
-            if (entryLocation == null) {
-                entryLocation = new Tile(getGame(), entryLocationStr);
-            }
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(entryLocationStr);
+            entryLocation = (fcgo instanceof Location) ? (Location)fcgo
+                : new Tile(getGame(), entryLocationStr);
         }
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
