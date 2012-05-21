@@ -242,7 +242,7 @@ public class WorkerWish extends Wish {
     @Override
     public String toString() {
         return "[" + getId() + " " + unitType.getNameKey()
-            + " (" + getValue() + (expertNeeded ? ", expert" : "") + "]";
+            + " (" + getValue() + (expertNeeded ? ", expert" : "") + ")]";
     }
 
     /**

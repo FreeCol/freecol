@@ -234,9 +234,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // REF garrisons thinly.
-                Settlement settlement = DefendSettlementMission
-                    .extractTarget(aiUnit, path);
-                if (getSettlementDefenders(settlement) > 0) value = 0;
+                Location loc = DefendSettlementMission.extractTarget(aiUnit, path);
+                if (loc instanceof Settlement
+                    && getSettlementDefenders((Settlement)loc) > 0) value = 0;
             } else if (type == UnitSeekAndDestroyMission.class) {
                 Location target = UnitSeekAndDestroyMission
                     .extractTarget(aiUnit, path);
