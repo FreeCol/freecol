@@ -128,11 +128,10 @@ public class WorkInsideColonyMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        final Unit unit = aiUnit.getUnit();
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : (!unit.isPerson()) ? Mission.UNITNOTAPERSON
-            : ((reason = invalidTargetReason(loc, unit.getOwner()))
+            : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
+            : ((reason = invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
                 != null) ? reason
             : null;
     }
