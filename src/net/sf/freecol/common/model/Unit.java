@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -4045,9 +4046,10 @@ public class Unit extends FreeColGameObject
      * @return A string representation of this <code>Unit</code>.
      */
     public String toString() {
-        return "[" + getId() + " " + getType().getId()
+        return "[" + getId()
+            + " " + Utils.lastPart(owner.getNationID(), ".")
+            + " " + Utils.lastPart(getType().getId(), ".")
             + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
-            + " " + owner.getNationID()
             + " " + getMovesAsString() + "]";
     }
 

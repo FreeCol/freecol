@@ -76,7 +76,7 @@ public class Map extends FreeColGameObject implements Location {
         };
 
     /**
-     * A cost decider to help find a path to Europe.
+     * A cost decider to help find a path to Europe without knowing the unit.
      */
     private static final CostDecider europeCostDecider = new CostDecider() {
             public int getCost(Unit unit, Tile oldTile, Tile newTile, 
@@ -300,6 +300,11 @@ public class Map extends FreeColGameObject implements Location {
      */
     private final java.util.Map<String, Region> regions
         = new HashMap<String, Region>();
+
+    /**
+     * The search tracing status.
+     */
+    private boolean traceSearch = false;
 
 
     /**
@@ -891,8 +896,17 @@ public class Map extends FreeColGameObject implements Location {
                                 carrier != null, null, path);
         }
 
-        return search(unit, (Tile)start, goalDecider, costDecider, maxTurns,
+        return search(unit, start.getTile(), goalDecider, costDecider, maxTurns,
                       carrier, null);
+    }
+
+    /**
+     * Sets the search tracing status.
+     *
+     * @param trace The new search tracing status.
+     */
+    public void setSearchTrace(boolean trace) {
+        traceSearch = trace;
     }
 
     /**
@@ -954,16 +968,16 @@ public class Map extends FreeColGameObject implements Location {
                             - f.get(p2.getTile().getId()).intValue());
                     }
                 });
+        final List<Tile> tracing = (traceSearch) ? new ArrayList<Tile>()
+            : null;
 
         // What unit starts the path?
         Unit currentUnit = (carrier != null) ? carrier : unit;
 
         // Create the start node and put it on the open list.
-        final PathNode firstNode
-            = new PathNode(start,
-                           ((currentUnit != null) ? currentUnit.getMovesLeft()
-                               : -1), 0, carrier != null,
-                           null, null);
+        final PathNode firstNode = new PathNode(start,
+            ((currentUnit != null) ? currentUnit.getMovesLeft() : -1),
+            0, carrier != null, null, null);
         f.put(start.getId(),
             new Integer((searchHeuristic == null) ? 0
                 : searchHeuristic.getValue(start)));
@@ -974,13 +988,14 @@ public class Map extends FreeColGameObject implements Location {
             // Choose the node with the lowest f.
             final PathNode currentNode = openListQueue.poll();
             final Tile currentTile = currentNode.getTile();
+            if (tracing != null) tracing.add(currentTile);
             openList.remove(currentTile.getId());
             closedList.put(currentTile.getId(), currentNode);
 
             // Reset current unit to that of this node.
             currentUnit = (currentNode.isOnCarrier()) ? carrier : unit;
 
-            // Check for simple success.
+            // Stop at simple success.
             if (goalDecider.check(currentUnit, currentNode)
                 && !goalDecider.hasSubGoals()) {
                 break;
@@ -993,12 +1008,12 @@ public class Map extends FreeColGameObject implements Location {
 
             // Only check further along a path (i.e. ignore initial
             // node) if it is possible to transit *through* it.
-            if (currentUnit != null && currentNode.previous != null) {
-                PathNode prev = currentNode.previous;
-                if (!currentUnit.getSimpleMoveType(prev.getTile(),
-                                                   currentNode.getTile())
-                    .isProgress()) continue;
-            }
+            //if (currentUnit != null && currentNode.previous != null) {
+            //    PathNode prev = currentNode.previous;
+            //    if (!currentUnit.getSimpleMoveType(prev.getTile(),
+            //                                       currentNode.getTile())
+            //        .isProgress()) continue;
+            //}
 
             // Collect the parameters for the current node.
             final int currentCost = currentNode.getCost();
@@ -1031,10 +1046,10 @@ public class Map extends FreeColGameObject implements Location {
                     ? moveUnit.getInitialMovesLeft()
                     : currentMovesLeft;
                 int moveTurns = currentTurns;
-                CostDecider moveDecider = (costDecider != null) ? costDecider
-                    : CostDeciders.defaultCostDeciderFor(moveUnit);
 
                 // Consider cost of moving to the new tile.
+                CostDecider moveDecider = (costDecider != null) ? costDecider
+                    : CostDeciders.defaultCostDeciderFor(moveUnit);
                 int extraCost = moveDecider.getCost(moveUnit, currentTile,
                                                     moveTile, moveMovesLeft);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
@@ -1046,8 +1061,7 @@ public class Map extends FreeColGameObject implements Location {
                                                        moveTile).isLegal()
                         || !goalDecider.check(moveUnit,
                             new PathNode(moveTile, moveMovesLeft, moveTurns,
-                                moveOnCarrier,
-                                currentNode, null))) {
+                                         moveOnCarrier, currentNode, null))) {
                         continue;
                     }
                     // Pretend it finishes the move.
@@ -1061,19 +1075,20 @@ public class Map extends FreeColGameObject implements Location {
 
                 // Is this an improvement?  If not, ignore.
                 PathNode successor = openList.get(moveTile.getId());
-                if (successor != null) {
-                    if (successor.getCost() <= moveCost) continue;
-                    openList.remove(successor.getTile().getId());
-                    openListQueue.remove(successor);
-                }
+                if (successor != null
+                    && successor.getCost() <= moveCost) continue;
 
                 // Queue new node with updated parameters.
-                if (searchHeuristic != null) {
-                    moveCost += searchHeuristic.getValue(moveTile);
+                if (successor != null) {
+                    openList.remove(successor.getTile().getId());
+                    openListQueue.remove(successor);
                 }
                 successor = new PathNode(moveTile, moveMovesLeft, moveTurns,
                                          moveOnCarrier,
                                          currentNode, null);
+                if (searchHeuristic != null) {
+                    moveCost += searchHeuristic.getValue(moveTile);
+                }
                 f.put(moveTile.getId(), new Integer(moveCost));
                 openList.put(moveTile.getId(), successor);
                 openListQueue.offer(successor);
@@ -1086,9 +1101,14 @@ public class Map extends FreeColGameObject implements Location {
                 bestTarget.previous.next = bestTarget;
                 bestTarget = bestTarget.previous;
             }
-            return bestTarget;
         }
-        return null;
+        if (tracing != null) {
+            String logMe = "Search trace:";
+            for (Tile t : tracing) logMe += " " + t;
+            if (bestTarget != null) logMe += "*";
+            logger.finest(logMe);
+        }
+        return bestTarget;
     }
 
     /**

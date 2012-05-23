@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -2058,7 +2059,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public String toString() {
         return "Tile(" + x + "," + y +"):"
-            + ((type == null) ? "unknown" : type.getId());
+            + ((type == null) ? "unknown" : Utils.lastPart(type.getId(), "."));
     }
 
     /**

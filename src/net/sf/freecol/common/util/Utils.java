@@ -87,6 +87,21 @@ public class Utils {
     }
 
     /**
+     * Gets the last part of a string after a supplied delimiter.
+     *
+     * @param s The string to operate on.
+     * @param delim The delimiter.
+     * @return The last part of the string after the last instance of
+     *     the delimiter, or the original string if the delimiter is
+     *     not present.
+     */
+    public static String lastPart(String s, String part) {
+        int last = (s == null) ? -1 : s.lastIndexOf(part);
+        return (last > 0) ? s.substring(last+part.length(), s.length())
+            : s;
+    }
+
+    /**
      * Generalize this method instead of calling it directly elsewhere.
      * 
      * @return			String
