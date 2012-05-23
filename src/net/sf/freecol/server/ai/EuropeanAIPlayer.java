@@ -199,7 +199,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Gets the best plan for a colony from the tipMap.
      *
      * @param colony The <code>Colony</code> to check.
-     * @return The tile with the best plan for a colony.
+     * @return The tile with the best plan for a colony, or null if none found.
      */
     public Tile getBestPlanTile(Colony colony) {
         TileImprovementPlan best = null;
@@ -211,7 +211,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 best = tip;
             }
         }
-        return best.getTarget();
+        return (best == null) ? null : best.getTarget();
     }
 
 
