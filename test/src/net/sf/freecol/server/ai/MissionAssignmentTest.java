@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tension;
@@ -103,16 +104,18 @@ public class MissionAssignmentTest extends FreeColTestCase {
         //Make tests
         int turnsToReach = 1; // not important
 
-        assertFalse("Cannot attack own unit", UnitSeekAndDestroyMission.isTarget(aiUnit, friendlyColonist));
-        assertFalse("Players are not at war", UnitSeekAndDestroyMission.isTarget(aiUnit, enemyColonist));
+        assertNotNull("Cannot attack own unit",
+            UnitSeekAndDestroyMission.invalidReason(aiUnit, friendlyColonist));
+        assertNotNull("Players are not at war",
+            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyColonist));
 
         dutch.setStance(french, Stance.WAR);
         french.setStance(dutch, Stance.WAR);
 
-        assertTrue("Unit should be able to attack land unit",
-            UnitSeekAndDestroyMission.isTarget(aiUnit, enemyColonist));
-        assertFalse("Land unit cannot attack naval unit",
-            UnitSeekAndDestroyMission.isTarget(aiUnit, enemyGalleon));
+        assertEquals("Unit should be able to attack land unit", null,
+            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyColonist));
+        assertNotNull("Land unit cannot attack naval unit",
+            UnitSeekAndDestroyMission.invalidReason(aiUnit, enemyGalleon));
     }
 
     public void testIsTargetValidForSeekAndDestroy() {
@@ -160,35 +163,33 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create defending player
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-
-        //Make tests
-
         aiDutch.giveMilitaryMission(aiUnit);
-
-        boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
-
-        assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
+        assertTrue("No enemy units are present => UnitWanderHostileMission",
+            aiUnit.getMission() instanceof UnitWanderHostileMission);
 
         // Add non-hostile unit
-        Tile tile2 = map.getTile(2, 1);
-        new ServerUnit(game, tile2, french, colonistType);
+        Tile tile2 = map.getTile(2, 4);
+        Unit colonist = new ServerUnit(game, tile2, french, colonistType);
 
         // reassign mission and check
         aiDutch.giveMilitaryMission(aiUnit);
-        isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
+        assertTrue("No hostile units are present => UnitWanderHostileMission",
+            aiUnit.getMission() instanceof UnitWanderHostileMission);
 
-        assertTrue("No hostile units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
-
-        // Make unit hostile by changing stance to War,reassign mission and check
+        // Make unit hostile by changing stance to War,reassign
+        // mission and check
         dutch.setStance(french, Stance.WAR);
         french.setStance(dutch, Stance.WAR);
+
+        assertEquals("Enemy unit is present, destroying it possible", null,
+            UnitSeekAndDestroyMission.invalidReason(aiUnit));
+        PathNode path = UnitSeekAndDestroyMission.findTargetPath(aiUnit, 16);
+        assertNotNull(path);
+        assertEquals(colonist, UnitSeekAndDestroyMission.extractTarget(aiUnit, path));
+        assertEquals(aiDutch.chooseMilitaryTarget(aiUnit), colonist);
         aiDutch.giveMilitaryMission(aiUnit);
-
-        isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
-        boolean isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
-
-        assertFalse("Enemy unit is present, should not be UnitWanderHostileMission", isUnitWanderHostileMission);
-        assertTrue("Enemy unit is present, should be UnitSeekAndDestroyMission", isSeekAndDestroyMission);
+        assertTrue("Enemy unit is present => UnitSeekAndDestroyMission", 
+            aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
     }
 
     public void testAssignDefendSettlementMission() {
@@ -222,9 +223,10 @@ public class MissionAssignmentTest extends FreeColTestCase {
         assertTrue(colony.getOwner() == dutch);
         assertTrue(colony.getUnitCount() == 1);
         aiUnit.abortMission("test");
-        assertTrue("DefendSettlementMission should be possible",
-            DefendSettlementMission.isValid(aiUnit)
-            && DefendSettlementMission.isTarget(aiUnit, colony));
+        assertEquals("DefendSettlementMission should be possible", null,
+            DefendSettlementMission.invalidReason(aiUnit));
+        assertEquals("DefendSettlementMission should work with colony", null,
+            DefendSettlementMission.invalidReason(aiUnit, colony));
 
         // reassign mission and check
         aiDutch.giveMilitaryMission(aiUnit);
@@ -255,18 +257,25 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Tile settlementTile = map.getTile(9, 9);
         Tile adjacentTile = settlementTile.getNeighbourOrNull(Direction.N);
-        assertTrue("Settlement tile should be land",settlementTile.isLand());
-        assertTrue("Adjacent tile should be land", adjacentTile != null && adjacentTile.isLand());
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.player(inca).settlementTile(settlementTile).build();
+        assertTrue("Settlement tile should be land",
+            settlementTile.isLand());
+        assertTrue("Adjacent tile should be land",
+            adjacentTile != null && adjacentTile.isLand());
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.player(inca)
+            .settlementTile(settlementTile).initialBravesInCamp(8).build();
+        assertEquals("One camp", 1, inca.getNumberOfSettlements());
 
-        // put one brave outside the camp, but in the settlement tile, so that he may defend the settlement
-        Unit braveOutside = new ServerUnit(game, settlementTile, inca, braveType);
+        // Put one brave outside the camp, but in the settlement tile,
+        // so that he may defend the settlement
+        Unit braveOutside = new ServerUnit(game, settlementTile, inca, 
+                                           braveType);
         braveOutside.setIndianSettlement(camp);
 
         // Setup enemy units
         int enemyUnits = camp.getUnitCount() + 1;
-        for(int i=0; i< enemyUnits; i++){
+        for (int i = 0; i < enemyUnits; i++) {
             new ServerUnit(game, adjacentTile, dutch, veteranType);
         }
 
@@ -276,46 +285,44 @@ public class MissionAssignmentTest extends FreeColTestCase {
             assertNotNull("Got null while getting the camps units", brave);
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);
-
-            aiInca.giveMilitaryMission(aiUnit);
-
-            boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
-
-            assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
+            aiUnit.setMission(new UnitWanderHostileMission(aiMain, aiUnit));
+            assertTrue("Should be UnitWanderHostileMission", 
+                aiUnit.getMission() instanceof UnitWanderHostileMission);
+            assertEquals("Unit should be candidate for seek+destroy", null,
+                UnitSeekAndDestroyMission.invalidReason(aiUnit));
+            assertEquals("Unit should be candidate for defend", null,
+                DefendSettlementMission.invalidReason(aiUnit));
         }
 
         inca.setStance(dutch, Stance.WAR);
         inca.setTension(dutch, new Tension(Tension.Level.HATEFUL.getLimit()));
+        camp.setAlarm(dutch, inca.getTension(dutch));
         assertTrue("Indian player should be at war with dutch",
                    inca.getStance(dutch) == Stance.WAR);
         assertEquals("Wrong Indian player tension towards dutch",
                      Tension.Level.HATEFUL.getLimit(),
                      inca.getTension(dutch).getValue());
-
         aiInca.secureIndianSettlement(camp);
 
         // Verify if a unit was assigned a UnitSeekAndDestroyMission
         boolean isSeekAndDestroyMission = false;
-        for(Unit brave : inca.getUnits()){
+        for (Unit brave : inca.getUnits()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
-            assertNotNull("Couldnt get aiUnit for players brave",aiUnit);
-            assertNotNull("Unit missing mission",aiUnit.getMission());
-
-            isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
-
-            // found unit
-            if(isSeekAndDestroyMission){
-                break;
-            }
+            assertNotNull("Couldnt get aiUnit for players brave", aiUnit);
+            assertNotNull("Unit missing mission", aiUnit.getMission());
+            isSeekAndDestroyMission = aiUnit.getMission()
+                instanceof UnitSeekAndDestroyMission;
+            if (isSeekAndDestroyMission) break;
         }
-        assertTrue("One brave should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
+        assertTrue("A brave should have a UnitSeekAndDestroyMission",
+                   isSeekAndDestroyMission);
     }
 
     /**
      * When searching for threats to a settlement, the indian player
      * should ignore naval threats, as he does not have naval power
      */
-    public void testSecureIndianSettlementMissionIgnoreNavalThreath() {
+    public void testSecureIndianSettlementMissionIgnoreNavalThreat() {
         Map map = getCoastTestMap(plainsType);
         Game game = ServerTestHelper.startServerGame(map);
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
@@ -328,31 +335,30 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Tile settlementTile = map.getTile(9, 9);
         Tile seaTile = map.getTile(10, 9);
-        assertTrue("Settlement tile should be land",settlementTile.isLand());
-        assertFalse("Galleon tile should be ocean",seaTile.isLand());
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp = builder.player(inca).settlementTile(settlementTile).initialBravesInCamp(10).build();
-
+        assertTrue("Settlement tile should be land", settlementTile.isLand());
+        assertFalse("Galleon tile should be ocean", seaTile.isLand());
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.player(inca)
+            .settlementTile(settlementTile).initialBravesInCamp(10).build();
         Unit galleon = new ServerUnit(game, seaTile, dutch, galleonType);
-
         int unitsInGalleon = 6;
         for (int i = 0; i < unitsInGalleon; i++) {
             Unit artillery = new ServerUnit(game, settlementTile, dutch,
                 artilleryType);
             igc.embarkUnit(dutch, artillery, galleon);
         }
-        assertEquals("Wrong number of units onboard galleon",unitsInGalleon,galleon.getUnitCount());
-        assertEquals("Galleon should be full",0,galleon.getSpaceLeft());
+        assertEquals("Wrong number of units onboard galleon", unitsInGalleon,
+            galleon.getUnitCount());
+        assertEquals("Galleon should be full", 0, galleon.getSpaceLeft());
 
-        for(Unit brave : camp.getUnitList()){
+        for (Unit brave : camp.getUnitList()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
-
-            aiInca.giveMilitaryMission(aiUnit);
-
-            boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
-
-            assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
+            aiUnit.setMission(new UnitWanderHostileMission(aiMain, aiUnit));
+            assertEquals("No enemy units present",
+                UnitWanderHostileMission.class,
+                aiUnit.getMission().getClass());
         }
 
         inca.setStance(dutch, Stance.WAR);
@@ -363,20 +369,17 @@ public class MissionAssignmentTest extends FreeColTestCase {
                      Tension.Level.HATEFUL.getLimit(),
                      inca.getTension(dutch).getValue());
 
+        aiInca.abortInvalidAndOneTimeMissions();
         aiInca.secureIndianSettlement(camp);
-
-        boolean notUnitWanderHostileMission = false;
-        for(Unit brave : inca.getUnits()){
+        boolean seeking = false;
+        for (Unit brave : inca.getUnits()) {
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull(aiUnit);
-
-            boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
-
-            if(!isUnitWanderHostileMission){
-                notUnitWanderHostileMission = true;
+            if (aiUnit.getMission() instanceof UnitSeekAndDestroyMission) {
+                seeking = true;
                 break;
             }
         }
-        assertFalse("Braves should not pursue naval units, or units aboard naval units", notUnitWanderHostileMission);
+        assertFalse("Braves should not pursue naval units", seeking);
     }
 }

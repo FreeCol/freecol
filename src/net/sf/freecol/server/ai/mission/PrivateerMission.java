@@ -92,14 +92,79 @@ public class PrivateerMission extends Mission {
     }
 
 
+    // Mission interface
+
+    /**
+     * Gets the target for this mission.
+     *
+     * @return The target for this mission.
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * Why would a PrivateeringMission be invalid with the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
+     */
+    private static String invalidPrivateeringReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (!unit.isCarrier()) ? "unit-not-a-carrier"
+            : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+            : (!unit.hasAbility(Ability.PIRACY)) ? "unit-not-a-pirate"
+            : (unit.getGoodsCount() > 0) ? "unit-has-goods"
+            : (unit.getUnitCount() > 0) ? "unit-has-units"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for the mission invalidity, or null if still valid.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidPrivateeringReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidPrivateeringReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    // Not a one-time mission, omit isOneTime().
+
     /**
      * Performs the mission. This is done by searching for hostile units
      * that are located within one tile and attacking them. If no such units
      * are found, then wander in a random direction.
      */
     public void doMission() {
-    	logger.finest("Entering doMission");
-    	Unit unit = getUnit();
+        Unit unit = getUnit();
         while(isValid() && unit.getMovesLeft() > 0){
         	// Unit is between Europe and America, nothing to do
         	if (unit.isAtSea()){
@@ -242,36 +307,6 @@ public class PrivateerMission extends Mission {
         for (Unit u : unit.getUnitList()) {
             unitLeavesTransport(getAIMain().getAIUnit(u), null);
         }
-    }
-
-    /**
-     * Checks if this mission is valid for the given unit.
-     *
-     * @param aiUnit The unit.
-     * @return <code>true</code> if this mission is valid to perform
-     *         and <code>false</code> otherwise.
-     */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isCarrier()
-            && aiUnit.getUnit().isOffensiveUnit()
-            && aiUnit.getUnit().hasAbility(Ability.PIRACY)
-            && aiUnit.getUnit().getGoodsCount() == 0
-            && aiUnit.getUnit().getUnitCount() == 0;
-    }
-
-    /**
-     * Checks if this mission is still valid to perform.
-     *
-     * @return True if the mission is still valid.
-     */
-    public boolean isValid() {
-        return super.isValid() && valid
-            && getUnit().isCarrier()
-            && getUnit().isOffensiveUnit()
-            && getUnit().hasAbility(Ability.PIRACY)
-            && getUnit().getGoodsCount() == 0
-            && getUnit().getUnitCount() == 0;
     }
 
     /**

@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
@@ -96,12 +97,111 @@ public class IndianDemandMission extends Mission {
     }
 
 
+    // Mission interface
+
+    /**
+     * Gets the mission target.
+     *
+     * @return The target <code>Colony</code>.
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * Why would an IndianDemandMission be invalid with the given unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
+     */
+    private static String invalidDemandReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (unit.getIndianSettlement() == null) ? "home-destroyed"
+            : null;
+    }
+
+    /**
+     * Why would an IndianDemandMission be invalid with the given
+     * unit and colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param colony The <code>Colony</code> to test.
+     * @return A reason why the mission would be invalid with the unit
+     *     and colony or null if none found.
+     */
+    private static String invalidDemandColonyReason(AIUnit aiUnit,
+                                                    Colony colony) {
+        final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
+        Player targetPlayer = colony.getOwner();
+        switch (owner.getStance(targetPlayer)) {
+        case UNCONTACTED: case PEACE: case ALLIANCE:
+            return "bad-stance";
+        case WAR: case CEASE_FIRE:
+            Tension tension = unit.getIndianSettlement()
+                .getAlarm(targetPlayer);
+            if (tension != null && tension.getLevel()
+                .compareTo(Tension.Level.CONTENT) <= 0) return "happy";
+            break;
+        }
+        return null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return (completed) ? "completed"
+            : invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidDemandReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidDemandReason(aiUnit)) != null) ? reason
+            : (aiUnit.getUnit().getSpaceLeft() == 0) ? null
+            : (loc instanceof Colony)
+            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+                : ((reason = invalidDemandColonyReason(aiUnit, (Colony)loc))
+                    != null) ? reason : null)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
+
     /**
      * Performs the mission.
      */
     public void doMission() {
-        if (!isValid()) return;
-        Unit unit = getUnit();
+        final Unit unit = getUnit();
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
+            return;
+        }
 
         if (hasTribute()) {
             if (unit.getTile() != unit.getIndianSettlement().getTile()) {
@@ -288,23 +388,6 @@ public class IndianDemandMission extends Mission {
      */
     private boolean hasTribute() {
         return (getUnit().getSpaceLeft() == 0);
-    }
-
-    /**
-     * Checks if this mission is still valid to perform.
-     * This mission will be invalidated when complete, if the home settlement
-     * is gone, the target is gone, or tension reduces to happy.
-     *
-     * @return True if this mission is still valid.
-     */
-    public boolean isValid() {
-        return super.isValid() && !completed
-            && getUnit().getIndianSettlement() != null
-            && (hasTribute()
-                || (target != null && !target.isDisposed()
-                    && target.getTile().getColony() == target
-                    && getUnit().getOwner().getTension(target.getOwner())
-                        .getLevel().compareTo(Tension.Level.HAPPY) <= 0));
     }
 
 

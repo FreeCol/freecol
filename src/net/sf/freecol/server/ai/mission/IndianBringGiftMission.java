@@ -32,9 +32,11 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -102,13 +104,107 @@ public class IndianBringGiftMission extends Mission {
     }
 
 
+    // Mission interface
+
+    /**
+     * Gets the mission target.
+     *
+     * @return The target <code>Colony</code>.
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * Why would an IndianBringGiftMission be invalid with the given unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
+     */
+    private static String invalidGiftReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (unit.getIndianSettlement() == null) ? "home-destroyed"
+            : (unit.getTile() == null) ? Mission.UNITNOTONMAP
+            : null;
+    }
+
+    /**
+     * Why would an IndianBringGiftMission be invalid with the given
+     * unit and colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param colony The <code>Colony</code> to test.
+     * @return A reason why the mission would be invalid with the unit
+     *     and colony or null if none found.
+     */
+    private static String invalidGiftColonyReason(AIUnit aiUnit,
+                                                  Colony colony) {
+        final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
+        Player targetPlayer = colony.getOwner();
+        switch (owner.getStance(targetPlayer)) {
+        case UNCONTACTED: case WAR: case CEASE_FIRE:
+            return "bad-stance";
+        case PEACE: case ALLIANCE:
+            Tension tension = unit.getIndianSettlement()
+                .getAlarm(targetPlayer);
+            if (tension != null && tension.getLevel()
+                .compareTo(Tension.Level.HAPPY) > 0) return "unhappy";
+        }
+        return null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidGiftReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidGiftReason(aiUnit)) != null) ? reason
+            : (loc instanceof Colony)
+            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+                : ((reason = invalidGiftColonyReason(aiUnit, (Colony)loc))
+                    != null) ? reason : null)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
+
     /**
      * Performs the mission.
      */
     public void doMission() {
-
-        if (!isValid()) {
-            // the destination colony may have been destroyed
+        final Unit unit = getUnit();
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
@@ -171,45 +267,6 @@ public class IndianBringGiftMission extends Mission {
      */
     private boolean hasGift() {
         return (getUnit().getSpaceLeft() == 0);
-    }
-
-    /**
-     * Checks if this mission is still valid to perform.
-     *
-     * This mission will be invalidated when the gift has been
-     * delivered. In case of the stances {@link
-     * net.sf.freecol.common.model.Player.Stance#WAR WAR} or {@link
-     * net.sf.freecol.common.model.Player.Stance#CEASE_FIRE
-     * CEASE_FIRE} towards the target player, the mission would be
-     * invalidated as well.
-     *
-     * @return True if this mission is still valid.
-     */
-    public boolean isValid() {
-        return super.isValid() && !completed
-            && target != null && !target.isDisposed()
-            && target.getTile().getColony() == target
-            && isValidMission(getUnit().getOwner(), target.getOwner())
-            && getUnit().getIndianSettlement() != null;
-    }
-
-    /**
-     * Checks if the player <code>owner</code> can bring a gift to the
-     * <code>targetPlayer</code>.
-     *
-     * @param owner The owner of this mission.
-     * @param targetPlayer The target of the gift.
-     * @return <code>true</code> if this mission is still valid to perform
-     *         with regard to the tension towards the target player.
-     */
-    public static boolean isValidMission(Player owner, Player targetPlayer) {
-        switch (owner.getStance(targetPlayer)) {
-        case UNCONTACTED: case WAR: case CEASE_FIRE:
-            break;
-        case PEACE: case ALLIANCE:
-            return owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
-        }
-        return false;
     }
 
 

@@ -92,13 +92,33 @@ public class IdleAtSettlementMission extends Mission {
         return (shouldTakeTransportToTile(target)) ? target : null;
     }
 
+
     // Mission interface
+
+    /**
+     * Gets the mission target.
+     *
+     * @return Null.  There is no target.
+     */
+    public Location getTarget() {
+        return null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidAIUnitReason(getAIUnit());
+    }
 
     /**
      * Should this Mission only be carried out once?
      *
      * @return True.
      */
+    @Override
     public boolean isOneTime() {
         return true;
     }
@@ -109,8 +129,9 @@ public class IdleAtSettlementMission extends Mission {
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.warning(tag + " broken(" + reason + "): " + unit);
             return;
         }
 

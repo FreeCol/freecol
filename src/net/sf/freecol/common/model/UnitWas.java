@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -272,7 +273,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         String locStr = (loc == null) ? ""
             : (loc instanceof Building)
-            ? ((Building)loc).getType().toString().substring(15)
+            ? Utils.lastPart(((Building)loc).getType().toString(), ".")
             : (loc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)loc).getWorkTile()).toString()
             : (loc instanceof Tile)
@@ -285,7 +286,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         String newLocStr = (newLoc == null) ? ""
             : (newLoc instanceof Building)
-            ? ((Building)newLoc).getType().toString().substring(15)
+            ? Utils.lastPart(((Building)newLoc).getType().toString(), ".")
             : (newLoc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)newLoc).getWorkTile()).toString()
             : (newLoc instanceof Tile)
@@ -294,12 +295,12 @@ public class UnitWas implements Comparable<UnitWas> {
         GoodsType newWork = unit.getWorkType();
         int newWorkAmount = (newWork == null) ? 0 : getAmount(newLoc, newWork);
         return String.format("%-30s %-25s -> %-25s",
-            unit.getId() + ":" + unit.getType().toString().substring(11),
+            unit.getId() + ":" + Utils.lastPart(unit.getType().toString(),"."),
             locStr + ((work == null || workAmount <= 0) ? "" : "("
                 + Integer.toString(workAmount) + " "
-                + work.toString().substring(12) + ")"),
+                + Utils.lastPart(work.toString(), ".") + ")"),
             newLocStr + ((newWork == null || newWorkAmount <= 0) ? "" : "("
                 + Integer.toString(newWorkAmount) + " "
-                + newWork.toString().substring(12) + ")")).trim();
+                + Utils.lastPart(newWork.toString(), ".") + ")")).trim();
     }
 }

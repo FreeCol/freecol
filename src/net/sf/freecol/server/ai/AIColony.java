@@ -459,6 +459,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 aiU.setMission(new WorkInsideColonyMission(aiMain, aiU, this));
             }
         }
+        EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
+        Tile pioneerTile;
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
             if (aiU == null || aiU.getMission() != null) continue;
@@ -468,14 +470,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                            colony));
                 break;
             case SCOUT:
-                if (preferScouts && ScoutingMission.isValid(aiU)) {
+                if (preferScouts
+                    && ScoutingMission.invalidReason(aiU) == null) {
                     aiU.setMission(new ScoutingMission(aiMain, aiU));
                 }
                 break;
             case PIONEER:
                 if (aiPlayer.needsPioneers()
-                    && PioneeringMission.isValid(aiU)) {
-                    aiU.setMission(new PioneeringMission(aiMain, aiU));
+                    && PioneeringMission.invalidReason(aiU) == null
+                    && (pioneerTile = aip.getBestPlanTile(colony)) != null) {
+                    aiU.setMission(new PioneeringMission(aiMain, aiU,
+                                                         pioneerTile));
                 }
                 break;
             // TODO: case MISSIONARY:

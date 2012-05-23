@@ -71,7 +71,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      *        <code>Settlement</code> or a <code>Unit</code>.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
-                                     Location target) {
+        Location target) {
         super(aiMain, aiUnit);
 
         if (!(target instanceof Unit || target instanceof Settlement)) {
@@ -105,70 +105,6 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
-     * Gets the object we are trying to destroy.
-     *
-     * @return The object which should be destroyed.
-     */
-    @Override
-    public Location getTarget() {
-        return target;
-    }
-
-
-    /**
-     * Is a location a suitable settlement seek-and-destroy target for
-     * an AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param target The target to test.
-     * @return True if the target is suitable.
-     */
-    private static boolean isSettlementTarget(AIUnit aiUnit, Location target) {
-        if (!(target instanceof Settlement)) return false;
-        return !aiUnit.getUnit().isNaval();
-    }
-
-    /**
-     * Is a location a suitable unit seek-and-destroy target for an AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param target The target to test.
-     * @return True if the target is suitable.
-     */
-    private static boolean isUnitTarget(AIUnit aiUnit, Location target) {
-        if (!(target instanceof Unit)) return false;
-        Unit unit = (Unit)target;
-        Tile tile = unit.getTile();
-        return tile != null
-            && tile.getSettlement() == null
-            && aiUnit.getUnit().isNaval() == (unit.isNaval() && !tile.isLand());
-    }
-
-    /**
-     * Is a location a suitable seek-and-destroy target for an AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param target The target to test.
-     * @return True if the target is suitable.
-     */
-    public static boolean isTarget(AIUnit aiUnit, Location target) {
-        final Unit unit = aiUnit.getUnit();
-        final Player owner = unit.getOwner();
-        Player targetPlayer;
-        return target != null && !((FreeColGameObject)target).isDisposed()
-            && target.getTile() != null
-            && (target instanceof Ownable)
-            && (targetPlayer = ((Ownable)target).getOwner()) != null
-            && targetPlayer != owner
-            && (owner.getStance(targetPlayer) == Stance.WAR
-                || (owner.isIndian()
-                    && owner.getTension(targetPlayer).getLevel()
-                    .compareTo(Tension.Level.CONTENT) > 0))
-            && (isSettlementTarget(aiUnit, target)
-                || isUnitTarget(aiUnit, target));
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
@@ -177,11 +113,13 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
         final Tile tile = (path == null) ? null : path.getLastNode().getTile();
-        Unit unit, def;
-        return (tile == null || aiUnit == null
-            || (unit = aiUnit.getUnit()) == null) ? null
-            : (isTarget(aiUnit, tile.getSettlement())) ? tile.getSettlement()
-            : (isTarget(aiUnit, def = tile.getDefendingUnit(unit))) ? def
+        return (tile == null || aiUnit == null || aiUnit.getUnit() == null) 
+            ? null
+            : (invalidReason(aiUnit, tile.getSettlement()) == null)
+            ? tile.getSettlement()
+            : (invalidReason(aiUnit,
+                    tile.getDefendingUnit(aiUnit.getUnit())) == null)
+            ? tile.getDefendingUnit(aiUnit.getUnit())
             : null;
     }
 
@@ -200,7 +138,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A score of the desirability of the mission.
      */
     private static int scoreSettlementPath(AIUnit aiUnit, PathNode path,
-                                           Settlement settlement) {
+        Settlement settlement) {
         final Unit unit = aiUnit.getUnit();
         final CombatModel combatModel = unit.getGame().getCombatModel();
 
@@ -238,7 +176,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A score of the desirability of the mission.
      */
     private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
-                                     Unit defender) {
+        Unit defender) {
         final Unit unit = aiUnit.getUnit();
         final Tile tile = path.getLastNode().getTile();
         final int turns = path.getTotalTurns();
@@ -299,7 +237,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     public static PathNode findTargetPath(AIUnit aiUnit, int range) {
         return Mission.findTargetPath(aiUnit, range,
-                                      UnitSeekAndDestroyMission.class);
+            UnitSeekAndDestroyMission.class);
     }
 
     /**
@@ -332,26 +270,132 @@ public class UnitSeekAndDestroyMission extends Mission {
     // Mission interface
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Gets the target of this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @return True if this mission is valid.
+     * @return The mission target.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isOffensiveUnit();
+    public Location getTarget() {
+        return target;
     }
-        
+
     /**
-     * Check to see if this mission is still valid.
+     * Why would a UnitSeekAndDestroyMission be invalid with the given unit.
      *
-     * @return True if this mission is valid.
-    */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().isOffensiveUnit()
-            && isTarget(getAIUnit(), target);
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidDestroyReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+            : null;
     }
+
+    /**
+     * Why would a UnitSeekAndDestroyMission be invalid with the given unit
+     * with respect to another player.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param other The other <code>Player</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidStanceReason(AIUnit aiUnit, Player other) {
+        final Player owner = aiUnit.getUnit().getOwner();
+        return (owner == other) ? Mission.TARGETOWNERSHIP
+            : (owner.getStance(other) == Stance.WAR) ? null
+            : (owner.isIndian() || owner.getTension(other).getLevel()
+                .compareTo(Tension.Level.CONTENT) > 0) ? null
+            : "target-at-peace";
+    }
+
+    /**
+     * Why would a UnitSeekAndDestroyMission be invalid with the given unit
+     * and settlement.
+     *
+     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
+     * @param settlement The <code>Settlement</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidSettlementReason(AIUnit aiUnit,
+                                                  Settlement settlement) {
+        final Unit unit = aiUnit.getUnit();
+        final Player player = unit.getOwner();
+        String reason;
+        return (unit.isNaval()) ? "unit-is-naval"
+            : ((reason = invalidTargetReason(settlement, null))
+                != null) ? reason
+            : (settlement.getOwner() == player) ? Mission.TARGETOWNERSHIP
+            : ((reason = invalidStanceReason(aiUnit, settlement.getOwner()))
+                != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would a UnitSeekAndDestroyMission be invalid with the given unit
+     * and target unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
+     * @param target The target <code>Unit</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidUnitReason(AIUnit aiUnit, Unit target) {
+        final Unit unit = aiUnit.getUnit();
+        Tile tile = target.getTile();
+        String reason;
+        return ((reason = invalidTargetReason(target, null)) != null) ? reason
+            : ((reason = invalidStanceReason(aiUnit, target.getOwner()))
+                != null) ? reason
+            : (tile == null) ? "target-not-on-map"
+            : (tile.getSettlement() != null) ? "target-in-settlement"
+            : ((target.isNaval() && !tile.isLand())
+                != unit.isNaval()) ? "target-incompatible"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidDestroyReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidDestroyReason(aiUnit)) != null) ? reason
+            : (loc instanceof Settlement)
+            ? invalidSettlementReason(aiUnit, (Settlement)loc)
+            : (loc instanceof Unit)
+            ? invalidUnitReason(aiUnit, (Unit)loc)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs the mission.
@@ -363,41 +407,39 @@ public class UnitSeekAndDestroyMission extends Mission {
     @Override
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
-            return;
-        } else if (!unit.isOffensiveUnit()) {
-            logger.finest(tag + " disarmed: " + unit);
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            target = null;
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
-        final Player player = unit.getOwner();
 
-        // Check target, and if there is a target-of-opportunity?
+        // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
         Location nearbyTarget = findTarget(aiUnit, 1);
-        if (nearbyTarget == target) nearbyTarget = null;
-        if (isValid()) {
-            if (nearbyTarget != null) {
+        if (nearbyTarget != null) {
+            if (target == null) {
+                logger.finest(tag + " retargeted " + nearbyTarget
+                    + ": " + unit);
+                target = nearbyTarget;
+                nearbyTarget = null;
+            } else if (nearbyTarget == target) {
+                nearbyTarget = null;
+            } else {
                 logger.finest(tag + " found target-of-opportunity "
                     + nearbyTarget + ": " + unit);
             }
-        } else {
-            if (nearbyTarget == null) {
-                logger.finest(tag + " can not find a target: " + unit);
-                return;
-            }
-            logger.finest(tag + " abandoning " + target
-                + " retargeting " + nearbyTarget + ": " + unit);
-            target = nearbyTarget;
-            nearbyTarget = null;
+        } else if (reason != null) {
+            logger.finest(tag + " " + reason + ": " + unit);
+            return;
         }
 
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget : target;
         Unit.MoveType mt = travelToTarget(tag, currentTarget);
         switch (mt) {
-        case MOVE_NO_MOVES:
-            logger.finest(tag + " en route to " + currentTarget + ": " + unit);
+        case MOVE_NO_MOVES: case MOVE_ILLEGAL:
             break;
         case ATTACK_UNIT: case ATTACK_SETTLEMENT:
             Tile unitTile = unit.getTile();
@@ -410,7 +452,10 @@ public class UnitSeekAndDestroyMission extends Mission {
                 return;
             }
             Direction dirn = unitTile.getDirection(currentTarget.getTile());
-            if (dirn == null) throw new IllegalStateException("No direction");
+            if (dirn == null) {
+                throw new IllegalStateException("No direction " + unitTile
+                    + " to " + currentTarget.getTile());
+            }
             logger.finest(tag + " attacking " + currentTarget + ": " + unit);
             AIMessage.askAttack(aiUnit, dirn);
             break;

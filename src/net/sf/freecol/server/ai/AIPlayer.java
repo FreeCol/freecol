@@ -61,14 +61,6 @@ public abstract class AIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    public static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
-
-    public static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
-
-    public static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
-
-    public static final int MAX_NUMBER_OF_DEMANDS = 1;
-
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -206,6 +198,15 @@ public abstract class AIPlayer extends AIObject {
      */
     protected void clearAIUnits() {
         aiUnits.clear();
+    }
+
+    /**
+     * Removes an AI unit owned by this player.
+     *
+     * @param aiUnit The <code>AIUnit</code> to remove.
+     */
+    public void removeAIUnit(AIUnit aiUnit) {
+        aiUnits.remove(aiUnit);
     }
 
     /**
@@ -488,9 +489,8 @@ public abstract class AIPlayer extends AIObject {
     protected void abortInvalidMissions() {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
-            if (mission != null && !mission.isValid()) {
-                abortUnitMission(au, "invalid");
-            }
+            String reason = (mission == null) ? null : mission.invalidReason();
+            if (reason != null) abortUnitMission(au, reason);
         }
     }
 
@@ -500,12 +500,10 @@ public abstract class AIPlayer extends AIObject {
     protected void abortInvalidAndOneTimeMissions() {
         for (AIUnit au : getAIUnits()) {
             Mission mission = au.getMission();
-            if (mission == null) continue;
-            if (!mission.isValid()) {
-                abortUnitMission(au, "invalid");
-            } else if (mission.isOneTime()) {
-                abortUnitMission(au, "one-time");
-            }
+            String reason = (mission == null) ? null
+                : (mission.isOneTime()) ? "oneTime"
+                : mission.invalidReason();
+            if (reason != null) abortUnitMission(au, reason);
         }
     }
 
@@ -513,15 +511,11 @@ public abstract class AIPlayer extends AIObject {
      * Makes every unit perform their mission.
      */
     protected void doMissions() {
-        logger.finest("Entering method doMissions");
         for (AIUnit au : getAIUnits()) {
-            if (au.hasMission() && au.getMission().isValid()
-                && !au.getUnit().isOnCarrier()) {
-                try {
-                    au.doMission();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "doMissions failed", e);
-                }
+            try {
+                au.doMission();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "doMissions failed for: " + au, e);
             }
         }
     }

@@ -30,10 +30,12 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -43,6 +45,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -70,6 +73,15 @@ public abstract class Mission extends AIObject {
 
     protected static final int NO_PATH_TO_TARGET = -2,
                                NO_MORE_MOVES_LEFT = -1;
+
+    // Common mission invalidity reasons.
+    protected static final String AIUNITNULL = "aiUnit-null";
+    protected static final String TARGETINVALID = "target-invalid";
+    protected static final String TARGETOWNERSHIP = "target-ownership";
+    protected static final String TARGETNOTFOUND = "target-not-found";
+    protected static final String UNITNOTAPERSON = "unit-not-a-person";
+    protected static final String UNITNOTOFFENSIVE = "unit-not-offensive";
+    protected static final String UNITNOTONMAP = "unit-not-on-map";
 
     /** The unit to undertake the mission. */
     private AIUnit aiUnit;
@@ -111,16 +123,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Gets the target of this mission, if any.
-     * Subclasses should override this.
-     *
-     * @return The target of this mission or null if none.
-     */
-    public Location getTarget() {
-        return null;
-    }
-
-    /**
      * Gets the AI-unit this mission has been created for.
      *
      * @return The <code>AIUnit</code>.
@@ -145,6 +147,15 @@ public abstract class Mission extends AIObject {
      */
     public Unit getUnit() {
         return (aiUnit == null) ? null : aiUnit.getUnit();
+    }
+
+    /**
+     * Convenience accessor for the owning player.
+     *
+     * @return The <code>Player</code> that owns the mission unit.
+     */
+    protected Player getPlayer() {
+        return (getUnit() == null) ? null : getUnit().getOwner();
     }
 
     /**
@@ -177,6 +188,84 @@ public abstract class Mission extends AIObject {
      */
     protected Random getAIRandom() {
         return aiUnit.getAIRandom();
+    }
+
+    /**
+     * Is this mission valid?
+     *
+     * @return True if the mission is valid.
+     */
+    public final boolean isValid() {
+        return invalidReason() == null;
+    }
+
+    /**
+     * Is an invalidity reason due to a target failure?
+     *
+     * @return True if the reason starts with "target-".
+     */
+    public boolean isTargetReason(String reason) {
+        return reason != null && reason.startsWith("target-");
+    }
+
+    /**
+     * Is a unit able to perform a mission of a particular type?
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidUnitReason(Unit unit) {
+        return (unit == null) ? "unit-null"
+            : (unit.isDisposed()) ? "unit-disposed"
+            : (unit.isUnderRepair()) ? "unit-under-repair"
+            : null;
+    }
+
+    /**
+     * Is an AI unit able to perform a mission of a particular type?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidAIUnitReason(AIUnit aiUnit) {
+        String reason;
+        return (aiUnit == null) ? AIUNITNULL
+            : ((reason = invalidUnitReason(aiUnit.getUnit())) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Is an AI unable to perform a new mission because it already has
+     * a valid, non-onetime mission?
+     *
+     * @return "mission-exists" if a valid mission is found, or null
+     *     if none found.
+     */
+    public static String invalidNewMissionReason(AIUnit aiUnit) {
+        return (aiUnit == null) ? AIUNITNULL
+            : (aiUnit.hasMission()
+                && !aiUnit.getMission().isOneTime()
+                && aiUnit.getMission().isValid()) ? "mission-exists"
+            : null;
+    }
+
+    /**
+     * Is a target a valid mission target?
+     *
+     * @param target The target <code>Location</code> to check.
+     * @param player An optional <code>Player</code> that should own
+     *     the target.
+     * @return A reason for the target to be invalid, or null if none found.
+     */
+    public static String invalidTargetReason(Location target, Player owner) {
+        String reason;
+        return (target == null) ? "target-null"
+            : (((FreeColGameObject)target).isDisposed()) ? "target-disposed"
+            : (owner == null) ? null
+            : (target instanceof Ownable
+                && owner != ((Ownable)target).getOwner())
+            ? Mission.TARGETOWNERSHIP
+            : null;
     }
 
 
@@ -245,10 +334,12 @@ public abstract class Mission extends AIObject {
             = direction.getClosestDirections(logMe, aiRandom);
         for (int j = 0; j < directions.length; j++) {
             Direction d = directions[j];
-            if (unit.getTile().getNeighbourOrNull(d) != null
+            Tile moveTo = unit.getTile().getNeighbourOrNull(d);
+            if (moveTo != null
                 && unit.getMoveType(d) == MoveType.MOVE) {
-                AIMessage.askMove(aiUnit, d);
-                return d;
+                return (AIMessage.askMove(aiUnit, d)
+                    && unit.getTile() == moveTo) ? d
+                    : null; // Failed!
             }
         }
         return null; // Stuck!
@@ -661,7 +752,7 @@ public abstract class Mission extends AIObject {
      * - MOVE_ILLEGAL if the unit is unable to proceed for now
      * - MOVE_NO_MOVES if out of moves short of the target
      * - MOVE_NO_REPAIR if the unit died for whatever reason
-     * - other results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
+     * - other legal results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
      *   handle them.
@@ -695,7 +786,7 @@ public abstract class Mission extends AIObject {
                 }
                 if (unit.getTile().canMoveToEurope()) {
                     if (aiUnit.moveToEurope()) {
-                        logger.finest(logMe + " set sail for Europe: " + unit);
+                        logger.finest(logMe + " sailed for Europe: " + unit);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
                         logger.finest(logMe + " failed to sail for Europe: "
@@ -724,16 +815,17 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 } else if (unit.isInEurope()) {
                     if (aiUnit.moveToAmerica()) {
-                        logger.finest(logMe + " set sail for the New World: "
+                        logger.finest(logMe + " sailed for the New World: "
                             + unit);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
-                        logger.finest(logMe + " in Europe failed to set sail: "
+                        logger.finest(logMe + " in Europe failed to sail: "
                             + unit);
                         return MoveType.MOVE_ILLEGAL;
                     }
                 } else {
-                    path = unit.findPath(targetTile);
+                    path = unit.findPath(unit.getTile(), targetTile, null,
+                        CostDeciders.avoidSettlementsAndBlockingUnits());
                     if (path == null) {
                         logger.finest(logMe
                             + " can not sail from " + unit.getTile()
@@ -742,10 +834,11 @@ public abstract class Mission extends AIObject {
                     }
                 }
             } else if (unit.isOnCarrier()) {
-                if (carrier.getTile() == null) {
+                if (unit.getTile() == null) {
                     inTransit = true;
                 } else {
-                    path = unit.findPath(unit.getTile(), targetTile, carrier);
+                    path = unit.findPath(unit.getTile(), targetTile, carrier,
+                        CostDeciders.avoidSettlementsAndBlockingUnits());
                     if (path == null) {
                         logger.finest(logMe 
                             + " can not get from " + unit.getTile()
@@ -762,7 +855,8 @@ public abstract class Mission extends AIObject {
                     throw new IllegalStateException("No tile or carrier: "
                         + unit);
                 } else {
-                    path = unit.findPath(targetTile);
+                    path = unit.findPath(unit.getTile(), targetTile, null,
+                        CostDeciders.avoidSettlementsAndBlockingUnits());
                     if (path == null) needTransport = true;
                 }
             }
@@ -867,36 +961,71 @@ public abstract class Mission extends AIObject {
     // Mission interface to be implemented/overridden by descendants.
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Gets the target of this mission, if any.
+     *
+     * @return The target of this mission, or null if none.
+     */
+    public abstract Location getTarget();
+
+    /**
+     * Why is this mission invalid?
+     *
+     * Mission subclasses must implement this routine, which probably
+     * should start by checking invalidAIUnitReason.
+     * 
+     * A mission can be invalid for a number of subclass-specific
+     * reasons.  For example: a seek-and-destroy mission could be
+     * invalid because of a improved stance towards the targeted
+     * player.
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public abstract String invalidReason();
+
+    /**
+     * Is an AI unit able to perform a different mission?
+     *
+     * AIPlayers will call FooMission.invalidReason(aiUnit) to
+     * determine whether it is valid to assign some unit to a
+     * FooMission, so `interesting' Mission subclasses with complex
+     * validity requirements must implement a routine with this
+     * signature.  Conversely, simple Missions that are always possible
+     * need not.
+     *
+     * Implementations should usually start by calling this routine
+     * (i.e. Mission.invalidReason(AIUnit)).
      *
      * @param aiUnit The <code>AIUnit</code> to check.
-     * @return True if the unit can be usefully assigned this mission.
+     * @return A reason for mission invalidity, or null if none found.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return aiUnit != null
-            && (aiUnit.getMission() == null || !aiUnit.getMission().isValid())
-            && aiUnit.getUnit() != null
-            && !aiUnit.getUnit().isDisposed()
-            && !aiUnit.getUnit().isUnderRepair();
+    public static String invalidReason(AIUnit aiUnit) {
+        return invalidAIUnitReason(aiUnit);
     }
 
     /**
-     * Checks if this mission is still valid to perform.  At this
-     * level, if the unit was killed then the mission becomes invalid.
+     * Is an AI unit able to perform a mission with a specified target?
      *
-     * A mission can be invalidated for a number of subclass-specific
-     * reasons.  For example: a seek-and-destroy mission could be
-     * invalidated when the relationship towards the targeted player
-     * improves.
+     * Specific Missions can be invalid for target-related reasons.
+     * Such Missions need to implement a routine with this signature,
+     * as it will be called by the GoalDeciders in map path find/searches
+     * to choose a Mission target.
      *
-     * @return True if the unit is still intact to perform its mission.
+     * Implementations should usually start by calling either
+     * invalidAIUnitReason() or this routine if the target checking is
+     * trivial.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The target <code>Location</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
      */
-    public boolean isValid() {
-        return getUnit() != null && !getUnit().isDisposed();
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : invalidTargetReason(loc, null);
     }
 
     /**
-     * Checks if this Mission should only be carried out once.
+     * Should this mission only be carried out once?
      *
      * Missions are not one-time by default, true one-time missions
      * must override this routine.
@@ -930,5 +1059,15 @@ public abstract class Mission extends AIObject {
         throws XMLStreamException {
         String unit = in.getAttributeValue(null, "unit");
         setAIUnit((AIUnit)getAIMain().getAIObject(unit));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        // Shorten the classname to just the mission part.
+        // Makes the logs much easier to read.
+        return Utils.lastPart(getClass().getName(), ".")
+            + "@" + Integer.toString(hashCode());
     }
 }

@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -80,73 +81,112 @@ public class UnitWanderHostileMission extends Mission {
     }
 
 
+    // Mission interface
+
     /**
-     * Looks for a target of opportunity, move to it and attack.
-     * Pretend to be a UnitSeekAndDestroyMission which has the targeting
-     * code.
+     * Gets the mission target.
      *
-     * @param aiUnit The <code>AIUnit</code> that attacks.
-     * @return True if the move is completed by this action.
+     * @return Null.
      */
-    private boolean seekAndAttack(AIUnit aiUnit) {
+    public Location getTarget() {
+        return null;
+    }
+
+    /**
+     * Why would a UnitWanderHostileMission be invalid with the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
+     */
+    private static String invalidHostileReason(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        if (!unit.isOffensiveUnit()) return false;
-        PathNode path = Mission.findTargetPath(aiUnit, 1,
-                                               UnitSeekAndDestroyMission.class);
-        Location target = UnitSeekAndDestroyMission.extractTarget(aiUnit, path);
-        if (target == null) return false;
-        Unit.MoveType mt = travelToTarget(tag, target);
-        switch (mt) {
-        case MOVE_NO_MOVES:
-            logger.finest(tag + " en route to " + target + ": " + unit);
-            break;
-        case ATTACK_UNIT: case ATTACK_SETTLEMENT:
-            Tile unitTile = unit.getTile();
-            Settlement settlement = unitTile.getSettlement();
-            if (settlement != null && settlement.getUnitCount() < 2) {
-                // Do not risk attacking out of a settlement that
-                // might collapse.  Defend instead.
-                aiUnit.setMission(new DefendSettlementMission(getAIMain(),
-                        aiUnit, settlement));
-                return true;
-            }
-            Direction dirn = unitTile.getDirection(target.getTile());
-            if (dirn == null) {
-                throw new IllegalStateException("No direction");
-            }
-            logger.finest(tag + " attacking " + target + ": " + unit);
-            AIMessage.askAttack(aiUnit, dirn);
-            break;
-        default:
-            logger.finest(tag + " unexpected move type: " + mt
-                + ": " + unit);
-            break;
-        }
+        return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+            : (unit.getTile() == null) ? Mission.UNITNOTONMAP
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), null);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidHostileReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidHostileReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Should this mission only be carried out once?
+     *
+     * @return True.
+     */
+    @Override
+    public boolean isOneTime() {
         return true;
     }
 
     /**
-     * Performs the mission. This is done by searching for hostile units
-     * that are located within one tile and attacking them. If no such units
-     * are found, then wander in a random direction.
+     * Performs the mission.  Search for hostile targets that are
+     * located within one move and attack them, otherwise wander in a
+     * random direction.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
-            return;
-        } else if (unit.getTile() == null) {
-            logger.warning(tag + " not on the map: " + unit);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
         // Make random moves in a reasonably consistent direction,
         // checking for a target along the way.
+        final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
+        int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
+                                                    getAIRandom(), 4);
         Direction d = Direction.getRandomDirection(tag, getAIRandom());
         boolean moved = false;
+        Mission m;
         while (unit.getMovesLeft() > 0) {
-            if (seekAndAttack(aiUnit)) return;
+            // Every checkTurns, look for a target of opportunity.
+            if (check == 0) {
+                Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1);
+                if (loc != null) {
+                    m = new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
+                    aiUnit.setMission(m);
+                    m.doMission();
+                    return;
+                }
+                check = checkTurns;
+            } else check--;
+
             if ((d = moveRandomly(tag, d)) == null) break;
             moved = true;
         }
@@ -155,15 +195,6 @@ public class UnitWanderHostileMission extends Mission {
         } else {
             logger.finest(tag + " failed to move: " + unit);
         }
-    }
-
-    /**
-     * Returns true if this Mission should only be carried out once.
-     *
-     * @return true
-     */
-    public boolean isOneTime() {
-        return true;
     }
 
 

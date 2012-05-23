@@ -124,33 +124,6 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Gets the target of this mission.
-     *
-     * @return The tile where a colony is to be built.
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-
-    /**
-     * Is a tile a suitable colony build target for an AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> that is building.
-     * @param target The candidate <code>Tile</code>.
-     * @return True if the target is suitable.
-     */
-    public static boolean isTarget(AIUnit aiUnit, Location target) {
-        return (target instanceof Colony)
-            ? (((Colony)target).isConnected()
-                && aiUnit.getUnit().getOwner().owns((Colony)target))
-            : (target instanceof Tile)
-            ? (((Tile)target).isLand()
-                && ((Tile)target).getColony() == null)
-            : false;
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -162,8 +135,8 @@ public class BuildColonyMission extends Mission {
         final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
             : path.getLastNode().getTile();
         Colony colony = tile.getColony();
-        return (isTarget(aiUnit, colony)) ? colony
-            : (isTarget(aiUnit, tile)) ? tile
+        return (invalidReason(aiUnit, colony) == null) ? colony
+            : (invalidReason(aiUnit, tile) == null) ? tile
             : null;
     }
 
@@ -180,7 +153,7 @@ public class BuildColonyMission extends Mission {
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         final Location loc = extractTarget(aiUnit, path);
-        if (!isTarget(aiUnit, loc)) return Integer.MIN_VALUE;
+        if (invalidReason(aiUnit, loc) != null) return Integer.MIN_VALUE;
         int turns = (path == null) ? 1 : (path.getTotalTurns() + 1);
 
         if (loc instanceof Colony) {
@@ -227,7 +200,7 @@ public class BuildColonyMission extends Mission {
             public boolean check(Unit u, PathNode path) {
                 int value = scorePath(aiUnit, path);
                 Colony colony = path.getTile().getColony();
-                if (colony != null && isTarget(aiUnit, colony)) {
+                if (colony != null && invalidReason(aiUnit, colony) == null) {
                     if (deferOK && value > backupValue) {
                         backupValue = value;
                         backup = path;
@@ -293,7 +266,7 @@ public class BuildColonyMission extends Mission {
             : extractTarget(aiUnit, path);
     }
 
-
+       
     // Fake Transportable interface
 
     /**
@@ -312,51 +285,98 @@ public class BuildColonyMission extends Mission {
     // Mission interface
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Gets the target of this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @return True if the unit can be usefully assigned this mission.
+     * @return The tile where a colony is to be built.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().hasAbility("model.ability.foundColony");
+    public Location getTarget() {
+        return target;
     }
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Why would a BuildColonyMission be invalid with the given unit?
      *
-     * @return True if this mission is still valid to perform.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().hasAbility("model.ability.foundColony")
-            && target != null;
+    private static String invalidBuildReason(AIUnit aiUnit) {
+        return (!aiUnit.getUnit().hasAbility("model.ability.foundColony"))
+            ? "unit-not-a-colony-founder"
+            : null;
     }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidBuildReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidBuildReason(aiUnit)) != null) ? reason
+            : (loc instanceof Colony)
+            ? (((reason = invalidTargetReason(loc, aiUnit.getUnit().getOwner()))
+                    != null) ? reason : null)
+            : (loc instanceof Tile)
+            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+                : (!((Tile)loc).isLand()) ? "target-not-land"
+                : (((Tile)loc).getColony() != null) ? "target-has-colony"
+                : null)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs this mission.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
-            return;
-        } else if (!unit.hasAbility("model.ability.foundColony")) {
-            logger.finest(tag + " can not found colony: " + unit);
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            ; // handled below
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
         // Check the target
+        final AIMain aiMain = getAIMain();
         final Player player = unit.getOwner();
         final AIUnit aiUnit = getAIUnit();
         Location newTarget;
         int value;
-        if (!isTarget(aiUnit, target)
+        if (reason != null
             || (target instanceof Tile
                 && (value = player.getColonyValue((Tile)target)) < colonyValue)) {
             if ((newTarget = findTarget(aiUnit, true)) == null) {
                 setTarget(null);
-                logger.finest(tag + " found no targets: " + unit);
+                logger.finest(tag + " unable to retarget: " + unit);
                 return;
             }
             setTarget(newTarget);
@@ -367,17 +387,19 @@ public class BuildColonyMission extends Mission {
 
         // If arrived at the target colony it is time to either
         // retarget and insist on finding a building site.  On failure,
-        // just nullify the target which will invalidate this mission
-        // and free this unit for other tasks.
+        // try working in the colony for the present.
         if (target instanceof Colony) {
             String name = ((Colony)target).getName();
-            if ((newTarget = findTarget(aiUnit, false)) != null) {
+            PathNode path = findTargetPath(aiUnit, false);
+            if (path != null
+                && (newTarget = extractTarget(aiUnit, path)) != null) {
                 setTarget(newTarget);
                 logger.finest(tag + " arrived at " + name
                     + ", retargeting " + target + ": " + unit);
             } else {
-                setTarget(null);
                 logger.finest(tag + " gives up at " + name + ": " + unit);
+                aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
+                        aiMain.getAIColony((Colony)target)));
             }
             return;
         }
@@ -433,9 +455,10 @@ public class BuildColonyMission extends Mission {
         if (AIMessage.askBuildColony(aiUnit, Player.ASSIGN_SETTLEMENT_NAME)
             && tile.getColony() != null) {
             Colony colony = tile.getColony();
-            logger.finest(tag + " completed " + colony.getName() + ": " + unit);
-            aiUnit.setMission(new WorkInsideColonyMission(getAIMain(), aiUnit,
-                    getAIMain().getAIColony(colony)));
+            logger.finest(tag + " completed " + colony.getName()
+                + ": " + unit);
+            aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
+                    aiMain.getAIColony(colony)));
         } else {
             setTarget(null);
             logger.warning(tag + " failed to build at " + tile + ": " + unit);

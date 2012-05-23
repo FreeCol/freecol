@@ -91,8 +91,10 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertTrue("The player should need pioneers", aiPlayer.needsPioneers());
 
         // Setup mission
-        assertFalse("Pioneering should be invalid (no tools)",
-            PioneeringMission.isValid(aiUnit));
+        assertEquals("Pioneering should be valid (despite no tools)", null,
+            PioneeringMission.invalidReason(aiUnit));
+        assertNull("Pioneering should find no targets though",
+            PioneeringMission.findTarget(aiUnit));
 
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
@@ -100,19 +102,17 @@ public class PioneeringMissionTest extends FreeColTestCase {
             colony.canProvideEquipment(pioneerEquipment));
         assertEquals("Colony found", colony,
             PioneeringMission.findTarget(aiUnit));
-        assertNull(aiUnit.getMission());
-        assertTrue(Mission.isValid(aiUnit));
-        assertTrue(colonist.isPerson());
-        assertTrue("Pioneering should be valid (tools present in colony)",
-            PioneeringMission.isValid(aiUnit));
+        assertEquals("Pioneer has no mission", null, aiUnit.getMission());
+        assertEquals("Pioneering should be valid (tools present in colony)",
+            null, PioneeringMission.invalidReason(aiUnit));
 
         // Move tools to the unit and try again.
         colony.addGoods(toolsGoodsType, -100);
         colonist.changeEquipment(toolsEqType, 1);
         assertNotNull("TileImprovementPlan found",
             PioneeringMission.findTarget(aiUnit));
-        assertTrue("Pioneering should be valid (unit has tools)",
-            PioneeringMission.isValid(aiUnit));
+        assertEquals("Pioneering should be valid (unit has tools)", null,
+            PioneeringMission.invalidReason(aiUnit));
 
         PioneeringMission mission = new PioneeringMission(aiMain, aiUnit);
         assertTrue("Mission should be valid", mission.isValid());

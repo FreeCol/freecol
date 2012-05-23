@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIColony;
@@ -38,6 +39,8 @@ import net.sf.freecol.server.ai.AIUnit;
 public class WorkInsideColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
+
+    private static final String tag = "AI worker";
 
     /** The AI colony to work inside. */
     private AIColony aiColony;
@@ -98,39 +101,67 @@ public class WorkInsideColonyMission extends Mission {
      *         already or can get there itself.
      */
     public Tile getTransportDestination() {
-        final Tile colonyTile = aiColony.getColony().getTile();
+        final Tile colonyTile = (Tile)getTarget();
         return (shouldTakeTransportToTile(colonyTile))
             ? colonyTile
             : null;
     }
 
+
     // Mission interface
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Gets the mission target.
      *
-     * @return True if this mission is still valid to perform.
+     * @return The mission target location.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().isPerson()
-            && aiColony != null
-            && aiColony.getColony() != null
-            && !aiColony.getColony().isDisposed()
-            && aiColony.getColony().getOwner() == getUnit().getOwner();
+    public Location getTarget() {
+        return (aiColony == null || aiColony.getColony() == null) ? null
+            : aiColony.getColony().getTile();
     }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        final Unit unit = aiUnit.getUnit();
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : (!unit.isPerson()) ? Mission.UNITNOTAPERSON
+            : ((reason = invalidTargetReason(loc, unit.getOwner()))
+                != null) ? reason
+            : null;
+    }
+
+    // Omitted invalidReason(AIUnit), not needed.
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs this mission.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed() || !isValid()) {
-            logger.finest("AI worker broken: " + unit);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
-        travelToTarget("AI worker", aiColony.getColony().getTile());
+        travelToTarget(tag, getTarget());
     }
 
 
@@ -156,6 +187,7 @@ public class WorkInsideColonyMission extends Mission {
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
+
         out.writeAttribute("colony", aiColony.getId());
     }
 
@@ -165,6 +197,7 @@ public class WorkInsideColonyMission extends Mission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
+
         aiColony = (AIColony) getAIMain()
             .getAIObject(in.getAttributeValue(null, "colony"));
     }

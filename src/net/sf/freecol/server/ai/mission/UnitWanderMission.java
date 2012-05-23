@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIMain;
@@ -77,7 +78,28 @@ public class UnitWanderMission extends Mission {
     // Mission interface
 
     /**
-     * Returns true if this Mission should only be carried out once.
+     * Gets the mission target.
+     *
+     * @return The target <code>Colony</code>.
+     */
+    public Location getTarget() {
+        return null;
+    }
+
+    // Omitted invalidReason(aiUnit, Location), location irrelevant
+    // Omitted invalidReason(aiUnit), always true
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidAIUnitReason(getAIUnit());
+    }
+
+    /**
+     * Should this mission only be carried out once?
      *
      * @return True.
      */
@@ -92,11 +114,9 @@ public class UnitWanderMission extends Mission {
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
-            return;
-        } else if (unit.getTile() == null) {
-            logger.warning(tag + " not on the map: " + unit);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 

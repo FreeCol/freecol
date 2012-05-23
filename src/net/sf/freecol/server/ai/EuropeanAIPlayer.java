@@ -90,6 +90,15 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
+    /** A comparator to sort naval units before land units. */
+    private static final Comparator<AIUnit> navalComparator 
+        = new Comparator<AIUnit>() {
+            public int compare(AIUnit a1, AIUnit a2) {
+                return (((a1.getUnit().isNaval()) ? 0 : 1)
+                    - ((a2.getUnit().isNaval()) ? 0 : 1));
+            }
+        };
+
     /** A cached map of Tile to best TileImprovementPlan.  Do not serialize. */
     private final Map<Tile, TileImprovementPlan> tipMap
         = new HashMap<Tile, TileImprovementPlan>();
@@ -186,8 +195,27 @@ public class EuropeanAIPlayer extends AIPlayer {
         return (tipMap == null) ? null : tipMap.get(tile);
     }
 
-/* IMPLEMENTATION (AIPlayer interface) ****************************************/
+    /**
+     * Gets the best plan for a colony from the tipMap.
+     *
+     * @param colony The <code>Colony</code> to check.
+     * @return The tile with the best plan for a colony.
+     */
+    public Tile getBestPlanTile(Colony colony) {
+        TileImprovementPlan best = null;
+        int bestValue = Integer.MIN_VALUE;
+        for (Tile t : colony.getOwnedTiles()) {
+            TileImprovementPlan tip = tipMap.get(t);
+            if (tip != null && tip.getValue() > bestValue) {
+                bestValue = tip.getValue();
+                best = tip;
+            }
+        }
+        return best.getTarget();
+    }
 
+
+    // AIPlayer interface
 
     /**
      * Tells this <code>AIPlayer</code> to make decisions. The
@@ -195,9 +223,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        final Player player = getPlayer();
-        logger.finest("Entering method startWorking: "
-                      + player + ", year " + getGame().getTurn());
+        logger.finest(getClass().getName() + " in " + getGame().getTurn()
+            + ": " + getPlayer().getNationID());
         buildTipMap();
         sessionRegister.clear();
         clearAIUnits();
@@ -214,7 +241,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         doMissions();
         rearrangeWorkersInColonies();
         abortInvalidMissions();
-        // Some of the mission might have been invalidated by a another mission.
+        // Some of the mission might have been invalidated by another mission.
         giveNormalMissions();
         doMissions();
         rearrangeWorkersInColonies();
@@ -789,15 +816,12 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Ensures that all workers inside a colony gets a
      * {@link WorkInsideColonyMission}.
+     * TODO: Find out why this happens, or even if it still does.
      */
     private void ensureColonyMissions() {
-        logger.finest("Entering method ensureColonyMissions");
-
         for (AIUnit au : getAIUnits()) {
             if (au.hasMission()) continue;
-
-            // TODO: Find out why this happens, or even if it still does.
-            Unit u = au.getUnit();
+            final Unit u = au.getUnit();
             if (u.getLocation() instanceof WorkLocation) {
                 AIColony ac = getAIColony(u.getColony());
                 if (ac == null) {
@@ -815,236 +839,10 @@ public class EuropeanAIPlayer extends AIPlayer {
      * owns.
      */
     private void rearrangeWorkersInColonies() {
-        logger.finest("Entering method rearrangeWorkersInColonies");
         for (AIColony aic : getAIColonies()) aic.rearrangeWorkers();
     }
 
-    /**
-     * Takes the necessary actions to secure a european colony
-     */
-    /*
-    private void secureColony(Colony colony) {
-        GoodsType musketType = getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-        final EquipmentType muskets = getSpecification().getEquipmentType("model.equipment.muskets");
-        final EquipmentType horses = getSpecification().getEquipmentType("model.equipment.horses");
-
-        Map map = getPlayer().getGame().getMap();
-        int olddefenders = 0;
-        int defenders = 0;
-        int threat = 0;
-        int worstThreat = 0;
-        Location bestTarget = null;
-        Iterator<Unit> ui = colony.getTile().getUnitIterator();
-        while (ui.hasNext()) {
-            if ((ui.next()).isDefensiveUnit()) {
-                defenders++;
-            }
-        }
-        Iterator<Position> positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
-        while (positionIterator.hasNext()) {
-            Tile t = map.getTile(positionIterator.next());
-            if (t.getFirstUnit() != null) {
-                if (t.getFirstUnit().getOwner() == getPlayer()) {
-                    Iterator<Unit> uit = t.getUnitIterator();
-                    while (uit.hasNext()) {
-                        if (uit.next().isOffensiveUnit()) {
-                            defenders++;
-                        }
-                    }
-                } else {
-                    int thisThreat = 0;
-                    if (getPlayer().getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
-                        Iterator<Unit> uit = t.getUnitIterator();
-                        while (uit.hasNext()) {
-                            if (uit.next().isOffensiveUnit()) {
-                                thisThreat += 2;
-                            }
-                        }
-                    } else if (getPlayer().getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
-                        Iterator<Unit> uit = t.getUnitIterator();
-                        while (uit.hasNext()) {
-                            if (uit.next().isOffensiveUnit()) {
-                                thisThreat++;
-                            }
-                        }
-                    }
-                    threat += thisThreat;
-                    if (thisThreat > worstThreat) {
-                        if (t.getSettlement() != null) {
-                            bestTarget = t.getSettlement();
-                        } else {
-                            bestTarget = t.getFirstUnit();
-                        }
-                        worstThreat = thisThreat;
-                    }
-                }
-            }
-        }
-        olddefenders = defenders;
-        if (colony.hasStockade()) {
-            defenders += (defenders * (colony.getStockade().getLevel()) / 2);
-        }
-        if (threat > defenders) {
-            // We're under attack! Man the stockade!
-            ArrayList<Unit> recruits = new ArrayList<Unit>();
-            ArrayList<Unit> others = new ArrayList<Unit>();
-            int inColonyCount = 0;
-            // Let's make some more soldiers, if we can.
-            // First, find some people we can recruit.
-            ui = colony.getUnitIterator();
-            while (ui.hasNext()) {
-                Unit u = (ui.next());
-                if (u.isOffensiveUnit()) {
-                    continue; // don't bother dealing with current
-                    // soldiers at the moment
-                }
-                if (u.getLocation() != colony.getTile()) {
-                    // If we are not on the tile we are in the colony.
-                    inColonyCount++;
-                }
-                if (u.hasAbility(Ability.EXPERT_SOLDIER)) {
-                    recruits.add(u);
-                } else if (u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    others.add(u);
-                }
-            }
-            // ATTENTION: skill may be Integer.MIN_VALUE!
-            Collections.sort(others, Unit.getSkillLevelComparator());
-            recruits.addAll(others);
-            // Don't overdo it - leave at least one person behind.
-            int recruitCount = threat - defenders;
-            if (recruitCount > recruits.size() - 1) {
-                recruitCount = recruits.size() - 1;
-            }
-            if (recruitCount > inColonyCount - 1) {
-                recruitCount = inColonyCount - 1;
-            }
-            // Actually go through and arm our people.
-            boolean needMuskets = false;
-            boolean needHorses = false;
-            ui = recruits.iterator();
-            while (ui.hasNext() && recruitCount > 0) {
-                Unit u = (ui.next());
-                if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
-                    recruitCount--;
-                    Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                    equipUnitElement.setAttribute("unit", u.getId());
-                    equipUnitElement.setAttribute("type", muskets.getId());
-                    equipUnitElement.setAttribute("amount", "1");
-                    u.equipWith(muskets);
-                    sendAndWaitSafely(equipUnitElement);
-                    Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-                    putOutsideColonyElement.setAttribute("unit", u.getId());
-                    u.putOutsideColony();
-                    sendAndWaitSafely(putOutsideColonyElement);
-                    // Check if the unit can fortify before sending the order
-                    if (u.checkSetState(UnitState.FORTIFYING)) {
-                        Element changeStateElement = Message.createNewRootElement("changeState");
-                        changeStateElement.setAttribute("unit", u.getId());
-                        changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
-                        sendAndWaitSafely(changeStateElement);
-                    }
-                    olddefenders++;
-                    if (!u.isMounted() && u.canBeEquippedWith(horses)) {
-                        equipUnitElement = Message.createNewRootElement("equipUnit");
-                        equipUnitElement.setAttribute("unit", u.getId());
-                        equipUnitElement.setAttribute("type", horses.getId());
-                        equipUnitElement.setAttribute("amount", "1");
-                        sendAndWaitSafely(equipUnitElement);
-                    } else {
-                        needHorses = true;
-                    }
-                } else {
-                    needMuskets = true;
-                    break;
-                }
-            }
-            AIColony ac = null;
-            if (needMuskets || needHorses) {
-                Iterator<AIColony> aIterator = getAIColonyIterator();
-                while (aIterator.hasNext()) {
-                    AIColony temp = aIterator.next();
-                    if (temp != null && temp.getColony() == colony) {
-                        ac = temp;
-                        break;
-                    }
-                }
-            }
-            if (needMuskets && ac != null) {
-                // Check and see if we have already made a GoodsWish for
-                // here.
-                Iterator<Wish> wishes = ac.getWishIterator();
-                boolean made = false;
-                while (wishes.hasNext()) {
-                    Wish w = wishes.next();
-                    if (!(w instanceof GoodsWish)) {
-                        continue;
-                    }
-                    GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == musketType) {
-                        made = true;
-                    }
-                }
-                if (made == false) {
-                    // Add a new GoodsWish onto the stack.
-                    ac
-                            .addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
-                                    musketType));
-                }
-            }
-            if (needHorses && ac != null) {
-                // Check and see if we have already made a GoodsWish for
-                // here.
-                Iterator<Wish> wishes = ac.getWishIterator();
-                boolean made = false;
-                while (wishes.hasNext()) {
-                    Wish w = wishes.next();
-                    if (!(w instanceof GoodsWish)) {
-                        continue;
-                    }
-                    GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == horsesType) {
-                        made = true;
-                    }
-                }
-                if (made == false) {
-                    // Add a new GoodsWish onto the stack.
-                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, horsesType));
-                }
-            }
-            defenders = olddefenders;
-            if (colony.hasStockade()) {
-                defenders += (defenders * (colony.getStockade().getLevel()) / 2);
-            }
-        }
-        if (defenders > (threat * 2)) {
-            // We're so big and tough, we can go wipe out this threat.
-            // Pick someone to go make it happen.
-            Unit u = null;
-            Iterator<Unit> uit = colony.getUnitIterator();
-            while (uit.hasNext()) {
-                Unit candidate = uit.next();
-                if (candidate.isOffensiveUnit() && candidate.getState() == UnitState.FORTIFIED) {
-                    u = candidate;
-                    break;
-                }
-            }
-            if (u != null) {
-                u.setState(UnitState.ACTIVE);
-                u.setLocation(colony.getTile());
-                AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(u);
-                if (bestTarget != null) {
-                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
-                } else {
-                    newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
-                }
-            }
-        }
-    }
-    */
-
-    private List<AIUnit>getPlayerPioneers() {
+    private List<AIUnit> getPlayerPioneers() {
         List<AIUnit> pioneers = new ArrayList<AIUnit>();
         AIMain aiMain = getAIMain();
         for (Unit u : getPlayer().getUnits()) {
@@ -1058,14 +856,19 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Gives a mission to non-naval units.
+     * Ensures all units have a useful mission.
      */
     protected void giveNormalMissions() {
-        logger.finest("Entering method giveNormalMissions");
+        final AIMain aiMain = getAIMain();
+        final Player player = getPlayer();
+        final boolean isPastStart = getGame().getTurn().getNumber() > 5
+            && !player.getSettlements().isEmpty();
+        final boolean fewColonies = hasFewColonies();
+        int pioneersWanted = tipMap.size() / 2 - getPlayerPioneers().size();
 
         // Create a datastructure for the worker wishes:
-        java.util.Map<UnitType, ArrayList<Wish>> workerWishes =
-            new HashMap<UnitType, ArrayList<Wish>>();
+        java.util.Map<UnitType, ArrayList<Wish>> workerWishes
+            = new HashMap<UnitType, ArrayList<Wish>>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             workerWishes.put(unitType, new ArrayList<Wish>());
         }
@@ -1075,95 +878,114 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        final boolean fewColonies = hasFewColonies();
-        boolean isPioneerReq = getPlayerPioneers().size() == 0
-            && needsPioneers();
-        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
-        while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = aiUnitsIterator.next();
-            if (aiUnit.hasMission()) continue;
+        // Sort the units, putting naval/transport units at the front
+        // so that we can rely on valid transport missions for them
+        // when handling their passengers.  Then loop through them
+        // making sure they get an appropriate mission.
+        List<AIUnit> aiUnits = getAIUnits();
+        Collections.sort(aiUnits, navalComparator);
+        Location loc;
+        for (AIUnit aiUnit : aiUnits) {
+            final Unit unit = aiUnit.getUnit();
 
-            Unit unit = aiUnit.getUnit();
+            String reason = null;
             if (unit.isUninitialized()) {
-                logger.warning("Unit is uninitialized: " + unit.getId());
-                continue;
-            }
+                reason = "(unit uninitialized)";
 
-            if (unit.isDisposed()) continue;
+            } else if (unit.isDisposed()) {
+                reason = "(unit disposed)";
 
-            if (unit.getState() == UnitState.IN_COLONY
+            } else if (unit.getState() == UnitState.IN_COLONY
                 && unit.getSettlement().getUnitCount() <= 1) {
                 // The unit has its hand full keeping the colony alive.
+                reason = "(unit vital to colony)";
+            }
+            if (reason != null) {
+                logger.finest("Mission-Ignored " + reason + ": " + unit);
                 continue;
             }
 
-            if (PrivateerMission.isValid(aiUnit)) {
-                aiUnit.setMission(new PrivateerMission(getAIMain(), aiUnit));
-                continue;
-            }
-            /* TODO: we need a mission for frigates and similar
-             * units to patrol enemy shipping lanes
-             */
+            // Check the current mission, and assign a new one to m if needed.
+            Mission m = aiUnit.getMission();
+            if (m != null && m.isValid() && !m.isOneTime()) {
+                m = null;
 
-            if (unit.isCarrier()) {
-                aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
-                continue;
-            }
+            } else if (PrivateerMission.invalidReason(aiUnit) == null) {
+                m = new PrivateerMission(aiMain, aiUnit);
 
-            if (unit.canCarryTreasure()) {
-                aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
-                continue;
-            }
+            // TODO: we need a mission for frigates and similar
+            // units to patrol enemy shipping lanes
 
-            if (ScoutingMission.isValid(aiUnit) && preferScoutsToSoldiers()) {
-                aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
-                continue;
-            }
+            } else if (TransportMission.invalidReason(aiUnit) == null) {
+                m = new TransportMission(aiMain, aiUnit);
 
-            if (unit.isOffensiveUnit() || unit.isDefensiveUnit()){
-                Player owner = unit.getOwner();
-                boolean isPastStart = getGame().getTurn().getNumber() > 5
-                    && !owner.getSettlements().isEmpty();
+            } else if (CashInTreasureTrainMission.invalidReason(aiUnit)==null) {
+                m = new CashInTreasureTrainMission(aiMain, aiUnit);
 
-                if (!unit.isColonist() || isPastStart) {
-                    giveMilitaryMission(aiUnit);
-                    continue;
-                }
-            }
+            } else if (preferScoutsToSoldiers()
+                && ScoutingMission.invalidReason(aiUnit) == null) {
+                m = new ScoutingMission(aiMain, aiUnit);
 
-            // Setup as a pioneer if unit:
-            // - already has tools
-            // - an expert pioneer
-            // - a non-expert unit and there are no other units assigned as pioneers
-            boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
-                                || unit.hasAbility(Ability.EXPERT_PIONEER);
-            boolean isExpert = unit.getSkillLevel() > 0;
-            if (isPioneer || (isPioneerReq && !isExpert)) {
-                if (PioneeringMission.isValid(aiUnit)) {
-                    aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
-                    isPioneerReq = false;
-                    continue;
-                }
-            }
+            } else if (pioneersWanted > 0
+                && PioneeringMission.invalidReason(aiUnit) == null
+                && (unit.hasAbility("model.ability.improveTerrain")
+                    || (unit.getRole() == Unit.Role.DEFAULT
+                        && (unit.isInEurope() || unit.getColony() != null)
+                        && aiUnit.equipForRole(Unit.Role.PIONEER, false)))
+                && (loc = PioneeringMission.findTarget(aiUnit)) != null) {
+                m = new PioneeringMission(aiMain, aiUnit, loc);
+                pioneersWanted--;
 
-            if (unit.isColonist()) {
-                giveColonistMission(aiUnit, fewColonies, workerWishes);
-            }
+            } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
+                && (!unit.isColonist() || isPastStart)
+                && !fewColonies
+                && (m = getMilitaryMission(aiUnit)) != null) {
+                ; // ok
 
-            if (!aiUnit.hasMission()) {
-                if (aiUnit.getUnit().isOffensiveUnit()) {
-                    aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+            } else if (unit.isColonist()
+                && (m = getColonistMission(aiUnit, fewColonies,
+                                           workerWishes)) != null) {
+                ; // ok
+
+            } else {
+                if (m instanceof IdleAtSettlementMission) {
+                    m = null;
                 } else {
-                    //non-offensive units should take shelter in a nearby colony,
-                    //not try to be hostile
-                    aiUnit.setMission(new IdleAtSettlementMission(getAIMain(), aiUnit));
+                    m = new IdleAtSettlementMission(aiMain, aiUnit);
+                }
+            }
+            if (m != null) {
+                logger.finest("Mission-New " + m + ": " + unit);
+                aiUnit.setMission(m);
+            } else {
+                logger.finest("Mission-Continues " + aiUnit.getMission()
+                    + ": " + unit);
+            }
+
+            // If a unit is on a carrier, make sure the carrier always has a
+            // transport mission!
+            // TODO: see if this can be removed.
+            if (unit.isOnCarrier()) {
+                Unit carrier = unit.getCarrier();
+                AIUnit aic = getAIUnit(carrier);
+                if (aic.getMission() == null
+                    || !aic.getMission().isValid()
+                    || aic.getMission().isOneTime()) {
+                    aic.setMission(new TransportMission(aiMain, aic));
+                }
+                if (aic.getMission() instanceof TransportMission) {
+                    TransportMission tm = (TransportMission)aic.getMission();
+                    if (tm != null && !tm.isOnTransportList(aiUnit)) {
+                        tm.addToTransportList(aiUnit);
+                    }
                 }
             }
         }
     }
 
-    private void giveColonistMission(AIUnit aiUnit, boolean fewColonies,
-                                     java.util.Map<UnitType, ArrayList<Wish>> workerWishes) {
+    private Mission getColonistMission(AIUnit aiUnit, boolean fewColonies,
+                                       java.util.Map<UnitType, ArrayList<Wish>> workerWishes) {
+        final AIMain aiMain = getAIMain();
         final Unit unit = aiUnit.getUnit();
         /*
          * Motivated by (speed) performance: This map stores the
@@ -1203,13 +1025,12 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         if (bestWish != null) {
             bestWish.setTransportable(aiUnit);
-            aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
-            return;
+            return new WishRealizationMission(aiMain, aiUnit, bestWish);
         }
         // Find a site for a new colony:
         Location buildTarget = null;
         if (getPlayer().canBuildColonies()
-            && BuildColonyMission.isValid(aiUnit)
+            && BuildColonyMission.invalidReason(aiUnit) == null
             && (buildTarget = BuildColonyMission.findTarget(aiUnit, false))
             != null) {
             bestTurns = unit.getTurnsToReach(buildTarget);
@@ -1239,30 +1060,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         if (bestWish != null) {
             bestWish.setTransportable(aiUnit);
-            aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
-            return;
+            return new WishRealizationMission(aiMain, aiUnit, bestWish);
         }
         // Choose to build a new colony:
         if (buildTarget != null) {
-            aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit,
-                                                     buildTarget));
-            if (aiUnit.getUnit().isOnCarrier()) {
-                // Verify carrier mission
-                AIUnit carrier = getAIUnit((Unit) aiUnit.getUnit()
-                    .getLocation());
-                Mission carrierMission = carrier.getMission();
-                if (carrierMission == null) {
-                    carrierMission = new TransportMission(getAIMain(), carrier);
-                    carrier.setMission(carrierMission);
-                } else if (!(carrierMission instanceof TransportMission)) {
-                    throw new IllegalStateException("Carrier carrying unit not on a transport mission");
-                }
-                // Transport unit to carrier destination (is this what
-                // is truly wanted?)
-                ((TransportMission) carrierMission).addToTransportList(aiUnit);
-            }
-            return;
+            return new BuildColonyMission(aiMain, aiUnit, buildTarget);
         }
+        return null;
     }
 
     private int getScaledTurns(java.util.Map<Location, Integer> distances, Location destination) {
@@ -1310,13 +1114,13 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param aiUnit The <code>AIUnit</code> that will attack.
      * @return The best target for a military mission.
      */
-    public Ownable chooseMilitaryTarget(AIUnit aiUnit) {
+    public Location chooseMilitaryTarget(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
-        Ownable target, bestTarget = null;
+        Location target, bestTarget = null;
         int value, bestValue = Integer.MIN_VALUE;
         PathNode path;
 
@@ -1363,7 +1167,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             && (value = UnitSeekAndDestroyMission.scorePath(aiUnit,
                     path)) > bestValue) {
             bestValue = value;
-            bestTarget = (Ownable)targetLoc;
+            bestTarget = targetLoc;
         }
 
         // General check for seek-and-destroy.
@@ -1375,7 +1179,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             && (value = UnitSeekAndDestroyMission.scorePath(aiUnit, 
                     path)) > bestValue) {
             bestValue = value;
-            bestTarget = (Ownable)targetLoc;
+            bestTarget = targetLoc;
         }
 
         return (bestValue < 0) ? null : bestTarget;
@@ -1391,18 +1195,24 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param aiUnit The <code>AIUnit</code> to give a mission to.
      */
     public void giveMilitaryMission(AIUnit aiUnit) {
+        aiUnit.setMission(getMilitaryMission(aiUnit));
+    }
+
+    /**
+     * Chooses a military mission for the given unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to choose a mission for.
+     * @return A military mission.
+     */
+    public Mission getMilitaryMission(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        Ownable bestTarget = chooseMilitaryTarget(aiUnit);
-        Mission mission = (bestTarget == null)
-            ? new UnitWanderHostileMission(aiMain, aiUnit)
-            : (bestTarget instanceof Settlement
-                && ((Settlement)bestTarget).getOwner() == player)
-            ? new DefendSettlementMission(aiMain, aiUnit,
-                                          (Settlement)bestTarget)
-            : new UnitSeekAndDestroyMission(aiMain, aiUnit,
-                                            (Location)bestTarget);
-        aiUnit.setMission(mission);
+        Location target = chooseMilitaryTarget(aiUnit);
+        return (DefendSettlementMission.invalidReason(aiUnit, target) == null)
+            ? new DefendSettlementMission(aiMain, aiUnit, (Settlement)target)
+            : (UnitSeekAndDestroyMission.invalidReason(aiUnit, target) == null)
+            ? new UnitSeekAndDestroyMission(aiMain, aiUnit, target)
+            : new UnitWanderHostileMission(aiMain, aiUnit);
     }
 
     private int getTurns(Transportable t, TransportMission tm) {

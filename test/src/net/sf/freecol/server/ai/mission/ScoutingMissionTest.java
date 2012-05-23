@@ -77,12 +77,12 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertEquals("Scout should have the scout role", scout.getRole(),
             Unit.Role.SCOUT);
-        assertTrue("The Inca settlement should be a scouting target",
-            ScoutingMission.isTarget(aiUnit, is));
+        assertEquals("The Inca settlement should be a scouting target", null,
+            ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
             is, ScoutingMission.findTarget(aiUnit));
-        assertTrue("Scouting mission should be assignable to scout",
-            ScoutingMission.isValid(aiUnit));
+        assertEquals("Scouting mission should be assignable to scout", null,
+            ScoutingMission.invalidReason(aiUnit));
         aiUnit.setMission(new ScoutingMission(aiMain, aiUnit));
         assertTrue("Scout should have been assigned a Scouting mission",
             aiUnit.getMission() instanceof ScoutingMission);
@@ -94,11 +94,11 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
         assertFalse("Scout should not have the scout role",
-            scout.getRole() == Unit.Role.SCOUT);
-        assertFalse("Scouting mission should be invalid",
-            aiUnit.getMission().isValid());
-        assertFalse("Scouting mission should be impossible for this unit",
-            ScoutingMission.isValid(aiUnit));
+            Unit.Role.SCOUT == scout.getRole());
+        assertNotNull("Scouting mission should be invalid",
+            aiUnit.getMission().invalidReason());
+        assertNotNull("Scouting mission should be impossible for this unit",
+            ScoutingMission.invalidReason(aiUnit));
         
         // Restore the horses.
         scout.changeEquipment(horsesEqType, 1);
@@ -113,8 +113,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Add an LCR.  Mission could become valid again.
         Tile lcrTile = map.getTile(2, 3);
         lcrTile.addLostCityRumour(new LostCityRumour(game, lcrTile));
-        assertTrue("Scouting mission should be possible for this unit",
-            ScoutingMission.isValid(aiUnit));
+        assertEquals("Scouting mission should be possible for this unit", null,
+            ScoutingMission.invalidReason(aiUnit));
         assertEquals("The LCR tile should be a scouting target",
             lcrTile, ScoutingMission.findTarget(aiUnit));
     }

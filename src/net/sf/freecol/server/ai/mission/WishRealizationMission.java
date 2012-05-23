@@ -47,6 +47,8 @@ public class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
+    private static final String tag = "AI wisher";
+
     /** The wish to be realized. */
     private Wish wish;
 
@@ -64,9 +66,8 @@ public class WishRealizationMission extends Mission {
         super(aiMain, aiUnit);
 
         this.wish = wish;
-        logger.finest("AI wish unit starting"
-            + " with destination " + wish.getDestination()
-            + ": " + aiUnit.getUnit());
+        logger.finest(tag + " starting with destination "
+            + wish.getDestination() + ": " + aiUnit.getUnit());
         uninitialized = false;
     }
 
@@ -114,44 +115,68 @@ public class WishRealizationMission extends Mission {
         return (shouldTakeTransportToTile(tile)) ? tile : null;
     }
 
+
     // Mission interface
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Gets the target of this mission.
      *
-     * @return True if this mission is still valid to perform.
+     * @return The target of this mission, or null if none.
      */
-    public boolean isValid() {
-        Location loc;
-        return super.isValid()
-            && wish != null
-            && (loc = wish.getDestination()) != null
-            && !((FreeColGameObject)loc).isDisposed()
-            && !(loc instanceof Ownable
-                && ((Ownable)loc).getOwner() != getUnit().getOwner());
+    public Location getTarget() {
+        return (wish == null) ? null : wish.getDestination();
     }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return (wish == null) ? "wish-null"
+            : invalidReason(getAIUnit(), getTarget());
+    }
+
+    // Omitted invalidReason(AIUnit), not needed
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidTargetReason(loc,
+                        aiUnit.getUnit().getOwner())) != null) ? reason
+            : null;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs this mission.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed() || !isValid()) {
-            logger.warning("AI wish broken: " + unit);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
         // Move towards the target.
-        if (travelToTarget("AI wish unit", wish.getDestination())
-            != Unit.MoveType.MOVE) return;
+        Location target = getTarget();
+        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
 
-        if (wish.getDestination() instanceof Colony) {
-            final Colony colony = (Colony)wish.getDestination();
+        if (target instanceof Colony) {
+            final Colony colony = (Colony)target;
             final AIUnit aiUnit = getAIUnit();
             final AIColony aiColony = getAIMain().getAIColony(colony);
             aiColony.completeWish(wish, "mission(" + unit + ")");
-            logger.finest("AI wish completed at " + colony
-                + ": " + unit);
+            logger.finest(tag + " completed at " + colony + ": " + unit);
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.  Beware
             // that setMission() will dispose of this mission which is
@@ -165,7 +190,7 @@ public class WishRealizationMission extends Mission {
                                   aiUnit, aiColony));
             }
         } else {
-            logger.warning("AI wish unknown destination type " + wish
+            logger.warning(tag + " unknown destination type " + wish
                 + ": " + unit);
             wish.dispose();
             wish = null;

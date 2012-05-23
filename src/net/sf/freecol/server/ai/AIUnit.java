@@ -167,7 +167,8 @@ public class AIUnit extends AIObject implements Transportable {
      * Disposes this object and any attached mission.
      */
     public void dispose() {
-        abortMission("disposed");
+        getAIOwner().removeAIUnit(this);
+        abortMission("AIUnit-disposed");
         setTransport(null);
         super.dispose();
     }
@@ -258,9 +259,8 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void abortMission(String why) {
         if (mission != null) {
-            logger.finest("Aborting old " + why
-                + " " + mission.getClass().getName()
-                + " for unit " + getUnit());
+            logger.finest("Mission-ABORT " + mission + " (" + why + "): "
+                + getUnit());
             mission.dispose();
             this.mission = null;
         }
@@ -275,9 +275,12 @@ public class AIUnit extends AIObject implements Transportable {
     public void setMission(Mission mission) {
         final Mission oldMission = this.mission;
         if (oldMission != null) {
-            logger.finest("Replacing old " + oldMission.getClass().getName()
-                + " with " + mission.getClass().getName()
-                + " for unit " + getUnit());
+            String reason = oldMission.invalidReason();
+            reason = (reason != null) ? "(" + reason + ")"
+                : (oldMission.isOneTime()) ? "(oneTime)"
+                : "(forced)";
+            logger.finest("Replacing " + reason + " old mission "
+                + oldMission + " with " + mission + ": " + getUnit());
             oldMission.dispose();
         }
         this.mission = mission;
@@ -548,8 +551,8 @@ public class AIUnit extends AIObject implements Transportable {
             if (mission.isValid()) {
                 mission.toXML(out);
             } else {
-                logger.warning("AI unit with invalid mission " + mission
-                    + ": " + this);
+                logger.warning("AI unit with " + mission.invalidReason()
+                    + " mission " + mission + ": " + getUnit());
             }
         }
 

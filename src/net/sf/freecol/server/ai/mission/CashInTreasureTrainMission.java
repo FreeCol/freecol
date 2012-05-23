@@ -88,29 +88,6 @@ public class CashInTreasureTrainMission extends Mission {
         readFromXML(in);
     }
 
-    /**
-     * Gets the location we are aiming to cash in at.
-     *
-     * @return The location we are aiming to cash in at.
-     */
-    @Override
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * Is a location a valid place to cash in this treasure train?
-     *
-     * @param aiUnit The treasure train <code>AIUnit</code>.
-     * @param loc The <code>Location</code> to test.
-     * @return True if the location is a valid cash in target.
-     */
-    public static boolean isTarget(AIUnit aiUnit, Location loc) {
-        return (loc instanceof Europe
-                && !((Europe)loc).isDisposed())
-            || (loc instanceof Tile
-                && aiUnit.getUnit().canCashInTreasureTrain((Tile)loc));
-    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -124,7 +101,7 @@ public class CashInTreasureTrainMission extends Mission {
         final Unit unit = aiUnit.getUnit();
         final Tile tile = (path == null) ? unit.getTile()
             : path.getLastNode().getTile();
-        return (isTarget(aiUnit, tile)) ? tile : null;
+        return (invalidReason(aiUnit, tile) == null) ? tile : null;
     }
 
     /**
@@ -138,7 +115,7 @@ public class CashInTreasureTrainMission extends Mission {
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
         Location loc = extractTarget(aiUnit, path);
-        return (isTarget(aiUnit, loc)) ? 1000 / turns
+        return (invalidReason(aiUnit, loc) == null) ? 1000 / turns
             : Integer.MIN_VALUE;
     }
 
@@ -206,8 +183,8 @@ public class CashInTreasureTrainMission extends Mission {
     public static Location findTarget(AIUnit aiUnit) {
         Location loc = extractTarget(aiUnit, findTargetPath(aiUnit));
         if (loc == null) loc = aiUnit.getUnit().getOwner().getEurope();
-        return (isTarget(aiUnit, loc)) ? loc : null;
-    }        
+        return (invalidReason(aiUnit, loc) == null) ? loc : null;
+    }
 
 
     // Fake Transportable interface
@@ -239,59 +216,91 @@ public class CashInTreasureTrainMission extends Mission {
     // Mission interface
 
     /**
-     * Is it valid to for a unit to perform a CashInTreasureTrainMission.
+     * Gets the location we are aiming to cash in at.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @return True if the task would be valid.
+     * @return The location we are aiming to cash in at.
      */
-    private static boolean isValid(Unit unit) {
-        return unit.canCarryTreasure()
-            && unit.getTreasureAmount() > 0;
+    public Location getTarget() {
+        return target;
     }
 
     /**
-     * Is it valid to for an AI unit to perform a CashInTreasureTrainMission.
+     * Why would a CashInTreasureTrainMission be invalid with the given unit?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
-     * @return True if the task would be valid.
+     * @return A reason to not perform the mission, or null if none.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && isValid(aiUnit.getUnit())
-            && findTarget(aiUnit) != null;
+    private static String invalidCashinReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (!unit.canCarryTreasure()) ? "unit-cannot-carry-treasure"
+            : (unit.getTreasureAmount() > 0) ? "unit-treasure-nonpositive"
+            : null;
     }
 
     /**
-     * Is this mission still valid to perform.
+     * Why is this mission invalid?
      *
-     * @return True if the task is still valid.
+     * @return A reason for mission invalidity, or null if none found.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && isValid(getUnit())
-            && isTarget(getAIUnit(), target);
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
     }
 
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidCashinReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidCashinReason(aiUnit)) != null) ? reason
+            : (loc instanceof Europe)
+            ? (((reason = invalidTargetReason(loc,
+                            aiUnit.getUnit().getOwner())) != null) ? reason
+                : null)
+            : (loc instanceof Tile)
+            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+                : (!aiUnit.getUnit().canCashInTreasureTrain((Tile)loc))
+                ? "cashin-impossible-at-location"
+                : null)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
+    
     /**
      * Performs this mission.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed() || !isValid(unit)) {
-            logger.warning(tag + " broken: " + unit);
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            if ((target = findTarget(getAIUnit())) == null) {
+                logger.finest(tag + " could not retarget: " + unit);
+                return;
+            }
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
-        // Validate target.
-        final AIUnit aiUnit = getAIUnit();
-        if (!isTarget(aiUnit, target)) {
-            if ((target = findTarget(aiUnit)) == null) {
-                logger.finest(tag + " could not find a target: " + unit);
-                return;
-            }
-        }
-
-        // Go there.
+        // Go to the target.
         if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
@@ -300,6 +309,7 @@ public class CashInTreasureTrainMission extends Mission {
         // - or there is no potential carrier to get the treasure to there
         // - or if the transport fee is not in effect.
         // Otherwise, it is better to send to Europe.
+        final AIUnit aiUnit = getAIUnit();
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
         if (unit.canCashInTreasureTrain()) {

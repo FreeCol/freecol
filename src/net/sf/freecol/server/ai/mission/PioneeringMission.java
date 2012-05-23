@@ -102,6 +102,26 @@ public class PioneeringMission extends Mission {
     }
 
     /**
+     * Creates a pioneering mission for the given <code>AIUnit</code>.
+     * Note that PioneeringMission.isValid(aiUnit) should be called
+     * before this, to guarantee that
+     * findTileImprovementPlan/findColonyWithTools succeed.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission
+     *        is created for.
+     * @param loc The target <code>Location</code>.
+     */
+    public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location loc) {
+        super(aiMain, aiUnit);
+
+        setTarget(loc);
+        logger.finest(tag + " starts with target " + target
+            + ": " + aiUnit.getUnit());
+        uninitialized = false;
+    }
+
+    /**
      * Creates a new <code>PioneeringMission</code> and reads the
      * given element.
      *
@@ -129,22 +149,14 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Get the best improvement associated with a tile.
+     * Get the best improvement associated with a tile for a given unit.
+     * Take care to first check if the unit has a plan already, if so,
+     * return that.
      *
      * @return The <code>TileImprovementPlan</code>, or null if not found.
      */
     private static TileImprovementPlan getBestPlan(AIUnit aiUnit, Tile tile) {
         return ((EuropeanAIPlayer)aiUnit.getAIOwner()).getBestPlan(tile);
-    }
-
-    /**
-     * Gets the target for this mission, either the colony to go to,
-     * or the tile that needs improvement.
-     *
-     * @return The target for this mission.
-     */
-    public Location getTarget() {
-        return target;
     }
 
     /**
@@ -204,7 +216,6 @@ public class PioneeringMission extends Mission {
         super.dispose();
     }
 
-
     /**
      * Does a supplied unit have tools?
      *
@@ -225,47 +236,6 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Checks if a target is one of our colonies.
-     *
-     * @param aiUnit The <code>AIUnit</code> that needs tools.
-     * @param target The target to check.
-     * @return True if the colony can provide tools.
-     */
-    private static boolean isOurColonyTarget(AIUnit aiUnit, Location target) {
-        if (!(target instanceof Colony)) return false;
-        Colony colony = (Colony)target;
-        return colony != null && !colony.isDisposed()
-            && aiUnit.getUnit().getOwner().owns(colony);
-    }
-
-    /**
-     * Checks if a target is a colony that can provide the tools
-     * required for a pioneer.
-     *
-     * @param aiUnit The <code>AIUnit</code> that needs tools.
-     * @param target The target to check.
-     * @return True if the colony can provide tools.
-     */
-    private static boolean isColonyTarget(AIUnit aiUnit, Location target) {
-        if (!isOurColonyTarget(aiUnit, target)) return false;
-        Colony colony = (Colony)target;
-        return colony.canProvideEquipment(Unit.Role.PIONEER
-            .getRoleEquipment(colony.getSpecification()));
-    }
-
-    /**
-     * Checks if a target is a tile with improvements required.
-     *
-     * @param aiUnit The <code>AIUnit</code> to improve with.
-     * @param target The target to check.
-     * @return True if the tile needs improvement.
-     */
-    private static boolean isTipTarget(AIUnit aiUnit, Location target) {
-        return target instanceof Tile
-            && getBestPlan(aiUnit, (Tile)target) != null;
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -278,9 +248,12 @@ public class PioneeringMission extends Mission {
             : path.getLastNode().getTile();
         TileImprovementPlan tip;
         return (tile == null) ? null
-            : (hasTools(aiUnit)) ? ((isTipTarget(aiUnit, tile)) ? tile : null)
-            : (isColonyTarget(aiUnit, tile.getColony())) ? tile.getColony()
-            : null;
+            : (Mission.invalidAIUnitReason(aiUnit) != null) ? null
+            : (hasTools(aiUnit))
+            ? ((invalidPioneeringTileReason(aiUnit, tile) == null)
+                ? tile : null)
+            : ((invalidPioneeringColonyReason(aiUnit, tile.getColony()) == null)
+                ? tile.getColony() : null);
     }
 
     /**
@@ -295,8 +268,9 @@ public class PioneeringMission extends Mission {
         int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
         Location loc = extractTarget(aiUnit, path);
         TileImprovementPlan tip;
-        return (isTipTarget(aiUnit, loc))
-            ? 100 * getBestPlan(aiUnit, (Tile)loc).getValue() / turns
+        return (loc instanceof Colony) ? (100 / turns)
+            : (loc instanceof Tile) ? (100 * getBestPlan(aiUnit, (Tile)loc)
+                .getValue() / turns)
             : Integer.MIN_VALUE;
     }
 
@@ -310,7 +284,11 @@ public class PioneeringMission extends Mission {
         Unit unit = aiUnit.getUnit();
         Tile startTile = unit.getPathStartTile();
 
-        if (isColonyTarget(aiUnit, startTile.getColony())) return null;
+        Colony colony = startTile.getColony();
+        if (colony != null
+            && invalidPioneeringColonyReason(aiUnit, colony) == null) {
+            return null;
+        }
 
         final GoalDecider equipDecider = new GoalDecider() {
                 private PathNode best = null;
@@ -319,7 +297,8 @@ public class PioneeringMission extends Mission {
                 public PathNode getGoal() { return best; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
-                    if (isColonyTarget(aiUnit, path.getTile().getColony())
+                    Colony colony = path.getTile().getColony();
+                    if (invalidPioneeringColonyReason(aiUnit, colony) == null
                         && path.getTotalTurns() < bestValue) {
                         bestValue = path.getTotalTurns();
                         best = path;
@@ -347,7 +326,8 @@ public class PioneeringMission extends Mission {
         final GoalDecider pioneeringDecider
             = getMissionGoalDecider(aiUnit, PioneeringMission.class);
 
-        return (startTile == null || isTipTarget(aiUnit, startTile)) ? null
+        return (startTile == null
+            || invalidPioneeringTileReason(aiUnit, startTile) == null) ? null
             : unit.search(startTile, pioneeringDecider,
                           CostDeciders.avoidIllegal(), MAX_TURNS,
                           unit.getCarrier());
@@ -420,30 +400,127 @@ public class PioneeringMission extends Mission {
             : target;
     }
 
+
     // Mission interface
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Gets the target for this mission, either the colony to go to,
+     * or the tile that needs improvement.
      *
-     * @return True if this mission is still valid to perform.
+     * @return The target for this mission.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().isPerson()
-            && getTarget() != null;
+    public Location getTarget() {
+        return target;
     }
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Why would a PioneeringMission be invalid with the given unit.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
-     * @return True if the AI unit can be assigned a PioneeringMission.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isPerson()
-            && findTarget(aiUnit) != null;
+    private static String invalidPioneeringReason(AIUnit aiUnit) {
+        return (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
+            : null;
     }
+
+    /**
+     * Why would a PioneeringMission be invalid with the given unit and colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param colony The <code>Colony</code> to check.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidPioneeringColonyReason(AIUnit aiUnit,
+                                                        Colony colony) {
+        String reason;
+        return ((reason = invalidTargetReason(colony,
+                    aiUnit.getUnit().getOwner())) != null) ? reason
+            : (aiUnit.getUnit().getTile() == null
+                || aiUnit.getUnit().isOnCarrier()) ? null 
+            : (!colony.canProvideEquipment(Unit.Role.PIONEER
+                    .getRoleEquipment(colony.getSpecification()))
+                && !hasTools(aiUnit)) ? "colony-can-not-provide-equipment"
+            : null;
+    }
+
+    /**
+     * Gets the existing tile improvement plan for a unit and tile.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param tile The <code>Tile</code> to check.
+     * @return The associated <code>TileImprovementPlan</code>.
+     */
+    private static TileImprovementPlan getPlan(AIUnit aiUnit, Tile tile) {
+        if (aiUnit.getMission() instanceof PioneeringMission) {
+            PioneeringMission pm = (PioneeringMission)aiUnit.getMission();
+            if (pm.getTileImprovementPlan() != null
+                && pm.getTileImprovementPlan().getTarget() == tile) {
+                return pm.getTileImprovementPlan();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Why would a PioneeringMission be invalid with the given unit and tile.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param tile The <code>Tile</code> to check.
+     * @return A reason why the mission would be invalid, or null if none found.
+     */
+    private static String invalidPioneeringTileReason(AIUnit aiUnit,
+                                                      Tile tile) {
+        return (tile == null) ? Mission.TARGETINVALID
+            : (!hasTools(aiUnit)) ? "unit-needs-tools"
+            : (getPlan(aiUnit, tile) == null
+                && getBestPlan(aiUnit, tile) == null) ? "tile-has-no-plan"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidPioneeringReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidPioneeringReason(aiUnit)) != null) ? reason
+            : (loc instanceof Colony)
+            ? invalidPioneeringColonyReason(aiUnit, (Colony)loc)
+            : (loc instanceof Tile)
+            ? invalidPioneeringTileReason(aiUnit, (Tile)loc)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs this mission.
@@ -456,11 +533,11 @@ public class PioneeringMission extends Mission {
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.finest(tag + " broken: " + unit);
-            return;
-        } else if (!unit.isPerson()) {
-            logger.finest(tag + " not a person: " + unit);
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            ; // handled below
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
             return;
         }
 
@@ -470,14 +547,16 @@ public class PioneeringMission extends Mission {
         PathNode path;
         Tile tile;
         String where;
-
         // Get tools first.
         while (!hasTools()) {
-            if (!isOurColonyTarget(aiUnit, target)) {
+            if (invalidTargetReason(target, player) != null) {
                 setTarget(extractTarget(aiUnit, findColonyPath(aiUnit)));
+                if (invalidTargetReason(target, player) != null) {
+                    logger.finest(tag + " unable to retarget: " + unit);
+                    return;
+                }
                 logger.finest(tag + " retargeting for tools " + target
                     + ": " + unit);
-                if (!isOurColonyTarget(aiUnit, target)) return;
             }
 
             // Go there and clear target on arrival.
@@ -497,7 +576,8 @@ public class PioneeringMission extends Mission {
         }
 
         // Going to an intermediate colony?
-        if (isOurColonyTarget(aiUnit, target)) {
+        if (target instanceof Colony
+            && invalidTargetReason(target, player) == null) {
             if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
             where = ((Colony)target).getName();
             setTarget(null);
@@ -585,30 +665,6 @@ public class PioneeringMission extends Mission {
             }
         } else { // Probably just out of moves.
             logger.finest(tag + " waiting to improve at " + tile + ": " + unit);
-        }
-    }
-
-    /**
-     * Gets debugging information about this mission.
-     * This string is a short representation of this
-     * object's state.
-     *
-     * @return The <code>String</code>:
-     *      <ul>
-     *          <li>"(x, y) P" (for plowing)</li>
-     *          <li>"(x, y) R" (for building road)</li>
-     *          <li>"(x, y) Getting tools: (x, y)"</li>
-     *      </ul>
-     */
-    public String getDebuggingInfo() {
-        if (hasTools()) {
-            if (tileImprovementPlan == null) return "No target";
-            final String action = tileImprovementPlan.getType().getNameKey();
-            return tileImprovementPlan.getTarget().getPosition().toString()
-                + " " + action;
-        } else {
-            if (target == null) return "No target";
-            return "Getting tools from " + target;
         }
     }
 

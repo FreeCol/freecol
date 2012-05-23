@@ -101,65 +101,6 @@ public class ScoutingMission extends Mission {
 
 
     /**
-     * Gets the object we are trying to destroy.
-     *
-     * @return The object which should be destroyed.
-     */
-    @Override
-    public Location getTarget() {
-        return target;
-    }
-
-
-    /**
-     * Is this a valid scouting target because it is a suitable native
-     * settlement.
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param target The target to test.
-     * @return True if the target is a valid scouting target.
-     */
-    private static boolean isIndianSettlementTarget(AIUnit aiUnit,
-                                                    Location target) {
-        if (!(target instanceof IndianSettlement)) return false;
-        IndianSettlement settlement = (IndianSettlement)target;
-        final Player owner = aiUnit.getUnit().getOwner();
-        Tension tension = settlement.getAlarm(owner);
-        return !settlement.hasSpokenToChief(owner)
-            && (tension == null
-                || tension.getValue() < Tension.Level.HATEFUL.getLimit());
-    }
-
-    /**
-     * Is this a valid scouting target because it is one of our
-     * connected colonies.
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param target The target to test.
-     * @return True if the target is a valid scouting target.
-     */
-    private static boolean isOurColonyTarget(AIUnit aiUnit, Location target) {
-        if (!(target instanceof Colony)) return false;
-        Colony colony = (Colony)target;
-        return colony.isConnected() && aiUnit.getUnit().getOwner().owns(colony);
-    }
-
-    /**
-     * Is a tile a valid scouting target for a unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param target The target to test.
-     * @return True if the target is a valid scouting target.
-     */
-    public static boolean isTarget(AIUnit aiUnit, Location target) {
-        return target != null
-            && ((target instanceof Tile
-                    && ((Tile)target).hasLostCityRumour())
-                || isIndianSettlementTarget(aiUnit, target)
-                || isOurColonyTarget(aiUnit, target));
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -171,8 +112,11 @@ public class ScoutingMission extends Mission {
         final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
             : path.getLastNode().getTile();
         return (tile == null) ? null
-            : (isTarget(aiUnit, tile)) ? tile
-            : (isTarget(aiUnit, tile.getSettlement())) ? tile.getSettlement()
+            : (tile.getIndianSettlement() != null
+                && invalidSettlementReason(aiUnit,
+                    tile.getIndianSettlement()) == null)
+            ? tile.getIndianSettlement()
+            : (invalidTileReason(aiUnit, tile) == null) ? tile
             : null;
     }
 
@@ -263,53 +207,119 @@ public class ScoutingMission extends Mission {
     // Mission interface
 
     /**
-     * Checks if it is possible to assign a valid scouting mission to
-     * a unit.
+     * Gets the target for this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to be checked.
-     * @return True if the unit could be a scout.
+     * @return The mission target.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().getRole() == Unit.Role.SCOUT
-            && findTarget(aiUnit) != null;
+    public Location getTarget() {
+        return target;
     }
 
     /**
-     * Checks if this mission is still valid.
-     * Allows for a backup colony target.
+     * Why would a ScoutingMission be invalid with the given unit.
      *
-     * @return True if this mission is still valid.
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().getRole() == Unit.Role.SCOUT
-            && isTarget(getAIUnit(), target);
+    private static String invalidScoutingReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (unit.getRole() != Unit.Role.SCOUT) ? "unit-not-a-SCOUT"
+            : null;
     }
+
+    /**
+     * Is this a valid scouting target because it is a suitable native
+     * settlement.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param is The <code>IndianSettlement</code> to test.
+     * @return A reason why the mission would be invalid, or null if none found.
+     */
+    private static String invalidSettlementReason(AIUnit aiUnit,
+                                                  IndianSettlement is) {
+        final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
+        Tension tension = is.getAlarm(owner);
+        return (is.hasSpokenToChief(owner)) ? "settlement-contacted"
+            : (tension != null && tension.getValue()
+                >= Tension.Level.HATEFUL.getLimit()) ? "settlement-hateful"
+            : null;
+    }
+
+    /**
+     * Is this a valid scouting target because it is a suitable tile.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param is The <code>IndianSettlement</code> to test.
+     * @return A reason why the mission would be invalid, or null if none found.
+     */
+    private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
+        final Unit unit = aiUnit.getUnit();
+        return (!tile.hasLostCityRumour()) ? "tile-empty"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidScoutingReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidScoutingReason(aiUnit)) != null) ? reason
+            : (loc instanceof Tile)
+            ? invalidTileReason(aiUnit, (Tile)loc)
+            : (loc instanceof IndianSettlement)
+            ? invalidSettlementReason(aiUnit, (IndianSettlement)loc)
+            : Mission.TARGETINVALID;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs this mission.
      */
     public void doMission() {
         final Unit unit = getUnit();
-        if (unit == null || unit.isDisposed()) {
-            logger.warning(tag + " broken: " + unit);
-            return;
-        } else if (unit.getRole() != Unit.Role.SCOUT) {
-            logger.warning(tag + " dismounted: " + unit);
-            return;
-        }
-
-        // Check the target.
-        final AIUnit aiUnit = getAIUnit();
-        if (!isTarget(aiUnit, target)) {
-            if ((target = findTarget(aiUnit)) == null) {
-                logger.finest(tag + " could not find a target: " + unit);
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            if ((target = findTarget(getAIUnit())) == null) {
+                logger.finest(tag + " could not retarget: " + unit);
                 return;
             }
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + unit);
+            return;
         }
 
-        // Go there.
+        // Go to the target.
+        final AIUnit aiUnit = getAIUnit();
         Unit.MoveType mt = travelToTarget(tag, target);
         switch (mt) {
         case ATTACK_UNIT: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
@@ -337,10 +347,11 @@ public class ScoutingMission extends Mission {
 
         // Retarget when complete, but do not retarget from one colony
         // to another (just drop equipment and invalidate the mission).
+        final Player player = unit.getOwner();
         Location completed = target;
         target = findTarget(aiUnit);
-        if (isOurColonyTarget(aiUnit, completed)
-            && isOurColonyTarget(aiUnit, target)) {
+        if (invalidTargetReason(completed, player) == null
+            && invalidTargetReason(target, player) == null) {
             Colony colony = (Colony)completed;
             for (EquipmentType e : new ArrayList<EquipmentType>(unit
                     .getEquipment().keySet())) {

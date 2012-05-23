@@ -121,21 +121,5 @@ public class TensionTest extends FreeColTestCase {
         assertNotNull(tension);
         assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
         assertEquals(Stance.PEACE, stance);
-
-        // but one brave will go on a rampage and declare war.
-        Iterator<Unit> iter = settlement.getOwnedUnitsIterator();
-        while (iter.hasNext()) {
-            Unit brave = iter.next();
-            AIUnit aiBrave = aiMain.getAIUnit(brave);
-            if (aiBrave.getMission() instanceof UnitSeekAndDestroyMission) {
-                fail();
-            }
-        }
-        // => Stealing a single tile of land with unarmed units (which pose not much threat)
-        // results in Indian declaration of war.
-        // this doesn't seem right, since TENSION_ADD_LAND_TAKEN < Level.CONTENT
-        // Perhaps we should improve secureIndianSettlement() to better check the stance/tension
-        // before jumping the gun and start with hostilities?
-        // or should we adjust the tension values so that this doesn't happen?
     }
 }

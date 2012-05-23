@@ -759,7 +759,7 @@ public class TransportMission extends Mission {
                  space -= newUnit.getUnit().getSpaceTaken()) {
                 newUnit = getCheapestUnitInEurope();
                 if (newUnit == null
-                    || !BuildColonyMission.isValid(newUnit)) break;
+                    || BuildColonyMission.invalidReason(newUnit) != null) break;
                 addToTransportList(newUnit);
                 Location buildTarget = BuildColonyMission.findTarget(aiUnit, false);
                 if (buildTarget == null) break;
@@ -1338,6 +1338,7 @@ public class TransportMission extends Mission {
         return getUnit().findPathToEurope(start);
     }
 
+
     // Fake Transportable interface
 
     /**
@@ -1358,44 +1359,77 @@ public class TransportMission extends Mission {
         return 0;
     }
 
+
     // Mission interface
 
     /**
-     * Checks if this mission is valid for the given unit.
+     * Gets the target for this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @return True if this mission is for the unit.
+     * @return The mission target.
      */
-    public static boolean isValid(AIUnit aiUnit) {
-        return Mission.isValid(aiUnit)
-            && aiUnit.getUnit().isCarrier()
-            && !aiUnit.getUnit().isUnderRepair();
+    public Location getTarget() {
+        return null; // TODO
     }
 
     /**
-     * Checks if this mission is still valid to perform.
+     * Why would an TransportMission be invalid with the given unit?
      *
-     * @return True as long as the unit exists and is a carrier.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
      */
-    public boolean isValid() {
-        return super.isValid()
-            && getUnit().isCarrier()
-            && !getUnit().isUnderRepair();
+    private static String invalidTransportReason(AIUnit aiUnit) {
+        final Unit unit = aiUnit.getUnit();
+        return (!unit.isCarrier()) ? "no-longer-a-carrier"
+            : null;
     }
+
+    /**
+     * Why is this mission invalid?
+     *
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        String reason;
+        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
+            : ((reason = invalidTransportReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason;
+        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
+            : ((reason = invalidTransportReason(aiUnit)) != null) ? reason
+            : null;
+    }
+
+    // Not a one-time mission, omit isOneTime().
 
     /**
      * Performs the mission.
      */
     public void doMission() {
         final Unit carrier = getUnit();
-        if (carrier == null || carrier.isDisposed()) {
-            logger.finest(tag + " broken: " + carrier);
-            return;
-        } else if (!carrier.isCarrier()) {
-            logger.finest(tag + " not a carrier: " + carrier);
-            return;
-        } else if (carrier.isUnderRepair()) {
-            logger.finest(tag + " is under repair: " + carrier);
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + carrier);
             return;
         }
         updateTransportables();
