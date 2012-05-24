@@ -571,7 +571,7 @@ abstract public class Settlement extends GoodsLocation
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("settlementType", getType().getId());
-        // Not owner, it is subject to PlayerExploredTile handling.
+        // TODO: Not owner, it is subject to PlayerExploredTile handling.
     }
 
     /**

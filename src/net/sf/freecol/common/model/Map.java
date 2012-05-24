@@ -44,10 +44,8 @@ import net.sf.freecol.common.util.Utils;
 
 /**
  * A rectangular isometric map. The map is represented as a
- * two-dimensional array of tiles. Off-map destinations, such as
+ * two-dimensional array of tiles.  Off-map destinations, such as
  * {@link Europe}, can be reached via the {@link HighSeas}.
- *
- * <br/><br/>
  *
  * In theory, a {@link Game} might contain several Map instances
  * connected by the HighSeas.
@@ -56,6 +54,10 @@ public class Map extends FreeColGameObject implements Location {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
+    /**
+     * The number of tiles from the upper edge that are considered
+     * polar by default.
+     */
     public final static int POLAR_HEIGHT = 2;
 
     /**
@@ -1223,25 +1225,24 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Checks whether a position is valid.
      *
-     * @param position The position
+     * @param position The <code>Position</code> to check.
      * @param width The width of the map.
      * @param height The height of the map.
-     * @return <code>true</code> if the given position is
-     *        within the bounds of the map and <code>false</code> otherwise
+     * @return True if the given position is within the bounds of the map.
      */
     public static boolean isValid(Position position, int width, int height) {
         return isValid(position.x, position.y, width, height);
     }
 
     /**
-     * Checks if the given position is valid.
+     * Checks if an (x,y) coordinate tuple is within a map of
+     * specified width and height.
      *
      * @param x The x-coordinate of the position.
      * @param y The y-coordinate of the position.
      * @param width The width of the map.
      * @param height The height of the map.
-     * @return <code>true</code> if the given position is
-     *        within the bounds of the map and <code>false</code> otherwise
+     * @return True if the given position is within the bounds of the map.
      */
     public static boolean isValid(int x, int y, int width, int height) {
         return x >= 0 && x < width && y >= 0 && y < height;
@@ -1254,12 +1255,11 @@ public class Map extends FreeColGameObject implements Location {
         public final int x, y;
 
         /**
-         * Creates a new object with the given position.
+         * Creates a new <code>Position</code> object with the given
+         * coordinates.
          *
-         * @param posX
-         *            The x-coordinate for this position.
-         * @param posY
-         *            The y-coordinate for this position.
+         * @param posX The x-coordinate for this position.
+         * @param posY The y-coordinate for this position.
          */
         public Position(int posX, int posY) {
             x = posX;
@@ -1267,7 +1267,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns the x-coordinate of this Position.
+         * Gets the x-coordinate of this Position.
          *
          * @return The x-coordinate of this Position.
          */
@@ -1276,7 +1276,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns the y-coordinate of this Position.
+         * Gets the y-coordinate of this Position.
          *
          * @return The y-coordinate of this Position.
          */
@@ -1287,8 +1287,8 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Compares the other Position based on the coordinates.
          *
-         * @param other the reference object with which to compare.
-         * @return true iff the coordinates match.
+         * @param other The other object to compare with.
+         * @return True iff the coordinates match.
          */
         @Override
         public boolean equals(Object other) {
@@ -1299,16 +1299,16 @@ public class Map extends FreeColGameObject implements Location {
             } else if (!(other instanceof Position)) {
                 return false;
             } else {
-                return x == ((Position) other).x && y == ((Position) other).y;
+                return x == ((Position)other).x && y == ((Position)other).y;
             }
         }
 
         /**
-         * Returns a hash code value. The current implementation (which may
-         * change at any time) works well as long as the maximum coordinates fit
-         * in 16 bits.
+         * Gets a hash code value.  The current implementation
+         * (which may change at any time) works well as long as the
+         * maximum coordinates fit in 16 bits.
          *
-         * @return a hash code value for this object.
+         * @return A hash code value for this object.
          */
         @Override
         public int hashCode() {
@@ -1316,9 +1316,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns a string representation of the object.
-         *
-         * @return a string representation of the object.
+         * {@inheritDoc}
          */
         @Override
         public String toString() {
@@ -1332,23 +1330,23 @@ public class Map extends FreeColGameObject implements Location {
          * @param direction The direction (N, NE, E, etc.)
          * @return Adjacent position
          */
-         public Position getAdjacent(Direction direction) {
-             int x = this.x + ((this.y & 1) != 0 ?
-                                   direction.getOddDX() : direction.getEvenDX());
-             int y = this.y + ((this.y & 1) != 0 ?
-                                   direction.getOddDY() : direction.getEvenDY());
-             return new Position(x, y);
-         }
+        public Position getAdjacent(Direction direction) {
+            int x = this.x + (((this.y & 1) != 0) ? direction.getOddDX()
+                : direction.getEvenDX());
+            int y = this.y + (((this.y & 1) != 0) ? direction.getOddDY()
+                : direction.getEvenDY());
+            return new Position(x, y);
+        }
 
         /**
-         * Gets the distance in tiles between two map positions. With an isometric
-         * map this is a non-trivial task. The formula below has been developed
-         * largely through trial and error. It should cover all cases, but I
-         * wouldn't bet my life on it.
+         * Gets the distance in tiles between two map positions.
+         * With an isometric map this is a non-trivial task.
+         * The formula below has been developed largely through trial and
+         * error.  It should cover all cases, but I wouldn't bet my
+         * life on it.
          *
-         * @param position
-         *            The second position.
-         * @return Distance
+         * @param position The <code>Position</code> to compare.
+         * @return The distance to the other position.
          */
         public int getDistance(Position position) {
             int ay = getY();
@@ -1360,7 +1358,6 @@ public class Map extends FreeColGameObject implements Location {
             } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
                 r--;
             }
-
             return Math.max(Math.abs(ay - by + r), Math.abs(r));
         }
     }
@@ -1369,8 +1366,6 @@ public class Map extends FreeColGameObject implements Location {
      * Base class for internal iterators.
      */
     private abstract class MapIterator implements Iterator<Position> {
-
-        protected Direction[] directions = Direction.values();
 
         /**
          * Get the next position as a position rather as an object.
@@ -1469,8 +1464,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return True of there is another position
          */
         public boolean hasNext() {
-            for (int i = x; i < 8; i++) {
-                Position newPosition = basePosition.getAdjacent(directions[i]);
+            for (int i = x; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
+                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1486,8 +1481,8 @@ public class Map extends FreeColGameObject implements Location {
          */
         @Override
         public Position nextPosition() throws NoSuchElementException {
-            for (int i = x; i < 8; i++) {
-                Position newPosition = basePosition.getAdjacent(directions[i]);
+            for (int i = x; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
+                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
                 if (isValid(newPosition)) {
                     x = i + 1;
                     return newPosition;
@@ -1680,8 +1675,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return True of there is another position
          */
         public boolean hasNext() {
-            for (int i = index; i < 8; i += 2) {
-                Position newPosition = basePosition.getAdjacent(directions[i]);
+            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i += 2) {
+                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1697,8 +1692,8 @@ public class Map extends FreeColGameObject implements Location {
          */
         @Override
         public Position nextPosition() throws NoSuchElementException {
-            for (int i = index; i < 8; i += 2) {
-                Position newPosition = basePosition.getAdjacent(directions[i]);
+            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i += 2) {
+                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
                 if (isValid(newPosition)) {
                     index = i + 2;
                     return newPosition;

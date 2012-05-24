@@ -1504,6 +1504,7 @@ public class ChangeSet {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        Collections.sort(changes, changeComparator);
         for (Change c : changes) {
             sb.append(c.toString());
             sb.append("\n");

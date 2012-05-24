@@ -2052,14 +2052,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Returns a String representation of this Tile.
-     *
-     * @return A String representation of this Tile.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return "Tile(" + x + "," + y +"):"
-            + ((type == null) ? "unknown" : Utils.lastPart(type.getId(), "."));
+        return "[" + getId()
+            + " " + ((type == null) ? "unknown"
+                : Utils.lastPart(type.getId(), "."))
+            + " " + x + "," + y
+            + ((getSettlement() == null) ? "" : " " + getSettlement().getName())
+            + "]";
     }
 
     /**

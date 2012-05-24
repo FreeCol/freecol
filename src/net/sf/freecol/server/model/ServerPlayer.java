@@ -2800,6 +2800,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + settlement);
         }
         cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
+        // Now the settlement is gone, the center tile can be claimed.
         if (centerClaimant != null) {
             centerTile.changeOwnership(centerClaimant.getOwner(),
                                        centerClaimant);
