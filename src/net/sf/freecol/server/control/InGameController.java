@@ -805,12 +805,11 @@ public final class InGameController extends Controller {
 
             // Flush accumulated changes and return.
             // Send to all players, taking care that the new player is
-            // last, then return null to the old player who requested
+            // last, then return to the old player who requested
             // the end-of-turn.
             sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
-            sendElement(serverPlayer, cs);
             sendElement((ServerPlayer)player, cs);
-            return null;
+            return cs.build(serverPlayer);
         }
     }
 
