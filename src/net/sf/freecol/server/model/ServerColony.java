@@ -199,7 +199,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
             if (workLocation instanceof Building) {
                 // TODO: generalize to other WorkLocations?
-                csCheckMissingInput((Building) workLocation, productionInfo, cs);
+                csCheckMissingInput((Building)workLocation, productionInfo, cs);
             }
         }
 
@@ -498,39 +498,26 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Check a building to see if it is missing input.
      *
+     * The building must need input, have a person working there, and have
+     * no production occurring.
+     *
      * @param building The <code>Building</code> to check.
      * @param pi The <code>ProductionInfo</code> for the building.
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csCheckMissingInput(Building building, ProductionInfo pi,
                                      ChangeSet cs) {
-        // Can not happen if the building needs no input or no one is
-        // working there.
-        if (building.canAutoProduce() || building.isEmpty()) return;
-
-        // Check all goods types produced by this building.  If the
-        // output for a type is zero and the maximum production is
-        // non-zero then the building input type must be missing, Emit
-        // a message and return avoiding possible multiple messages
-        // per building.
-        for (AbstractGoods goods : pi.getProduction()) {
-            if (goods.getAmount() > 0) continue;
-            GoodsType type = goods.getType();
-            for (AbstractGoods g : pi.getMaximumProduction()) {
-                if (g.getType() != type) continue;
-                if (goods.getAmount() >= 0) {
-                    type = building.getGoodsInputType();
-                    cs.addMessage(See.only((ServerPlayer) owner),
-                        new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                         "model.building.notEnoughInput",
-                                         this, type)
-                                  .add("%inputGoods%", type.getNameKey())
-                                  .add("%building%", building.getNameKey())
-                                  .addName("%colony%", getName()));
-                    return;
-                }
-                break;
-            }
+        GoodsType type = building.getGoodsInputType();
+        if (!building.canAutoProduce() && type != null
+            && !building.isEmpty()
+            && pi.getProduction().isEmpty()) {
+            cs.addMessage(See.only((ServerPlayer) owner),
+                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                           "model.building.notEnoughInput",
+                                           this, type)
+                .add("%inputGoods%", type.getNameKey())
+                .add("%building%", building.getNameKey())
+                .addName("%colony%", getName()));
         }
     }
 
