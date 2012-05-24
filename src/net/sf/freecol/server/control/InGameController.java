@@ -660,6 +660,7 @@ public final class InGameController extends Controller {
         }
 
         for (;;) {
+            logger.finest("Ending turn for " + player.getName());
             player.clearModelMessages();
 
             // Has anyone won?
@@ -802,17 +803,14 @@ public final class InGameController extends Controller {
                 }
             }
 
-            // First, flush accumulated changes to other players.
-            // Then, if this is an AI or normal connected player in
-            // non-debug mode then return the accumulated changes directly,
-            // otherwise flush them out and retry.
-            sendToOthers(serverPlayer, cs);
-            if (player.isAI()
-                || (player.isConnected() && debugOnlyAITurns <= 0)) {
-                return cs.build(serverPlayer);
-            } else {
-                sendElement(serverPlayer, cs);
-            }
+            // Flush accumulated changes and return.
+            // Send to all players, taking care that the new player is
+            // last, then return null to the old player who requested
+            // the end-of-turn.
+            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
+            sendElement(serverPlayer, cs);
+            sendElement((ServerPlayer)player, cs);
+            return null;
         }
     }
 
