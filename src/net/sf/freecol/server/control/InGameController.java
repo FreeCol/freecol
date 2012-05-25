@@ -809,17 +809,14 @@ public final class InGameController extends Controller {
             // which conflict with these updates.  Finally return to the
             // current player which requested the end-of-turn, unless
             // it is doing a debug run.
-            List<ServerPlayer> sends = new ArrayList<ServerPlayer>();
-            sends.addAll(getOtherPlayers((ServerPlayer)player));
-            sends.add((ServerPlayer)player);
-            sendToList(sends, cs);
+            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
+            sendElement((ServerPlayer)player, cs);
             if (!player.isAI()
                 && freeColServer.isSingleplayer()
                 && debugOnlyAITurns > 0) {
                 continue;
-            } else {
-                return null;
             }
+            return cs.build(serverPlayer);
         }
     }
 
