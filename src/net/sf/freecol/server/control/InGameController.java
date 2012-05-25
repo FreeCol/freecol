@@ -803,13 +803,23 @@ public final class InGameController extends Controller {
                 }
             }
 
-            // Flush accumulated changes and return.
-            // Send to all players, taking care that the new player is
-            // last, then return to the old player who requested
-            // the end-of-turn.
-            sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
-            sendElement((ServerPlayer)player, cs);
-            return cs.build(serverPlayer);
+            // Flush accumulated changes.  Send to all players, but
+            // take care that the new player is last so that it does
+            // not immediately start moving and cause further changes
+            // which conflict with these updates.  Finally return to the
+            // current player which requested the end-of-turn, unless
+            // it is doing a debug run.
+            List<ServerPlayer> sends = new ArrayList<ServerPlayer>();
+            sends.addAll(getOtherPlayers((ServerPlayer)player));
+            sends.add((ServerPlayer)player);
+            sendToList(sends, cs);
+            if (!player.isAI()
+                && freeColServer.isSingleplayer()
+                && debugOnlyAITurns > 0) {
+                continue;
+            } else {
+                return null;
+            }
         }
     }
 
