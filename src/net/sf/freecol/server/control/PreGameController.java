@@ -30,11 +30,13 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -129,9 +131,14 @@ public final class PreGameController extends Controller {
             if (player.isIndian()) {
                 // Indian players know about each other, but European colonial
                 // players do not.
+                final int alarm = (Tension.Level.HAPPY.getLimit()
+                    + Tension.Level.CONTENT.getLimit()) / 2;
                 for (Player other : game.getPlayers()) {
                     if (other != player && other.isIndian()) {
                         player.setStance(other, Stance.PEACE);
+                        for (IndianSettlement is : player.getIndianSettlements()) {
+                            is.setAlarm(other, new Tension(alarm));
+                        }
                     }
                 }
             }
