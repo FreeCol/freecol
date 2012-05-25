@@ -1976,14 +1976,9 @@ public final class InGameController implements NetworkConstants {
             .getBoolean(ClientOptions.SHOW_END_TURN_DIALOG)) {
             List<Unit> units = new ArrayList<Unit>();
             for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
-                if (unit.couldMove()) {
-                    units.add(unit);
-                }
+                if (unit.couldMove()) units.add(unit);
             }
-            if (units.size() > 0) {
-                if (!gui.showEndTurnDialog(units))
-                    return;
-            }
+            if (!units.isEmpty() && !gui.showEndTurnDialog(units)) return;
         }
 
         // Ensure end-turn mode sticks.
@@ -3709,7 +3704,11 @@ public final class InGameController implements NetworkConstants {
      * Skip a unit.
      */
     public void skipActiveUnit() {
-        changeState(gui.getActiveUnit(), UnitState.SKIPPED);
+        final Unit unit = gui.getActiveUnit();
+        if (unit != null && unit.getState() != UnitState.SKIPPED) {
+            unit.setState(UnitState.SKIPPED);
+        }
+        nextActiveUnit();
     }
 
     /**
