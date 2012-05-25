@@ -233,7 +233,7 @@ public class CashInTreasureTrainMission extends Mission {
     private static String invalidCashinReason(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
         return (!unit.canCarryTreasure()) ? "unit-cannot-carry-treasure"
-            : (unit.getTreasureAmount() > 0) ? "unit-treasure-nonpositive"
+            : (unit.getTreasureAmount() <= 0) ? "unit-treasure-nonpositive"
             : null;
     }
 
