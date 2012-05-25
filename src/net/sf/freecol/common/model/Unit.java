@@ -2740,20 +2740,22 @@ public class Unit extends FreeColGameObject
         }
     }
 
-
-    // TODO: make these go away, if possible, private if not
+    /**
+     * Does the unit have arms?
+     *
+     * @return True if the unit has arms.
+     */
     public boolean isArmed() {
-        if(getOwner().isIndian()){
-            return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.muskets"));
-        }
-        return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.muskets"));
+        return getRole() == Role.SOLDIER || getRole() == Role.DRAGOON;
     }
 
+    /**
+     * Does the unit have a mount?
+     *
+     * @return True if the unit have a mount.
+     */
     public boolean isMounted() {
-        if(getOwner().isIndian()){
-            return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.indian.horses"));
-        }
-        return equipment.containsKey(getSpecification().getEquipmentType("model.equipment.horses"));
+        return getRole() == Role.SCOUT || getRole() == Role.DRAGOON;
     }
 
     /**

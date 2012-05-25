@@ -86,7 +86,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertEquals(wrongQtyMusketsMsg,none,camp2.getGoodsCount(musketsType));
         assertEquals(wrongQtyHorsesMsg,none,camp2.getGoodsCount(horsesType));
 
-        camp1.tradeGoodsWithSetlement(camp2);
+        camp1.tradeGoodsWithSettlement(camp2);
 
         assertEquals(wrongQtyMusketsMsg,enoughToShare / 2,camp1.getGoodsCount(musketsType));
         assertEquals(wrongQtyHorsesMsg,notEnoughToShare,camp1.getGoodsCount(horsesType));

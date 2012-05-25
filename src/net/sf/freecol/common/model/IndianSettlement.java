@@ -910,12 +910,12 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Allows spread of horses and arms between settlements
-     * @param settlement
+     *
+     * @param settlement The other <code>IndianSettlement</code> to trade with.
      */
-    public void tradeGoodsWithSetlement(IndianSettlement settlement) {
+    public void tradeGoodsWithSettlement(IndianSettlement settlement) {
         GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
         GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-
         List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
         goodsToTrade.add(armsType);
         goodsToTrade.add(horsesType);
