@@ -84,11 +84,12 @@ public class PioneeringMissionTest extends FreeColTestCase {
         // Check there are improvements to be made.
         aiColony.createTileImprovementPlans();
         List<TileImprovementPlan> improvements
-            = aiPlayer.getTileImprovementPlans();
+            = aiColony.getTileImprovementPlans();
         assertTrue("There should be valid improvements",
             !improvements.isEmpty());
         aiPlayer.buildTipMap();
-        assertTrue("The player should need pioneers", aiPlayer.needsPioneers());
+        assertTrue("The player should need pioneers",
+            aiPlayer.pioneersNeeded() > 0);
 
         // Setup mission
         assertEquals("Pioneering should be valid (despite no tools)", null,

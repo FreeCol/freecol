@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
@@ -353,7 +354,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
         AIPlayer aiPlayer = getAIOwner();
-        boolean preferScouts = aiPlayer.preferScoutsToSoldiers();
+        boolean preferScouts = ((EuropeanAIPlayer)aiPlayer).scoutsNeeded() > 0;
         Colony scratch = colonyPlan.assignWorkers(workers, preferScouts);
         if (scratch == null) {
             if (!UnitWas.revertAll(was)) {
@@ -460,6 +461,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         EuropeanAIPlayer aip = (EuropeanAIPlayer)aiMain.getAIPlayer(player);
+        boolean pioneersWanted = aip.pioneersNeeded() > 0;
         Tile pioneerTile;
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
@@ -476,9 +478,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
                 break;
             case PIONEER:
-                if (aiPlayer.needsPioneers()
-                    && PioneeringMission.invalidReason(aiU) == null
-                    && (pioneerTile = aip.getBestPlanTile(colony)) != null) {
+                if (PioneeringMission.invalidReason(aiU) == null
+                    && ((pioneerTile = aip.getBestPlanTile(colony)) != null
+                        || pioneersWanted)) {
                     aiU.setMission(new PioneeringMission(aiMain, aiU,
                                                          pioneerTile));
                 }
@@ -843,20 +845,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 i++;
             }
 
-            // Export new goods
-            while (exportAmount >= GoodsContainer.CARGO_SIZE) {
+            // Export new goods, to Europe if possible.
+            Location destination = (colony.getOwner().canTrade(g)) ? europe
+                : null;
+            while (exportAmount >= EXPORT_MINIMUM) {
+                int amount = Math.min(exportAmount, GoodsContainer.CARGO_SIZE);
                 AIGoods newGoods = new AIGoods(getAIMain(), colony, g,
-                    GoodsContainer.CARGO_SIZE, europe);
+                                               amount, destination);
                 newGoods.setTransportPriority(priority);
                 newAIGoods.add(newGoods);
                 goodsLog(newGoods, "makes");
-                exportAmount -= GoodsContainer.CARGO_SIZE;
-            }
-            if (exportAmount >= EXPORT_MINIMUM) {
-                AIGoods newGoods = new AIGoods(getAIMain(), colony, g,
-                    exportAmount, europe);
-                goodsLog(newGoods, "makes");
-                newAIGoods.add(newGoods);
+                exportAmount -= amount;
             }
         }
         aiGoods.addAll(newAIGoods);
@@ -1258,6 +1257,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Removes a <code>TileImprovementPlan</code> from the list
+     *
      * @return True if it was successfully deleted, false otherwise
      */
     public boolean removeTileImprovementPlan(TileImprovementPlan plan){

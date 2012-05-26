@@ -309,146 +309,6 @@ public abstract class AIPlayer extends AIObject {
         return player.getStance(other);
     }
 
-
-    // Interface
-
-    /**
-     * Tells this <code>AIPlayer</code> to make decisions. The
-     * <code>AIPlayer</code> is done doing work this turn when this method
-     * returns.
-     */
-    public abstract void startWorking();
-
-    /**
-     * Evaluates a proposed mission type for a unit.
-     * Subclasses should override and refine this.
-     *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
-     * @param type The mission type.
-     * @return A score representing the desirability of this mission.
-     */
-    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        return Mission.scorePath(aiUnit, path, type);
-    }
-
-
-    /**
-     * Should this AI prefer to make scouts rather than soldiers ATM?
-     * Subclasses should override this.
-     *
-     * @return True if scouts should be preferred.
-     */
-    public boolean preferScoutsToSoldiers() {
-        return false;
-    }
-
-    /**
-     * Does this player need pioneers?
-     * Subclasses should override this.
-     *
-     * @return True if pioneers are needed.
-     */
-    public boolean needsPioneers() {
-        return false;
-    }
-
-    /**
-     * Resolves a native demand.
-     * One of goods/gold is significant.
-     * Overridden by the European player.
-     *
-     * @param unit The native <code>Unit</code> making the demand.
-     * @param colony The <code>Colony</code> being demanded of.
-     * @param goods The <code>Goods</code> demanded (may be null).
-     * @param gold The gold demanded (invalid if goods non-null).
-     * @return The response of the player.
-     */
-    public boolean indianDemand(Unit unit, Colony colony,
-                                Goods goods, int gold) {
-        return false;
-    }
-
-    /**
-     * Resolves a diplomatic trade offer.
-     *
-     * @param agreement The proposed <code>DiplomaticTrade</code>.
-     * @return True if the agreement is accepted.
-     */
-    public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
-
-    /**
-     * Called after another <code>Player</code> sends a
-     * <code>trade</code> message
-     *
-     * @param goods The goods which we are going to offer
-     */
-    public abstract void registerSellGoods(Goods goods);
-
-    /**
-     * Called when another <code>Player</code> proposes to buy.
-     *
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> is trading.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
-     */
-    public abstract int buyProposition(Unit unit, Settlement settlement,
-                                       Goods goods, int gold);
-
-    /**
-     * Called when another <code>Player</code> proposes a sale.
-     *
-     *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
-     */
-    public abstract int sellProposition(Unit unit, Settlement settlement,
-                                        Goods goods, int gold);
-
-    /**
-     * Decides to accept a tax raise or not.
-     * Overridden by the European player.
-     *
-     * @param tax The tax raise.
-     * @return True if the raise is accepted.
-     */
-    public boolean acceptTax(int tax) {
-        return false;
-    }
-
-    /**
-     * Decides to accept an offer of mercenaries or not.
-     * Overridden by the European player.
-     *
-     * @return True if the mercenaries are accepted.
-     */
-    public boolean acceptMercenaries() {
-        return false;
-    }
-
-    /**
-     * Determines the stances towards each player.
-     * That is: should we declare war?
-     * TODO: something better, that includes peacemaking.
-     */
-    protected void determineStances() {
-        logger.finest("Entering method determineStances");
-        Player player = getPlayer();
-        for (Player p : getGame().getPlayers()) {
-            if (p != player && !p.isDead()) determineStance(p);
-        }
-    }
-
     /**
      * Aborts the mission for a unit, but tries to recover the unit onto
      * a neighbouring carrier.
@@ -582,17 +442,6 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Selects the most useful founding father offered.
-     * Overridden by EuropeanAIPlayers.
-     *
-     * @param ffs The founding fathers on offer.
-     * @return The founding father selected.
-     */
-    public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
-        return null;
-    }
-
-    /**
      * Checks the integrity of this AIPlayer.
      *
      * @return True if the player is intact.
@@ -601,6 +450,136 @@ public abstract class AIPlayer extends AIObject {
         return super.checkIntegrity()
             && player != null
             && !player.isDisposed();
+    }
+
+
+    // Interface to be implemented by subclasses
+
+    /**
+     * Tells this <code>AIPlayer</code> to make decisions. The
+     * <code>AIPlayer</code> is done doing work this turn when this method
+     * returns.
+     */
+    public abstract void startWorking();
+
+    /**
+     * Evaluates a proposed mission type for a unit.
+     * Subclasses should override and refine this.
+     *
+     * @param aiUnit The <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param type The mission type.
+     * @return A score representing the desirability of this mission.
+     */
+    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
+        return Mission.scorePath(aiUnit, path, type);
+    }
+
+    /**
+     * Resolves a native demand.
+     * One of goods/gold is significant.
+     * Overridden by the European player.
+     *
+     * @param unit The native <code>Unit</code> making the demand.
+     * @param colony The <code>Colony</code> being demanded of.
+     * @param goods The <code>Goods</code> demanded (may be null).
+     * @param gold The gold demanded (invalid if goods non-null).
+     * @return The response of the player.
+     */
+    public boolean indianDemand(Unit unit, Colony colony,
+                                Goods goods, int gold) {
+        return false;
+    }
+
+    /**
+     * Resolves a diplomatic trade offer.
+     *
+     * @param agreement The proposed <code>DiplomaticTrade</code>.
+     * @return True if the agreement is accepted.
+     */
+    public abstract boolean acceptDiplomaticTrade(DiplomaticTrade agreement);
+
+    /**
+     * Called after another <code>Player</code> sends a
+     * <code>trade</code> message
+     *
+     * @param goods The goods which we are going to offer
+     */
+    public abstract void registerSellGoods(Goods goods);
+
+    /**
+     * Called when another <code>Player</code> proposes to buy.
+     *
+     *
+     * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> is trading.
+     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param gold The suggested price.
+     * @return The price this <code>AIPlayer</code> suggests or
+     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     */
+    public abstract int buyProposition(Unit unit, Settlement settlement,
+                                       Goods goods, int gold);
+
+    /**
+     * Called when another <code>Player</code> proposes a sale.
+     *
+     *
+     * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> if trying to sell goods.
+     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param gold The suggested price.
+     * @return The price this <code>AIPlayer</code> suggests or
+     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     */
+    public abstract int sellProposition(Unit unit, Settlement settlement,
+                                        Goods goods, int gold);
+
+    /**
+     * Decides to accept a tax raise or not.
+     * Overridden by the European player.
+     *
+     * @param tax The tax raise.
+     * @return True if the raise is accepted.
+     */
+    public boolean acceptTax(int tax) {
+        return false;
+    }
+
+    /**
+     * Decides to accept an offer of mercenaries or not.
+     * Overridden by the European player.
+     *
+     * @return True if the mercenaries are accepted.
+     */
+    public boolean acceptMercenaries() {
+        return false;
+    }
+
+    /**
+     * Determines the stances towards each player.
+     * That is: should we declare war?
+     * TODO: something better, that includes peacemaking.
+     */
+    public void determineStances() {
+        logger.finest("Entering method determineStances");
+        Player player = getPlayer();
+        for (Player p : getGame().getPlayers()) {
+            if (p != player && !p.isDead()) determineStance(p);
+        }
+    }
+
+    /**
+     * Selects the most useful founding father offered.
+     * Overridden by EuropeanAIPlayers.
+     *
+     * @param ffs The founding fathers on offer.
+     * @return The founding father selected.
+     */
+    public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
+        return null;
     }
 
 
