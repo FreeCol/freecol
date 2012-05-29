@@ -25,11 +25,14 @@ package net.sf.freecol.common.model;
  */
 public class Turn {
 
+    /**
+     * The season.  Not distingished before 1600, then split into
+     * SPRING and AUTUMN.
+     */
     public static enum Season { YEAR, SPRING, AUTUMN }
 
     /**
      * The numerical value of the Turn, never less than one.
-     *
      */
     private int turn = 1;
 
@@ -52,32 +55,32 @@ public class Turn {
     };
 
 
-
     /**
      * Creates a new <code>Turn</code> instance.
      *
-     * @param turn an <code>int</code> value
+     * @param turn The numeric value of the turn.
      */
     public Turn(int turn) {
         this.turn = turn;
     }
 
     /**
-     * Describe <code>yearToTurn</code> method here.
+     * Converts an integer year to a turn-integer-value.
+     * Allows for the season split.
      *
-     * @param year an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param year A year.
+     * @return The integer value of the corresponding turn.
      */
     public static int yearToTurn(int year) {
         return yearToTurn(year, Season.YEAR);
     }
 
     /**
-     * Describe <code>yearToTurn</code> method here.
+     * Converts an integer year and specified season to a turn-integer-value.
      *
      * @param year an <code>int</code> value
      * @param season a <code>Season</code> value
-     * @return an <code>int</code> value
+     * @return The integer value of the corresponding turn.
      */
     public static int yearToTurn(int year, Season season) {
         int turn = 1;
@@ -100,30 +103,29 @@ public class Turn {
         return new Turn(turn + 1);
     }
 
-
     /**
      * Gets the turn number.
+     *
      * @return The number of turns.
      */
     public int getNumber() {
         return turn;
     }
 
-
     /**
-     * Describe <code>getAge</code> method here.
+     * Gets the age corresponding to the current turn.
      *
-     * @return an <code>int</code> value
+     * @return The age of this turn.
      */
     public int getAge() {
         return getAge(getYear());
     }
 
     /**
-     * Describe <code>getAge</code> method here.
+     * Gets the age corresponding to a given turn.
      *
-     * @param year an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param year The turn integer value.
+     * @return The age of this turn.
      */
     public static int getAge(int year) {
         for (int index = 0; index < ages.length; index++) {
@@ -134,18 +136,14 @@ public class Turn {
         return ages.length;
     }
 
-
     /**
-     * Checks if this turn is equal to another turn.
+     * Gets the year this turn is in.
+     *
+     * @return The calculated year based on the turn number.
      */
-    public boolean equals(Object o) {
-        if (o instanceof Turn) {
-            return turn == ((Turn) o).turn;
-        } else {
-            return false;
-        }
+    public int getYear() {
+        return getYear(turn);
     }
-
 
     /**
      * Gets the year the given turn is in.
@@ -158,37 +156,8 @@ public class Turn {
             : seasonYear + (year - seasonYear)/2;
     }
 
-
     /**
-     * Gets the year this turn is in.
-     *
-     * @return The calculated year based on the turn number.
-     */
-    public int getYear() {
-        return getYear(turn);
-    }
-
-
-    /**
-     * Returns a string representation of this turn.
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "Spring 1602", "1503"...
-     */
-    public String toString() {
-        return toString(turn);
-    }
-
-    /**
-     * Returns a non-localized string representation of the given turn.
-     * @return A string with the format: "<i>season year</i>".
-     *         Examples: "SPRING 1602", "YEAR 1503"...
-     */
-    public static String toString(int turn) {
-        return getSeason(turn).toString() + " " + Integer.toString(getYear(turn));
-    }
-
-    /**
-     * Return the Season of the given Turn number.
+     * Gets the Season of the given Turn number.
      *
      * @param turn The turn number to calculate from.
      * @return The season corresponding to the turn number.
@@ -201,7 +170,7 @@ public class Turn {
     }
 
     /**
-     * Return the Season of this Turn.
+     * Gets the Season of this Turn.
      *
      * @return a <code>Season</code> value
      */
@@ -209,21 +178,20 @@ public class Turn {
         return getSeason(turn);
     }
 
-
     /**
-     * Describe <code>getLabel</code> method here.
+     * Gets a localization template for this turn.
      *
-     * @return a <code>StringTemplate</code> value
+     * @return A <code>StringTemplate</code> describing the turn.
      */
     public StringTemplate getLabel() {
         return getLabel(turn);
     }
 
     /**
-     * Describe <code>getLabel</code> method here.
+     * Gets a localization template for a given turn.
      *
-     * @param turn an <code>int</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param turn The integer value of the turn to describe.
+     * @return A <code>StringTemplate</code> describing the turn.
      */
     public static StringTemplate getLabel(int turn) {
         return StringTemplate.template("year." + getSeason(turn))
@@ -231,66 +199,102 @@ public class Turn {
     }
 
     /**
-     * Get the <code>StartingYear</code> value.
+     * Gets the starting year.
      *
-     * @return an <code>int</code> value
+     * @return The numeric value of the starting year.
      */
     public static final int getStartingYear() {
         return startingYear;
     }
 
     /**
-     * Set the <code>StartingYear</code> value.
+     * Sets the starting year.
      *
-     * @param newStartingYear The new StartingYear value.
+     * @param newStartingYear The new starting year value.
      */
     public static final void setStartingYear(final int newStartingYear) {
         startingYear = newStartingYear;
     }
 
     /**
-     * Get the <code>SeasonYear</code> value.
+     * Gets the season year (the year the seasons split).
      *
-     * @return an <code>int</code> value
+     * @return The numeric value of the season year.
      */
     public static final int getSeasonYear() {
         return seasonYear;
     }
 
     /**
-     * Set the <code>SeasonYear</code> value.
+     * Sets the season year.
      *
-     * @param newSeasonYear The new SeasonYear value.
+     * @param newSeasonYear The new season year value.
      */
     public static final void setSeasonYear(final int newSeasonYear) {
         seasonYear = newSeasonYear;
     }
 
     /**
-     * Describe <code>isFirstSeasonTurn</code> method here.
+     * Is this turn the first one?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this turn is the first turn.
+     */
+    public boolean isFirstTurn() {
+        return turn == 1;
+    }
+
+    /**
+     * Is this turn the season year?
+     *
+     * @return True if this turn is the season year.
      */
     public boolean isFirstSeasonTurn() {
         return turn == yearToTurn(seasonYear, Season.SPRING);
     }
 
     /**
-     * Get the <code>Ages</code> value.
+     * Get the ages boundary array.
      *
-     * @return an <code>int[]</code> value
+     * @return The ages boundaries.
      */
     public static final int[] getAges() {
         return ages;
     }
 
     /**
-     * Set the <code>Ages</code> value.
+     * Sets the ages boundaries.
      *
-     * @param newAges The new Ages value.
+     * @param newAges The new ages boundaries.
      */
     public static final void setAges(final int[] newAges) {
         ages = newAges;
     }
 
+    /**
+     * Checks if this turn is equal to another turn.
+     */
+    public boolean equals(Object o) {
+        return (o instanceof Turn) ? turn == ((Turn)o).turn : false;
+    }
+
+    /**
+     * Gets a string representation of this turn.
+     *
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "Spring 1602", "1503"...
+     */
+    public String toString() {
+        return toString(turn);
+    }
+
+    /**
+     * Gets a non-localized string representation of the given turn.
+     *
+     * @return A string with the format: "<i>season year</i>".
+     *         Examples: "SPRING 1602", "YEAR 1503"...
+     */
+    public static String toString(int turn) {
+        return getSeason(turn).toString()
+            + " " + Integer.toString(getYear(turn));
+    }
 }
