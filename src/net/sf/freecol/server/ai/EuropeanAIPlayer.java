@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
@@ -997,31 +998,66 @@ public class EuropeanAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.finest(getClass().getName() + " in " + getGame().getTurn()
+        Turn turn = getGame().getTurn();
+        logger.finest(getClass().getName() + " in " + turn
             + ": " + getPlayer().getNationID());
-        buildTipMap();
         sessionRegister.clear();
         clearAIUnits();
         cheat();
         determineStances();
-        rearrangeWorkersInColonies();
-        abortInvalidAndOneTimeMissions();
-        ensureColonyMissions();
-        giveNormalMissions();
-        bringGifts();
-        demandTribute();
-        createAIGoodsInColonies();
-        createTransportLists();
-        doMissions();
-        rearrangeWorkersInColonies();
-        abortInvalidMissions();
-        // Some of the mission might have been invalidated by another mission.
-        giveNormalMissions();
+        if (turn.isFirstTurn()) {
+            initializeMissions();
+        } else {
+            buildTipMap();
+            rearrangeWorkersInColonies();
+            abortInvalidAndOneTimeMissions();
+            ensureColonyMissions();
+            giveNormalMissions();
+            bringGifts();
+            demandTribute();
+            createAIGoodsInColonies();
+            createTransportLists();
+            doMissions();
+            rearrangeWorkersInColonies();
+            abortInvalidMissions();
+            giveNormalMissions();
+        }
         doMissions();
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureColonyMissions();
         clearAIUnits();
+    }
+
+    /**
+     * Simple initialization of AI missions given that we know the starting
+     * conditions.
+     */
+    private void initializeMissions() {
+        AIMain aiMain = getAIMain();
+
+        // Give the ship a transport mission.
+        TransportMission tm = null;
+        for (AIUnit aiu : getAIUnits()) {
+            Unit u = aiu.getUnit();
+            if (u.isNaval()) {
+                aiu.setMission(tm = new TransportMission(aiMain, aiu));
+            }
+        }
+
+        // Find a colony site, give the land units build colony missions,
+        // and add them to the ship's transport mission.
+        Location target = null;
+        for (AIUnit aiu : getAIUnits()) {
+            Unit u = aiu.getUnit();
+            if (!u.isNaval()) {
+                if (target == null) {
+                    target = BuildColonyMission.findTarget(aiu, false);
+                }
+                aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
+                tm.addToTransportList(aiu);                
+            }
+        }
     }
 
     /**

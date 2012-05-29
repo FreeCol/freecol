@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeItem;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -151,25 +152,53 @@ public class NativeAIPlayer extends AIPlayer {
      * this method returns.
      */
     public void startWorking() {
-        logger.finest(getClass().getName() + " in " + getGame().getTurn()
+        Turn turn = getGame().getTurn();
+        logger.finest(getClass().getName() + " in " + turn
             + ": " + getPlayer().getNationID());
         sessionRegister.clear();
         clearAIUnits();
         determineStances();
-        abortInvalidAndOneTimeMissions();
-        secureSettlements();
-        bringGifts();
-        demandTribute();
-        giveNormalMissions();
-        doMissions();
-        abortInvalidMissions();
-        // Some of the mission might have been invalidated by another mission.
-        giveNormalMissions();
+        if (turn.isFirstTurn()) {
+            initializeMissions();
+        } else {
+            abortInvalidAndOneTimeMissions();
+            secureSettlements();
+            bringGifts();
+            demandTribute();
+            giveNormalMissions();
+            doMissions();
+            abortInvalidMissions();
+            giveNormalMissions();
+        }
         doMissions();
         abortInvalidMissions();
         clearAIUnits();
     }
 
+    /**
+     * Simple initialization of AI missions given that we know the starting
+     * conditions.
+     */
+    private void initializeMissions() {
+        AIMain aiMain = getAIMain();
+        Player player = getPlayer();
+        
+        // Give defensive missions up to the minimum expected defence,
+        // leave the rest with the default wander-hostile mission.
+        List<Unit> units = new ArrayList<Unit>();
+        for (IndianSettlement is : player.getIndianSettlements()) {
+            int defence = is.getType().getMinimumSize() - 1;
+            units.clear();
+            units.addAll(is.getTile().getUnitList());
+            units.addAll(is.getUnitList());
+            while (units.size() > defence) units.remove(0);
+            for (Unit u : units) {
+                AIUnit aiu = getAIUnit(u);
+                aiu.setMission(new DefendSettlementMission(aiMain, aiu, is));
+            }
+        }
+    }
+    
     /**
      * Takes the necessary actions to secure the settlements.
      * This is done by making new military units or to give existing
