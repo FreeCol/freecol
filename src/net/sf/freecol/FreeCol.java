@@ -912,21 +912,24 @@ public final class FreeCol {
     }
 
     /**
-     * Is a debug run complete?
+     * Try to complete a debug run, if any.
      *
-     * @return True if a debug run is complete.
+     * @param fcc The <code>FreeColClient</code> of the game.
+     * @return True if a debug run was completed.
      */
-    public static boolean isDebugRunComplete() {
-        return debugRunTurns == 0;
-    }
-
-    /**
-     * Gets the name of a file to save to at the end of a debug run.
-     *
-     * @return The name of a file to save to at the end of a debug run.
-     */
-    public static String getDebugRunSaveName() {
-        return debugRunSave;
+    public static boolean tryCompleteDebugRun(FreeColClient fcc) {
+        if (debugRunTurns != 0) return false;
+        if (debugRunSave != null) {
+            FreeColServer fcs = fcc.getFreeColServer();
+            if (fcs != null) {
+                try {
+                    fcs.saveGame(new File(".", debugRunSave),
+                        fcc.getMyPlayer().getName(),
+                        fcc.getClientOptions());
+                } catch (IOException e) {}
+            }
+        }
+        return true;
     }
 
     /**

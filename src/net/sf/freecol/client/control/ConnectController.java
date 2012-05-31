@@ -440,9 +440,10 @@ public final class ConnectController {
 
             final int sgo = freeColClient.getClientOptions()
                 .getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
-            if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
-                || !defaultSinglePlayer
-                && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
+            boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
+                || (!defaultSinglePlayer
+                    && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
+            if (show) {
                 if (gui.showLoadingSavegameDialog(defaultPublicServer,
                                                   defaultSinglePlayer)) {
                     LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();

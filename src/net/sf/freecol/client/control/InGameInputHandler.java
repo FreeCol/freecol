@@ -451,14 +451,7 @@ public final class InGameInputHandler extends InputHandler {
         if (FreeCol.isInDebugMode()
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
 
-        if (FreeCol.isDebugRunComplete()
-            && FreeCol.getDebugRunSaveName() != null) {
-            try {
-                fcc.getFreeColServer().saveGame(new File(".",
-                        FreeCol.getDebugRunSaveName()),
-                    fcc.getMyPlayer().getName(),
-                    fcc.getClientOptions());
-            } catch (IOException e) {}
+        if (FreeCol.tryCompleteDebugRun(fcc)) {
             fcc.quit();
             return null;
         }
@@ -525,6 +518,7 @@ public final class InGameInputHandler extends InputHandler {
                                                        Player.class);
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
+            if (FreeCol.tryCompleteDebugRun(freeColClient)) freeColClient.quit();
             if (freeColClient.isSingleplayer()) {
                 if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
                     && new ShowConfirmDialogSwingTask(null,
@@ -556,6 +550,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
+        if (FreeCol.tryCompleteDebugRun(freeColClient)) freeColClient.quit();
 
         Player winner = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                                        Player.class);
