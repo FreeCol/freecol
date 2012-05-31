@@ -1149,24 +1149,27 @@ public final class ColonyPanel extends FreeColPanel
         }
 
         public void update() {
-            int population = getColony().getUnitCount();
-            int members = getColony().getMembers();
-            int rebels = getColony().getSoL();
+            Colony colony = getColony();
+            int population = colony.getUnitCount();
+            int members = colony.getMembers();
+            int rebels = colony.getSoL();
+            int grow = colony.getPreferredSizeChange();
             String rebelNumber = Messages.message(StringTemplate.template("colonyPanel.rebelLabel")
-                                                  .addAmount("%number%", members));
+                .addAmount("%number%", members));
             String royalistNumber = Messages.message(StringTemplate.template("colonyPanel.royalistLabel")
-                                                     .addAmount("%number%", population - members));
-
+                .addAmount("%number%", population - members));
             popLabel.setText(Messages.message(StringTemplate.template("colonyPanel.populationLabel")
-                                              .addAmount("%number%", population)));
+                    .addAmount("%number%", population)));
             rebelLabel.setText(rebelNumber);
             rebelMemberLabel.setText(Integer.toString(rebels) + "%");
             bonusLabel.setText(Messages.message(StringTemplate.template("colonyPanel.bonusLabel")
-                                                .addAmount("%number%", getColony().getProductionBonus())));
+                    .addAmount("%number%", colony.getProductionBonus())
+                    .add("%extra%", (grow == 0) ? ""
+                        : "(" + Integer.toString(grow) + ")")));
             royalistLabel.setText(royalistNumber);
-            royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
-            rebelShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(getColony().getOwner().getNation(), 0.5)));
-            royalistShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(getColony().getOwner().getNation()
+            royalistMemberLabel.setText(Integer.toString(colony.getTory()) + "%");
+            rebelShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation(), 0.5)));
+            royalistShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation()
                                                                                  .getRefNation(), 0.5)));
             revalidate();
             repaint();

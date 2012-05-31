@@ -106,6 +106,15 @@ public class RebelToolTip extends JToolTip {
         add(new JLabel(turns50 == 0 ? na : Integer.toString((int) Math.ceil(turns50))), "skip");
         add(new JLabel(Messages.message("report.100percent")));
         add(new JLabel(turns100 == 0 ? na : Integer.toString((int) Math.ceil(turns100))), "skip");
+
+        int grow = colony.getPreferredSizeChange();
+        if (grow > 0) {
+            add(new JLabel(Messages.message("report.changeMore")));
+            add(new JLabel(Integer.toString(grow)), "skip");
+        } else if (grow < 0) {
+            add(new JLabel(Messages.message("report.changeLess")));
+            add(new JLabel(Integer.toString(-grow)), "skip");
+        }
     }
 
 
