@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
