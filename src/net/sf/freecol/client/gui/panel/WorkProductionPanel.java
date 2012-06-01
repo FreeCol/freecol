@@ -117,11 +117,10 @@ public class WorkProductionPanel extends FreeColPanel {
 
         add(new UnitLabel(getFreeColClient(), unit, getGUI(), false, false), "wrap");
 
-        float result = 0;
+        float result = 0.0f;
         for (Modifier modifier : unitModifiers) {
             result = addModifier(modifier, unitType, result);
         }
-
         if (!modifiers.isEmpty()) {
             add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
 
@@ -130,8 +129,13 @@ public class WorkProductionPanel extends FreeColPanel {
             }
         }
 
+        if (result < 0.0f) {
+            add(new JLabel(Messages.message("model.source.zeroThreshold.name")),
+                "newline");
+            add(new JLabel(getModifierFormat().format(-result)), "wrap 30");
+            result = 0.0f;
+        }
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
-
         JLabel finalLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");

@@ -459,6 +459,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                         maxProd = prod;
                     }
                 }
+                prod = Math.max(0, prod);
+                maxProd = Math.max(0, maxProd);
                 result.addProduction(new AbstractGoods(outputType, prod));
                 if (maxProd > prod) {
                     result.addMaximumProduction(new AbstractGoods(outputType, maxProd));
@@ -558,7 +560,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 productivity += getUnitProductivity(unit);
             }
         }
-        return productivity;
+        return Math.max(0, productivity);
     }
 
     /**
@@ -575,12 +577,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         int productivity = buildingType.getBasicProduction();
         if (productivity > 0) {
             productivity += getColony().getProductionBonus();
-            return (int)prodUnit.getType()
+            productivity = (int)prodUnit.getType()
                 .applyModifier(Math.max(1, productivity),
                                getGoodsOutputType().getId());
-        } else {
-            return 0;
         }
+        return Math.max(0, productivity);
     }
 
     /**
@@ -608,10 +609,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return The production of the given type of goods.
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
-        return (unit == null
+        int result = (unit == null
             || getGoodsOutputType() == null
             || getGoodsOutputType() != goodsType) ? 0
             : getUnitProductivity(unit);
+        return Math.max(0, result);
     }
 
     /**
@@ -636,7 +638,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                     getGame().getTurn(), getProductionModifiers());
             }
         }
-        return production;
+        return Math.max(0, production);
     }
 
 

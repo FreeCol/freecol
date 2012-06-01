@@ -456,7 +456,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                 production += getProductionOf(unit, goodsType);
             }
         }
-        return production;
+        return Math.max(0, production);
     }
 
     /**
@@ -487,7 +487,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                         new ArrayList<Modifier>(modifiers)));
             }
         }
-        return result;
+        return Math.max(0, result);
     }
 
     /**
@@ -526,7 +526,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                         new ArrayList<Modifier>(modifiers)));
             }
         }
-        return production;
+        return Math.max(0, production);
     }
 
     /**

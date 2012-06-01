@@ -490,7 +490,6 @@ public class BuildingTest extends FreeColTestCase {
 
         building.add(colonist);
         // 3 from the colonist
-        assertEquals(3, colonist.getProductionOf(bellsType, townHallType.getBasicProduction()));
         assertEquals(3, building.getUnitProductivity(colonist));
         // 3 from the colonist + 1
         assertEquals("Wrong bell production", 4, building.getProduction());

@@ -3385,24 +3385,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Given a type of goods to produce in the field and a tile,
-     * returns the unit's potential to produce goods.
-     *
-     * @param goodsType The type of goods to be produced.
-     * @param base an <code>int</code> value
-     * @return The potential amount of goods to be farmed.
-     */
-    // TODO: do we need this?
-    public int getProductionOf(GoodsType goodsType, int base) {
-        if (base == 0) {
-            return 0;
-        } else {
-            return Math.round(FeatureContainer.applyModifierSet(base, getGame().getTurn(),
-                                                                getModifierSet(goodsType.getId())));
-        }
-    }
-
-    /**
      * Removes all references to this object.
      *
      * @return A list of disposed objects.
