@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.common.model.Map.Direction;
 
 /**
@@ -65,10 +64,10 @@ public class MoveAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) { 
         switch(gui.getCurrentViewMode()) {
-        case ViewMode.MOVE_UNITS_MODE:
+        case GUI.MOVE_UNITS_MODE:
             getFreeColClient().getInGameController().moveActiveUnit(direction);
             break;
-        case ViewMode.VIEW_TERRAIN_MODE:
+        case GUI.VIEW_TERRAIN_MODE:
             getFreeColClient().getInGameController().moveTileCursor(direction);
             break;
         }

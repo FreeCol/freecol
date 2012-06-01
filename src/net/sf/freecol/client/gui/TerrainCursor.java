@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import javax.swing.event.EventListenerList;
 
-import net.sf.freecol.common.model.Tile;
 
 public class TerrainCursor implements ActionListener  {
     
@@ -33,7 +32,7 @@ public class TerrainCursor implements ActionListener  {
     public static final int OFF = 0;
     public static final int ON = 1;
     
-    private Tile tile;
+
     private int canvasX;
     private int canvasY;
     private Timer blinkTimer;
@@ -81,15 +80,7 @@ public class TerrainCursor implements ActionListener  {
         if(blinkTimer.isRunning())
             blinkTimer.stop();
     }
-    
-    public void setTile(Tile tile){
-        this.tile = tile;
-    }
-    
-    public Tile getTile(){
-        return tile;
-    }
-    
+
     public void setCanvasPos(int x,int y){
         canvasX = x;
         canvasY = y;

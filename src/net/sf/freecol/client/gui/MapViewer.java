@@ -119,12 +119,15 @@ public final class MapViewer {
     private ImageLibrary lib;
 
     private TerrainCursor cursor;
-    private ViewMode viewMode;
     private final Vector<GUIMessage> messages;
 
     private Tile selectedTile;
     private Tile focus = null;
     private Unit activeUnit;
+
+    private Unit savedActiveUnit;
+
+    private int currentMode;
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
@@ -231,7 +234,6 @@ public final class MapViewer {
 
         logger.info("GUI created.");
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
-        viewMode = new ViewMode(this);
         logger.info("Starting in Move Units View Mode");
         blinkingMarqueeEnabled = true;
 
@@ -1171,15 +1173,6 @@ public final class MapViewer {
 
 
     /**
-     *  Get the <code>View Mode</code> object
-     * @return the current view mode.
-     */
-    public ViewMode getViewMode(){
-        return viewMode;
-    }
-
-
-    /**
      * Returns the width of this GUI.
      * @return The width of this GUI.
      */
@@ -1337,9 +1330,9 @@ public final class MapViewer {
         updateGotoPathForActiveUnit();
 
         // The user activated a unit
-        if (viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE
+        if (getView() == GUI.VIEW_TERRAIN_MODE
             && activeUnit != null) {
-            viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
+            changeViewMode(GUI.MOVE_UNITS_MODE);
         }
 
         if (activeUnit != null) {
@@ -1461,7 +1454,7 @@ public final class MapViewer {
 
         selectedTile = newTileToSelect;
 
-        if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
+        if (getView() == GUI.MOVE_UNITS_MODE) {
             if (noActiveUnitIsAt(selectedTile)) {
                 if (selectedTile != null && selectedTile.getSettlement() != null) {
                     Settlement s = selectedTile.getSettlement();
@@ -2102,7 +2095,7 @@ public final class MapViewer {
                 // paint transparent borders
                 paintBorders(g, tile, BorderType.COUNTRY, false);
 
-                if (viewMode.displayTileCursor(tile)) {
+                if (displayTileCursor(tile)) {
                     drawCursor(g);
                 }
                 // check for units
@@ -2550,7 +2543,7 @@ public final class MapViewer {
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
-            if (viewMode.displayUnitCursor(unit)) {
+            if (displayUnitCursor(unit)) {
                 drawCursor(g);
             }
 
@@ -3362,5 +3355,52 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
+
+    public void toggleViewMode() {
+        logger.warning("Changing view");
+        changeViewMode(1 - currentMode);
+    }
+
+    public void changeViewMode(int newViewMode) {
+
+        if (newViewMode == currentMode) {
+            logger.warning("Trying to change to the same view mode");
+            return;
+        }
+
+        currentMode = newViewMode;
+
+        switch (currentMode) {
+        case GUI.MOVE_UNITS_MODE:
+            if (getActiveUnit() == null) {
+                setActiveUnit(savedActiveUnit);
+            }
+            savedActiveUnit = null;
+            logger.warning("Change view to Move Units Mode");
+            break;
+        case GUI.VIEW_TERRAIN_MODE:
+            savedActiveUnit = activeUnit;
+            setActiveUnit(null);
+            logger.warning("Change view to View Terrain Mode");
+            break;
+        }
+    }
+
+    public int getView() {
+        return currentMode;
+    }
+
+    public boolean displayTileCursor(Tile tile) {
+        return (currentMode == GUI.VIEW_TERRAIN_MODE) && 
+            tile != null &&
+            tile.equals(selectedTile);
+    }
+
+    public boolean displayUnitCursor(Unit unit) {
+        return (currentMode == GUI.MOVE_UNITS_MODE) &&
+            (unit == activeUnit) && 
+            (cursor.isActive() || (unit.getMovesLeft() == 0)) ;
+    }
+    
 
 }

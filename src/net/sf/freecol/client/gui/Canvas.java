@@ -645,7 +645,7 @@ public final class Canvas extends JDesktopPane {
 
         // change to default view mode
         // Must be done before removing jMenuBar to prevent exception (crash)
-        gui.getMapViewer().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
+        gui.getMapViewer().changeViewMode(GUI.MOVE_UNITS_MODE);
 
         for (Component c : getComponents()) {
             removeFromCanvas(c);
@@ -900,7 +900,7 @@ public final class Canvas extends JDesktopPane {
      * @param t a <code>Tile</code> value
      */
     public void showColonyPanel(Tile t) {
-        if (gui.getCurrentViewMode() == ViewMode.MOVE_UNITS_MODE) {
+        if (gui.getCurrentViewMode() == GUI.MOVE_UNITS_MODE) {
             if (t != null && t.getColony() != null
                 && freeColClient.getMyPlayer().owns(t.getColony())) {
                 mapViewer.setFocus(t);

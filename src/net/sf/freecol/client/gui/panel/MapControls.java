@@ -28,7 +28,6 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
@@ -150,10 +149,10 @@ public abstract class MapControls {
     public void update() {
         int viewMode = gui.getCurrentViewMode();
         switch (viewMode) {
-        case ViewMode.MOVE_UNITS_MODE:
+        case GUI.MOVE_UNITS_MODE:
             infoPanel.update(gui.getActiveUnit());
             break;
-        case ViewMode.VIEW_TERRAIN_MODE:
+        case GUI.VIEW_TERRAIN_MODE:
             if (gui.getSelectedTile() != null) {
                 Tile selectedTile = gui.getSelectedTile();
                 if (infoPanel.getTile() != selectedTile) {

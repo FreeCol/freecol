@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
@@ -224,7 +223,7 @@ public final class InfoPanel extends FreeColPanel {
         tileInfoPanel.setVisible(false);
         if (getFreeColClient().isMapEditor()) {
             mapEditorPanel.setVisible(true);
-        } else if (viewMode == ViewMode.VIEW_TERRAIN_MODE) {
+        } else if (viewMode == GUI.VIEW_TERRAIN_MODE) {
             tileInfoPanel.setVisible(true);
         } else if (unitInfoPanel.getUnit() != null) {
             unitInfoPanel.setVisible(true);

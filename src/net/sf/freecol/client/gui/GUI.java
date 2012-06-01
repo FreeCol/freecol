@@ -119,6 +119,12 @@ public class GUI {
      */
     private static final int DEFAULT_WINDOW_SPACE = 50;
 
+    
+
+    public static final int MOVE_UNITS_MODE = 0;
+
+    public static final int VIEW_TERRAIN_MODE = 1;
+
 
     private FreeColClient freeColClient;
 
@@ -321,7 +327,7 @@ public class GUI {
     }
 
     public int getCurrentViewMode() {
-        return mapViewer.getViewMode().getView();
+        return mapViewer.getView();
     }
 
     public Tile getFocus() {
@@ -1074,7 +1080,7 @@ public class GUI {
     }
 
     public void toggleViewMode() {
-        mapViewer.getViewMode().toggleViewMode();
+        mapViewer.toggleViewMode();
     }
 
     /**
