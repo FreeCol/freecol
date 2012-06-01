@@ -77,6 +77,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         LOWER_TAX_OTHER,
         WAIVE_TAX,
         ADD_TO_REF,
+        DECLARE_PEACE,
         DECLARE_WAR,
         SUPPORT_LAND,
         SUPPORT_SEA,
@@ -230,6 +231,25 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
+     * Collects a list of potential friends for this player.
+     */
+    public List<Player> collectPotentialFriends() {
+        List<Player> friends = new ArrayList<Player>();
+        // Benjamin Franklin puts an end to the monarch's interference
+        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
+            for (Player enemy : getGame().getLiveEuropeanPlayers()) {
+                if (enemy.isREF()) continue;
+                switch (player.getStance(enemy)) {
+                case WAR: case CEASE_FIRE:
+                    friends.add(enemy);
+                    break;
+                }
+            }
+        }
+        return friends;
+    }
+
+    /**
      * Checks if a specified action is valid at present.
      *
      * @param action The <code>MonarchAction</code> to check.
@@ -238,18 +258,18 @@ public final class Monarch extends FreeColGameObject implements Named {
         switch (action) {
         case NO_ACTION:
             return true;
-        case RAISE_TAX_ACT:
-        case RAISE_TAX_WAR:
+        case RAISE_TAX_ACT: case RAISE_TAX_WAR:
             return player.getTax() < taxMaximum();
         case FORCE_TAX:
             return false;
-        case LOWER_TAX_WAR:
-        case LOWER_TAX_OTHER:
+        case LOWER_TAX_WAR: case LOWER_TAX_OTHER:
             return player.getTax() > MINIMUM_TAX_RATE + 10;
         case WAIVE_TAX:
             return true;
         case ADD_TO_REF:
             return true;
+        case DECLARE_PEACE:
+            return !collectPotentialFriends().isEmpty();
         case DECLARE_WAR:
             return !collectPotentialEnemies().isEmpty();
         case SUPPORT_SEA:
@@ -294,6 +314,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         addIfValid(choices, MonarchAction.LOWER_TAX_WAR, 5 - dx);
         addIfValid(choices, MonarchAction.LOWER_TAX_OTHER, 5 - dx);
         addIfValid(choices, MonarchAction.ADD_TO_REF, 10 + dx);
+        addIfValid(choices, MonarchAction.DECLARE_PEACE, 6 - dx);
         addIfValid(choices, MonarchAction.DECLARE_WAR, 5 + dx);
         if (player.checkGold(MINIMUM_PRICE)) {
             addIfValid(choices, MonarchAction.OFFER_MERCENARIES, 6 - dx);

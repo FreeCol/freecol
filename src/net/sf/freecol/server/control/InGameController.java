@@ -1051,6 +1051,17 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                    new MonarchActionMessage(action, template));
             break;
+        case DECLARE_PEACE:
+            List<Player> friends = monarch.collectPotentialFriends();
+            if (friends.isEmpty()) break;
+            Player friend = Utils.getRandomMember(logger, "Choose friend",
+                friends, random);
+            serverPlayer.csChangeStance(Stance.PEACE, friend, true, cs);
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+                new MonarchActionMessage(action,
+                    StringTemplate.template(messageId)
+                        .addStringTemplate("%nation%", friend.getNationName())));
+            break;
         case DECLARE_WAR:
             List<Player> enemies = monarch.collectPotentialEnemies();
             if (enemies.isEmpty()) break;
