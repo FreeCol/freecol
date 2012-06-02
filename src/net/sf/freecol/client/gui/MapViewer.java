@@ -995,8 +995,6 @@ public final class MapViewer {
     * @see #setFocus(Tile)
     */
     public Tile getFocus() {
-        if (focus == null)
-            return null;
         return focus;
     }
 
