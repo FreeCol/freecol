@@ -55,6 +55,7 @@ import net.sf.freecol.client.gui.Canvas.ScoutColonyAction;
 import net.sf.freecol.client.gui.Canvas.ScoutIndianSettlementAction;
 import net.sf.freecol.client.gui.Canvas.SellAction;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
+import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -1231,6 +1232,16 @@ public class GUI {
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         return freeColClient.getClientOptions().getInteger(key);
+    }
+
+    public void animateUnitAttack(Unit unit, Unit defender, boolean success) {
+        Animations.unitAttack(this, unit, defender, success);
+        
+    }
+
+    public void animateUnitMove(Unit unit, Tile sourceTile, Tile destinationTile) {
+        Animations.unitMove(this, unit, sourceTile, destinationTile);
+        
     }
     
 }

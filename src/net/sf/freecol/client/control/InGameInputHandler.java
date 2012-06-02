@@ -31,7 +31,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.model.Colony;
@@ -1514,7 +1513,8 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(sourceTile)) {
                 gui.setFocusImmediately(sourceTile);
             }
-            Animations.unitMove(gui, unit, sourceTile, destinationTile);
+            
+            gui.animateUnitMove(unit, sourceTile, destinationTile);
             gui.refresh();
         }
     }
@@ -1567,7 +1567,8 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(unit.getTile())) {
                 gui.setFocusImmediately(unit.getTile());
             }
-            Animations.unitAttack(gui, unit, defender, success);
+            
+            gui.animateUnitAttack(unit, defender, success);
             gui.refresh();
         }
     }
