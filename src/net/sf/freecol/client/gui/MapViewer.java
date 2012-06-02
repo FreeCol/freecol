@@ -1902,55 +1902,53 @@ public final class MapViewer {
      * @param gotoPath a <code>PathNode</code> value
      */
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
-        if (gotoPath != null) {
-            PathNode temp = gotoPath;
-            Font font = ResourceManager.getFont("NormalFont", 12f);
-            while (temp != null) {
-                Point p = getTilePosition(temp.getTile());
-                if (p != null) {
-                    Tile tile = temp.getTile();
-                    Image image;
-                    final Color textColor;
-                    if (temp.getTurns() == 0) {
-                        g.setColor(Color.GREEN);
-                        image = lib.getPathImage(activeUnit);
-                        if (activeUnit != null
-                                && tile.isExplored()
-                                && activeUnit.isNaval()
-                                && tile.isLand()
-                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = lib.getPathImage(activeUnit.getFirstUnit());
-                        }
-                        textColor = Color.BLACK;
-                    } else {
-                        g.setColor(Color.RED);
-                        image = lib.getPathNextTurnImage(activeUnit);
-                        if (activeUnit != null
-                                && tile.isExplored()
-                                && activeUnit.isNaval()
-                                && tile.isLand()
-                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = lib.getPathNextTurnImage(activeUnit.getFirstUnit());
-                        }
-                        textColor = Color.WHITE;
+        PathNode temp = gotoPath;
+        Font font = ResourceManager.getFont("NormalFont", 12f);
+        while (temp != null) {
+            Point p = getTilePosition(temp.getTile());
+            if (p != null) {
+                Tile tile = temp.getTile();
+                Image image;
+                final Color textColor;
+                if (temp.getTurns() == 0) {
+                    g.setColor(Color.GREEN);
+                    image = lib.getPathImage(activeUnit);
+                    if (activeUnit != null
+                            && tile.isExplored()
+                            && activeUnit.isNaval()
+                            && tile.isLand()
+                            && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                        image = lib.getPathImage(activeUnit.getFirstUnit());
                     }
-                    g.translate(p.x, p.y);
-                    if (image != null) {
-                        centerImage(g, image);
-                    } else {
-                        g.fillOval(halfWidth, halfHeight, 10, 10);
-                        g.setColor(Color.BLACK);
-                        g.drawOval(halfWidth, halfHeight, 10, 10);
+                    textColor = Color.BLACK;
+                } else {
+                    g.setColor(Color.RED);
+                    image = lib.getPathNextTurnImage(activeUnit);
+                    if (activeUnit != null
+                            && tile.isExplored()
+                            && activeUnit.isNaval()
+                            && tile.isLand()
+                            && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                        image = lib.getPathNextTurnImage(activeUnit.getFirstUnit());
                     }
-                    if (temp.getTurns() > 0) {
-                        Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
-                                                              textColor, font);
-                        centerImage(g, stringImage);
-                    }
-                    g.translate(-p.x, -p.y);
+                    textColor = Color.WHITE;
                 }
-                temp = temp.next;
+                g.translate(p.x, p.y);
+                if (image != null) {
+                    centerImage(g, image);
+                } else {
+                    g.fillOval(halfWidth, halfHeight, 10, 10);
+                    g.setColor(Color.BLACK);
+                    g.drawOval(halfWidth, halfHeight, 10, 10);
+                }
+                if (temp.getTurns() > 0) {
+                    Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
+                                                          textColor, font);
+                    centerImage(g, stringImage);
+                }
+                g.translate(-p.x, -p.y);
             }
+            temp = temp.next;
         }
     }
 
@@ -2237,8 +2235,10 @@ public final class MapViewer {
         Display goto path
         */
 
-        displayGotoPath(g, currentPath);
-        displayGotoPath(g, gotoPath);
+        if (currentPath != null)
+            displayGotoPath(g, currentPath);
+        if (gotoPath != null)
+            displayGotoPath(g, gotoPath);
 
         /*
         PART 5

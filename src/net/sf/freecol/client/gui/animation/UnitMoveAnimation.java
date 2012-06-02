@@ -24,7 +24,6 @@ import java.awt.Rectangle;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
@@ -48,9 +47,6 @@ final class UnitMoveAnimation {
 
     private GUI gui;
 
-    private FreeColClient freeColClient;
-    
-
     /**
      * Constructor
      *
@@ -60,9 +56,8 @@ final class UnitMoveAnimation {
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(FreeColClient freeColClient, GUI gui, Unit unit,
+    public UnitMoveAnimation(GUI gui, Unit unit,
                              Tile sourceTile, Tile destinationTile) {
-        this.freeColClient = freeColClient;
         this.gui = gui;
         this.unit = unit;
         this.sourceTile = sourceTile;
@@ -74,7 +69,7 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final int movementSpeed = Animations.getAnimationSpeed(freeColClient, unit);
+        final int movementSpeed = gui.getAnimationSpeed(unit);
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         
