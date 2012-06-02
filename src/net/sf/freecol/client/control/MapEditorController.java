@@ -20,7 +20,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +33,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
-import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -199,25 +197,7 @@ public final class MapEditorController {
             @Override
             public void run() {
                 try {
-                    // create thumbnail
-                    MiniMap miniMap = new MiniMap(freeColClient, gui);
-                    miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-                    int width = freeColClient.getGame().getMap().getWidth()
-                        * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
-                    int height = freeColClient.getGame().getMap().getHeight()
-                        * MiniMap.MAX_TILE_SIZE / 4;
-                    BufferedImage image = new BufferedImage(width, height,
-                                                            BufferedImage.TYPE_INT_ARGB);
-                    Graphics2D g2d = image.createGraphics();
-                    miniMap.paintMap(g2d);
-
-                    // TODO: this can probably done more efficiently
-                    // by applying a suitable AffineTransform to the
-                    // Graphics2D
-                    double scaledWidth = Math.min((64 * width) / height, 128);
-                    BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
-                                                                  BufferedImage.TYPE_INT_ARGB);
-                    scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
+                    BufferedImage scaledImage = gui.createMiniMapThumbNail();
                     freeColClient.getFreeColServer().saveGame(file, "mapEditor", null, scaledImage);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

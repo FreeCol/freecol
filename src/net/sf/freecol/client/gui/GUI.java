@@ -22,12 +22,14 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -64,6 +66,7 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.EuropePanel;
+import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapControls;
@@ -1242,6 +1245,28 @@ public class GUI {
     public void animateUnitMove(Unit unit, Tile sourceTile, Tile destinationTile) {
         Animations.unitMove(this, unit, sourceTile, destinationTile);
         
+    }
+    
+    public BufferedImage createMiniMapThumbNail() {
+        MiniMap miniMap = new MiniMap(freeColClient, this);
+        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+        int width = freeColClient.getGame().getMap().getWidth()
+            * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
+        int height = freeColClient.getGame().getMap().getHeight()
+            * MiniMap.MAX_TILE_SIZE / 4;
+        BufferedImage image = new BufferedImage(width, height,
+                                                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        miniMap.paintMap(g2d);
+
+        // TODO: this can probably done more efficiently
+        // by applying a suitable AffineTransform to the
+        // Graphics2D
+        double scaledWidth = Math.min((64 * width) / height, 128);
+        BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
+                                                      BufferedImage.TYPE_INT_ARGB);
+        scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
+        return scaledImage;
     }
     
 }

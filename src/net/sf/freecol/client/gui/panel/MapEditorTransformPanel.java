@@ -193,15 +193,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     /**
-     * Get the <code>NativePlayer</code> value.
-     *
-     * @return a <code>Player</code> value
-     */
-    public static Player getNativePlayer() {
-        return nativePlayer;
-    }
-
-    /**
      * Set the <code>NativePlayer</code> value.
      *
      * @param newNativePlayer The new NativePlayer value.

@@ -61,7 +61,7 @@ public abstract class MapControls {
     protected final FreeColClient freeColClient;
 
     protected final InfoPanel infoPanel;
-    protected final MiniMap miniMap;
+    protected MiniMap miniMap;
     protected final UnitButton miniMapZoomOutButton;
     protected final UnitButton miniMapZoomInButton;
     protected final List<UnitButton> unitButtons;
