@@ -814,7 +814,7 @@ public final class InGameController implements NetworkConstants {
         // Ask the server
         if (askServer().claimLand(tile, claimant, price)
             && player.owns(tile)) {
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             return true;
         }
         return false;
@@ -831,7 +831,7 @@ public final class InGameController implements NetworkConstants {
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().emigrate(slot)) {
             europeWas.fireChanges();
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
         }
     }
 
@@ -1664,7 +1664,7 @@ public final class InGameController implements NetworkConstants {
             for (TransactionListener l : market.getTransactionListener()) {
                 l.logPurchase(type, toBuy, price);
             }
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             nextModelMessage();
             return true;
         }
@@ -1795,7 +1795,7 @@ public final class InGameController implements NetworkConstants {
             && unit.isDisposed()) {
             gui.playSound("sound.event.cashInTreasureTrain");
             unitWas.fireChanges();
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             nextActiveUnit(tile);
             return true;
         }
@@ -2022,7 +2022,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().equipUnit(unit, type, amount)) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
         }
     }
 
@@ -2876,7 +2876,7 @@ public final class InGameController implements NetworkConstants {
                 gui.showInformationMessage(settlement,
                     "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
-                gui.updateGoldLabel();
+                gui.updateMenuBar();
                 gui.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.speakBeads")
                     .addAmount("%amount%", player.getGold() - oldGold));
@@ -3126,7 +3126,7 @@ public final class InGameController implements NetworkConstants {
                 case BUY: // Accept price, make purchase
                     if (askServer().buyFromSettlement(unit,
                             settlement, goods, gold)) {
-                        gui.updateGoldLabel(); // Assume success
+                        gui.updateMenuBar(); // Assume success
                     }
                     return;
                 case HAGGLE: // Try to negotiate a lower price
@@ -3171,7 +3171,7 @@ public final class InGameController implements NetworkConstants {
                 case SELL: // Accepted price, make the sale
                     if (askServer().sellToSettlement(unit,
                             settlement, goods, gold)) {
-                        gui.updateGoldLabel(); // Assume success
+                        gui.updateMenuBar(); // Assume success
                     }
                     return;
                 case HAGGLE: // Ask for more money
@@ -3211,7 +3211,7 @@ public final class InGameController implements NetworkConstants {
     private void moveTribute(Unit unit, Direction direction) {
         if (askServer().demandTribute(unit, direction)) {
             // Assume tribute paid
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             nextActiveUnit();
         }
     }
@@ -3279,7 +3279,7 @@ public final class InGameController implements NetworkConstants {
                         .addAmount("%amount%", gold),
                         "yes", "no")) {
                     if (askServer().incite(unit, direction, enemy, gold) >= 0) {
-                        gui.updateGoldLabel();
+                        gui.updateMenuBar();
                     }
                 }
                 nextActiveUnit();
@@ -3390,7 +3390,7 @@ public final class InGameController implements NetworkConstants {
                 "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type)) {
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             return true;
         }
         return false;
@@ -3421,7 +3421,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().payForBuilding(colony)
             && colony.getPriceForBuilding() == 0) {
             colonyWas.fireChanges();
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
         }
     }
 
@@ -3586,7 +3586,7 @@ public final class InGameController implements NetworkConstants {
             for (TransactionListener l : market.getTransactionListener()) {
                 l.logSale(type, amount, price, tax);
             }
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             nextModelMessage();
             return true;
         }
@@ -3728,7 +3728,7 @@ public final class InGameController implements NetworkConstants {
 
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().trainUnitInEurope(unitType)) {
-            gui.updateGoldLabel();
+            gui.updateMenuBar();
             europeWas.fireChanges();
         }
     }
