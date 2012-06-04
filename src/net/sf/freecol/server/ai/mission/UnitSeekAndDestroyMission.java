@@ -79,8 +79,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
             
         this.target = target;
-        logger.finest(tag + " begins with target " + target
-            + ": " + aiUnit.getUnit());
+        logger.finest(tag + " begins with target " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -160,9 +159,6 @@ public class UnitSeekAndDestroyMission extends Mission {
             Tension tension = is.getAlarm(unit.getOwner());
             if (tension != null) value += tension.getValue() / 2;
         }
-
-        //logger.finest("UnitSeekAndDestroyMission settlement score(" + unit
-        //    + " v " + settlement + ") = " + value);
         return value;
     }
 
@@ -202,9 +198,6 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (defender.hasAbility(Ability.EXPERT_SOLDIER)
                 && !defender.isArmed()) value += 100;
         }
-
-        //logger.finest("UnitSeekAndDestroyMission score(" + unit
-        //    + " v " + defender + ") = " + value);
         return value;
     }
 
@@ -410,7 +403,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         if (isTargetReason(reason)) {
             target = null;
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -420,17 +413,17 @@ public class UnitSeekAndDestroyMission extends Mission {
         if (nearbyTarget != null) {
             if (target == null) {
                 logger.finest(tag + " retargeted " + nearbyTarget
-                    + ": " + unit);
+                    + ": " + this);
                 target = nearbyTarget;
                 nearbyTarget = null;
             } else if (nearbyTarget == target) {
                 nearbyTarget = null;
             } else {
                 logger.finest(tag + " found target-of-opportunity "
-                    + nearbyTarget + ": " + unit);
+                    + nearbyTarget + ": " + this);
             }
         } else if (reason != null) {
-            logger.finest(tag + " " + reason + ": " + unit);
+            logger.finest(tag + " " + reason + ": " + this);
             return;
         }
 
@@ -455,11 +448,11 @@ public class UnitSeekAndDestroyMission extends Mission {
                 throw new IllegalStateException("No direction " + unitTile
                     + " to " + currentTarget.getTile());
             }
-            logger.finest(tag + " attacking " + currentTarget + ": " + unit);
+            logger.finest(tag + " attacking " + currentTarget + ": " + this);
             AIMessage.askAttack(aiUnit, dirn);
             break;
         default:
-            logger.finest(tag + " unexpected move type: " + mt + ": " + unit);
+            logger.finest(tag + " unexpected move type: " + mt + ": " + this);
             break;
         }
     }

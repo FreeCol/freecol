@@ -96,8 +96,7 @@ public class PioneeringMission extends Mission {
         super(aiMain, aiUnit);
 
         setTarget(findTarget(aiUnit));
-        logger.finest(tag + " starts with target " + target
-            + ": " + aiUnit.getUnit());
+        logger.finest(tag + " starts with target " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -116,8 +115,7 @@ public class PioneeringMission extends Mission {
         super(aiMain, aiUnit);
 
         setTarget(loc);
-        logger.finest(tag + " starts with target " + target
-            + ": " + aiUnit.getUnit());
+        logger.finest(tag + " starts with target " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -537,7 +535,7 @@ public class PioneeringMission extends Mission {
         if (isTargetReason(reason)) {
             ; // handled below
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -552,11 +550,11 @@ public class PioneeringMission extends Mission {
             if (invalidTargetReason(target, player) != null) {
                 setTarget(extractTarget(aiUnit, findColonyPath(aiUnit)));
                 if (invalidTargetReason(target, player) != null) {
-                    logger.finest(tag + " unable to retarget: " + unit);
+                    logger.finest(tag + " unable to retarget: " + this);
                     return;
                 }
                 logger.finest(tag + " retargeting for tools " + target
-                    + ": " + unit);
+                    + ": " + this);
             }
 
             // Go there and clear target on arrival.
@@ -568,10 +566,10 @@ public class PioneeringMission extends Mission {
             if (aiUnit.equipForRole(Unit.Role.PIONEER, false)
                 && hasTools()) {
                 logger.finest(tag + " reached " + where
-                    + " and equips: " + unit);
+                    + " and equips: " + this);
             } else {
                 logger.finest(tag + " reached " + where
-                    + " but fails to equip: " + unit);
+                    + " but fails to equip: " + this);
             }
         }
 
@@ -582,7 +580,7 @@ public class PioneeringMission extends Mission {
             where = ((Colony)target).getName();
             setTarget(null);
             logger.finest(tag + " reached intermediate colony " + where
-                + ": " + unit);
+                + ": " + this);
         }
 
         // Now insist on a tip-target.
@@ -594,11 +592,11 @@ public class PioneeringMission extends Mission {
             setTarget(extractTarget(aiUnit, findTipPath(aiUnit)));
             if (tileImprovementPlan == null) {
                 logger.finest(tag + " at " + unit.getLocation() 
-                    + " could not find improvement: " + unit);
+                    + " could not find improvement: " + this);
                 return;
             }
             logger.finest(tag + " retargeting " + tileImprovementPlan
-                + ": " + unit);
+                + ": " + this);
         }
 
         // Go there.
@@ -627,7 +625,7 @@ public class PioneeringMission extends Mission {
                 tileImprovementPlan.dispose();
                 setTarget(null);
                 logger.finest(tag + " can not claim land at " + tile
-                    + ": " + unit);
+                    + ": " + this);
                 return;
             }
         }
@@ -650,21 +648,21 @@ public class PioneeringMission extends Mission {
         if (unit.getState() == UnitState.IMPROVING) {
             unit.setMovesLeft(0);
             logger.finest(tag + " improving "
-                + tileImprovementPlan.getType() + ": " + unit);
+                + tileImprovementPlan.getType() + ": " + this);
         } else if (unit.checkSetState(UnitState.IMPROVING)) {
             if (AIMessage.askChangeWorkImprovementType(aiUnit,
                     tileImprovementPlan.getType())) {
                 logger.finest(tag + " began improvement "
                     + tileImprovementPlan.getType()
-                    + " at target " + tile + ": " + unit);
+                    + " at target " + tile + ": " + this);
             } else {
                 setTarget(null);
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                logger.finest(tag + " failed to improve " + tile + ": " + unit);
+                logger.finest(tag + " failed to improve " + tile + ": " + this);
             }
         } else { // Probably just out of moves.
-            logger.finest(tag + " waiting to improve at " + tile + ": " + unit);
+            logger.finest(tag + " waiting to improve at " + tile + ": " + this);
         }
     }
 

@@ -79,7 +79,7 @@ public class ScoutingMission extends Mission {
 
         target = findTarget(aiUnit);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + aiUnit.getUnit());
+            + " with target " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -163,10 +163,7 @@ public class ScoutingMission extends Mission {
         // If no target was found but there is a carrier, then give up
         // as we should have been able to get everywhere except
         // islands in lakes.
-        if (carrier != null) {
-            logger.finest(tag + " (with carrier) out of targets: " + unit);
-            return null;
-        }
+        if (carrier != null) return null;
 
         // Search again, purely on distance in tiles, which allows
         // water tiles and thus potentially finds targets that require
@@ -310,11 +307,11 @@ public class ScoutingMission extends Mission {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
             if ((target = findTarget(getAIUnit())) == null) {
-                logger.finest(tag + " could not retarget: " + unit);
+                logger.finest(tag + " could not retarget: " + this);
                 return;
             }
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -336,12 +333,12 @@ public class ScoutingMission extends Mission {
             AIMessage.askScoutIndianSettlement(aiUnit, d);
             if (unit.isDisposed()) {
                 logger.finest(tag + " died at target " + target
-                    + ": " + unit);
+                    + ": " + this);
                 return;
             }
             break;
         default:
-            logger.warning(tag + " unexpected move type " + mt + ": " + unit);
+            logger.warning(tag + " unexpected move type " + mt + ": " + this);
             return;
         }
 
@@ -362,7 +359,7 @@ public class ScoutingMission extends Mission {
             target = null;
         }
         logger.finest(tag + " completed target " + completed
-            + ", retargeting " + target + ": " + unit);
+            + ", retargeting " + target + ": " + this);
     }
 
 

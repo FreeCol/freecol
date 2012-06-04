@@ -157,7 +157,7 @@ public class UnitWanderHostileMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -187,9 +187,9 @@ public class UnitWanderHostileMission extends Mission {
             moved = true;
         }
         if (moved) {
-            logger.finest(tag + " moved to " + unit.getTile() + ": " + unit);
+            logger.finest(tag + " moved to " + unit.getTile() + ": " + this);
         } else {
-            logger.finest(tag + " failed to move: " + unit);
+            logger.finest(tag + " failed to move: " + this);
         }
     }
 

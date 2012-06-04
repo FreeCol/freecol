@@ -67,7 +67,7 @@ public class CashInTreasureTrainMission extends Mission {
         super(aiMain, aiUnit);
         target = findTarget(aiUnit);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + aiUnit.getUnit());
+            + " with target " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -169,7 +169,6 @@ public class CashInTreasureTrainMission extends Mission {
         if (path != null) return path;
 
         // Failed.  TODO: some sort of hack to build a colony nearby.
-        logger.finest(tag + " out of targets: " + unit);
         return null;
     }
 
@@ -292,11 +291,11 @@ public class CashInTreasureTrainMission extends Mission {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
             if ((target = findTarget(getAIUnit())) == null) {
-                logger.finest(tag + " could not retarget: " + unit);
+                logger.finest(tag + " could not retarget: " + this);
                 return;
             }
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -319,16 +318,16 @@ public class CashInTreasureTrainMission extends Mission {
                 || unit.getTransportFee() == 0) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                     logger.finest(tag + " completed cash in at "
-                        + unit.getLocation() + ": " + unit);
+                        + unit.getLocation() + ": " + this);
                 }
             } else {
                 target = europe;
                 logger.finest(tag + " at " + unit.getLocation()
-                    + " retargeting Europe: " + unit);
+                    + " retargeting Europe: " + this);
             }
         } else {
             logger.finest(tag + " waiting to cash in at "
-                + unit.getLocation() + ": " + unit);
+                + unit.getLocation() + ": " + this);
         }
     }
 

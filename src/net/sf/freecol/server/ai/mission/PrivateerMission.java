@@ -292,7 +292,7 @@ public class PrivateerMission extends Mission {
         for(Goods goods : goodsLst){
             if(inEurope){
             	logger.finest("Before dumping: money=" + unit.getOwner().getGold());
-              goodsLeavesTransport(goods);
+              goodsLeavesTransport(goods.getType(), goods.getAmount());
             	logger.finest("After dumping: money=" + unit.getOwner().getGold());
             } else{
             	Colony colony = unit.getTile().getColony();

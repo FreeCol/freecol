@@ -89,7 +89,7 @@ public class BuildColonyMission extends Mission {
 
         setTarget(target);
         logger.finest(tag + " starts with target " + target
-            + " and value " + colonyValue + ": " + aiUnit.getUnit());
+            + " and value " + colonyValue + ": " + this);
         uninitialized = false;
     }
 
@@ -361,7 +361,7 @@ public class BuildColonyMission extends Mission {
         if (isTargetReason(reason)) {
             ; // handled below
         } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -376,7 +376,7 @@ public class BuildColonyMission extends Mission {
                 && (value = player.getColonyValue((Tile)target)) < colonyValue)) {
             if ((newTarget = findTarget(aiUnit, true)) == null) {
                 setTarget(null);
-                logger.finest(tag + " unable to retarget: " + unit);
+                logger.finest(tag + " unable to retarget: " + this);
                 return;
             }
             setTarget(newTarget);
@@ -395,9 +395,9 @@ public class BuildColonyMission extends Mission {
                 && (newTarget = extractTarget(aiUnit, path)) != null) {
                 setTarget(newTarget);
                 logger.finest(tag + " arrived at " + name
-                    + ", retargeting " + target + ": " + unit);
+                    + ", retargeting " + target + ": " + this);
             } else {
-                logger.finest(tag + " gives up at " + name + ": " + unit);
+                logger.finest(tag + " gives up at " + name + ": " + this);
                 aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
                         aiMain.getAIColony((Colony)target)));
             }
@@ -439,7 +439,7 @@ public class BuildColonyMission extends Mission {
             }
             if (fail) {
                 logger.finest(tag + " failed to claim land at " + tile
-                    + ": " + unit);
+                    + ": " + this);
                 setTarget(null);
                 return;
             }
@@ -447,7 +447,7 @@ public class BuildColonyMission extends Mission {
 
         // Check that the unit has moves left, which are required for building.
         if (unit.getMovesLeft() <= 0) {
-            logger.finest(tag + " waiting to build at " + tile + ": " + unit);
+            logger.finest(tag + " waiting to build at " + tile + ": " + this);
             return;
         }
             
@@ -456,12 +456,12 @@ public class BuildColonyMission extends Mission {
             && tile.getColony() != null) {
             Colony colony = tile.getColony();
             logger.finest(tag + " completed " + colony.getName()
-                + ": " + unit);
+                + ": " + this);
             aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony)));
         } else {
             setTarget(null);
-            logger.warning(tag + " failed to build at " + tile + ": " + unit);
+            logger.warning(tag + " failed to build at " + tile + ": " + this);
         }
     }
 

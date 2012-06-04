@@ -131,7 +131,7 @@ public class IdleAtSettlementMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.warning(tag + " broken(" + reason + "): " + unit);
+            logger.warning(tag + " broken(" + reason + "): " + this);
             return;
         }
 

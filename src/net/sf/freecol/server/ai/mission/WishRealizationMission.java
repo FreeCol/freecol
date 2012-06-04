@@ -65,7 +65,7 @@ public class WishRealizationMission extends Mission {
 
         this.wish = wish;
         logger.finest(tag + " starting with destination "
-            + wish.getDestination() + ": " + aiUnit.getUnit());
+            + wish.getDestination() + ": " + this);
         uninitialized = false;
     }
 
@@ -161,7 +161,7 @@ public class WishRealizationMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -174,7 +174,7 @@ public class WishRealizationMission extends Mission {
             final AIUnit aiUnit = getAIUnit();
             final AIColony aiColony = getAIMain().getAIColony(colony);
             aiColony.completeWish(wish, "mission(" + unit + ")");
-            logger.finest(tag + " completed at " + colony + ": " + unit);
+            logger.finest(tag + " completed at " + colony + ": " + this);
             // Replace the mission, with a defensive one if this is a
             // military unit or a simple working one if not.  Beware
             // that setMission() will dispose of this mission which is
@@ -189,7 +189,7 @@ public class WishRealizationMission extends Mission {
             }
         } else {
             logger.warning(tag + " unknown destination type " + wish
-                + ": " + unit);
+                + ": " + this);
             wish.dispose();
             wish = null;
         }

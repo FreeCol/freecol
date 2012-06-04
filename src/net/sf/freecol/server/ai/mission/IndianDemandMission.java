@@ -199,7 +199,7 @@ public class IndianDemandMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -217,7 +217,7 @@ public class IndianDemandMission extends Mission {
                     is.addGoods(tribute);
                 }
                 logger.finest(tag + " completed unloading tribute at "
-                    + is.getName() + ": " + unit);
+                    + is.getName() + ": " + this);
                 completed = true;
             }
         } else {
@@ -257,7 +257,7 @@ public class IndianDemandMission extends Mission {
                         + " accepted at " + target.getName()
                         + " tribute: " + ((goods != null) ? goods.toString()
                             : (Integer.toString(gold) + " gold"))
-                        + ": " + unit);
+                        + ": " + this);
                 } else { // If the demand was rejected and not content, attack.
                     int unitTension = (unit.getIndianSettlement() == null) ? 0
                         : unit.getIndianSettlement().getAlarm(enemy).getValue();
@@ -269,8 +269,7 @@ public class IndianDemandMission extends Mission {
                         if (d != null) AIMessage.askAttack(au, d);
                     }
                     logger.finest(tag + " demand "
-                        + " refused at " + target.getName()
-                        + ": " + unit);
+                        + " refused at " + target.getName() + ": " + this);
                 }
                 return;
             }

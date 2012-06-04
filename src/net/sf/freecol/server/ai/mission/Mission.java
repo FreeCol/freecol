@@ -518,21 +518,35 @@ public abstract class Mission extends AIObject {
     /**
      * Goods leaves a ship.
      *
-     * @param goods The <code>Goods</code> to unload.
+     * @param type The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
      * @return True if the unload succeeds.
      */
-    protected boolean goodsLeavesTransport(Goods goods) {
+    protected boolean goodsLeavesTransport(GoodsType type, int amount) {
         final Unit carrier = getUnit();
+        if (carrier.getGoodsContainer().getGoodsCount(type) < amount) {
+            return false;
+        }
         final AIUnit aiUnit = getAIUnit();
-        final Colony colony = carrier.getTile().getColony();
-        boolean result = (carrier.isInEurope()
-            && carrier.getOwner().canTrade(goods.getType())) 
-            ? AIMessage.askSellGoods(aiUnit, goods)
-            : AIMessage.askUnloadCargo(aiUnit, goods);
-        if (result && colony != null) {
-            AIColony aiColony = getAIMain().getAIColony(colony);
-            if (aiColony != null) aiColony.completeWish(goods);
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+        boolean result;
+        Goods goods = new Goods(carrier.getGame(), carrier, type, amount);
+        if (carrier.isInEurope()) {
+            if (carrier.getOwner().canTrade(type)) {
+                result = AIMessage.askSellGoods(aiUnit, goods);
+                logger.finest("Sell " + goods + " in Europe "
+                    + ((result) ? "succeeds" : "fails")
+                    + ": " + this);
+            } else { // dump
+                result = AIMessage.askUnloadCargo(aiUnit, goods);
+            }
+        } else {
+            result = AIMessage.askUnloadCargo(aiUnit, goods);
+            if (result) {
+                final Colony colony = carrier.getTile().getColony();
+                final AIColony aiColony = getAIMain().getAIColony(colony);
+                if (aiColony != null) aiColony.completeWish(goods);
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            }
         }
         return result;
     }
@@ -546,18 +560,17 @@ public abstract class Mission extends AIObject {
      */
     protected boolean goodsLeavesTransport(AIGoods aiGoods) {
         final Unit carrier = getUnit();
-        final AIUnit aiUnit = getAIUnit();
         Goods goods = aiGoods.getGoods();
-        boolean result = goodsLeavesTransport(goods);
-        Colony colony = carrier.getColony();
-        AIColony ac;
+        boolean result = goodsLeavesTransport(goods.getType(),
+                                              goods.getAmount());
         if (result) {
+            Colony colony = carrier.getColony();
+            AIColony ac;
             if (colony != null
                 && (ac = getAIMain().getAIColony(colony)) != null) {
                 ac.completeWish(goods);
                 colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
-            aiGoods.dispose();
         }
         return result;
     }
@@ -598,12 +611,12 @@ public abstract class Mission extends AIObject {
 
     // Deprecated, going away.
     protected boolean sellCargoInEurope(Goods goods) {
-        return goodsLeavesTransport(goods);
+        return goodsLeavesTransport(goods.getType(), goods.getAmount());
     }
 
     // Deprecated, going away.
     protected boolean unloadCargoInColony(Goods goods) {
-        return goodsLeavesTransport(goods);
+        return goodsLeavesTransport(goods.getType(), goods.getAmount());
     }
 
     // Deprecated, going away.
@@ -781,16 +794,16 @@ public abstract class Mission extends AIObject {
 
             if (unit.isNaval()) {
                 if (unit.isAtSea()) {
-                    logger.finest(logMe + " at sea: " + unit);
+                    logger.finest(logMe + " at sea: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
                 if (unit.getTile().canMoveToEurope()) {
                     if (aiUnit.moveToEurope()) {
-                        logger.finest(logMe + " sailed for Europe: " + unit);
+                        logger.finest(logMe + " sailed for Europe: " + this);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
                         logger.finest(logMe + " failed to sail for Europe: "
-                            + unit);
+                            + this);
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
@@ -798,7 +811,7 @@ public abstract class Mission extends AIObject {
                 if (path == null) {
                     logger.finest(logMe
                         + " can not get from " + unit.getTile()
-                        + " to Europe: " + unit);
+                        + " to Europe: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
             } else if (unit.isOnCarrier()) {
@@ -811,16 +824,16 @@ public abstract class Mission extends AIObject {
 
             if (unit.isNaval()) {
                 if (unit.isAtSea()) {
-                    logger.finest(logMe + " at sea: " + unit);
+                    logger.finest(logMe + " at sea: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 } else if (unit.isInEurope()) {
                     if (aiUnit.moveToAmerica()) {
                         logger.finest(logMe + " sailed for the New World: "
-                            + unit);
+                            + this);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
                         logger.finest(logMe + " in Europe failed to sail: "
-                            + unit);
+                            + this);
                         return MoveType.MOVE_ILLEGAL;
                     }
                 } else {
@@ -829,7 +842,7 @@ public abstract class Mission extends AIObject {
                     if (path == null) {
                         logger.finest(logMe
                             + " can not sail from " + unit.getTile()
-                            + " to " + targetTile + ": " + unit);
+                            + " to " + targetTile + ": " + this);
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
@@ -842,7 +855,7 @@ public abstract class Mission extends AIObject {
                     if (path == null) {
                         logger.finest(logMe 
                             + " can not get from " + unit.getTile()
-                            + " to " + targetTile + ": " + unit);
+                            + " to " + targetTile + ": " + this);
                         return MoveType.MOVE_ILLEGAL;
                     } else {
                         inTransit = path.isOnCarrier();
@@ -862,11 +875,11 @@ public abstract class Mission extends AIObject {
             }
         }
         if (inTransit) {
-            logger.finest(logMe + " in transit to " + target + ": " + unit);
+            logger.finest(logMe + " in transit to " + target + ": " + this);
             return MoveType.MOVE_ILLEGAL;
         } else if (needTransport) {
             logger.finest(logMe + " at " + unit.getLocation()
-                + " needs transport to " + target + ": " + unit);
+                + " needs transport to " + target + ": " + this);
             return MoveType.MOVE_ILLEGAL;
         }
 
@@ -890,7 +903,7 @@ public abstract class Mission extends AIObject {
             if (unit.getMovesLeft() <= 0) {
                 logger.finest(logMe + " at " + unit.getTile()
                     + " en route to " + path.getLastNode().getTile()
-                    + ": " + unit);
+                    + ": " + this);
                 return MoveType.MOVE_NO_MOVES;
             }
 
@@ -899,11 +912,11 @@ public abstract class Mission extends AIObject {
 
             if (!AIMessage.askMove(getAIUnit(), path.getDirection())) {
                 logger.finest(logMe + " at " + unit.getTile()
-                    + " failed to move: " + unit);
+                    + " failed to move: " + this);
                 return MoveType.MOVE_ILLEGAL;
             } else if (unit.isDisposed()) {
                 logger.finest(logMe + " died en route to " + path.getTile()
-                    + ": " + unit);
+                    + ": " + this);
                 return MoveType.MOVE_NO_REPAIR;
             }
         }
@@ -911,10 +924,10 @@ public abstract class Mission extends AIObject {
             if (!AIMessage.askMoveTo(getAIUnit(),
                     unit.getOwner().getEurope())) {
                 logger.finest(logMe + " at " + unit.getTile()
-                    + " failed to sail for Europe: " + unit);
+                    + " failed to sail for Europe: " + this);
                 return MoveType.MOVE_ILLEGAL;
             }
-            logger.finest(logMe + " sailed for Europe: " + unit);
+            logger.finest(logMe + " sailed for Europe: " + this);
             return MoveType.MOVE_HIGH_SEAS;
         }             
         return MoveType.MOVE; // Must have completed path
@@ -1065,9 +1078,10 @@ public abstract class Mission extends AIObject {
      * {@inheritDoc}
      */
     public String toString() {
-        // Shorten the classname to just the mission part.
-        // Makes the logs much easier to read.
         return Utils.lastPart(getClass().getName(), ".")
-            + "@" + Integer.toString(hashCode());
+            + "@" + Integer.toString(hashCode())
+            + ((aiUnit == null) ? "aiUnit-null"
+                : (getUnit() == null) ? "unit-null"
+                : getUnit().toString());
     }
 }

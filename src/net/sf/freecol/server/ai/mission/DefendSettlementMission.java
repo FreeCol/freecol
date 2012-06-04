@@ -69,8 +69,7 @@ public class DefendSettlementMission extends Mission {
                                    Settlement settlement) {
         super(aiMain, aiUnit);
         this.target = settlement;
-        logger.finest(tag + " started with " + target
-            + ": " + aiUnit.getUnit());
+        logger.finest(tag + " started with " + target + ": " + this);
         uninitialized = false;
     }
 
@@ -260,7 +259,7 @@ public class DefendSettlementMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -311,7 +310,7 @@ public class DefendSettlementMission extends Mission {
             } else {
                 logMe = " fortify failed at ";
             }
-            logger.finest(tag + logMe + target.getName() + ": " + unit);
+            logger.finest(tag + logMe + target.getName() + ": " + this);
             return;
         }
 
@@ -352,11 +351,11 @@ public class DefendSettlementMission extends Mission {
         // Attack if a target is available.
         if (bestTarget != null) {
             logger.finest(tag + " attacking " + bestTarget
-                + " from " + target.getName() + ": " + unit);
+                + " from " + target.getName() + ": " + this);
             AIMessage.askAttack(getAIUnit(), bestDirection);
         } else {
             logger.finest(tag + " defending " + target.getName()
-                + ": " + unit);
+                + ": " + this);
         }
     }
     

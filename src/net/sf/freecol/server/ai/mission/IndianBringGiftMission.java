@@ -204,7 +204,7 @@ public class IndianBringGiftMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + unit);
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
@@ -246,10 +246,10 @@ public class IndianBringGiftMission extends Mission {
                                                 getUnit().getGoodsIterator().next())) {
                     AIMessage.askCloseTransaction(getAIUnit(), target);
                     logger.finest(tag + " completed at " + target.getName()
-                        + ": " + getUnit());
+                        + ": " + this);
                 } else {
                     logger.warning(tag + " failed at " + target.getName()
-                        + ": " + getUnit());
+                        + ": " + this);
                 }
                 completed = true;
             }
