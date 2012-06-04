@@ -2388,7 +2388,7 @@
         <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
         <!-- Whether experts have connections, producing without raw materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections" defaultValue="true"/>
-        <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
+        <booleanOption id="model.option.saveProductionOverflow" defaultValue="true"/>
         <!-- Whether to educate the least skilled unit first -->
         <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
       </optionGroup>
