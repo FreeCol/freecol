@@ -728,6 +728,21 @@ public class Messages {
     }
 
     /**
+     * Collects all the names with a given prefix.
+     *
+     * @param prefix The prefix to check.
+     * @param names A list to fill with the names found.
+     */
+    private static void collectNames(String prefix, List<String> names) {
+        String name;
+        int i = 0;
+        while (Messages.containsKey(name = prefix + Integer.toString(i))) {
+            names.add(Messages.message(name));
+            i++;
+        }
+    }
+
+    /**
      * Gets a list of settlement names and a fallback prefix for a player.
      *
      * @param player The <code>Player</code> to get names for.
@@ -735,22 +750,33 @@ public class Messages {
      *     fallback prefix.
      */
     public static List<String> getSettlementNames(Player player) {
-        final String prefix = player.getNationID() + ".settlementName.";
         List<String> names = new ArrayList<String>();
 
         // Fallback prefix first
         names.add(message((player.isEuropean()) ? "Colony" : "Settlement"));
 
-        // Collect all the names
-        int i = 0;
-        while (Messages.containsKey(prefix + Integer.toString(i))) {
-            names.add(Messages.message(prefix + Integer.toString(i)));
-            i++;
-        }
-
+        // Collect the rest
+        collectNames(player.getNationID() + ".settlementName.", names);
         return names;
     }
 
+    /**
+     * Gets a list of ship names and a fallback prefix for a player.
+     *
+     * @param player The <code>Player</code> to get names for.
+     * @return A list of ship names, with the first being the fallback prefix.
+     */
+    public static List<String> getShipNames(Player player) {
+        final String prefix = player.getNationID() + ".ship.";
+        List<String> names = new ArrayList<String>();
+
+        // Fallback prefix first
+        names.add(message("Ship"));
+
+        // Collect the rest
+        collectNames(prefix, names);
+        return names;
+    }
 
     /**
      * Loads a new resource file into the current message bundle.
@@ -821,6 +847,4 @@ public class Messages {
          }
          return -1;
      }
-
-
 }

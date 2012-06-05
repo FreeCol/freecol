@@ -763,12 +763,15 @@ public class SimpleMapGenerator implements MapGenerator {
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
-                Unit newUnit = new ServerUnit(game, null, player,
-                                              startingUnit.getUnitType(spec),
+                UnitType type = startingUnit.getUnitType(spec);
+                Unit newUnit = new ServerUnit(game, null, player, type,
                                               startingUnit.getEquipment(spec));
-                if (newUnit.canCarryUnits() && newUnit.isNaval()) {
-                    newUnit.setState(Unit.UnitState.ACTIVE);
-                    carriers.add(newUnit);
+                newUnit.setName(player.getUnitName(type, random));
+                if (newUnit.isNaval()) {
+                    if (newUnit.canCarryUnits()) {
+                        newUnit.setState(Unit.UnitState.ACTIVE);
+                        carriers.add(newUnit);
+                    }
                 } else {
                     newUnit.setState(Unit.UnitState.SENTRY);
                     passengers.add(newUnit);

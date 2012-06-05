@@ -531,8 +531,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      */
     private Unit csBuildUnit(BuildQueue<? extends BuildableType> buildQueue,
                              Random random, ChangeSet cs) {
-        Unit unit = new ServerUnit(getGame(), getTile(), owner,
-            (UnitType) buildQueue.getCurrentlyBuilding());
+        UnitType type = (UnitType)buildQueue.getCurrentlyBuilding();
+        Unit unit = new ServerUnit(getGame(), getTile(), owner, type);
         if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -540,6 +540,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                            this, unit)
                           .addName("%colony%", getName()));
         } else {
+            unit.setName(owner.getUnitName(type, random));
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                            "model.colony.unitReady",
