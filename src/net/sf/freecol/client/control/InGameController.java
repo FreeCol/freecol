@@ -1461,12 +1461,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Get and check the name.
-        String name = player.getSettlementName();
-        if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
-            player.installSettlementNames(Messages.getSettlementNames(player),
-                                          null);
-            name = player.getSettlementName();
-        }
+        String name = player.getSettlementName(null);
         name = gui.showInputDialog(tile,
             StringTemplate.key("nameColony.text"), name,
             "nameColony.yes", "nameColony.no", true);

@@ -382,11 +382,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 if (settlement == null) {
                     UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
                         .getObject();
-                    String name = nativePlayer.getSettlementName();
-                    if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
-                        nativePlayer.installSettlementNames(Messages.getSettlementNames(nativePlayer), null);
-                        name = nativePlayer.getSettlementName();
-                    }
+                    String name = nativePlayer.getSettlementName(null);
                     settlement = new ServerIndianSettlement(t.getGame(), nativePlayer, name, t, false,
                                                       skill, new HashSet<Player>(), null);
                     nativePlayer.addSettlement(settlement);

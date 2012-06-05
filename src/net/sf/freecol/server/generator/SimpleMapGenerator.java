@@ -638,17 +638,11 @@ public class SimpleMapGenerator implements MapGenerator {
      * @return The <code>IndianSettlement</code> just being placed
      *      on the map.
      */
-    private IndianSettlement placeIndianSettlement(Player player, boolean capital,
-                                       Position position, Map map) {
+    private IndianSettlement placeIndianSettlement(Player player,
+        boolean capital, Position position, Map map) {
         final Tile tile = map.getTile(position);
-        String name = (capital) ? player.getCapitalName()
-            : player.getSettlementName();
-        if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
-            player.installSettlementNames(Messages.getSettlementNames(player),
-                                          random);
-            name = (capital) ? player.getCapitalName()
-                : player.getSettlementName();
-        }
+        String name = (capital) ? player.getCapitalName(random)
+            : player.getSettlementName(random);
         UnitType skill
             = generateSkillForLocation(map, tile, player.getNationType());
         IndianSettlement settlement

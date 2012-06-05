@@ -838,46 +838,49 @@ public class Player extends FreeColGameObject implements Nameable {
      * Installs suitable settlement names (and the capital if native)
      * into the player name cache.
      *
-     * @param names A list of settlement names with the fallback prefix first.
-     * @param random A <code>Random</code> number source.
+     * @param random An optional pseudo-random number source.
      */
-    public void installSettlementNames(List<String> names, Random random) {
+    private void initializeSettlementNames(Random random) {
         if (settlementNames == null) {
             settlementNames = new ArrayList<String>();
-            settlementNames.addAll(names);
+            settlementNames.addAll(Messages.getSettlementNames(this));
             settlementFallback = settlementNames.remove(0);
             if (isIndian()) {
                 capitalName = settlementNames.remove(0);
                 if (random != null) {
                     Collections.shuffle(settlementNames, random);
                 }
+            } else {
+                capitalName = null;
             }
+            logger.info("Installed " + settlementNames.size()
+                + " settlement names for player " + this);
         }
-        logger.info("Installed " + names.size()
-                    + " settlement names for player " + this.toString());
     }
 
     /**
      * Gets the name of this players capital.  Only meaningful to natives.
      *
+     * @param random An optional pseudo-random number source.
      * @return The name of this players capital.
      */
-    public String getCapitalName() {
-        return (capitalName == null) ? ASSIGN_SETTLEMENT_NAME : capitalName;
+    public String getCapitalName(Random random) {
+        if (isEuropean()) return null;
+        if (capitalName == null) initializeSettlementNames(random);
+        return capitalName;
     }
 
     /**
      * Gets a settlement name suitable for this player.
      *
+     * @param random An optional pseudo-random number source.
      * @return A new settlement name.
      */
-    public String getSettlementName() {
+    public String getSettlementName(Random random) {
         Game game = getGame();
+        if (settlementNames == null) initializeSettlementNames(random);
 
-        // ASSIGN_SETTLEMENT_NAME can be sent with buildColony and a
-        // default name will be filled in.
-        if (settlementNames == null) return ASSIGN_SETTLEMENT_NAME;
-
+        // Try the names in the players national name list.
         while (!settlementNames.isEmpty()) {
             String name = settlementNames.remove(0);
             if (game.getSettlement(name) == null) return name;

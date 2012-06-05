@@ -2780,13 +2780,7 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         Settlement settlement;
         if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
-            name = serverPlayer.getSettlementName();
-            if (Player.ASSIGN_SETTLEMENT_NAME.equals(name)) {
-                // Load settlement names on demand.
-                serverPlayer.installSettlementNames(Messages
-                        .getSettlementNames(serverPlayer), random);
-                name = serverPlayer.getSettlementName();
-            }
+            name = serverPlayer.getSettlementName(random);
         }
         if (serverPlayer.isEuropean()) {
             settlement = new ServerColony(game, serverPlayer, name, tile);
