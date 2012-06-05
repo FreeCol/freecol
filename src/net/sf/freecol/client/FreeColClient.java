@@ -113,7 +113,7 @@ public final class FreeColClient {
 
     private boolean mapEditor;
 
-    private boolean singleplayer;
+    private boolean singlePlayer;
 
     private final ActionManager actionManager;
 
@@ -485,14 +485,14 @@ public final class FreeColClient {
 
 
     /**
-     * Is the user playing in singleplayer mode.
+     * Is the user playing in single player mode.
      *
-     * @return <i>true</i> if the user is playing in singleplayer mode and
+     * @return <i>true</i> if the user is playing in single player mode and
      *         <i>false</i> otherwise.
-     * @see #setSingleplayer
+     * @see #setSinglePlayer
      */
-    public boolean isSingleplayer() {
-        return singleplayer;
+    public boolean isSinglePlayer() {
+        return singlePlayer;
     }
 
     /**
@@ -522,7 +522,7 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().quitGame(isSingleplayer());
+        getConnectController().quitGame(isSinglePlayer());
         exitActions();
         gui.quit();
         System.exit(0);
@@ -632,14 +632,14 @@ public final class FreeColClient {
     }
     
     /**
-     * Sets whether or not this game is a singleplayer game.
+     * Sets whether or not this game is a single player game.
      *
-     * @param singleplayer Indicates whether or not this game is a singleplayer
-     *            game.
-     * @see #isSingleplayer
+     * @param singlePlayer Indicates whether or not this game is a
+     *     single player game.
+     * @see #isSinglePlayer
      */
-    public void setSingleplayer(boolean singleplayer) {
-        this.singleplayer = singleplayer;
+    public void setSinglePlayer(boolean singlePlayer) {
+        this.singlePlayer = singlePlayer;
     }
     
     /**

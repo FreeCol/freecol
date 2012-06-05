@@ -3651,7 +3651,7 @@ public final class InGameController implements NetworkConstants {
            }
 
            // GUI management.
-           if (!freeColClient.isSingleplayer()) {
+           if (!freeColClient.isSinglePlayer()) {
                gui.playSound("sound.anthem." + player.getNationID());
            }
            displayModelMessages(true, true);

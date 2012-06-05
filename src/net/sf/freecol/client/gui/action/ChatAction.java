@@ -51,7 +51,7 @@ public class ChatAction extends FreeColAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && !getFreeColClient().isSingleplayer()
+            && !getFreeColClient().isSinglePlayer()
             && (!gui.isShowingSubPanel() || getFreeColClient().getGame() != null
                 && !getFreeColClient().currentPlayerIsMyPlayer());
     }

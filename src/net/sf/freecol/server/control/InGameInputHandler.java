@@ -696,7 +696,7 @@ public final class InGameInputHandler extends InputHandler
         Element reply = null;
         player.setConnected(false);
         if (getFreeColServer().getGame().getCurrentPlayer() == player
-                && !getFreeColServer().isSingleplayer()) {
+                && !getFreeColServer().isSinglePlayer()) {
             reply = getFreeColServer().getInGameController().endTurn(player);
         }
         try {

@@ -394,7 +394,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
-        if (getAIMain().getFreeColServer().isSingleplayer()
+        if (getAIMain().getFreeColServer().isSinglePlayer()
             && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = spec.getUnitTypeList();

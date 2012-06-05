@@ -181,14 +181,14 @@ public final class ConnectController {
     }
 
     /**
-     * Starts a new singleplayer game by connecting to the server.
+     * Starts a new single player game by connecting to the server.
      * TODO: connect client/server directly (not using network-classes)
      *
      * @param specification The <code>Specification</code> for the game.
      * @param userName The name to use when logging in.
      * @param advantages The national <code>Advantages</code>.
      */
-    public void startSingleplayerGame(Specification specification,
+    public void startSinglePlayerGame(Specification specification,
                                       String userName, Advantages advantages) {
         freeColClient.setMapEditor(false);
 
@@ -218,7 +218,7 @@ public final class ConnectController {
             FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
         }
         freeColClient.setFreeColServer(freeColServer);
-        freeColClient.setSingleplayer(true);
+        freeColClient.setSinglePlayer(true);
         if (login(userName, "127.0.0.1", freeColServer.getPort())) {
             freeColClient.getPreGameController().setReady(true);
             gui.showStartGamePanel(freeColClient.getGame(),
@@ -247,7 +247,7 @@ public final class ConnectController {
             userName = choice;
         }
 
-        freeColClient.setSingleplayer(false);
+        freeColClient.setSinglePlayer(false);
         if (login(userName, host, port) && !freeColClient.isInGame()) {
             gui.showStartGamePanel(freeColClient.getGame(),
                                    freeColClient.getMyPlayer(), false);
@@ -338,8 +338,9 @@ public final class ConnectController {
 
         // Reconnect
         if (msg.getStartGame()) {
-            Tile entryTile = player.getEntryLocation().getTile();
-            freeColClient.setSingleplayer(msg.isSinglePlayer());
+            Tile entryTile = (player.getEntryLocation() == null) ? null
+                : player.getEntryLocation().getTile();
+            freeColClient.setSinglePlayer(msg.isSinglePlayer());
             freeColClient.getPreGameController().startGame();
 
             if (msg.isCurrentPlayer()) {
@@ -354,7 +355,7 @@ public final class ConnectController {
                     gui.setSelectedTile(entryTile, false);
                 }
             } else {
-                gui.setSelectedTile(player.getEntryLocation().getTile(), false);
+                gui.setSelectedTile(entryTile, false);
             }
         }
 
@@ -410,12 +411,12 @@ public final class ConnectController {
             }
         }
 
-        final boolean singleplayer;
+        final boolean singlePlayer;
         final String name;
         final int port;
         XMLStream xs = null;
         try {
-            // Get suggestions for "singleplayer" and "publicServer"
+            // Get suggestions for "singlePlayer" and "publicServer"
             // settings from the file
             final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
             xs = new XMLStream(fis.getSavegameInputStream());
@@ -447,14 +448,14 @@ public final class ConnectController {
                 if (gui.showLoadingSavegameDialog(defaultPublicServer,
                                                   defaultSinglePlayer)) {
                     LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
-                    singleplayer = lsd.isSingleplayer();
+                    singlePlayer = lsd.isSinglePlayer();
                     name = lsd.getName();
                     port = lsd.getPort();
                 } else {
                     return;
                 }
             } else {
-                singleplayer = defaultSinglePlayer;
+                singlePlayer = defaultSinglePlayer;
                 name = null;
                 port = -1;
             }
@@ -494,7 +495,7 @@ public final class ConnectController {
                     freeColClient.setFreeColServer(freeColServer);
                     final String userName = freeColServer.getOwner();
                     final int port = freeColServer.getPort();
-                    freeColClient.setSingleplayer(singleplayer);
+                    freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {

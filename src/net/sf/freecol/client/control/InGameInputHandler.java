@@ -516,12 +516,12 @@ public final class InGameInputHandler extends InputHandler {
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
             if (FreeCol.tryCompleteDebugRun(freeColClient)) freeColClient.quit();
-            if (freeColClient.isSingleplayer()) {
+            if (freeColClient.isSinglePlayer()) {
                 if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
                     && new ShowConfirmDialogSwingTask(null,
-                        StringTemplate.key("defeatedSingleplayer.text"),
-                        "defeatedSingleplayer.yes",
-                        "defeatedSingleplayer.no").confirm()) {
+                        StringTemplate.key("defeatedSinglePlayer.text"),
+                        "defeatedSinglePlayer.yes",
+                        "defeatedSinglePlayer.no").confirm()) {
                     freeColClient.askServer().enterRevengeMode();
                 } else {
                     freeColClient.quit();

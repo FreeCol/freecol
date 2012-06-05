@@ -736,8 +736,8 @@ public class GUI {
         return canvas.showLoadDialog(directory, fileFilters);
     }
 
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
-        return canvas.showLoadingSavegameDialog(publicServer, singleplayer);
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singlePlayer) {
+        return canvas.showLoadingSavegameDialog(publicServer, singlePlayer);
     }
 
 

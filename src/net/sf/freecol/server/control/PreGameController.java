@@ -74,7 +74,7 @@ public final class PreGameController extends Controller {
     }
 
     /**
-     * Updates and starts the game.
+     * Updates and starts the new game.
      *
      * This method performs these tasks in the given order:
      *
@@ -127,7 +127,7 @@ public final class PreGameController extends Controller {
         // Initial stances and randomizations for all players.
         Random random = getFreeColServer().getServerRandom();
         for (Player player : game.getPlayers()) {
-            ((ServerPlayer) player).startGame(random);
+            ((ServerPlayer)player).startGame(random);
             if (player.isIndian()) {
                 // Indian players know about each other, but European colonial
                 // players do not.

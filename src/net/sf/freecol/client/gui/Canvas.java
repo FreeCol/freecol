@@ -797,7 +797,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showChatPanel() {
         // TODO: does it have state, or can we create a new one?
-        if (freeColClient.isSingleplayer()) {
+        if (freeColClient.isSinglePlayer()) {
             return; // In single player, no chat available
         }
         showSubPanel(chatPanel);
@@ -1338,12 +1338,12 @@ public final class Canvas extends JDesktopPane {
      * after calling this method.
      *
      * @param publicServer Default value.
-     * @param singleplayer Default value.
+     * @param singlePlayer Default value.
      * @return <code>true</code> if the "ok"-button was pressed and
      *         <code>false</code> otherwise.
      */
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
-        loadingSavegameDialog.initialize(publicServer, singleplayer);
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singlePlayer) {
+        loadingSavegameDialog.initialize(publicServer, singlePlayer);
         return showFreeColDialog(loadingSavegameDialog, null);
     }
 

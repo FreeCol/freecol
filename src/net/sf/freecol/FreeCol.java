@@ -975,7 +975,7 @@ public final class FreeCol {
             if (savegameFile != null) {
                 XMLStream xs = null;
                 try {
-                    // Get suggestions for "singleplayer" and "public
+                    // Get suggestions for "singlePlayer" and "public
                     // game" settings from the file:
                     final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
                     xs = FreeColServer.createXMLStreamReader(fis);

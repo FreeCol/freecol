@@ -488,7 +488,7 @@ public final class InGameController extends Controller {
             });
         DOMMessage reply;
         try {
-            boolean single = getFreeColServer().isSingleplayer();
+            boolean single = getFreeColServer().isSinglePlayer();
             reply = future.get(FreeCol.getFreeColTimeout(single),
                                TimeUnit.SECONDS);
         } catch (TimeoutException te) {
@@ -668,7 +668,7 @@ public final class InGameController extends Controller {
             // that would stop revenge mode.
             Player winner = game.checkForWinner();
             if (winner != null
-                && !(freeColServer.isSingleplayer() && winner.isAI())) {
+                && !(freeColServer.isSinglePlayer() && winner.isAI())) {
                 ChangeSet cs = new ChangeSet();
                 cs.addTrivial(See.all(), "gameEnded",
                               ChangePriority.CHANGE_NORMAL,
@@ -812,7 +812,7 @@ public final class InGameController extends Controller {
             sendToList(getOtherPlayers(serverPlayer, (ServerPlayer)player), cs);
             sendElement((ServerPlayer)player, cs);
             if (!player.isAI()
-                && freeColServer.isSingleplayer()
+                && freeColServer.isSinglePlayer()
                 && debugOnlyAITurns > 0) {
                 continue;
             }
@@ -1164,7 +1164,7 @@ public final class InGameController extends Controller {
     public Element continuePlaying(ServerPlayer serverPlayer) {
         ServerGame game = (ServerGame) getGame();
         Element reply = null;
-        if (!getFreeColServer().isSingleplayer()) {
+        if (!getFreeColServer().isSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
         } else if (serverPlayer != game.checkForWinner()) {
             logger.warning("Can not continue playing, as "
@@ -3863,7 +3863,7 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element enterRevengeMode(ServerPlayer serverPlayer) {
-        if (!getFreeColServer().isSingleplayer()) {
+        if (!getFreeColServer().isSinglePlayer()) {
             return DOMMessage.clientError("Can not enter revenge mode,"
                 + " as this is not a single player game.");
         }

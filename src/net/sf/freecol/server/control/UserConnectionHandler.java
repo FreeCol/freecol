@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
@@ -129,11 +130,53 @@ public final class UserConnectionHandler implements MessageHandler {
                 version + " != " + FreeCol.getVersion());
         }
 
-        Game game = freeColServer.getGame();
+        Game game;
+        ServerPlayer player;
         Server server = freeColServer.getServer();
-        if (freeColServer.getGameState()
-            != FreeColServer.GameState.STARTING_GAME) {
-            ServerPlayer player = (ServerPlayer)game.getPlayerByName(userName);
+        Unit active = null;
+        boolean isCurrentPlayer = false;
+        MessageHandler mh;
+        boolean starting = freeColServer.getGameState()
+            == FreeColServer.GameState.STARTING_GAME;
+        if (starting) {
+            // Wait until the game has been created.
+            // TODO: is this still needed?
+            int timeOut = 20000;
+            while (freeColServer.getGame() == null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {}
+                if ((timeOut -= 1000) <= 0) {
+                    return DOMMessage.createError("server.timeOut", null);
+                }
+            }
+
+            game = freeColServer.getGame();
+            if (!game.canAddNewPlayer()) {
+                return DOMMessage.createError("server.maximumPlayers", null);
+            } else if (game.playerNameInUse(userName)) {
+                return DOMMessage.createError("server.userNameInUse",
+                    userName + " is already in use.");
+            }
+
+            // Create and add the new player:
+            boolean admin = game.getPlayers().size() == 0;
+            player = new ServerPlayer(game, userName, admin,
+                                      game.getVacantNation(),
+                                      connection.getSocket(), connection);
+            game.addPlayer(player);
+
+            // Send message to all players except to the new player:
+            Element add = DOMMessage.createMessage("addPlayer");
+            add.appendChild(player.toXMLElement(null, add.getOwnerDocument()));
+            server.sendToAll(add, connection);
+
+            // Ready now to handle pre-game messages.
+            mh = freeColServer.getPreGameInputHandler();
+
+        } else { // Restoring from existing game.
+            game = freeColServer.getGame();
+            player = (ServerPlayer)game.getPlayerByName(userName);
             if (player == null) {
                 return DOMMessage.createError("server.alreadyStarted", null);
             } else if (player.isConnected() && !player.isAI()) {
@@ -152,67 +195,27 @@ public final class UserConnectionHandler implements MessageHandler {
 
             // If this player is the first to reconnect, it is the
             // current player.
-            boolean isCurrentPlayer = game.getCurrentPlayer() == null;
-            if (isCurrentPlayer) game.setCurrentPlayer(player);
-
-            connection.setMessageHandler(freeColServer.getInGameInputHandler());
-            server.addConnection(connection);
-
-            try {
-                freeColServer.updateMetaServer();
-            } catch (NoRouteToServerException e) {}
-
-            return new LoginMessage(player, userName, version,
-                true, freeColServer.isSingleplayer(), isCurrentPlayer,
-                ((isCurrentPlayer) ? freeColServer.getActiveUnit() : null),
-                freeColServer.getGame()).toXMLElement();
-        }
-
-        // TODO: is this still needed?
-        int timeOut = 20000; // Wait until the game has been created:
-        while (freeColServer.getGame() == null) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-
-            timeOut -= 1000;
-
-            if (timeOut <= 0) {
-                return DOMMessage.createError("server.timeOut", null);
+            isCurrentPlayer = game.getCurrentPlayer() == null;
+            if (isCurrentPlayer) {
+                game.setCurrentPlayer(player);
+                active = freeColServer.getActiveUnit();
             }
+
+            // Go straight into the game.
+            mh = freeColServer.getInGameInputHandler();
         }
 
-        if (!game.canAddNewPlayer()) {
-            return DOMMessage.createError("server.maximumPlayers", null);
-        } else if (game.playerNameInUse(userName)) {
-            return DOMMessage.createError("server.userNameInUse",
-                userName + " is already in use.");
-        }
-
-        // Create and add the new player:
-        boolean admin = game.getPlayers().size() == 0;
-        ServerPlayer newPlayer
-            = new ServerPlayer(game, userName, admin, game.getVacantNation(),
-                               connection.getSocket(), connection);
-        freeColServer.getGame().addPlayer(newPlayer);
-
-        // Send message to all players except to the new player:
-        Element add = DOMMessage.createMessage("addPlayer");
-        add.appendChild(newPlayer.toXMLElement(null, add.getOwnerDocument()));
-        freeColServer.getServer().sendToAll(add, connection);
-
-        connection.setMessageHandler(freeColServer.getPreGameInputHandler());
+        connection.setMessageHandler(mh);
         server.addConnection(connection);
         try {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {
             logger.log(Level.WARNING, "Unable to update meta-server.", e);
         }
-
-        return new LoginMessage(newPlayer, userName, version,
-            false, freeColServer.isSingleplayer(), false,
-            null,
-            game).toXMLElement();
+        return new LoginMessage(player, userName, version, !starting,
+                                freeColServer.isSinglePlayer(),
+                                isCurrentPlayer, active,
+                                game).toXMLElement();
     }
 
     /**

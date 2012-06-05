@@ -76,11 +76,11 @@ public final class ServerTestHelper {
         return startServer(publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
     }
 
-    public static FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) {
+    public static FreeColServer startServer(boolean publicServer, boolean singlePlayer, int port, String name) {
         stopServer(server);
         try {
             // TODO: fixme! Pass tc
-            server = new FreeColServer(FreeColTestCase.spec(), publicServer, singleplayer, port, name);
+            server = new FreeColServer(FreeColTestCase.spec(), publicServer, singlePlayer, port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (IOException e) {
@@ -91,11 +91,11 @@ public final class ServerTestHelper {
         return server;
     }
 
-    public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer) {
-        return startServer(file, publicServer, singleplayer, SERVER_PORT, SERVER_NAME);
+    public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer) {
+        return startServer(file, publicServer, singlePlayer, SERVER_PORT, SERVER_NAME);
     }
 
-    public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name) {
+    public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer, int port, String name) {
         stopServer(server);
         try {
             server = new FreeColServer(new FreeColSavegameFile(file), port, name);

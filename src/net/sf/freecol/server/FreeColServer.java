@@ -171,7 +171,7 @@ public final class FreeColServer {
 
     private MapGenerator mapGenerator;
 
-    private boolean singleplayer;
+    private boolean singlePlayer;
 
     // The username of the player owning this server.
     private String owner;
@@ -255,7 +255,7 @@ public final class FreeColServer {
      * @param publicServer This value should be set to <code>true</code> in
      *            order to appear on the meta server's listing.
      *
-     * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
+     * @param singlePlayer Sets the game as single player (if <i>true</i>) or
      *            multiplayer (if <i>false</i>).
      *
      * @param port The TCP port to use for the public socket. That is the port
@@ -269,19 +269,19 @@ public final class FreeColServer {
      *
      */
     public FreeColServer(Specification specification, boolean publicServer,
-                         boolean singleplayer, int port, String name)
+                         boolean singlePlayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(specification, publicServer, singleplayer, port, name,
+        this(specification, publicServer, singlePlayer, port, name,
              Advantages.SELECTABLE);
     }
 
     public FreeColServer(Specification specification, boolean publicServer,
-                         boolean singleplayer, int port, String name,
+                         boolean singlePlayer, int port, String name,
                          Advantages advantages)
         throws IOException, NoRouteToServerException {
 
         this.publicServer = publicServer;
-        this.singleplayer = singleplayer;
+        this.singlePlayer = singlePlayer;
         this.port = port;
         this.name = name;
         this.random = new Random(FreeCol.getFreeColSeed());
@@ -363,7 +363,7 @@ public final class FreeColServer {
         server = serverStart(port);
 
         try {
-            loadGame(savegame, specification);
+            this.game = loadGame(savegame, specification);
         } catch (FreeColException e) {
             server.shutdown();
             throw e;
@@ -394,23 +394,23 @@ public final class FreeColServer {
     }
 
     /**
-     * Sets the mode of the game: singleplayer/multiplayer.
+     * Sets the mode of the game: single/multiplayer.
      *
-     * @param singleplayer Sets the game as singleplayer (if <i>true</i>) or
+     * @param singleplayer Sets the game as single player (if <i>true</i>) or
      *            multiplayer (if <i>false</i>).
      */
-    public void setSingleplayer(boolean singleplayer) {
-        this.singleplayer = singleplayer;
+    public void setSinglePlayer(boolean singlePlayer) {
+        this.singlePlayer = singlePlayer;
     }
 
     /**
-     * Checks if the user is playing in singleplayer mode.
+     * Checks if the user is playing in single player mode.
      *
-     * @return <i>true</i> if the user is playing in singleplayer mode,
+     * @return <i>true</i> if the user is playing in single player mode,
      *         <i>false</i> otherwise.
      */
-    public boolean isSingleplayer() {
-        return singleplayer;
+    public boolean isSinglePlayer() {
+        return singlePlayer;
     }
 
     /**
@@ -857,7 +857,7 @@ public final class FreeColServer {
             // Add the attributes:
             xsw.writeAttribute("owner", username);
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
-            xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
+            xsw.writeAttribute("singleplayer", Boolean.toString(singlePlayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
             xsw.writeAttribute("randomState", Utils.getRandomState(random));
             if (getActiveUnit() != null) {
@@ -905,7 +905,8 @@ public final class FreeColServer {
      *                <code>XMLStreamException</code> have been thrown by the
      *                parser.
      */
-    public static XMLStream createXMLStreamReader(FreeColSavegameFile fis) throws IOException {
+    public static XMLStream createXMLStreamReader(FreeColSavegameFile fis)
+        throws IOException {
         return new XMLStream(fis.getSavegameInputStream());
     }
 
@@ -921,7 +922,7 @@ public final class FreeColServer {
      *                parser.
      * @exception FreeColException if the savegame contains incompatible data.
      */
-    public Game loadGame(final FreeColSavegameFile fis)
+    public ServerGame loadGame(final FreeColSavegameFile fis)
         throws IOException, FreeColException {
         return loadGame(fis, null);
     }
@@ -945,8 +946,8 @@ public final class FreeColServer {
         final int savegameVersion = getSavegameVersion(fis);
         ArrayList<String> serverStrings = null;
         XMLStream xs = null;
+        ServerGame game = null;
         try {
-            ServerGame game = null;
             String active = null;
             xs = createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
@@ -955,7 +956,7 @@ public final class FreeColServer {
             logger.info("Found savegame version " + savegameVersion);
 
             if (server != null) {
-                server.setSingleplayer(FreeColObject.getAttribute(xsr,
+                server.setSinglePlayer(FreeColObject.getAttribute(xsr,
                         "singleplayer", true));
                 server.setPublicServer(FreeColObject.getAttribute(xsr,
                         "publicServer", false));
@@ -1015,12 +1016,12 @@ public final class FreeColServer {
                 Unit u = game.getFreeColGameObject(active, Unit.class);
                 server.setActiveUnit(u);
             }
-            return game;
         } catch (Exception e) {
             throw new IOException("Exception: " + e.getMessage());
         } finally {
             if (xs != null) xs.close();
         }
+        return game;
     }
 
     /**
@@ -1032,8 +1033,8 @@ public final class FreeColServer {
      * @exception FreeColException if the savegame contains incompatible data.
      * @exception IOException if there is problem reading a stream.
      */
-    public Game loadGame(final FreeColSavegameFile fis,
-                         Specification specification)
+    public ServerGame loadGame(final FreeColSavegameFile fis,
+                               Specification specification)
         throws FreeColException, IOException {
 
         ServerGame game = readGame(fis, specification, this);
@@ -1062,7 +1063,7 @@ public final class FreeColServer {
                             logger.info("Found unit on way to new world: "
                                 + u.toString());
                             u.setLocation(p.getHighSeas());
-                            u.setDestination(getGame().getMap());
+                            u.setDestination(game.getMap());
                         }
                     }
                 }

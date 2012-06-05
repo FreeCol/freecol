@@ -298,7 +298,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     if (level != null) {
                         getSpecification().applyDifficultyLevel(level);
                         advantages = (Advantages) nationalAdvantages.getSelectedItem();
-                        connectController.startSingleplayerGame(getSpecification(), name.getText(), advantages);
+                        connectController.startSinglePlayerGame(getSpecification(), name.getText(), advantages);
                     }
                     break;
                 case JOIN:

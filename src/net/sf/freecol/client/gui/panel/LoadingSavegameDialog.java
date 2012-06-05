@@ -54,7 +54,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
     private JLabel header;
 
-    private JRadioButton singleplayer;
+    private JRadioButton singlePlayer;
 
     private JRadioButton privateMultiplayer;
 
@@ -102,9 +102,9 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         panel.add(portField);
 
         ButtonGroup bg = new ButtonGroup();
-        singleplayer = new JRadioButton(Messages.message("LoadingSavegame.singleplayer"));
-        bg.add(singleplayer);
-        panel.add(singleplayer);
+        singlePlayer = new JRadioButton(Messages.message("LoadingSavegame.singlePlayer"));
+        bg.add(singlePlayer);
+        panel.add(singlePlayer);
         privateMultiplayer = new JRadioButton(Messages.message("LoadingSavegame.privateMultiplayer"));
         bg.add(privateMultiplayer);
         panel.add(privateMultiplayer);
@@ -123,8 +123,8 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
     }
 
 
-    public boolean isSingleplayer() {
-        return singleplayer.isSelected();
+    public boolean isSinglePlayer() {
+        return singlePlayer.isSelected();
     }
 
     public boolean isPublic() {
@@ -140,14 +140,14 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         return serverNameField.getName();
     }
 
-    public void initialize(boolean publicServer, boolean singleplayer) {
+    public void initialize(boolean publicServer, boolean singlePlayer) {
 
-        this.singleplayer.setSelected(false);
+        this.singlePlayer.setSelected(false);
         this.privateMultiplayer.setSelected(false);
         this.publicMultiplayer.setSelected(false);
 
-        if (singleplayer) {
-            this.singleplayer.setSelected(true);
+        if (singlePlayer) {
+            this.singlePlayer.setSelected(true);
         } else if (publicServer) {
             this.publicMultiplayer.setSelected(true);
         } else {

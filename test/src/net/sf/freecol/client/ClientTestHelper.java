@@ -34,7 +34,7 @@ public class ClientTestHelper {
         FreeColClient client = new FreeColClient(null, null, false, null, false, null);
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
-        client.setSingleplayer(true);
+        client.setSinglePlayer(true);
         client.setHeadless(true);
         boolean connected = connectController.login(username, "127.0.0.1",
                                                     freeColServer.getPort());
