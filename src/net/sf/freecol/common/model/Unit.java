@@ -3131,6 +3131,16 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Is this unit at a specified location?
+     *
+     * @param loc The <code>Location</code> to test.
+     * @return True if the locations are the same, or on the same tile.
+     */
+    public boolean isAtLocation(Location loc) {
+        return Map.isSameLocation(getLocation(), loc);
+    }
+
+    /**
      * Returns the amount of space left on this Unit.
      *
      * @return The amount of units/goods than can be moved onto this Unit.

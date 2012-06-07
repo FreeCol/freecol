@@ -118,12 +118,7 @@ public class EmbarkMessage extends DOMMessage {
             // Locations must be the same, or the source is also a
             // carrier in the same location as the carrier, or they
             // must be on the same tile.
-            if (sourceLocation == carrier.getLocation()
-                || ((sourceLocation instanceof Unit)
-                    && ((Unit) sourceLocation).getLocation()
-                    == carrier.getLocation())
-                || (sourceLocation.getTile() != null
-                    && sourceLocation.getTile() == carrier.getTile())) {
+            if (carrier.isAtLocation(sourceLocation)) {
                 direction = null;
             } else {
                 return DOMMessage.clientError("Unit " + unitId

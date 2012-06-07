@@ -1703,6 +1703,22 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
+    /**
+     * Are two locations non-null and either the same or at the same tile.
+     * This routine is here because Location is an interface.
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if this location is the same or at the same tile.
+     */
+    public static final boolean isSameLocation(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null) ? false
+            : l1.getTile() == l2.getTile();
+    }
+
+
     // Location interface
 
     /**
@@ -1862,6 +1878,8 @@ public class Map extends FreeColGameObject implements Location {
         return null;
     }
 
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
