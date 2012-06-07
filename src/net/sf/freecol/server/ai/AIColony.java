@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
@@ -524,7 +525,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     && !g.isBuildingMaterial()
                     && !g.isMilitaryGoods()
                     && !g.isTradeGoods()) {
-                    if (g.isRawMaterial() && produce.contains(g)) {
+                    if (g.isRawMaterial()) {
                         partExport.add(g);
                     } else {
                         fullExport.add(g);
@@ -753,7 +754,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Goods goods = (ag == null) ? null : ag.getGoods();
         int amount = (goods == null) ? -1 : goods.getAmount();
         String type = (goods == null) ? "(null)"
-            : ag.getGoods().getType().toString().substring(12);
+            : Utils.lastPart(ag.getGoods().getType().getId(), ".");
         logger.finest(String.format("%-20s %-10s %s %s %s",
                 colony.getName(), action,
                 ((ag == null) ? "(null)" : ag.getId()),
