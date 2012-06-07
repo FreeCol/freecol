@@ -259,8 +259,10 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void abortMission(String why) {
         if (mission != null) {
-            logger.finest("Mission-ABORT " + mission + " (" + why + "): "
-                + getUnit());
+            if (!mission.isOneTime()) {
+                logger.fine("Mission-ABORT " + mission + " (" + why + "): "
+                    + getUnit());
+            }
             mission.dispose();
             this.mission = null;
         }
@@ -274,13 +276,19 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void setMission(Mission mission) {
         final Mission oldMission = this.mission;
-        if (oldMission != null) {
+        if (oldMission == null) {
+            if (!mission.isOneTime()) {
+                logger.fine("Replacing null mission with " + mission);
+            }
+        } else {
             String reason = oldMission.invalidReason();
             reason = (reason != null) ? "(" + reason + ")"
                 : (oldMission.isOneTime()) ? "(oneTime)"
                 : "(forced)";
-            logger.finest("Replacing " + reason + " old mission "
-                + oldMission + " with " + mission + ": " + getUnit());
+            if (!(oldMission.isOneTime() && mission.isOneTime())) {
+                logger.fine("Replacing " + reason + " old mission "
+                    + oldMission + " with " + mission);
+            }
             oldMission.dispose();
         }
         this.mission = mission;
@@ -552,7 +560,7 @@ public class AIUnit extends AIObject implements Transportable {
                 mission.toXML(out);
             } else {
                 logger.warning("AI unit with " + mission.invalidReason()
-                    + " mission " + mission + ": " + getUnit());
+                    + " mission " + mission);
             }
         }
 

@@ -531,6 +531,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Location loc;
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
+            Mission m = aiUnit.getMission();
 
             String reason = null;
             if (unit.isUninitialized()) {
@@ -545,12 +546,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                 reason = "(unit vital to colony)";
             }
             if (reason != null) {
-                logger.finest("Mission-Ignored " + reason + ": " + unit);
+                logger.finest("Mission-Ignored " + reason + ": " + m);
                 continue;
             }
 
             // Check the current mission, and assign a new one to m if needed.
-            Mission m = aiUnit.getMission();
             if (m != null && m.isValid() && !m.isOneTime()) {
                 m = null;
 
@@ -601,11 +601,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
             }
             if (m != null) {
-                logger.finest("Mission-New " + m + ": " + unit);
+                if (!m.isOneTime()) logger.fine("Mission-New " + m);
                 aiUnit.setMission(m);
             } else {
-                logger.finest("Mission-Continues " + aiUnit.getMission()
-                    + ": " + unit);
+                logger.finest("Mission-Continues " + aiUnit.getMission());
             }
 
             // If a unit is on a carrier, make sure the carrier always has a
@@ -979,8 +978,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 continue;
             } else if (bestTransport.addToTransportList(t)) {
                 logger.finest("Transport found for: " + t
-                    + " using: " + bestTransport
-                    + "  unit: " + bestTransport.getUnit());
+                    + " using: " + bestTransport);
             } else {
                 logger.finest("Transport failed for: " + t
                     + " using: " + bestTransport);
@@ -999,7 +997,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public void startWorking() {
         Turn turn = getGame().getTurn();
         logger.finest(getClass().getName() + " in " + turn
-            + ": " + getPlayer().getNationID());
+            + ": " + Utils.lastPart(getPlayer().getNationID(), "."));
         sessionRegister.clear();
         clearAIUnits();
         cheat();

@@ -447,7 +447,9 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
             if (m != null) {
-                logger.finest("Mission-New " + m + ": " + unit);
+                if (!m.isOneTime()) {
+                    logger.fine("Mission-New " + m + ": " + unit);
+                }
                 aiUnit.setMission(m);
             } else {
                 logger.finest("Mission-Continues " + aiUnit.getMission()

@@ -1080,8 +1080,8 @@ public abstract class Mission extends AIObject {
     public String toString() {
         return Utils.lastPart(getClass().getName(), ".")
             + "@" + Integer.toString(hashCode())
-            + ((aiUnit == null) ? "aiUnit-null"
-                : (getUnit() == null) ? "unit-null"
+            + ((aiUnit == null) ? "-aiUnit-null"
+                : (getUnit() == null) ? "-unit-null"
                 : getUnit().toString());
     }
 }
