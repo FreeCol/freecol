@@ -2804,7 +2804,12 @@ public final class InGameController extends Controller {
                                                     null);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);
-            // TODO: its lame that the settlement starts with no contacts
+            for (Player p : getGame().getPlayers()) {
+                if ((ServerPlayer)p == serverPlayer) continue;
+                ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
+                    ? new Tension(Tension.Level.CONTENT.getLimit())
+                    : serverPlayer.getTension(p));
+            }
         }
 
         // Join.  Remove equipment first in case role confuses placement.
