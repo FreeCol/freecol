@@ -29,6 +29,13 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -45,7 +52,7 @@ import net.sf.freecol.common.option.OptionGroup;
  *
  * @see OptionGroup
  */
-public final class DifficultyDialog extends OptionsDialog implements ItemListener {
+public final class DifficultyDialog extends OptionsDialog implements TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
@@ -57,20 +64,13 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     private String DEFAULT_LEVEL = "model.difficulty.medium";
     private String CUSTOM_LEVEL = "model.difficulty.custom";
 
+    private OptionGroup selected;
+
     /**
      * We need our own copy of the specification, as the dialog is
      * used before the game has been started.
      */
     private Specification specification;
-
-    private final JComboBox difficultyBox = new JComboBox();
-
-
-    private class BoxRenderer extends FreeColComboBoxRenderer {
-        public void setLabelValues(JLabel c, Object value) {
-            c.setText(Messages.message((String) value));
-        }
-    }
 
 
     /**
@@ -84,15 +84,11 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      */
     public DifficultyDialog(FreeColClient freeColClient, GUI gui,
                             OptionGroup level) {
-        super(freeColClient, gui, false);
-        difficultyBox.setRenderer(new BoxRenderer());
+        super(freeColClient, gui, true);
         specification = getSpecification();
-
-        difficultyBox.addItem(level.getId());
-        difficultyBox.setEnabled(false);
-
-        initialize(level, Messages.message("difficulty"), difficultyBox);
-
+        selected = level;
+        initialize(level, Messages.message("difficulty"), null);
+        getOptionUI().getTree().addTreeSelectionListener(this);
     }
 
     /**
@@ -107,45 +103,31 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
     public DifficultyDialog(FreeColClient freeColClient, GUI gui,
                             Specification specification) {
         super(freeColClient, gui, true);
-        difficultyBox.setRenderer(new BoxRenderer());
         this.specification = specification;
 
         boolean customized = loadCustomOptions();
 
-        OptionGroup group = specification.getDifficultyLevel(customized ? CUSTOM_LEVEL : DEFAULT_LEVEL);
-        if (group == null) {
+        OptionGroup group = specification.getOptionGroup("difficultyLevels");
+        selected = specification.getDifficultyLevel(customized ? CUSTOM_LEVEL : DEFAULT_LEVEL);
+        if (selected == null) {
             // this really should not happen
-            group = specification.getDifficultyLevels().get(0);
+            selected = specification.getDifficultyLevels().get(0);
         }
-
-        for (OptionGroup level : specification.getDifficultyLevels()) {
-            String id = level.getId();
-            difficultyBox.addItem(id);
-        }
-        difficultyBox.setSelectedItem(group.getId());
 
         edit.setActionCommand(EDIT);
         edit.addActionListener(this);
-        edit.setEnabled(!CUSTOM_LEVEL.equals(group.getId()));
+        edit.setEnabled(!isGroupEditable());
         getButtons().add(edit);
 
-        save.setEnabled(CUSTOM_LEVEL.equals(group.getId()));
+        save.setEnabled(isGroupEditable());
 
-        difficultyBox.addItemListener(this);
-
-        initialize(group, Messages.message("difficulty"), difficultyBox);
-
+        initialize(group, Messages.message("difficulty"), null);
+        getOptionUI().getTree().addTreeSelectionListener(this);
+        selectLevel(getOptionUI().getTree(), selected.getId());
     }
 
-
-    @Override
-    protected boolean isGroupEditable() {
-        return super.isGroupEditable() && CUSTOM_LEVEL.equals(getGroup().getId());
-    }
-
-    @Override
-    public boolean isEditable() {
-        return super.isEditable() && CUSTOM_LEVEL.equals(getGroup().getId());
+    private boolean isGroupEditable() {
+        return selected != null && selected.isEditable();
     }
 
     @Override
@@ -168,30 +150,56 @@ public final class DifficultyDialog extends OptionsDialog implements ItemListene
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (EDIT.equals(command)) {
+        if (OK.equals(command)) {
+            getOptionUI().updateOption();
+            getGUI().removeFromCanvas(this);
+            setResponse(selected);
+        } else if (EDIT.equals(command)) {
             OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
-            custom.setValue(getGroup());
-            difficultyBox.setSelectedItem(CUSTOM_LEVEL);
+            custom.setValue(selected);
+            JTree tree = getOptionUI().getTree();
+            for (int row = tree.getRowCount() - 1; row >= 0; row--) {
+                tree.collapseRow(row);
+            }
+            selectLevel(tree, CUSTOM_LEVEL);
         } else if (LOAD.equals(command)) {
             File loadFile = getGUI().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
-                difficultyBox.setSelectedItem(CUSTOM_LEVEL);
             }
         } else {
             super.actionPerformed(event);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void itemStateChanged(ItemEvent event) {
-        String id = (String) difficultyBox.getSelectedItem();
-        edit.setEnabled(!CUSTOM_LEVEL.equals(id));
-        save.setEnabled(CUSTOM_LEVEL.equals(id));
-        updateUI(specification.getOptionGroup(id));
+    private void selectLevel(JTree tree, String id) {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        for (int index = 0; index < root.getChildCount(); index++) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getChildAt(index);
+            OptionGroup group = (OptionGroup) node.getUserObject();
+            if (id.equals(group.getId())) {
+                TreeNode[] nodes = new TreeNode[] { root, node, node.getFirstChild() };
+                tree.setSelectionPath(new TreePath(nodes));
+                break;
+            }
+        }
     }
+
+    public OptionGroup getSelectedGroup(TreePath path) {
+        if (path.getPathCount() < 2) {
+            return null;
+        } else {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getPathComponent(1);
+            return (OptionGroup) node.getUserObject();
+        }
+    }
+
+    public void valueChanged(TreeSelectionEvent event) {
+        selected = getSelectedGroup(event.getPath());
+        edit.setEnabled(!isGroupEditable());
+        save.setEnabled(isGroupEditable());
+    }
+
 
     /**
      * Returns the default file name to save the custom difficulty

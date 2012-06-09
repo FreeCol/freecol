@@ -46,6 +46,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private Map<String, Option> optionMap = new HashMap<String, Option>();
 
+    private boolean editable = true;
+
+
     /**
      * Creates a new <code>OptionGroup</code>.
      * @param id The identifier for this option.
@@ -64,10 +67,19 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     public OptionGroup clone() throws CloneNotSupportedException {
         OptionGroup result = new OptionGroup(getId());
+        result.editable = editable;
         result.setValues(this);
         result.options = new ArrayList<Option>(options);
         result.optionMap = new HashMap<String, Option>(optionMap);
         return result;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     /**
@@ -90,7 +102,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
         optionMap.put(id, option);
         if (option instanceof OptionGroup) {
-            addOptionGroup((OptionGroup) option);
+            OptionGroup group = (OptionGroup) option;
+            group.setEditable(editable && group.isEditable());
+            addOptionGroup(group);
         }
     }
 
@@ -245,6 +259,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("editable", Boolean.toString(editable));
         Iterator<Option> oi = options.iterator();
         while (oi.hasNext()) {
             (oi.next()).toXML(out);
@@ -262,6 +277,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        editable = getAttribute(in, "editable", true);
         if (id != null) {
             setId(id);
         }

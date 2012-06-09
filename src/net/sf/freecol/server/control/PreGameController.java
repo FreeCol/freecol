@@ -144,6 +144,11 @@ public final class PreGameController extends Controller {
             }
         }
 
+        // ensure that option groups can not be edited
+        game.getMapGeneratorOptions().setEditable(false);
+        gameOptions.setEditable(false);
+        spec.getOptionGroup("difficultyLevels").setEditable(false);
+
         // Inform the clients.
         for (Player player : game.getPlayers()) {
             if (!player.isAI()) {
@@ -165,7 +170,7 @@ public final class PreGameController extends Controller {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
 
-        
+
         freeColServer.getServer()
             .sendToAll(DOMMessage.createMessage("startGame"));
         freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());

@@ -62,9 +62,10 @@ public final class GameOptionsDialog extends OptionsDialog {
         if (editable && getFreeColClient().isSinglePlayer()) {
             BooleanOptionUI comp = (BooleanOptionUI) getOptionUI()
                 .getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
-
-            comp.setValue(false);
-            comp.getComponent().setEnabled(false);
+            if (comp != null) {
+                comp.setValue(false);
+                comp.getComponent().setEnabled(false);
+            }
         }
     }
 

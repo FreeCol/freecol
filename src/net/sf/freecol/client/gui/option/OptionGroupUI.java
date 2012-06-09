@@ -19,20 +19,22 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.GUI;
@@ -41,137 +43,113 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.OptionGroup}. In order to enable values
- * to be both seen and changed.
+ * This panel displays an OptionGroup using a JTree.
  */
-public final class OptionGroupUI extends JPanel implements OptionUpdater {
+public final class OptionGroupUI extends JPanel
+    implements OptionUpdater, TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(OptionGroupUI.class.getName());
 
-    public static final int H_GAP = 10;
-
     private final List<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
 
-    private final HashMap<String, OptionUI> optionUIs;
+    private final HashMap<String, OptionUI> optionUIs = new HashMap<String, OptionUI>();
 
-    private final JTabbedPane tb;
+
+    private JPanel detailPanel;
+
+    private JTree tree;
 
     private GUI gui;
 
+    private OptionGroup group;
+
 
     /**
-     * Creates a new <code>OptionGroupUI</code> for the given
-     * <code>OptionGroup</code>. This is the same as using
-     * {@link #OptionGroupUI(GUI, OptionGroup, boolean)} with
-     * <code>editable == true</code>.
+     * The constructor that will add the items to this panel.
      *
-     * @param option The <code>OptionGroup</code> to make a user interface for.
+     * @param parent The parent of this panel.
+     * @param id a <code>String</code> value
      */
-    public OptionGroupUI(GUI gui, OptionGroup option) {
-        this(gui, option, true);
-    }
-
-    /**
-     * Creates a new <code>OptionGroupUI</code> for the given
-     * <code>OptionGroup</code>.
-     *
-     * @param option The <code>OptionGroup</code> to make a user interface for
-     * @param editable boolean whether user can modify the setting
-     */
-    public OptionGroupUI(GUI gui, OptionGroup option, boolean editable) {
-        super(new BorderLayout());
+    public OptionGroupUI(GUI gui, OptionGroup group) {
         this.gui = gui;
+        this.group = group;
 
-        JPanel northPanel = new JPanel();
-        northPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
-        northPanel.setOpaque(false);
+        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[top]"));
 
-        optionUIs = new HashMap<String, OptionUI>();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(group);
+        buildTree(group, root);
 
-        tb = new JTabbedPane(JTabbedPane.TOP);
-        tb.setOpaque(false);
+        DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        tree = new JTree(treeModel) {
+                @Override
+                public Dimension getPreferredSize() {
+                    return new Dimension(200, super.getPreferredSize().height);
+                }
+                @Override
+                public String convertValueToText(Object value, boolean selected, boolean expanded,
+                                                 boolean leaf, int row, boolean hasFocus) {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+                    Option option = (Option) node.getUserObject();
+                    return Messages.message(option.getId() + ".name");
+                }
+            };
 
-        Iterator<Option> it = option.iterator();
-        while (it.hasNext()) {
-            Option o = it.next();
+        tree.setOpaque(false);
+        tree.addTreeSelectionListener(this);
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
+        renderer.setBackgroundNonSelectionColor(new Color(0,0,0,1));
 
-            if (o instanceof OptionGroup) {
-                OptionGroup group = (OptionGroup) o;
-                JPanel groupPanel = new JPanel();
-                groupPanel.setLayout(new MigLayout("wrap 4", "[fill]related[fill]unrelated[fill]related[fill]"));
-                groupPanel.setOpaque(true);
-                addOptionGroupUI(group, groupPanel, editable);
-                JScrollPane scroll = new JScrollPane(groupPanel,
-                                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                scroll.getVerticalScrollBar().setUnitIncrement(16);
-                scroll.setBorder(BorderFactory.createEmptyBorder());
-                groupPanel.setBorder(BorderFactory.createEmptyBorder(H_GAP - 5, H_GAP, 0, H_GAP));
-                tb.addTab(Messages.getName((Option) group), null, scroll,
-                          Messages.getShortDescription((Option) group));
-            } else {
-                addOptionUI(o, northPanel, editable);
-            }
-        }
-        if (tb.getTabCount() > 0) {
-            /** ignore options that do not belong to an OptionGroup, e.g. window sizes and positions
-            if (northPanel.getComponentCount() > 0) {
-                tb.addTab(" *** ", northPanel);
-            }
-            */
-            add(tb, BorderLayout.CENTER);
-        } else {
-            add(northPanel, BorderLayout.CENTER);
-        }
+        add(tree);
+        detailPanel = new JPanel(new MigLayout("wrap 2", "[fill]related[fill]"));
+        detailPanel.setOpaque(false);
+        add(detailPanel, "grow");
 
-        setOpaque(false);
     }
 
+    public JTree getTree() {
+        return tree;
+    }
 
-    private void addOptionGroupUI(OptionGroup group, JPanel panel, boolean editable) {
-        Iterator<Option> iterator = group.iterator();
-        while (iterator.hasNext()) {
-            Option o = iterator.next();
-            if (o instanceof OptionGroup) {
-                OptionGroup subgroup = (OptionGroup) o;
-                panel.add(new JLabel(Messages.getName((Option) subgroup)),
-                          "newline 20, span, split 2");
-                panel.add(new JSeparator(), "growx");
-                addOptionGroupUI(subgroup, panel, editable);
-            } else {
-                addOptionUI(o, panel, editable);
+    /**
+     * Builds the JTree which represents the navigation menu and then returns it
+     *
+     * @return The navigation tree.
+     */
+    private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
+
+        for (Option option : group.getOptions()) {
+            if (option instanceof OptionGroup) {
+                DefaultMutableTreeNode branch = new DefaultMutableTreeNode(option);
+                parent.add(branch);
+                buildTree((OptionGroup) option, branch);
             }
         }
     }
 
-    private void addOptionUI(Option option, JPanel panel, boolean editable) {
-        OptionUI ui = OptionUI.getOptionUI(gui, option, editable);
-        if (ui == null) {
-            logger.warning("Unknown option type: " + option.toString());
-        } else if (ui instanceof FreeColActionUI) {
-            ((FreeColActionUI) ui).setOptionGroupUI(this);
-        }
-        JLabel label = ui.getLabel();
-        if (label == null) {
-            panel.add(ui.getComponent(), "newline, span");
-        } else {
-            if (label.getText().length() > 30) {
-                panel.add(label, "newline, span 3");
+    /**
+     * This function analyses a tree selection event and calls the right methods to take care
+     * of building the requested unit's details.
+     *
+     * @param event The incoming TreeSelectionEvent.
+     */
+    public void valueChanged(TreeSelectionEvent event) {
+        detailPanel.removeAll();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        if (node != null) {
+            if (node.isLeaf()) {
+                OptionGroup group = (OptionGroup) node.getUserObject();
+                for (Option option : group.getOptions()) {
+                    addOptionUI(option, group.isEditable());
+                }
             } else {
-                panel.add(label);
+                tree.expandPath(event.getPath());
             }
-            panel.add(ui.getComponent());
         }
-        if (editable) {
-            optionUpdaters.add((OptionUpdater) ui);
-        }
-        if (!option.getId().equals(FreeColObject.NO_ID)) {
-            optionUIs.put(option.getId(), ui);
-        }
+        detailPanel.revalidate();
+        detailPanel.repaint();
     }
-
 
     /**
      * Updates the value of the {@link net.sf.freecol.common.option.Option} this object keeps.
@@ -185,6 +163,29 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     public OptionUI getOptionUI(String key) {
         return optionUIs.get(key);
     }
+
+    private void addOptionUI(Option option, boolean editable) {
+        OptionUI ui = OptionUI.getOptionUI(gui, option, editable);
+        if (ui == null) {
+            logger.warning("Unknown option type: " + option.toString());
+        } else if (ui instanceof FreeColActionUI) {
+            ((FreeColActionUI) ui).setOptionGroupUI(this);
+        }
+        JLabel label = ui.getLabel();
+        if (label == null) {
+            detailPanel.add(ui.getComponent(), "newline, span");
+        } else {
+            detailPanel.add(label);
+            detailPanel.add(ui.getComponent());
+        }
+        if (group.isEditable()) {
+            optionUpdaters.add((OptionUpdater) ui);
+        }
+        if (!option.getId().equals(FreeColObject.NO_ID)) {
+            optionUIs.put(option.getId(), ui);
+        }
+    }
+
 
     /**
      * Removes the given <code>KeyStroke</code> from all of this
@@ -213,4 +214,5 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     public String getUIClassID() {
         return "ReportPanelUI";
     }
+
 }

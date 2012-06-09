@@ -70,4 +70,39 @@ public class OptionTest extends FreeColTestCase {
     }
 
 
+    /**
+     * OptionGroups are editable by default. If an OptionGroup is not
+     * editable, however, none of its subgroups are editable either.
+     */
+    public void testInheritsEditable() {
+
+        OptionGroup difficulties = spec().getOptionGroup("difficultyLevels");
+        assertNotNull(difficulties);
+        assertTrue(difficulties.isEditable());
+
+        String[] levels = new String[] { "veryEasy", "easy", "medium", "hard", "veryHard" };
+        String[] names = new String[] { "immigration", "natives", "monarch", "government", "other" };
+        for (String level : levels) {
+            OptionGroup group = (OptionGroup) difficulties.getOption("model.difficulty." + level);
+            assertNotNull("Failed to find difficulty level '" + level + "'", group);
+            assertFalse("Difficulty level '" + level + "' should not be editable", group.isEditable());
+            for (String name : names) {
+                OptionGroup subGroup = (OptionGroup) group.getOption("model.difficulty." + name);
+                assertNotNull("Failed to find option group '" + name + "' (" + level + ")", subGroup);
+                assertFalse("Option group '" + name + "' should not be editable", subGroup.isEditable());
+            }
+        }
+
+        OptionGroup group = (OptionGroup) difficulties.getOption("model.difficulty.custom");
+        assertNotNull("Failed to find difficulty level 'custom'", group);
+        assertTrue("Difficulty level 'custom' should be editable", group.isEditable());
+        for (String name : names) {
+            OptionGroup subGroup = (OptionGroup) group.getOption("model.difficulty." + name);
+            assertNotNull("Failed to find option group '" + name + "' (custom)", subGroup);
+            assertTrue("Option group '" + name + "' should be editable", subGroup.isEditable());
+        }
+
+    }
+
+
 }

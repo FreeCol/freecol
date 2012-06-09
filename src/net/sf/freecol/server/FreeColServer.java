@@ -1085,6 +1085,15 @@ public final class FreeColServer {
         }
         // end compatibility code
 
+        // ensure that option groups can not be edited
+        game.getMapGeneratorOptions().setEditable(false);
+        try {
+            specification.getOptionGroup("gameOptions").setEditable(false);
+            specification.getOptionGroup("difficultyLevels").setEditable(false);
+        } catch(Exception e) {
+            logger.warning("Failed to make option groups read-only");
+        }
+
         // AI initialization.
         AIMain aiMain = getAIMain();
         if (aiMain.checkIntegrity()) {

@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.68 -->
+<!-- specification version 0.69 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -1774,329 +1774,355 @@
     -->
   <options>
     <optionGroup id="difficultyLevels" recursive="false">
-      <optionGroup id="model.difficulty.veryEasy">
-        <integerOption id="model.option.startingMoney" value="1000"/>
-        <integerOption id="model.option.crossesIncrement" value="6"/>
-        <integerOption id="model.option.badGovernmentLimit" value="8"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
-        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
-        <integerOption id="model.option.landPriceFactor" value="40"/>
-        <integerOption id="model.option.foundingFatherFactor" value="24"/>
-        <integerOption id="model.option.arrearsFactor" value="300"/>
-        <integerOption id="model.option.nativeConvertProbability" value="50"/>
-        <integerOption id="model.option.burnProbability" value="2"/>
-        <integerOption id="model.option.nativeDemands" value="0"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="20"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.monarchMeddling" value="0"/>
-        <integerOption id="model.option.taxAdjustment" value="0"/>
-        <integerOption id="model.option.mercenaryPrice" value="50"/>
-        <integerOption id="model.option.maximumTax" value="50"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-        <integerOption id="model.option.monarchSupport" value="4"/>
-        <integerOption id="model.option.rumourDifficulty" value="0"/>
-        <integerOption id="model.option.treasureTransportFee" value="50"/>
-        <integerOption id="model.option.shipTradePenalty" value="-20"/>
-        <integerOption id="model.option.interventionBells" value="2000" />
-        <integerOption id="model.option.interventionTurns" value="50" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="true" />
-        <stringOption  id="model.option.tileProduction" value="veryHigh" />
-        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
-        <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
-        <unitListOption  id="model.option.immigrants">
-          <unitOption id="model.option.immigrants.1">
-            <unitType value="model.unit.masterCarpenter"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-          <unitOption id="model.option.immigrants.2">
-            <unitType value="model.unit.expertFarmer"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-          <unitOption id="model.option.immigrants.3">
-            <unitType value="model.unit.seasonedScout"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.refSize">
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="SOLDIER" />
-            <number value="15" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="DRAGOON" />
-            <number value="5" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="SOLDIER" />
-            <number value="4" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="DRAGOON" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="4" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="3" />
-          </unitOption>
-        </unitListOption>
+      <optionGroup id="model.difficulty.veryEasy" editable="false">
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="6"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="20"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="true" />
+          <unitListOption  id="model.option.immigrants">
+            <unitOption id="model.option.immigrants.1">
+              <unitType value="model.unit.masterCarpenter"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+            <unitOption id="model.option.immigrants.2">
+              <unitType value="model.unit.expertFarmer"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+            <unitOption id="model.option.immigrants.3">
+              <unitType value="model.unit.seasonedScout"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.landPriceFactor" value="40"/>
+          <integerOption id="model.option.nativeConvertProbability" value="50"/>
+          <integerOption id="model.option.burnProbability" value="2"/>
+          <integerOption id="model.option.nativeDemands" value="0"/>
+          <integerOption id="model.option.rumourDifficulty" value="0"/>
+          <integerOption id="model.option.shipTradePenalty" value="-20"/>
+          <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
+          <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
+          <integerOption id="model.option.monarchMeddling" value="0"/>
+          <integerOption id="model.option.taxAdjustment" value="0"/>
+          <integerOption id="model.option.mercenaryPrice" value="50"/>
+          <integerOption id="model.option.maximumTax" value="50"/>
+          <integerOption id="model.option.monarchSupport" value="4"/>
+          <integerOption id="model.option.treasureTransportFee" value="50"/>
+          <integerOption id="model.option.interventionBells" value="2000" />
+          <integerOption id="model.option.interventionTurns" value="50" />
+          <unitListOption id="model.option.refSize">
+            <unitOption id="model.option.refSize.soldiers">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="SOLDIER" />
+              <number value="15" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="DRAGOON" />
+              <number value="5" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="SOLDIER" />
+              <number value="4" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="DRAGOON" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="4" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="8"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
+          <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="1000"/>
+          <integerOption id="model.option.foundingFatherFactor" value="24"/>
+          <integerOption id="model.option.arrearsFactor" value="300"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+          <stringOption  id="model.option.tileProduction" value="veryHigh" />
+        </optionGroup>
       </optionGroup>
-      <optionGroup id="model.difficulty.easy">
-        <integerOption id="model.option.startingMoney" value="300"/>
-        <integerOption id="model.option.crossesIncrement" value="8"/>
-        <integerOption id="model.option.badGovernmentLimit" value="7"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
-        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
-        <integerOption id="model.option.landPriceFactor" value="50"/>
-        <integerOption id="model.option.foundingFatherFactor" value="32"/>
-        <integerOption id="model.option.arrearsFactor" value="400"/>
-        <integerOption id="model.option.nativeConvertProbability" value="40"/>
-        <integerOption id="model.option.burnProbability" value="4"/>
-        <integerOption id="model.option.nativeDemands" value="1"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.monarchMeddling" value="1"/>
-        <integerOption id="model.option.taxAdjustment" value="1"/>
-        <integerOption id="model.option.mercenaryPrice" value="60"/>
-        <integerOption id="model.option.maximumTax" value="60"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-        <integerOption id="model.option.monarchSupport" value="3"/>
-        <integerOption id="model.option.rumourDifficulty" value="1"/>
-        <integerOption id="model.option.treasureTransportFee" value="55"/>
-        <integerOption id="model.option.shipTradePenalty" value="-25"/>
-        <integerOption id="model.option.interventionBells" value="3500" />
-        <integerOption id="model.option.interventionTurns" value="51" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="true" />
-        <stringOption  id="model.option.tileProduction" value="high" />
-        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
-        <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
-        <unitListOption  id="model.option.immigrants">
-          <unitOption id="model.option.immigrants.1">
-            <unitType value="model.unit.masterCarpenter"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-          <unitOption id="model.option.immigrants.2">
-            <unitType value="model.unit.expertFarmer"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.refSize">
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="SOLDIER" />
-            <number value="23" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="DRAGOON" />
-            <number value="10" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="8" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="5" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="SOLDIER" />
-            <number value="3" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="DRAGOON" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-        </unitListOption>
+      <optionGroup id="model.difficulty.easy" editable="false">
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="8"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="true" />
+          <unitListOption  id="model.option.immigrants">
+            <unitOption id="model.option.immigrants.1">
+              <unitType value="model.unit.masterCarpenter"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+            <unitOption id="model.option.immigrants.2">
+              <unitType value="model.unit.expertFarmer"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.landPriceFactor" value="50"/>
+          <integerOption id="model.option.nativeConvertProbability" value="40"/>
+          <integerOption id="model.option.burnProbability" value="4"/>
+          <integerOption id="model.option.nativeDemands" value="1"/>
+          <integerOption id="model.option.rumourDifficulty" value="1"/>
+          <integerOption id="model.option.shipTradePenalty" value="-25"/>
+          <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
+          <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
+          <integerOption id="model.option.monarchMeddling" value="1"/>
+          <integerOption id="model.option.taxAdjustment" value="1"/>
+          <integerOption id="model.option.mercenaryPrice" value="60"/>
+          <integerOption id="model.option.maximumTax" value="60"/>
+          <integerOption id="model.option.monarchSupport" value="3"/>
+          <integerOption id="model.option.treasureTransportFee" value="55"/>
+          <integerOption id="model.option.interventionBells" value="3500" />
+          <integerOption id="model.option.interventionTurns" value="51" />
+          <unitListOption id="model.option.refSize">
+            <unitOption id="model.option.refSize.soldiers">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="SOLDIER" />
+              <number value="23" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="DRAGOON" />
+              <number value="10" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="8" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="5" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="DRAGOON" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="7"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
+          <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="300"/>
+          <integerOption id="model.option.foundingFatherFactor" value="32"/>
+          <integerOption id="model.option.arrearsFactor" value="400"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+          <stringOption  id="model.option.tileProduction" value="high" />
+        </optionGroup>
       </optionGroup>
-      <optionGroup id="model.difficulty.medium">
-        <integerOption id="model.option.startingMoney" value="0"/>
-        <integerOption id="model.option.crossesIncrement" value="10"/>
-        <integerOption id="model.option.badGovernmentLimit" value="6"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
-        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
-        <integerOption id="model.option.landPriceFactor" value="60"/>
-        <integerOption id="model.option.foundingFatherFactor" value="40"/>
-        <integerOption id="model.option.arrearsFactor" value="500"/>
-        <integerOption id="model.option.nativeConvertProbability" value="30"/>
-        <integerOption id="model.option.burnProbability" value="6"/>
-        <integerOption id="model.option.nativeDemands" value="2"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="40"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.monarchMeddling" value="2"/>
-        <integerOption id="model.option.taxAdjustment" value="2"/>
-        <integerOption id="model.option.mercenaryPrice" value="65"/>
-        <integerOption id="model.option.maximumTax" value="65"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-        <integerOption id="model.option.monarchSupport" value="2"/>
-        <integerOption id="model.option.rumourDifficulty" value="2"/>
-        <integerOption id="model.option.treasureTransportFee" value="60"/>
-        <integerOption id="model.option.shipTradePenalty" value="-30"/>
-        <integerOption id="model.option.interventionBells" value="5000" />
-        <integerOption id="model.option.interventionTurns" value="52" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="false" />
-        <stringOption  id="model.option.tileProduction" value="medium" />
-        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
-        <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
-        <unitListOption  id="model.option.immigrants">
-          <unitOption id="model.option.immigrants.1">
-            <unitType value="model.unit.masterCarpenter"/>
-            <role value="DEFAULT" />
-            <number value="1"/>
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.refSize">
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="SOLDIER" />
-            <number value="31" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="DRAGOON" />
-            <number value="15" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="14" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="8" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="SOLDIER" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="DRAGOON" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-        </unitListOption>
+      <optionGroup id="model.difficulty.medium" editable="false">
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="10"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="40"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="false" />
+          <unitListOption  id="model.option.immigrants">
+            <unitOption id="model.option.immigrants.1">
+              <unitType value="model.unit.masterCarpenter"/>
+              <role value="DEFAULT" />
+              <number value="1"/>
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.landPriceFactor" value="60"/>
+          <integerOption id="model.option.nativeConvertProbability" value="30"/>
+          <integerOption id="model.option.burnProbability" value="6"/>
+          <integerOption id="model.option.nativeDemands" value="2"/>
+          <integerOption id="model.option.rumourDifficulty" value="2"/>
+          <integerOption id="model.option.shipTradePenalty" value="-30"/>
+          <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
+          <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
+          <integerOption id="model.option.monarchMeddling" value="2"/>
+          <integerOption id="model.option.taxAdjustment" value="2"/>
+          <integerOption id="model.option.mercenaryPrice" value="65"/>
+          <integerOption id="model.option.maximumTax" value="65"/>
+          <integerOption id="model.option.monarchSupport" value="2"/>
+          <integerOption id="model.option.treasureTransportFee" value="60"/>
+          <integerOption id="model.option.interventionBells" value="5000" />
+          <integerOption id="model.option.interventionTurns" value="52" />
+          <unitListOption id="model.option.refSize">
+            <unitOption id="model.option.refSize.soldiers">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="SOLDIER" />
+              <number value="31" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="DRAGOON" />
+              <number value="15" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="14" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="8" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="SOLDIER" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="DRAGOON" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="6"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
+          <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="0"/>
+          <integerOption id="model.option.foundingFatherFactor" value="40"/>
+          <integerOption id="model.option.arrearsFactor" value="500"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+          <stringOption  id="model.option.tileProduction" value="medium" />
+        </optionGroup>
       </optionGroup>
-      <optionGroup id="model.difficulty.hard">
-        <integerOption id="model.option.startingMoney" value="0"/>
-        <integerOption id="model.option.crossesIncrement" value="12"/>
-        <integerOption id="model.option.badGovernmentLimit" value="5"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
-        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
-        <integerOption id="model.option.landPriceFactor" value="70"/>
-        <integerOption id="model.option.foundingFatherFactor" value="48"/>
-        <integerOption id="model.option.arrearsFactor" value="600"/>
-        <integerOption id="model.option.nativeConvertProbability" value="20"/>
-        <integerOption id="model.option.burnProbability" value="8"/>
-        <integerOption id="model.option.nativeDemands" value="3"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.monarchMeddling" value="3"/>
-        <integerOption id="model.option.taxAdjustment" value="3"/>
-        <integerOption id="model.option.mercenaryPrice" value="70"/>
-        <integerOption id="model.option.maximumTax" value="70"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+      <optionGroup id="model.difficulty.hard" editable="false">
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="12"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="false" />
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.landPriceFactor" value="70"/>
+          <integerOption id="model.option.nativeConvertProbability" value="20"/>
+          <integerOption id="model.option.burnProbability" value="8"/>
+          <integerOption id="model.option.nativeDemands" value="3"/>
+          <integerOption id="model.option.rumourDifficulty" value="3"/>
+          <integerOption id="model.option.shipTradePenalty" value="-35"/>
+          <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
+          <rangeOption id="model.option.settlementNumber" defaultValue="6" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
+          <integerOption id="model.option.monarchMeddling" value="3"/>
+          <integerOption id="model.option.taxAdjustment" value="3"/>
+          <integerOption id="model.option.mercenaryPrice" value="70"/>
+          <integerOption id="model.option.maximumTax" value="70"/>
         <integerOption id="model.option.monarchSupport" value="1"/>
-        <integerOption id="model.option.rumourDifficulty" value="3"/>
         <integerOption id="model.option.treasureTransportFee" value="65"/>
-        <integerOption id="model.option.shipTradePenalty" value="-35"/>
         <integerOption id="model.option.interventionBells" value="6500" />
         <integerOption id="model.option.interventionTurns" value="53" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="false" />
-        <stringOption  id="model.option.tileProduction" value="low" />
-        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
-        <rangeOption id="model.option.settlementNumber" defaultValue="6" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
         <unitListOption id="model.option.refSize">
           <unitOption id="model.option.refSize.soldiers">
             <unitType value="model.unit.kingsRegular" />
@@ -2141,154 +2167,167 @@
             <number value="2" />
           </unitOption>
         </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="5"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
+          <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="0"/>
+          <integerOption id="model.option.foundingFatherFactor" value="48"/>
+          <integerOption id="model.option.arrearsFactor" value="600"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+          <stringOption  id="model.option.tileProduction" value="low" />
+        </optionGroup>
       </optionGroup>
-      <optionGroup id="model.difficulty.veryHard">
-        <integerOption id="model.option.startingMoney" value="0"/>
-        <integerOption id="model.option.crossesIncrement" value="14"/>
-        <integerOption id="model.option.badGovernmentLimit" value="4"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
-        <integerOption id="model.option.goodGovernmentLimit" value="50"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
-        <integerOption id="model.option.landPriceFactor" value="80"/>
-        <integerOption id="model.option.foundingFatherFactor" value="56"/>
-        <integerOption id="model.option.arrearsFactor" value="700"/>
-        <integerOption id="model.option.nativeConvertProbability" value="10"/>
-        <integerOption id="model.option.burnProbability" value="10"/>
-        <integerOption id="model.option.nativeDemands" value="4"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="30"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100"/>
-        <integerOption id="model.option.monarchMeddling" value="4"/>
-        <integerOption id="model.option.taxAdjustment" value="4"/>
-        <integerOption id="model.option.mercenaryPrice" value="75"/>
-        <integerOption id="model.option.maximumTax" value="75"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
-        <integerOption id="model.option.monarchSupport" value="0"/>
-        <integerOption id="model.option.rumourDifficulty" value="4"/>
-        <integerOption id="model.option.treasureTransportFee" value="70"/>
-        <integerOption id="model.option.shipTradePenalty" value="-40"/>
-        <integerOption id="model.option.interventionBells" value="8000" />
-        <integerOption id="model.option.interventionTurns" value="54" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="false" />
-        <stringOption  id="model.option.tileProduction" value="veryLow" />
-        <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
-        <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
-        <unitListOption id="model.option.refSize">
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="SOLDIER" />
-            <number value="47" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="DRAGOON" />
-            <number value="25" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="26" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="14" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="SOLDIER" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="DRAGOON" />
-            <number value="1" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-        </unitListOption>
+      <optionGroup id="model.difficulty.veryHard" editable="false">
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="14"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="false" />
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.foundingFatherFactor" value="56"/>
+          <integerOption id="model.option.nativeConvertProbability" value="10"/>
+          <integerOption id="model.option.burnProbability" value="10"/>
+          <integerOption id="model.option.nativeDemands" value="4"/>
+          <integerOption id="model.option.rumourDifficulty" value="4"/>
+          <integerOption id="model.option.shipTradePenalty" value="-40"/>
+          <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
+          <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
+          <integerOption id="model.option.monarchMeddling" value="4"/>
+          <integerOption id="model.option.taxAdjustment" value="4"/>
+          <integerOption id="model.option.mercenaryPrice" value="75"/>
+          <integerOption id="model.option.maximumTax" value="75"/>
+          <integerOption id="model.option.monarchSupport" value="0"/>
+          <integerOption id="model.option.treasureTransportFee" value="70"/>
+          <integerOption id="model.option.interventionBells" value="8000" />
+          <integerOption id="model.option.interventionTurns" value="54" />
+          <unitListOption id="model.option.refSize">
+            <unitOption id="model.option.refSize.soldiers">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="SOLDIER" />
+              <number value="47" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="DRAGOON" />
+              <number value="25" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="26" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="14" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="SOLDIER" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="DRAGOON" />
+              <number value="1" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="4"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
+          <integerOption id="model.option.goodGovernmentLimit" value="50"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="0"/>
+          <integerOption id="model.option.landPriceFactor" value="80"/>
+          <integerOption id="model.option.arrearsFactor" value="700"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
+          <stringOption  id="model.option.tileProduction" value="veryLow" />
+        </optionGroup>
       </optionGroup>
       <optionGroup id="model.difficulty.custom">
-        <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
-        <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
-        <!-- these limits are intentially higher than 100 %, so they can be effectively disabled -->
-        <integerOption id="model.option.goodGovernmentLimit" value="50" minimumValue="0" maximumValue="150"/>
-        <integerOption id="model.option.veryGoodGovernmentLimit" value="100" minimumValue="0" maximumValue="150"/>
-        <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
-        <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
-        <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
+        <optionGroup id="model.difficulty.immigration">
+          <integerOption id="model.option.crossesIncrement" value="14" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="30" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.lowerCapIncrease" value="0" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.priceIncrease.artillery" value="100" minimumValue="0" maximumValue="1000"/>
+          <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+          <booleanOption id="model.option.expertStartingUnits" value="false" />
+          <unitListOption  id="model.option.immigrants" maximumNumber="3">
+            <template>
+              <unitOption id="model.option.immigrants.template">
+                <unitType value="model.unit.freeColonist" generate="IMMIGRANTS" />
+                <role value="DEFAULT" >
+                  <choice value="DEFAULT" />
+                </role>
+                <number value="1" minimumValue="1" maximumValue="1" />
+              </unitOption>
+            </template>
+          </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.natives">
+          <integerOption id="model.option.landPriceFactor" value="80" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.nativeConvertProbability" value="10" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.burnProbability" value="10" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
+          <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
+          <integerOption id="model.option.shipTradePenalty" value="-40" minimumValue="-100" maximumValue="0"/>
+          <!-- Whether a player can build a colony on native land without
+               having to buy/steal the land first. -->
+          <stringOption  id="model.option.buildOnNativeLand"
+                         value="model.option.buildOnNativeLand.never">
+            <choice value="model.option.buildOnNativeLand.always" />
+            <choice value="model.option.buildOnNativeLand.first" />
+            <choice value="model.option.buildOnNativeLand.firstAndUncontacted" />
+            <choice value="model.option.buildOnNativeLand.never" />
+          </stringOption>
+          <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
+            <rangeValue label="verySmall" value="10"/>
+            <rangeValue label="small" value="8"/>
+            <rangeValue label="medium" value="7"/>
+            <rangeValue label="large" value="6"/>
+            <rangeValue label="veryLarge" value="5"/>
+          </rangeOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.monarch">
         <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
         <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
         <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
         <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
-        <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
         <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
-        <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
         <integerOption id="model.option.treasureTransportFee" value="70" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.shipTradePenalty" value="-40" minimumValue="-100" maximumValue="0"/>
         <integerOption id="model.option.interventionBells" value="8000" minimumValue="0" maximumValue="100000" />
         <integerOption id="model.option.interventionTurns" value="54" minimumValue="20" maximumValue="100" />
-        <booleanOption id="model.option.priceIncreasePerType" value="true"/>
-        <booleanOption id="model.option.expertStartingUnits" value="false" />
-        <stringOption  id="model.option.tileProduction" value="veryLow">
-          <choice value="veryLow" />
-          <choice value="low" />
-          <choice value="medium" />
-          <choice value="high" />
-          <choice value="veryHigh" />
-        </stringOption>
-        <!-- Whether a player can build a colony on native land without
-             having to buy/steal the land first. -->
-        <stringOption  id="model.option.buildOnNativeLand"
-                       value="model.option.buildOnNativeLand.never">
-          <choice value="model.option.buildOnNativeLand.always" />
-          <choice value="model.option.buildOnNativeLand.first" />
-          <choice value="model.option.buildOnNativeLand.firstAndUncontacted" />
-          <choice value="model.option.buildOnNativeLand.never" />
-        </stringOption>
-        <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="8"/>
-          <rangeValue label="medium" value="7"/>
-          <rangeValue label="large" value="6"/>
-          <rangeValue label="veryLarge" value="5"/>
-        </rangeOption>
-        <unitListOption  id="model.option.immigrants" maximumNumber="3">
-          <template>
-            <unitOption id="model.option.immigrants.template">
-              <unitType value="model.unit.freeColonist" generate="IMMIGRANTS" />
-              <role value="DEFAULT" >
-                <choice value="DEFAULT" />
-              </role>
-              <number value="1" minimumValue="1" maximumValue="1" />
-            </unitOption>
-          </template>
-        </unitListOption>
         <unitListOption id="model.option.refSize">
           <template>
             <unitOption id="model.option.refSize.template">
@@ -2349,6 +2388,27 @@
             <number value="2" minimumValue="0" maximumValue="999" />
           </unitOption>
         </unitListOption>
+        </optionGroup>
+        <optionGroup id="model.difficulty.government">
+          <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
+          <!-- these limits are intentially higher than 100 %, so they can be effectively disabled -->
+          <integerOption id="model.option.goodGovernmentLimit" value="50" minimumValue="0" maximumValue="150"/>
+          <integerOption id="model.option.veryGoodGovernmentLimit" value="100" minimumValue="0" maximumValue="150"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.other">
+          <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>
+          <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
+          <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
+          <stringOption  id="model.option.tileProduction" value="veryLow">
+            <choice value="veryLow" />
+            <choice value="low" />
+            <choice value="medium" />
+            <choice value="high" />
+            <choice value="veryHigh" />
+          </stringOption>
+        </optionGroup>
       </optionGroup>
     </optionGroup>
     <optionGroup id="gameOptions">

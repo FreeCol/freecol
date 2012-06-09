@@ -648,6 +648,7 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
+      <xs:attribute name="editable" use="optional" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 
