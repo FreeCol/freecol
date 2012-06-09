@@ -169,7 +169,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-        
+
         graphics.drawImage(backgroundImage, 0, 0, null);
         paintMap(graphics);
      }
@@ -185,7 +185,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      *                 to draw this component.
      */
     public void paintMap(Graphics graphics) {
-        
+
         int width = getWidth();
         int height = getHeight();
         final Graphics2D g = (Graphics2D) graphics;
@@ -203,7 +203,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (gui.getFocus() == null) {
             return;
         }
-        
+
 
 
         /* xSize and ySize represent how many tiles can be represented on the
@@ -278,7 +278,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         final ImageLibrary library = gui.getImageLibrary();
 
 
-        
+
         // Row per row; start with the top modified row
         for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
@@ -313,16 +313,14 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             g.translate(0, halfHeight);
         }
         g.setTransform(baseTransform);
-            
-        
-        System.out.println("pluto");
-    
+
+
         /* Defines where to draw the white rectangle on the mini map.
          * miniRectX/Y are the center of the rectangle.
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
 
-        
+
         if (getParent() != null) {
             TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
             int miniRectX = (gui.getFocus().getX() - firstColumn) * tileSize;
@@ -341,30 +339,30 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             }
 
             g.setColor(ResourceManager.getColor("miniMapBorder.color"));
-            // Use Math max and min to prevent the rect from being larger than the minimap. 
+            // Use Math max and min to prevent the rect from being larger than the minimap.
             int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, 0);
             int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, 0);
             int miniRectMinWidth = Math.min(miniRectWidth, width - 1);
             int miniRectMinHeight = Math.min(miniRectHeight, height - 1);
-            // Prevent the rect from overlapping the bigger adjust rect 
+            // Prevent the rect from overlapping the bigger adjust rect
             if(miniRectMaxX + miniRectMinWidth > width - 1) {
                 miniRectMaxX = width - miniRectMinWidth - 1;
             }
             if(miniRectMaxY + miniRectMinHeight > height - 1) {
                 miniRectMaxY = height - miniRectMinHeight - 1;
             }
-            // Draw the rect. 
+            // Draw the rect.
             g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
-            // Draw an additional rect, if the whole map is shown on the minimap 
+            // Draw an additional rect, if the whole map is shown on the minimap
             if (adjustX > 0 && adjustY > 0) {
                 g.setColor(ResourceManager.getColor("miniMapBorder.color"));
                 g.drawRect(0, 0, width - 1, height - 1);
             }
         }
         g.setTransform(originTransform);
-        
-        
-        
+
+
+
     }
 
 
