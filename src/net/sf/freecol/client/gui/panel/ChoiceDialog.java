@@ -59,6 +59,7 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * @param cancelText <code>String</code>
      * @param choices List of <code>ChoiceItem<T></code>
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public ChoiceDialog(FreeColClient freeColClient, GUI gui, String text,
                         String cancelText, List<ChoiceItem<T>> choices) {
         super(freeColClient, gui);

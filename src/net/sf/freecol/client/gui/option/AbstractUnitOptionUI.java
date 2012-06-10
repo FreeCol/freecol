@@ -72,6 +72,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     * @param option The <code>AbstractUnitOption</code> to make a user interface for
     * @param editable boolean whether user can modify the setting
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option, boolean editable) {
         super(gui, option, editable);
 
@@ -135,6 +136,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         numberUI.reset();
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
         JComboBox box = roleUI.getComponent();
         UnitType type = (UnitType) typeUI.getComponent().getSelectedItem();

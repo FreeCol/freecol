@@ -93,6 +93,7 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
     /**
      * The constructor to use.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public EndTurnDialog(FreeColClient freeColClient, GUI gui, List<Unit> units) {
         super(freeColClient, gui);
 

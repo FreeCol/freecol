@@ -42,6 +42,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     * @param option The <code>LanguageOption</code> to make a user interface for.
     * @param editable boolean whether user can modify the setting
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public LanguageOptionUI(GUI gui, final LanguageOption option, boolean editable) {
         super(gui, option, editable);
 

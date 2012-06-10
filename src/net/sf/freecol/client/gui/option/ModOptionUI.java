@@ -48,6 +48,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     * @param option The <code>ModOption</code> to make a user interface for
     * @param editable boolean whether user can modify the setting
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public ModOptionUI(GUI gui, final ModOption option, boolean editable) {
         super(gui, option, editable);
 

@@ -67,6 +67,7 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
         = new JButton(Messages.message("traderouteDialog.deassignRoute"));
 
     private final DefaultListModel listModel = new DefaultListModel();
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private final JList tradeRoutes = new JList(listModel);
     private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
 
@@ -88,6 +89,7 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
      * @param gui The <code>GUI</code> to display in.
      * @param unit The optional <code>Unit</code> to operate on.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public TradeRouteDialog(FreeColClient freeColClient, final GUI gui,
                             Unit unit) {
         super(freeColClient, gui);

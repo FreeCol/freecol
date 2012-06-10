@@ -77,6 +77,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * @param option The <code>ListOption</code> to display.
      * @param editable boolean whether user can modify the setting
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public ListOptionUI(final GUI gui, final ListOption<T> option,
                         boolean editable) {
         super(gui, option, editable);
@@ -218,6 +219,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * Reset with the value from the Option.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public void reset() {
         model.clear();
         for (AbstractOption<T> o : getOption().getValue()) {

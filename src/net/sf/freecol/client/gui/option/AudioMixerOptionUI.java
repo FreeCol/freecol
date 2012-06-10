@@ -74,6 +74,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      *      interface for.
      * @param editable boolean whether user can modify the setting
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public AudioMixerOptionUI(GUI gui, final AudioMixerOption option, boolean editable) {
         super(gui, option, editable);
 

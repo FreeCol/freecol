@@ -46,6 +46,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
      * @param option The <code>StringOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public StringOptionUI(GUI gui, final StringOption option, boolean editable) {
         super(gui, option, editable);
 

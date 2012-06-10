@@ -497,6 +497,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
         }
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         private void updateColonyBox() {
 
             if (!player.isEuropean()) {
@@ -593,6 +594,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             setSize(getPreferredSize());
         }
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         private void updateGoodsBox(List<Goods> allGoods) {
 
             // Remove all action listeners, so the update has no effect (except
@@ -725,6 +727,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
         }
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         public void updateStanceBox(){
             stanceBox.removeAllItems();
             Stance stance = source.getStance(target);

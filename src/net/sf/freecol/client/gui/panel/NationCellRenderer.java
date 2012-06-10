@@ -50,6 +50,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     *
     * @param nations array of <code>Nation</code>
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public NationCellRenderer(Nation[] nations) {
         this.nations = nations;
         this.comboBox = new JComboBox(nations);

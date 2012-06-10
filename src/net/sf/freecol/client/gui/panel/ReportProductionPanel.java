@@ -58,6 +58,7 @@ public final class ReportProductionPanel extends ReportPanel {
      *
      * @param gui The parent of this panel.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public ReportProductionPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, Messages.message("reportProductionAction.name"));
 

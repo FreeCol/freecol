@@ -47,6 +47,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      * @param option The <code>UnitTypeOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public UnitTypeOptionUI(GUI gui, final UnitTypeOption option, boolean editable) {
         super(gui, option, editable);
 

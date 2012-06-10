@@ -240,8 +240,10 @@ public final class PlayersTable extends JTable {
 
     class AvailableCellRenderer implements TableCellRenderer {
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox box = new JComboBox(allStates);
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         public AvailableCellRenderer() {
             box.setRenderer(new NationStateRenderer());
         }
@@ -272,7 +274,9 @@ public final class PlayersTable extends JTable {
 
     public final class AvailableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox aiStateBox = new JComboBox(aiStates);
+        @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox allStateBox = new JComboBox(allStates);
         private JComboBox activeBox;
 
@@ -282,6 +286,7 @@ public final class PlayersTable extends JTable {
                 }
             };
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         public AvailableCellEditor() {
             aiStateBox.setRenderer(new NationStateRenderer());
             aiStateBox.addActionListener(listener);

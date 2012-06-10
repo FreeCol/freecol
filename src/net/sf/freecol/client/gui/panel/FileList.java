@@ -37,6 +37,7 @@ public class FileList extends JList {
     *
     * @param directory The directory to list files from.
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public FileList(File directory) {        
         super();       
         setListData(getEntries(directory, getDefaultFileFilter()));        
@@ -50,6 +51,7 @@ public class FileList extends JList {
     * @param directory The directory to list files from.
     * @param fileFilter The filter to apply when displaying the files.
     */    
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public FileList(File directory, FileFilter fileFilter) {
         super();        
         setListData(getEntries(directory, fileFilter));

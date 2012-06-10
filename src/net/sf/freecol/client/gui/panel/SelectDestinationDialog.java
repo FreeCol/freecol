@@ -100,6 +100,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * The constructor to use.
      * @param freeColClient 
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectDestinationDialog(FreeColClient freeColClient, GUI gui, Unit unit) {
         super(freeColClient, gui);
 
@@ -350,6 +351,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         return "";
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private void filterDestinations() {
         DefaultListModel model = (DefaultListModel) destinationList.getModel();
         Object selected = destinationList.getSelectedValue();

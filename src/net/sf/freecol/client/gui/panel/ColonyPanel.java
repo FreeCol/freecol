@@ -175,6 +175,7 @@ public final class ColonyPanel extends FreeColPanel
      * @param gui The <code>GUI</code> to display on.
      * @param colony The <code>Colony</code> to display in this panel.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public ColonyPanel(FreeColClient freeColClient, GUI gui, Colony colony) {
         super(freeColClient, gui);
 

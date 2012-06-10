@@ -44,6 +44,7 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     *
     * @param nationTypes List of <code>EuropeanNationType></code>
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
         super(new JComboBox(new Vector<EuropeanNationType>(nationTypes)));
         ((JComboBox) getComponent()).setRenderer(new AdvantageRenderer());

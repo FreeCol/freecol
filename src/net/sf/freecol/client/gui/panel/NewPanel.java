@@ -92,8 +92,11 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         Advantages.FIXED,
         Advantages.NONE
     };
+
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private final JComboBox nationalAdvantages = new JComboBox(choices);
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private final JComboBox specificationBox = new JComboBox();
 
     private final Component[] joinComponents = new Component[] {
@@ -137,6 +140,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * @param specification An optional <code>Specification</code> value for
      *     the new game.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public NewPanel(FreeColClient freeColClient, GUI gui, Specification specification) {
         super(freeColClient, gui);
         this.specification = specification;

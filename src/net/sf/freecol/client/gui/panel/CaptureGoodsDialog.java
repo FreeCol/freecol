@@ -69,6 +69,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
      * @param winner The <code>Unit</code> that is looting.
      * @param loot The <code>Goods</code> to loot.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public CaptureGoodsDialog(FreeColClient freeColClient, GUI gui,
                               Unit winner, List<Goods> loot) {
         super(freeColClient, gui);

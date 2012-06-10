@@ -112,6 +112,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      */
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public BuildQueuePanel(FreeColClient freeColClient, GUI gui, Colony colony) {
 
         super(freeColClient, gui, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
@@ -157,6 +158,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildQueueList.addMouseListener(new BuildQueueMouseAdapter(false));
 
         Action deleteAction = new AbstractAction() {
+                @SuppressWarnings("deprecation") // FIXME in Java7
                 public void actionPerformed(ActionEvent e) {
                     for (Object type : buildQueueList.getSelectedValues()) {
                         removeBuildable(type);
@@ -169,6 +171,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildQueueList.getActionMap().put("delete", deleteAction);
 
         Action addAction = new AbstractAction() {
+                @SuppressWarnings("deprecation") // FIXME in Java7
                 public void actionPerformed(ActionEvent e) {
                     DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
                     for (Object type : ((JList) e.getSource()).getSelectedValues()) {
@@ -235,6 +238,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         model.removeElement(type);
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateUnitList() {
         DefaultListModel units = (DefaultListModel) unitList.getModel();
         units.clear();
@@ -304,6 +308,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateBuildingList() {
         DefaultListModel buildings = (DefaultListModel) buildingList.getModel();
         DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
@@ -601,6 +606,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateDetailView() {
         cellRenderer = getCellRenderer();
         buildQueueList.setCellRenderer(cellRenderer);
@@ -626,6 +632,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      * <code>BuildQueueItem</code>s between the build queue list, the
      * unit list and the building list.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public class BuildQueueTransferHandler extends TransferHandler {
 
         private final DataFlavor buildQueueFlavor = new DataFlavor(List.class, "BuildingQueueFlavor");
@@ -832,6 +839,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * queue.
          */
         @Override
+        @SuppressWarnings("deprecation") // FIXME in Java7
         protected Transferable createTransferable(JComponent comp) {
             if (comp instanceof JList) {
                 source = (JList) comp;
@@ -999,6 +1007,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
 
         @Override
+        @SuppressWarnings({"deprecation", "unchecked"}) // FIXME in Java7
         public void mousePressed(MouseEvent e) {
             if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
                 enabled = true;

@@ -43,6 +43,7 @@ public final class SelectOptionUI extends OptionUI<SelectOption>  {
     * @param option The <code>SelectOption</code> to make a user interface for
     * @param editable boolean whether user can modify the setting
     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectOptionUI(GUI gui, final SelectOption option, boolean editable) {
         super(gui, option, editable);
 

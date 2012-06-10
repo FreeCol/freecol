@@ -34,6 +34,7 @@ public final class NationCellEditor extends DefaultCellEditor {
      *
      * @param nations array of <code>Nation</code>
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public NationCellEditor(Nation[] nations) {
         super(new JComboBox(nations));
     }

@@ -88,6 +88,8 @@ public class SaveLoadTest extends FreeColTestCase {
         } catch (FreeColException e) {
             fail(e.getMessage());
         }
+        ((FileOption) mapGenerator.getMapGeneratorOptions()
+            .getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());

@@ -97,6 +97,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final DefaultListModel listModel = new DefaultListModel();
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private final JList stopList = new JList(listModel);
 
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
@@ -113,6 +114,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @param gui The <code>GUI</code> to display on.
      * @param newRoute The <code>TradeRoute</code> to operate on.
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
                                  TradeRoute newRoute) {
         super(freeColClient, gui);
@@ -514,6 +516,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             return MOVE;
         }
 
+        @SuppressWarnings("unchecked") // FIXME in Java7
         public boolean importData(JComponent target, Transferable data) {
             if (canImport(target, data.getTransferDataFlavors())) {
                 try {

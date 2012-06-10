@@ -74,6 +74,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      * @param gui the GUI
      * @param settlement the IndianSettlement to edit
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public EditSettlementDialog(FreeColClient freeColClient, GUI gui, final IndianSettlement settlement) {
 
         super(freeColClient, gui);
@@ -128,6 +129,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         setSize(getPreferredSize());
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private DefaultComboBoxModel getSkillModel() {
         IndianNationType ownerType = (IndianNationType)
             ((Nation) owner.getSelectedItem()).getType();
@@ -138,6 +140,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         return skillModel;
     }
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
         skill.setModel(getSkillModel());
         skill.setSelectedItem(settlement.getLearnableSkill());
