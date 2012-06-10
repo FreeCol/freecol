@@ -131,8 +131,8 @@
             deprecation="off"
             source="${java.target.version}"
             target="${java.target.version}"
-            includeantruntime="false"
-        />
+            includeantruntime="false">
+        </javac>
     </target>
 
     <target name="build" depends="init,compile" description="Compiles the source files.">

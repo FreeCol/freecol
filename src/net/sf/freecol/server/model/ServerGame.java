@@ -227,7 +227,7 @@ public class ServerGame extends Game implements ServerModelObject {
         setTurn(getTurn().next());
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
-        logger.info("ServerGame.csNewTurn, turn is " + getTurn().toString());
+        logger.finest("ServerGame.csNewTurn, turn is " + getTurn().toString());
 
         for (Player player : getPlayers()) {
             if (!player.isUnknownEnemy() && !player.isDead()) {

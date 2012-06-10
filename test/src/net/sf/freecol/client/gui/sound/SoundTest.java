@@ -36,19 +36,22 @@ public class SoundTest extends FreeColTestCase {
 
     private SoundPlayer soundPlayer = null;
 
-    private SoundPlayer getSoundPlayer() {
-        if (soundPlayer == null) {
-            ClientOptions clientOptions = new ClientOptions();
-            final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
-            final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
-            po.setValue(10); // 10% volume
-            try {
-                soundPlayer = new SoundPlayer(amo, po);
-            } catch (Exception e) {
-                fail("Could not construct sound player: " + e.getMessage());
-            }
+    @Override
+    public void setUp() {
+        ClientOptions clientOptions = new ClientOptions();
+        final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
+        final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
+        po.setValue(10); // 10% volume
+        try {
+            soundPlayer = new SoundPlayer(amo, po);
+        } catch (Exception e) {
+            fail("Could not construct sound player: " + e.getMessage());
         }
-        return soundPlayer;
+    }
+
+    @Override
+    public void tearDown() {
+        soundPlayer = null;
     }
 
     private void playSound(String id) {
@@ -63,16 +66,15 @@ public class SoundTest extends FreeColTestCase {
         } else {
             try {
                 assertNotNull(AudioSystem.getAudioInputStream(file));
+                soundPlayer.playOnce(file);
+                try { // Just play the beginning of the sound to check it works
+                    Thread.sleep(100);
+                    soundPlayer.stop();
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {}
             } catch (Exception e) {
                 fail("Could not play " + id + ": " + e.getMessage());
             }
-            SoundPlayer soundPlayer = getSoundPlayer();
-            soundPlayer.playOnce(file);
-            try {
-                // Just play the beginning of the sound to check it works
-                Thread.sleep(300);
-            } catch (InterruptedException e) {}
-            soundPlayer.stop();
         }
     }
 
@@ -114,5 +116,4 @@ public class SoundTest extends FreeColTestCase {
         playSound("sound.event.sellCargo");
         playSound("sound.event.shipSunk");
     }
-
 }

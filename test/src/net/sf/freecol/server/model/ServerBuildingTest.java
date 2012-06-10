@@ -293,12 +293,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         while (4 == getUnitList(colony, freeColonistType).size()) {
             ServerTestHelper.newTurn();
-            System.out.println("new turn");
         }
 
-        for (Unit unit: colony.getUnitList()) {
-            System.out.println(unit);
-        }
         assertEquals(3, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
