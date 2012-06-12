@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -96,7 +96,7 @@ public class Message {
     private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
-        boolean dumpMsgOnError = FreeCol.isInDebugMode();
+        boolean dumpMsgOnError = FreeColDebugger.isInDebugMode();
         if (dumpMsgOnError) {
             /*
              * inputSource.setByteStream( new

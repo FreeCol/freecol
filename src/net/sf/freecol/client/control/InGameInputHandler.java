@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.control;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +29,12 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -66,6 +68,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -445,10 +448,10 @@ public final class InGameInputHandler extends InputHandler {
         final Player newPlayer = getGame()
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
         final boolean newTurn = player.equals(newPlayer);
-        if (FreeCol.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode()
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
 
-        if (FreeCol.tryCompleteDebugRun(fcc)) {
+        if (tryCompleteDebugRun(fcc)) {
             fcc.quit();
             return null;
         }
@@ -515,7 +518,7 @@ public final class InGameInputHandler extends InputHandler {
                                                        Player.class);
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
-            if (FreeCol.tryCompleteDebugRun(freeColClient)) freeColClient.quit();
+            if (tryCompleteDebugRun(freeColClient)) freeColClient.quit();
             if (freeColClient.isSinglePlayer()) {
                 if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
                     && new ShowConfirmDialogSwingTask(null,
@@ -547,7 +550,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        if (FreeCol.tryCompleteDebugRun(freeColClient)) freeColClient.quit();
+        if (tryCompleteDebugRun(freeColClient)) freeColClient.quit();
 
         Player winner = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                                        Player.class);
@@ -1137,6 +1140,27 @@ public final class InGameInputHandler extends InputHandler {
      * Handler methods end here.
      *
      */
+
+    /**
+     * Try to complete a debug run, if any.
+     *
+     * @param fcc The <code>FreeColClient</code> of the game.
+     * @return True if a debug run was completed.
+     */
+    public static boolean tryCompleteDebugRun(FreeColClient fcc) {
+        if (FreeColDebugger.getDebugRunTurns() != 0) return false;
+        if (FreeColDebugger.getDebugRunSave() != null) {
+            FreeColServer fcs = fcc.getFreeColServer();
+            if (fcs != null) {
+                try {
+                    fcs.saveGame(new File(".", FreeColDebugger.getDebugRunSave()),
+                        fcc.getMyPlayer().getName(),
+                        fcc.getClientOptions());
+                } catch (IOException e) {}
+            }
+        }
+        return true;
+    }
 
     /**
      * This utility class is the base class for tasks that need to run in the

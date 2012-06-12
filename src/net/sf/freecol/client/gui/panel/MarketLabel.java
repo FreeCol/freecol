@@ -24,9 +24,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -93,7 +93,7 @@ public final class MarketLabel extends AbstractGoodsLabel {
             toolTipText = Messages.message(getType().getLabel(false));
             setEnabled(false);
         }
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             toolTipText += " " + market.getAmountInMarket(getType());
         }
         setToolTipText(toolTipText);

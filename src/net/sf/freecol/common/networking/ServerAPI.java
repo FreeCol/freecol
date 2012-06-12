@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -162,7 +162,7 @@ public class ServerAPI {
             String messageId = reply.getAttribute("messageID");
             String messageText = reply.getAttribute("message");
             if (messageId != null && messageText != null
-                && FreeCol.isInDebugMode()) {
+                && FreeColDebugger.isInDebugMode()) {
                 // If debugging suppress the bland but i18n compliant
                 // failure message in favour of the higher detail
                 // non-i18n text.
@@ -212,7 +212,7 @@ public class ServerAPI {
             + " which should have been " + tag
             + " to message " + message;
         logger.warning(complaint);
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             freeColClient.getGUI().errorMessage(null, complaint);
         }
         return null;

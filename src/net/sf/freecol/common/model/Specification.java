@@ -38,7 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -1140,7 +1140,7 @@ public final class Specification {
         }
 
         // TODO: find a better place for this!
-        if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL) {
+        if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
             getIntegerOption(GameOptions.STARTING_MONEY).setValue(10000);
         }
 

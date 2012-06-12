@@ -64,12 +64,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -164,7 +164,7 @@ public final class ColonyPanel extends FreeColPanel
 
     private JButton colonyUnitsButton = new JButton(Messages.message("Colony Units"));
 
-    private JButton setGoodsButton = (FreeCol.isInDebugMode())
+    private JButton setGoodsButton = (FreeColDebugger.isInDebugMode())
         ? new JButton("Set Goods") : null;
 
 
@@ -1400,7 +1400,7 @@ public final class ColonyPanel extends FreeColPanel
          * Update this WarehousePanel.
          */
         private void update() {
-            final int threshold = (FreeCol.isInDebugMode()) ? 1
+            final int threshold = (FreeColDebugger.isInDebugMode()) ? 1
                 : getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             removeAll();
             GoodsContainer container = getColony().getGoodsContainer();

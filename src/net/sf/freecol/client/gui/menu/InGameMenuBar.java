@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 
@@ -99,7 +99,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         buildColopediaMenu();
 
         // --> Debug
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             add(new DebugMenu(freeColClient, gui));
         }
 

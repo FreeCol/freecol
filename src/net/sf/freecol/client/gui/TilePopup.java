@@ -34,12 +34,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ReportPanel;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Game;
@@ -224,7 +224,7 @@ public final class TilePopup extends JPopupMenu {
         }
 
         // START DEBUG
-        if (FreeCol.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode()
             && freeColClient.getFreeColServer() != null) {
             final Game serverGame = freeColClient.getFreeColServer().getGame();
             final Player serverPlayer = serverGame.getFreeColGameObject(player.getId(),
@@ -557,7 +557,7 @@ public final class TilePopup extends JPopupMenu {
      * @return True if this popup has at least one menuitem, false otherwise.
      */
     public boolean hasItem() {
-        return hasAnItem || FreeCol.isInDebugMode();
+        return hasAnItem || FreeColDebugger.isInDebugMode();
     }
 
     /**

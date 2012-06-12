@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -670,7 +670,7 @@ public class SimpleMapGenerator implements MapGenerator {
         settlement.placeSettlement(true);
 
         // START DEBUG:
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             for (GoodsType goodsType : map.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isNewWorldGoodsType())
                     settlement.addGoods(goodsType, 150);
@@ -829,7 +829,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
 
-            if (FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL) {
+            if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
                 createDebugUnits(map, player, startTile);
             }
         }

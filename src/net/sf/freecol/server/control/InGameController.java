@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -171,7 +172,7 @@ public final class InGameController extends Controller {
      * @return The number of terms to skip.
      */
     public int getSkippedTurns() {
-        return (FreeCol.isInDebugMode()) ? debugOnlyAITurns : -1;
+        return (FreeColDebugger.isInDebugMode()) ? debugOnlyAITurns : -1;
     }
 
     /**
@@ -180,7 +181,7 @@ public final class InGameController extends Controller {
      * @param turns The number of turns to skip through.
      */
     public void setSkippedTurns(int turns) {
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             debugOnlyAITurns = turns;
         }
     }
@@ -192,7 +193,7 @@ public final class InGameController extends Controller {
      * @param action The <code>MonarchAction</code> to be taken.
      */
     public void setMonarchAction(Player player, MonarchAction action) {
-        if (FreeCol.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode()) {
             debugMonarchPlayer = (ServerPlayer) player;
             debugMonarchAction = action;
         }
@@ -714,8 +715,8 @@ public final class InGameController extends Controller {
                     if (--debugOnlyAITurns <= 0) {
                         // If this was a debug run, complete it.  This will
                         // possibly signal the client to save and quit.
-                        if (FreeCol.getDebugRunTurns() > 0) {
-                            FreeCol.completeDebugRun();
+                        if (FreeColDebugger.getDebugRunTurns() > 0) {
+                            FreeColDebugger.completeDebugRun();
                         }
                     }
                 }

@@ -42,6 +42,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
@@ -101,14 +102,6 @@ public final class FreeCol {
 
     private static boolean standAloneServer = false;
     private static boolean publicServer = true;
-
-    public static final int DEBUG_OFF = 0;
-    public static final int DEBUG_LIMITED = 1;
-    public static final int DEBUG_FULL = 2;
-    public static final int DEBUG_FULL_COMMS = 3;
-    private static int debugLevel = DEBUG_OFF;
-    private static int debugRunTurns = -1;
-    private static String debugRunSave = null;
 
     private static String fontName = null;
 
@@ -733,17 +726,12 @@ public final class FreeCol {
             }
             if (line.hasOption("version")) {
                 System.out.println("FreeCol " + getVersion());
-                System.exit(0);
+                System.exit(0); 
             }
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
-                try {
-                    debugLevel = Integer.parseInt(line.getOptionValue("debug"));
-                    debugLevel = Math.min(Math.max(debugLevel, DEBUG_OFF),
-                                          DEBUG_FULL_COMMS);
-                } catch (NumberFormatException e) {
-                    debugLevel = DEBUG_FULL;
-                }
+                String optionValue = line.getOptionValue("debug");
+                FreeColDebugger.configureDebugLevel(optionValue);
                 // user set log level has precedence
                 if (!line.hasOption("log-level")) {
                     logLevel = Level.FINEST;
@@ -754,11 +742,11 @@ public final class FreeCol {
                     String turns = opt.substring(0, (comma < 0) ? opt.length()
                                                  : comma);
                     try {
-                        debugRunTurns = Integer.parseInt(turns);
+                        FreeColDebugger.setDebugRunTurns(Integer.parseInt(turns));
                     } catch (NumberFormatException e) {
-                        debugRunTurns = -1;
+                        FreeColDebugger.setDebugRunTurns(-1);
                     }
-                    if (comma > 0) debugRunSave = opt.substring(comma + 1);
+                    if (comma > 0) FreeColDebugger.setDebugRunSave(opt.substring(comma + 1));
                 }
             }
             if (line.hasOption("server")) {
@@ -832,7 +820,6 @@ public final class FreeCol {
         }
     }
 
-
     private static void printUsage() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("java -Xmx 128M -jar freecol.jar [OPTIONS]", options);
@@ -865,71 +852,6 @@ public final class FreeCol {
      */
     public static String getLogFile() {
         return logFile;
-    }
-
-    /**
-     * Checks if the program is in "Debug mode".
-     * @return <code>true</code> if the program is in debug
-     *       mode and <code>false</code> otherwise.
-     */
-    public static boolean isInDebugMode() {
-        return debugLevel > DEBUG_OFF;
-    }
-
-    /**
-     * Gets the debug level.
-     *
-     * @return The debug level.
-     */
-    public static int getDebugLevel() {
-        return debugLevel;
-    }
-
-    /**
-     * Sets the "debug mode" to be active or not.
-     * @param debug Should be <code>true</code> in order
-     *       to active debug mode and <code>false</code>
-     *       otherwise.
-     */
-    public static void setInDebugMode(boolean debug) {
-        debugLevel = (debug) ? DEBUG_FULL : DEBUG_OFF;
-    }
-
-    /**
-     * Gets the turns to run in debug mode.
-     *
-     * @return The turns to run in debug mode.
-     */
-    public static int getDebugRunTurns() {
-        return debugRunTurns;
-    }
-
-    /**
-     * Complete debug run.
-     */
-    public static void completeDebugRun() {
-        debugRunTurns = 0;
-    }
-
-    /**
-     * Try to complete a debug run, if any.
-     *
-     * @param fcc The <code>FreeColClient</code> of the game.
-     * @return True if a debug run was completed.
-     */
-    public static boolean tryCompleteDebugRun(FreeColClient fcc) {
-        if (debugRunTurns != 0) return false;
-        if (debugRunSave != null) {
-            FreeColServer fcs = fcc.getFreeColServer();
-            if (fcs != null) {
-                try {
-                    fcs.saveGame(new File(".", debugRunSave),
-                        fcc.getMyPlayer().getName(),
-                        fcc.getClientOptions());
-                } catch (IOException e) {}
-            }
-        }
-        return true;
     }
 
     /**

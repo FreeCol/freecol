@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 
 import javax.swing.Timer;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -75,7 +75,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
         try {
             if (e.getClickCount() > 1) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                if (FreeCol.isInDebugMode()) {
+                if (FreeColDebugger.isInDebugMode()) {
                     if (tile.getSettlement() != null) {
                         canvas.debugForeignColony(tile.getSettlement());
                     }

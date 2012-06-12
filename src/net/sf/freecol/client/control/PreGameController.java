@@ -24,10 +24,10 @@ package net.sf.freecol.client.control;
 import java.awt.Color;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
@@ -230,8 +230,8 @@ public final class PreGameController {
 
         gui.setUpMouseListenersForCanvas();
 
-        if (FreeCol.isInDebugMode() && FreeCol.getDebugRunTurns() > 0) {
-            freeColClient.skipTurns(FreeCol.getDebugRunTurns());
+        if (FreeColDebugger.isInDebugMode() && FreeColDebugger.getDebugRunTurns() > 0) {
+            freeColClient.skipTurns(FreeColDebugger.getDebugRunTurns());
         } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
             ModelMessage message =
                 new ModelMessage(ModelMessage.MessageType.TUTORIAL,

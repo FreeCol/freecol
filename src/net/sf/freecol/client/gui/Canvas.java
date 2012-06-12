@@ -129,6 +129,7 @@ import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
@@ -1823,7 +1824,7 @@ public final class Canvas extends JDesktopPane {
         if (s instanceof Colony) {
             if (s.getOwner().equals(freeColClient.getMyPlayer())) {
                 showColonyPanel((Colony) s);
-            } else if (FreeCol.isInDebugMode()) {
+            } else if (FreeColDebugger.isInDebugMode()) {
                 debugForeignColony(s);
             }
         } else if (s instanceof IndianSettlement) {

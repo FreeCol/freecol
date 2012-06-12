@@ -24,9 +24,9 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 /**
  * Switch debug mode on.
@@ -53,7 +53,7 @@ public class DebugAction extends FreeColAction {
      */
     @Override
     public boolean shouldBeEnabled() {
-        return !FreeCol.isInDebugMode();
+        return !FreeColDebugger.isInDebugMode();
     }
 
     /**

@@ -40,6 +40,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -163,13 +164,13 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Sets the "debug mode" to be active or not. Calls
-     * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
+     * {@link FreeColDebugger#setInDebugMode(boolean)} and reinitialize the
      * <code>FreeColMenuBar</code>.
      *
      * @param debug Set to <code>true</code> to enable debug mode.
      */
     public void setInDebugMode(boolean debug) {
-        FreeCol.setInDebugMode(debug);
+        FreeColDebugger.setInDebugMode(debug);
         logger.info("Debug mode set to " + debug);
         gui.updateMenuBar();
     }

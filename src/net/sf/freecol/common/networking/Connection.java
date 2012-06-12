@@ -40,7 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -77,7 +77,7 @@ public class Connection {
     private String name;
 
     protected static boolean dump
-        = FreeCol.getDebugLevel() >= FreeCol.DEBUG_FULL_COMMS;
+        = FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL_COMMS;
 
 
     /**

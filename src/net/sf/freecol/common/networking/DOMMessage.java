@@ -41,7 +41,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.debug.FreeColDebugger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -399,7 +399,7 @@ public class DOMMessage {
      */
     public static Element clientError(String message) {
         logger.warning(message);
-        if (FreeCol.isInDebugMode()) Thread.dumpStack();
+        if (FreeColDebugger.isInDebugMode()) Thread.dumpStack();
         return createMessage("error",
             "messageID", "server.reject",
             "message", message);
