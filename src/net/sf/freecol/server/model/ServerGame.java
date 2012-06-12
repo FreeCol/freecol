@@ -267,17 +267,15 @@ public class ServerGame extends Game implements ServerModelObject {
         }
 
         // Only eliminate the weakest AI if limits are met
-        Limit weakestPlayerLimit;
-        Limit strongestPlayerLimit;
+        Limit weakLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.weakestPlayer");
+        Limit strongLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer");
         if (weakestAIPlayer != null
             && strongestAIPlayer != null
             && weakestAIPlayer != strongestAIPlayer
-            && ((weakestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.weakestPlayer")) == null
-                || weakestPlayerLimit.evaluate(weakestAIPlayer))
-            && ((strongestPlayerLimit = spanishSuccession.getLimit("model.limit.spanishSuccession.strongestPlayer")) == null
-                || strongestPlayerLimit.evaluate(strongestAIPlayer))) {
+            && (weakLimit == null || weakLimit.evaluate(weakestAIPlayer))
+            && (strongLimit == null || strongLimit.evaluate(strongestAIPlayer))) {
             String logMe = "Spanish succession"
-                + " in " + getGame().getTurn().toString()
+                + " in " + getTurn()
                 + " " + weakestAIPlayer.getName()
                 + " cedes to " + strongestAIPlayer.getName()
                 + ":";
