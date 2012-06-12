@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
@@ -383,7 +384,7 @@ public final class ConnectController {
      * and loads the game.
      */
     public void loadGame() {
-        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file != null) {
             //FreeCol.setSaveDirectory(file.getParentFile());
             loadGame(file);

@@ -25,9 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -75,7 +75,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         super.actionPerformed(event);
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            File file = FreeCol.getClientOptionsFile();
+            File file = FreeColDirectories.getClientOptionsFile();
             try {
                 getGroup().save(file);
                 getFreeColClient().getActionManager().update();

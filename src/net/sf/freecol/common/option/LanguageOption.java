@@ -34,8 +34,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -157,7 +157,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      */
     private static void findLanguages() {
 
-        File i18nDirectory = new File(FreeCol.getDataDirectory(), Messages.STRINGS_DIRECTORY);
+        File i18nDirectory = FreeColDirectories.getI18nDirectory();
         File[] files = i18nDirectory.listFiles();
         if (files == null) {
             throw new RuntimeException("No language files could be found in the <" + i18nDirectory +

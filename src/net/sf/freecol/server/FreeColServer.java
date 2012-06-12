@@ -50,6 +50,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Building;
@@ -116,8 +117,6 @@ public final class FreeColServer {
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
     private static final int NUMBER_OF_HIGH_SCORES = 10;
-    private static final String HIGH_SCORE_FILE = "HighScores.xml";
-
     /**
      * The save game format used for saving games.
      *
@@ -1314,7 +1313,7 @@ public final class FreeColServer {
      * a previous game.
      */
     public static void removeAutosaves(final String prefix) {
-        for (File autosaveFile : FreeCol.getAutosaveDirectory().listFiles()) {
+        for (File autosaveFile : FreeColDirectories.getAutosaveDirectory().listFiles()) {
             if (autosaveFile.getName().startsWith(prefix)) {
                 autosaveFile.delete();
             }
@@ -1461,8 +1460,7 @@ public final class FreeColServer {
         FileOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
-            fos = new FileOutputStream(new File(FreeCol.getDataDirectory(),
-                                                HIGH_SCORE_FILE));
+            fos = new FileOutputStream(FreeColDirectories.getHighScoreFile());
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
             xsw.writeStartDocument("UTF-8", "1.0");
             xsw.writeStartElement("highScores");
@@ -1503,7 +1501,7 @@ public final class FreeColServer {
      */
     public void loadHighScores() throws IOException, FreeColException {
         highScores = new ArrayList<HighScore>();
-        File hsf = new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE);
+        File hsf = FreeColDirectories.getHighScoreFile();
         if (!hsf.exists()) return;
         XMLInputFactory xif = XMLInputFactory.newInstance();
         FileInputStream fis = null;
@@ -1526,7 +1524,6 @@ public final class FreeColServer {
             if (fis != null) fis.close();
         }
     }
-
 
     public void shutdown() {
         server.shutdown();

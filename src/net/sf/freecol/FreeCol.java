@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.SecureRandom;
 import java.util.Locale;
@@ -33,7 +32,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.filechooser.FileSystemView;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
@@ -43,6 +41,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
@@ -81,8 +80,6 @@ public final class FreeCol {
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
-    public static final String DEFAULT_TC = "freecol";
-
     private static final String FREECOL_VERSION = "0.10.0-trunk";
     private static String FREECOL_REVISION;
 
@@ -95,7 +92,6 @@ public final class FreeCol {
                             memoryCheck = true,
                             consoleLogging = false,
                             introVideo = true;
-    private static String dataFolder = "data";
     private static String logFile = null;
 
     private static FreeColClient freeColClient;
@@ -107,27 +103,6 @@ public final class FreeCol {
 
     private static int serverPort = -1;
     private static String serverName = null;
-
-    private static File mainUserDirectory = null;
-
-    private static File saveDirectory;
-    /** Directory containing automatically created save games.
-     *  At program start, the path of this directory is based on the path
-     *  where to store regular save games. If the value of saveGame is
-     *  changed by the user during the game, then the value of
-     *  autoSaveDirectory will not be effected.
-     */
-    private static File autoSaveDirectory;
-
-    private static File tcUserDirectory;
-
-    private static File userModsDirectory;
-
-    private static String tc = DEFAULT_TC;
-
-    private static File savegameFile = null;
-
-    private static File clientOptionsFile = null;
 
     private static Level logLevel = Level.INFO;
 
@@ -167,7 +142,7 @@ public final class FreeCol {
         // parse command line arguments
         handleArgs(args);
 
-        createAndSetDirectories();
+        FreeColDirectories.createAndSetDirectories();
         initLogging();
 
         Locale locale = getLocale();
@@ -191,7 +166,7 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
-            freeColClient = new FreeColClient(savegameFile, windowSize, sound, splashFilename, introVideo, fontName);
+            freeColClient = new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize, sound, splashFilename, introVideo, fontName);
         }
     }
 
@@ -205,7 +180,7 @@ public final class FreeCol {
             baseLogger.removeHandler(handlers[i]);
         }
         if (logFile == null) {
-            logFile = mainUserDirectory.getPath() + File.separator
+            logFile = FreeColDirectories.getMainUserDirectory().getPath() + File.separator
                 + "FreeCol.log";
         }
         try {
@@ -231,7 +206,7 @@ public final class FreeCol {
     public static Locale getLocale() {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader in = null;
-        File options = getClientOptionsFile();
+        File options = FreeColDirectories.getClientOptionsFile();
         if (options.canRead()) {
             try {
                 in = xif.createXMLStreamReader(new FileInputStream(options), "UTF-8");
@@ -278,99 +253,12 @@ public final class FreeCol {
     }
 
     /**
-     * Returns the file containing the client options.
-     * @return The file.
-     */
-    public static File getClientOptionsFile() {
-        return clientOptionsFile;
-    }
-
-    /**
      * Gets the <code>FreeColClient</code>.
      * @return The <code>FreeColClient</code>, or <code>null</code>
      *      if the game is run as a standalone server.
      */
     public static FreeColClient getFreeColClient() {
         return freeColClient;
-    }
-
-    /**
-     * Try to make a directory.
-     *
-     * @param file A <code>File</code> specifying where to make the directory.
-     * @return True if the directory is there after the call.
-     */
-    private static boolean insistDirectory(File file) {
-        if (file.exists()) {
-            if (file.isDirectory()) return true;
-            System.out.println("Could not create directory " + file.getName()
-                + " under " + file.getParentFile().getName()
-                + " because a non-directory with that name is already there.");
-            return false;
-        }
-        return file.mkdir();
-    }
-
-    /**
-     * Creates a freecol dir for the current user.
-     *
-     * The directory is created within the current user's
-     * home directory. This directory will be called "freecol"
-     * and underneath that directory a "save" directory will
-     * be created.
-     *
-     * For MacOS X the Library/FreeCol is used
-     * (which is the standard path for application related files).
-     *
-     * For os.name beginning with "Windows" JFileChooser() is used to
-     * find the path to "My Documents" (or localized equivalent)
-     */
-    private static void createAndSetDirectories() {
-        // TODO: The location of the save directory should be determined by the installer.;
-
-        String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
-                ".freecol" : "freecol";
-
-        File userHome = FileSystemView.getFileSystemView().getDefaultDirectory();
-
-        // Checks for OS specific paths, however if the old {home}/.freecol exists
-        // that overrides OS-specifics for backwards compatibility.
-        // TODO: remove compatibility code
-        if (System.getProperty("os.name").equals("Mac OS X")) {
-            // We are running on a Mac and should use {home}/Library/FreeCol
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                userHome = new File(userHome, "Library");
-                freeColDirectoryName = "FreeCol";
-            }
-        } else if (System.getProperty("os.name").startsWith("Windows")) {
-            // We are running on Windows and should use "My Documents" (or localized equivalent)
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                freeColDirectoryName = "FreeCol";
-            }
-        }
-
-        if (mainUserDirectory == null) {
-            mainUserDirectory = new File(userHome, freeColDirectoryName);
-        }
-        if (!insistDirectory(mainUserDirectory)) return;
-        if (saveDirectory == null) {
-            saveDirectory = new File(mainUserDirectory, "save");
-        }
-        if (!insistDirectory(saveDirectory)) saveDirectory = null;
-
-        autoSaveDirectory = new File(saveDirectory, "autosave");
-        if (!insistDirectory(autoSaveDirectory)) autoSaveDirectory = null;
-
-        tcUserDirectory = new File(mainUserDirectory, tc);
-        if (!insistDirectory(tcUserDirectory)) tcUserDirectory = null;
-
-        userModsDirectory = new File(mainUserDirectory, "mods");
-        if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
-
-        if (clientOptionsFile == null) {
-            clientOptionsFile = (tcUserDirectory == null) ? null
-                : new File(tcUserDirectory, "options.xml");
-        }
     }
 
     /**
@@ -383,86 +271,7 @@ public final class FreeCol {
             System.exit(1);
         }
 
-        savegameFile = new File(name);
-        if (!savegameFile.exists() || !savegameFile.isFile()) {
-            savegameFile = new File(getSaveDirectory(), name);
-            if (!savegameFile.exists() || !savegameFile.isFile()) {
-                System.out.println("Could not find savegame file: " + name);
-                System.exit(1);
-            }
-        } else {
-            setSaveDirectory(savegameFile.getParentFile());
-        }
-    }
-
-    /**
-     * Returns the directory where the savegames should be put.
-     * @return The directory where the savegames should be put.
-     */
-    public static File getSaveDirectory() {
-        return saveDirectory;
-    }
-
-    /**
-     * Set the directory where the savegames should be put.
-     * @param saveDirectory a <code>File</code> value for the savegame directory
-     */
-    public static void setSaveDirectory(File saveDirectory) {
-        FreeCol.saveDirectory = saveDirectory;
-    }
-
-    /**
-     * Returns the data directory.
-     * @return The directory where the data files are located.
-     */
-    public static File getDataDirectory() {
-        if (dataFolder.equals("")) {
-            return new File("data");
-        } else {
-            return new File(dataFolder);
-        }
-    }
-
-    /**
-     * Gets the mods directory.
-     *
-     * @return The directory where the standard mods are located.
-     */
-    public static File getStandardModsDirectory() {
-        return new File(getDataDirectory(), "mods");
-    }
-
-    /**
-     * Gets the user mods directory.
-     *
-     * @return The directory where user mods are located, or null if none.
-     */
-    public static File getUserModsDirectory() {
-        return userModsDirectory;
-    }
-
-    /**
-     * Returns the directory where the autogenerated savegames
-     * should be put.
-     *
-     * @return The directory.
-     */
-    public static File getAutosaveDirectory() {
-        return autoSaveDirectory;
-    }
-
-    /**
-     * Returns the directory for saving options.
-     *
-     * @return The directory.
-     */
-    public static File getOptionsDirectory() {
-        return tcUserDirectory;
-    }
-
-    public static InputStream getSpecificationInputStream() throws IOException {
-        final FreeColTcFile tcData = new FreeColTcFile(tc);
-        return tcData.getSpecificationInputStream();
+        FreeColDirectories.setSaveGameFile(name);
     }
 
     /**
@@ -506,7 +315,7 @@ public final class FreeCol {
             }
         }
         if (locationArg != null) {
-            dataFolder = locationArg;
+            FreeColDirectories.setDataFolder(locationArg);
         }
         if (localeArg == null) {
             Messages.setMessageBundle(Locale.getDefault());
@@ -655,22 +464,22 @@ public final class FreeCol {
                 }
             }
             if (line.hasOption("freecol-data")) {
-                dataFolder = line.getOptionValue("freecol-data");
+                FreeColDirectories.setDataFolder(line.getOptionValue("freecol-data"));
             }
             if (line.hasOption("tc")) {
-                tc = line.getOptionValue("tc");
+                FreeColDirectories.setTc(line.getOptionValue("tc"));
             }
             if (line.hasOption("home-directory")) {
                 String arg = line.getOptionValue("home-directory");
-                mainUserDirectory = new File(arg);
+                FreeColDirectories.setMainUserDirectory(new File(arg));
                 String errMsg = null;
-                if(!mainUserDirectory.exists()){
+                if(!FreeColDirectories.getMainUserDirectory().exists()){
                     errMsg = "cli.error.home.notExists";
                 }
-                if(!mainUserDirectory.canRead()){
+                if(!FreeColDirectories.getMainUserDirectory().canRead()){
                     errMsg = "cli.error.home.noRead";
                 }
-                if(!mainUserDirectory.canWrite()){
+                if(!FreeColDirectories.getMainUserDirectory().canWrite()){
                     errMsg = "cli.error.home.noWrite";
                 }
                 if(errMsg != null){
@@ -805,7 +614,7 @@ public final class FreeCol {
                 String fileName = line.getOptionValue("clientOptions");
                 File file = new File(fileName);
                 if (file.exists() && file.isFile() && file.canRead()) {
-                    clientOptionsFile = file;
+                    FreeColDirectories.setClientOptionsFile(file);
                 } else {
                     String err = Messages.message(StringTemplate
                         .template("cli.error.clientOptions")
@@ -894,12 +703,12 @@ public final class FreeCol {
         logger.info("Starting stand-alone server.");
         try {
             final FreeColServer freeColServer;
-            if (savegameFile != null) {
+            if (FreeColDirectories.getSavegameFile() != null) {
                 XMLStream xs = null;
                 try {
                     // Get suggestions for "singlePlayer" and "public
                     // game" settings from the file:
-                    final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
+                    final FreeColSavegameFile fis = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
                     xs = FreeColServer.createXMLStreamReader(fis);
                     final XMLStreamReader in = xs.getXMLStreamReader();
                     in.nextTag();
@@ -926,7 +735,7 @@ public final class FreeCol {
                 }
             } else {
                 try {
-                    FreeColTcFile tcData = new FreeColTcFile(tc);
+                    FreeColTcFile tcData = new FreeColTcFile(FreeColDirectories.getTc());
                     Specification specification = tcData.getSpecification();
                     freeColServer = new FreeColServer(specification,
                         publicServer, false, serverPort, serverName);

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -86,8 +86,6 @@ import net.sf.freecol.common.option.Option;
 public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
-
-    public static final String STRINGS_DIRECTORY = "strings";
 
     public static final String FILE_PREFIX = "FreeColMessages";
 
@@ -159,7 +157,7 @@ public class Messages {
 
         if (!NumberRules.isInitialized()) {
             // attempt to read grammatical rules
-            File stringDirectory = new File(FreeCol.getDataDirectory(), "strings");
+            File stringDirectory = FreeColDirectories.getI18nDirectory();
             if (stringDirectory.exists()) {
                 File cldr = new File(stringDirectory, "plurals.xml");
                 if (cldr.exists()) {
@@ -184,7 +182,7 @@ public class Messages {
         setGrammaticalNumber(NumberRules.getNumberForLanguage(language));
 
         for (String fileName : filenames) {
-            File resourceFile = new File(getI18nDirectory(), fileName);
+            File resourceFile = new File(FreeColDirectories.getI18nDirectory(), fileName);
             loadResources(resourceFile);
             logger.finest("Loaded message bundle " + fileName + " from messages.");
         }
@@ -205,15 +203,6 @@ public class Messages {
                 }
             }
         }
-    }
-
-    /**
-     * Returns the directory containing language property files.
-     *
-     * @return a <code>File</code> value
-     */
-    public static File getI18nDirectory() {
-        return new File(FreeCol.getDataDirectory(), STRINGS_DIRECTORY);
     }
 
     /**

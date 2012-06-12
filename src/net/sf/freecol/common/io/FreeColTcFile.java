@@ -22,15 +22,12 @@ package net.sf.freecol.common.io;
 import java.io.File;
 import java.io.IOException;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 /**
  * A Total Conversion (TC).
  */
 public class FreeColTcFile extends FreeColModFile {
-
-    public static final String DIRECTORY = "rules";
 
     /**
      * Opens the given file for reading.
@@ -49,7 +46,7 @@ public class FreeColTcFile extends FreeColModFile {
      * @throws IOException if thrown while opening the file.
      */
     public FreeColTcFile(final String id) throws IOException {
-        super(new File(getRulesDirectory(), id));
+        super(new File(FreeColDirectories.getRulesDirectory(), id));
     }
 
     /**
@@ -79,57 +76,6 @@ public class FreeColTcFile extends FreeColModFile {
     @Override
     protected String[] getFileEndings() {
         return new String[] {".ftc", ".zip"};
-    }
-
-
-    /*
-      Don't attempt this before specification handling is sorted out.
-    public ResourceMapping getDefaultResourceMapping() throws Exception {
-        Specification.createSpecification(getSpecificationInputStream());
-
-        ResourceMapping map = new ResourceMapping();
-        String key, value, keyPrefix, urlPrefix, urlSuffix, roleId, shortId;
-
-        // resources
-        urlPrefix = "resources/images/bonus/";
-        for (ResourceType resourceType : Specification.getSpecification().getResourceTypeList()) {
-            key = resourceType.getId() + ".image";
-            value = urlPrefix + getShortId(resourceType).toLowerCase() + ".png";
-            map.add(key, ResourceFactory.createResource(getURI(value)));
-        }
-
-        // units
-        String[][] attackAnimations = new String[][] {
-            { ".attack.w.animation", "-attack-left.sza" },
-            { ".attack.e.animation", "-attack-right.sza" }
-        };
-
-        urlPrefix = "resources/images/units/";
-        for (UnitType unitType : Specification.getSpecification().getUnitTypeList()) {
-            keyPrefix = unitType.getId() + ".";
-            shortId = getShortId(unitType);
-            urlSuffix = "/" + shortId + ".png";
-
-            for (Role role : Role.values()) {
-                // role images
-                roleId = role.getId();
-                key = keyPrefix + roleId + ".image";
-                value = urlPrefix + roleId + urlSuffix;
-                map.add(key, ResourceFactory.createResource(getURI(value)));
-                // attack animations
-                for (String[] animation : attackAnimations) {
-                    key = keyPrefix + roleId + animation[0];
-                    value = urlPrefix + roleId + "/" + shortId + animation[1];
-                    map.add(key, ResourceFactory.createResource(getURI(value)));
-                }
-            }
-        }
-        return map;
-    }
-    */
-
-    public static File getRulesDirectory() {
-        return new File(FreeCol.getDataDirectory(), DIRECTORY);
     }
 
 }

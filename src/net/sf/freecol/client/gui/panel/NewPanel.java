@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
@@ -148,7 +149,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc);
-            if ((specification == null && FreeCol.DEFAULT_TC.equals(tc.getId()))
+            if ((specification == null && FreeColDirectories.DEFAULT_TC.equals(tc.getId()))
                 || (specification != null && specification.getId().equals(tc.getId()))) {
                 specificationBox.setSelectedItem(tc);
             }

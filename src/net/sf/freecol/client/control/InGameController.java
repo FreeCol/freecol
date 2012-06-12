@@ -34,13 +34,13 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -934,7 +934,7 @@ public final class InGameController implements NetworkConstants {
         String beforeFilename = autosave_text + "-"
             + Messages.message("clientOptions.savegames.autosave.beforelastturn")
             + ".fsg";
-        File autosaveDir = FreeCol.getAutosaveDirectory();
+        File autosaveDir = FreeColDirectories.getAutosaveDirectory();
         File saveGameFile = new File(autosaveDir, filename);
         File beforeSaveFile = new File(autosaveDir, beforeFilename);
 
@@ -994,7 +994,7 @@ public final class InGameController implements NetworkConstants {
     public File getLastSaveGameFile() {
         File lastSave = null;
         for (File directory : new File[] {
-                FreeCol.getSaveDirectory(), FreeCol.getAutosaveDirectory() }) {
+                FreeColDirectories.getSaveDirectory(), FreeColDirectories.getAutosaveDirectory() }) {
             for (File savegame : directory.listFiles(FSG_FILTER)) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
@@ -1010,7 +1010,7 @@ public final class InGameController implements NetworkConstants {
      * loads the game.
      */
     public void loadGame() {
-        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file == null) return;
         if (!file.isFile()) {
             gui.errorMessage("fileNotFound");
@@ -1039,7 +1039,7 @@ public final class InGameController implements NetworkConstants {
         if (game != null) {
             String gid = Integer.toHexString(game.getUUID().hashCode());
             String filename = "quicksave-" + gid + ".fsg";
-            File file = new File(FreeCol.getAutosaveDirectory(), filename);
+            File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
             if (file.isFile()) {
                 // ask user to confirm reload action
                 boolean ok = true; // canvas.showConfirmDialog(gid, gid, filename);
@@ -1073,9 +1073,9 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.canSaveCurrentGame()) {
             final File file
-                = gui.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
+                = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(), fileName);
             if (file != null) {
-                FreeCol.setSaveDirectory(file.getParentFile());
+                FreeColDirectories.setSaveDirectory(file.getParentFile());
                 return saveGame(file);
             }
         }
@@ -1116,7 +1116,7 @@ public final class InGameController implements NetworkConstants {
         if (game != null) {
             String gid = Integer.toHexString(game.getUUID().hashCode());
             String filename = "quicksave-" + gid + ".fsg";
-            File file = new File(FreeCol.getAutosaveDirectory(), filename);
+            File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
             return saveGame(file);
         }
         return false;

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 
 /**
  * Contains methods for getting a list of available mods.
@@ -62,8 +61,8 @@ public class Mods {
         };
 
     static {
-        getDirectoryMods(FreeCol.getUserModsDirectory());
-        getDirectoryMods(FreeCol.getStandardModsDirectory());
+        getDirectoryMods(FreeColDirectories.getUserModsDirectory());
+        getDirectoryMods(FreeColDirectories.getStandardModsDirectory());
     }
 
 
@@ -131,7 +130,7 @@ public class Mods {
      */
     public static List<FreeColTcFile> getRuleSets() {
         List<FreeColTcFile> result = new ArrayList<FreeColTcFile>();
-        File directory = FreeColTcFile.getRulesDirectory();
+        File directory = FreeColDirectories.getRulesDirectory();
         for (File dir : directory.listFiles()) {
             if (dir.isDirectory()) {
                 File modDescription = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);

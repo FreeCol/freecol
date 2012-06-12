@@ -32,10 +32,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -157,7 +157,7 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
             }
             selectLevel(tree, CUSTOM_LEVEL);
         } else if (LOAD.equals(command)) {
-            File loadFile = getGUI().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
+            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
             }

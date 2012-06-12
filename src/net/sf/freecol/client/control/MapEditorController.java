@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
@@ -181,7 +182,7 @@ public final class MapEditorController {
      */
     public void saveGame() {
         String fileName = "my_map.fsg";
-        final File file = gui.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
+        final File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(), fileName);
         if (file != null) {
             saveGame(file);
         }
@@ -222,7 +223,7 @@ public final class MapEditorController {
      * game.
      */
     public void loadGame() {
-        File file = gui.showLoadDialog(FreeCol.getSaveDirectory());
+        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
 
         if (file == null) {
             return;

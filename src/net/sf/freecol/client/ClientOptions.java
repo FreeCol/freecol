@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
@@ -504,8 +505,7 @@ public class ClientOptions extends OptionGroup {
      * Adds the options to this <code>GameOptions</code>.
      */
     private void addDefaultOptions() {
-        loadOptions(new File(new File(FreeCol.getDataDirectory(), "base"),
-                "client-options.xml"));
+        loadOptions(new File(FreeColDirectories.getBaseDirectory(), "client-options.xml"));
     }
 
     /**

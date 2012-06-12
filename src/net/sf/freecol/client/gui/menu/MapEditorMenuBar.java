@@ -29,7 +29,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
@@ -49,6 +48,7 @@ import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -111,7 +111,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         JMenuItem playItem = new JMenuItem(Messages.message("startGame"));
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File saveGameFile = new File(FreeCol.getAutosaveDirectory(), "tempMap.fsg");
+                    File saveGameFile = new File(FreeColDirectories.getAutosaveDirectory(), "tempMap.fsg");
                     OptionGroup options = freeColClient.getGame().getMapGeneratorOptions();
                     FileOption fileOption = (FileOption) options.getOption(MapGeneratorOptions.IMPORT_FILE);
                     fileOption.setValue(saveGameFile);

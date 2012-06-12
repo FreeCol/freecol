@@ -44,6 +44,7 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColDataFile;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -153,7 +154,7 @@ public final class FreeColClient {
         gui = new GUI(this);
 
         // Look for base data directory.  Failure is fatal.
-        File baseDirectory = new File(FreeCol.getDataDirectory(), "base");
+        File baseDirectory = FreeColDirectories.getBaseDirectory();
         if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
             System.err.println("Could not find base data directory: "
                                + baseDirectory.getName());
@@ -233,7 +234,7 @@ public final class FreeColClient {
         // Swing system and look-and-feel initialization.
         try {
             FreeColLookAndFeel fclaf
-                = new FreeColLookAndFeel(FreeCol.getDataDirectory());
+                = new FreeColLookAndFeel(FreeColDirectories.getDataDirectory());
             FreeColLookAndFeel.install(fclaf, font);
         } catch (FreeColException e) {
             logger.log(Level.SEVERE, "Unable to install FreeCol look-and-feel.",
@@ -650,7 +651,7 @@ public final class FreeColClient {
           int validDays = getClientOptions().getInteger(ClientOptions.AUTOSAVE_VALIDITY);
           long validPeriod = (long)validDays * 86400 * 1000;  // millisecond equivalent of valid days
           long timeNow = System.currentTimeMillis();
-          File autosaveDir = FreeCol.getAutosaveDirectory();
+          File autosaveDir = FreeColDirectories.getAutosaveDirectory();
 
           if (validPeriod != 0) {
              // analyse all files in autosave directory
@@ -705,7 +706,7 @@ public final class FreeColClient {
             }
         }
 
-        File userOptions = FreeCol.getClientOptionsFile();
+        File userOptions = FreeColDirectories.getClientOptionsFile();
         if (userOptions != null && userOptions.exists()) {
             clientOptions.updateOptions(userOptions);
             logger.info("Updated client options from user options file: "

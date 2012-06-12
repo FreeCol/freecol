@@ -38,11 +38,11 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -219,7 +219,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             revalidate();
             repaint();
         } else if (SAVE.equals(command)) {
-            File saveFile = getGUI().showSaveDialog(FreeCol.getOptionsDirectory(), ".xml",
+            File saveFile = getGUI().showSaveDialog(FreeColDirectories.getOptionsDirectory(), ".xml",
                                                        filters, getDefaultFileName());
             if (saveFile != null) {
                 ui.updateOption();
@@ -233,7 +233,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
                 }
             }
         } else if (LOAD.equals(command)) {
-            File loadFile = getGUI().showLoadDialog(FreeCol.getOptionsDirectory(), filters);
+            File loadFile = getGUI().showLoadDialog(FreeColDirectories.getOptionsDirectory(), filters);
             if (loadFile != null) {
                 load(loadFile);
             }
@@ -271,7 +271,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @return true if custom options were loaded
      */
     protected boolean loadCustomOptions() {
-        File customFile = new File(FreeCol.getOptionsDirectory(), getDefaultFileName());
+        File customFile = new File(FreeColDirectories.getOptionsDirectory(), getDefaultFileName());
         if (customFile.exists()) {
             load(customFile);
             return true;

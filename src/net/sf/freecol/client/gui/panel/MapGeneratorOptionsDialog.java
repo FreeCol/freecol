@@ -34,12 +34,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -83,7 +83,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
             /*
              * TODO: The update should be solved by PropertyEvent.
              */
-            File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
+            File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
                 for (final File file : mapDirectory.listFiles(new FileFilter() {
                         public boolean accept(File file) {
