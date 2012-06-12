@@ -837,7 +837,6 @@ public final class InGameInputHandler extends InputHandler {
         final Element fullTile = (Element) nodeList.item(0);
         final Element normalTile = (Element) nodeList.item(1);
         String tileId = element.getAttribute("tile");
-        FreeColGameObject fcgo;
         final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
             logger.warning("spyResult bad tile = " + tileId);
@@ -967,7 +966,6 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     public Element addObject(Element element) {
-        final FreeColClient fcc = getFreeColClient();
         Game game = getGame();
         Specification spec = game.getSpecification();
         NodeList nodes = element.getChildNodes();
