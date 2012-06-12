@@ -570,7 +570,6 @@ public final class ConnectController {
         }
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
-        freeColClient.setIsRetired(false);
         freeColClient.setClient(null);
         freeColClient.setLoggedIn(false);
     }

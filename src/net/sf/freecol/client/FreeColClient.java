@@ -98,8 +98,6 @@ public final class FreeColClient {
     /** The player "owning" this client. */
     private Player player;
 
-    private boolean isRetired = false;
-
 
     /**
      * Indicates if the game has started, has nothing to do with
@@ -536,7 +534,6 @@ public final class FreeColClient {
     public void retire() {
         if (gui.showConfirmDialog("retireDialog.areYouSure.text",
                                   "ok", "cancel")) {
-            setIsRetired(true);
             if (askServer().retire()) {
                 // Panel exit calls quit.
                 gui.showHighScoresPanel(null);
@@ -595,15 +592,6 @@ public final class FreeColClient {
     }
 
 
-
-    /**
-     * Sets whether or not the user has retired the game.
-     *
-     * @param isRetired Indicates whether or not the user has retired the game.
-     */
-    public void setIsRetired(boolean isRetired) {
-        this.isRetired = isRetired;
-    }
 
     /**
      * Sets whether or not this client is logged in to a server.

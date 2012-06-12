@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -113,7 +112,6 @@ public class UnitWanderMission extends Mission {
      * the move points are zero or the unit gets stuck.
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);

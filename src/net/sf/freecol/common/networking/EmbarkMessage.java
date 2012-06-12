@@ -110,16 +110,11 @@ public class EmbarkMessage extends DOMMessage {
         }
 
         Location sourceLocation = unit.getLocation();
-        Tile sourceTile = null;
-        Tile destinationTile = null;
-        Direction direction;
         if (directionString == null) {
             // Locations must be the same, or the source is also a
             // carrier in the same location as the carrier, or they
             // must be on the same tile.
-            if (carrier.isAtLocation(sourceLocation)) {
-                direction = null;
-            } else {
+            if (!carrier.isAtLocation(sourceLocation)) {
                 return DOMMessage.clientError("Unit " + unitId
                     + " at " + ((FreeColGameObject) sourceLocation)
                     + " and carrier " + carrierId
@@ -134,6 +129,7 @@ public class EmbarkMessage extends DOMMessage {
                     + unitId);
             }
 
+            Tile destinationTile = null;
             try {
                 destinationTile = unit.getNeighbourTile(directionString);
             } catch (Exception e) {
