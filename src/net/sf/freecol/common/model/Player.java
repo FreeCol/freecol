@@ -952,7 +952,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Find a new name in the installed ship names if possible.
         if (shipNames == null) initializeShipNames(random);
-        int n = 0;
         while (!shipNames.isEmpty()) {
             name = shipNames.remove(0);
             if (!navalNames.contains(name)) return name;
