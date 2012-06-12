@@ -241,10 +241,7 @@ public class SoundPlayer {
             } catch (FileNotFoundException e) {
                 logger.warning("Could not find audio file: " + file.getName());
                 return false;
-            } catch (IOException e) {
-                logger.warning("Could not prepare stream for: "
-                    + file.getName());
-            }
+            } 
 
             AudioInputStream in = null;
             if (fis != null) {
