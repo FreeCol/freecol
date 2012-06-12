@@ -72,7 +72,6 @@ public class PayForBuildingMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
 
         Colony colony;
         try {

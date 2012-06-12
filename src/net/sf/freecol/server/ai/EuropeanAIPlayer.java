@@ -682,7 +682,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         // Check if we can find a better site to work than a new colony:
-        PathNode path;
         if (!fewColonies || buildTarget == null || bestTurns > 10) {
             for (List<Wish> wishes : workerWishes.values()) {
                 for (int j = 0; j < wishes.size(); j++) {
@@ -760,7 +759,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The best target for a military mission.
      */
     public Location chooseMilitaryTarget(AIUnit aiUnit) {
-        final AIMain aiMain = getAIMain();
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
@@ -851,7 +849,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public Mission getMilitaryMission(AIUnit aiUnit) {
         final AIMain aiMain = getAIMain();
-        final Player player = getPlayer();
         Location target = chooseMilitaryTarget(aiUnit);
         return (DefendSettlementMission.invalidReason(aiUnit, target) == null)
             ? new DefendSettlementMission(aiMain, aiUnit, (Settlement)target)

@@ -232,7 +232,6 @@ public class IndianDemandMission extends Mission {
                 int gold = 0;
                 int oldGoods = (goods == null) ? 0
                     : unit.getGoodsContainer().getGoodsCount(goods.getType());
-                final int oldGold = unit.getOwner().getGold();
                 if (goods == null) {
                     if (!enemy.checkGold(1)) {
                         completed = true;
