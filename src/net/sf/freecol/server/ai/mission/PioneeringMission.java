@@ -244,7 +244,6 @@ public class PioneeringMission extends Mission {
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
         final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
             : path.getLastNode().getTile();
-        TileImprovementPlan tip;
         return (tile == null) ? null
             : (Mission.invalidAIUnitReason(aiUnit) != null) ? null
             : (hasTools(aiUnit))
@@ -265,7 +264,6 @@ public class PioneeringMission extends Mission {
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
         Location loc = extractTarget(aiUnit, path);
-        TileImprovementPlan tip;
         return (loc instanceof Colony) ? (100 / turns)
             : (loc instanceof Tile) ? (100 * getBestPlan(aiUnit, (Tile)loc)
                 .getValue() / turns)
@@ -338,7 +336,6 @@ public class PioneeringMission extends Mission {
      * @return A <code>PathNode</code> to the target, or null if none found.
      */
     public static PathNode findTargetPath(final AIUnit aiUnit) {
-        TileImprovementPlan tip;
         Unit unit;
         Tile startTile;
         return (aiUnit == null
@@ -542,7 +539,6 @@ public class PioneeringMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Player player = unit.getOwner();
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
-        PathNode path;
         Tile tile;
         String where;
         // Get tools first.

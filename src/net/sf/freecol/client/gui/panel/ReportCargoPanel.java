@@ -20,9 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
@@ -57,8 +54,7 @@ public final class ReportCargoPanel extends ReportUnitPanel {
                                        .addStringTemplate("%nation%", player.getNationName())),
                         "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
-
-        List<AbstractUnit> cargoTypes = new ArrayList<AbstractUnit>();
+        
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player)
                 && (unitType.canCarryUnits() || unitType.canCarryGoods())) {

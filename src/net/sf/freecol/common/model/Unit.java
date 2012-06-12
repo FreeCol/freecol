@@ -1318,7 +1318,6 @@ public class Unit extends FreeColGameObject
             logger.log(Level.WARNING, "destination == null", new Throwable());
         }
 
-        Map map = getGame().getMap();
         boolean toEurope = destination instanceof Europe;
         Unit carrier = getCarrier();
         PathNode p;
@@ -2376,7 +2375,6 @@ public class Unit extends FreeColGameObject
      * @param newLocation The new <code>Location</code>.
      */
     public void setLocation(Location newLocation) {
-        Location oldLocation = location;
 
         // If either the add or remove involves a colony, call the
         // colony-specific routine...

@@ -252,7 +252,6 @@ public class ScoutingMission extends Mission {
      * @return A reason why the mission would be invalid, or null if none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
-        final Unit unit = aiUnit.getUnit();
         return (!tile.hasLostCityRumour()) ? "tile-empty"
             : null;
     }
