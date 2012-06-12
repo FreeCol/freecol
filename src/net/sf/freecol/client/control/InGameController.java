@@ -1450,7 +1450,7 @@ public final class InGameController implements NetworkConstants {
             // Claim tile from other owners before founding a settlement.
             // Only native owners that we can steal, buy from, or use a
             // bonus center tile exception should be possible by this point.
-            if (!claimTile(player, tile, null, player.getLandPrice(tile), 0))
+            if (!claimTile(player, tile, unit, player.getLandPrice(tile), 0))
                 return;
             // One more check that founding can now proceed.
             if (!player.canClaimToFoundSettlement(tile)) return;
