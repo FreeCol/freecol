@@ -408,10 +408,11 @@ public abstract class AIPlayer extends AIObject {
      * @return True if an attack can be launched.
      */
     public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
-        Player attackerPlayer = attacker.getOwner();
 
         // Insist the attacker exists.
         if (attacker == null) return false;
+        
+        Player attackerPlayer = attacker.getOwner();
 
         // Determine the defending player.
         Settlement settlement = tile.getSettlement();
