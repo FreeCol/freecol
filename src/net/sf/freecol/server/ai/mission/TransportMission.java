@@ -269,7 +269,6 @@ public class TransportMission extends Mission {
      */
     private void updateTransportables() {
         final Unit carrier = getUnit();
-        final Player owner = carrier.getOwner();
         List<Goods> goods = new ArrayList<Goods>();
         List<Unit> units = new ArrayList<Unit>();
 
@@ -753,7 +752,6 @@ public class TransportMission extends Mission {
         if (aiPlayer.hasFewColonies()) {
             // since we are in Europe, use the carrier entry point to
             // search for a good settlement spot.
-            Unit carrier = getUnit();
             AIUnit newUnit;            
             for (int space = getAvailableSpace(); space > 0;
                  space -= newUnit.getUnit().getSpaceTaken()) {
@@ -1119,7 +1117,6 @@ public class TransportMission extends Mission {
      *         <code>false</code>otherwise.
      */
     private boolean unloadCargoAtDestination() {
-        Map map = getGame().getMap();
         Unit carrier = getUnit();
         boolean transportablesChanged = false;
 

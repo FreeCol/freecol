@@ -45,7 +45,6 @@ public class UnitWas implements Comparable<UnitWas> {
     private GoodsType work;
     private int workAmount;
     private Colony colony;
-    private GoodsContainer goodsContainer;
     private TypeCountMap<EquipmentType> equipment;
 
 
