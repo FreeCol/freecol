@@ -201,7 +201,6 @@ public class IndianBringGiftMission extends Mission {
      * Performs the mission.
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);

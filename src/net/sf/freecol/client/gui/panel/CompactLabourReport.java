@@ -188,7 +188,6 @@ public final class CompactLabourReport extends ReportPanel {
      * adds the header rows
      */
     private void addHeader() {
-        int row = 1;
 
         JLabel empty = new JLabel("");
         empty.setBorder(TOPLEFTCELLBORDER);

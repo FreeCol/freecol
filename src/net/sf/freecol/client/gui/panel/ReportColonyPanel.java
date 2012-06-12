@@ -869,7 +869,6 @@ public final class ReportColonyPanel extends ReportPanel
                           List<UnitType> have, Colony colony, int grow) {
         final String action = colony.getId();
         final ImageLibrary lib = getGUI().getImageLibrary();
-        final Specification spec = getSpecification();
 
         String layout = (suggestions.size() <= 1) ? null
             : "split " + Integer.toString(suggestions.size());

@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -71,7 +70,6 @@ public final class ReportNavalPanel extends ReportUnitPanel {
                         "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> ships = new ArrayList<AbstractUnit>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isAvailableTo(player) && unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 AbstractUnit unit = new AbstractUnit(unitType, Role.DEFAULT, getCount("naval", unitType));

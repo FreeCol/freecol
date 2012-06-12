@@ -62,7 +62,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute.Stop;
-import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -802,8 +801,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public void csMove(Tile newTile, Random random, ChangeSet cs) {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
-        Game game = getGame();
-        Turn turn = game.getTurn();
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.

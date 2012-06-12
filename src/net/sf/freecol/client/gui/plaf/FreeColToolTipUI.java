@@ -73,7 +73,6 @@ public class FreeColToolTipUI extends BasicToolTipUI {
     }
 
     public void paint(Graphics g, JComponent c) {
-        Dimension size = c.getSize();
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }

@@ -37,7 +37,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TypeCountMap;
 
 
@@ -109,7 +108,6 @@ public final class ReportProductionPanel extends ReportPanel {
         reportPanel.add(selectButton, "wrap 20");
 
         if (!selectedTypes.isEmpty()) {
-            Player player = getMyPlayer();
 
             TypeCountMap<BuildingType> buildingCount = new TypeCountMap<BuildingType>();
             List<List<BuildingType>> basicBuildingTypes = new ArrayList<List<BuildingType>>();
