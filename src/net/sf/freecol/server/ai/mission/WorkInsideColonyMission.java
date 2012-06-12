@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -153,7 +152,6 @@ public class WorkInsideColonyMission extends Mission {
      * Performs this mission.
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);

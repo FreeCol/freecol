@@ -258,7 +258,6 @@ public abstract class Mission extends AIObject {
      * @return A reason for the target to be invalid, or null if none found.
      */
     public static String invalidTargetReason(Location target, Player owner) {
-        String reason;
         return (target == null) ? "target-null"
             : (((FreeColGameObject)target).isDisposed()) ? "target-disposed"
             : (owner == null) ? null

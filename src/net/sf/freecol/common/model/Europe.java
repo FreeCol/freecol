@@ -411,7 +411,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-            Unit unit;
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(in);
             }
