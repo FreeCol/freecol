@@ -337,10 +337,9 @@ public class PioneeringMission extends Mission {
      */
     public static PathNode findTargetPath(final AIUnit aiUnit) {
         Unit unit;
-        Tile startTile;
         return (aiUnit == null
             || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
-            || (startTile = unit.getPathStartTile()) == null) ? null
+            || (unit.getPathStartTile()) == null) ? null
             : (hasTools(aiUnit)) ? findTipPath(aiUnit)
             : findColonyPath(aiUnit);
     }

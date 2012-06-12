@@ -394,7 +394,6 @@ public final class QuickActionMenu extends JPopupMenu {
                 for (Unit unit : tempUnit.getColony().getTile().getUnitList()){
                     if (unit.isCarrier() && unit.canCarryUnits()){
                         if(tempUnit.isOnCarrier()){
-                            final Unit funit = unit;
                             menuItem = new JMenuItem(Messages.message("leaveTown"));
                             menuItem.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e){
