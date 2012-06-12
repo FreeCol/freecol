@@ -214,7 +214,7 @@ public final class ColonyPanel extends FreeColPanel
 
         netProductionPanel.setOpaque(false);
 
-        constructionPanel = new ConstructionPanel(freeColClient, gui, colony, true);
+        constructionPanel = new ConstructionPanel(gui, colony, true);
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();

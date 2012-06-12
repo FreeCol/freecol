@@ -31,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -56,8 +55,6 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      */
     private StringTemplate defaultLabel = StringTemplate.key("colonyPanel.clickToBuild");
 
-    private FreeColClient freeColClient;
-
     private GUI gui;
 
 
@@ -71,9 +68,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      * @param openBuildQueue True if the build queue should be immediately
      *     shown.
      */
-    public ConstructionPanel(FreeColClient freeColClient, GUI gui,
+    public ConstructionPanel(GUI gui,
                              Colony colony, boolean openBuildQueue) {
-        this.freeColClient = freeColClient;
         this.gui = gui;
         this.openBuildQueue = openBuildQueue;
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
